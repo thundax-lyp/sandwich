@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.persistence.mapper;
 
-import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +10,25 @@ import java.util.List;
  * 角色 MyBatis Mapper。
  */
 @MyBatisDao
-public interface RoleMapper extends CrudDao<RoleDO> {
+public interface RoleMapper {
+
+    RoleDO get(RoleDO role);
+
+    List<RoleDO> getMany(@Param("idList") List<String> idList);
+
+    List<RoleDO> findList(RoleDO role);
+
+    int insert(RoleDO role);
+
+    int update(RoleDO role);
+
+    int updatePriority(RoleDO role);
+
+    int updateStatus(RoleDO role);
+
+    int updateDelFlag(RoleDO role);
+
+    int delete(RoleDO role);
 
     /**
      * 启用/禁用。

@@ -43,10 +43,8 @@
         FROM sys_role a
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.enableFlag != null and query.enableFlag != ''">
-                    AND a.enable_flag = #{query.enableFlag}
-                </if>
+            <if test="queryEnableFlag != null and queryEnableFlag != ''">
+                AND a.enable_flag = #{queryEnableFlag}
             </if>
         </where>
         ORDER BY a.priority, a.create_date

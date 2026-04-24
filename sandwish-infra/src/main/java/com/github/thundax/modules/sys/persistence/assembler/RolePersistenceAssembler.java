@@ -32,7 +32,7 @@ public final class RolePersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -62,7 +62,6 @@ public final class RolePersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -99,21 +98,10 @@ public final class RolePersistenceAssembler {
         return userIds;
     }
 
-    private static RoleDO.Query toDataObjectQuery(Role.Query query) {
+    private static void copyQuery(Role.Query query, RoleDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        RoleDO.Query dataObjectQuery = new RoleDO.Query();
-        dataObjectQuery.setEnableFlag(query.getEnableFlag());
-        return dataObjectQuery;
-    }
-
-    private static Role.Query toEntityQuery(RoleDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Role.Query entityQuery = new Role.Query();
-        entityQuery.setEnableFlag(query.getEnableFlag());
-        return entityQuery;
+        dataObject.setQueryEnableFlag(query.getEnableFlag());
     }
 }

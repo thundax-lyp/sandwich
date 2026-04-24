@@ -42,12 +42,6 @@
 
 ## P0 - 持久化表达改造
 
-- [ ] `sys-role`：改造角色持久化表达
-  - 范围对象：`RoleService`、`RoleServiceImpl`、`RoleDao`、`RoleDaoImpl`、`RoleMapper`、`mysql/dameng/kingbase/RoleMapper.xml`、`RoleDO`、`RolePersistenceAssembler`
-  - 当前依赖：`RoleService extends CrudService<Role>`；`RoleServiceImpl extends CrudServiceImpl<RoleDao, Role>`；`RoleDao extends CrudDao<Role>`；`RoleMapper extends CrudDao<RoleDO>`；`Role extends BaseRole extends AdminDataEntity<Role>`；`RoleDO extends AdminDataEntity<RoleDO>`；存在 `Role.Query <-> RoleDO.Query`
-  - 处理动作：收敛角色基础查询、启停、角色菜单、角色用户关系读取和写入的持久化表达；明确 `findRoleMenu`、`findRoleUser` 返回值在 DAO implementation 中的 Entity 装配边界；拆除或替换通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 依赖
-  - 验收点：角色与菜单、用户关系 SQL 仍由 Mapper XML 承担；Service 只使用 Entity 或稳定业务参数；关系装配不泄漏 `DO`
-
 - [ ] `sys-menu`：改造菜单持久化表达
   - 范围对象：`MenuService`、`MenuServiceImpl`、`MenuDao`、`MenuDaoImpl`、`MenuMapper`、`mysql/dameng/kingbase/MenuMapper.xml`、`MenuDO`、`MenuPersistenceAssembler`
   - 当前依赖：`MenuService extends TreeService<Menu>`；`MenuServiceImpl extends TreeServiceImpl<MenuDao, Menu>`；`MenuDao extends TreeDao<Menu>`；`MenuMapper extends TreeDao<MenuDO>`；`Menu extends BaseMenu extends AdminTreeEntity<Menu>`；`MenuDO extends AdminTreeEntity<MenuDO>`；存在 `Menu.Query <-> MenuDO.Query`

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.sys.dao.DictDao">
+<mapper namespace="com.github.thundax.modules.sys.persistence.mapper.DictMapper">
 
     <sql id="dictColumns">
         a.id,
@@ -16,14 +16,24 @@
 		a.del_flag AS "delFlag"
     </sql>
 
-    <select id="get" resultType="com.github.thundax.modules.sys.entity.Dict">
+    <select id="get" resultType="com.github.thundax.modules.sys.persistence.dataobject.DictDO">
         SELECT
         <include refid="dictColumns"/>
         FROM sys_dict a
         WHERE id = #{id}
     </select>
 
-    <select id="findList" resultType="com.github.thundax.modules.sys.entity.Dict">
+    <select id="getMany" resultType="com.github.thundax.modules.sys.persistence.dataobject.DictDO">
+        SELECT
+        <include refid="dictColumns"/>
+        FROM sys_dict a
+        WHERE id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findList" resultType="com.github.thundax.modules.sys.persistence.dataobject.DictDO">
         SELECT
         <include refid="dictColumns"/>
         FROM sys_dict a

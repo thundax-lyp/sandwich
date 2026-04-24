@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.sys.dao.RoleDao">
+<mapper namespace="com.github.thundax.modules.sys.persistence.mapper.RoleMapper">
 
-    <resultMap id="roleResult" type="com.github.thundax.modules.sys.entity.Role">
+    <resultMap id="roleResult" type="com.github.thundax.modules.sys.persistence.dataobject.RoleDO">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="adminFlag" column="adminFlag"/>
@@ -94,8 +94,8 @@
     </update>
 
     <!-- 维护role-menu关系 -->
-    <select id="findRoleMenu" resultType="com.github.thundax.modules.sys.entity.Menu">
-        SELECT menu_id AS "id"
+    <select id="findRoleMenu" resultType="String">
+        SELECT menu_id
         FROM sys_role_menu
         WHERE role_id = #{id}
     </select>
@@ -114,8 +114,8 @@
     </insert>
 
     <!-- 维护role-user关系 -->
-    <select id="findRoleUser" resultType="com.github.thundax.modules.sys.entity.User">
-        SELECT user_id AS "id"
+    <select id="findRoleUser" resultType="String">
+        SELECT user_id
         FROM sys_user_role
         WHERE role_id = #{id}
     </select>
@@ -128,8 +128,8 @@
 
     <insert id="insertRoleUser">
         INSERT INTO sys_user_role(role_id, user_id)
-        <foreach collection="userList" item="item" separator=" union all ">
-            SELECT #{role.id}, #{item.id} FROM dual
+        <foreach collection="userIdList" item="userId" separator=" union all ">
+            SELECT #{role.id}, #{userId} FROM dual
         </foreach>
     </insert>
 

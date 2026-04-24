@@ -26,6 +26,6 @@
   - 验收点：AI 能按 `docs/AGENT.md` 找到对应治理入口，不需要默认全量加载 `docs`
 
 - [ ] `sandwish-infra`：讨论持久化实现层抽取方案
-  - 任务目标：评估新增 `sandwish-infra` 模块，将持久化实现从 `sandwish-biz` 中抽取出来
-  - 当前判断：方向可行，但应定位为三层架构中的持久化实现模块，不作为额外业务分层；`biz` 保留 Service、轻量 Entity 和 DAO 接口，`infra` 承载 `DO`、Mapper、`PersistenceAssembler` 和 DAO 实现
-  - 需要确认：是否采用 `Controller -> Service(biz) -> DAO interface(biz) -> DAO/Mapper impl(infra) -> DB` 的依赖方向；是否先选择 `storage` 或 `dict` 做试点；是否允许逐步移除 `BaseEntity`
+  - 任务目标：建立临时操作手册，指导模型职责隔离和 `sandwish-infra` 持久化实现抽取
+  - 当前判断：这不是架构换血，而是模型职责隔离；固定 `Controller` 使用 `Request/Response`，`Service` 使用轻量 `Entity`，`DAO` 使用 `DO/DataObject`，层间通过 `InterfaceAssembler` 和 `PersistenceAssembler` 转换
+  - 需要确认：是否采用 `Controller -> InterfaceAssembler -> Service(Entity) -> DAO interface -> infra DAO impl -> PersistenceAssembler -> Mapper(DO) -> DB` 的执行路径；是否先选择 `storage` 或 `dict` 做试点；试点完成后是否删除临时手册并将稳定规则沉淀到治理文档

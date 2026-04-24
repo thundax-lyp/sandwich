@@ -18,15 +18,14 @@
 - 页面展示对象：`VO`
 - 接口传输对象：`DTO`
 - 通用技术能力：`Utils` / `Helper`
-- JSP 页面：放在所属 WAR 模块视图目录
-- 静态资源：放在所属 WAR 模块静态资源目录
+- 静态资源：放在所属 API 模块静态资源目录
 
 ## Hard Rules（可门禁，必须稳定）
 
 ### Path
 
-- `PATH_ADMIN_WEB_OWNERSHIP`：后台入口、后台 JSP、后台静态资源固定归属 `sandwish-admin-api`
-- `PATH_FRONT_WEB_OWNERSHIP`：前台入口、前台 JSP、前台静态资源固定归属 `sandwish-front-api`
+- `PATH_ADMIN_API_OWNERSHIP`：后台接口入口和后台 API 支撑静态资源固定归属 `sandwish-admin-api`
+- `PATH_FRONT_API_OWNERSHIP`：前台接口入口和前台 API 支撑静态资源固定归属 `sandwish-front-api`
 - `PATH_SHARED_BUSINESS_OWNERSHIP`：前后台共享业务规则固定归属 `sandwish-biz`
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
 
@@ -34,9 +33,9 @@
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
-- `LAYER_DAO_NO_WEB`：DAO / Mapper 不感知 HTTP、JSP、Session 和权限适配
-- `LAYER_JSP_NO_BUSINESS_RULE`：JSP 不承载核心业务规则
-- `LAYER_NO_DDD_DEFAULT`：不得默认新增 `api / interfaces / application / domain / infra` 等 DDD 分层目录
+- `LAYER_DAO_NO_WEB`：DAO / Mapper 不感知 HTTP、Session 和权限适配
+- `LAYER_NO_SERVER_PAGE`：不得新增服务端页面模板、页面装饰器或标签库作为业务入口
+- `LAYER_NO_EXTRA_ARCH_DEFAULT`：不得默认新增 `interfaces / application / domain / infra` 等额外分层目录
 
 ### Naming & Placement
 
@@ -52,10 +51,10 @@
 
 ### Path
 
-- 同一业务对象的 Controller、Service、DAO、Entity、JSP 和静态资源应保持模块归属一致
+- 同一业务对象的 Controller、Service、DAO、Entity 和 API 支撑资源应保持模块归属一致
 - 后台专用入口不放到 `sandwish-front-api`
 - 前台专用入口不放到 `sandwish-admin-api`
-- 前后台复用业务不复制到两个 WAR 模块
+- 前后台复用业务不复制到两个 API 入口模块
 
 ### Layer
 

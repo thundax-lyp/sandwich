@@ -1,23 +1,19 @@
 package com.github.thundax.autoconfigure;
 
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.filter.xss.XssFilter;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
-import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
 import com.github.thundax.modules.sys.servlet.SmsValidateCodeServlet;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
-import org.sitemesh.config.ConfigurableSiteMeshFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.DispatcherType;
@@ -64,28 +60,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
 
     @Bean
-    public FilterRegistrationBean<ConfigurableSiteMeshFilter> siteMeshFilter(VltavaProperties properties) {
-        VltavaProperties.SiteMeshProperties siteMeshProperties = properties.getSiteMesh();
-
-        FilterRegistrationBean<ConfigurableSiteMeshFilter> bean = new FilterRegistrationBean<>();
-        bean.setFilter(new ConfigurableSiteMeshFilter());
-
-        if (ListUtils.isNotEmpty(siteMeshProperties.getUrlPatterns())) {
-            bean.setUrlPatterns(siteMeshProperties.getUrlPatterns());
-        } else {
-            bean.addUrlPatterns("/*");
-        }
-
-        if (StringUtils.isNotEmpty(siteMeshProperties.getConfigFile())) {
-            Map<String, String> initParams = MapUtils.newHashMap();
-            initParams.put(ConfigurableSiteMeshFilter.CONFIG_FILE_PARAM, siteMeshProperties.getConfigFile());
-            bean.setInitParameters(initParams);
-        }
-
-        return bean;
-    }
-
-    @Bean
     public FilterRegistrationBean<PooledThreadLocalFilter> polledThreadFilterRegistrationBean() {
         FilterRegistrationBean<PooledThreadLocalFilter> bean = new FilterRegistrationBean<>();
         bean.setFilter(new PooledThreadLocalFilter());
@@ -117,12 +91,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         initParameters.put("enabled", properties.getXssFilter().getEnabled());
         registration.setInitParameters(initParameters);
         return registration;
-    }
-
-
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        registry.jsp("/WEB-INF/views/", ".jsp");
     }
 
 

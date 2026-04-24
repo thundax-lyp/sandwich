@@ -18,7 +18,6 @@ public class VltavaProperties {
     private String whiteCaptcha;
 
     private ProductProperties productProperties;
-    private SiteMeshProperties siteMeshProperties;
     private UploadProperties uploadProperties;
     private ApiProperties apiProperties;
 
@@ -49,15 +48,6 @@ public class VltavaProperties {
 
     public void setProduct(ProductProperties productProperties) {
         this.productProperties = productProperties;
-    }
-
-    @NonNull
-    public SiteMeshProperties getSiteMesh() {
-        return siteMeshProperties != null ? siteMeshProperties : new SiteMeshProperties();
-    }
-
-    public void setSiteMesh(SiteMeshProperties siteMeshProperties) {
-        this.siteMeshProperties = siteMeshProperties;
     }
 
     @NonNull
@@ -238,30 +228,6 @@ public class VltavaProperties {
             this.imageQuality = imageQuality;
         }
     }
-
-
-    public static class SiteMeshProperties {
-
-        private String configFile;
-        private List<String> urlPatterns;
-
-        public String getConfigFile() {
-            return configFile;
-        }
-
-        public void setConfigFile(String configFile) {
-            this.configFile = configFile;
-        }
-
-        public List<String> getUrlPatterns() {
-            return urlPatterns;
-        }
-
-        public void setUrlPatterns(List<String> urlPatterns) {
-            this.urlPatterns = urlPatterns;
-        }
-    }
-
 
     public static class ApiProperties {
 

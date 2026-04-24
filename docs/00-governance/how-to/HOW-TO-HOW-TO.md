@@ -41,7 +41,7 @@
 - 新增一个 Controller 入口
 - 新增一个 Service 编排
 - 新增一个 DAO / Mapper 查询链路
-- 新增一个 JSP 页面入口
+- 新增一个 API 静态支撑资源
 - 更新 `TODO.md` 与提交
 
 禁止主题：

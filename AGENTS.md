@@ -12,15 +12,15 @@
 - Prefer the simplest workable solution.
 - Do not add abstraction, config, directories, or helper layers without a concrete need.
 - Keep the existing Maven multi-module structure and three-layer architecture.
-- Do not migrate Bacon's DDD layer model into this project by default.
+- Keep Sandwich documentation self-contained and project-owned.
 
 ## Project Layout
 
 - Root project: Maven multi-module, Java 8, root `pom.xml`
 - Shared code: `sandwish-common/`
 - Business code: `sandwish-biz/`
-- Admin WAR application: `sandwish-admin-api/`
-- Front WAR application: `sandwish-front-api/`
+- Admin API application: `sandwish-admin-api/`
+- Front API application: `sandwish-front-api/`
 - AI routing docs: `docs/`
 
 Main dependency direction:
@@ -30,7 +30,7 @@ Main dependency direction:
 
 Main runtime chain:
 
-- `HTTP/JSP/API -> Controller -> Service -> DAO/Mapper -> Database`
+- `HTTP/API -> Controller -> Service -> DAO/Mapper -> Database`
 
 ## Code Rules
 
@@ -42,17 +42,17 @@ Main runtime chain:
 
 Layer responsibilities:
 
-- `Controller`: HTTP entry, request binding, session/security adaptation, response or JSP view selection
+- `Controller`: HTTP entry, request binding, session/security adaptation, API response assembly
 - `Service`: business flow, transaction boundary, validation, cross-DAO orchestration
 - `DAO/Mapper`: persistence access and SQL mapping
-- `JSP/static`: presentation and interaction, not core business rules
+- `static`: static API support assets only, not core business rules
 
 ## Testing
 
 - Tests live in `src/test/java`.
 - Behavior changes require test updates.
 - Shared framework or business changes should run `mvn test` when feasible.
-- WAR-facing changes should run the relevant module package command when feasible.
+- API application changes should run the relevant module package command when feasible.
 
 ## Commits
 

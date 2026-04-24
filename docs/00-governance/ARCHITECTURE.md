@@ -8,7 +8,7 @@
 - 新增类、改类名、改目录、判断模块归属见 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
 - 数据库、实体、DAO、Mapper 和持久化查询见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
 - 文档写作与维护见 [`DOCUMENT-RULES.md`](./DOCUMENT-RULES.md)
-- 上线准备、运维和 WAR 打包见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
+- 上线准备、运维和 jar 打包见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
 
 ## Project Baseline
 
@@ -18,29 +18,28 @@
 - packaging:
   - `sandwish-common`: jar
   - `sandwish-biz`: jar
-  - `sandwish-admin-api`: war
-  - `sandwish-front-api`: war
+  - `sandwish-admin-api`: jar
+  - `sandwish-front-api`: jar
 - base package: `com.github.thundax`
 - persistence: MyBatis + PageHelper
-- view: JSP + static assets
+- api docs: Swagger / Springfox
 
 ## Architecture Shape
 
-Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
+Sandwich 固定采用三层 API 架构。
 
 固定主链路为：
 
-`HTTP/JSP/API -> Controller -> Service -> DAO/Mapper -> Database`
+`HTTP/API -> Controller -> Service -> DAO/Mapper -> Database`
 
 三层职责固定为：
 
-- Web 层：请求入口、登录态、权限、参数接收、响应组装、页面跳转。
+- Web 层：请求入口、登录态、权限、参数接收、API 响应组装。
 - Service 层：业务流程、事务边界、业务校验、跨 DAO 编排。
 - DAO/Mapper 层：持久化访问、SQL 映射、分页查询、数据装载。
 
-以下 DDD 目录语义不作为 Sandwich 默认架构：
+以下目录语义不作为 Sandwich 默认架构：
 
-- `api`
 - `interfaces`
 - `application`
 - `domain`
@@ -84,18 +83,18 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 
 - 可以依赖 `sandwish-common`。
 - 不依赖 `sandwish-admin-api` 和 `sandwish-front-api`。
-- 不放 JSP、Controller 页面跳转逻辑和前后端入口适配。
-- 业务规则优先收敛到 Service，不下沉到 JSP 或 Controller。
+- 不放 Controller 入口适配。
+- 业务规则优先收敛到 Service，不下沉到 Controller。
 
 ### `sandwish-admin-api`
 
 职责：
 
-- 后台 WAR 应用入口
+- 后台 API 应用入口
 - 后台 Controller
 - 后台配置
-- 后台 JSP、标签、静态资源
 - 后台安全、日志、Swagger、任务等入口适配
+- 后台静态 API 支撑资源
 - 后台专用工具与 VO
 
 边界：
@@ -103,17 +102,17 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 - 可以依赖 `sandwish-biz`。
 - 面向管理端能力，不承载前台用户访问语义。
 - Controller 不直接编写复杂业务流程；复杂流程进入 Service。
-- JSP 只表达展示和交互，不承载核心业务规则。
+- Controller 只输出 API 响应，不返回服务端页面视图。
 
 ### `sandwish-front-api`
 
 职责：
 
-- 前台 WAR 应用入口
+- 前台 API 应用入口
 - 前台 Controller
 - 前台配置
-- 前台 JSP、静态资源
 - 前台安全、Shiro、过滤器、拦截器等入口适配
+- 前台静态 API 支撑资源
 - 前台专用工具与 VO
 
 边界：
@@ -133,7 +132,7 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 
 禁止依赖方向：
 
-- `sandwish-common` 不得依赖任何业务或 WAR 模块。
+- `sandwish-common` 不得依赖任何业务或入口模块。
 - `sandwish-biz` 不得依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
 - `sandwish-admin-api` 与 `sandwish-front-api` 不得互相依赖。
 - 后台与前台不得通过复制 Service 实现来共享业务能力。
@@ -143,7 +142,7 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 ### Controller
 
 - 负责 HTTP 请求入口、参数接收、基础校验、登录态和权限适配。
-- 负责选择 JSP 视图或返回 API 响应。
+- 负责返回 API 响应。
 - 可以调用 Service。
 - 不直接访问 DAO / Mapper。
 - 不直接拼接复杂 SQL。
@@ -170,28 +169,28 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 - Entity 优先表达持久化对象或业务数据对象。
 - VO / DTO 用于入口响应、页面展示或跨层传输。
 - 不在 VO / DTO 中写复杂业务流程。
-- 不为了迁移 Bacon 经验而强制引入值对象、聚合根等 DDD 概念。
+- 不强制引入值对象、聚合根等非当前架构必需概念。
 
-### JSP / Static
+### Static
 
-- JSP 负责展示结构、表单、页面片段和前端资源引用。
-- JSP 不写核心业务规则。
-- JavaScript 可做交互和轻量校验，但服务端 Service 仍必须保留关键校验。
-- 静态资源按 WAR 模块归属放置，后台与前台资源不得混放。
+- 静态资源仅用于 API 文档、上传访问或其他运行支撑。
+- 不新增服务端页面模板、页面装饰器或标签库作为业务入口。
+- 前端页面和交互由独立前端项目承载。
+- 服务端 Service 必须保留关键业务校验。
 
 ## Web Application Rules
 
-- `sandwish-admin-api` 和 `sandwish-front-api` 是两个独立 WAR 应用。
-- 两个 WAR 可以复用 `sandwish-biz` 和 `sandwish-common`。
-- WAR 模块中的 `WEB-INF/lib` vendor JAR 路径保持稳定，打包规则不得随意改动。
+- `sandwish-admin-api` 和 `sandwish-front-api` 是两个独立 jar API 应用。
+- 两个 API 应用可以复用 `sandwish-biz` 和 `sandwish-common`。
+- 不新增 `src/main/webapp`、`WEB-INF`、服务端页面模板、标签库或页面装饰器配置。
 - 配置文件固定放在 `src/main/resources/config`。
-- JSP 固定放在 `src/main/webapp/WEB-INF/views` 或现有视图目录。
 - 静态资源固定放在 `src/main/resources/static` 或现有静态资源目录。
+- API 文档能力保留 Swagger / Springfox。
 
 ## Business Module Rules
 
 - 业务模块当前按 `com.github.thundax.modules.*` 组织。
-- 同一业务对象的 Controller、Service、DAO、Entity、JSP 和静态资源应保持模块归属一致。
+- 同一业务对象的 Controller、Service、DAO、Entity 和 API 支撑资源应保持模块归属一致。
 - 后台专用入口放在 `sandwish-admin-api`。
 - 前台专用入口放在 `sandwish-front-api`。
 - 前后台共享业务规则放在 `sandwish-biz`。
@@ -207,9 +206,9 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 
 ## Security And Session Boundary
 
-- Web 登录态、权限、过滤器、拦截器属于 WAR 入口模块。
+- Web 登录态、权限、过滤器、拦截器属于 API 入口模块。
 - 后台和前台安全语义分开维护。
-- Service 不直接依赖 JSP、Servlet 视图语义。
+- Service 不直接依赖 Servlet 视图语义。
 - Service 如需当前用户、租户、机构等上下文，应通过稳定上下文对象或现有 Holder 获取，避免散落读取 request。
 - 密码、令牌、密钥、验证码等敏感信息不得写入日志或页面隐藏字段。
 
@@ -227,12 +226,12 @@ Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
 - 先把共享业务规则放到 `sandwish-biz`，再考虑入口模块专用适配。
 - 先保证数据库是真相源，再考虑缓存和本地临时状态。
 - 先保留旧项目可运行性，再做结构治理。
-- 文档治理可以学习 Bacon，架构形态不照搬 Bacon。
+- 文档、代码、测试和提交记录必须保持同一套项目口径。
 
 ## Open Items
 
 - 是否统一项目展示名为 `sandwich`，还是继续沿用 Maven artifact `sandwish`。
-- 是否保留 WAR finalName 中的 `interaction-admin-api` 等历史命名。
+- 是否保留 jar finalName 中的 `interaction-admin-api`、`hudong` 等历史命名。
 - 是否补充后台、前台、业务模块的详细目录规范。
 - 是否为现有业务域建立 `10-requirements/` 和 `20-database/` 文档。
 - 是否引入轻量架构测试或 Maven 检查来守住模块依赖方向。

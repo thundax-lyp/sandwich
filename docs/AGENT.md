@@ -8,8 +8,8 @@
 - 先读治理文档，再读业务文档。
 - `docs/` 不是默认全量输入目录。
 - 工程级规则优先于业务模块文档。
-- Sandwich 固定采用三层架构，不迁移 Bacon 的 DDD 分层模型。
-- 不默认引入 `api / interfaces / application / domain / infra` 等 DDD 目录语义。
+- Sandwich 固定采用三层 API 架构。
+- 文档必须保持项目独立口径，不引用外部项目作为正式规则来源。
 
 ## Mandatory Entry
 
@@ -28,12 +28,12 @@
 - 数据库、实体、DAO、Mapper、SQL、持久化查询：
   再读 `00-governance/DATABASE-RULES.md`
   再读对应 `20-database/*-DATABASE-DESIGN.md`
-- JSP、静态资源、后台页面、前台页面：
+- 静态资源、API 文档、前后台接口入口：
   先读 `ARCHITECTURE.md`
   再读对应业务需求文档和专项设计文档
 - 改文档：
   再读 `00-governance/DOCUMENT-RULES.md`
-- 上线准备、运维、发布、WAR 打包：
+- 上线准备、运维、发布、jar 打包：
   先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
   再读 `40-readiness/`
 - TODO 协作、任务拆解、人机审阅：
@@ -52,9 +52,9 @@
 - `sandwish-biz`:
   业务实体、DAO、Service、业务工具与共享业务能力。
 - `sandwish-admin-api`:
-  后台 WAR 应用，包含后台 Controller、配置、JSP、标签、静态资源和 vendor JAR。
+  后台 API 应用，包含后台 Controller、配置、过滤器、拦截器、Swagger 和静态 API 支撑资源。
 - `sandwish-front-api`:
-  前台 WAR 应用，包含前台 Controller、配置、JSP、静态资源和访问适配。
+  前台 API 应用，包含前台 Controller、配置、过滤器、拦截器和访问适配。
 
 ## Layer Router
 
@@ -64,14 +64,14 @@
   关注业务流程、事务、校验、跨 DAO 编排和业务规则。
 - DAO / Mapper / Entity / SQL:
   关注持久化访问、对象映射和查询性能。
-- JSP / tag / static:
-  关注展示、交互和资源引用，不承载核心业务规则。
+- static:
+  仅保留 API 支撑静态资源，不承载核心业务规则。
 
 ## Load Limits
 
 - 单模块任务：不要默认加载其他模块文档。
 - 数据库任务：不要顺手加载全部需求文档。
-- 页面任务：只加载涉及的 JSP、静态资源和对应业务文档。
+- API 资源任务：只加载涉及的静态资源和对应业务文档。
 - 跨模块任务：只加载涉及的模块。
 - commit 整理、纯格式调整、无实现判断的机械修改：
   不额外加载业务需求文档。

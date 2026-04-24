@@ -22,6 +22,5 @@
 
 - [ ] `docs/00-governance`：补齐治理文档基础集
   - 范围对象：`DOCUMENT-RULES.md`、`NAMING-AND-PLACEMENT-RULES.md`、`DATABASE-RULES.md`、`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
-  - 处理动作：按 Sandwich 三层架构改写 Bacon 的治理经验，保留文档结构与执行闭环，不迁移 DDD 分层
+  - 处理动作：按 Sandwich 三层 API 架构补齐治理文档，保留文档结构、任务路由与执行闭环
   - 验收点：AI 能按 `docs/AGENT.md` 找到对应治理入口，不需要默认全量加载 `docs`
-

@@ -4,7 +4,7 @@
 
 ## 1. Purpose
 
-Sandwich 当前以两个 WAR 应用作为主要运行入口：
+Sandwich 当前以两个 jar API 应用作为主要运行入口：
 
 - `sandwish-admin-api`
 - `sandwish-front-api`
@@ -15,7 +15,7 @@ Sandwich 当前以两个 WAR 应用作为主要运行入口：
 
 当前范围：
 
-- WAR 打包
+- jar 打包
 - 配置文件
 - 前后台入口边界
 - vendor JAR 路径
@@ -29,9 +29,9 @@ Sandwich 当前以两个 WAR 应用作为主要运行入口：
 
 ## 3. Deployment Units
 
-- `sandwish-admin-api` 打包为后台 WAR
-- `sandwish-front-api` 打包为前台 WAR
-- `sandwish-biz` 和 `sandwish-common` 打包为 jar，由 WAR 模块依赖
+- `sandwish-admin-api` 打包为后台 API jar
+- `sandwish-front-api` 打包为前台 API jar
+- `sandwish-biz` 和 `sandwish-common` 打包为 jar，由 API 入口模块依赖
 
 ## 4. Traffic Boundary
 
@@ -46,7 +46,7 @@ Sandwich 当前以两个 WAR 应用作为主要运行入口：
 - 配置文件固定放在 `src/main/resources/config`
 - 不提交环境私有密钥、账号、密码和生产连接串
 - 环境差异通过 profile、部署参数或外部配置覆盖
-- WAR 模块中的 `WEB-INF/lib` vendor JAR 路径保持稳定
+- 不新增 `WEB-INF/lib`、服务端页面模板、标签库或页面装饰器运行入口
 
 ## 6. Readiness Documents
 

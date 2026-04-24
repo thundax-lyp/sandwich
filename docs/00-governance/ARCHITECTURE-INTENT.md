@@ -4,7 +4,7 @@
 
 ## 1. Purpose
 
-Sandwich 的目标不是迁移到 Bacon 的纯 DDD 模型，而是在现有 Java 8、Spring Boot 2、WAR、JSP 和三层架构基础上建立可持续治理方式。
+Sandwich 的目标是在现有 Java 8、Spring Boot 2、jar 应用和三层 API 架构基础上建立可持续治理方式。
 
 本文档只解释以下意图：
 
@@ -17,11 +17,9 @@ Sandwich 的目标不是迁移到 Bacon 的纯 DDD 模型，而是在现有 Java
 
 Sandwich 固定以现有三层架构为主线：
 
-`HTTP/JSP/API -> Controller -> Service -> DAO/Mapper -> Database`
+`HTTP/API -> Controller -> Service -> DAO/Mapper -> Database`
 
-治理目标是让这条链路更清晰，而不是把现有系统重排为 `api / interfaces / application / domain / infra`。
-
-文档治理可以学习 Bacon；架构形态不照搬 Bacon。
+治理目标是让这条链路更清晰，并保持文档、代码、测试和提交记录之间的闭环。
 
 ## 3. Small Step Commit Intent
 

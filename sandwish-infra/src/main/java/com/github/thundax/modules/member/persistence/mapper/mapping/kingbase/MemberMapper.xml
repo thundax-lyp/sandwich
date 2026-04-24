@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.member.dao.MemberDao">
+<mapper namespace="com.github.thundax.modules.member.persistence.mapper.MemberMapper">
 
-    <resultMap id="memberResult" type="com.github.thundax.modules.member.entity.Member">
+    <resultMap id="memberResult" type="com.github.thundax.modules.member.persistence.dataobject.MemberDO">
         <id property="id" column="id"/>
         <result property="loginName" column="loginName"/>
         <result property="loginPass" column="loginPass"/>
@@ -230,6 +230,13 @@
         <include refid="memberColumns" />
         FROM tb_member a
         WHERE a.ywtb_id = #{ywtbId}
+    </select>
+
+    <select id="getByZjhm" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns" />
+        FROM tb_member a
+        WHERE a.zjhm = #{query.zjhm}
     </select>
 
 </mapper>

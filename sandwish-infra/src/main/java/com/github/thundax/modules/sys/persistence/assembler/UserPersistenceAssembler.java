@@ -46,7 +46,7 @@ public final class UserPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -89,7 +89,6 @@ public final class UserPersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -115,35 +114,17 @@ public final class UserPersistenceAssembler {
         return roles;
     }
 
-    private static UserDO.Query toDataObjectQuery(User.Query query) {
+    private static void copyQuery(User.Query query, UserDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        UserDO.Query dataObjectQuery = new UserDO.Query();
-        dataObjectQuery.setOfficeId(query.getOfficeId());
-        dataObjectQuery.setOfficeTreeLeft(query.getOfficeTreeLeft());
-        dataObjectQuery.setOfficeTreeRight(query.getOfficeTreeRight());
-        dataObjectQuery.setLoginName(query.getLoginName());
-        dataObjectQuery.setName(query.getName());
-        dataObjectQuery.setEnableFlag(query.getEnableFlag());
-        dataObjectQuery.setSuperFlag(query.getSuperFlag());
-        dataObjectQuery.setOrderBy(query.getOrderBy());
-        return dataObjectQuery;
-    }
-
-    private static User.Query toEntityQuery(UserDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        User.Query entityQuery = new User.Query();
-        entityQuery.setOfficeId(query.getOfficeId());
-        entityQuery.setOfficeTreeLeft(query.getOfficeTreeLeft());
-        entityQuery.setOfficeTreeRight(query.getOfficeTreeRight());
-        entityQuery.setLoginName(query.getLoginName());
-        entityQuery.setName(query.getName());
-        entityQuery.setEnableFlag(query.getEnableFlag());
-        entityQuery.setSuperFlag(query.getSuperFlag());
-        entityQuery.setOrderBy(query.getOrderBy());
-        return entityQuery;
+        dataObject.setQueryOfficeId(query.getOfficeId());
+        dataObject.setQueryOfficeTreeLeft(query.getOfficeTreeLeft());
+        dataObject.setQueryOfficeTreeRight(query.getOfficeTreeRight());
+        dataObject.setQueryLoginName(query.getLoginName());
+        dataObject.setQueryName(query.getName());
+        dataObject.setQueryEnableFlag(query.getEnableFlag());
+        dataObject.setQuerySuperFlag(query.getSuperFlag());
+        dataObject.setQueryOrderBy(query.getOrderBy());
     }
 }

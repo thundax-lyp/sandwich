@@ -42,12 +42,6 @@
 
 ## P0 - 持久化表达改造
 
-- [ ] `sys-user`：改造用户持久化表达
-  - 范围对象：`UserService`、`UserServiceImpl`、`UserDao`、`UserDaoImpl`、`UserMapper`、`mysql/dameng/kingbase/UserMapper.xml`、`UserDO`、`UserPersistenceAssembler`
-  - 当前依赖：`UserService extends CrudService<User>`；`UserServiceImpl extends CrudServiceImpl<UserDao, User>`；`UserDao extends CrudDao<User>`；`UserMapper extends CrudDao<UserDO>`；`User extends BaseUser extends AdminDataEntity<User>`；`UserDO extends AdminDataEntity<UserDO>`；存在 `User.Query <-> UserDO.Query`
-  - 处理动作：收敛用户查询、登录名查询、SSO 登录名查询、登录信息更新、启停、密码更新和用户角色读取/写入的持久化表达；拆除或替换本链路对通用查询契约、`Entity.query <-> DO.query` 和 `DO extends AdminDataEntity` 的依赖
-  - 验收点：Service 不感知 `DO`；Mapper XML result 仍指向 `UserDO`；DAO implementation 完成 Entity/DO 转换；用户链路不再依赖待替换的通用查询表达
-
 - [ ] `sys-user-encrypt`：改造用户密文字段持久化表达
   - 范围对象：`UserEncryptService`、`DefaultUserEncryptServiceImpl`、`DatabaseUserEncryptServiceImpl`、`UserEncryptDao`、`UserEncryptDaoImpl`、`UserEncryptMapper`、`mysql/dameng/kingbase/UserEncryptMapper.xml`、`UserEncryptDO`、`UserEncryptPersistenceAssembler`
   - 当前依赖：`UserEncryptService extends CrudService<UserEncrypt>`；两个 Service implementation 均继承 `CrudServiceImpl<UserEncryptDao, UserEncrypt>`；`UserEncryptDao extends CrudDao<UserEncrypt>`；`UserEncryptMapper extends CrudDao<UserEncryptDO>`；`UserEncrypt extends BaseUserEncrypt extends AdminDataEntity<UserEncrypt>`；`UserEncryptDO extends AdminDataEntity<UserEncryptDO>`；当前无独立 `Query`

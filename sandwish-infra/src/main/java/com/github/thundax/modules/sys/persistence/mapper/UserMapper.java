@@ -1,8 +1,8 @@
 package com.github.thundax.modules.sys.persistence.mapper;
 
-import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,7 +10,21 @@ import java.util.List;
  * 用户 MyBatis Mapper。
  */
 @MyBatisDao
-public interface UserMapper extends CrudDao<UserDO> {
+public interface UserMapper {
+
+    UserDO get(UserDO user);
+
+    List<UserDO> getMany(@Param("idList") List<String> idList);
+
+    List<UserDO> findList(UserDO user);
+
+    int insert(UserDO user);
+
+    int update(UserDO user);
+
+    int updatePriority(UserDO user);
+
+    int delete(UserDO user);
 
     UserDO getByLoginName(String loginName);
 

@@ -28,4 +28,4 @@
 - [ ] `sandwish-infra`：讨论持久化实现层抽取方案
   - 任务目标：建立临时操作手册，指导模型职责隔离和 `sandwish-infra` 持久化实现抽取
   - 当前判断：这不是架构换血，而是模型职责隔离；固定 `Controller` 使用 `Request/Response`，`Service` 使用轻量 `Entity`，`DAO` 使用 `DO/DataObject`，层间通过 `InterfaceAssembler` 和 `PersistenceAssembler` 转换
-  - 需要确认：是否采用 `Controller -> InterfaceAssembler -> Service(Entity) -> DAO interface -> infra DAO impl -> PersistenceAssembler -> Mapper(DO) -> DB` 的执行路径；是否先选择 `storage` 或 `dict` 做试点；试点完成后是否删除临时手册并将稳定规则沉淀到治理文档
+  - 需要确认：先建 `sandwish-infra` 空子工程，再落架构治理文档，再按模块拆迁移 TODO；执行过程中按讨论持续调整临时手册，试点完成后删除临时手册并将稳定规则沉淀到治理文档

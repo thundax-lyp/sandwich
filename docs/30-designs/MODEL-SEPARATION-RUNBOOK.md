@@ -135,7 +135,101 @@ sandwish-infra
 
 ## 7. Execution Steps
 
-### 7.1 Choose Pilot Module
+### 7.1 Add `sandwish-infra`
+
+第一步先建立子工程，只提供承载位置，不迁移业务代码。
+
+本步骤全仓只执行一次。后续所有业务模块迁移都复用同一个 `sandwish-infra`，不得为每个业务模块重复新增子工程。
+
+新增 Maven 模块：
+
+- root `pom.xml` 增加 `sandwish-infra`
+- 新建 `sandwish-infra/pom.xml`
+- `sandwish-infra` 依赖 `sandwish-biz`
+- `sandwish-admin-api` / `sandwish-front-api` 依赖 `sandwish-infra`
+- `sandwish-biz` 不依赖 `sandwish-infra`
+
+本步骤验收：
+
+- Maven reactor 能识别 `sandwish-infra`
+- `sandwish-admin-api` 和 `sandwish-front-api` 能通过 `sandwish-infra` 装配持久化实现
+- `sandwish-biz` 不反向依赖 `sandwish-infra`
+- 不迁移任何业务模块
+- 后续模块 TODO 不再包含“新增子工程”动作
+
+固定验证：
+
+```bash
+mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
+```
+
+### 7.2 Update Architecture Documents
+
+第二步先落架构治理口径，再进入模块迁移。
+
+必须更新：
+
+- `docs/00-governance/ARCHITECTURE.md`
+- `docs/00-governance/NAMING-AND-PLACEMENT-RULES.md`
+- `docs/00-governance/DATABASE-RULES.md`
+
+更新重点：
+
+- 固定 `sandwish-infra` 是持久化实现模块，不是额外业务分层
+- 固定 `biz` 保留轻量 `Entity`、`Service`、DAO interface
+- 固定 `infra` 承载 `DO`、Mapper、Mapper XML、DAO implementation、`PersistenceAssembler`
+- 固定 `Controller` 使用 `Request/Response`
+- 固定 `Service` 不感知 `Request/Response/DO`
+- 固定 `DAO` 层不处理 HTTP 模型
+- 固定层间转换由 `InterfaceAssembler` 与 `PersistenceAssembler` 承担
+
+本步骤验收：
+
+- 文档能说明为什么新增 `sandwish-infra`
+- 文档能说明这不是架构换血
+- 文档能指导后续模块 TODO 拆解
+
+### 7.3 Split Module TODOs
+
+第三步按模块拆迁移 TODO。
+
+每个模块 TODO 必须包含：
+
+- 范围对象
+- 当前持久化链路
+- 需要新增的 `DO`
+- 需要新增的 `PersistenceAssembler`
+- 需要迁移的 Mapper / XML / DAO implementation
+- 是否需要新增 `Request/Response`
+- 是否需要新增 `InterfaceAssembler`
+- 验收命令
+
+拆分原则：
+
+- 一个 TODO 只覆盖一个业务模块或一个清晰子链路
+- 不把全仓 Entity 轻量化写成一个大任务
+- 试点模块排在第一批
+- 未完成部分必须继续留在 TODO 中
+
+### 7.4 Adjust This Runbook During Execution
+
+执行中允许调整本临时手册。
+
+触发条件：
+
+- 子工程依赖方向需要修正
+- 试点暴露出新的固定步骤
+- `Assembler` 放置位置需要调整
+- 命名规则需要收敛
+- 验收命令需要变化
+
+调整要求：
+
+- 只记录迁移期间需要的操作步骤
+- 不把稳定规则长期堆在本文件中
+- 稳定规则最终沉淀到治理文档
+
+### 7.5 Choose Pilot Module
 
 先选择一个小而完整的业务域做试点。
 
@@ -148,18 +242,9 @@ sandwish-infra
 
 - 有完整 Controller / Service / DAO / Entity / Mapper 链路
 - 表结构和查询复杂度可控
-- 改动能在一个 commit 或少量 commit 内解释清楚
+- 改动能在一个或少量 commit 内解释清楚
 
-### 7.2 Add `sandwish-infra`
-
-新增 Maven 模块：
-
-- root `pom.xml` 增加 `sandwish-infra`
-- `sandwish-infra` 依赖 `sandwish-biz`
-- `sandwish-admin-api` / `sandwish-front-api` 依赖 `sandwish-infra`
-- `sandwish-biz` 不依赖 `sandwish-infra`
-
-### 7.3 Split Persistence Model
+### 7.6 Split Persistence Model
 
 对试点模块执行：
 
@@ -169,7 +254,7 @@ sandwish-infra
 4. 数据库审计字段、逻辑删除字段、MyBatis 细节进入 `DO`。
 5. 不在 `Entity` 中新增 MyBatis 或数据库专用注解。
 
-### 7.4 Add `PersistenceAssembler`
+### 7.7 Add `PersistenceAssembler`
 
 新增 `*PersistenceAssembler`，固定只做：
 
@@ -184,7 +269,7 @@ sandwish-infra
 - 不处理 HTTP Request / Response
 - 不写业务流程
 
-### 7.5 Move Mapper And DAO Implementation
+### 7.8 Move Mapper And DAO Implementation
 
 对试点模块执行：
 
@@ -194,7 +279,7 @@ sandwish-infra
 4. Mapper XML 移入 `sandwish-infra` 对应资源目录。
 5. DAO implementation 使用 `PersistenceAssembler` 完成 `Entity <-> DO` 转换。
 
-### 7.6 Add `InterfaceAssembler`
+### 7.9 Add `InterfaceAssembler`
 
 如果试点接口仍直接暴露或接收 `Entity`，新增 `*InterfaceAssembler`：
 
@@ -207,7 +292,7 @@ sandwish-infra
 - 不处理事务
 - 不转换 `DO`
 
-### 7.7 Verify Dependency Direction
+### 7.10 Verify Dependency Direction
 
 迁移后必须满足：
 
@@ -217,7 +302,7 @@ sandwish-infra
 - `sandwish-infra` 不依赖 `sandwish-admin-api` / `sandwish-front-api`
 - DAO implementation 只在 `sandwish-infra`
 
-### 7.8 Build And Review
+### 7.11 Build And Review
 
 固定执行：
 

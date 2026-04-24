@@ -19,10 +19,11 @@
     <inceptionYear>2026-Now</inceptionYear>
 
     <modules>
+        <module>sandwish-common</module>
+        <module>sandwish-biz</module>
+        <module>sandwish-infra</module>
         <module>sandwish-admin-api</module>
         <module>sandwish-front-api</module>
-        <module>sandwish-biz</module>
-        <module>sandwish-common</module>
     </modules>
 
 

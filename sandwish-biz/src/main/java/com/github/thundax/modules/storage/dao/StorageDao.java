@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +10,6 @@ import java.util.List;
 /**
  * @author wdit
  */
-@MyBatisDao
 public interface StorageDao extends CrudDao<Storage> {
 
     /**

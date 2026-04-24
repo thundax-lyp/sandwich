@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.storage.dao.StorageDao">
+<mapper namespace="com.github.thundax.modules.storage.persistence.mapper.StorageMapper">
 
-    <resultMap id="storageResult" type="com.github.thundax.modules.storage.entity.Storage">
+    <resultMap id="storageResult" type="com.github.thundax.modules.storage.persistence.dataobject.StorageDO">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="extendName" column="extendName"/>
         <result property="mimeType" column="mimeType"/>
+        <result property="businessId" column="businessId"/>
+        <result property="businessType" column="businessType"/>
+        <result property="businessParams" column="businessParams"/>
         <result property="ownerId" column="ownerId"/>
         <result property="ownerType" column="ownerType"/>
         <result property="enableFlag" column="enableFlag"/>
+        <result property="publicFlag" column="publicFlag"/>
         <result property="priority" column="priority"/>
         <result property="remarks" column="remarks"/>
         <result property="createDate" column="createDate"/>
@@ -17,14 +21,26 @@
         <result property="delFlag" column="delFlag"/>
     </resultMap>
 
+    <resultMap id="storageBusinessResult" type="com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO">
+        <id property="id" column="id"/>
+        <result property="businessId" column="businessId"/>
+        <result property="businessType" column="businessType"/>
+        <result property="businessParams" column="businessParams"/>
+        <result property="publicFlag" column="publicFlag"/>
+    </resultMap>
+
     <sql id="storageColumns">
         a.id,
 		a.name,
 		a.extend_name AS "extendName",
 		a.mime_type AS "mimeType",
+		a.business_id AS "businessId",
+		a.business_type AS "businessType",
+		a.business_params AS "businessParams",
 		a.owner_id AS "ownerId",
 		a.owner_type AS "ownerType",
 		a.enable_flag AS "enableFlag",
+		a.public_flag AS "publicFlag",
 		a.priority,
 		a.remarks,
 		a.create_date AS "createDate",
@@ -39,11 +55,26 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getMany" resultMap="storageResult">
+        SELECT
+        <include refid="storageColumns"/>
+        FROM assist_storage a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
     <select id="findMimeTypeList" resultType="string">
         SELECT mime_type
         FROM assist_storage
         GROUP BY mime_type
         ORDER BY mime_type
+    </select>
+
+    <select id="findBusinessTypeList" resultType="string">
+        SELECT business_type
+        FROM assist_storage
+        GROUP BY business_type
+        ORDER BY business_type
     </select>
 
     <select id="findList" resultMap="storageResult">
@@ -56,6 +87,12 @@
                 <if test="query.mimeType != null and query.mimeType != ''">
                     AND mime_type = #{query.mimeType}
                 </if>
+                <if test="query.businessId != null and query.businessId != ''">
+                    AND business_id = #{query.businessId}
+                </if>
+                <if test="query.businessType != null and query.businessType != ''">
+                    AND business_type = #{query.businessType}
+                </if>
                 <if test="query.ownerId != null and query.ownerId != ''">
                     AND owner_id = #{query.ownerId}
                 </if>
@@ -64,6 +101,9 @@
                 </if>
                 <if test="query.enableFlag != null and query.enableFlag != ''">
                     AND enable_flag = #{query.enableFlag}
+                </if>
+                <if test="query.publicFlag != null and query.publicFlag != ''">
+                    AND public_flag = #{query.publicFlag}
                 </if>
                 <if test="query.name != null and query.name != ''">
                     AND name LIKE CONCAT('%', #{query.name}, '%')
@@ -79,15 +119,17 @@
     <insert id="insert">
         INSERT INTO assist_storage(id,
                                           name, extend_name, mime_type,
+                                          business_id, business_type, business_params,
                                           owner_id, owner_type,
-                                          enable_flag,
+                                          enable_flag, public_flag,
                                           priority, remarks,
                                           create_date, update_date,
                                           del_flag)
         VALUES (#{id},
                 #{name}, #{extendName}, #{mimeType},
+                #{businessId}, #{businessType}, #{businessParams},
                 #{ownerId}, #{ownerType},
-                #{enableFlag},
+                #{enableFlag}, #{publicFlag},
                 #{priority}, #{remarks},
                 #{createDate}, #{updateDate},
                 #{delFlag})
@@ -98,9 +140,13 @@
         SET name            = #{name},
             extend_name     = #{extendName},
             mime_type       = #{mimeType},
+            business_id     = #{businessId},
+            business_type   = #{businessType},
+            business_params = #{businessParams},
             owner_id        = #{ownerId},
             owner_type      = #{ownerType},
             enable_flag     = #{enableFlag},
+            public_flag     = #{publicFlag},
             priority        = #{priority},
             remarks         = #{remarks},
             update_date     = #{updateDate},
@@ -128,35 +174,61 @@
         WHERE id = #{id}
     </delete>
 
-
-    <select id="findBusiness" resultType="com.github.thundax.modules.storage.entity.StorageBusiness">
-        SELECT a.file_id,
+    <select id="findBusiness" resultMap="storageBusinessResult">
+        SELECT a.id,
                a.business_id     AS "businessId",
                a.business_type   AS "businessType",
                a.business_params AS "businessParams",
                a.public_flag     AS "publicFlag"
-        FROM assist_storage_business a
-        WHERE a.file_id = #{id}
+        FROM assist_storage a
+        WHERE a.id = #{id}
+          AND a.business_id IS NOT NULL
     </select>
 
-    <insert id="insertBusiness">
-        INSERT INTO assist_storage_business(file_id, business_id, business_type, business_params, public_flag)
-        <foreach collection="list" item="item" separator=" union all " index="idx">
-            SELECT #{item.id}, #{item.businessId}, #{item.businessType}, #{item.businessParams}, #{item.publicFlag} FROM dual
-        </foreach>
-    </insert>
+    <update id="insertBusiness">
+        UPDATE assist_storage
+        SET business_id = CASE id
+            <foreach collection="list" item="item">
+                WHEN #{item.id} THEN #{item.businessId}
+            </foreach>
+            END,
+            business_type = CASE id
+            <foreach collection="list" item="item">
+                WHEN #{item.id} THEN #{item.businessType}
+            </foreach>
+            END,
+            business_params = CASE id
+            <foreach collection="list" item="item">
+                WHEN #{item.id} THEN #{item.businessParams}
+            </foreach>
+            END,
+            public_flag = CASE id
+            <foreach collection="list" item="item">
+                WHEN #{item.id} THEN #{item.publicFlag}
+            </foreach>
+            END,
+            update_date = CURRENT_TIMESTAMP
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">#{item.id}</foreach>
+    </update>
 
-    <delete id="deleteBusiness">
-        DELETE
-        FROM assist_storage_business
-        WHERE file_id = #{id}
-    </delete>
+    <update id="deleteBusiness">
+        UPDATE assist_storage
+        SET business_id     = NULL,
+            business_type   = NULL,
+            business_params = NULL,
+            update_date     = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
 
-    <delete id="deleteBusinessByBusiness">
-        DELETE
-        FROM assist_storage_business
+    <update id="deleteBusinessByBusiness">
+        UPDATE assist_storage
+        SET business_id     = NULL,
+            business_type   = NULL,
+            business_params = NULL,
+            update_date     = CURRENT_TIMESTAMP
         WHERE business_id = #{businessId}
           AND business_type = #{businessType}
-    </delete>
+    </update>
 
 </mapper>

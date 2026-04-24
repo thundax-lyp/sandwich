@@ -32,11 +32,6 @@
   - 处理动作：固定 `sandwish-infra` 是持久化实现模块；固定 `biz` 保留 `Entity`、`Service`、DAO interface；固定 `infra` 承载 `DO/DataObject`、DAO implementation、Mapper、Mapper XML、`PersistenceAssembler`
   - 验收点：后续模块迁移不需要重新讨论 `sandwish-infra` 的定位、依赖方向和持久化模型归属
 
-- [ ] `sys-office`：迁移机构树持久化链路到 infra
-  - 范围对象：`Office`、`BaseOffice`、`OfficeDao`、`OfficeDao.xml`
-  - 处理动作：新增 `OfficeDO`、`OfficePersistenceAssembler`、`OfficeDaoImpl`、`OfficeMapper`；按 `TreeDao` 语义迁移 MySQL、达梦、人大金仓 `OfficeDao.xml`；`OfficeDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
-  - 验收点：`OfficeService` 不感知 `DO`；机构树 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
-
 - [ ] `sys-role`：迁移角色持久化链路到 infra
   - 范围对象：`Role`、`BaseRole`、`RoleDao`、`RoleDao.xml`
   - 处理动作：新增 `RoleDO`、`RolePersistenceAssembler`、`RoleDaoImpl`、`RoleMapper`；迁移 MySQL、达梦、人大金仓 `RoleDao.xml`；`RoleDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记

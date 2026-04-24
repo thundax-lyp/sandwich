@@ -32,11 +32,6 @@
   - 处理动作：固定 `sandwish-infra` 是持久化实现模块；固定 `biz` 保留 `Entity`、`Service`、DAO interface；固定 `infra` 承载 `DO/DataObject`、DAO implementation、Mapper、Mapper XML、`PersistenceAssembler`
   - 验收点：后续模块迁移不需要重新讨论 `sandwish-infra` 的定位、依赖方向和持久化模型归属
 
-- [ ] `sys-user`：迁移用户持久化链路到 infra
-  - 范围对象：`User`、`BaseUser`、`UserDao`、`UserDao.xml`
-  - 处理动作：新增 `UserDO`、`UserPersistenceAssembler`、`UserDaoImpl`、`UserMapper`；迁移 MySQL、达梦、人大金仓 `UserDao.xml`；`UserDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
-  - 验收点：`UserService` 不感知 `DO`；用户 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
-
 - [ ] `sys-user-encrypt`：迁移用户加密持久化链路到 infra
   - 范围对象：`UserEncrypt`、`BaseUserEncrypt`、`UserEncryptDao`、`UserEncryptDao.xml`
   - 处理动作：新增 `UserEncryptDO`、`UserEncryptPersistenceAssembler`、`UserEncryptDaoImpl`、`UserEncryptMapper`；迁移 MySQL、达梦、人大金仓 `UserEncryptDao.xml`；`UserEncryptDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记

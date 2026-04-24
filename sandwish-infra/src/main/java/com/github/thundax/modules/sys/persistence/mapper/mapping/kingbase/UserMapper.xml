@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.sys.dao.UserDao">
+<mapper namespace="com.github.thundax.modules.sys.persistence.mapper.UserMapper">
 
-    <resultMap id="userResult" type="com.github.thundax.modules.sys.entity.User">
+    <resultMap id="userResult" type="com.github.thundax.modules.sys.persistence.dataobject.UserDO">
         <id property="id" column="id"/>
         <result property="officeId" column="officeId"/>
         <result property="name" column="name"/>
@@ -210,8 +210,8 @@
     </update>
 
     <!-- 获取用户-权限关联表数据 -->
-    <select id="findUserRole" resultType="com.github.thundax.modules.sys.entity.Role">
-        SELECT role_id AS "id"
+    <select id="findUserRole" resultType="String">
+        SELECT role_id
         FROM sys_user_role
         WHERE user_id = #{id}
     </select>

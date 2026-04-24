@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.sys.dao.UserDao">
+<mapper namespace="com.github.thundax.modules.sys.persistence.mapper.UserMapper">
 
-    <resultMap id="userResult" type="com.github.thundax.modules.sys.entity.User">
+    <resultMap id="userResult" type="com.github.thundax.modules.sys.persistence.dataobject.UserDO">
         <id property="id" column="id"/>
         <result property="officeId" column="officeId"/>
         <result property="name" column="name"/>
@@ -118,23 +118,9 @@
                 <if test="query.superFlag != null and query.superFlag != ''">
                     AND a.super_flag = #{query.superFlag}
                 </if>
-                <if test="query.officeId != null and query.officeId != ''">
-                    AND a.office_id = #{query.officeId}
-                </if>
             </if>
         </where>
-        ORDER BY
-        <choose>
-            <when test="query != null and query.orderBy == 'name_desc'">a.name DESC</when>
-            <when test="query != null and query.orderBy == 'name_asc'">a.name ASC</when>
-            <when test="query != null and query.orderBy == 'loginName_desc'">a.login_name DESC</when>
-            <when test="query != null and query.orderBy == 'loginName_asc'">a.login_name ASC</when>
-            <when test="query != null and query.orderBy == 'enable_desc'">a.enable_flag DESC</when>
-            <when test="query != null and query.orderBy == 'enable_asc'">a.enable_flag ASC</when>
-            <otherwise>
-                a.login_name
-            </otherwise>
-        </choose>
+        ORDER BY a.priority, a.create_date
     </select>
 
     <insert id="insert">
@@ -224,8 +210,8 @@
     </update>
 
     <!-- 获取用户-权限关联表数据 -->
-    <select id="findUserRole" resultType="com.github.thundax.modules.sys.entity.Role">
-        SELECT role_id AS "id"
+    <select id="findUserRole" resultType="String">
+        SELECT role_id
         FROM sys_user_role
         WHERE user_id = #{id}
     </select>

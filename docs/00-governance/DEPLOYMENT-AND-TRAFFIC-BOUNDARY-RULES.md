@@ -18,6 +18,8 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 - jar 打包
 - 配置文件
 - 前后台入口边界
+- API 流量归属
+- 静态 API 支撑资源运行边界
 - vendor JAR 路径
 - 上线准备文档路由
 
@@ -31,15 +33,21 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 
 - `sandwish-admin-api` 打包为后台 API jar
 - `sandwish-front-api` 打包为前台 API jar
-- `sandwish-biz` 和 `sandwish-common` 打包为 jar，由 API 入口模块依赖
+- `sandwish-infra` 打包为 jar，由 API 入口模块依赖
+- `sandwish-biz` 和 `sandwish-common` 打包为 jar，由上层模块依赖
+- API 应用固定通过 Maven module 打包，不新增 `war` 运行入口
 
 ## 4. Traffic Boundary
 
 - 后台管理流量进入 `sandwish-admin-api`
 - 前台用户流量进入 `sandwish-front-api`
+- 后台专用 Controller、Filter、Interceptor、Swagger 配置和静态 API 支撑资源归属 `sandwish-admin-api`
+- 前台专用 Controller、Filter、Interceptor 和访问适配归属 `sandwish-front-api`
 - 前后台共享业务能力进入 `sandwish-biz`
+- 前后台共享持久化实现进入 `sandwish-infra`
 - 通用技术能力进入 `sandwish-common`
 - `sandwish-admin-api` 与 `sandwish-front-api` 不互相依赖
+- 外部流量不得绕过 API 入口模块直接访问 `sandwish-biz` 或 `sandwish-infra`
 
 ## 5. Configuration Rules
 
@@ -47,6 +55,7 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 - 不提交环境私有密钥、账号、密码和生产连接串
 - 环境差异通过 profile、部署参数或外部配置覆盖
 - 不新增 `WEB-INF/lib`、服务端页面模板、标签库或页面装饰器运行入口
+- vendor JAR 只在确有依赖且 Maven 仓库不可用时保留，并限制在需要它的模块
 
 ## 6. Readiness Documents
 

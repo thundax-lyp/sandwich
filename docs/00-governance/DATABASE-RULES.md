@@ -2,6 +2,27 @@
 
 本文件只定义工程级数据库红线。
 
+## Purpose
+
+本文档固定数据库、持久化模型和查询映射的工程级规则，避免 Entity、DAO interface、DAO implementation、Mapper、Mapper XML 和 `DO/DataObject` 的职责混淆。
+
+## Scope
+
+当前范围：
+
+- 数据库平台默认规则
+- 表、字段、索引和关系约束
+- DAO / Mapper / Mapper XML 归属
+- Entity 与 `DO/DataObject` 的边界
+- `PersistenceAssembler` 职责
+- 数据库设计文档结构
+
+不在范围内：
+
+- 不定义业务接口模型，API 模型归属见 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
+- 不定义部署流量入口，部署规则见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
+- 不替代具体业务域数据库设计文档
+
 ## Platform
 
 - 数据库以当前项目实际配置为准
@@ -45,11 +66,14 @@
 
 - `sandwish-biz` 固定保留 `Entity`、Service 和 DAO interface。
 - `sandwish-infra` 固定承载 `DO/DataObject`、DAO implementation、MyBatis Mapper、Mapper XML 和 `PersistenceAssembler`。
+- `Entity` 表达 Service 可使用的业务数据对象，不直接作为 MyBatis XML result type。
+- `DO/DataObject` 表达持久化实现对象，不暴露给 Controller 或 Service。
 - DAO interface 不使用 MyBatis 扫描标记。
 - MyBatis Mapper interface 使用 MyBatis 扫描标记。
 - Mapper XML namespace 固定指向 `sandwish-infra` 中的 Mapper interface。
 - Mapper XML result type 固定指向 `DO/DataObject`。
 - `PersistenceAssembler` 只负责 `Entity <-> DO/DataObject` 转换，不调用 Service、DAO 或 Mapper。
+- DAO implementation 负责调用 MyBatis Mapper 并通过 `PersistenceAssembler` 完成模型转换。
 - Service 不感知 `DO/DataObject`。
 - Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
 
@@ -64,6 +88,7 @@
 ## Document Requirements
 
 - 业务域数据库设计文档必须遵守本文件
+- 数据库设计文档固定放在 `docs/20-database/`
 - 每份数据库设计文档至少包含：
   - `Purpose`
   - `Scope`

@@ -1,5 +1,7 @@
 # 命名与目录规则
 
+## Purpose
+
 本文件只回答三个问题：
 
 1. 该建什么类型的类
@@ -9,6 +11,22 @@
 本文件采用二维结构：按 `Path/Layer/Naming` 组织规则，并按 `Hard Rules（可门禁）` 与 `Review Rules（AI/人工审阅）` 分区。
 新增规则必须先完成分类归位：先判定 `Hard/Review`，再归入 `Path/Layer/Naming`，禁止新增未分类规则。
 
+## Scope
+
+当前范围：
+
+- Maven 模块归属
+- Java 类、接口、实现、持久化对象、装配器命名
+- Controller / Service / DAO / Mapper 层归属
+- API 模型、业务对象和持久化对象的放置边界
+- 静态 API 支撑资源放置边界
+
+不在范围内：
+
+- 不定义字段级数据库命名规则，字段和索引规则见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
+- 不定义部署入口和流量边界，部署规则见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
+- 不替代业务需求文档
+
 ## Fast Choice
 
 - HTTP / 页面入口：`Controller`
@@ -16,8 +34,11 @@
 - 持久化访问：`DAO` / `Mapper`
 - 持久化对象：`Entity`
 - 持久化实现对象：`DO` / `DataObject`
+- API 请求对象：`Request`
+- API 响应对象：`Response`
 - 页面展示对象：`VO`
 - 接口传输对象：`DTO`
+- API 模型装配器：`InterfaceAssembler`
 - 通用技术能力：`Utils` / `Helper`
 - 静态资源：放在所属 API 模块静态资源目录
 
@@ -30,11 +51,14 @@
 - `PATH_SHARED_BUSINESS_OWNERSHIP`：前后台共享业务规则固定归属 `sandwish-biz`
 - `PATH_INFRA_PERSISTENCE_OWNERSHIP`：DAO implementation、MyBatis Mapper、Mapper XML、`DO/DataObject`、`PersistenceAssembler` 固定归属 `sandwish-infra`
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
+- `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 
 ### Layer
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
+- `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装，不把入口模型下沉到 Service
+- `LAYER_SERVICE_ENTITY_MODEL`：Service 固定使用 Entity 或稳定业务参数，不直接依赖 API `Request` / `Response`
 - `LAYER_DAO_NO_WEB`：DAO / Mapper 不感知 HTTP、Session 和权限适配
 - `LAYER_NO_SERVER_PAGE`：不得新增服务端页面模板、页面装饰器或标签库作为业务入口
 - `LAYER_NO_EXTRA_ARCH_DEFAULT`：不得默认新增 `interfaces / application / domain / facade / repository` 等额外分层目录
@@ -51,6 +75,8 @@
 - `NAME_ENTITY`：Entity 命名表达业务对象，不使用无意义泛化名称
 - `NAME_DATA_OBJECT`：持久化对象命名以 `DO` 或 `DataObject` 结尾
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾
+- `NAME_INTERFACE_ASSEMBLER`：API 模型装配器命名以 `InterfaceAssembler` 结尾
+- `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾
 - `NAME_VO_DTO`：VO / DTO 命名必须表达使用场景或业务对象
 
 ## Review Rules（AI/人工审阅，暂不强门禁）
@@ -68,6 +94,7 @@
 
 - Controller 优先完成参数接收、基础校验和响应组装
 - Service 优先表达业务动作，避免让 Controller 感知过多持久化细节
+- `InterfaceAssembler` 只做 API 模型与 Service 入参/Entity/业务结果之间的转换，不调用 Service、DAO 或 Mapper
 - DAO / Mapper 查询、分页、过滤、排序优先下推到数据库
 - VO / DTO 不写复杂业务流程
 

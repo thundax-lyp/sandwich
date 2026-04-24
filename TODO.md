@@ -18,13 +18,6 @@
 4. 质量与交付闭环
    - 按任务补测试、文档同步和小步提交
 
-## P0 - 文档治理
-
-- [ ] `docs/00-governance`：补齐治理文档基础集
-  - 范围对象：`DOCUMENT-RULES.md`、`NAMING-AND-PLACEMENT-RULES.md`、`DATABASE-RULES.md`、`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
-  - 处理动作：按 Sandwich 三层 API 架构补齐治理文档，保留文档结构、任务路由与执行闭环
-  - 验收点：AI 能按 `docs/AGENT.md` 找到对应治理入口，不需要默认全量加载 `docs`
-
 ## P0 - Controller / Service 模型职责隔离
 
 - [ ] `docs/00-governance`：固化 Controller / Service 模型边界规则

@@ -2,15 +2,15 @@ package com.github.thundax.modules.storage.persistence.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.persistence.DataEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 /**
  * 存储文件持久化对象。
  */
+@NoArgsConstructor
 public class StorageDO extends DataEntity<StorageDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String name;
     private String extendName;
@@ -22,10 +22,6 @@ public class StorageDO extends DataEntity<StorageDO> {
     private String ownerType;
     private String enableFlag;
     private String publicFlag;
-
-    public StorageDO() {
-        super();
-    }
 
     public StorageDO(String id) {
         super(id);
@@ -126,8 +122,6 @@ public class StorageDO extends DataEntity<StorageDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String mimeType;
         private String businessId;

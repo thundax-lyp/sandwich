@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,9 +10,8 @@ import java.util.Date;
 /**
  * 日志持久化对象。
  */
+@NoArgsConstructor
 public class LogDO extends AdminDataEntity<LogDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String userId;
     private String type;
@@ -22,10 +22,6 @@ public class LogDO extends AdminDataEntity<LogDO> {
     private String method;
     private String requestUri;
     private String requestParams;
-
-    public LogDO() {
-        super();
-    }
 
     public LogDO(String id) {
         super(id);
@@ -118,8 +114,6 @@ public class LogDO extends AdminDataEntity<LogDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String type;
         private String remoteAddr;

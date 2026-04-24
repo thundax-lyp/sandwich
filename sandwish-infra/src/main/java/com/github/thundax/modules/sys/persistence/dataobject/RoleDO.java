@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dataobject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -10,18 +11,13 @@ import java.util.List;
 /**
  * 角色持久化对象。
  */
+@NoArgsConstructor
 public class RoleDO extends AdminDataEntity<RoleDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String name;
     private String adminFlag;
     private String enableFlag;
     private List<String> menuIdList;
-
-    public RoleDO() {
-        super();
-    }
 
     public RoleDO(String id) {
         super(id);
@@ -77,8 +73,6 @@ public class RoleDO extends AdminDataEntity<RoleDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String enableFlag;
 

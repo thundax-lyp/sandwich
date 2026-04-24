@@ -2,15 +2,15 @@ package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.persistence.AdminTreeEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 /**
  * 菜单持久化对象。
  */
+@NoArgsConstructor
 public class MenuDO extends AdminTreeEntity<MenuDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String parentId;
     private Integer lft;
@@ -22,10 +22,6 @@ public class MenuDO extends AdminTreeEntity<MenuDO> {
     private String displayParams;
     private String url;
     private String target;
-
-    public MenuDO() {
-        super();
-    }
 
     public MenuDO(String id) {
         super(id);
@@ -133,8 +129,6 @@ public class MenuDO extends AdminTreeEntity<MenuDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String parentId;
         private String displayFlag;

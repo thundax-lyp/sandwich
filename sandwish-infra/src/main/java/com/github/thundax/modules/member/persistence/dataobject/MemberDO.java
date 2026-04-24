@@ -2,6 +2,7 @@ package com.github.thundax.modules.member.persistence.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,9 +10,8 @@ import java.util.Date;
 /**
  * 会员持久化对象。
  */
+@NoArgsConstructor
 public class MemberDO extends AdminDataEntity<MemberDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String loginName;
     private String loginPass;
@@ -28,10 +28,6 @@ public class MemberDO extends AdminDataEntity<MemberDO> {
     private Date lastLoginDate;
     private String ywtbId;
     private int loginCount;
-
-    public MemberDO() {
-        super();
-    }
 
     public MemberDO(String id) {
         super(id);
@@ -172,8 +168,6 @@ public class MemberDO extends AdminDataEntity<MemberDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String enableFlag;
         private String email;

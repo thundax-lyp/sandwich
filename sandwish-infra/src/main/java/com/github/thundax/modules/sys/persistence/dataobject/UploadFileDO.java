@@ -1,13 +1,13 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 /**
  * 上传文件持久化对象。
  */
+@NoArgsConstructor
 public class UploadFileDO extends AdminDataEntity<UploadFileDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String name;
     private String extendName;
@@ -15,10 +15,6 @@ public class UploadFileDO extends AdminDataEntity<UploadFileDO> {
     private Long size;
     private String path;
     private byte[] content;
-
-    public UploadFileDO() {
-        super();
-    }
 
     public UploadFileDO(String id) {
         super(id);

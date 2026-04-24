@@ -2,6 +2,7 @@ package com.github.thundax.modules.assist.persistence.dataobject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.persistence.DataEntity;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,18 +10,13 @@ import java.util.List;
 /**
  * 签名持久化对象。
  */
+@NoArgsConstructor
 public class SignatureDO extends DataEntity<SignatureDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String businessType;
     private String businessId;
     private String signature;
     private String isVerifySign;
-
-    public SignatureDO() {
-        super();
-    }
 
     public SignatureDO(String id) {
         super(id);
@@ -73,8 +69,6 @@ public class SignatureDO extends DataEntity<SignatureDO> {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         private String businessType;
         private String businessId;

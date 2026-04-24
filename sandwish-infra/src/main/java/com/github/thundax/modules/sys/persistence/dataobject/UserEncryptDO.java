@@ -1,22 +1,18 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户加密信息持久化对象。
  */
+@NoArgsConstructor
 public class UserEncryptDO extends AdminDataEntity<UserEncryptDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String loginPass;
     private String email;
     private String mobile;
     private String tel;
-
-    public UserEncryptDO() {
-        super();
-    }
 
     public UserEncryptDO(String id) {
         super(id);

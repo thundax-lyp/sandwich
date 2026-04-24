@@ -1,13 +1,13 @@
 package com.github.thundax.modules.assist.persistence.dataobject;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
+import lombok.NoArgsConstructor;
 
 /**
  * 异步任务持久化对象。
  */
+@NoArgsConstructor
 public class AsyncTaskDO extends AdminDataEntity<AsyncTaskDO> {
-
-    private static final long serialVersionUID = 1L;
 
     private String title;
     private String status;
@@ -15,10 +15,6 @@ public class AsyncTaskDO extends AdminDataEntity<AsyncTaskDO> {
     private String data;
     private Boolean isPrivate;
     private Integer expiredSeconds;
-
-    public AsyncTaskDO() {
-        super();
-    }
 
     public AsyncTaskDO(String id) {
         super(id);

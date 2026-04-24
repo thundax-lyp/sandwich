@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.assist.persistence.mapper.SignatureMapper">
+
+    <resultMap id="signatureResult" type="com.github.thundax.modules.assist.persistence.dataobject.SignatureDO">
+        <result property="businessType" column="businessType"/>
+        <result property="businessId" column="businessId"/>
+        <result property="signature" column="signature"/>
+        <result property="isVerifySign" column="isVerifySign"/>
+        <result property="createDate" column="createDate"/>
+        <result property="updateDate" column="updateDate"/>
+    </resultMap>
+
+    <sql id="signatureColumns">
+        a.business_type AS businessType,
+		a.business_id AS businessId,
+		a.signature,
+		a.is_verify_sign AS isVerifySign,
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate"
+    </sql>
+
+    <select id="get" resultMap="signatureResult">
+        SELECT
+        <include refid="signatureColumns"/>
+        FROM tb_assist_signature a
+        WHERE business_type = #{businessType} AND business_id = #{businessId}
+    </select>
+
+    <select id="getMany" resultMap="signatureResult">
+        SELECT
+        <include refid="signatureColumns"/>
+        FROM tb_assist_signature a
+        WHERE a.business_id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="findList" resultMap="signatureResult">
+        SELECT
+        <include refid="signatureColumns"/>
+        FROM tb_assist_signature a
+        <where>
+            <if test="query != null">
+                <if test="query.businessType != null and query.businessType != ''">
+                    AND a.business_type = #{query.businessType}
+                </if>
+                <if test="query.businessId != null and query.businessId != ''">
+                    AND a.business_id = #{query.businessId}
+                </if>
+                <if test="query.businessIdList != null">
+                    AND a.business_id IN
+                    <foreach collection="query.businessIdList" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="query.isVerifySign != null and query.isVerifySign != ''">
+                    AND a.is_verify_sign = #{query.isVerifySign}
+                </if>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO tb_assist_signature(business_type, business_id, signature, is_verify_sign, create_date, update_date)
+        VALUES (#{businessType}, #{businessId}, #{signature}, #{isVerifySign}, #{createDate}, #{updateDate})
+    </insert>
+
+    <insert id="insertOrUpdate">
+        INSERT INTO tb_assist_signature(business_type, business_id, signature, is_verify_sign, create_date, update_date)
+        VALUES (#{businessType}, #{businessId}, #{signature}, #{isVerifySign}, #{createDate}, #{updateDate})
+        ON DUPLICATE KEY UPDATE signature = VALUES(signature),
+                                is_verify_sign = VALUES(is_verify_sign),
+                                update_date = VALUES(update_date)
+    </insert>
+
+    <update id="update">
+        UPDATE tb_assist_signature
+        SET signature = #{signature},
+            is_verify_sign = #{isVerifySign},
+            update_date = #{updateDate}
+        WHERE business_type = #{businessType} AND business_id = #{businessId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tb_assist_signature WHERE business_type = #{businessType} AND business_id = #{businessId}
+    </delete>
+
+</mapper>

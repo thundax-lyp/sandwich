@@ -1,7 +1,6 @@
 package com.github.thundax.modules.assist.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.assist.entity.Signature;
 
 /**
@@ -9,7 +8,6 @@ import com.github.thundax.modules.assist.entity.Signature;
  *
  * @author wdit
  */
-@MyBatisDao
 public interface SignatureDao extends CrudDao<Signature> {
 
     /**

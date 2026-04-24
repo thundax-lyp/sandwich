@@ -53,3 +53,40 @@
   - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`MODEL-SEPARATION-RUNBOOK.md`、`TODO.md`、治理文档
   - 处理动作：两套迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：临时手册不再保留，完成历史只存在于 commit / PR 中
+
+## P0 - 持久化表达改造
+
+- [ ] `sys`：拆分系统域持久化表达改造任务
+  - 范围对象：用户、角色、菜单、机构、日志、字典、上传文件相关持久化链路
+  - 处理动作：先横向盘点 `sys` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
+  - 验收点：系统域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+
+- [ ] `storage`：拆分存储域持久化表达改造任务
+  - 范围对象：存储文件、存储业务绑定相关持久化链路
+  - 处理动作：先横向盘点 `storage` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
+  - 验收点：存储域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+
+- [ ] `assist`：拆分辅助域持久化表达改造任务
+  - 范围对象：签名、异步任务相关持久化链路
+  - 处理动作：先横向盘点 `assist` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
+  - 验收点：辅助域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+
+- [ ] `member`：拆分会员域持久化表达改造任务
+  - 范围对象：会员查询、会员资料相关持久化链路
+  - 处理动作：先横向盘点 `member` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
+  - 验收点：会员域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+
+- [ ] `common-persistence`：拆分公共持久化契约改造任务
+  - 范围对象：`CrudDao`、`TreeDao` 及其对通用查询入口、父类字段和树结构父类的依赖
+  - 处理动作：先横向盘点公共持久化契约中的通用查询入口、基类字段假设和树结构假设，按清晰子链路拆出后续改造 TODO，标明各自涉及的公共接口、受影响业务域和替换顺序
+  - 验收点：公共持久化契约形成可逐条执行的改造任务清单；本项不直接修改任何公共接口或基类代码
+
+- [ ] `common-assembler`：拆分公共 PersistenceAssembler 收敛任务
+  - 范围对象：各业务域 `PersistenceAssembler` 中的 `Entity.query <-> DO.query` 转换和 `DO` 继承依赖
+  - 处理动作：先横向盘点各业务域 `PersistenceAssembler` 当前承担的 query 转换和父类字段装配职责，按对象或清晰子链路拆出后续收敛 TODO，标明各自涉及的 `Entity`、`DO` 和装配规则调整点
+  - 验收点：公共 `PersistenceAssembler` 收敛形成可逐条执行的任务清单；本项不直接修改任何装配代码
+
+- [ ] `docs/00-governance`：拆分持久化表达改造治理同步任务
+  - 范围对象：`ARCHITECTURE.md`、`DATABASE-RULES.md`、`NAMING-AND-PLACEMENT-RULES.md`、`TODO.md`
+  - 处理动作：先盘点治理文档中与 DAO 查询契约、`DO` 定义、`PersistenceAssembler` 职责相关的现有规则，拆出后续治理同步 TODO，标明需要调整的规则点和对应迁移前置条件
+  - 验收点：治理同步形成可逐条执行的文档任务清单；本项不直接修改治理文档内容

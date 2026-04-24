@@ -32,11 +32,6 @@
   - 处理动作：固定 `sandwish-infra` 是持久化实现模块；固定 `biz` 保留 `Entity`、`Service`、DAO interface；固定 `infra` 承载 `DO/DataObject`、DAO implementation、Mapper、Mapper XML、`PersistenceAssembler`
   - 验收点：后续模块迁移不需要重新讨论 `sandwish-infra` 的定位、依赖方向和持久化模型归属
 
-- [ ] `sandwish-infra`：按业务模块建立 infra 横切骨架
-  - 范围对象：`sys`、`storage`、`assist`、`member`、`auth`
-  - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 建立每个模块的 `dataobject`、`assembler`、`mapper`、`dao` 承载目录或最小占位文件
-  - 验收点：只形成 infra 横切承载骨架，不迁移任何 Controller / Service / Mapper / XML 代码，构建通过
-
 - [ ] `TODO.md`：建立 infra 迁移任务模板与索引
   - 范围对象：`TODO.md`、`docs/30-designs/INFRA-SPLIT-RUNBOOK.md`
   - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 固定模块任务模板，明确每个模块拆分时必须记录当前持久化链路、待新增 `DO`、待新增 `PersistenceAssembler`、待迁移 Mapper/XML/DAO implementation、DAO interface 是否需要去除 MyBatis 扫描标记

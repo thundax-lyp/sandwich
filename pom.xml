@@ -41,6 +41,7 @@
         <poi.version>4.1.2</poi.version>
         <jwt.version>3.8.3</jwt.version>
         <cxf.version>3.4.0</cxf.version>
+        <lombok.version>1.16.22</lombok.version>
 
         <!-- framework version setting -->
         <mybatis.version>3.5.5</mybatis.version>

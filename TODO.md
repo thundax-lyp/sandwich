@@ -27,10 +27,17 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `assist`：拆分辅助模块 infra 迁移任务
-  - 范围对象：签名、密钥、异步任务等 `assist` 持久化链路
-  - 处理动作：先横向盘点辅助模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
-  - 验收点：辅助模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
+- [ ] `assist-signature`：迁移签名存储持久化链路到 infra
+  - 范围对象：`Signature`、`BaseSignature`、`SignatureDao`、`SignatureDao.xml`
+  - 当前差异：达梦、人大金仓存在 `SignatureDao.xml`，两者 SQL 当前一致；MySQL 当前缺少对应 XML；`SignatureDao` 额外声明 `insertOrUpdate`
+  - 处理动作：新增 `SignatureDO`、`SignaturePersistenceAssembler`、`SignatureDaoImpl`、`SignatureMapper`；迁移达梦、人大金仓 `SignatureDao.xml`；`SignatureDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记；确认 MySQL 缺少对应 XML 是否为预期
+  - 验收点：`SignatureService` 不感知 `DO`；签名 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`；`insertOrUpdate` 在达梦、人大金仓 Mapper statement 中保留
+
+- [ ] `assist-async-task`：迁移异步任务 Redis 持久化边界到 infra
+  - 范围对象：`AsyncTask`、`BaseAsyncTask`、`AsyncTaskService`、`AsyncTaskServiceImpl`
+  - 当前差异：异步任务当前通过 `AsyncTaskServiceImpl` 直接读写 `RedisClient`，没有 DAO、Mapper 或 Mapper XML；属于 Redis 持久化链路，不属于 MyBatis XML 迁移
+  - 处理动作：新增 `AsyncTaskDO`、`AsyncTaskPersistenceAssembler`、`AsyncTaskDao`、`AsyncTaskDaoImpl`；`AsyncTaskDaoImpl` 位于 `sandwish-infra` 并封装 `RedisClient` 读写；不新增 `AsyncTaskMapper` 或 Mapper XML，除非迁移时明确改为数据库持久化
+  - 验收点：`AsyncTaskServiceImpl` 不直接依赖 `RedisClient` 或 `DO`；异步任务 Redis persistence implementation 位于 `sandwish-infra`；任务过期时间、默认状态和私有标记语义保持不变
 
 - [ ] `member`：拆分会员模块 infra 迁移任务
   - 范围对象：`member` Entity、DAO、Mapper/XML、Service

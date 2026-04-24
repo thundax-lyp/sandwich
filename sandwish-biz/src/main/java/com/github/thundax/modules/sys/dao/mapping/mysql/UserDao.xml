@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.sys.dao.UserDao">
+
+    <resultMap id="userResult" type="com.github.thundax.modules.sys.entity.User">
+        <id property="id" column="id"/>
+        <result property="officeId" column="officeId"/>
+        <result property="name" column="name"/>
+        <result property="loginName" column="loginName"/>
+        <result property="loginPass" column="loginPass"/>
+        <result property="email" column="email" typeHandler="com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler"/>
+        <result property="mobile" column="mobile" typeHandler="com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler"/>
+        <result property="tel" column="tel"/>
+        <result property="ranks" column="ranks"/>
+
+        <result property="registerDate" column="registerDate"/>
+        <result property="registerIp" column="registerIp"/>
+
+        <result property="lastLoginDate" column="lastLoginDate"/>
+        <result property="lastLoginIp" column="lastLoginIp"/>
+        <result property="loginCount" column="loginCount"/>
+
+        <result property="superFlag" column="superFlag"/>
+        <result property="adminFlag" column="adminFlag"/>
+        <result property="enableFlag" column="enableFlag"/>
+
+        <result property="priority" column="priority"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createDate" column="createDate"/>
+        <result property="createUserId" column="createUserId"/>
+        <result property="updateDate" column="updateDate"/>
+        <result property="updateUserId" column="updateUserId"/>
+        <result property="delFlag" column="delFlag"/>
+        <result property="ssoLoginName" column="ssoLoginName"/>
+    </resultMap>
+
+    <sql id="userColumns">
+        a.id,
+		a.office_id AS "officeId",
+		a.name,
+		a.login_name AS "loginName",
+		a.login_pass AS "loginPass",
+		a.email,
+		a.mobile,
+		a.tel,
+		a.ranks,
+
+		a.register_date AS "registerDate",
+		a.register_ip AS "registerIp",
+
+		a.last_login_date AS "lastLoginDate",
+		a.last_login_ip AS "lastLoginIp",
+		a.login_count AS "loginCount",
+
+		a.super_flag AS "superFlag",
+		a.admin_flag AS "adminFlag",
+		a.enable_flag AS "enableFlag",
+
+		a.priority,
+		a.remarks,
+		a.create_date AS "createDate",
+		a.create_by AS "createUserId",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateUserId",
+		a.del_flag AS "delFlag",
+		a.sso_login_name AS "ssoLoginName"
+    </sql>
+
+    <select id="get" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getByLoginName" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.login_name = #{loginName}
+    </select>
+
+    <select id="getBySsoLoginName" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.sso_login_name = #{ssoLoginName}
+    </select>
+
+    <!-- 获取指定id数据列表 -->
+    <select id="getMany" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="findList" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <if test="query != null and query.officeTreeLeft != null and query.officeTreeRight != null">
+            JOIN sys_office o ON o.id = a.office_id AND o.lft BETWEEN #{query.officeTreeLeft} AND #{query.officeTreeRight}
+        </if>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="query != null">
+                <if test="query.loginName != null and query.loginName != ''">
+                    AND a.login_name LIKE CONCAT('%', #{query.loginName}, '%')
+                </if>
+                <if test="query.name != null and query.name != ''">
+                    AND a.name LIKE CONCAT('%', #{query.name}, '%')
+                </if>
+                <if test="query.enableFlag != null and query.enableFlag != ''">
+                    AND a.enable_flag = #{query.enableFlag}
+                </if>
+                <if test="query.superFlag != null and query.superFlag != ''">
+                    AND a.super_flag = #{query.superFlag}
+                </if>
+                <if test="query.officeId != null and query.officeId != ''">
+                    AND a.office_id = #{query.officeId}
+                </if>
+            </if>
+        </where>
+        ORDER BY
+        <choose>
+            <when test="query != null and query.orderBy == 'name_desc'">a.name DESC</when>
+            <when test="query != null and query.orderBy == 'name_asc'">a.name ASC</when>
+            <when test="query != null and query.orderBy == 'loginName_desc'">a.login_name DESC</when>
+            <when test="query != null and query.orderBy == 'loginName_asc'">a.login_name ASC</when>
+            <when test="query != null and query.orderBy == 'enable_desc'">a.enable_flag DESC</when>
+            <when test="query != null and query.orderBy == 'enable_asc'">a.enable_flag ASC</when>
+            <otherwise>
+                a.login_name
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_user(id,
+                                    name, office_id,
+                                    login_name, login_pass,
+                                    email, mobile, tel, ranks,
+                                    register_date, register_ip,
+                                    last_login_date, last_login_ip, login_count,
+                                    super_flag, admin_flag,
+                                    enable_flag,
+                                    priority, remarks,
+                                    create_date, create_by,
+                                    update_date, update_by,
+                                    del_flag, sso_login_name)
+        VALUES (#{id},
+                #{name}, #{officeId},
+                #{loginName}, #{loginPass},
+                #{email, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+                #{mobile, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+                #{tel}, #{ranks},
+                #{registerDate},
+                #{registerIp},
+                #{lastLoginDate}, #{lastLoginIp}, #{loginCount},
+                #{superFlag}, #{adminFlag}, #{enableFlag},
+                #{priority}, #{remarks},
+                #{createDate}, #{createUserId},
+                #{updateDate}, #{updateUserId},
+                #{delFlag}, #{ssoLoginName})
+    </insert>
+
+    <update id="update">
+        UPDATE sys_user
+        SET name        = #{name},
+            office_id   = #{officeId},
+            login_name  = #{loginName},
+            email       = #{email, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            mobile      = #{mobile, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            tel         = #{tel},
+            ranks       = #{ranks},
+            admin_flag  = #{adminFlag},
+            enable_flag = #{enableFlag},
+            priority    = #{priority},
+            remarks     = #{remarks},
+            update_date = #{updateDate},
+            update_by   = #{updateUserId},
+            del_flag    = #{delFlag},
+            sso_login_name    = #{ssoLoginName}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginInfo">
+        UPDATE sys_user
+        SET last_login_date = #{lastLoginDate},
+            last_login_ip   = #{lastLoginIp},
+            login_count     = #{loginCount}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateEnableFlag">
+        UPDATE sys_user
+        SET enable_flag = #{enableFlag},
+            login_count = 0,
+            update_date = #{updateDate},
+            update_by   = #{updateUserId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginPass">
+        UPDATE sys_user
+        SET login_pass  = #{loginPass},
+            update_date = #{updateDate},
+            update_by   = #{updateUserId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePriority">
+        UPDATE sys_user
+        SET priority = #{priority}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE
+        FROM sys_user
+        WHERE id = #{id}
+    </update>
+
+    <!-- 获取用户-权限关联表数据 -->
+    <select id="findUserRole" resultType="com.github.thundax.modules.sys.entity.Role">
+        SELECT role_id AS "id"
+        FROM sys_user_role
+        WHERE user_id = #{id}
+    </select>
+
+    <!-- 删除用户-角色关联表数据 -->
+    <delete id="deleteUserRole">
+        DELETE
+        FROM sys_user_role
+        WHERE user_id = #{id}
+    </delete>
+
+    <!-- 插入用户-角色关联表数据 -->
+    <insert id="insertUserRole">
+        INSERT INTO sys_user_role(user_id, role_id)
+        <foreach collection="roleIdList" item="roleId" separator=" union all ">
+            SELECT #{id}, #{roleId} FROM dual
+        </foreach>
+    </insert>
+
+</mapper>

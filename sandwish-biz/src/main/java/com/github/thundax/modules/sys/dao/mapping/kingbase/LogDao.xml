@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.sys.dao.LogDao">
+
+    <sql id="logColumns">
+        a.id,
+		a.user_id AS "userId",
+		a.type,
+		a.log_date AS "logDate",
+		a.title,
+		a.remote_addr AS "remoteAddr",
+		a.user_agent AS "userAgent",
+		a.method,
+		a.request_uri AS "requestUri",
+		a.request_params AS "requestParams"
+    </sql>
+
+    <select id="get" resultType="com.github.thundax.modules.sys.entity.Log">
+        SELECT
+        <include refid="logColumns"/>
+        FROM sys_log a
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.github.thundax.modules.sys.entity.Log">
+        SELECT
+        <include refid="logColumns"/>
+        FROM sys_log a
+        LEFT JOIN sys_user u ON u.id = a.user_id
+        <where>
+            <if test="query != null">
+                <if test="query.type != null and query.type != ''">
+                    AND a.type = #{query.type}
+                </if>
+                <if test="query.remoteAddr != null and query.remoteAddr != ''">
+                    AND a.remote_addr = #{query.remoteAddr}
+                </if>
+                <if test="query.userLoginName != null and query.userLoginName != ''">
+                    AND u.login_name LIKE CONCAT('%', #{query.userLoginName}, '%')
+                </if>
+                <if test="query.userName != null and query.userName != ''">
+                    AND u.name LIKE CONCAT('%', #{query.userName}, '%')
+                </if>
+                <if test="query.title != null and query.title != ''">
+                    AND a.title LIKE CONCAT('%', #{query.title}, '%')
+                </if>
+                <if test="query.requestUri != null and query.requestUri != ''">
+                    AND a.request_uri LIKE CONCAT('%', #{query.requestUri}, '%')
+                </if>
+                <if test="query.beginDate != null and query.endDate != null">
+                    AND a.log_date BETWEEN #{query.beginDate} AND #{query.endDate}
+                </if>
+            </if>
+        </where>
+        ORDER BY a.log_date DESC
+    </select>
+
+    <delete id="batchDelete">
+        DELETE FROM sys_log a
+        <where>
+            <if test="query != null">
+                <if test="query.type != null and query.type != ''">
+                    AND a.type = #{query.type}
+                </if>
+                <if test="query.remoteAddr != null and query.remoteAddr != ''">
+                    AND a.remote_addr = #{query.remoteAddr}
+                </if>
+                <if test="query.title != null and query.title != ''">
+                    AND a.title LIKE CONCAT('%', #{query.title}, '%')
+                </if>
+                <if test="query.requestUri != null and query.requestUri != ''">
+                    AND a.request_uri LIKE CONCAT('%', #{query.requestUri}, '%')
+                </if>
+                <if test="query.beginDate != null and query.endDate != null">
+                    AND a.log_date BETWEEN #{query.beginDate} AND #{query.endDate}
+                </if>
+            </if>
+        </where>
+    </delete>
+
+    <insert id="insert">
+        INSERT INTO sys_log(id, user_id,
+                                   type, log_date,
+                                   title,
+                                   remote_addr, user_agent,
+                                   method,
+                                   request_uri, request_params)
+        VALUES (#{id}, #{userId},
+                #{type}, #{logDate},
+                #{title},
+                #{remoteAddr}, #{userAgent},
+                #{method},
+                #{requestUri}, #{requestParams})
+    </insert>
+
+
+    <insert id="insertList">
+        INSERT INTO sys_log(id, user_id,
+        type, log_date, title,
+        remote_addr, user_agent, method,
+        request_uri, request_params)
+        VALUES (#{id}, #{userId},
+        #{type}, #{logDate},
+        #{title},
+        #{remoteAddr}, #{userAgent},
+        #{method},
+        #{requestUri}, #{requestParams})
+        <foreach collection="list" item="item" separator=" union all " index="idx">
+            SELECT #{item.id}, #{item.userId},
+            #{item.type}, #{item.logDate}, #{item.title},
+            #{item.remoteAddr}, #{item.userAgent}, #{item.method},
+            #{item.requestUri}, #{item.requestParams}
+            FROM dual
+        </foreach>
+    </insert>
+
+
+    <delete id="delete">
+        DELETE
+        FROM sys_log
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

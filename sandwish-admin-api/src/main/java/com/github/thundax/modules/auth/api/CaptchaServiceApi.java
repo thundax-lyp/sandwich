@@ -1,0 +1,45 @@
+package com.github.thundax.modules.auth.api;
+
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.modules.auth.api.vo.LoginFormVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * @author wdit
+ */
+@Api(tags = "01-02. 鉴权-图形验证码")
+@RequestMapping(value = "/api/auth")
+public interface CaptchaServiceApi {
+
+    /**
+     * 图形验证码
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException IO异常
+     */
+    @ApiOperation(value = "图形验证码", notes = "ignore")
+    @GetMapping(value = "captcha")
+    void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    /**
+     * 刷新图形验证码
+     *
+     * @param form 登录表单
+     * @return 成功:true
+     * @throws ApiException API异常
+     */
+    @ApiOperation(value = "刷新图形验证码", notes = "ignore")
+    @PostMapping(value = "captcha/refresh")
+    Boolean refreshCaptcha(@RequestBody LoginFormVo form) throws ApiException;
+
+}

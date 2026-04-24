@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.sys.dao.UserEncryptDao">
+
+    <resultMap id="userResult" type="com.github.thundax.modules.sys.entity.UserEncrypt">
+        <id property="id" column="id"/>
+        <result property="loginPass" column="loginPass"/>
+        <result property="email" column="email" />
+        <result property="mobile" column="mobile" />
+        <result property="tel" column="tel"/>
+        <result property="createDate" column="createDate"/>
+        <result property="createUserId" column="createUserId"/>
+        <result property="updateDate" column="updateDate"/>
+        <result property="updateUserId" column="updateUserId"/>
+    </resultMap>
+
+    <sql id="userColumns">
+        a.id,
+		a.login_pass AS "loginPass",
+		a.email,
+		a.mobile,
+		a.tel,
+		a.create_date AS "createDate",
+		a.create_by AS "createUserId",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateUserId"
+    </sql>
+
+    <select id="get" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user_encrypt a
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 获取指定id数据列表 -->
+    <select id="getMany" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user_encrypt a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="findList" resultMap="userResult">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user_encrypt a
+
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_user_encrypt(id,
+                                    login_pass,
+                                    email, mobile, tel,
+                                    create_date, create_by,
+                                    update_date, update_by)
+        VALUES (#{id},
+                #{loginPass},
+                #{email}, #{mobile}, #{tel},
+                #{createDate}, #{createUserId},
+                #{updateDate}, #{updateUserId}
+    </insert>
+
+    <update id="update">
+        UPDATE sys_user_encrypt
+        SET
+            email       = #{email},
+            mobile      = #{mobile},
+            tel         = #{tel},
+            update_date = #{updateDate},
+            update_by   = #{updateUserId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginPass">
+        UPDATE sys_user_encrypt
+        SET login_pass  = #{loginPass},
+            update_date = #{updateDate},
+            update_by   = #{updateUserId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE
+        FROM sys_user_encrypt
+        WHERE id = #{id}
+    </update>
+
+</mapper>

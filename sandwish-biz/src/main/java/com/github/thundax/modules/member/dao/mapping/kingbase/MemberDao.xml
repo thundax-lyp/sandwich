@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.member.dao.MemberDao">
+
+    <resultMap id="memberResult" type="com.github.thundax.modules.member.entity.Member">
+        <id property="id" column="id"/>
+        <result property="loginName" column="loginName"/>
+        <result property="loginPass" column="loginPass"/>
+        <result property="email" column="email" typeHandler="com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler"/>
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="mobile" column="mobile" typeHandler="com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler"/>
+        <result property="address" column="address" typeHandler="com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler"/>
+        <result property="zipcode" column="zipcode"/>
+        <result property="enableFlag" column="enableFlag"/>
+        <result property="loginCount" column="loginCount"/>
+
+        <result property="registerIp" column="registerIp"/>
+        <result property="registerDate" column="registerDate"/>
+        <result property="lastLoginIp" column="lastLoginIp"/>
+        <result property="lastLoginDate" column="lastLoginDate"/>
+
+        <result property="priority" column="priority"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createDate" column="createDate"/>
+        <result property="updateDate" column="updateDate"/>
+        <result property="delFlag" column="delFlag"/>
+    </resultMap>
+
+    <sql id="memberColumns">
+        a.id,
+        a.login_name AS "loginName",
+        a.login_pass AS "loginPass",
+        a.login_count AS "loginCount",
+        a.email,
+        a.name,
+        a.gender,
+        a.mobile,
+        a.address,
+        a.zipcode,
+
+        a.enable_flag AS "enableFlag",
+
+        a.register_ip AS "registerIp",
+        a.register_date AS "registerDate",
+        a.last_login_ip AS "lastLoginIp",
+        a.last_login_date AS "lastLoginDate",
+
+		a.priority,
+		a.remarks,
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+    </sql>
+
+    <select id="get" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM tb_member a
+        WHERE a.id = #{id}
+    </select>
+
+
+    <select id="findByLoginName" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM tb_member a
+        WHERE a.login_name = #{loginName}
+    </select>
+
+
+    <select id="findByEmail" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM tb_member a
+        WHERE a.email = #{email}
+    </select>
+
+
+    <select id="findList" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM tb_member a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="query != null">
+                <if test="query.enableFlag != null and query.enableFlag != ''">
+                    AND a.enable_flag = #{query.enableFlag}
+                </if>
+                <if test="query.email != null and query.email != ''">
+                    AND a.email LIKE CONCAT('%', #{query.email}, '%')
+                </if>
+                <if test="query.name != null and query.name != ''">
+                    AND a.name LIKE CONCAT('%', #{query.name}, '%')
+                </if>
+                <if test="query.remarks != null and query.remarks != ''">
+                    AND a.remarks LIKE CONCAT('%', #{query.remarks}, '%')
+                </if>
+                <if test="query.beginRegisterDate != null and query.endRegisterDate != null">
+                    AND a.register_date BETWEEN #{query.beginRegisterDate} AND #{query.endRegisterDate}
+                </if>
+                <if test="query.beginLoginDate != null and query.endLoginDate != null">
+                    AND a.last_login_date BETWEEN #{query.beginLoginDate} AND #{query.endLoginDate}
+                </if>
+                <if test="query.mobile != null and query.mobile != ''">
+                    and a.mobile = #{query.mobile}
+                </if>
+            </if>
+        </where>
+        ORDER BY a.priority, a.email
+    </select>
+
+    <select id="getMany" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns"/>
+        FROM tb_member a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO tb_member(
+             id,
+             email,
+             login_pass,
+             name,
+             gender,
+             mobile,
+             address,
+             zipcode,
+             enable_flag,
+             register_ip,
+             register_date,
+             last_login_ip,
+             last_login_date,
+             priority,
+             remarks,
+             create_date,
+             update_date,
+             ywtb_id,
+             login_name,
+             del_flag
+             )
+        values (
+            #{id},
+            #{email, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            #{loginPass},
+            #{name},
+            #{gender},
+            #{mobile, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            #{address, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            #{zipcode},
+            #{enableFlag},
+            #{registerIp},
+            #{registerDate},
+            #{lastLoginIp},
+            #{lastLoginDate},
+            #{priority},
+            #{remarks},
+            #{createDate},
+            #{updateDate},
+            #{ywtbId},
+            #{loginName},
+            #{delFlag}
+            )
+    </insert>
+
+    <update id="update">
+        UPDATE tb_member
+        SET name        = #{name},
+            gender      = #{gender},
+            mobile      = #{mobile, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            address     = #{address, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            email       = #{email, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            zipcode     = #{zipcode},
+            enable_flag = #{enableFlag},
+            priority    = #{priority},
+            remarks     = #{remarks},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginInfo">
+        UPDATE tb_member
+        SET last_login_ip   = #{lastLoginIp},
+            last_login_date = #{lastLoginDate},
+            login_count = #{loginCount}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateInfo">
+        UPDATE tb_member
+        SET name        = #{name},
+            gender      = #{gender},
+            mobile      = #{mobile, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            address     = #{address, typeHandler=com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler},
+            zipcode     = #{zipcode},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateLoginPass">
+        UPDATE tb_member
+        SET login_pass = #{loginPass}
+        WHERE id = #{id}
+    </update>
+
+
+    <update id="updateEnableFlag">
+        UPDATE tb_member
+        SET enable_flag = #{enableFlag},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+
+    <update id="updatePriority">
+        UPDATE tb_member
+        SET priority    = #{priority},
+            update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM tb_member WHERE id = #{id}
+    </delete>
+
+    <select id="getByYwtbId" resultMap="memberResult">
+        SELECT
+        <include refid="memberColumns" />
+        FROM tb_member a
+        WHERE a.ywtb_id = #{ywtbId}
+    </select>
+
+</mapper>

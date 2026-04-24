@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.sys.dao.MenuDao">
+
+    <resultMap id="menuResult" type="com.github.thundax.modules.sys.entity.Menu">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parentId"/>
+        <result property="lft" column="lft"/>
+        <result property="rgt" column="rgt"/>
+        <result property="name" column="name"/>
+        <result property="perms" column="perms"/>
+        <result property="ranks" column="ranks"/>
+        <result property="url" column="url"/>
+        <result property="target" column="target"/>
+        <result property="displayFlag" column="displayFlag"/>
+        <result property="displayParams" column="displayParams"/>
+        <result property="priority" column="priority"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createDate" column="createDate"/>
+        <result property="createUserId" column="createUserId"/>
+        <result property="updateDate" column="updateDate"/>
+        <result property="updateUserId" column="updateUserId"/>
+        <result property="delFlag" column="delFlag"/>
+    </resultMap>
+
+    <sql id="menuColumns">
+        a.id,
+		a.parent_id AS "parentId",
+		a.lft,
+		a.rgt,
+		a.name,
+		a.perms,
+		a.ranks,
+		a.url,
+		a.target,
+		a.display_flag AS "displayFlag",
+		a.display_params AS "displayParams",
+		a.priority,
+		a.remarks,
+		a.create_date AS "createDate",
+		a.create_by AS "createUserId",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateUserId",
+		a.del_flag
+    </sql>
+
+    <select id="get" resultMap="menuResult">
+        SELECT
+        <include refid="menuColumns"/>
+        FROM sys_menu a
+        WHERE id = #{id}
+    </select>
+
+    <!-- 获取指定id数据列表 -->
+    <select id="getMany" resultMap="menuResult">
+        SELECT
+        <include refid="menuColumns"/>
+        FROM sys_menu a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
+    <select id="findList" resultMap="menuResult">
+        SELECT
+        <include refid="menuColumns"/>
+        FROM sys_menu a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="query != null">
+                <if test="query.parentId != null">
+                    <choose>
+                        <when test="query.parentId != 'ROOT'">
+                            AND a.parent_id = #{query.parentId}
+                        </when>
+                        <otherwise>
+                            AND a.parent_id IS NULL
+                        </otherwise>
+                    </choose>
+                </if>
+                <if test="query.displayFlag != null and query.displayFlag != ''">
+                    AND display_flag = ${query.displayFlag}
+                </if>
+                <if test="query.maxRank != null">
+                    AND ranks &lt;= ${query.maxRank}
+                </if>
+            </if>
+        </where>
+        ORDER BY a.lft
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_menu(id,
+                                    parent_id, lft, rgt,
+                                    name, perms, ranks,
+                                    url, target,
+                                    display_flag, display_params,
+                                    priority, remarks,
+                                    create_date, create_by,
+                                    update_date, update_by,
+                                    del_flag)
+        VALUES (#{id},
+                #{parentId}, #{lft}, #{rgt},
+                #{name}, #{perms}, #{ranks},
+                #{url}, #{target},
+                #{displayFlag}, #{displayParams},
+                #{priority}, #{remarks},
+                #{createDate}, #{createUserId},
+                #{updateDate}, #{updateUserId},
+                #{delFlag})
+    </insert>
+
+    <update id="update">
+        UPDATE sys_menu
+        SET parent_id      = #{parentId},
+            name           = #{name},
+            perms          = #{perms},
+            ranks          = #{ranks},
+            url            = #{url},
+            target         = #{target},
+            display_flag   = #{displayFlag},
+            display_params = #{displayParams},
+            remarks        = #{remarks},
+            update_date    = #{updateDate},
+            update_by      = #{updateUserId},
+            del_flag       = #{delFlag}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateDisplayFlag">
+        UPDATE sys_menu
+        SET display_flag = #{displayFlag},
+            update_date  = #{updateDate},
+            update_by    = #{updateUserId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE
+        FROM sys_menu
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteMenuRole">
+        DELETE
+        FROM sys_role_menu
+        WHERE menu_id = #{id}
+    </update>
+
+
+    <!-- 维护树形结构 开始 -->
+    <!-- 获取树节点 -->
+    <select id="getTreeNode" resultMap="menuResult">
+        SELECT id,
+               parent_id AS "parentId",
+               lft,
+               rgt
+        FROM sys_menu
+        WHERE id = #{id}
+    </select>
+
+    <!-- 获取最大右编号 -->
+    <select id="getMaxPosition" resultType="Integer">
+        SELECT max(rgt)
+        FROM sys_menu
+    </select>
+
+    <update id="updateLftRgt">
+        UPDATE sys_menu
+        SET lft = #{node.lft},
+            rgt = #{node.rgt}
+        WHERE id = #{node.id}
+    </update>
+
+    <update id="updateParent">
+        UPDATE sys_menu
+        SET parent_id = #{node.parentId}
+        WHERE id = #{node.id}
+    </update>
+
+    <!-- 批量更新右编号 -->
+    <update id="moveTreeRgts">
+        UPDATE sys_menu
+        SET rgt = rgt + #{offset}
+        WHERE rgt &gt;= #{from}
+    </update>
+
+    <!-- 批量更新左编号 -->
+    <update id="moveTreeLfts">
+        UPDATE sys_menu
+        SET lft = lft + #{offset}
+        WHERE lft >= #{from}
+    </update>
+
+    <update id="moveTreeNodes">
+        UPDATE sys_menu
+        SET lft = lft + #{offset},
+            rgt = rgt + #{offset}
+        WHERE lft BETWEEN #{from} AND #{to}
+    </update>
+    <!-- 维护树形结构 结束 -->
+
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.thundax.modules.sys.dao.UploadFileDao">
+
+    <sql id="uploadFileColumns">
+        a.id,
+		a.create_date AS "createDate",
+		a.name,
+		a.extend_name as "extendName",
+		a.mime_type as "mimeType",
+		a.size,
+		a.path
+    </sql>
+
+    <select id="get" resultType="com.github.thundax.modules.sys.entity.UploadFile">
+        SELECT
+        <include refid="uploadFileColumns"/>
+        FROM sys_upload_file a
+        WHERE id = #{id}
+    </select>
+
+    <select id="findList" resultType="com.github.thundax.modules.sys.entity.UploadFile">
+        SELECT
+        <include refid="uploadFileColumns"/>
+        FROM sys_upload_file a
+        <where>
+            1=1
+            <if test="query != null">
+            </if>
+        </where>
+        ORDER BY a.create_date
+    </select>
+
+    <insert id="insert">
+        INSERT INTO sys_upload_file
+        (
+            id,
+            create_date,
+            name,
+            extend_name,
+            mime_type,
+            size,
+            path
+        )
+        VALUES
+        (
+            #{id},
+            #{createDate},
+            #{name},
+            #{extendName},
+            #{mimeType},
+            #{size},
+            #{path}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE sys_upload_file
+        SET name = #{name},
+            extend_name = #{extendName},
+            mime_type  = #{mimeType},
+            size = #{size},
+            path = #{path}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE
+        FROM sys_upload_file
+        WHERE id = #{id}
+    </update>
+
+    <select id="getContent" resultType="com.github.thundax.modules.sys.entity.UploadFile">
+        SELECT
+        <include refid="uploadFileColumns"/>
+        FROM sys_upload_file a
+        WHERE a.id = #{id}
+    </select>
+
+    <update id="deleteContent">
+		DELETE from sys_upload_file_data
+		WHERE id = #{id}
+	</update>
+
+</mapper>

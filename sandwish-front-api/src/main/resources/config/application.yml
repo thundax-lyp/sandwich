@@ -1,0 +1,61 @@
+server:
+  port: 20002
+  servlet:
+    context-path: /putuo-interaction-front
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    name: putuo-interaction-front
+
+  main:
+    bannerMode: "off"
+
+  jmx:
+    default-domain: putuo-interaction-front
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  thymeleaf:
+    enabled: false
+
+  resources:
+    add-mappings: false
+
+  messages:
+    basename: i18n/messages
+
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 20971520
+
+  profiles:
+    active: vastbase-dev
+
+shiro:
+  loginUrl: /auth/login
+  successUrl: /user/index
+  sessionManager:
+    sessionIdUrlRewritingEnabled: false
+    sessionIdCookieEnabled: true
+    cookie:
+      name: interaction.sid
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+
+logging:
+  config: classpath:config/logback-spring.xml
+  level:
+    com.wdit: DEBUG
+
+wdit:
+  interface:
+    authCode: 77dddd6a15444710a0a51defe66545f7

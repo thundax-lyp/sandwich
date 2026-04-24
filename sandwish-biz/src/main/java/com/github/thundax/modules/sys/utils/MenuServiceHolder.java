@@ -1,0 +1,62 @@
+package com.github.thundax.modules.sys.utils;
+
+import com.github.thundax.common.collect.ListUtils;
+import com.github.thundax.common.collect.MapUtils;
+import com.github.thundax.common.thread.PooledThreadLocal;
+import com.github.thundax.common.utils.SpringContextHolder;
+import com.github.thundax.common.utils.StringUtils;
+import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.MenuService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+/**
+ * @author wdit
+ */
+@Service
+@Lazy(false)
+public class MenuServiceHolder {
+
+    private static MenuService service;
+
+    private static final PooledThreadLocal<Map<String, Menu>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+
+    @Autowired
+    public MenuServiceHolder(MenuService targetService) {
+        service = targetService;
+    }
+
+    public static MenuService getService() {
+        if (service == null) {
+            service = SpringContextHolder.getBean(MenuService.class);
+        }
+        return service;
+    }
+
+    public static Menu get(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        return ID_OBJECT_HOLDER
+                .computeIfAbsent(MapUtils::newHashMap)
+                .computeIfAbsent(id, (key) -> getService().get(id));
+    }
+
+    public static void removeAllCache() {
+        getService().removeAllCache();
+    }
+
+    public static String getMenuIcon(String targetUrl) {
+        Menu menu = ListUtils.find(getService().findList(User.MAX_RANKS), item ->
+                StringUtils.isNotEmpty(item.getUrl()) && targetUrl.endsWith(item.getUrl()));
+        if (menu != null) {
+            return (String) menu.getDisplayParam("icon", StringUtils.EMPTY);
+        }
+        return StringUtils.EMPTY;
+    }
+
+}

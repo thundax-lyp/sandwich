@@ -1,0 +1,63 @@
+server:
+  port: 20009
+  servlet:
+    context-path: /putuo-interaction-admin-api
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  application:
+    name: putuo-interaction-admin-api
+
+  main:
+    bannerMode: "off"
+
+  jmx:
+    default-domain: putuo-interaction-admin-api
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  thymeleaf:
+    enabled: false
+
+  resources:
+    add-mappings: false
+
+  messages:
+    basename: i18n/messages
+
+  servlet:
+    multipart:
+      max-file-size: 20971520
+      max-request-size: 20971520
+
+  profiles:
+    active: vastbase-dev
+
+shiro:
+  loginUrl: /admin/login
+  successUrl: /admin/index
+  sessionManager:
+    sessionIdUrlRewritingEnabled: false
+    sessionIdCookieEnabled: true
+    cookie:
+      name: vltava.sid
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+
+logging:
+  config: classpath:config/logback-spring.xml
+  level:
+    com.wdit: DEBUG
+
+swagger:
+  base-package: com.github.thundax.modules
+  title: 沃尔塔瓦服务接口
+  description: 沃尔塔瓦服务相关接口
+

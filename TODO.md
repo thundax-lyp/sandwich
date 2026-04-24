@@ -27,10 +27,22 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `auth`：拆分认证模块 infra 迁移任务
-  - 范围对象：认证、令牌、登录表单、密码相关持久化链路
-  - 处理动作：先横向盘点认证模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+- [ ] `auth`：横向盘点认证模块 infra 迁移链路并拆分子 TODO
+  - 范围对象：认证、令牌、登录表单、密码相关 Redis 持久化链路
+  - 处理动作：先横向盘点认证模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，优先拆分 `AccessToken` 在线令牌链路、`LoginForm` 登录表单链路和密码支撑链路
   - 验收点：认证模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
+  - [ ] `auth-access-token`：拆分 `AccessToken` 在线令牌链路 infra 迁移任务
+    - 范围对象：`AccessToken` 在线令牌链路
+    - 处理动作：盘点当前 `AccessTokenDao`、`AccessTokenDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确在线令牌保存、激活、删除、按 token / userId 查询和在线数统计的迁移边界
+    - 验收点：`AccessToken` 链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
+  - [ ] `auth-login-form`：拆分 `LoginForm` 登录表单链路 infra 迁移任务
+    - 范围对象：`LoginForm` 登录表单链路
+    - 处理动作：盘点当前 `LoginFormDao`、`LoginFormDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确登录表单创建、刷新、验证码、短信验证码、私钥与删除的迁移边界
+    - 验收点：`LoginForm` 链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
+  - [ ] `auth-password-support`：拆分密码支撑链路 infra 迁移任务
+    - 范围对象：登录失败计数、账号锁定和密码校验相关 Redis 持久化链路
+    - 处理动作：盘点 `AuthApiController` 中的失败次数与锁定 Redis 读写链路，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确密码输错计数、锁定状态和解锁清理的迁移边界
+    - 验收点：密码支撑链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
 
 ## P0 - Controller / Service 模型职责隔离
 

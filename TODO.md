@@ -32,10 +32,45 @@
   - 处理动作：固定 `sandwish-infra` 是持久化实现模块；固定 `biz` 保留 `Entity`、`Service`、DAO interface；固定 `infra` 承载 `DO/DataObject`、DAO implementation、Mapper、Mapper XML、`PersistenceAssembler`
   - 验收点：后续模块迁移不需要重新讨论 `sandwish-infra` 的定位、依赖方向和持久化模型归属
 
-- [ ] `sys`：拆分系统模块 infra 迁移任务
-  - 范围对象：`Dict`、`Log`、`Menu`、`Office`、`Role`、`UploadFile`、`User`、`UserEncrypt` 等系统模块持久化链路
-  - 处理动作：先横向盘点系统模块每条持久化链路，按对象拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
-  - 验收点：系统模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
+- [ ] `sys-dict`：迁移字典持久化链路到 infra
+  - 范围对象：`Dict`、`BaseDict`、`DictDao`、`DictDao.xml`
+  - 处理动作：新增 `DictDO`、`DictPersistenceAssembler`、`DictDaoImpl`、`DictMapper`；迁移 MySQL、达梦、人大金仓 `DictDao.xml`；`DictDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`DictService` 不感知 `DO`；字典 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-log`：迁移日志持久化链路到 infra
+  - 范围对象：`Log`、`BaseLog`、`LogDao`、`LogDao.xml`
+  - 处理动作：新增 `LogDO`、`LogPersistenceAssembler`、`LogDaoImpl`、`LogMapper`；迁移 MySQL、达梦、人大金仓 `LogDao.xml`；`LogDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`LogService` 不感知 `DO`；日志 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-menu`：迁移菜单树持久化链路到 infra
+  - 范围对象：`Menu`、`BaseMenu`、`MenuDao`、`MenuDao.xml`
+  - 处理动作：新增 `MenuDO`、`MenuPersistenceAssembler`、`MenuDaoImpl`、`MenuMapper`；按 `TreeDao` 语义迁移 MySQL、达梦、人大金仓 `MenuDao.xml`；`MenuDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`MenuService` 不感知 `DO`；菜单树 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-office`：迁移机构树持久化链路到 infra
+  - 范围对象：`Office`、`BaseOffice`、`OfficeDao`、`OfficeDao.xml`
+  - 处理动作：新增 `OfficeDO`、`OfficePersistenceAssembler`、`OfficeDaoImpl`、`OfficeMapper`；按 `TreeDao` 语义迁移 MySQL、达梦、人大金仓 `OfficeDao.xml`；`OfficeDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`OfficeService` 不感知 `DO`；机构树 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-role`：迁移角色持久化链路到 infra
+  - 范围对象：`Role`、`BaseRole`、`RoleDao`、`RoleDao.xml`
+  - 处理动作：新增 `RoleDO`、`RolePersistenceAssembler`、`RoleDaoImpl`、`RoleMapper`；迁移 MySQL、达梦、人大金仓 `RoleDao.xml`；`RoleDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`RoleService` 不感知 `DO`；角色 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-upload-file`：迁移上传文件持久化链路到 infra
+  - 范围对象：`UploadFile`、`BaseUploadFile`、`UploadFileDao`、`UploadFileDao.xml`
+  - 处理动作：新增 `UploadFileDO`、`UploadFilePersistenceAssembler`、`UploadFileDaoImpl`、`UploadFileMapper`；迁移 MySQL、达梦 `UploadFileDao.xml`，并确认人大金仓当前缺少对应 XML 是否为预期；`UploadFileDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`UploadFileService` 不感知 `DO`；上传文件 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-user`：迁移用户持久化链路到 infra
+  - 范围对象：`User`、`BaseUser`、`UserDao`、`UserDao.xml`
+  - 处理动作：新增 `UserDO`、`UserPersistenceAssembler`、`UserDaoImpl`、`UserMapper`；迁移 MySQL、达梦、人大金仓 `UserDao.xml`；`UserDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`UserService` 不感知 `DO`；用户 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
+
+- [ ] `sys-user-encrypt`：迁移用户加密持久化链路到 infra
+  - 范围对象：`UserEncrypt`、`BaseUserEncrypt`、`UserEncryptDao`、`UserEncryptDao.xml`
+  - 处理动作：新增 `UserEncryptDO`、`UserEncryptPersistenceAssembler`、`UserEncryptDaoImpl`、`UserEncryptMapper`；迁移 MySQL、达梦、人大金仓 `UserEncryptDao.xml`；`UserEncryptDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
+  - 验收点：`UserEncryptService` 不感知 `DO`；用户加密 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
 
 - [ ] `storage`：拆分存储模块 infra 迁移任务
   - 范围对象：`Storage` 相关 Entity、DAO、Mapper/XML、Service

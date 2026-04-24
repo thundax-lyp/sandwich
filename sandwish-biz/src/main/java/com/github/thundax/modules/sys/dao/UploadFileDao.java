@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.List;
 /**
  * @author wdit
  */
-@MyBatisDao
 public interface UploadFileDao extends CrudDao<UploadFile> {
 
 

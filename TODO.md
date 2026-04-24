@@ -32,11 +32,6 @@
   - 处理动作：固定 `sandwish-infra` 是持久化实现模块；固定 `biz` 保留 `Entity`、`Service`、DAO interface；固定 `infra` 承载 `DO/DataObject`、DAO implementation、Mapper、Mapper XML、`PersistenceAssembler`
   - 验收点：后续模块迁移不需要重新讨论 `sandwish-infra` 的定位、依赖方向和持久化模型归属
 
-- [ ] `TODO.md`：建立 infra 迁移任务模板与索引
-  - 范围对象：`TODO.md`、`docs/30-designs/INFRA-SPLIT-RUNBOOK.md`
-  - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 固定模块任务模板，明确每个模块拆分时必须记录当前持久化链路、待新增 `DO`、待新增 `PersistenceAssembler`、待迁移 Mapper/XML/DAO implementation、DAO interface 是否需要去除 MyBatis 扫描标记
-  - 验收点：后续模块拆分任务有统一模板；本项不直接拆任何业务模块，也不迁移代码
-
 - [ ] `sys`：拆分系统模块 infra 迁移任务
   - 范围对象：`Dict`、`Log`、`Menu`、`Office`、`Role`、`UploadFile`、`User`、`UserEncrypt` 等系统模块持久化链路
   - 处理动作：先横向盘点系统模块每条持久化链路，按对象拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML

@@ -27,12 +27,6 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `assist-async-task`：迁移异步任务 Redis 持久化边界到 infra
-  - 范围对象：`AsyncTask`、`BaseAsyncTask`、`AsyncTaskService`、`AsyncTaskServiceImpl`
-  - 当前差异：异步任务当前通过 `AsyncTaskServiceImpl` 直接读写 `RedisClient`，没有 DAO、Mapper 或 Mapper XML；属于 Redis 持久化链路，不属于 MyBatis XML 迁移
-  - 处理动作：新增 `AsyncTaskDO`、`AsyncTaskPersistenceAssembler`、`AsyncTaskDao`、`AsyncTaskDaoImpl`；`AsyncTaskDaoImpl` 位于 `sandwish-infra` 并封装 `RedisClient` 读写；不新增 `AsyncTaskMapper` 或 Mapper XML，除非迁移时明确改为数据库持久化
-  - 验收点：`AsyncTaskServiceImpl` 不直接依赖 `RedisClient` 或 `DO`；异步任务 Redis persistence implementation 位于 `sandwish-infra`；任务过期时间、默认状态和私有标记语义保持不变
-
 - [ ] `member`：拆分会员模块 infra 迁移任务
   - 范围对象：`member` Entity、DAO、Mapper/XML、Service
   - 处理动作：先横向盘点会员模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML

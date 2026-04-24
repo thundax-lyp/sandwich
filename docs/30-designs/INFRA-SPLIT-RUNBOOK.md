@@ -2,17 +2,13 @@
 
 ## 1. Purpose
 
-本文档是一次性工程操作手册，只指导按业务模块横切 `sandwish-infra`。
+本文档是项目级迁移操作手册，只指导按业务模块横切 `sandwish-infra`。
 
 目标是先把持久化实现承载位置、包结构和依赖方向稳定下来，再按模块逐步迁移 DAO implementation、Mapper、Mapper XML、`DO` 与 `PersistenceAssembler`。
 
 Controller / Service 的 `Request` / `Response` / `Entity` 隔离由 [`MODEL-SEPARATION-RUNBOOK.md`](./MODEL-SEPARATION-RUNBOOK.md) 管理。
 
-本文档用完即删。迁移完成后：
-
-- 已完成任务从 `TODO.md` 删除
-- 本文件删除
-- 稳定规则沉淀到 `docs/00-governance/ARCHITECTURE.md`、`NAMING-AND-PLACEMENT-RULES.md` 或 `DATABASE-RULES.md`
+本手册作为老工程治理与迁移的长期参考文档保留在项目中。
 
 ## 2. Scope
 

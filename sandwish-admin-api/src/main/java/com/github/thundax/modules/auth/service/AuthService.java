@@ -165,8 +165,9 @@ public interface AuthService {
      *
      * @param user 用户
      * @param plainPassword 明文密码
+     * @throws com.github.thundax.common.exception.ApiException 业务异常
      */
-    void validatePassword(User user, String plainPassword);
+    void validatePassword(User user, String plainPassword) throws com.github.thundax.common.exception.ApiException;
 
     /**
      * 获取 PrivateKey

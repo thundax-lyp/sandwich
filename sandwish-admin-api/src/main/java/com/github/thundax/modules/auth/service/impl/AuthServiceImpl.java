@@ -264,7 +264,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void validatePassword(User user, String plainPassword) {
+    public void validatePassword(User user, String plainPassword) throws ApiException {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -312,7 +312,7 @@ public class AuthServiceImpl implements AuthService {
         return sb.toString();
     }
 
-    private void checkUserLock(User user) {
+    private void checkUserLock(User user) throws ApiException {
         Integer failCount = loginLockDao.getFailCount(user.getLoginName());
         if (failCount == null) {
             failCount = 1;

@@ -38,7 +38,7 @@ public final class MenuPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -66,7 +66,6 @@ public final class MenuPersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -81,25 +80,12 @@ public final class MenuPersistenceAssembler {
         return entities;
     }
 
-    private static MenuDO.Query toDataObjectQuery(Menu.Query query) {
+    private static void copyQuery(Menu.Query query, MenuDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        MenuDO.Query dataObjectQuery = new MenuDO.Query();
-        dataObjectQuery.setParentId(query.getParentId());
-        dataObjectQuery.setDisplayFlag(query.getDisplayFlag());
-        dataObjectQuery.setMaxRank(query.getMaxRank());
-        return dataObjectQuery;
-    }
-
-    private static Menu.Query toEntityQuery(MenuDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Menu.Query entityQuery = new Menu.Query();
-        entityQuery.setParentId(query.getParentId());
-        entityQuery.setDisplayFlag(query.getDisplayFlag());
-        entityQuery.setMaxRank(query.getMaxRank());
-        return entityQuery;
+        dataObject.setQueryParentId(query.getParentId());
+        dataObject.setQueryDisplayFlag(query.getDisplayFlag());
+        dataObject.setQueryMaxRank(query.getMaxRank());
     }
 }

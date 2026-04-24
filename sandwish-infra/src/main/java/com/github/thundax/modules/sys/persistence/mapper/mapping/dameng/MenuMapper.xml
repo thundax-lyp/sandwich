@@ -66,23 +66,21 @@
         FROM sys_menu a
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.parentId != null">
+            <if test="queryParentId != null">
                     <choose>
-                        <when test="query.parentId != 'ROOT'">
-                            AND a.parent_id = #{query.parentId}
+                        <when test="queryParentId != 'ROOT'">
+                            AND a.parent_id = #{queryParentId}
                         </when>
                         <otherwise>
                             AND a.parent_id IS NULL
                         </otherwise>
                     </choose>
-                </if>
-                <if test="query.displayFlag != null and query.displayFlag != ''">
-                    AND display_flag = ${query.displayFlag}
-                </if>
-                <if test="query.maxRank != null">
-                    AND ranks &lt;= ${query.maxRank}
-                </if>
+            </if>
+            <if test="queryDisplayFlag != null and queryDisplayFlag != ''">
+                AND display_flag = ${queryDisplayFlag}
+            </if>
+            <if test="queryMaxRank != null">
+                AND ranks &lt;= ${queryMaxRank}
             </if>
         </where>
         ORDER BY a.lft

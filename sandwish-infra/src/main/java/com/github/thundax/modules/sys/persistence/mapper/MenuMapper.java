@@ -1,14 +1,49 @@
 package com.github.thundax.modules.sys.persistence.mapper;
 
-import com.github.thundax.common.persistence.TreeDao;
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 菜单 MyBatis Mapper。
  */
 @MyBatisDao
-public interface MenuMapper extends TreeDao<MenuDO> {
+public interface MenuMapper {
+
+    MenuDO get(MenuDO menu);
+
+    List<MenuDO> getMany(@Param("idList") List<String> idList);
+
+    List<MenuDO> findList(MenuDO menu);
+
+    int insert(MenuDO menu);
+
+    int update(MenuDO menu);
+
+    int updatePriority(MenuDO menu);
+
+    int updateStatus(MenuDO menu);
+
+    int updateDelFlag(MenuDO menu);
+
+    int delete(MenuDO menu);
+
+    MenuDO getTreeNode(String id);
+
+    void updateLftRgt(@Param("node") MenuDO node);
+
+    void updateParent(@Param("node") MenuDO node);
+
+    Integer getMaxPosition(@Param("node") MenuDO node);
+
+    void moveTreeRgts(@Param("node") MenuDO node, @Param("from") Integer from, @Param("offset") Integer offset);
+
+    void moveTreeLfts(@Param("node") MenuDO node, @Param("from") Integer from, @Param("offset") Integer offset);
+
+    void moveTreeNodes(@Param("node") MenuDO node, @Param("from") Integer from, @Param("to") Integer to,
+                       @Param("offset") Integer offset);
 
     /**
      * 更新 displayFlag。

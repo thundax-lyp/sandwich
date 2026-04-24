@@ -42,12 +42,6 @@
 
 ## P0 - 持久化表达改造
 
-- [ ] `sys-menu`：改造菜单持久化表达
-  - 范围对象：`MenuService`、`MenuServiceImpl`、`MenuDao`、`MenuDaoImpl`、`MenuMapper`、`mysql/dameng/kingbase/MenuMapper.xml`、`MenuDO`、`MenuPersistenceAssembler`
-  - 当前依赖：`MenuService extends TreeService<Menu>`；`MenuServiceImpl extends TreeServiceImpl<MenuDao, Menu>`；`MenuDao extends TreeDao<Menu>`；`MenuMapper extends TreeDao<MenuDO>`；`Menu extends BaseMenu extends AdminTreeEntity<Menu>`；`MenuDO extends AdminTreeEntity<MenuDO>`；存在 `Menu.Query <-> MenuDO.Query`
-  - 处理动作：收敛菜单树查询、树节点移动、显示状态更新和菜单角色关系删除的持久化表达；拆除或替换本链路对 `TreeDao`、树结构父类字段、`DO.query` 和 `DO extends AdminTreeEntity` 的依赖
-  - 验收点：树结构写入仍由 Service 编排；Mapper XML 只接收 `MenuDO`；菜单角色关系写入边界清晰
-
 - [ ] `sys-office`：改造机构持久化表达
   - 范围对象：`OfficeService`、`OfficeServiceImpl`、`OfficeDao`、`OfficeDaoImpl`、`OfficeMapper`、`mysql/dameng/kingbase/OfficeMapper.xml`、`OfficeDO`、`OfficePersistenceAssembler`
   - 当前依赖：`OfficeService extends TreeService<Office>`；`OfficeServiceImpl extends TreeServiceImpl<OfficeDao, Office>`；`OfficeDao extends TreeDao<Office>`；`OfficeMapper extends TreeDao<OfficeDO>`；`Office extends BaseOffice extends AdminTreeEntity<Office>`；`OfficeDO extends AdminTreeEntity<OfficeDO>`；存在 `Office.Query <-> OfficeDO.Query`

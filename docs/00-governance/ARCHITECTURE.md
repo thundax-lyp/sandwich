@@ -61,7 +61,8 @@ Sandwich 固定采用三层 API 架构。
 - i18n 支撑
 - 通用 Service 基类
 - 通用持久化基础设施
-- Redis、存储、线程等通用技术能力
+- Redis client、连接、序列化和通用技术支撑
+- 存储、线程等通用技术能力
 
 边界：
 
@@ -95,12 +96,14 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - 持久化实现
+- Redis persistence implementation
 - `DO` / `DataObject`
 - DAO implementation
 - MyBatis Mapper
 - Mapper XML
 - `PersistenceAssembler`
 - 数据库类型转换和分页查询实现
+- 业务 Redis 持久化实现、业务 Redis DAO implementation、Redis Mapper 和 Redis Mapper XML
 
 边界：
 

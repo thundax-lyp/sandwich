@@ -18,6 +18,7 @@
 - packaging:
   - `sandwish-common`: jar
   - `sandwish-biz`: jar
+  - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
   - `sandwish-front-api`: jar
 - base package: `com.github.thundax`
@@ -38,16 +39,15 @@ Sandwich 固定采用三层 API 架构。
 - Service 层：业务流程、事务边界、业务校验、跨 DAO 编排。
 - DAO/Mapper 层：持久化访问、SQL 映射、分页查询、数据装载。
 
-以下目录语义不作为 Sandwich 默认架构：
+以下目录语义不作为 Sandwich 默认业务架构：
 
 - `interfaces`
 - `application`
 - `domain`
-- `infra`
 - `facade`
 - `repository`
 
-如因局部重构确需引入上述命名，必须先在架构文档中明确边界和迁移规则。
+`sandwish-infra` 固定只作为持久化实现模块，不引入额外业务分层语义。
 
 ## Module Boundaries
 
@@ -74,7 +74,8 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - 共享业务实体
-- DAO / Mapper / Service
+- DAO interface
+- Service
 - 业务工具
 - 后台与前台复用的业务能力
 - 系统、认证、会员、存储、辅助能力等业务模块
@@ -82,9 +83,33 @@ Sandwich 固定采用三层 API 架构。
 边界：
 
 - 可以依赖 `sandwish-common`。
-- 不依赖 `sandwish-admin-api` 和 `sandwish-front-api`。
+- 不依赖 `sandwish-infra`、`sandwish-admin-api` 和 `sandwish-front-api`。
 - 不放 Controller 入口适配。
+- 不放 `DO` / `DataObject`。
+- 不放 MyBatis Mapper implementation。
+- 不放 Mapper XML。
 - 业务规则优先收敛到 Service，不下沉到 Controller。
+
+### `sandwish-infra`
+
+职责：
+
+- 持久化实现
+- `DO` / `DataObject`
+- DAO implementation
+- MyBatis Mapper
+- Mapper XML
+- `PersistenceAssembler`
+- 数据库类型转换和分页查询实现
+
+边界：
+
+- 可以依赖 `sandwish-biz` 和 `sandwish-common`。
+- 不依赖 `sandwish-admin-api` 和 `sandwish-front-api`。
+- 不承载业务流程。
+- 不暴露 HTTP 模型。
+- 不让 Controller 直接调用。
+- 持久化包路径固定保留 `persistence` 包段，用于显式区分业务侧 DAO interface 与 infra 侧持久化实现。
 
 ### `sandwish-admin-api`
 
@@ -126,14 +151,15 @@ Sandwich 固定采用三层 API 架构。
 
 固定依赖方向为：
 
-`sandwish-admin-api -> sandwish-biz -> sandwish-common`
+`sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common`
 
-`sandwish-front-api -> sandwish-biz -> sandwish-common`
+`sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common`
 
 禁止依赖方向：
 
 - `sandwish-common` 不得依赖任何业务或入口模块。
-- `sandwish-biz` 不得依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
+- `sandwish-biz` 不得依赖 `sandwish-infra`、`sandwish-admin-api` 或 `sandwish-front-api`。
+- `sandwish-infra` 不得依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
 - `sandwish-admin-api` 与 `sandwish-front-api` 不得互相依赖。
 - 后台与前台不得通过复制 Service 实现来共享业务能力。
 
@@ -163,6 +189,9 @@ Sandwich 固定采用三层 API 架构。
 - 不承载业务流程。
 - 不处理 Web 会话、权限适配和页面语义。
 - SQL 变化必须同步检查实体、Mapper XML、Service 调用和数据库文档。
+- DAO interface 固定归属 `sandwish-biz`。
+- DAO implementation、MyBatis Mapper、Mapper XML 和 `DO` / `DataObject` 固定归属 `sandwish-infra`。
+- `PersistenceAssembler` 固定归属 `sandwish-infra`，只负责 `Entity <-> DO/DataObject` 转换。
 
 ### Entity / VO / DTO
 
@@ -181,7 +210,7 @@ Sandwich 固定采用三层 API 架构。
 ## Web Application Rules
 
 - `sandwish-admin-api` 和 `sandwish-front-api` 是两个独立 jar API 应用。
-- 两个 API 应用可以复用 `sandwish-biz` 和 `sandwish-common`。
+- 两个 API 应用可以复用 `sandwish-infra`、`sandwish-biz` 和 `sandwish-common`。
 - 不新增 `src/main/webapp`、`WEB-INF`、服务端页面模板、标签库或页面装饰器配置。
 - 配置文件固定放在 `src/main/resources/config`。
 - 静态资源固定放在 `src/main/resources/static` 或现有静态资源目录。
@@ -190,10 +219,11 @@ Sandwich 固定采用三层 API 架构。
 ## Business Module Rules
 
 - 业务模块当前按 `com.github.thundax.modules.*` 组织。
-- 同一业务对象的 Controller、Service、DAO、Entity 和 API 支撑资源应保持模块归属一致。
+- 同一业务对象的 Controller、Service、DAO interface、Entity 和 API 支撑资源应按固定层归属放置，并保持业务模块路径一致。
 - 后台专用入口放在 `sandwish-admin-api`。
 - 前台专用入口放在 `sandwish-front-api`。
 - 前后台共享业务规则放在 `sandwish-biz`。
+- 前后台共享持久化实现放在 `sandwish-infra`。
 - 通用但无业务语义的工具放在 `sandwish-common`。
 
 ## Transaction And Consistency

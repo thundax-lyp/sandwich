@@ -41,6 +41,18 @@
 - 跨表写入必须在 Service 中明确编排
 - 跨模块引用只保留必要业务键或快照，不复制对端主表结构
 
+## Persistence Layer Rules
+
+- `sandwish-biz` 固定保留 `Entity`、Service 和 DAO interface。
+- `sandwish-infra` 固定承载 `DO/DataObject`、DAO implementation、MyBatis Mapper、Mapper XML 和 `PersistenceAssembler`。
+- DAO interface 不使用 MyBatis 扫描标记。
+- MyBatis Mapper interface 使用 MyBatis 扫描标记。
+- Mapper XML namespace 固定指向 `sandwish-infra` 中的 Mapper interface。
+- Mapper XML result type 固定指向 `DO/DataObject`。
+- `PersistenceAssembler` 只负责 `Entity <-> DO/DataObject` 转换，不调用 Service、DAO 或 Mapper。
+- Service 不感知 `DO/DataObject`。
+- Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
+
 ## Index And Uniqueness
 
 - 主键必须唯一

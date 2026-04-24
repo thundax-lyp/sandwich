@@ -5,6 +5,8 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
+import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
+import com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -50,7 +52,8 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
     @Override
     public AccessToken getByUserId(String userId) {
-        AccessToken accessToken = redisClient.get(CACHE_USER_ID_ + userId, AccessToken.class);
+        AccessTokenDO accessTokenDO = redisClient.get(CACHE_USER_ID_ + userId, AccessTokenDO.class);
+        AccessToken accessToken = AuthPersistenceAssembler.toEntity(accessTokenDO);
         if (accessToken != null) {
             accessToken.setUserId(userId);
         }
@@ -64,8 +67,9 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
         int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
+        AccessTokenDO accessTokenDO = AuthPersistenceAssembler.toDataObject(accessToken);
         redisClient.set(CACHE_TOKEN_ + accessToken.getToken(), accessToken.getUserId(), expiredSeconds);
-        redisClient.set(CACHE_USER_ID_ + accessToken.getUserId(), accessToken, expiredSeconds);
+        redisClient.set(CACHE_USER_ID_ + accessToken.getUserId(), accessTokenDO, expiredSeconds);
     }
 
     @Override

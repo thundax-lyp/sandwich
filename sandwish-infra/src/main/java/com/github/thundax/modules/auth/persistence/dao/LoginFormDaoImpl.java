@@ -8,6 +8,8 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
+import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -51,7 +53,8 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     @Override
     public LoginForm getByToken(String loginToken) {
-        LoginForm form = redisClient.get(CACHE_TOKEN_ + loginToken, LoginForm.class);
+        LoginFormDO formDO = redisClient.get(CACHE_TOKEN_ + loginToken, LoginFormDO.class);
+        LoginForm form = AuthPersistenceAssembler.toEntity(formDO);
         if (form != null) {
             form.setLoginToken(loginToken);
         }
@@ -100,7 +103,8 @@ public class LoginFormDaoImpl implements LoginFormDao {
             }
         }
 
-        redisClient.set(CACHE_TOKEN_ + form.getLoginToken(), form,
+        LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
+        redisClient.set(CACHE_TOKEN_ + form.getLoginToken(), formDO,
                 properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
 
         SetUtils.forEach(removeTokens,
@@ -127,7 +131,8 @@ public class LoginFormDaoImpl implements LoginFormDao {
         LoginForm form = getByToken(loginToken);
         if (form != null) {
             form.setCaptcha(captcha);
-            redisClient.set(CACHE_TOKEN_ + loginToken, form,
+            LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
+            redisClient.set(CACHE_TOKEN_ + loginToken, formDO,
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }
@@ -138,8 +143,8 @@ public class LoginFormDaoImpl implements LoginFormDao {
         if (form != null) {
             form.setMobile(mobile);
             form.setMobileValidateCode(validateCode);
-
-            redisClient.set(CACHE_TOKEN_ + loginToken, form,
+            LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
+            redisClient.set(CACHE_TOKEN_ + loginToken, formDO,
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }

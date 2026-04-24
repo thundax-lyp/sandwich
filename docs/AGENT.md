@@ -21,6 +21,8 @@
 
 - 纯实现、修 bug、重构业务逻辑：
   读 `ARCHITECTURE.md`，再读对应 `10-requirements/*-REQUIREMENTS.md`
+- 需要解释架构意图、规则冲突、分层取舍、小步提交意图或 AI 误改风险：
+  读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：
   再读 `00-governance/NAMING-AND-PLACEMENT-RULES.md`
 - 数据库、实体、DAO、Mapper、SQL、持久化查询：
@@ -34,6 +36,12 @@
 - 上线准备、运维、发布、WAR 打包：
   先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
   再读 `40-readiness/`
+- TODO 协作、任务拆解、人机审阅：
+  读 `00-governance/how-to/HOW-TO-RUN-TODO-COLLABORATION.md`
+- 任务收口、测试检查、文档同步、小步提交：
+  读 `00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md`
+- 新增或修改 `HOW-TO` 操作手册：
+  读 `00-governance/how-to/HOW-TO-HOW-TO.md`
 - 专项方案、路线图、跨模块设计：
   按需读 `30-designs/`
 
@@ -72,11 +80,21 @@
 ## TODO Lifecycle
 
 - 根目录 `TODO.md` 是任务执行队列，不是完成历史。
+- 宏观任务进入 `TODO.md` 后，按 [`00-governance/how-to/HOW-TO-RUN-TODO-COLLABORATION.md`](./00-governance/how-to/HOW-TO-RUN-TODO-COLLABORATION.md) 完成人机讨论、任务拆解、人工审阅和执行关闭。
 - 已完成任务不得在 `TODO.md` 中打勾长期保留，必须直接删除。
 - 删除已完成 TODO 项必须和完成该任务的代码、文档或测试修改放在同一个 commit。
 - 任务只完成一部分时，不得删除整项；必须拆分或收窄为剩余未完成内容。
 - 待讨论项完成决策后，必须删除待讨论项；若仍需执行，新增明确执行项。
 - 完成历史以 commit / PR 保留，不在 `TODO.md` 中重复记录。
+
+## Commit Lifecycle
+
+- 所有文件修改在任务结束前必须提交。
+- 提交前按 [`00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md`](./00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md) 完成收口判断。
+- commit 固定格式：`Type(domain): 中文说明`
+- 每个 commit 只收敛一个明确判断。
+- 不相关修改必须拆分提交。
+- commit message 必须说明具体能力变化，不写空泛的“调整”“修改”“优化”。
 
 ## Directory Map
 

@@ -1,38 +1,75 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
+## Read Order
 
-This is a Maven multi-module Java 8 Spring Boot project. The root `pom.xml` defines shared dependency versions and modules:
+- Read `docs/AGENT.md` first.
+- For implementation work, read `docs/00-governance/ARCHITECTURE.md`.
+- Do not treat root `README.md` as implementation authority.
 
-- `interaction-framework`: common framework utilities under `src/main/java/com/wdit/common`.
-- `interaction-base`: shared business/domain support under `src/main/java/com/wdit/modules`.
-- `interaction-admin-api`: admin WAR application with Java code, config, JSP views, tags, and vendor JARs.
-- `interaction-front`: front-facing WAR application with Java code, config, JSP views, and static assets.
+## Working Rules
 
-Use `src/main/java` for Java classes, `src/main/resources/config` for Spring configuration, `src/main/resources/static` for CSS/JS/images, and `src/main/webapp/WEB-INF/views` for JSP pages.
+- Load the minimum docs needed for the task.
+- Prefer the simplest workable solution.
+- Do not add abstraction, config, directories, or helper layers without a concrete need.
+- Keep the existing Maven multi-module structure and three-layer architecture.
+- Do not migrate Bacon's DDD layer model into this project by default.
 
-## Build, Test, and Development Commands
+## Project Layout
 
-- `mvn clean install`: builds all modules, runs tests, and installs artifacts locally.
-- `mvn test`: runs the full Maven test phase.
-- `mvn -pl interaction-admin-api -am package`: builds the admin WAR and required dependencies.
-- `mvn -pl interaction-front -am package`: builds the front WAR and required dependencies.
-- `mvn -pl interaction-framework test`: runs tests for one module.
+- Root project: Maven multi-module, Java 8, root `pom.xml`
+- Shared code: `sandwish-common/`
+- Business code: `sandwish-biz/`
+- Admin WAR application: `sandwish-admin-api/`
+- Front WAR application: `sandwish-front-api/`
+- AI routing docs: `docs/`
 
-The WAR modules rely on system-scoped vendor JARs in `src/main/webapp/WEB-INF/lib`; keep those paths intact when packaging.
+Main dependency direction:
 
-## Coding Style & Naming Conventions
+- `sandwish-admin-api -> sandwish-biz -> sandwish-common`
+- `sandwish-front-api -> sandwish-biz -> sandwish-common`
 
-Follow the existing Java style: 4-space indentation, package names under `com.wdit`, PascalCase classes, camelCase fields/methods, and uppercase constants. Keep controllers, services, utilities, JSPs, and static assets in the same module as the feature they serve. Prefer existing helper classes in `interaction-framework` and `interaction-base` before adding new utilities.
+Main runtime chain:
 
-## Testing Guidelines
+- `HTTP/JSP/API -> Controller -> Service -> DAO/Mapper -> Database`
 
-Place tests under each module’s `src/test/java`, mirroring the production package. Name unit tests `*Test` and integration-style tests `*IT` when added. Use `mvn test` before submitting shared framework/base changes, and run the relevant module package command before WAR-facing changes.
+## Code Rules
 
-## Commit & Pull Request Guidelines
+- Java/XML/YAML use 4-space indentation.
+- Base package: `com.github.thundax`
+- Class: `PascalCase`
+- Method/field: `camelCase`
+- Constant: `UPPER_SNAKE_CASE`
 
-The current history is minimal (`Initial commit`), so use clear imperative commit messages such as `Add archive upload validation` or `Fix front login redirect`. For pull requests, include a short summary, affected modules, test/build commands run, linked issues when applicable, and screenshots for JSP or static UI changes.
+Layer responsibilities:
 
-## Security & Configuration Tips
+- `Controller`: HTTP entry, request binding, session/security adaptation, response or JSP view selection
+- `Service`: business flow, transaction boundary, validation, cross-DAO orchestration
+- `DAO/Mapper`: persistence access and SQL mapping
+- `JSP/static`: presentation and interaction, not core business rules
 
-Do not commit credentials or environment-specific secrets in `application*.yml`. Keep database drivers and third-party binary updates deliberate, documented, and limited to the module that needs them.
+## Testing
+
+- Tests live in `src/test/java`.
+- Behavior changes require test updates.
+- Shared framework or business changes should run `mvn test` when feasible.
+- WAR-facing changes should run the relevant module package command when feasible.
+
+## Commits
+
+- Every file modification must be committed before ending the task.
+- Commit format: `Type(domain): 中文说明`
+- Split unrelated changes into separate commits.
+- Commit message must state the concrete capability changed.
+- Completed `TODO.md` items must be deleted, split, or narrowed in the same commit as the corresponding code, test, or document change.
+
+Examples:
+
+- `Feat(admin): 增加后台登录校验`
+- `Fix(storage): 修复文件删除状态更新`
+- `Docs(governance): 补充提交收口规则`
+- `Test(sys): 补充用户查询测试`
+
+## Security
+
+- Do not commit credentials or environment-specific secrets in `application*.yml`.
+- Keep database drivers and third-party binary updates deliberate, documented, and limited to the module that needs them.

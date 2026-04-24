@@ -2,6 +2,14 @@
 
 本文件只保留架构决策和实现红线。本文档是讨论稿，后续规则收敛后再拆分到命名、数据库、部署等专项治理文档。
 
+相关文档：
+
+- 架构意图、小步提交和决策记忆见 [`ARCHITECTURE-INTENT.md`](./ARCHITECTURE-INTENT.md)
+- 新增类、改类名、改目录、判断模块归属见 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
+- 数据库、实体、DAO、Mapper 和持久化查询见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
+- 文档写作与维护见 [`DOCUMENT-RULES.md`](./DOCUMENT-RULES.md)
+- 上线准备、运维和 WAR 打包见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
+
 ## Project Baseline
 
 - project: Maven multi-module

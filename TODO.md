@@ -42,10 +42,10 @@
   - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 的 TODO 模板，为每个模块列出当前持久化链路、待新增 `DO`、待新增 `PersistenceAssembler`、待迁移 Mapper/XML/DAO implementation、DAO interface 是否需要去除 MyBatis 扫描标记
   - 验收点：每个模块都有可独立验收的 infra 迁移 TODO；TODO 不包含 Controller / Service API 模型改造
 
-- [ ] `sys`：迁移系统模块持久化实现
+- [ ] `sys`：拆分系统模块 infra 迁移任务
   - 范围对象：`Dict`、`Log`、`Menu`、`Office`、`Role`、`UploadFile`、`User`、`UserEncrypt` 等系统模块持久化链路
-  - 处理动作：先从一个持久化子链路试点，再逐步建立 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML 的 `sandwish-infra` 实现
-  - 验收点：系统模块已迁移对象的 Service 不感知 `DO`，DAO implementation 和 Mapper/XML 位于 `sandwish-infra`
+  - 处理动作：先横向盘点系统模块每条持久化链路，按对象拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+  - 验收点：系统模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
 - [ ] `storage`：迁移存储模块 infra 实现
   - 范围对象：`Storage` 相关 Entity、DAO、Mapper/XML、Service

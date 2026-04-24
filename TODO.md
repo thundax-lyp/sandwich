@@ -27,10 +27,11 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `storage`：拆分存储模块 infra 迁移任务
-  - 范围对象：`Storage` 相关 Entity、DAO、Mapper/XML、Service
-  - 处理动作：先横向盘点存储模块持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
-  - 验收点：存储模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
+- [ ] `storage-file`：迁移存储文件与业务绑定持久化链路到 infra
+  - 范围对象：`Storage`、`BaseStorage`、`StorageBusiness`、`BaseStorageBusiness`、`StorageDao`、`StorageDao.xml`
+  - 当前差异：MySQL `StorageDao.xml` 将业务绑定字段放在 `assist_storage`，包含未被 `StorageDao` 声明的 `removeBusiness`，但缺少 `findBusiness`、`insertBusiness`、`deleteBusiness`、`deleteBusinessByBusiness`；达梦 `StorageDao.xml` 使用 `assist_storage_business` 关系表，包含业务绑定方法，但缺少 `findBusinessTypeList`；人大金仓当前缺少对应 XML
+  - 处理动作：新增 `StorageDO`、`StorageBusinessDO`、`StoragePersistenceAssembler`、`StorageDaoImpl`、`StorageMapper`；迁移 MySQL、达梦 `StorageDao.xml`；`StorageDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记；迁移时先保持现有数据库 SQL 语义差异，不在本任务统一表结构
+  - 验收点：`StorageService` 不感知 `DO`；存储 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`；MySQL 与达梦现有存储文件和业务绑定能力均有对应 Mapper statement；人大金仓缺少对应 XML 的状态被明确保留或补齐
 
 - [ ] `assist`：拆分辅助模块 infra 迁移任务
   - 范围对象：签名、密钥、异步任务等 `assist` 持久化链路

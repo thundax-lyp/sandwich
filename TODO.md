@@ -27,11 +27,6 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `sys-user-encrypt`：迁移用户加密持久化链路到 infra
-  - 范围对象：`UserEncrypt`、`BaseUserEncrypt`、`UserEncryptDao`、`UserEncryptDao.xml`
-  - 处理动作：新增 `UserEncryptDO`、`UserEncryptPersistenceAssembler`、`UserEncryptDaoImpl`、`UserEncryptMapper`；迁移 MySQL、达梦、人大金仓 `UserEncryptDao.xml`；`UserEncryptDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记
-  - 验收点：`UserEncryptService` 不感知 `DO`；用户加密 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`
-
 - [ ] `storage`：拆分存储模块 infra 迁移任务
   - 范围对象：`Storage` 相关 Entity、DAO、Mapper/XML、Service
   - 处理动作：先横向盘点存储模块持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML

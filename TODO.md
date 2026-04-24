@@ -27,10 +27,11 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `member`：拆分会员模块 infra 迁移任务
-  - 范围对象：`member` Entity、DAO、Mapper/XML、Service
-  - 处理动作：先横向盘点会员模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
-  - 验收点：会员模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
+- [ ] `member-member`：迁移会员持久化链路到 infra
+  - 范围对象：`Member`、`BaseMember`、`MemberDao`、`MemberDao.xml`
+  - 当前差异：MySQL、达梦、人大金仓 `MemberDao.xml` 当前内容一致；`MemberDao` 声明 `getByZjhm` 且 `MemberService` 会调用，但三套 XML 当前均缺少 `getByZjhm` statement；`email`、`mobile`、`address` 字段使用 `DefaultEncryptTypeHandler`
+  - 处理动作：新增 `MemberDO`、`MemberPersistenceAssembler`、`MemberDaoImpl`、`MemberMapper`；迁移 MySQL、达梦、人大金仓 `MemberDao.xml`；`MemberDao` 保留为 biz DAO interface 并去除 MyBatis 扫描标记；迁移时补齐或明确处理 `getByZjhm` statement
+  - 验收点：`MemberService` 不感知 `DO`；会员 DAO implementation、Mapper 和 XML 位于 `sandwish-infra`；`findByLoginName`、`findByEmail`、`updateLoginInfo`、`updateInfo`、`updateLoginPass`、`updateEnableFlag`、`getByZjhm`、`getByYwtbId` 均有对应 Mapper statement；敏感字段加密 typeHandler 语义保持不变
 
 - [ ] `auth`：拆分认证模块 infra 迁移任务
   - 范围对象：认证、令牌、登录表单、密码相关持久化链路

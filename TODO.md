@@ -42,12 +42,6 @@
 
 ## P0 - 持久化表达改造
 
-- [ ] `sys-user-encrypt`：改造用户密文字段持久化表达
-  - 范围对象：`UserEncryptService`、`DefaultUserEncryptServiceImpl`、`DatabaseUserEncryptServiceImpl`、`UserEncryptDao`、`UserEncryptDaoImpl`、`UserEncryptMapper`、`mysql/dameng/kingbase/UserEncryptMapper.xml`、`UserEncryptDO`、`UserEncryptPersistenceAssembler`
-  - 当前依赖：`UserEncryptService extends CrudService<UserEncrypt>`；两个 Service implementation 均继承 `CrudServiceImpl<UserEncryptDao, UserEncrypt>`；`UserEncryptDao extends CrudDao<UserEncrypt>`；`UserEncryptMapper extends CrudDao<UserEncryptDO>`；`UserEncrypt extends BaseUserEncrypt extends AdminDataEntity<UserEncrypt>`；`UserEncryptDO extends AdminDataEntity<UserEncryptDO>`；当前无独立 `Query`
-  - 处理动作：收敛用户密文字段查询、列表查询和密码更新的持久化表达；拆除或替换本链路对 `CrudDao` 通用契约和 `DO extends AdminDataEntity` 的依赖
-  - 验收点：默认加密实现与数据库加密实现仍保持现有业务语义；DAO implementation 完成 Entity/DO 转换；密文字段不向 Controller 或 Service 暴露 `DO`
-
 - [ ] `sys-role`：改造角色持久化表达
   - 范围对象：`RoleService`、`RoleServiceImpl`、`RoleDao`、`RoleDaoImpl`、`RoleMapper`、`mysql/dameng/kingbase/RoleMapper.xml`、`RoleDO`、`RolePersistenceAssembler`
   - 当前依赖：`RoleService extends CrudService<Role>`；`RoleServiceImpl extends CrudServiceImpl<RoleDao, Role>`；`RoleDao extends CrudDao<Role>`；`RoleMapper extends CrudDao<RoleDO>`；`Role extends BaseRole extends AdminDataEntity<Role>`；`RoleDO extends AdminDataEntity<RoleDO>`；存在 `Role.Query <-> RoleDO.Query`

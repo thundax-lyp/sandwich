@@ -37,35 +37,35 @@
   - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 建立每个模块的 `dataobject`、`assembler`、`mapper`、`dao` 承载目录或最小占位文件
   - 验收点：只形成 infra 横切承载骨架，不迁移任何 Controller / Service / Mapper / XML 代码，构建通过
 
-- [ ] `TODO.md`：按业务模块拆分 infra 迁移任务
-  - 范围对象：`sys`、`storage`、`assist`、`member`、`auth`
-  - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 的 TODO 模板，为每个模块列出当前持久化链路、待新增 `DO`、待新增 `PersistenceAssembler`、待迁移 Mapper/XML/DAO implementation、DAO interface 是否需要去除 MyBatis 扫描标记
-  - 验收点：每个模块都有可独立验收的 infra 迁移 TODO；TODO 不包含 Controller / Service API 模型改造
+- [ ] `TODO.md`：建立 infra 迁移任务模板与索引
+  - 范围对象：`TODO.md`、`docs/30-designs/INFRA-SPLIT-RUNBOOK.md`
+  - 处理动作：按 `docs/30-designs/INFRA-SPLIT-RUNBOOK.md` 固定模块任务模板，明确每个模块拆分时必须记录当前持久化链路、待新增 `DO`、待新增 `PersistenceAssembler`、待迁移 Mapper/XML/DAO implementation、DAO interface 是否需要去除 MyBatis 扫描标记
+  - 验收点：后续模块拆分任务有统一模板；本项不直接拆任何业务模块，也不迁移代码
 
 - [ ] `sys`：拆分系统模块 infra 迁移任务
   - 范围对象：`Dict`、`Log`、`Menu`、`Office`、`Role`、`UploadFile`、`User`、`UserEncrypt` 等系统模块持久化链路
   - 处理动作：先横向盘点系统模块每条持久化链路，按对象拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
   - 验收点：系统模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
-- [ ] `storage`：迁移存储模块 infra 实现
+- [ ] `storage`：拆分存储模块 infra 迁移任务
   - 范围对象：`Storage` 相关 Entity、DAO、Mapper/XML、Service
-  - 处理动作：建立 `DO` 与 `PersistenceAssembler`，将持久化实现迁入 `sandwish-infra`
-  - 验收点：存储模块 Service 只处理轻量 Entity，DAO implementation 和 Mapper/XML 位于 `sandwish-infra`，上传/查询/删除相关构建链路通过
+  - 处理动作：先横向盘点存储模块持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+  - 验收点：存储模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
-- [ ] `assist`：迁移辅助模块 infra 实现
+- [ ] `assist`：拆分辅助模块 infra 迁移任务
   - 范围对象：签名、密钥、异步任务等 `assist` 持久化链路
-  - 处理动作：建立 `DO`、`PersistenceAssembler`、DAO implementation 与 Mapper/XML 的 `sandwish-infra` 实现
-  - 验收点：`assist` 模块完成持久化模型隔离，Service 不感知 `DO`
+  - 处理动作：先横向盘点辅助模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+  - 验收点：辅助模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
-- [ ] `member`：迁移会员模块 infra 实现
+- [ ] `member`：拆分会员模块 infra 迁移任务
   - 范围对象：`member` Entity、DAO、Mapper/XML、Service
-  - 处理动作：建立会员模块 `DO` 和 `PersistenceAssembler`，迁移 DAO implementation 与 Mapper/XML
-  - 验收点：会员模块完成持久化模型隔离，Service 不感知 `DO`
+  - 处理动作：先横向盘点会员模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+  - 验收点：会员模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
-- [ ] `auth`：迁移认证模块 infra 实现
+- [ ] `auth`：拆分认证模块 infra 迁移任务
   - 范围对象：认证、令牌、登录表单、密码相关持久化链路
-  - 处理动作：识别业务模型与持久化模型边界，按需建立 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
-  - 验收点：认证模块完成持久化模型隔离，敏感字段不在持久化转换过程中误暴露
+  - 处理动作：先横向盘点认证模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，标明各自需要的 `DO`、`PersistenceAssembler`、DAO implementation、Mapper 和 Mapper XML
+  - 验收点：认证模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
 
 ## P0 - Controller / Service 模型职责隔离
 
@@ -79,10 +79,10 @@
   - 处理动作：按 `docs/30-designs/MODEL-SEPARATION-RUNBOOK.md` 的 TODO 模板，为每个入口列出当前 API 模型泄漏点、待新增或收窄的 `Request/Response`、待新增 `InterfaceAssembler`、Service 方法签名是否需要调整
   - 验收点：每个入口都有可独立验收的模型隔离 TODO；TODO 不包含 Mapper/XML/DAO implementation 迁移
 
-- [ ] `sys-dict`：完成 Controller / Service 模型职责隔离试点
+- [ ] `sys-dict`：拆分 Controller / Service 模型职责隔离试点任务
   - 范围对象：`Dict` 相关 Controller/API、Service、Entity、API 查询与响应模型
-  - 处理动作：以 `dict` 为试点建立或收窄 `Request/Response`、轻量 `Entity`、`InterfaceAssembler`，不迁移 Mapper/XML/DAO implementation
-  - 验收点：`Controller` 不依赖 `DO`，Controller 不直接暴露业务 Entity，Service 不依赖 `Request/Response`，构建通过
+  - 处理动作：先盘点 `dict` 入口的 API 模型泄漏点，拆出后续试点 TODO，标明需要新增或收窄的 `Request/Response`、`InterfaceAssembler` 和 Service 方法签名调整点；不迁移 Mapper/XML/DAO implementation
+  - 验收点：`sys-dict` 形成可执行的 Controller / Service 模型隔离试点清单；本项不直接改造任何入口代码
 
 - [ ] `docs/30-designs`：模型隔离迁移收尾
   - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`MODEL-SEPARATION-RUNBOOK.md`、`TODO.md`、治理文档

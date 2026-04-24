@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.entity.Log;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +9,6 @@ import java.util.List;
 /**
  * @author wdit
  */
-@MyBatisDao
 public interface LogDao extends CrudDao<Log> {
 
     /**

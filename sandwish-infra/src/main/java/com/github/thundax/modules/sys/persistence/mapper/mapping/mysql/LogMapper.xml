@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.github.thundax.modules.sys.dao.LogDao">
+<mapper namespace="com.github.thundax.modules.sys.persistence.mapper.LogMapper">
 
     <sql id="logColumns">
         a.id,
@@ -15,14 +15,14 @@
 		a.request_params AS "requestParams"
     </sql>
 
-    <select id="get" resultType="com.github.thundax.modules.sys.entity.Log">
+    <select id="get" resultType="com.github.thundax.modules.sys.persistence.dataobject.LogDO">
         SELECT
         <include refid="logColumns"/>
         FROM sys_log a
         WHERE id = #{id}
     </select>
 
-    <select id="findList" resultType="com.github.thundax.modules.sys.entity.Log">
+    <select id="findList" resultType="com.github.thundax.modules.sys.persistence.dataobject.LogDO">
         SELECT
         <include refid="logColumns"/>
         FROM sys_log a
@@ -99,12 +99,6 @@
         type, log_date, title,
         remote_addr, user_agent, method,
         request_uri, request_params)
-        VALUES (#{id}, #{userId},
-        #{type}, #{logDate},
-        #{title},
-        #{remoteAddr}, #{userAgent},
-        #{method},
-        #{requestUri}, #{requestParams})
         <foreach collection="list" item="item" separator=" union all " index="idx">
             SELECT #{item.id}, #{item.userId},
             #{item.type}, #{item.logDate}, #{item.title},

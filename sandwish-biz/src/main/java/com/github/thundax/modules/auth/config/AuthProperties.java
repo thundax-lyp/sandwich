@@ -4,22 +4,19 @@ import com.github.thundax.common.utils.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author wdit
+ * auth配置。
  */
 @ConfigurationProperties(prefix = "vltava.auth")
 public class AuthProperties {
 
-    /*** 最大同时登录用户数 ***/
-    private int maxLoginCount = 100;
-    /*** 最大同时在线用户数 ***/
+    private int maxLoginCount = 10;
+
     private int maxOnlineCount = 200;
-    /*** 登录超时时间（秒） ***/
+
     private int loginExpiredSeconds = 300;
-    /*** 会话超时时间（秒） ***/
-    private int tokenExpiredSeconds = 300;
-    /*** 验证码白名单，用于压力测试 ***/
+
     private String whiteCaptcha = StringUtils.EMPTY;
-    /*** 短信验证码模板 ***/
+
     private String validateCodeTemplate = StringUtils.EMPTY;
 
     public int getMaxLoginCount() {
@@ -44,14 +41,6 @@ public class AuthProperties {
 
     public void setLoginExpiredSeconds(int loginExpiredSeconds) {
         this.loginExpiredSeconds = loginExpiredSeconds;
-    }
-
-    public int getTokenExpiredSeconds() {
-        return tokenExpiredSeconds;
-    }
-
-    public void setTokenExpiredSeconds(int tokenExpiredSeconds) {
-        this.tokenExpiredSeconds = tokenExpiredSeconds;
     }
 
     public String getWhiteCaptcha() {

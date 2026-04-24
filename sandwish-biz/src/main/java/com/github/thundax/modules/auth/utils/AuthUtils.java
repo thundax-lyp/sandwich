@@ -11,7 +11,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author wdit
+ * auth工具。
  */
 public class AuthUtils {
 
@@ -48,5 +48,4 @@ public class AuthUtils {
         return StringUtils.isBlank(currentCheckCode)
                 || StringUtils.equals(checkCode, currentCheckCode);
     }
-
 }

@@ -6,6 +6,7 @@ import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
+import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 
 /**
@@ -158,6 +159,14 @@ public interface AuthService {
      * @param accessToken accessToken
      */
     void deleteAccessToken(AccessToken accessToken);
+
+    /**
+     * 校验登录密码并处理失败锁定。
+     *
+     * @param user 用户
+     * @param plainPassword 明文密码
+     */
+    void validatePassword(User user, String plainPassword);
 
     /**
      * 获取 PrivateKey

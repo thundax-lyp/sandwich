@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.dao.impl;
+package com.github.thundax.modules.auth.persistence.dao;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.redis.RedisClient;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 /**
- * @author thundax
+ * access token Redis DAO 实现。
  */
 @Repository
 @EnableConfigurationProperties(AuthProperties.class)
@@ -43,7 +43,6 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         return redisClient.keys(CACHE_TOKEN_).size();
     }
 
-
     @Override
     public String getUidByToken(String token) {
         return redisClient.get(CACHE_TOKEN_ + token);
@@ -63,16 +62,15 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         Assert.notNull(accessToken.getToken(), "token can not be null");
         Assert.notNull(accessToken.getUserId(), "userId can not be null");
 
-        int expiredSeconds = properties.getTokenExpiredSeconds() + SAFETY_SECONDS * 2;
+        int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
         redisClient.set(CACHE_TOKEN_ + accessToken.getToken(), accessToken.getUserId(), expiredSeconds);
         redisClient.set(CACHE_USER_ID_ + accessToken.getUserId(), accessToken, expiredSeconds);
     }
 
-
     @Override
     public void active(AccessToken accessToken) {
-        int expiredSeconds = properties.getTokenExpiredSeconds() + SAFETY_SECONDS * 2;
+        int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
         redisClient.expire(CACHE_TOKEN_ + accessToken.getToken(), expiredSeconds);
         redisClient.expire(CACHE_USER_ID_ + accessToken.getUserId(), expiredSeconds);
@@ -83,5 +81,4 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         redisClient.delete(CACHE_TOKEN_ + accessToken.getToken());
         redisClient.delete(CACHE_USER_ID_ + accessToken.getUserId());
     }
-
 }

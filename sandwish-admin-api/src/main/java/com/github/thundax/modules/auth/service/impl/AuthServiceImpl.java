@@ -1,20 +1,26 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.collect.ListUtils;
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
+import com.github.thundax.modules.auth.dao.LoginLockDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
+import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
+import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -43,15 +49,24 @@ public class AuthServiceImpl implements AuthService {
 
 
     private final AuthProperties properties;
+    private final LoginProperties loginProperties;
     private final LoginFormDao loginFormDao;
     private final AccessTokenDao accessTokenDao;
+    private final LoginLockDao loginLockDao;
+    private final PasswordService passwordService;
 
     public AuthServiceImpl(AuthProperties properties,
+                           LoginProperties loginProperties,
                            LoginFormDao loginFormDao,
-                           AccessTokenDao accessTokenDao) {
+                           AccessTokenDao accessTokenDao,
+                           LoginLockDao loginLockDao,
+                           PasswordService passwordService) {
         this.properties = properties;
+        this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
         this.accessTokenDao = accessTokenDao;
+        this.loginLockDao = loginLockDao;
+        this.passwordService = passwordService;
     }
 
     @Override
@@ -249,6 +264,29 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void validatePassword(User user, String plainPassword) {
+        if (user == null) {
+            throw new InvalidUsernamePasswordException();
+        }
+
+        if (loginProperties.getEnable() && loginLockDao.isLocked(user.getLoginName())) {
+            Long expire = loginLockDao.getLockedExpire(user.getLoginName());
+            throw new ApiException("帐号已被锁定，请等待（" + expire + "）秒后自动解锁!");
+        }
+
+        if (!passwordService.validate(plainPassword, user.getLoginPass())) {
+            if (loginProperties.getEnable()) {
+                checkUserLock(user);
+            } else {
+                throw new InvalidUsernamePasswordException();
+            }
+        } else {
+            loginLockDao.unlock(user.getLoginName());
+            loginLockDao.deleteFailCount(user.getLoginName());
+        }
+    }
+
+    @Override
     public String getPrivateKey(String loginToken) throws InvalidTokenException {
         LoginForm form = loginFormDao.getByToken(loginToken);
         if (form == null || !form.validateCheckCode()) {
@@ -272,6 +310,26 @@ public class AuthServiceImpl implements AuthService {
             sb.append(validateChars[random.nextInt(validateChars.length)]);
         }
         return sb.toString();
+    }
+
+    private void checkUserLock(User user) {
+        Integer failCount = loginLockDao.getFailCount(user.getLoginName());
+        if (failCount == null) {
+            failCount = 1;
+            loginLockDao.setFailCount(user.getLoginName(), failCount, loginProperties.getExpire());
+        } else {
+            failCount = failCount + 1;
+            loginLockDao.incrementFailCount(user.getLoginName(), 1L);
+        }
+
+        if (failCount + 1 > loginProperties.getMaxFailCount()) {
+            loginLockDao.lock(user.getLoginName(), loginProperties.getLockTime());
+            loginLockDao.deleteFailCount(user.getLoginName());
+            throw new ApiException("帐号已被锁定，请等待（" + loginProperties.getLockTime() + "）秒后自动解锁!");
+        } else {
+            String message = "密码输入错误" + loginProperties.getMaxFailCount() + "次后将被锁定，剩余" + (loginProperties.getMaxFailCount() - failCount) + "次";
+            throw new ApiException(message);
+        }
     }
 
 }

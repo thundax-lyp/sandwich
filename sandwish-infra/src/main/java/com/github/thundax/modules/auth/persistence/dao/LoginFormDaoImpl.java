@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.dao.impl;
+package com.github.thundax.modules.auth.persistence.dao;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.collect.ListUtils;
@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 import java.util.Set;
 
 /**
- * @author thundax
+ * login form Redis DAO 实现。
  */
 @Repository
 @EnableConfigurationProperties(AuthProperties.class)
@@ -49,7 +49,6 @@ public class LoginFormDaoImpl implements LoginFormDao {
         return redisClient.keys(CACHE_REFRESH_TOKEN_).size();
     }
 
-
     @Override
     public LoginForm getByToken(String loginToken) {
         LoginForm form = redisClient.get(CACHE_TOKEN_ + loginToken, LoginForm.class);
@@ -58,7 +57,6 @@ public class LoginFormDaoImpl implements LoginFormDao {
         }
         return form;
     }
-
 
     @Override
     public LoginForm getByRefreshToken(String refreshToken) {
@@ -109,7 +107,6 @@ public class LoginFormDaoImpl implements LoginFormDao {
                 token -> redisClient.delete(CACHE_TOKEN_ + token));
     }
 
-
     @Override
     public void deleteByToken(String loginToken) {
         LoginForm form = getByToken(loginToken);
@@ -120,12 +117,10 @@ public class LoginFormDaoImpl implements LoginFormDao {
         }
     }
 
-
     @Override
     public boolean tokenExists(String token) {
         return redisClient.exists(CACHE_TOKEN_ + token);
     }
-
 
     @Override
     public void updateCaptcha(String loginToken, String captcha) {
@@ -136,7 +131,6 @@ public class LoginFormDaoImpl implements LoginFormDao {
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }
-
 
     @Override
     public void updateSmsValidateCode(String loginToken, String mobile, String validateCode) {
@@ -149,5 +143,4 @@ public class LoginFormDaoImpl implements LoginFormDao {
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }
-
 }

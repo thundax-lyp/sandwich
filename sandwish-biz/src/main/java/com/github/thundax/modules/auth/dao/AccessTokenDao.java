@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.dao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 
 /**
- * @author wdit
+ * access token DAO。
  */
 public interface AccessTokenDao {
 
@@ -50,5 +50,4 @@ public interface AccessTokenDao {
      * @param accessToken accessToken
      */
     void delete(AccessToken accessToken);
-
 }

@@ -1,8 +1,5 @@
 package com.github.thundax.modules.auth.controller;
 
-import com.github.thundax.autoconfigure.LoginProperties;
-import com.github.thundax.common.Constants;
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
@@ -10,7 +7,6 @@ import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
@@ -23,7 +19,6 @@ import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AuthService;
-import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
@@ -46,46 +41,15 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
 
     private final AuthService authService;
     private final UserService userService;
-    private final PasswordService passwordService;
-    private final RedisClient redisClient;
-
-    private final static String FAIL_COUNT_PREFIX = Constants.CACHE_PREFIX + "login_fail_count_";
-    private final static String LOCK_USER_PREFIX = Constants.CACHE_PREFIX + "lock_user_";
-    /**
-     * 最大失败次数
-     **/
-    private final Integer MAX_FAIL_COUNT;
-    /**
-     * 锁定时间
-     **/
-    private final Integer LOCK_TIME;
-    /**
-     * 间隔时间
-     **/
-    private final Integer INTERVAL_TIME;
-    /**
-     * 是否开启密码锁定
-     **/
-    private final boolean CHECK_FAIL_ENABLE;
 
     @Autowired
     public AuthApiController(Validator validator,
                              AuthService authService,
-                             UserService userService,
-                             PasswordService passwordService,
-                             RedisClient redisClient,
-                             LoginProperties properties) {
+                             UserService userService) {
         super(validator);
 
         this.authService = authService;
         this.userService = userService;
-        this.passwordService = passwordService;
-        this.redisClient = redisClient;
-        this.MAX_FAIL_COUNT = properties.getMaxFailCount();
-        this.LOCK_TIME = properties.getLockTime();
-        this.INTERVAL_TIME = properties.getExpire();
-        this.CHECK_FAIL_ENABLE = properties.getEnable();
-
     }
 
     @Override
@@ -132,23 +96,19 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         // 解密密码（数据需要加密传输）
         String password = Sm2.decrypt(queryParam.getPassword(), privateKey);
 
-        if (CHECK_FAIL_ENABLE && redisClient.exists(LOCK_USER_PREFIX + user.getLoginName())) {
-            Long expire = redisClient.getExpire(LOCK_USER_PREFIX + user.getLoginName());
-            writeLog(currentRequest, "用户锁定", queryParam);
-            throw new ApiException("帐号已被锁定，请等待（" + expire + "）秒后自动解锁!");
-        }
-
-        //用户名密码登录，验证输错次数
-        if (!passwordService.validate(password, user.getLoginPass())) {
-            if (CHECK_FAIL_ENABLE) {
-                checkUserLock(user);
-            } else {
-                throw new InvalidUsernamePasswordException();
+        try {
+            authService.validatePassword(user, password);
+        } catch (ApiException e) {
+            if (!(e instanceof InvalidUsernamePasswordException)
+                    && user != null
+                    && StringUtils.isNotBlank(user.getLoginName())) {
+                if (e.getMessage() != null && e.getMessage().contains("锁定")) {
+                    writeLog(currentRequest, "用户锁定", queryParam);
+                } else {
+                    writeLog(currentRequest, "密码输入错误", queryParam);
+                }
             }
-        } else {
-            //用户名密码输入正确，清除缓存
-            redisClient.delete(LOCK_USER_PREFIX + user.getLoginName());
-            redisClient.delete(FAIL_COUNT_PREFIX + user.getLoginName());
+            throw e;
         }
 
         authService.deleteLoginForm(queryParam.getLoginToken());
@@ -204,35 +164,6 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
             vo.setToken(entity.getToken());
         }
         return vo;
-    }
-
-    /**
-     * 查看用户是否被锁定
-     *
-     */
-    private void checkUserLock(User user) throws ApiException {
-
-        Integer failCount = redisClient.get(FAIL_COUNT_PREFIX + user.getLoginName(), Integer.class);
-        if (failCount == null) {
-            failCount = 1;
-            redisClient.set(FAIL_COUNT_PREFIX + user.getLoginName(), failCount, INTERVAL_TIME);
-        } else {
-            failCount = failCount + 1;
-            redisClient.increment(FAIL_COUNT_PREFIX + user.getLoginName(), 1L);
-        }
-
-        if (failCount + 1 > MAX_FAIL_COUNT) {
-            // 超过固定次数，锁定账号
-            redisClient.set(LOCK_USER_PREFIX + user.getLoginName(), Global.YES, LOCK_TIME);
-            // 删除间隔记录
-            redisClient.delete(FAIL_COUNT_PREFIX + user.getLoginName());
-            writeLog(RequestUtils.currentRequest(), "用户锁定", null);
-            throw new ApiException("帐号已被锁定，请等待（" + LOCK_TIME + "）秒后自动解锁!");
-        } else {
-            String message = "密码输入错误" + MAX_FAIL_COUNT + "次后将被锁定，剩余" + (MAX_FAIL_COUNT - failCount) + "次";
-            writeLog(RequestUtils.currentRequest(), "密码输入错误", null);
-            throw new ApiException(message);
-        }
     }
 
     /**

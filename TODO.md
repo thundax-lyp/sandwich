@@ -42,10 +42,53 @@
 
 ## P0 - 持久化表达改造
 
-- [ ] `sys`：拆分系统域持久化表达改造任务
-  - 范围对象：用户、角色、菜单、机构、日志、字典、上传文件相关持久化链路
-  - 处理动作：先横向盘点 `sys` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
-  - 验收点：系统域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+- [ ] `sys-user`：改造用户持久化表达
+  - 范围对象：`UserService`、`UserServiceImpl`、`UserDao`、`UserDaoImpl`、`UserMapper`、`mysql/dameng/kingbase/UserMapper.xml`、`UserDO`、`UserPersistenceAssembler`
+  - 当前依赖：`UserService extends CrudService<User>`；`UserServiceImpl extends CrudServiceImpl<UserDao, User>`；`UserDao extends CrudDao<User>`；`UserMapper extends CrudDao<UserDO>`；`User extends BaseUser extends AdminDataEntity<User>`；`UserDO extends AdminDataEntity<UserDO>`；存在 `User.Query <-> UserDO.Query`
+  - 处理动作：收敛用户查询、登录名查询、SSO 登录名查询、登录信息更新、启停、密码更新和用户角色读取/写入的持久化表达；拆除或替换本链路对通用查询契约、`Entity.query <-> DO.query` 和 `DO extends AdminDataEntity` 的依赖
+  - 验收点：Service 不感知 `DO`；Mapper XML result 仍指向 `UserDO`；DAO implementation 完成 Entity/DO 转换；用户链路不再依赖待替换的通用查询表达
+
+- [ ] `sys-user-encrypt`：改造用户密文字段持久化表达
+  - 范围对象：`UserEncryptService`、`DefaultUserEncryptServiceImpl`、`DatabaseUserEncryptServiceImpl`、`UserEncryptDao`、`UserEncryptDaoImpl`、`UserEncryptMapper`、`mysql/dameng/kingbase/UserEncryptMapper.xml`、`UserEncryptDO`、`UserEncryptPersistenceAssembler`
+  - 当前依赖：`UserEncryptService extends CrudService<UserEncrypt>`；两个 Service implementation 均继承 `CrudServiceImpl<UserEncryptDao, UserEncrypt>`；`UserEncryptDao extends CrudDao<UserEncrypt>`；`UserEncryptMapper extends CrudDao<UserEncryptDO>`；`UserEncrypt extends BaseUserEncrypt extends AdminDataEntity<UserEncrypt>`；`UserEncryptDO extends AdminDataEntity<UserEncryptDO>`；当前无独立 `Query`
+  - 处理动作：收敛用户密文字段查询、列表查询和密码更新的持久化表达；拆除或替换本链路对 `CrudDao` 通用契约和 `DO extends AdminDataEntity` 的依赖
+  - 验收点：默认加密实现与数据库加密实现仍保持现有业务语义；DAO implementation 完成 Entity/DO 转换；密文字段不向 Controller 或 Service 暴露 `DO`
+
+- [ ] `sys-role`：改造角色持久化表达
+  - 范围对象：`RoleService`、`RoleServiceImpl`、`RoleDao`、`RoleDaoImpl`、`RoleMapper`、`mysql/dameng/kingbase/RoleMapper.xml`、`RoleDO`、`RolePersistenceAssembler`
+  - 当前依赖：`RoleService extends CrudService<Role>`；`RoleServiceImpl extends CrudServiceImpl<RoleDao, Role>`；`RoleDao extends CrudDao<Role>`；`RoleMapper extends CrudDao<RoleDO>`；`Role extends BaseRole extends AdminDataEntity<Role>`；`RoleDO extends AdminDataEntity<RoleDO>`；存在 `Role.Query <-> RoleDO.Query`
+  - 处理动作：收敛角色基础查询、启停、角色菜单、角色用户关系读取和写入的持久化表达；明确 `findRoleMenu`、`findRoleUser` 返回值在 DAO implementation 中的 Entity 装配边界；拆除或替换通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 依赖
+  - 验收点：角色与菜单、用户关系 SQL 仍由 Mapper XML 承担；Service 只使用 Entity 或稳定业务参数；关系装配不泄漏 `DO`
+
+- [ ] `sys-menu`：改造菜单持久化表达
+  - 范围对象：`MenuService`、`MenuServiceImpl`、`MenuDao`、`MenuDaoImpl`、`MenuMapper`、`mysql/dameng/kingbase/MenuMapper.xml`、`MenuDO`、`MenuPersistenceAssembler`
+  - 当前依赖：`MenuService extends TreeService<Menu>`；`MenuServiceImpl extends TreeServiceImpl<MenuDao, Menu>`；`MenuDao extends TreeDao<Menu>`；`MenuMapper extends TreeDao<MenuDO>`；`Menu extends BaseMenu extends AdminTreeEntity<Menu>`；`MenuDO extends AdminTreeEntity<MenuDO>`；存在 `Menu.Query <-> MenuDO.Query`
+  - 处理动作：收敛菜单树查询、树节点移动、显示状态更新和菜单角色关系删除的持久化表达；拆除或替换本链路对 `TreeDao`、树结构父类字段、`DO.query` 和 `DO extends AdminTreeEntity` 的依赖
+  - 验收点：树结构写入仍由 Service 编排；Mapper XML 只接收 `MenuDO`；菜单角色关系写入边界清晰
+
+- [ ] `sys-office`：改造机构持久化表达
+  - 范围对象：`OfficeService`、`OfficeServiceImpl`、`OfficeDao`、`OfficeDaoImpl`、`OfficeMapper`、`mysql/dameng/kingbase/OfficeMapper.xml`、`OfficeDO`、`OfficePersistenceAssembler`
+  - 当前依赖：`OfficeService extends TreeService<Office>`；`OfficeServiceImpl extends TreeServiceImpl<OfficeDao, Office>`；`OfficeDao extends TreeDao<Office>`；`OfficeMapper extends TreeDao<OfficeDO>`；`Office extends BaseOffice extends AdminTreeEntity<Office>`；`OfficeDO extends AdminTreeEntity<OfficeDO>`；存在 `Office.Query <-> OfficeDO.Query`
+  - 处理动作：收敛机构树查询、树节点移动和最大排序查询的持久化表达；拆除或替换本链路对 `TreeDao`、树结构父类字段、`DO.query` 和 `DO extends AdminTreeEntity` 的依赖
+  - 验收点：机构树 Service 语义不变；DAO implementation 完成 Entity/DO 转换；Mapper XML 不暴露 Entity
+
+- [ ] `sys-log`：改造日志持久化表达
+  - 范围对象：`LogService`、`LogServiceImpl`、`LogDao`、`LogDaoImpl`、`LogMapper`、`mysql/dameng/kingbase/LogMapper.xml`、`LogDO`、`LogPersistenceAssembler`
+  - 当前依赖：`LogService extends CrudService<Log>`；`LogServiceImpl extends CrudServiceImpl<LogDao, Log>`；`LogDao extends CrudDao<Log>`；`LogMapper extends CrudDao<LogDO>`；`Log extends BaseLog extends AdminDataEntity<Log>`；`LogDO extends AdminDataEntity<LogDO>`；存在 `Log.Query <-> LogDO.Query`
+  - 处理动作：收敛日志查询、批量插入和批量删除的持久化表达；拆除或替换本链路对通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 的依赖
+  - 验收点：日志批量写入和删除 SQL 仍由 Mapper XML 承担；Service 不直接感知持久化实现对象
+
+- [ ] `sys-dict-persistence`：改造字典持久化表达
+  - 范围对象：`DictService`、`DictServiceImpl`、`DictDao`、`DictDaoImpl`、`DictMapper`、`mysql/dameng/kingbase/DictMapper.xml`、`DictDO`、`DictPersistenceAssembler`
+  - 当前依赖：`DictService extends CrudService<Dict>`；`DictServiceImpl extends CrudServiceImpl<DictDao, Dict>`；`DictDao extends CrudDao<Dict>`；`DictMapper extends CrudDao<DictDO>`；`Dict extends BaseDict extends AdminDataEntity<Dict>`；`DictDO extends AdminDataEntity<DictDO>`；存在 `Dict.Query <-> DictDO.Query`
+  - 处理动作：收敛字典查询、字典类型列表查询和排序/状态/删除标记更新的持久化表达；拆除或替换本链路对通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 的依赖
+  - 验收点：`findTypeList` 仍由持久化层完成；DAO implementation 完成 Entity/DO 转换；字典链路不暴露 `DO`
+
+- [ ] `sys-upload-file`：改造上传文件持久化表达
+  - 范围对象：`UploadFileService`、`UploadFileServiceImpl`、`UploadFileDao`、`UploadFileDaoImpl`、`UploadFileMapper`、`mysql/dameng/UploadFileMapper.xml`、`UploadFileDO`、`UploadFilePersistenceAssembler`
+  - 当前依赖：`UploadFileService extends CrudService<UploadFile>`；`UploadFileServiceImpl extends CrudServiceImpl<UploadFileDao, UploadFile>`；`UploadFileDao extends CrudDao<UploadFile>`；`UploadFileMapper extends CrudDao<UploadFileDO>`；`UploadFile extends BaseUploadFile extends AdminDataEntity<UploadFile>`；`UploadFileDO extends AdminDataEntity<UploadFileDO>`；当前无独立 `Query`；当前未发现 `kingbase/UploadFileMapper.xml`
+  - 处理动作：收敛上传文件基础查询、文件内容查询和按文件 ID 批量查询的持久化表达；拆除或替换本链路对 `CrudDao` 通用契约和 `DO extends AdminDataEntity` 的依赖；确认是否需要补齐或明确不支持 Kingbase 上传文件 Mapper XML
+  - 验收点：文件内容查询仍在 Mapper XML 层完成；Service 不感知 `DO`；Kingbase 方言缺口有明确处理结果
 
 - [ ] `storage`：拆分存储域持久化表达改造任务
   - 范围对象：存储文件、存储业务绑定相关持久化链路

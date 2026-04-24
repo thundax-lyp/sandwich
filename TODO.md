@@ -27,10 +27,6 @@
 
 ## P0 - Infra 横切拆分
 
-- [ ] `auth`：横向盘点认证模块 infra 迁移链路并拆分子 TODO
-  - 范围对象：认证、令牌、登录表单、密码相关 Redis 持久化链路
-  - 处理动作：先横向盘点认证模块每条持久化链路，按对象或清晰子链路拆出后续 infra 迁移 TODO，优先拆分 `AccessToken` 在线令牌链路、`LoginForm` 登录表单链路和密码支撑链路
-  - 验收点：认证模块形成可逐条执行的 infra 迁移任务清单；本项不直接迁移任何单个业务对象
   - [ ] `auth-access-token`：拆分 `AccessToken` 在线令牌链路 infra 迁移任务
     - 范围对象：`AccessToken` 在线令牌链路
     - 处理动作：盘点当前 `AccessTokenDao`、`AccessTokenDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确在线令牌保存、激活、删除、按 token / userId 查询和在线数统计的迁移边界

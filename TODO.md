@@ -24,3 +24,8 @@
   - 范围对象：`DOCUMENT-RULES.md`、`NAMING-AND-PLACEMENT-RULES.md`、`DATABASE-RULES.md`、`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
   - 处理动作：按 Sandwich 三层 API 架构补齐治理文档，保留文档结构、任务路由与执行闭环
   - 验收点：AI 能按 `docs/AGENT.md` 找到对应治理入口，不需要默认全量加载 `docs`
+
+- [ ] `sandwish-infra`：讨论持久化实现层抽取方案
+  - 任务目标：评估新增 `sandwish-infra` 模块，将持久化实现从 `sandwish-biz` 中抽取出来
+  - 当前判断：方向可行，但应定位为三层架构中的持久化实现模块，不作为额外业务分层；`biz` 保留 Service、轻量 Entity 和 DAO 接口，`infra` 承载 `DO`、Mapper、`PersistenceAssembler` 和 DAO 实现
+  - 需要确认：是否采用 `Controller -> Service(biz) -> DAO interface(biz) -> DAO/Mapper impl(infra) -> DB` 的依赖方向；是否先选择 `storage` 或 `dict` 做试点；是否允许逐步移除 `BaseEntity`

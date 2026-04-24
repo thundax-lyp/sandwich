@@ -29,15 +29,15 @@
 
   - [ ] `auth-access-token`：拆分 `AccessToken` 在线令牌链路 infra 迁移任务
     - 范围对象：`AccessToken` 在线令牌链路
-    - 处理动作：盘点当前 `AccessTokenDao`、`AccessTokenDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation 和 DAO implementation；Redis 链路不涉及 Mapper 和 Mapper XML，明确在线令牌保存、激活、删除、按 token / userId 查询和在线数统计的迁移边界
+    - 处理动作：盘点当前 `AccessTokenDao`、`AccessTokenDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确在线令牌保存、激活、删除、按 token / userId 查询和在线数统计的迁移边界
     - 验收点：`AccessToken` 链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
   - [ ] `auth-login-form`：拆分 `LoginForm` 登录表单链路 infra 迁移任务
     - 范围对象：`LoginForm` 登录表单链路
-    - 处理动作：盘点当前 `LoginFormDao`、`LoginFormDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation 和 DAO implementation；Redis 链路不涉及 Mapper 和 Mapper XML，明确登录表单创建、刷新、验证码、短信验证码、私钥与删除的迁移边界
+    - 处理动作：盘点当前 `LoginFormDao`、`LoginFormDaoImpl` 和 Redis key 读写路径，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确登录表单创建、刷新、验证码、短信验证码、私钥与删除的迁移边界
     - 验收点：`LoginForm` 链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
   - [ ] `auth-password-support`：拆分密码支撑链路 infra 迁移任务
     - 范围对象：登录失败计数、账号锁定和密码校验相关 Redis 持久化链路
-    - 处理动作：盘点 `AuthApiController` 中的失败次数与锁定 Redis 读写链路，拆出后续需要迁入 infra 的 Redis persistence implementation 和 DAO implementation；Redis 链路不涉及 Mapper 和 Mapper XML，明确密码输错计数、锁定状态和解锁清理的迁移边界
+    - 处理动作：盘点 `AuthApiController` 中的失败次数与锁定 Redis 读写链路，拆出后续需要迁入 infra 的 Redis persistence implementation、DAO implementation、Mapper 和 Mapper XML，明确密码输错计数、锁定状态和解锁清理的迁移边界
     - 验收点：密码支撑链路形成可独立执行的 infra 迁移 TODO；本项不直接迁移代码
 
 ## P0 - Controller / Service 模型职责隔离

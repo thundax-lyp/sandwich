@@ -14,7 +14,7 @@
 
 当前范围：
 
-- 新增 `sandwish-infra` 持久化实现模块
+- 使用已建立的 `sandwish-infra` 持久化实现模块
 - 从 `sandwish-biz` 中抽取持久化实现
 - 建立 `Request/Response`、`Entity`、`DO/DataObject` 的模型隔离
 - 建立层间 `Assembler`
@@ -135,16 +135,15 @@ sandwish-infra
 
 ## 7. Execution Steps
 
-### 7.1 Add `sandwish-infra`
+### 7.1 Confirm `sandwish-infra`
 
-第一步先建立子工程，只提供承载位置，不迁移业务代码。
+第一步确认子工程已经存在，只提供承载位置，不迁移业务代码。
 
 本步骤全仓只执行一次。后续所有业务模块迁移都复用同一个 `sandwish-infra`，不得为每个业务模块重复新增子工程。
 
-新增 Maven 模块：
+固定模块关系：
 
-- root `pom.xml` 增加 `sandwish-infra`
-- 新建 `sandwish-infra/pom.xml`
+- root `pom.xml` 包含 `sandwish-infra`
 - `sandwish-infra` 依赖 `sandwish-biz`
 - `sandwish-admin-api` / `sandwish-front-api` 依赖 `sandwish-infra`
 - `sandwish-biz` 不依赖 `sandwish-infra`
@@ -204,6 +203,15 @@ mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
 - 是否需要新增 `InterfaceAssembler`
 - 验收命令
 
+模块拆分顺序固定为：
+
+1. `sys-dict` 试点
+2. `storage`
+3. `assist`
+4. `member`
+5. `auth`
+6. `sys` 剩余对象
+
 拆分原则：
 
 - 一个 TODO 只覆盖一个业务模块或一个清晰子链路
@@ -233,10 +241,9 @@ mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
 
 先选择一个小而完整的业务域做试点。
 
-优先候选：
+固定试点：
 
-- `storage`
-- `dict`
+- `sys-dict`
 
 选择标准：
 

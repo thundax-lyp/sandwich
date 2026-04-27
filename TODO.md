@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `sys-log-api`：隔离日志查询 API 模型
-  - 范围入口：`LogApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `LogQueryParam`、`LogVo`、`OfficeVo`、`UserVo`；Controller 内存在 `Log`、`Office`、`User` 到 API 模型转换
-  - 需要新增或收窄的 `Request`：日志分页查询请求
-  - 需要新增或收窄的 `Response`：日志分页响应、日志用户摘要响应、日志机构摘要响应
-  - 需要新增的 `InterfaceAssembler`：`LogInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；分页查询保持 Service 接收 `Log` 或稳定查询参数
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `sys-dict-api`：隔离字典管理 API 模型试点
   - 范围入口：`DictController`
   - 当前 API 模型泄漏点：入口直接使用 `DictVo`、`DictQueryParam`；Controller 内存在 `Dict` 到 API 模型转换；新增和更新入口直接复用 `DictVo`

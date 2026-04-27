@@ -3,8 +3,8 @@ package com.github.thundax.modules.sys.api;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.vo.PageVo;
-import com.github.thundax.modules.sys.api.query.LogQueryParam;
-import com.github.thundax.modules.sys.api.vo.LogVo;
+import com.github.thundax.modules.sys.request.LogPageRequest;
+import com.github.thundax.modules.sys.response.LogResponse;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ public interface LogServiceApi {
     /**
      * 获取列表
      *
-     * @param queryParam 查询条件
+     * @param request 日志分页查询请求
      * @return 列表
      * @throws ApiException API异常
      */
@@ -29,6 +29,6 @@ public interface LogServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<LogVo> page(@RequestBody @ApiParam("查询条件") LogQueryParam queryParam) throws ApiException;
+    PageVo<LogResponse> page(@RequestBody @ApiParam("日志分页查询请求") LogPageRequest request) throws ApiException;
 
 }

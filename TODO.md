@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `archunit-request-annotation-rule`：新增 Request 类级注解白名单门禁
-  - 依赖前置：完成 `archunit-request-annotation-baseline`
-  - 范围对象：承载架构测试的模块、ArchUnit 测试类
-  - 处理动作：将 Request 类级注解固定为且仅为 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)`
-  - 验收点：Request 缺少必需注解或存在额外类级注解时会被测试拦截
 - [ ] `request-required-annotation-migration`：迁移现有 Request 到注解白名单形态
   - 依赖前置：完成 `archunit-request-annotation-rule`
   - 范围对象：现有 `Request` 类及其必要 import

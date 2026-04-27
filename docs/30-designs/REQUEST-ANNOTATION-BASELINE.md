@@ -28,6 +28,10 @@ Request 注解规约适用于同时满足以下条件的 Java 类：
 
 字段级注解不属于本基线范围，例如 `@ApiModelProperty` 不应由 Request 类级注解规则检查。
 
+## 规则归属
+
+Request 注解规约的测试支撑归属于 `sandwish-common/sandwish-common-test`，包名使用项目基线约定的 `com.github.thundax.common.test.architecture`。
+
 ## 当前缺口
 
 `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/request/PersonalAvatarUploadRequest.java`

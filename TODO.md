@@ -20,12 +20,12 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `docs/30-designs`：模型隔离迁移收尾
-  - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`MODEL-SEPARATION-RUNBOOK.md`、`TODO.md`、治理文档
-  - 处理动作：两套迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
-  - 验收点：临时手册不再保留，完成历史只存在于 commit / PR 中
-
 ## P0 - 持久化表达改造
+
+- [ ] `docs/30-designs`：持久化迁移手册收尾
+  - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`TODO.md`、治理文档
+  - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
+  - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
 - [ ] `sys-office`：改造机构持久化表达
   - 范围对象：`OfficeService`、`OfficeServiceImpl`、`OfficeDao`、`OfficeDaoImpl`、`OfficeMapper`、`mysql/dameng/kingbase/OfficeMapper.xml`、`OfficeDO`、`OfficePersistenceAssembler`

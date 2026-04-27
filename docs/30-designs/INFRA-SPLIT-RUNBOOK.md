@@ -6,7 +6,7 @@
 
 目标是先把持久化实现承载位置、包结构和依赖方向稳定下来，再按模块逐步迁移 DAO implementation、Mapper、Mapper XML、`DO` 与 `PersistenceAssembler`。
 
-Controller / Service 的 `Request` / `Response` / `Entity` 隔离由 [`MODEL-SEPARATION-RUNBOOK.md`](./MODEL-SEPARATION-RUNBOOK.md) 管理。
+Controller / Service 的 `Request` / `Response` / `Entity` 隔离规则已沉淀到 [`ARCHITECTURE.md`](../00-governance/ARCHITECTURE.md) 和 [`NAMING-AND-PLACEMENT-RULES.md`](../00-governance/NAMING-AND-PLACEMENT-RULES.md)。
 
 本手册作为老工程治理与迁移的长期参考文档保留在项目中。
 

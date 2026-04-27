@@ -86,7 +86,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toBusinessDataObjectQuery(entity.getQuery()));
         return dataObject;
     }
 
@@ -106,7 +105,6 @@ public final class StoragePersistenceAssembler {
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toBusinessEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -147,27 +145,4 @@ public final class StoragePersistenceAssembler {
         dataObject.setQueryRemarks(query.getRemarks());
     }
 
-    private static StorageBusinessDO.Query toBusinessDataObjectQuery(StorageBusiness.Query query) {
-        if (query == null) {
-            return null;
-        }
-        StorageBusinessDO.Query dataObjectQuery = new StorageBusinessDO.Query();
-        dataObjectQuery.setBusinessId(query.getBusinessId());
-        dataObjectQuery.setBusinessType(query.getBusinessType());
-        dataObjectQuery.setBusinessParams(query.getBusinessParams());
-        dataObjectQuery.setPublicFlag(query.getPublicFlag());
-        return dataObjectQuery;
-    }
-
-    private static StorageBusiness.Query toBusinessEntityQuery(StorageBusinessDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        StorageBusiness.Query entityQuery = new StorageBusiness.Query();
-        entityQuery.setBusinessId(query.getBusinessId());
-        entityQuery.setBusinessType(query.getBusinessType());
-        entityQuery.setBusinessParams(query.getBusinessParams());
-        entityQuery.setPublicFlag(query.getPublicFlag());
-        return entityQuery;
-    }
 }

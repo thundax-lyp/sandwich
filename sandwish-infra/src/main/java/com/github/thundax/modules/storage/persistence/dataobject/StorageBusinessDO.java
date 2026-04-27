@@ -1,38 +1,46 @@
 package com.github.thundax.modules.storage.persistence.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.persistence.DataEntity;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 存储业务绑定持久化对象。
  */
 @NoArgsConstructor
-public class StorageBusinessDO extends DataEntity<StorageBusinessDO> {
+public class StorageBusinessDO {
+
+    private String id;
+    private boolean isNewRecord;
 
     private String businessId;
     private String businessType;
     private String businessParams;
     private String publicFlag;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String delFlag;
 
     public StorageBusinessDO(String id) {
-        super(id);
+        this.id = id;
     }
 
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
+    public String getId() {
+        return id;
     }
 
-    @JsonIgnore
-    public Query getQuery() {
-        return (Query) this.query;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public boolean getIsNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setIsNewRecord(boolean isNewRecord) {
+        this.isNewRecord = isNewRecord;
     }
 
     public String getBusinessId() {
@@ -67,43 +75,43 @@ public class StorageBusinessDO extends DataEntity<StorageBusinessDO> {
         this.publicFlag = publicFlag;
     }
 
-    public static class Query implements Serializable {
+    public Integer getPriority() {
+        return priority;
+    }
 
-        private String businessId;
-        private String businessType;
-        private String businessParams;
-        private String publicFlag;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
-        public String getBusinessId() {
-            return businessId;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public void setBusinessId(String businessId) {
-            this.businessId = businessId;
-        }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-        public String getBusinessType() {
-            return businessType;
-        }
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-        public void setBusinessType(String businessType) {
-            this.businessType = businessType;
-        }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-        public String getBusinessParams() {
-            return businessParams;
-        }
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-        public void setBusinessParams(String businessParams) {
-            this.businessParams = businessParams;
-        }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
-        public String getPublicFlag() {
-            return publicFlag;
-        }
+    public String getDelFlag() {
+        return delFlag;
+    }
 
-        public void setPublicFlag(String publicFlag) {
-            this.publicFlag = publicFlag;
-        }
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
     }
 }

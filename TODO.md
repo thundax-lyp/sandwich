@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `storage-business-persistence`：收敛存储业务绑定持久化表达
-  - 范围对象：`StorageDao` 业务绑定方法、`StorageDaoImpl`、`StorageMapper`、`mapper/mapping/mysql/StorageMapper.xml`、`mapper/mapping/dameng/StorageMapper.xml`、`StorageBusinessDO`、`StoragePersistenceAssembler`、`StorageBusiness`
-  - 当前依赖：`StorageBusinessDO extends DataEntity<StorageBusinessDO>`；`StorageBusinessDO.Query` 承载 `businessId`、`businessType`、`businessParams`、`publicFlag` 查询条件；`StoragePersistenceAssembler` 负责 `StorageBusiness.Query <-> StorageBusinessDO.Query` 转换；MySQL 将业务绑定字段直接更新在 `assist_storage`，达梦使用 `assist_storage_business` 关系表
-  - 处理动作：拉平 `StorageBusinessDO` 父类字段；移除业务绑定 DO query 转换；显式保留 `findBusiness`、`insertBusiness`、`deleteBusiness`、`deleteBusinessByBusiness` 方法；分别保持 MySQL 更新主表和达梦维护关系表的现有 SQL 语义
-  - 验收点：存储业务绑定链路不再依赖 `StorageBusinessDO.Query` 或 `StorageBusinessDO extends DataEntity`；Admin 包编译通过
-
 - [ ] `assist-signature-persistence`：收敛签名持久化表达
   - 范围对象：`SignatureService`、`SignatureServiceImpl`、`SignatureDao`、`SignatureDaoImpl`、`SignatureMapper`、`mapper/mapping/mysql/SignatureMapper.xml`、`mapper/mapping/dameng/SignatureMapper.xml`、`mapper/mapping/kingbase/SignatureMapper.xml`、`SignatureDO`、`SignaturePersistenceAssembler`
   - 当前依赖：`SignatureService extends CrudService<Signature>`；`SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature>`；`SignatureDao extends CrudDao<Signature>`；`SignatureMapper extends CrudDao<SignatureDO>`；`SignatureDO extends DataEntity<SignatureDO>`；`SignatureDO.Query` 承载 `businessType`、`businessId`、`businessIdList`、`isVerifySign` 查询条件；`SignaturePersistenceAssembler` 负责 `Signature.Query <-> SignatureDO.Query` 转换

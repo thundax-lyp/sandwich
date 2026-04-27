@@ -48,6 +48,22 @@ jasypt:
   encryptor:
     bean: jasyptStringEncryptor
 
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: true
+  local:
+    default:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 10000
+  remote:
+    default:
+      type: redis.lettuce
+      uri: ${SANDWISH_REDIS_URI:redis://127.0.0.1:6379/0}
+      keyConvertor: fastjson
+      valueEncoder: java
+      valueDecoder: java
+
 logging:
   config: classpath:config/logback-spring.xml
   level:

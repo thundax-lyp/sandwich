@@ -246,13 +246,7 @@
 - token 失效请求不得 touch。
 - 角色或菜单变更触发权限会话失效。
 
-测试隔离规则：
-
-- 登录与权限配置 testcase 使用测试专用 InMemory DAO/Impl 承接状态。
-- InMemory DAO/Impl 固定放在 `src/test/java`。
-- InMemory DAO/Impl 固定通过 `@Profile("test")` 或测试专用 `@TestConfiguration` 装配。
-- InMemory DAO/Impl 不得进入生产源码，不得参与默认生产 Bean 扫描。
-- 测试不得依赖 Redis、外部数据库或生产缓存。
+测试隔离固定遵循 `docs/00-governance/ARCHITECTURE.md` 的 DAO / Mapper 规则。登录与权限配置 testcase 使用测试专用 InMemory DAO/Impl 承接状态，不依赖 Redis、外部数据库或生产缓存。
 
 最小命令：
 

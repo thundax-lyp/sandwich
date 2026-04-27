@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -11,6 +12,7 @@ import org.springframework.util.Assert;
  * 后台权限会话 Redis DAO 实现。
  */
 @Repository
+@Profile("!test")
 public class PermissionDaoImpl implements PermissionDao {
 
     private static final String CACHE_ = Constants.CACHE_PREFIX + "AUTH_PERMISSION_";

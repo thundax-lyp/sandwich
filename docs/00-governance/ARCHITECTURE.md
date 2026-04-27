@@ -258,6 +258,7 @@ Spring Security 迁移链路允许入口模块依赖：
 - Mapper XML 查询条件固定读取一级方法参数或 infra 内部 persistence 参数对象，不依赖通用 `query.*` 容器。
 - Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper 或 Mapper XML。
 - 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
+- 当测试为生产 DAO implementation 提供 InMemory implementation 时，InMemory implementation 固定放在 `src/test/java` 并标记 `@Profile("test")`；对应生产 DAO implementation 必须标记 `@Profile("!test")`，防止测试上下文误加载生产实现。
 
 ### Entity / VO / DTO
 

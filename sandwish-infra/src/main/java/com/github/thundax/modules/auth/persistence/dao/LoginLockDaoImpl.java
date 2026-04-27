@@ -4,12 +4,14 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.dao.LoginLockDao;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 /**
  * 登录失败锁定 Redis DAO 实现。
  */
 @Repository
+@Profile("!test")
 public class LoginLockDaoImpl implements LoginLockDao {
 
     private static final String FAIL_COUNT_PREFIX = Constants.CACHE_PREFIX + "login_fail_count_";

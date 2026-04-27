@@ -129,6 +129,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
 
         response.setStatus(HttpStatus.OK.value());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getOutputStream().write(jsonString.getBytes(StandardCharsets.UTF_8));
     }

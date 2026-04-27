@@ -8,6 +8,7 @@ import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -15,6 +16,7 @@ import org.springframework.util.Assert;
  * access token Redis DAO 实现。
  */
 @Repository
+@Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)
 public class AccessTokenDaoImpl implements AccessTokenDao {
 

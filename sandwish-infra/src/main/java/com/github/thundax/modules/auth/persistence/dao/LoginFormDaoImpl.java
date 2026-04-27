@@ -11,6 +11,7 @@ import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
@@ -20,6 +21,7 @@ import java.util.Set;
  * login form Redis DAO 实现。
  */
 @Repository
+@Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)
 public class LoginFormDaoImpl implements LoginFormDao {
 

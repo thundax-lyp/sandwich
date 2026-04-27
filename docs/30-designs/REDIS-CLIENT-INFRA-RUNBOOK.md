@@ -1,5 +1,7 @@
 # RedisClient Infra Runbook
 
+> Superseded note: `docs/30-designs/COMMON-CACHE-JETCACHE-RUNBOOK.md` is now the active runbook for replacing `RedisClient` with JetCache through `sandwish-common-cache`. This document remains as historical inventory and boundary context.
+
 ## 1. Goal
 
 `RedisClient` is an old common utility wrapper. The target state is to delete `com.github.thundax.common.utils.redis.RedisClient`.
@@ -216,6 +218,6 @@ rg -n "RedisClient|common.utils.redis" sandwish-common sandwish-biz sandwish-inf
 
 - Do not change Spring Boot version.
 - Do not make controllers depend on JetCache.
-- Do not introduce a generic common cache module.
+- Do not introduce a generic RedisClient clone. The active migration now introduces `sandwish-common-cache` only for JetCache baseline configuration and thin cache infrastructure.
 - Do not rewrite Shiro session/cache internals unless required by a specific RedisClient deletion step.
 - Do not change existing Redis key names during the first migration pass.

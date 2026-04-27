@@ -18,8 +18,8 @@
 
 不在范围内：
 
-- 不引入 JetCache
-- 不建立 `sandwish-common-cache`
+- 不定义 JetCache 具体迁移步骤；当前 active runbook 为 `COMMON-CACHE-JETCACHE-RUNBOOK.md`
+- 不把业务 key、TTL、版本和失效策略上提到 `sandwish-common-cache`
 - 不删除 `CrudServiceImpl` 缓存方法
 - 不迁移 `Dict`、`Storage`、`Office`、`Menu`、`Role`、`User` 任一业务链路
 - 不改认证、会话、验证码、登录锁等非 CrudService Redis 用法
@@ -244,7 +244,7 @@ TTL 常量归属对应 `<BusinessObject>CacheSupport`。
 
 本设计为 `common-cache-boundary-decision` 提供以下判断输入：
 
-- 当前可落地方案不要求先建立 `sandwish-common-cache`。
+- 原始可落地方案不要求先建立 `sandwish-common-cache`；当前 RedisClient 替换主线已改为先建立 common-cache JetCache 基线。
 - 首条 `Dict` 迁移只需要一个业务专用 `DictCacheSupport`。
 - `Storage`、`Office`、`Menu`、`Role`、`User` 后续可能复用 key、TTL 和缓存操作抽象，但复用价值必须在至少一条链路迁移后再判断。
 - 当前阶段缓存 key、失效时机和版本策略均带业务语义，固定留在 infra。

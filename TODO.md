@@ -18,7 +18,79 @@
 4. 质量与交付闭环
    - 按任务补测试、文档同步和小步提交
 
-## P0 - Cache / Infra 边界演进
+## P0 - Common Cache / RedisClient JetCache 迁移
+
+执行原则：
+
+- 按列表顺序执行，除非某一步编译失败要求拆分。
+- JetCache 只能出现在 `sandwish-common-cache`、`sandwish-infra` 的实现细节，不能外泄到 Controller、Service、Entity、Request、Response。
+- 迁移期允许 `RedisClient` 暂存；新增或改造代码不得新增 `RedisClient` 调用点。
+
+- [ ] `common-cache-jetcache-baseline`：建立 `sandwish-common-cache` JetCache 基线模块
+  - 依赖前置：`docs/30-designs/COMMON-CACHE-JETCACHE-RUNBOOK.md`
+  - 范围对象：root `pom.xml`、`sandwish-common/pom.xml`、`sandwish-common-cache`、必要的 JetCache auto configuration
+  - 处理动作：参考 `../bacon` 的 JetCache 基线，新增 common-cache 模块；启用 JetCache 注解；不把 RedisClient 能力原样迁入 common-cache
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：`mvn -q -pl sandwish-common/sandwish-common-cache -am compile -DskipTests` 通过，common-cache 不依赖业务/infra/API 模块
+- [ ] `common-cache-application-wiring`：后台/前台应用接入 common-cache
+  - 依赖前置：完成 `common-cache-jetcache-baseline`
+  - 范围对象：`sandwish-admin-api`、`sandwish-front-api` Maven 依赖和运行配置
+  - 处理动作：应用依赖 `sandwish-common-cache`；补齐 JetCache local/remote 配置；迁移期允许 RedisClient 继续存在
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：`mvn -q -pl sandwish-admin-api,sandwish-front-api -am compile -DskipTests` 通过
+- [ ] `redis-client-sys-cache-support-jetcache-migration`：用 JetCache 替换系统类 CacheSupport 对 RedisClient 的依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`DictCacheSupport`、`MenuCacheSupport`、`OfficeCacheSupport`、`RoleCacheSupport`、`UserCacheSupport`
+  - 处理动作：在 CacheSupport 内部使用 `@CreateCache`；保留现有 key、TTL、版本和失效语义；JetCache 类型不外泄到 Service/Controller/Entity/Request/Response
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：系统类 CacheSupport 不再 import common RedisClient
+- [ ] `redis-client-storage-cache-support-jetcache-migration`：用 JetCache 替换存储 CacheSupport 对 RedisClient 的依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`StorageCacheSupport`
+  - 处理动作：在 Storage cache support 内部使用 `@CreateCache`；保留现有 key、TTL、版本和失效语义
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：`StorageCacheSupport` 不再 import common RedisClient
+- [ ] `redis-client-auth-dao-jetcache-migration`：用 JetCache 替换 auth DAO 对 RedisClient 的依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`AccessTokenDaoImpl`、`LoginFormDaoImpl`、`LoginLockDaoImpl`、`PermissionDaoImpl`
+  - 处理动作：保持现有业务 DAO 接口作为语义边界；JetCache 只留在 infra 实现；不新增泛化 CacheService/RedisService
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：auth DAO 不再 import common RedisClient
+- [ ] `redis-client-assist-dao-jetcache-migration`：用 JetCache 替换 assist DAO 对 RedisClient 的依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`AsyncTaskDaoImpl`、`KeypairPrivateKeyDaoImpl`
+  - 处理动作：保持现有业务 DAO 接口作为语义边界；JetCache 只留在 infra 实现；不新增泛化 CacheService/RedisService
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：assist DAO 不再 import common RedisClient
+- [ ] `redis-client-front-session-dict-jetcache-migration`：移除 front-api 对 RedisClient 的直接依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`SessionCacheServiceImpl`、`DictUtils`
+  - 处理动作：前台会话/字典缓存迁到业务 Store/DAO 或已有缓存路径；入口模块不直接注入 JetCache
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：`sandwish-front-api` 不再直接 import `RedisClient`
+- [ ] `redis-client-biz-sms-state-jetcache-migration`：移除短信验证码 Servlet 对 RedisClient 的直接依赖
+  - 依赖前置：完成 `common-cache-application-wiring`
+  - 范围对象：`SmsValidateCodeServlet`
+  - 处理动作：短信发送限流状态迁到业务 Store/DAO 或已有缓存路径；Servlet 不通过 `SpringContextHolder` 获取缓存能力；入口层不直接注入 JetCache
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：`sandwish-biz` 不再直接 import `RedisClient`
+- [ ] `redis-client-common-deletion`：删除 common-core RedisClient
+  - 依赖前置：完成所有 RedisClient 调用点迁移
+  - 范围对象：`sandwish-common-core` RedisClient 类、相关 Maven 依赖、相关文档
+  - 处理动作：删除 `com.github.thundax.common.utils.redis.RedisClient`；同步移除 common-core 中 Redis client 职责
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：是
+  - 验收点：全仓无 `com.github.thundax.common.utils.redis.RedisClient` import，common-core 不再暴露 Redis 客户端封装
+
+## P0 - Security / Permission 收敛
 
 - [ ] `spring-security-permission-migration`：用 Spring Security 替换后台自研权限链路
   - 依赖前置：登录与权限配置 testcase 基线已完成
@@ -28,38 +100,3 @@
   - 允许迁移 `RequiresRoles`：否
   - 允许删除旧权限 AOP：完成新注解全量替换后允许
   - 验收点：后台 Controller 不再依赖自研权限 AOP，权限会话由 `PermissionService -> PermissionDao -> PermissionDaoImpl` 管理，controller/service 不直接触碰 Redis；全仓无旧权限注解 import；失效 runbook 和 TODO 不再指向旧 Subject Redis 迁移
-- [ ] `redis-client-front-session-dict-migration`：移除前台工具对 RedisClient 的直接依赖
-  - 依赖前置：完成后台权限整改中的权限会话 Redis 收敛
-  - 范围对象：`SessionCacheServiceImpl`、Session 存储实现、`DictUtils`
-  - 处理动作：Session 缓存进入明确的会话 Store/DAO 实现；`DictUtils` 复用现有 Dict DAO/cache 路径或删除无效旧缓存；不新增通用 CacheService
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：否
-  - 验收点：`sandwish-front-api` 不再直接 import `RedisClient`
-- [ ] `redis-client-sms-state-migration`：移除短信验证码 Servlet 对 RedisClient 的直接依赖
-  - 依赖前置：完成 `redis-client-front-session-dict-migration`
-  - 范围对象：`SmsValidateCodeServlet`、短信发送限流状态 Store/DAO、必要时补短信验证码 Service、infra 实现
-  - 处理动作：将 `CACHE_MOBILE` 的 `exists/set/TTL` 收敛到业务语义 Store/DAO；若 Servlet 承担发送校验编排，则补 Service 承接编排；Servlet 不再通过 `SpringContextHolder` 获取 RedisClient
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：否
-  - 验收点：`sandwish-biz` 不再直接 import `RedisClient`
-- [ ] `redis-client-infra-dao-adapter-migration`：替换 infra DAO 对 common RedisClient 的依赖
-  - 依赖前置：完成上层所有 RedisClient 直接依赖迁移
-  - 范围对象：`AsyncTaskDaoImpl`、`AccessTokenDaoImpl`、`LoginFormDaoImpl`、`LoginLockDaoImpl`
-  - 处理动作：保持既有业务 DAO 接口作为语义边界，用 infra-local 语义存储或窄 adapter 承接 Redis 操作；不把通用 RedisClient 原样搬到 infra；不新增只转发 Redis 操作的 Service
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：否
-  - 验收点：infra DAO 不再 import `com.github.thundax.common.utils.redis.RedisClient`
-- [ ] `redis-client-cache-support-migration`：替换 CacheSupport 对 common RedisClient 的依赖
-  - 依赖前置：完成 `redis-client-infra-dao-adapter-migration`
-  - 范围对象：`StorageCacheSupport`、`DictCacheSupport`、`MenuCacheSupport`、`OfficeCacheSupport`、`RoleCacheSupport`、`UserCacheSupport`
-  - 处理动作：在 CacheSupport 内部替换 RedisClient，优先评估 JetCache 或 infra-local 窄 adapter；不为 CacheSupport 补 Service/DAO；不改变现有 key、TTL 和失效语义
-  - 允许引入 JetCache：是
-  - 允许删除 `RedisClient`：否
-  - 验收点：CacheSupport 不再 import common RedisClient，JetCache 类型不外泄到 Service/Controller/Entity/Request/Response
-- [ ] `redis-client-common-deletion`：删除 common-core RedisClient
-  - 依赖前置：完成所有 RedisClient 调用点迁移
-  - 范围对象：`sandwish-common-core` RedisClient 类、相关文档和依赖描述
-  - 处理动作：删除 `com.github.thundax.common.utils.redis.RedisClient`；同步移除或收窄 common-core 中 Redis client 职责表述
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：是
-  - 验收点：全仓无 `com.github.thundax.common.utils.redis.RedisClient` import，common 不再暴露 Redis 客户端封装

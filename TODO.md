@@ -20,19 +20,14 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `archunit-do-annotation-baseline`：盘点 DO 注解规约适用范围
-  - 依赖前置：完成 `common-test-baseline-module`
-  - 范围对象：`sandwish-infra` 下 `persistence.dataobject` 包、现有 `DO/DataObject`、Redis 持久化对象和数据库表映射对象
-  - 处理动作：确认哪些对象必须补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`，并记录 Redis-only DO 是否需要改名或迁移出 DO 命名体系
-  - 验收点：ArchUnit 规则的扫描范围和例外边界明确，不在实现阶段临时扩大或缩小口径
 - [ ] `archunit-do-annotation-rule`：引入 ArchUnit 并新增 DO 注解门禁
   - 依赖前置：完成 `archunit-do-annotation-baseline`
-  - 范围对象：根 `pom.xml`、承载架构测试的模块 `pom.xml`、ArchUnit 测试类
-  - 处理动作：新增 ArchUnit 测试依赖；将 `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS` 固化为自动化规则；只允许围绕该规约增加最小测试支撑
-  - 验收点：缺少任一必需注解的 `DO/DataObject` 会被测试拦截
+  - 范围对象：`sandwish-common/sandwish-common-test`、`sandwish-infra` 架构测试
+  - 处理动作：将 `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS` 固化为自动化规则；规则仅扫描数据库表映射 DO，排除 Redis-only DO
+  - 验收点：数据库表映射 DO 缺少任一必需注解会被测试拦截；Redis-only DO 不因缺少 `@TableName` 被误伤
 - [ ] `do-required-annotation-migration`：迁移现有 DO 到必需注解形态
   - 依赖前置：完成 `archunit-do-annotation-rule`
-  - 范围对象：现有 `DO/DataObject` 类及其必要 import
+  - 范围对象：现有数据库表映射 DO 类及其必要 import
   - 处理动作：补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`；不顺手删除手写 getter/setter，除非单独拆出重构任务
   - 验收点：ArchUnit 规则通过；迁移不改变 DAO、Mapper、XML 和 Service 行为
 

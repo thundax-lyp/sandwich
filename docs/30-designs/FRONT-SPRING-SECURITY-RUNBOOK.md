@@ -130,6 +130,7 @@
 处理动作：
 
 - 用 Spring Security principal 替代 `MemberPrincipal`。
+- 迁移期由 `MemberSecurityContext` 先读取 Spring Security 上下文，再兼容 Shiro 上下文。
 - `MemberAccessServiceImpl` 改为读取 `SecurityContextHolder`。
 - `LoginController` 改为通过 Spring Security 判断当前登录状态。
 - `LogoutController` 改为通过 Spring Security logout 或 session invalidation 完成登出。

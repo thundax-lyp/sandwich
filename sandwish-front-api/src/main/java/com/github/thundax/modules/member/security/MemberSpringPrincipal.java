@@ -10,6 +10,10 @@ public class MemberSpringPrincipal implements Serializable {
 
     private final String id;
 
+    public MemberSpringPrincipal(String id) {
+        this.id = id;
+    }
+
     public MemberSpringPrincipal(Member member) {
         this.id = member.getId();
     }

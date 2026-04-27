@@ -1,8 +1,7 @@
 package com.github.thundax.modules.member.service.impl;
 
-import com.github.thundax.modules.member.security.MemberPrincipal;
+import com.github.thundax.modules.member.security.MemberSecurityContext;
 import com.github.thundax.modules.member.service.MemberAccessService;
-import com.github.thundax.modules.member.utils.ShiroUtils;
 import org.springframework.stereotype.Service;
 
 /** @author wdit */
@@ -11,21 +10,16 @@ public class MemberAccessServiceImpl implements MemberAccessService {
 
     @Override
     public String getCurrentMemberId() {
-        MemberPrincipal principal = ShiroUtils.getPrincipal();
-        if (principal != null) {
-            return principal.getId();
-        }
-
-        return null;
+        return MemberSecurityContext.getCurrentMemberId();
     }
 
     @Override
     public Object getSessionCache(String name) {
-        return ShiroUtils.getSessionCache(name);
+        return MemberSecurityContext.getSessionCache(name);
     }
 
     @Override
     public void setSessionCache(String name, Object value) {
-        ShiroUtils.putSessionCache(name, value);
+        MemberSecurityContext.setSessionCache(name, value);
     }
 }

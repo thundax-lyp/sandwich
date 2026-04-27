@@ -43,6 +43,7 @@
         <cxf.version>3.4.0</cxf.version>
         <lombok.version>1.16.22</lombok.version>
         <archunit.version>1.4.1</archunit.version>
+        <jetcache.version>2.5.16</jetcache.version>
 
         <!-- framework version setting -->
         <mybatis.version>3.5.5</mybatis.version>
@@ -75,6 +76,11 @@
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit-junit4</artifactId>
                 <version>${archunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alicp.jetcache</groupId>
+                <artifactId>jetcache-core</artifactId>
+                <version>${jetcache.version}</version>
             </dependency>
 
             <dependency>

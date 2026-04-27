@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-jetcache-introduction`：评估并引入 JetCache 作为 infra 实现细节
-  - 依赖前置：至少完成一条缓存链路迁入 infra，并确认 infra 缓存契约稳定
-  - 范围对象：最窄可行依赖模块、配置项、infra CacheSupport 实现
-  - 处理动作：评估 Spring Boot 兼容版本；只在 infra/cache support 内引入 JetCache；不迁移额外业务链路
-  - 允许引入 JetCache：是
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：JetCache 类型不出现在 Service、Controller、Entity、Request、Response 中
 - [ ] `crud-service-cache-method-removal`：删除 CrudService 缓存公共契约
   - 依赖前置：完成所有 CrudService 缓存链路迁移和 Holder 缓存入口收窄
   - 范围对象：`CrudService`、`CrudServiceImpl` 中的缓存字段、构造器参数和方法

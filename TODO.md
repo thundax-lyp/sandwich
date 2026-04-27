@@ -22,12 +22,6 @@
 
 ## P0 - Common / MyBatis-Plus / XML 演进
 
-- [ ] `common-split-stage-1`：执行 common 第一阶段分拆
-  - 参考手册：`docs/30-designs/COMMON-SPLIT-RUNBOOK.md`
-  - 范围对象：root `pom.xml`、`sandwish-common`、新增 `sandwish-common-core`、新增 `sandwish-common-mybatis`、依赖 `sandwish-common` 的业务模块
-  - 处理动作：将 `sandwish-common` 改为聚合模块；建立 `sandwish-common-core` 与 `sandwish-common-mybatis`；先迁移持久化公共代码和最小 core 依赖；保持 PageHelper、Mapper XML 和业务行为不变
-  - 验收点：`mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package` 通过；MyBatis-Plus 尚未引入；本任务完成后删除或收窄该 TODO
-
 - [ ] `mybatis-plus-introduction`：在 common-mybatis 中引入 MyBatis-Plus
   - 参考手册：`docs/30-designs/MYBATIS-PLUS-INTRODUCTION-RUNBOOK.md`
   - 范围对象：root `pom.xml`、`sandwish-common-mybatis`、MyBatis / PageHelper 依赖声明、MyBatis-Plus 基础配置

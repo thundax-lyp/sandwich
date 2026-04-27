@@ -34,7 +34,8 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 - `sandwish-admin-api` 打包为后台 API jar
 - `sandwish-front-api` 打包为前台 API jar
 - `sandwish-infra` 打包为 jar，由 API 入口模块依赖
-- `sandwish-biz` 和 `sandwish-common` 打包为 jar，由上层模块依赖
+- `sandwish-biz`、`sandwish-common-core` 和 `sandwish-common-mybatis` 打包为 jar，由上层模块依赖
+- `sandwish-common` 是 common 聚合模块，不作为运行 jar 直接依赖
 - API 应用固定通过 Maven module 打包，不新增 `war` 运行入口
 
 ## 4. Traffic Boundary

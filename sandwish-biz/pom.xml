@@ -18,7 +18,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.thundax</groupId>
-			<artifactId>sandwish-common</artifactId>
+			<artifactId>sandwish-common-mybatis</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

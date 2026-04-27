@@ -16,7 +16,9 @@
 - java: 8
 - spring-boot: 2.0.5.RELEASE
 - packaging:
-  - `sandwish-common`: jar
+  - `sandwish-common`: pom
+  - `sandwish-common-core`: jar
+  - `sandwish-common-mybatis`: jar
   - `sandwish-biz`: jar
   - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
@@ -55,20 +57,46 @@ Sandwich 固定采用三层 API 架构。
 
 职责：
 
+- Common 聚合模块
+- 管理 `sandwish-common-core` 与 `sandwish-common-mybatis`
+
+边界：
+
+- 不直接承载 Java 源码。
+- 不被业务模块作为 jar 依赖。
+
+### `sandwish-common-core`
+
+职责：
+
 - 通用工具类
 - 基础 Web 支撑
 - 通用编码、加密、集合、日期、文件工具
 - i18n 支撑
-- 通用 Service 基类
-- 通用持久化基础设施
 - Redis client、连接、序列化和通用技术支撑
 - 存储、线程等通用技术能力
 
 边界：
 
 - 不承载具体业务流程。
-- 不依赖 `sandwish-biz`、`sandwish-admin-api`、`sandwish-front-api`。
+- 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 - 新增通用能力前，必须确认不是某个业务模块的专用逻辑。
+
+### `sandwish-common-mybatis`
+
+职责：
+
+- 通用持久化基础设施
+- 通用 Service 基类
+- MyBatis 扫描标记
+- PageHelper 迁移期支撑
+- 数据库方言类
+
+边界：
+
+- 可以依赖 `sandwish-common-core`。
+- 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-biz`
 
@@ -154,13 +182,13 @@ Sandwich 固定采用三层 API 架构。
 
 固定依赖方向为：
 
-`sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common`
+`sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
-`sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common`
+`sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
 禁止依赖方向：
 
-- `sandwish-common` 不得依赖任何业务或入口模块。
+- `sandwish-common` 及其子模块不得依赖任何业务或入口模块。
 - `sandwish-biz` 不得依赖 `sandwish-infra`、`sandwish-admin-api` 或 `sandwish-front-api`。
 - `sandwish-infra` 不得依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
 - `sandwish-admin-api` 与 `sandwish-front-api` 不得互相依赖。

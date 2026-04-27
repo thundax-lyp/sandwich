@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `sys-personal-api`：隔离个人中心 API 模型
-  - 范围入口：`PersonalApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `UserVo`、`UpdatePasswordQueryParam`、`MenuVo`；Controller 内存在当前用户 `User` 到 API 模型转换和菜单响应组装
-  - 需要新增或收窄的 `Request`：个人资料更新、密码更新、头像上传、头像删除请求
-  - 需要新增或收窄的 `Response`：个人信息响应、头像响应、菜单响应、权限编码响应
-  - 需要新增的 `InterfaceAssembler`：`PersonalInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；密码更新继续通过稳定业务参数传给 `PasswordService`
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `auth-admin-api`：隔离后台认证 API 模型
   - 范围入口：`AuthApiController`、`CaptchaApiController`
   - 当前 API 模型泄漏点：入口直接使用 `LoginFormVo`、`AccessTokenVo`、`UsernameLoginQueryParam`；Controller 内存在 `LoginForm`、`AccessToken` 到 API 模型转换；验证码刷新请求仍复用 `LoginFormVo`

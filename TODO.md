@@ -20,38 +20,12 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-## P0 - Common / MyBatis-Plus / XML 演进
-
-- [ ] `common-split-stage-1`：执行 common 第一阶段分拆
-  - 参考手册：`docs/30-designs/COMMON-SPLIT-RUNBOOK.md`
-  - 范围对象：root `pom.xml`、`sandwish-common`、新增 `sandwish-common-core`、新增 `sandwish-common-mybatis`、依赖 `sandwish-common` 的业务模块
-  - 处理动作：将 `sandwish-common` 改为聚合模块；建立 `sandwish-common-core` 与 `sandwish-common-mybatis`；先迁移持久化公共代码和最小 core 依赖；保持 PageHelper、Mapper XML 和业务行为不变
-  - 验收点：`mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package` 通过；MyBatis-Plus 尚未引入；本任务完成后删除或收窄该 TODO
-
-- [ ] `mybatis-plus-introduction`：在 common-mybatis 中引入 MyBatis-Plus
-  - 参考手册：`docs/30-designs/MYBATIS-PLUS-INTRODUCTION-RUNBOOK.md`
-  - 范围对象：root `pom.xml`、`sandwish-common-mybatis`、MyBatis / PageHelper 依赖声明、MyBatis-Plus 基础配置
-  - 处理动作：引入 `com.baomidou:mybatis-plus-boot-starter:3.5.5`；达梦分页插件固定 `DbType.DM`；保持现有 XML 和 Mapper 扫描行为不变；避免 MyBatis starter 重复竞争自动配置
-  - 验收点：Admin / Front 包编译通过；现有 XML 链路可继续运行；未迁移任何具体业务 Mapper
-
-- [ ] `xml-elimination-first-chain`：选择首条达梦标准链路消灭 XML
-  - 参考手册：`docs/30-designs/XML-ELIMINATION-RUNBOOK.md`
-  - 范围对象：一条已完成 DAO 显式化和 DO query 收敛的简单持久化链路、对应 Mapper interface、DAO implementation、DO、`PersistenceAssembler`、`mapping/mysql`、`mapping/dameng`、`mapping/kingbase` XML
-  - 处理动作：以达梦 XML 为唯一标准迁移到 MyBatis-Plus / Java 持久化实现；同步删除该链路三组 XML；MySQL / Kingbase 差异不再作为兼容目标
-  - 验收点：当前链路不再加载 XML；Admin / Front 相关包编译通过；TODO 删除或收窄该链路剩余工作
-
 ## P0 - 持久化表达改造
 
 - [ ] `docs/30-designs`：持久化迁移手册收尾
   - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`TODO.md`、治理文档
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
-
-- [ ] `assist-async-task-persistence`：收敛异步任务 Redis 持久化表达
-  - 范围对象：`AsyncTaskService`、`AsyncTaskServiceImpl`、`AsyncTaskDao`、`AsyncTaskDaoImpl`、`AsyncTaskDO`、`AsyncTaskPersistenceAssembler`
-  - 当前依赖：`AsyncTaskDao` 为自定义 Redis DAO，不存在 Mapper / Mapper XML；`AsyncTaskDO extends AdminDataEntity<AsyncTaskDO>`；`AsyncTaskPersistenceAssembler` 复制 `AdminDataEntity` 父类字段；Redis key 前缀为 `Constants.CACHE_PREFIX + "assist.asyncTask."`，保存时使用 `expiredSeconds`
-  - 处理动作：拉平 `AsyncTaskDO` 父类字段；保持 `get`、`save`、`delete` Redis 语义和过期时间语义；移除对 `AdminDataEntity` 父类字段的持久化对象依赖；不新增 Mapper 或数据库表
-  - 验收点：异步任务 Redis 链路不再依赖 `AsyncTaskDO extends AdminDataEntity`；Admin 包编译通过
 
 - [ ] `member-persistence`：收敛会员持久化表达
   - 范围对象：`MemberService`、`MemberServiceImpl`、`MemberDao`、`MemberDaoImpl`、`MemberMapper`、`mapper/mapping/mysql/MemberMapper.xml`、`mapper/mapping/dameng/MemberMapper.xml`、`mapper/mapping/kingbase/MemberMapper.xml`、`MemberDO`、`MemberPersistenceAssembler`
@@ -106,3 +80,23 @@
   - 当前依赖：命名目录规则已固定 `DO/DataObject`、Mapper、DAO implementation、`PersistenceAssembler` 目录和命名；尚未明确 `DO` 与业务 `Entity` 查询模型的命名边界、显式查询字段命名、公共 DAO 契约收敛后的放置口径
   - 处理动作：在公共契约和装配器收敛后，补充 DO 显式字段、查询字段命名、DAO / Mapper 显式方法命名和 `PersistenceAssembler` 单向 query 复制规则；同步删除过时的开放项或收窄为具体命名决策
   - 验收点：命名目录规则能作为新增持久化类、Mapper 方法和装配器方法的直接命名依据
+
+## P0 - Common / MyBatis-Plus / XML 演进
+
+- [ ] `common-split-stage-1`：执行 common 第一阶段分拆
+  - 参考手册：`docs/30-designs/COMMON-SPLIT-RUNBOOK.md`
+  - 范围对象：root `pom.xml`、`sandwish-common`、新增 `sandwish-common-core`、新增 `sandwish-common-mybatis`、依赖 `sandwish-common` 的业务模块
+  - 处理动作：将 `sandwish-common` 改为聚合模块；建立 `sandwish-common-core` 与 `sandwish-common-mybatis`；先迁移持久化公共代码和最小 core 依赖；保持 PageHelper、Mapper XML 和业务行为不变
+  - 验收点：`mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package` 通过；MyBatis-Plus 尚未引入；本任务完成后删除或收窄该 TODO
+
+- [ ] `mybatis-plus-introduction`：在 common-mybatis 中引入 MyBatis-Plus
+  - 参考手册：`docs/30-designs/MYBATIS-PLUS-INTRODUCTION-RUNBOOK.md`
+  - 范围对象：root `pom.xml`、`sandwish-common-mybatis`、MyBatis / PageHelper 依赖声明、MyBatis-Plus 基础配置
+  - 处理动作：引入 `com.baomidou:mybatis-plus-boot-starter:3.5.5`；达梦分页插件固定 `DbType.DM`；保持现有 XML 和 Mapper 扫描行为不变；避免 MyBatis starter 重复竞争自动配置
+  - 验收点：Admin / Front 包编译通过；现有 XML 链路可继续运行；未迁移任何具体业务 Mapper
+
+- [ ] `xml-elimination-first-chain`：选择首条达梦标准链路消灭 XML
+  - 参考手册：`docs/30-designs/XML-ELIMINATION-RUNBOOK.md`
+  - 范围对象：一条已完成 DAO 显式化和 DO query 收敛的简单持久化链路、对应 Mapper interface、DAO implementation、DO、`PersistenceAssembler`、`mapping/mysql`、`mapping/dameng`、`mapping/kingbase` XML
+  - 处理动作：以达梦 XML 为唯一标准迁移到 MyBatis-Plus / Java 持久化实现；同步删除该链路三组 XML；MySQL / Kingbase 差异不再作为兼容目标
+  - 验收点：当前链路不再加载 XML；Admin / Front 相关包编译通过；TODO 删除或收窄该链路剩余工作

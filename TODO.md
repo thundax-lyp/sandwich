@@ -51,10 +51,11 @@
   - 处理动作：拉平 `AsyncTaskDO` 父类字段；保持 `get`、`save`、`delete` Redis 语义和过期时间语义；移除对 `AdminDataEntity` 父类字段的持久化对象依赖；不新增 Mapper 或数据库表
   - 验收点：异步任务 Redis 链路不再依赖 `AsyncTaskDO extends AdminDataEntity`；Admin 包编译通过
 
-- [ ] `member`：拆分会员域持久化表达改造任务
-  - 范围对象：会员查询、会员资料相关持久化链路
-  - 处理动作：先横向盘点 `member` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
-  - 验收点：会员域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+- [ ] `member-persistence`：收敛会员持久化表达
+  - 范围对象：`MemberService`、`MemberServiceImpl`、`MemberDao`、`MemberDaoImpl`、`MemberMapper`、`mapper/mapping/mysql/MemberMapper.xml`、`mapper/mapping/dameng/MemberMapper.xml`、`mapper/mapping/kingbase/MemberMapper.xml`、`MemberDO`、`MemberPersistenceAssembler`
+  - 当前依赖：`MemberService extends CrudService<Member>`；`MemberServiceImpl extends CrudServiceImpl<MemberDao, Member>`；`MemberDao extends CrudDao<Member>`；`MemberMapper extends CrudDao<MemberDO>`；`MemberDO extends AdminDataEntity<MemberDO>`；`MemberDO.Query` 承载 `enableFlag`、`email`、`name`、`remarks`、`beginRegisterDate`、`endRegisterDate`、`beginLoginDate`、`endLoginDate`、`ywtbId`、`zjhm`、`mobile` 查询条件；`MemberPersistenceAssembler` 负责 `Member.Query <-> MemberDO.Query` 转换
+  - 处理动作：显式化会员 Mapper 方法；拉平 `MemberDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get`、`getMany`、`findList`、`insert`、`update`、`delete`、`updatePriority`、`findByLoginName`、`findByEmail`、`updateLoginInfo`、`updateInfo`、`updateLoginPass`、`updateEnableFlag`、`getByZjhm`、`getByYwtbId` 能力；保持 MySQL / 达梦 / Kingbase 三方言 SQL 语义一致
+  - 验收点：会员链路不再依赖通用查询契约、`MemberDO.Query` 或 `MemberDO extends AdminDataEntity`；Front 包编译通过
 
 - [ ] `common-persistence`：拆分公共持久化契约改造任务
   - 范围对象：`CrudDao`、`TreeDao` 及其对通用查询入口、父类字段和树结构父类的依赖

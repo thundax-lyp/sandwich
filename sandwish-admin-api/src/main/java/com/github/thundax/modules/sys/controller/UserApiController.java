@@ -10,19 +10,26 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.common.vo.PageVo;
-import com.github.thundax.common.vo.UserVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
 import com.github.thundax.modules.auth.service.PasswordService;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.api.UserServiceApi;
-import com.github.thundax.modules.sys.api.query.UserQueryParam;
-import com.github.thundax.modules.sys.api.vo.OfficeVo;
-import com.github.thundax.modules.sys.api.vo.RoleVo;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.request.UserAvatarRequest;
+import com.github.thundax.modules.sys.request.UserCheckRequest;
+import com.github.thundax.modules.sys.request.UserIdRequest;
+import com.github.thundax.modules.sys.request.UserOfficeRequest;
+import com.github.thundax.modules.sys.request.UserQueryRequest;
+import com.github.thundax.modules.sys.request.UserRoleRequest;
+import com.github.thundax.modules.sys.request.UserSaveRequest;
+import com.github.thundax.modules.sys.request.UserStatusRequest;
+import com.github.thundax.modules.sys.response.UserOfficeResponse;
+import com.github.thundax.modules.sys.response.UserResponse;
+import com.github.thundax.modules.sys.response.UserRoleResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -33,7 +40,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,12 +68,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
     private final RoleService roleService;
     private final RedisClient redisClient;
     private final PasswordService passwordService;
+    private final UserInterfaceAssembler userInterfaceAssembler;
 
     @Autowired
     public UserApiController(UserService userService,
                              OfficeService officeService,
                              RoleService roleService,
-                             Validator validator, RedisClient redisClient, PasswordService passwordService) {
+                             Validator validator,
+                             RedisClient redisClient,
+                             PasswordService passwordService,
+                             UserInterfaceAssembler userInterfaceAssembler) {
         super(validator);
 
         this.userService = userService;
@@ -75,63 +85,64 @@ public class UserApiController extends BaseApiController implements UserServiceA
         this.roleService = roleService;
         this.redisClient = redisClient;
         this.passwordService = passwordService;
+        this.userInterfaceAssembler = userInterfaceAssembler;
     }
 
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public UserVo get(@RequestBody UserVo vo) throws ApiException {
-        User bean = userService.get(vo.getId());
+    public UserResponse get(@RequestBody UserIdRequest request) throws ApiException {
+        User bean = userService.get(request.getId());
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, vo.getId());
+            throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
-        return entityToVo(bean);
+        return userInterfaceAssembler.toResponse(bean);
     }
 
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public List<UserVo> list(@RequestBody UserQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public List<UserResponse> list(@RequestBody UserQueryRequest request) throws ApiException {
+        validate(request);
 
-        User query = readQuery(queryParam);
+        User query = readQuery(request);
 
-        return ListUtils.map(userService.findList(query), this::entityToVo);
+        return ListUtils.map(userService.findList(query), userInterfaceAssembler::toResponse);
     }
 
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public PageVo<UserVo> page(@RequestBody UserQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public PageVo<UserResponse> page(@RequestBody UserQueryRequest request) throws ApiException {
+        validate(request);
 
-        User query = readQuery(queryParam);
-        Page<User> page = readPage(queryParam);
+        User query = readQuery(request);
+        Page<User> page = readUserPage(request);
 
-        return entityPageToVo(userService.findPage(query, page), this::entityToVo);
+        return entityPageToVo(userService.findPage(query, page), userInterfaceAssembler::toResponse);
     }
 
 
     @Override
     @RequiresPermissions("sys:user:edit")
-    public UserVo add(@RequestBody UserVo vo) throws ApiException {
+    public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(vo.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + vo.getToken()));
-        vo.setLoginPass(password);
-        validate(vo);
-        validateOffice(vo.getOffice());
-        validateRoles(vo.getRoleList());
+        String password = Sm2.decrypt(request.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
+        request.setLoginPass(password);
+        validate(request);
+        validateOffice(request.getOffice());
+        validateRoles(request.getRoleList());
 
-        if (!check(vo)) {
+        if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
             throw new InvalidParameterException("loginName");
         }
 
-        if (StringUtils.isBlank(vo.getLoginPass())) {
+        if (StringUtils.isBlank(request.getLoginPass())) {
             throw new InvalidParameterException("password");
         }
 
-        User entity = voToEntity(new User(), vo);
-        entity.setLoginPass(passwordService.encrypt(vo.getLoginPass()));
+        User entity = userInterfaceAssembler.toEntity(new User(), request);
+        entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
 
         if (StringUtils.isNotEmpty(entity.getId())) {
             User bean = userService.get(entity.getId());
@@ -146,37 +157,37 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         userService.save(entity);
 
-        return entityToVo(entity);
+        return userInterfaceAssembler.toResponse(entity);
     }
 
 
     @Override
     @RequiresPermissions("sys:user:edit")
-    public UserVo update(@RequestBody UserVo vo) throws ApiException {
+    public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        if (StringUtils.isNotBlank(vo.getLoginPass())) {
-            String password = Sm2.decrypt(vo.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + vo.getToken()));
+        if (StringUtils.isNotBlank(request.getLoginPass())) {
+            String password = Sm2.decrypt(request.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
             // 先解密，否则密码规则无法校验
-            vo.setLoginPass(password);
+            request.setLoginPass(password);
         }
-        validate(vo);
-        validateOffice(vo.getOffice());
-        validateRoles(vo.getRoleList());
+        validate(request);
+        validateOffice(request.getOffice());
+        validateRoles(request.getRoleList());
 
-        if (!check(vo)) {
+        if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
             throw new InvalidParameterException("loginName");
         }
 
-        if(!checkSsoLoginName(vo)){
+        if(!isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId())){
             throw new InvalidParameterException("ssoLoginName");
         }
 
-        User bean = userService.get(vo.getId());
+        User bean = userService.get(request.getId());
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, vo.getId());
+            throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
         // 非超管用户无权限开启/关闭管理员
-        if (!currentUser().isSuper() && !(Boolean.TRUE.equals(vo.getAdmin()) ? Global.YES : Global.NO).equals(bean.getAdminFlag())) {
+        if (!currentUser().isSuper() && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO).equals(bean.getAdminFlag())) {
             throw new PermissionDeniedException();
         }
         // 无权限修改超管/等级高于自身的用户信息
@@ -187,16 +198,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
 
 
-        User entity = voToEntity(bean, vo);
+        User entity = userInterfaceAssembler.toEntity(bean, request);
 
         userService.save(entity);
 
-        if (StringUtils.isNotBlank(vo.getLoginPass())) {
-            entity.setLoginPass(passwordService.encrypt(vo.getLoginPass()));
+        if (StringUtils.isNotBlank(request.getLoginPass())) {
+            entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
             userService.updatePassword(entity);
         }
 
-        return entityToVo(entity);
+        return userInterfaceAssembler.toResponse(entity);
     }
 
 
@@ -208,19 +219,19 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @RequiresPermissions("sys:user:edit")
-    public Boolean deleteAvatar(@RequestBody UserVo user) throws ApiException {
+    public Boolean deleteAvatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return true;
     }
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public String avatar(@RequestBody UserVo user) throws ApiException {
+    public String avatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return "";
     }
 
     @Override
     @RequiresPermissions("sys:user:edit")
-    public Boolean updateEnableFlag(@RequestBody List<UserVo> list) throws ApiException {
+    public Boolean updateEnableFlag(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = currentUser();
 
         List<User> beanList = validateList(list,
@@ -241,7 +252,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @RequiresPermissions("sys:user:edit")
-    public Boolean delete(@RequestBody List<UserVo> list) throws ApiException {
+    public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = currentUser();
 
         List<User> beanList = validateList(list,
@@ -260,45 +271,29 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public Boolean check(@RequestBody UserVo user) {
-        if (StringUtils.isBlank(user.getLoginName())) {
-            return true;
-        }
-        User bean = userService.getByLoginName(user.getLoginName());
-        if (bean == null) {
-            return true;
-        }
-
-        return StringUtils.equals(bean.getId(), user.getId());
+    public Boolean check(@RequestBody UserCheckRequest request) {
+        return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public Boolean checkSsoLoginName(@RequestBody UserVo user) {
-        if (StringUtils.isBlank(user.getSsoLoginName())) {
-            return true;
-        }
-        User bean = userService.getBySsoLoginName(user.getSsoLoginName());
-        if (bean == null) {
-            return true;
-        }
-
-        return StringUtils.equals(bean.getId(), user.getId());
+    public Boolean checkSsoLoginName(@RequestBody UserCheckRequest request) {
+        return isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId());
     }
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public List<OfficeVo> officeTree() {
-        return ListUtils.map(officeService.findList(new Office()), this::entityToVo);
+    public List<UserOfficeResponse> officeTree() {
+        return ListUtils.map(officeService.findList(new Office()), userInterfaceAssembler::toOfficeResponse);
     }
 
     @Override
     @RequiresPermissions("sys:user:view")
-    public List<RoleVo> roleList() {
+    public List<UserRoleResponse> roleList() {
         Role query = new Role();
         query.setQueryProp(Role.Query.PROP_ENABLE_FLAG, Global.ENABLE);
 
-        return ListUtils.map(roleService.findList(query), this::entityToVo);
+        return ListUtils.map(roleService.findList(query), userInterfaceAssembler::toRoleResponse);
     }
 
     @Override
@@ -326,144 +321,103 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 response.getOutputStream());
     }
 
-    private User readQuery(UserQueryParam queryParam) throws ApiException {
+    private User readQuery(UserQueryRequest request) throws ApiException {
         User query = new User();
 
-        query.setQueryProp(User.Query.PROP_LOGIN_NAME, queryParam.getLoginName());
-        query.setQueryProp(User.Query.PROP_NAME, queryParam.getName());
+        query.setQueryProp(User.Query.PROP_LOGIN_NAME, request.getLoginName());
+        query.setQueryProp(User.Query.PROP_NAME, request.getName());
 
-        if (queryParam.getEnable() != null) {
-            query.setQueryProp(User.Query.PROP_ENABLE_FLAG, queryParam.getEnable() ? Global.ENABLE : Global.DISABLE);
+        if (request.getEnable() != null) {
+            query.setQueryProp(User.Query.PROP_ENABLE_FLAG, request.getEnable() ? Global.ENABLE : Global.DISABLE);
         }
 
-        if (StringUtils.isNotBlank(queryParam.getOfficeId())) {
-            Office office = OfficeServiceHolder.get(queryParam.getOfficeId());
+        if (StringUtils.isNotBlank(request.getOfficeId())) {
+            Office office = OfficeServiceHolder.get(request.getOfficeId());
             if (office == null) {
-                throw new NullBeanException(Office.BEAN_NAME, queryParam.getOfficeId());
+                throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
 
             query.setQueryProp(User.Query.PROP_OFFICE_TREE_LEFT, office.getLft());
             query.setQueryProp(User.Query.PROP_OFFICE_TREE_RIGHT, office.getRgt());
         }
 
-        query.setQueryProp(User.Query.PROP_ORDER_BY, queryParam.getOrderBy());
+        query.setQueryProp(User.Query.PROP_ORDER_BY, request.getOrderBy());
 
         return query;
     }
 
 
-    private void validateOffice(OfficeVo vo) throws ApiException {
-        if (vo == null || StringUtils.isBlank(vo.getId())) {
+    private void validateOffice(UserOfficeRequest request) throws ApiException {
+        if (request == null || StringUtils.isBlank(request.getId())) {
             throw new InvalidParameterException("office.id");
 
         } else {
-            Office bean = OfficeServiceHolder.get(vo.getId());
+            Office bean = OfficeServiceHolder.get(request.getId());
             if (bean == null) {
-                throw new NullBeanException(Office.BEAN_NAME, vo.getId());
+                throw new NullBeanException(Office.BEAN_NAME, request.getId());
             }
         }
     }
 
 
-    private void validateRoles(List<RoleVo> voList) throws ApiException {
-        if (ListUtils.isEmpty(voList)) {
+    private void validateRoles(List<UserRoleRequest> requestList) throws ApiException {
+        if (ListUtils.isEmpty(requestList)) {
             return;
         }
-        for (RoleVo vo : voList) {
-            if (vo == null || StringUtils.isBlank(vo.getId())) {
+        for (UserRoleRequest request : requestList) {
+            if (request == null || StringUtils.isBlank(request.getId())) {
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                Role bean = RoleServiceHolder.get(vo.getId());
+                Role bean = RoleServiceHolder.get(request.getId());
                 if (bean == null) {
-                    throw new NullBeanException(Role.BEAN_NAME, vo.getId());
+                    throw new NullBeanException(Role.BEAN_NAME, request.getId());
                 }
             }
         }
     }
 
+    private Page<User> readUserPage(UserQueryRequest request) {
+        Integer pageNo = request.getPageNo();
+        Integer pageSize = request.getPageSize();
 
-    @NonNull
-    private UserVo entityToVo(User entity) {
-        if (entity == null) {
-            return new UserVo();
+        if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
+            pageNo = Page.FIRST_PAGE_INDEX;
         }
 
-        UserVo vo = baseEntityToVo(new UserVo(), entity);
+        if (pageSize == null || pageSize <= 0) {
+            pageSize = Page.DEFAULT_PAGE_SIZE;
+        }
 
-        vo.setLoginName(entity.getLoginName());
-        vo.setRanks(entity.getRanks());
-
-        vo.setName(entity.getName());
-        vo.setEmail(entity.getEmail());
-        vo.setMobile(entity.getMobile());
-        vo.setAvatar(getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
-
-        vo.setSuper(entity.isSuper());
-        vo.setAdmin(entity.isAdmin());
-        vo.setEnable(entity.isEnable());
-
-        vo.setRegisterDate(entity.getRegisterDate());
-        vo.setRegisterIp(entity.getRegisterIp());
-        vo.setLastLoginDate(entity.getLastLoginDate());
-        vo.setLastLoginIp(entity.getLastLoginIp());
-
-        vo.setOffice(entityToVo(entity.getOffice()));
-        vo.setRoleList(ListUtils.map(entity.getRoleList(), this::entityToVo));
-
-        return vo;
+        Page<User> page = new Page<>();
+        page.setPageNo(pageNo);
+        page.setPageSize(pageSize);
+        return page;
     }
 
-    @NonNull
-    private OfficeVo entityToVo(Office entity) {
-        if (entity == null) {
-            return new OfficeVo();
+
+    private boolean isLoginNameAvailable(String loginName, String id) {
+        if (StringUtils.isBlank(loginName)) {
+            return true;
+        }
+        User bean = userService.getByLoginName(loginName);
+        if (bean == null) {
+            return true;
         }
 
-        OfficeVo vo = new OfficeVo(entity.getId());
-        if (StringUtils.isNotBlank(entity.getParentId())) {
-            vo.setParentId(entity.getParentId());
-        }
-        vo.setName(entity.getName());
-        vo.setName(entity.getName());
-        vo.setNamePath(entity.getNamePath());
-
-        return vo;
+        return StringUtils.equals(bean.getId(), id);
     }
 
-    @NonNull
-    private RoleVo entityToVo(Role entity) {
-        if (entity == null) {
-            return new RoleVo();
+    private boolean isSsoLoginNameAvailable(String ssoLoginName, String id) {
+        if (StringUtils.isBlank(ssoLoginName)) {
+            return true;
+        }
+        User bean = userService.getBySsoLoginName(ssoLoginName);
+        if (bean == null) {
+            return true;
         }
 
-        RoleVo vo = new RoleVo(entity.getId());
-        vo.setName(entity.getName());
-
-        return vo;
-    }
-
-    @NonNull
-    private User voToEntity(@NonNull User entity, @NonNull UserVo vo) {
-        baseVoToEntity(entity, vo);
-
-        if (vo.getOffice() != null) {
-            entity.setOfficeId(vo.getOffice().getId());
-        }
-
-        entity.setLoginName(vo.getLoginName());
-        entity.setRanks(vo.getRanks());
-
-        entity.setName(vo.getName());
-        entity.setEmail(vo.getEmail());
-        entity.setMobile(vo.getMobile());
-
-        entity.setAdminFlag(Boolean.TRUE.equals(vo.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE);
-
-        entity.setRoleIdList(ListUtils.map(vo.getRoleList(), RoleVo::getId));
-
-        return entity;
+        return StringUtils.equals(bean.getId(), id);
     }
 
     public static String getAvatarUrl(String userId, String token) {

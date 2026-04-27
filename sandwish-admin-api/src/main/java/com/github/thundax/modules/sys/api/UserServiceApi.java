@@ -3,11 +3,16 @@ package com.github.thundax.modules.sys.api;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.vo.PageVo;
-import com.github.thundax.common.vo.UserVo;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
-import com.github.thundax.modules.sys.api.query.UserQueryParam;
-import com.github.thundax.modules.sys.api.vo.OfficeVo;
-import com.github.thundax.modules.sys.api.vo.RoleVo;
+import com.github.thundax.modules.sys.request.UserAvatarRequest;
+import com.github.thundax.modules.sys.request.UserCheckRequest;
+import com.github.thundax.modules.sys.request.UserIdRequest;
+import com.github.thundax.modules.sys.request.UserQueryRequest;
+import com.github.thundax.modules.sys.request.UserSaveRequest;
+import com.github.thundax.modules.sys.request.UserStatusRequest;
+import com.github.thundax.modules.sys.response.UserOfficeResponse;
+import com.github.thundax.modules.sys.response.UserResponse;
+import com.github.thundax.modules.sys.response.UserRoleResponse;
 import io.swagger.annotations.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +34,7 @@ public interface UserServiceApi {
     /**
      * 获取对象
      *
-     * @param user 用户
+     * @param request 用户标识请求
      * @return 用户
      * @throws ApiException API异常
      */
@@ -39,13 +44,13 @@ public interface UserServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    UserVo get(@RequestBody @ApiParam("用户") UserVo user) throws ApiException;
+    UserResponse get(@RequestBody @ApiParam("用户标识请求") UserIdRequest request) throws ApiException;
 
 
     /**
      * 获取列表
      *
-     * @param queryParam 用户查询参数
+     * @param request 用户查询请求
      * @return 用户列表
      * @throws ApiException API异常
      */
@@ -55,13 +60,13 @@ public interface UserServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<UserVo> list(@RequestBody @ApiParam("用户查询参数") UserQueryParam queryParam) throws ApiException;
+    List<UserResponse> list(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request) throws ApiException;
 
 
     /**
      * 获取分页列表
      *
-     * @param queryParam 用户查询参数
+     * @param request 用户查询请求
      * @return 分页
      * @throws ApiException API异常
      */
@@ -71,13 +76,13 @@ public interface UserServiceApi {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<UserVo> page(@RequestBody @ApiParam("用户查询参数") UserQueryParam queryParam) throws ApiException;
+    PageVo<UserResponse> page(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request) throws ApiException;
 
 
     /**
      * 添加
      *
-     * @param user 用户
+     * @param request 用户保存请求
      * @return 用户
      * @throws ApiException API异常
      */
@@ -87,13 +92,13 @@ public interface UserServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    UserVo add(@RequestBody @ApiParam("用户") UserVo user) throws ApiException;
+    UserResponse add(@RequestBody @ApiParam("用户保存请求") UserSaveRequest request) throws ApiException;
 
 
     /**
      * 更新
      *
-     * @param user 用户
+     * @param request 用户保存请求
      * @return 用户
      * @throws ApiException API异常
      */
@@ -103,7 +108,7 @@ public interface UserServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    UserVo update(@RequestBody @ApiParam("用户") UserVo user) throws ApiException;
+    UserResponse update(@RequestBody @ApiParam("用户保存请求") UserSaveRequest request) throws ApiException;
 
 
     /**
@@ -128,7 +133,7 @@ public interface UserServiceApi {
     /**
      * 删除头像
      *
-     * @param user 用户
+     * @param request 用户头像请求
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -138,13 +143,13 @@ public interface UserServiceApi {
     })
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
-    Boolean deleteAvatar(@RequestBody @ApiParam("用户") UserVo user) throws ApiException;
+    Boolean deleteAvatar(@RequestBody @ApiParam("用户头像请求") UserAvatarRequest request) throws ApiException;
 
 
     /**
      * 获取头像相对路径
      *
-     * @param user 用户
+     * @param request 用户头像请求
      * @return 头像相对路径
      * @throws ApiException API异常
      */
@@ -153,13 +158,13 @@ public interface UserServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "avatar", method = RequestMethod.POST)
-    String avatar(@RequestBody @ApiParam("用户") UserVo user) throws ApiException;
+    String avatar(@RequestBody @ApiParam("用户头像请求") UserAvatarRequest request) throws ApiException;
 
 
     /**
      * 启用/禁用
      *
-     * @param list 用户列表
+     * @param list 用户状态请求列表
      * @return 影响记录数
      * @throws ApiException API异常
      */
@@ -169,13 +174,13 @@ public interface UserServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("用户列表") List<UserVo> list) throws ApiException;
+    Boolean updateEnableFlag(@RequestBody @ApiParam("用户状态请求列表") List<UserStatusRequest> list) throws ApiException;
 
 
     /**
      * 删除
      *
-     * @param list 用户列表
+     * @param list 用户标识请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -185,13 +190,13 @@ public interface UserServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("用户列表") List<UserVo> list) throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("用户标识请求列表") List<UserIdRequest> list) throws ApiException;
 
 
     /**
      * 检查 [loginName]是否合法
      *
-     * @param user 用户
+     * @param request 用户唯一性检查请求
      * @return 合法:true, 不合法:false
      */
     @ApiOperation(value = "检查 [loginName]是否存在", notes = "sys:user:view")
@@ -199,13 +204,13 @@ public interface UserServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "check", method = RequestMethod.POST)
-    Boolean check(@RequestBody @ApiParam("用户") UserVo user);
+    Boolean check(@RequestBody @ApiParam("用户唯一性检查请求") UserCheckRequest request);
 
 
     /**
      * 检查 [ssoLoginName]是否合法
      *
-     * @param user 用户
+     * @param request 用户唯一性检查请求
      * @return 合法:true, 不合法:false
      */
     @ApiOperation(value = "检查 [ssoLoginName]是否存在", notes = "sys:user:view")
@@ -213,7 +218,7 @@ public interface UserServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "check-sso-loginName", method = RequestMethod.POST)
-    Boolean checkSsoLoginName(@RequestBody @ApiParam("用户") UserVo user);
+    Boolean checkSsoLoginName(@RequestBody @ApiParam("用户唯一性检查请求") UserCheckRequest request);
 
 
     /**
@@ -226,7 +231,7 @@ public interface UserServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "office/tree", method = RequestMethod.POST)
-    List<OfficeVo> officeTree();
+    List<UserOfficeResponse> officeTree();
 
 
     /**
@@ -239,7 +244,7 @@ public interface UserServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "role/list", method = RequestMethod.POST)
-    List<RoleVo> roleList();
+    List<UserRoleResponse> roleList();
 
 
     /**

@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `response-required-annotation-migration`：迁移现有 Response 到注解白名单形态
-  - 依赖前置：完成 `archunit-response-annotation-rule`
-  - 范围对象：现有 `Response` 类及其必要 import
-  - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
-  - 验收点：ArchUnit 规则通过；Response 序列化语义保持稳定
 - [ ] `archunit-do-annotation-baseline`：盘点 DO 注解规约适用范围
   - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：`sandwish-infra` 下 `persistence.dataobject` 包、现有 `DO/DataObject`、Redis 持久化对象和数据库表映射对象

@@ -5,15 +5,7 @@ import com.github.thundax.common.test.architecture.ModelAnnotationArchitectureRu
 import com.tngtech.archunit.core.domain.JavaClasses;
 import org.junit.Test;
 
-public class RequestAnnotationArchitectureTest extends AbstractArchitectureTest {
-
-    @Test
-    public void shouldEnforceRequestClassAnnotations() {
-        JavaClasses classes = importPackages("com.github.thundax.modules");
-
-        ModelAnnotationArchitectureRuleSupport.requestClassAnnotationsRequired("com.github.thundax.modules")
-                .check(classes);
-    }
+public class ResponseAnnotationArchitectureTest extends AbstractArchitectureTest {
 
     @Test
     public void shouldEnforceResponseClassAnnotations() {

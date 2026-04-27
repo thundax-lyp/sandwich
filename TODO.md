@@ -20,10 +20,17 @@
 
 ## P0 - Cache / Infra 边界演进
 
+- [ ] `spring-security-auth-testcase-baseline`：补登录与权限配置 testcase 基线
+  - 依赖前置：Spring Security token filter 已接管后台 `/api/**` 认证并恢复权限会话
+  - 范围对象：`AuthServiceImpl`、`PermissionServiceImpl`、Spring Security token filter/config、测试专用 InMemory DAO/Impl
+  - 处理动作：为登录、token active/release、权限会话 create/touch、filter 认证与未授权响应补 testcase；测试中使用 InMemory `AccessTokenDao`、`LoginFormDao`、`LoginLockDao`、`PermissionDao` 等实现承接状态，不用 Redis 或外部数据库
+  - 测试隔离：InMemory DAO/Impl 固定放在 `src/test/java`；通过 `@Profile("test")` 或测试专用 `@TestConfiguration` 装配；不得进入生产源码和默认生产 Bean 扫描
+  - 允许新增测试专用实现：是
+  - 验收点：登录/权限配置测试能验证 token 生命周期、permissions 灌入、TTL/touch 语义和未授权响应
 - [ ] `spring-security-permission-migration`：用 Spring Security 替换后台自研权限链路
-  - 依赖前置：`PermissionService -> PermissionDao -> PermissionDaoImpl` 已提供权限会话和 Redis TTL/touch 能力
-  - 范围对象：后台 token filter、权限注解、旧 `Subject` 权限链路、旧权限 AOP、失效权限/Redis 迁移 runbook
-  - 处理动作：登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`；删除旧 `RequiresRoles`、`Logical.OR`、旧权限 AOP、`SubjectServiceImpl` 权限缓存链路；删除或收窄已失效的 Redis subject cache runbook 内容
+  - 依赖前置：完成 `spring-security-auth-testcase-baseline`
+  - 范围对象：权限注解、旧 `Subject` 权限链路、旧权限 AOP、失效权限/Redis 迁移 runbook
+  - 处理动作：逐步替换旧 `RequiresPermissions`；删除旧 `RequiresRoles`、`Logical.OR`、旧权限 AOP、`SubjectServiceImpl` 权限缓存链路；删除或收窄已失效的 Redis subject cache runbook 内容
   - 允许引入 Spring Security：是
   - 允许迁移 `RequiresRoles`：否
   - 允许删除旧权限 AOP：完成新注解全量替换后允许

@@ -3,9 +3,7 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
-import com.github.thundax.modules.auth.filter.AccessTokenFilter;
 import com.github.thundax.modules.auth.filter.ResponseWrapperFilter;
-import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
@@ -66,23 +64,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
         if (ListUtils.isNotEmpty(wrapperFilterProperties.getUrlPatterns())) {
             bean.setUrlPatterns(wrapperFilterProperties.getUrlPatterns());
-        } else {
-            bean.addUrlPatterns("/api/*");
-        }
-
-        return bean;
-    }
-
-    @Bean
-    public FilterRegistrationBean<AccessTokenFilter> accessTokenFilter(VltavaProperties properties,
-                                                                       AuthService authService) {
-        VltavaProperties.AccessTokenFilterProperties tokenFilterProperties = properties.getAccessTokenFilter();
-
-        FilterRegistrationBean<AccessTokenFilter> bean = new FilterRegistrationBean<>();
-        bean.setFilter(new AccessTokenFilter(tokenFilterProperties, authService));
-
-        if (ListUtils.isNotEmpty(tokenFilterProperties.getUrlPatterns())) {
-            bean.setUrlPatterns(tokenFilterProperties.getUrlPatterns());
         } else {
             bean.addUrlPatterns("/api/*");
         }

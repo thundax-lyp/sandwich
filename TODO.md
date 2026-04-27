@@ -26,13 +26,6 @@
 - JetCache 只能出现在 `sandwish-common-cache`、`sandwish-infra` 的实现细节，不能外泄到 Controller、Service、Entity、Request、Response。
 - 迁移期允许 `RedisClient` 暂存；新增或改造代码不得新增 `RedisClient` 调用点。
 
-- [ ] `redis-client-storage-cache-support-jetcache-migration`：用 JetCache 替换存储 CacheSupport 对 RedisClient 的依赖
-  - 依赖前置：后台/前台应用已接入 `sandwish-common-cache`
-  - 范围对象：`StorageCacheSupport`
-  - 处理动作：在 Storage cache support 内部使用 `@CreateCache`；保留现有 key、TTL、版本和失效语义
-  - 允许引入 JetCache：是
-  - 允许删除 `RedisClient`：否
-  - 验收点：`StorageCacheSupport` 不再 import common RedisClient
 - [ ] `redis-client-auth-dao-jetcache-migration`：用 JetCache 替换 auth DAO 对 RedisClient 的依赖
   - 依赖前置：后台/前台应用已接入 `sandwish-common-cache`
   - 范围对象：`AccessTokenDaoImpl`、`LoginFormDaoImpl`、`LoginLockDaoImpl`、`PermissionDaoImpl`

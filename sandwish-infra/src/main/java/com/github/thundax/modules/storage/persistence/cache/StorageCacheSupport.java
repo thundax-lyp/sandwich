@@ -1,10 +1,13 @@
 package com.github.thundax.modules.storage.persistence.cache;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.storage.entity.Storage;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /** 存储文件缓存支撑。 */
@@ -17,38 +20,39 @@ public class StorageCacheSupport {
     private static final String ID_PREFIX = "id_";
     private static final String VERSION_KEY = "version";
 
-    private final RedisClient redisClient;
-
-    public StorageCacheSupport(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
+    @CreateCache(
+            name = CACHE_SECTION,
+            cacheType = CacheType.REMOTE,
+            expire = OBJECT_EXPIRE_SECONDS,
+            timeUnit = TimeUnit.SECONDS)
+    private Cache<String, Object> cache;
 
     public Storage getById(String id) {
-        return redisClient.get(objectKey(id), Storage.class);
+        return (Storage) cache.get(objectKey(id));
     }
 
     public void putById(Storage storage) {
         if (storage != null && StringUtils.isNotBlank(storage.getId())) {
-            redisClient.set(objectKey(storage.getId()), storage, OBJECT_EXPIRE_SECONDS);
+            cache.put(objectKey(storage.getId()), storage, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 
     public void removeById(String id) {
-        redisClient.delete(objectKey(id));
+        cache.remove(objectKey(id));
         touchVersion();
     }
 
     public String currentVersion() {
-        String version = redisClient.get(versionKey());
+        String version = (String) cache.get(versionKey());
         if (StringUtils.isBlank(version)) {
             version = IdGen.uuid();
-            redisClient.set(versionKey(), version);
+            cache.put(versionKey(), version);
         }
         return version;
     }
 
     public void touchVersion() {
-        redisClient.set(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS);
+        cache.put(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(String id) {

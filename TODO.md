@@ -20,6 +20,14 @@
 
 ## P0 - Cache / Infra 边界演进
 
+- [ ] `spring-security-permission-migration`：用 Spring Security 替换后台自研权限链路
+  - 依赖前置：完成 `docs/30-designs/SPRING-SECURITY-PERMISSION-RUNBOOK.md` 的人工审阅
+  - 范围对象：`common-security`、后台 token filter、权限注解、权限匹配规则、`PermissionService`、权限 Redis DAO/infra 实现、旧 `Subject` 权限链路
+  - 处理动作：新增 `sandwish-common-security` 并同步 project baseline；保留 `role -> menu -> permissions`、默认 `user/admin/super` 和冒号前缀权限语义；登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`
+  - 允许引入 Spring Security：是
+  - 允许迁移 `RequiresRoles`：否
+  - 允许删除旧权限 AOP：完成新注解全量替换后允许
+  - 验收点：后台 Controller 不再依赖自研权限 AOP，权限会话由 `PermissionService -> PermissionDao -> PermissionDaoImpl` 管理，controller/service 不直接触碰 Redis
 - [ ] `redis-client-subject-cache-migration`：移除 SubjectService 对 RedisClient 的直接依赖
   - 依赖前置：后台密钥接口已完成 RedisClient 迁移
   - 范围对象：`SubjectServiceImpl`、subject/version 远端缓存 Store/DAO、infra 或安全适配实现

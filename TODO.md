@@ -57,10 +57,23 @@
   - 处理动作：显式化会员 Mapper 方法；拉平 `MemberDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get`、`getMany`、`findList`、`insert`、`update`、`delete`、`updatePriority`、`findByLoginName`、`findByEmail`、`updateLoginInfo`、`updateInfo`、`updateLoginPass`、`updateEnableFlag`、`getByZjhm`、`getByYwtbId` 能力；保持 MySQL / 达梦 / Kingbase 三方言 SQL 语义一致
   - 验收点：会员链路不再依赖通用查询契约、`MemberDO.Query` 或 `MemberDO extends AdminDataEntity`；Front 包编译通过
 
-- [ ] `common-persistence`：拆分公共持久化契约改造任务
-  - 范围对象：`CrudDao`、`TreeDao` 及其对通用查询入口、父类字段和树结构父类的依赖
-  - 处理动作：先横向盘点公共持久化契约中的通用查询入口、基类字段假设和树结构假设，按清晰子链路拆出后续改造 TODO，标明各自涉及的公共接口、受影响业务域和替换顺序
-  - 验收点：公共持久化契约形成可逐条执行的改造任务清单；本项不直接修改任何公共接口或基类代码
+- [ ] `common-crud-dao-contract`：收敛通用 Crud DAO 契约
+  - 范围对象：`sandwish-common/.../CrudDao.java`、仍继承 `CrudDao` 的业务 DAO / Mapper、相关 `CrudServiceImpl` 调用点
+  - 当前依赖：`CrudDao<T>` 固定暴露 `get`、`getMany`、`findList`、`insert`、`update`、`updatePriority`、`updateStatus`、`updateDelFlag`、`delete`；剩余继承点包括 `SignatureDao`、`MemberDao`、`StorageDao`、`UserDao`、`RoleDao`、`UserEncryptDao`、`DictDao`、`LogDao`、`UploadFileDao`、`OfficeDao` 以及 `SignatureMapper`、`MemberMapper`、`StorageMapper`
+  - 处理动作：在各业务链路完成显式 Mapper / DAO 方法后，盘点仍需保留的通用读写方法；将无业务语义或只由旧 XML 模板支撑的方法从公共契约中拆出或下沉到具体 DAO；同步 `CrudServiceImpl` 依赖
+  - 验收点：公共 Crud 契约只保留跨业务真实共享的方法；所有剩余继承点有明确业务理由；Admin / Front 包编译通过
+
+- [ ] `common-tree-dao-contract`：收敛通用 Tree DAO 契约
+  - 范围对象：`sandwish-common/.../TreeDao.java`、`MenuDao`、菜单树 Mapper XML、已显式化的 `OfficeDao` 对照实现
+  - 当前依赖：`TreeDao<T>` 继承 `CrudDao<T>`，并通过 `@Param("node")` 传递树节点对象，统一要求 `getTreeNode`、`updateLftRgt`、`updateParent`、`getMaxPosition`、`moveTreeRgts`、`moveTreeLfts`、`moveTreeNodes`；当前仅 `MenuDao` 仍继承 `TreeDao`
+  - 处理动作：参考 `OfficeDao` 显式树方法改造经验，评估 `MenuDao` 是否下沉显式树方法；移除公共树契约对 `CrudDao`、父类字段和嵌套集字段命名的隐式假设；保持菜单树移动、删除、插入语义
+  - 验收点：树 DAO 契约不再强制所有树对象共享同一 Mapper 参数结构；菜单与机构树链路编译通过
+
+- [ ] `common-entity-query-contract`：收敛公共实体 query 契约
+  - 范围对象：`BaseEntity`、`DataEntity`、`TreeEntity`、`AdminDataEntity`、`AdminTreeEntity`、剩余 `Entity.Query` / `DO.Query` 使用点
+  - 当前依赖：`DataEntity` 持有通用 `Object query`，并提供 `createQueryObject`、`setQueryProp`、`getQueryProp` 反射入口；`AdminDataEntity` / `AdminTreeEntity` 叠加创建人、更新人和签名能力；剩余 DO 继承集中在 `SignatureDO`、`AsyncTaskDO`、`StorageDO`、`StorageBusinessDO`、`MemberDO`
+  - 处理动作：等待各 `DO.Query` 消除后，评估 `DataEntity.query`、反射 query setter/getter 和 DO 侧父类继承是否还能保留；将业务实体仍需的查询对象职责与持久化 DO 职责分离；避免一次性删除影响 Controller / Service 查询绑定
+  - 验收点：公共实体基类不再作为持久化查询条件容器；剩余 query 使用点有明确业务层理由；Admin / Front 包编译通过
 
 - [ ] `common-assembler`：拆分公共 PersistenceAssembler 收敛任务
   - 范围对象：各业务域 `PersistenceAssembler` 中的 `Entity.query <-> DO.query` 转换和 `DO` 继承依赖

@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `request-required-annotation-migration`：迁移现有 Request 到注解白名单形态
-  - 依赖前置：完成 `archunit-request-annotation-rule`
-  - 范围对象：现有 `Request` 类及其必要 import
-  - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
-  - 验收点：ArchUnit 规则通过；Request 序列化和反序列化语义保持稳定
 - [ ] `archunit-response-annotation-baseline`：盘点 Response 注解规约适用范围
   - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：后台与前台 API 入口模块中的 `Response` 类、复用响应模型和历史非标准响应对象

@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `archunit-response-annotation-baseline`：盘点 Response 注解规约适用范围
-  - 依赖前置：完成 `common-test-baseline-module`
-  - 范围对象：后台与前台 API 入口模块中的 `Response` 类、复用响应模型和历史非标准响应对象
-  - 处理动作：确认哪些类应受 `NAME_RESPONSE_REQUIRED_ANNOTATIONS` 约束，并识别已有额外类级注解或缺失注解
-  - 验收点：Response 注解门禁的扫描范围明确，额外注解处理方式明确
 - [ ] `archunit-response-annotation-rule`：新增 Response 类级注解白名单门禁
   - 依赖前置：完成 `archunit-response-annotation-baseline`
   - 范围对象：承载架构测试的模块、ArchUnit 测试类

@@ -87,7 +87,6 @@ public class UserServiceHolder {
                     menuIds.addAll(ListUtils.map(role.getMenuList(), Menu::getId));
                 }
 
-                MenuServiceHolder.getService().preload(ListUtils.newArrayList(menuIds));
                 menuIds.removeIf(menuId -> {
                     Menu menuBean = MenuServiceHolder.get(menuId);
                     return menuBean == null || menuBean.getRanks() > user.getRanks();
@@ -96,8 +95,6 @@ public class UserServiceHolder {
                 menuIdList = ListUtils.newArrayList(menuIds);
             }
         }
-
-        MenuServiceHolder.getService().preload(menuIdList);
 
         List<Menu> menuList = MenuServiceHolder.getService().getMany(menuIdList);
 

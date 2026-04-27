@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author wdit
@@ -25,9 +23,7 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements MenuService {
 
-    private String lastCacheVersion;
     private final SignService signService;
-    private final List<Menu> cacheMenuList = ListUtils.newArrayList();
 
     @Autowired
     public MenuServiceImpl(MenuDao dao, RedisClient redisClient, SignService signService) {
@@ -36,51 +32,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
     }
 
     @Override
-    protected boolean isRedisCacheEnabled() {
-        return true;
-    }
-
-    @Override
-    protected String getCacheSection() {
-        return Constants.CACHE_PREFIX + "sys.menu.";
-    }
-
-    @Override
-    public void initialize() {
-        //此处没有加锁，先更新版本，后更新数据，保证数据比版本新
-        lastCacheVersion = getCacheVersion();
-        cacheMenuList.addAll(dao.findList(new Menu()));
-    }
-
-    private synchronized List<Menu> findAllList() {
-        String currentCacheVersion = getCacheVersion();
-
-        if (!StringUtils.equals(currentCacheVersion, lastCacheVersion)) {
-            cacheMenuList.clear();
-
-            lastCacheVersion = getCacheVersion();
-            cacheMenuList.addAll(dao.findList(new Menu()));
-        }
-
-        return cacheMenuList;
-    }
-
-
-    @Override
-    public Menu get(String id) {
-        return ListUtils.find(findAllList(), item -> Objects.equals(item.getId(), id));
-    }
-
-
-    @Override
-    public Menu get(Menu menu) {
-        return get(menu.getId());
-    }
-
-
-    @Override
     public List<Menu> findList(Integer maxRank) {
-        List<Menu> menus = ListUtils.newArrayList(findAllList());
+        List<Menu> menus = ListUtils.newArrayList(dao.findList(new Menu()));
         menus.removeIf(menu -> menu.getRanks() > maxRank);
         return menus;
     }
@@ -88,7 +41,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
 
     @Override
     public List<Menu> findChildList(String parentId) {
-        List<Menu> menus = ListUtils.newArrayList(findAllList());
+        List<Menu> menus = ListUtils.newArrayList(dao.findList(new Menu()));
         menus.removeIf(menu -> !StringUtils.equals(menu.getParentId(), parentId));
         return menus;
     }
@@ -104,8 +57,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
             dao.update(menu);
         }
 
-        removeAllCache();
         signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
+        notifyCacheChanged();
     }
 
 
@@ -114,8 +67,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
     public int updateDisplayFlag(Menu menu) {
         menu.preUpdate();
         int result = dao.updateDisplayFlag(menu);
-        removeCache(menu);
         signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
+        notifyCacheChanged();
         return result;
     }
 
@@ -138,8 +91,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
 
         int retVal = dao.delete(bean);
 
-        removeAllCache();
         signService.deleteSign(menu.getSignName(), menu.getSignId());
+        notifyCacheChanged();
 
         return retVal;
     }
@@ -148,7 +101,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Menu from, Menu to, MoveTreeNodeType moveType) {
         dao.moveTreeNode(from.getId(), to.getId(), moveType);
-        removeAllCache();
+        notifyCacheChanged();
     }
 
     @Override
@@ -156,10 +109,7 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
         return child != null && parent != null && dao.isChildOf(child.getId(), parent.getId());
     }
 
-    @Override
-    protected void removeCache(Menu entity) {
-        super.removeCache(entity);
-
+    private void notifyCacheChanged() {
         MapUtils.forEach(SpringContextHolder.getBeansOfType(CacheChangedListener.class),
                 (name, listener) -> listener.onMenuCacheChanged());
     }

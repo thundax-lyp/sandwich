@@ -46,10 +46,6 @@ public class MenuServiceHolder {
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
-    public static void removeAllCache() {
-        getService().removeAllCache();
-    }
-
     public static String getMenuIcon(String targetUrl) {
         Menu menu = ListUtils.find(getService().findList(User.MAX_RANKS), item ->
                 StringUtils.isNotEmpty(item.getUrl()) && targetUrl.endsWith(item.getUrl()));

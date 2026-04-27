@@ -6,10 +6,12 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.cache.MenuCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,19 +21,46 @@ import java.util.List;
 public class MenuDaoImpl implements MenuDao {
 
     private final MenuMapper mapper;
+    private final MenuCacheSupport cacheSupport;
 
-    public MenuDaoImpl(MenuMapper mapper) {
+    public MenuDaoImpl(MenuMapper mapper, MenuCacheSupport cacheSupport) {
         this.mapper = mapper;
+        this.cacheSupport = cacheSupport;
     }
 
     @Override
     public Menu get(Menu entity) {
-        return MenuPersistenceAssembler.toEntity(mapper.get(MenuPersistenceAssembler.toDataObject(entity)));
+        Menu menu = cacheSupport.getById(entity.getId());
+        if (menu != null) {
+            return menu;
+        }
+
+        menu = MenuPersistenceAssembler.toEntity(mapper.get(MenuPersistenceAssembler.toDataObject(entity)));
+        cacheSupport.putById(menu);
+        return menu;
     }
 
     @Override
     public List<Menu> getMany(List<String> idList) {
-        return MenuPersistenceAssembler.toEntityList(mapper.getMany(idList));
+        List<Menu> menuList = new ArrayList<>();
+        List<String> uncachedIdList = new ArrayList<>();
+        for (String id : idList) {
+            Menu menu = cacheSupport.getById(id);
+            if (menu == null) {
+                uncachedIdList.add(id);
+            } else {
+                menuList.add(menu);
+            }
+        }
+
+        if (!uncachedIdList.isEmpty()) {
+            List<Menu> uncachedMenuList = MenuPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            for (Menu menu : uncachedMenuList) {
+                cacheSupport.putById(menu);
+                menuList.add(menu);
+            }
+        }
+        return menuList;
     }
 
     @Override
@@ -57,7 +86,9 @@ public class MenuDaoImpl implements MenuDao {
         dataObject.setRgt(newPosition + 1);
         mapper.moveTreeRgts(newPosition, 2);
         mapper.moveTreeLfts(newPosition, 2);
-        return mapper.insert(dataObject);
+        int count = mapper.insert(dataObject);
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
@@ -69,12 +100,16 @@ public class MenuDaoImpl implements MenuDao {
         if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
-        return mapper.update(dataObject);
+        int count = mapper.update(dataObject);
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public int updatePriority(Menu entity) {
-        return mapper.updatePriority(MenuPersistenceAssembler.toDataObject(entity));
+        int count = mapper.updatePriority(MenuPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     public int updateStatus(Menu entity) {
@@ -83,7 +118,9 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public int updateDelFlag(Menu entity) {
-        return mapper.updateDelFlag(MenuPersistenceAssembler.toDataObject(entity));
+        int count = mapper.updateDelFlag(MenuPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     @Override
@@ -94,7 +131,9 @@ public class MenuDaoImpl implements MenuDao {
         }
         mapper.moveTreeRgts(node.getLft(), -treeSpan(node));
         mapper.moveTreeLfts(node.getLft(), -treeSpan(node));
-        return mapper.delete(MenuPersistenceAssembler.toDataObject(entity));
+        int count = mapper.delete(MenuPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
@@ -132,6 +171,7 @@ public class MenuDaoImpl implements MenuDao {
         parentUpdate.setId(fromId);
         parentUpdate.setParentId(newParentId);
         mapper.updateParent(parentUpdate);
+        cacheSupport.removeAll();
     }
 
     @Override
@@ -145,7 +185,9 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public int updateDisplayFlag(Menu menu) {
-        return mapper.updateDisplayFlag(MenuPersistenceAssembler.toDataObject(menu));
+        int count = mapper.updateDisplayFlag(MenuPersistenceAssembler.toDataObject(menu));
+        cacheSupport.removeById(menu.getId());
+        return count;
     }
 
     @Override

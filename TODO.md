@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-menu-chain-migration`：迁移 Menu 缓存链路到 infra
-  - 依赖前置：完成 `cache-office-chain-migration`
-  - 范围对象：`MenuServiceImpl`、`MenuDao`、`MenuDaoImpl`、`MenuMapper`、`MenuServiceHolder`、`UserServiceHolder` 中的 `preload` 调用
-  - 处理动作：将 Menu 缓存、预加载和版本判断迁入 infra；不改变权限菜单查询语义
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：`MenuServiceImpl` 不再调用 `preload`、`removeAllCache`、`getCacheVersion`
 - [ ] `cache-role-chain-migration`：迁移 Role 缓存链路到 infra
   - 依赖前置：完成 `cache-menu-chain-migration`
   - 范围对象：`RoleServiceImpl`、`RoleDao`、`RoleDaoImpl`、`RoleMapper`、`RoleServiceHolder`

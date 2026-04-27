@@ -75,10 +75,17 @@
   - 处理动作：等待各 `DO.Query` 消除后，评估 `DataEntity.query`、反射 query setter/getter 和 DO 侧父类继承是否还能保留；将业务实体仍需的查询对象职责与持久化 DO 职责分离；避免一次性删除影响 Controller / Service 查询绑定
   - 验收点：公共实体基类不再作为持久化查询条件容器；剩余 query 使用点有明确业务层理由；Admin / Front 包编译通过
 
-- [ ] `common-assembler`：拆分公共 PersistenceAssembler 收敛任务
-  - 范围对象：各业务域 `PersistenceAssembler` 中的 `Entity.query <-> DO.query` 转换和 `DO` 继承依赖
-  - 处理动作：先横向盘点各业务域 `PersistenceAssembler` 当前承担的 query 转换和父类字段装配职责，按对象或清晰子链路拆出后续收敛 TODO，标明各自涉及的 `Entity`、`DO` 和装配规则调整点
-  - 验收点：公共 `PersistenceAssembler` 收敛形成可逐条执行的任务清单；本项不直接修改任何装配代码
+- [ ] `assembler-query-conversion`：清理持久化装配中的 DO query 双向转换
+  - 范围对象：`SignaturePersistenceAssembler`、`StoragePersistenceAssembler`、`MemberPersistenceAssembler`、相关 `SignatureDO`、`StorageDO`、`StorageBusinessDO`、`MemberDO`
+  - 当前依赖：签名、存储、会员仍存在 `toDataObjectQuery` / `toEntityQuery` 或 `toBusinessDataObjectQuery` / `toBusinessEntityQuery`，并在 `toDataObject` / `toEntity` 中执行 `Entity.Query <-> DO.Query` 双向转换
+  - 处理动作：随 `assist-signature-persistence`、`storage-file-persistence`、`storage-business-persistence`、`member-persistence` 逐项删除 DO query 转换；查询条件从业务实体 query 单向复制到 DO 显式查询字段；实体回转不再重建业务 query
+  - 验收点：所有 `PersistenceAssembler` 不再调用 `dataObject.setQuery(...)` 或 `dataObject.getQuery()`；剩余业务实体 query 只服务 Controller / Service 查询输入
+
+- [ ] `assembler-common-field-copy`：收口持久化装配中的公共字段复制
+  - 范围对象：全部 `*PersistenceAssembler`、已拉平的 `*DO` 公共字段、仍待拉平的 `SignatureDO`、`AsyncTaskDO`、`StorageDO`、`StorageBusinessDO`、`MemberDO`
+  - 当前依赖：各装配器重复复制 `id`、`isNewRecord`、`priority`、`remarks`、`createDate`、`updateDate`、`delFlag`、`createUserId`、`updateUserId`；`sys` 域已多处改为 `copyQuery(entity.getQuery(), dataObject)` 单向复制，辅助 / 存储 / 会员仍有 DO query 双向转换
+  - 处理动作：在所有 DO 拉平后，评估是否保留局部显式复制或抽取最小公共复制方法；避免新增跨层重型基类；保持字段复制在 `PersistenceAssembler` 内可读、可追踪
+  - 验收点：公共字段复制规则一致；无新的 DO 父类依赖或反射式装配；Admin / Front 包编译通过
 
 - [ ] `docs/00-governance`：拆分持久化表达改造治理同步任务
   - 范围对象：`ARCHITECTURE.md`、`DATABASE-RULES.md`、`NAMING-AND-PLACEMENT-RULES.md`、`TODO.md`

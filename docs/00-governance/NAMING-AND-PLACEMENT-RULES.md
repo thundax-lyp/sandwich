@@ -78,6 +78,7 @@
 - `NAME_MAPPER`：Mapper 命名以 `Mapper` 结尾
 - `NAME_ENTITY`：Entity 命名表达业务对象，不使用无意义泛化名称
 - `NAME_DATA_OBJECT`：持久化对象命名以 `DO` 或 `DataObject` 结尾
+- `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS`：`DO/DataObject` 固定使用 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor` 和 `@TableName`；这些注解属于持久化实现对象的允许注解
 - `NAME_DATA_OBJECT_QUERY_FIELD`：`DO/DataObject` 中用于持久化查询的字段必须显式命名，不使用通用 `query`
 - `NAME_DAO_MAPPER_METHOD`：DAO / Mapper 查询方法名必须表达动作和条件，不新增无条件语义的通用查询方法
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾

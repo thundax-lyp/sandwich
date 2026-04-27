@@ -4,16 +4,19 @@ import com.github.thundax.common.exception.*;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.vo.query.MoveTreeNodeQueryParam;
+import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
+import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
 import com.github.thundax.modules.sys.api.OfficeServiceApi;
-import com.github.thundax.modules.sys.api.query.OfficeQueryParam;
-import com.github.thundax.modules.sys.api.vo.OfficeVo;
 import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.request.OfficeIdRequest;
+import com.github.thundax.modules.sys.request.OfficeMoveRequest;
+import com.github.thundax.modules.sys.request.OfficeQueryRequest;
+import com.github.thundax.modules.sys.request.OfficeSaveRequest;
+import com.github.thundax.modules.sys.response.OfficeResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,46 +31,50 @@ import java.util.Set;
 public class OfficeApiController extends BaseApiController implements OfficeServiceApi {
 
     private final OfficeService officeService;
+    private final OfficeInterfaceAssembler officeInterfaceAssembler;
 
     @Autowired
-    public OfficeApiController(OfficeService officeService, Validator validator) {
+    public OfficeApiController(OfficeService officeService,
+                               Validator validator,
+                               OfficeInterfaceAssembler officeInterfaceAssembler) {
         super(validator);
         this.officeService = officeService;
+        this.officeInterfaceAssembler = officeInterfaceAssembler;
     }
 
 
     @Override
     @RequiresPermissions("sys:office:view")
-    public OfficeVo get(@RequestBody OfficeVo vo) throws ApiException {
-        Office bean = officeService.get(vo.getId());
+    public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
+        Office bean = officeService.get(request.getId());
         if (bean == null) {
-            throw new NullBeanException(Office.BEAN_NAME, vo.getId());
+            throw new NullBeanException(Office.BEAN_NAME, request.getId());
         }
-        return entityToVo(bean);
+        return officeInterfaceAssembler.toResponse(bean);
     }
 
 
     @Override
     @RequiresPermissions("sys:office:view")
-    public List<OfficeVo> list(@RequestBody OfficeQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public List<OfficeResponse> list(@RequestBody OfficeQueryRequest request) throws ApiException {
+        validate(request);
 
         Office query = new Office();
 
-        query.setQueryProp(Office.Query.PROP_PARENT_ID, queryParam.getParentId());
-        query.setQueryProp(Office.Query.PROP_NAME, queryParam.getName());
-        query.setQueryProp(Office.Query.PROP_REMARKS, queryParam.getRemarks());
+        query.setQueryProp(Office.Query.PROP_PARENT_ID, request.getParentId());
+        query.setQueryProp(Office.Query.PROP_NAME, request.getName());
+        query.setQueryProp(Office.Query.PROP_REMARKS, request.getRemarks());
 
-        return ListUtils.map(officeService.findList(query), this::entityToVo);
+        return ListUtils.map(officeService.findList(query), officeInterfaceAssembler::toResponse);
     }
 
 
     @Override
     @RequiresPermissions("sys:office:edit")
-    public OfficeVo add(@RequestBody OfficeVo vo) throws ApiException {
-        validate(vo);
+    public OfficeResponse add(@RequestBody OfficeSaveRequest request) throws ApiException {
+        validate(request);
 
-        Office entity = voToEntity(new Office(), vo);
+        Office entity = officeInterfaceAssembler.toEntity(new Office(), request);
         if (StringUtils.isNotEmpty(entity.getId())) {
             Office bean = officeService.get(entity.getId());
             if (bean != null) {
@@ -85,38 +92,38 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
         officeService.save(entity);
 
-        return entityToVo(entity);
+        return officeInterfaceAssembler.toResponse(entity);
     }
 
 
     @Override
     @RequiresPermissions("sys:office:edit")
-    public OfficeVo update(@RequestBody OfficeVo vo) throws ApiException {
-        validate(vo);
+    public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
+        validate(request);
 
-        Office bean = officeService.get(vo.getId());
+        Office bean = officeService.get(request.getId());
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
-        if (StringUtils.isNotEmpty(vo.getParentId())) {
-            Office parent = officeService.get(vo.getParentId());
+        if (StringUtils.isNotEmpty(request.getParentId())) {
+            Office parent = officeService.get(request.getParentId());
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        Office entity = voToEntity(bean, vo);
+        Office entity = officeInterfaceAssembler.toEntity(bean, request);
 
         officeService.save(entity);
 
-        return entityToVo(entity);
+        return officeInterfaceAssembler.toResponse(entity);
     }
 
 
     @Override
     @RequiresPermissions("sys:office:edit")
-    public Boolean delete(@RequestBody List<OfficeVo> list) throws ApiException {
+    public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
         List<Office> beanList = validateList(list, vo -> officeService.get(vo.getId()), null, null);
 
         officeService.delete(beanList);
@@ -127,10 +134,10 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
     @Override
     @RequiresPermissions("sys:office:view")
-    public List<OfficeVo> tree(@RequestBody List<OfficeVo> excludeList) {
+    public List<OfficeResponse> tree(@RequestBody List<OfficeIdRequest> excludeList) {
         List<Office> beanList = officeService.findList(new Office());
 
-        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, OfficeVo::getId));
+        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, OfficeIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(beanList, new RemoveTreeNodeSupport<Office>() {
@@ -152,71 +159,44 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
         }, excludeIds);
 
-        return ListUtils.map(beanList, entity -> {
-            OfficeVo vo = new OfficeVo(entity.getId());
-            if (StringUtils.isNotBlank(entity.getParentId())) {
-                vo.setParentId(entity.getParentId());
-            }
-            vo.setName(entity.getName());
-            vo.setShortName(entity.getShortName());
-            return vo;
-        });
+        return ListUtils.map(beanList, officeInterfaceAssembler::toTreeResponse);
     }
 
 
     @Override
     @RequiresPermissions("sys:office:edit")
-    public Boolean move(@RequestBody MoveTreeNodeQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
+        validate(request);
 
-        Office fromBean = officeService.get(queryParam.getFromNodeId());
+        Office fromBean = officeService.get(request.getFromNodeId());
         if (fromBean == null) {
-            throw new NullBeanException(Office.BEAN_NAME, queryParam.getFromNodeId());
+            throw new NullBeanException(Office.BEAN_NAME, request.getFromNodeId());
         }
 
-        Office toBean = officeService.get(queryParam.getToNodeId());
+        Office toBean = officeService.get(request.getToNodeId());
         if (toBean == null) {
-            throw new NullBeanException(Office.BEAN_NAME, queryParam.getToNodeId());
+            throw new NullBeanException(Office.BEAN_NAME, request.getToNodeId());
         }
 
         if (toBean.equals(fromBean) || toBean.isChildOf(fromBean, null)) {
-            throw new MoveTreeNodeException(Office.BEAN_NAME, queryParam.getFromNodeId(), queryParam.getToNodeId());
+            throw new MoveTreeNodeException(Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
-        officeService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(queryParam));
+        officeService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));
 
         return true;
     }
 
-    @NonNull
-    private OfficeVo entityToVo(Office entity) {
-        if (entity == null) {
-            return new OfficeVo();
+    private TreeService.MoveTreeNodeType readMoveTreeNodeType(OfficeMoveRequest request) {
+        switch (request.getType()) {
+            case OfficeMoveRequest.TYPE_BEFORE:
+                return TreeService.MoveTreeNodeType.BEFORE;
+            case OfficeMoveRequest.TYPE_INSIDE:
+                return TreeService.MoveTreeNodeType.INSIDE;
+            case OfficeMoveRequest.TYPE_INSIDE_LAST:
+                return TreeService.MoveTreeNodeType.INSIDE_LAST;
+            default:
+                return TreeService.MoveTreeNodeType.AFTER;
         }
-
-        OfficeVo vo = baseEntityToVo(new OfficeVo(), entity);
-
-        if (StringUtils.isNotEmpty(entity.getParentId())) {
-            vo.setParentId(entity.getParentId());
-        }
-        vo.setName(entity.getName());
-        vo.setShortName(entity.getShortName());
-        vo.setNamePath(entity.getNamePath());
-
-        return vo;
     }
-
-    @NonNull
-    private Office voToEntity(@NonNull Office entity, @NonNull OfficeVo vo) {
-        baseVoToEntity(entity, vo);
-
-        if (StringUtils.isNotEmpty(vo.getParentId())) {
-            entity.setParentId(vo.getParentId());
-        }
-        entity.setName(vo.getName());
-        entity.setShortName(vo.getShortName());
-
-        return entity;
-    }
-
 }

@@ -2,10 +2,12 @@ package com.github.thundax.modules.sys.api;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.vo.query.MoveTreeNodeQueryParam;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
-import com.github.thundax.modules.sys.api.query.OfficeQueryParam;
-import com.github.thundax.modules.sys.api.vo.OfficeVo;
+import com.github.thundax.modules.sys.request.OfficeIdRequest;
+import com.github.thundax.modules.sys.request.OfficeMoveRequest;
+import com.github.thundax.modules.sys.request.OfficeQueryRequest;
+import com.github.thundax.modules.sys.request.OfficeSaveRequest;
+import com.github.thundax.modules.sys.response.OfficeResponse;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +26,7 @@ public interface OfficeServiceApi {
     /**
      * 获取对象
      *
-     * @param office 组织机构
+     * @param request 机构标识请求
      * @return 组织机构
      * @throws ApiException API异常
      */
@@ -34,13 +36,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    OfficeVo get(@RequestBody @ApiParam("组织机构") OfficeVo office) throws ApiException;
+    OfficeResponse get(@RequestBody @ApiParam("机构标识请求") OfficeIdRequest request) throws ApiException;
 
 
     /**
      * 获取列表
      *
-     * @param queryParam 组织机构查询参数
+     * @param request 机构查询请求
      * @return 列表
      * @throws ApiException API异常
      */
@@ -50,13 +52,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<OfficeVo> list(@RequestBody @ApiParam("组织机构查询参数") OfficeQueryParam queryParam) throws ApiException;
+    List<OfficeResponse> list(@RequestBody @ApiParam("机构查询请求") OfficeQueryRequest request) throws ApiException;
 
 
     /**
      * 添加
      *
-     * @param office 组织机构
+     * @param request 机构保存请求
      * @return 组织机构
      * @throws ApiException API异常
      */
@@ -66,13 +68,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    OfficeVo add(@RequestBody @ApiParam(value = "组织机构") OfficeVo office) throws ApiException;
+    OfficeResponse add(@RequestBody @ApiParam(value = "机构保存请求") OfficeSaveRequest request) throws ApiException;
 
 
     /**
      * 更新
      *
-     * @param office 组织机构
+     * @param request 机构保存请求
      * @return 组织机构
      * @throws ApiException API异常
      */
@@ -82,13 +84,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    OfficeVo update(@RequestBody @ApiParam("组织机构") OfficeVo office) throws ApiException;
+    OfficeResponse update(@RequestBody @ApiParam("机构保存请求") OfficeSaveRequest request) throws ApiException;
 
 
     /**
      * 删除
      *
-     * @param list 列表
+     * @param list 机构标识请求列表
      * @return 影响记录数
      * @throws ApiException API异常
      */
@@ -98,13 +100,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("组织机构列表") List<OfficeVo> list) throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("机构标识请求列表") List<OfficeIdRequest> list) throws ApiException;
 
 
     /**
      * 获取树形结构
      *
-     * @param excludeList 排除列表
+     * @param excludeList 排除机构标识请求列表
      * @return 列表
      * @throws ApiException API异常
      */
@@ -114,13 +116,13 @@ public interface OfficeServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
-    List<OfficeVo> tree(@RequestBody @ApiParam("排除列表") List<OfficeVo> excludeList) throws ApiException;
+    List<OfficeResponse> tree(@RequestBody @ApiParam("排除机构标识请求列表") List<OfficeIdRequest> excludeList) throws ApiException;
 
 
     /**
      * 移动
      *
-     * @param queryParam 移动参数
+     * @param request 机构树节点移动请求
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -130,6 +132,6 @@ public interface OfficeServiceApi {
     })
     @SysLogger("移动")
     @RequestMapping(value = "move", method = RequestMethod.POST)
-    Boolean move(@RequestBody @ApiParam("移动参数") MoveTreeNodeQueryParam queryParam) throws ApiException;
+    Boolean move(@RequestBody @ApiParam("机构树节点移动请求") OfficeMoveRequest request) throws ApiException;
 
 }

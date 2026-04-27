@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `sys-office-api`：隔离机构管理 API 模型
-  - 范围入口：`OfficeApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `OfficeVo`、`OfficeQueryParam`、`MoveTreeNodeQueryParam`；Controller 内存在树过滤、`entityToVo`、`voToEntity`
-  - 需要新增或收窄的 `Request`：机构查询、创建、更新、删除、树排除、树节点移动请求
-  - 需要新增或收窄的 `Response`：机构详情/列表/树响应
-  - 需要新增的 `InterfaceAssembler`：`OfficeInterfaceAssembler`
-  - Service 方法签名是否需要调整：验收时不得让 Service 依赖通用 `MoveTreeNodeQueryParam`，存在时收敛为稳定业务参数
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `sys-menu-api`：隔离菜单管理 API 模型
   - 范围入口：`MenuApiController`
   - 当前 API 模型泄漏点：入口直接使用 `MenuVo`、`MenuQueryParam`、`MoveTreeNodeQueryParam`；Controller 内存在树过滤、`entityToVo`、`voToEntity`

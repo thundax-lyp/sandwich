@@ -91,22 +91,22 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public Integer getMaxPosition(Office node) {
-        return mapper.getMaxPosition(OfficePersistenceAssembler.toDataObject(node));
+    public Integer getMaxPosition() {
+        return mapper.getMaxPosition();
     }
 
     @Override
-    public void moveTreeRgts(Office node, Integer from, Integer offset) {
-        mapper.moveTreeRgts(OfficePersistenceAssembler.toDataObject(node), from, offset);
+    public void moveTreeRgts(Integer from, Integer offset) {
+        mapper.moveTreeRgts(from, offset);
     }
 
     @Override
-    public void moveTreeLfts(Office node, Integer from, Integer offset) {
-        mapper.moveTreeLfts(OfficePersistenceAssembler.toDataObject(node), from, offset);
+    public void moveTreeLfts(Integer from, Integer offset) {
+        mapper.moveTreeLfts(from, offset);
     }
 
     @Override
-    public void moveTreeNodes(Office node, Integer from, Integer to, Integer offset) {
-        mapper.moveTreeNodes(OfficePersistenceAssembler.toDataObject(node), from, to, offset);
+    public void moveTreeNodes(Integer from, Integer to, Integer offset) {
+        mapper.moveTreeNodes(from, to, offset);
     }
 }

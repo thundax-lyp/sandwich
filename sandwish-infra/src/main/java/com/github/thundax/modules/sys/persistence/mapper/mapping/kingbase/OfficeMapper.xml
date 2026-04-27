@@ -41,29 +41,35 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getMany" resultMap="officeResult">
+        SELECT
+        <include refid="officeColumns"/>
+        FROM sys_office a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
     <select id="findList" resultMap="officeResult">
         SELECT
         <include refid="officeColumns"/>
         FROM sys_office a
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.parentId != null and query.parentId !=''">
-                    <choose>
-                        <when test="query.parentId != 'ROOT'">
-                            AND a.parent_id = #{query.parentId}
-                        </when>
-                        <otherwise>
-                            AND a.parent_id IS NULL
-                        </otherwise>
-                    </choose>
-                </if>
-                <if test="query.name != null and query.name != ''">
-                    AND ( a.name LIKE CONCAT('%', #{query.name}, '%') OR a.short_name LIKE CONCAT('%', #{query.name}, '%') )
-                </if>
-                <if test="query.remarks != null and query.remarks != ''">
-                    AND a.remarks LIKE CONCAT('%', #{query.remarks}, '%')
-                </if>
+            <if test="queryParentId != null and queryParentId !=''">
+                <choose>
+                    <when test="queryParentId != 'ROOT'">
+                        AND a.parent_id = #{queryParentId}
+                    </when>
+                    <otherwise>
+                        AND a.parent_id IS NULL
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="queryName != null and queryName != ''">
+                AND ( a.name LIKE CONCAT('%', #{queryName}, '%') OR a.short_name LIKE CONCAT('%', #{queryName}, '%') )
+            </if>
+            <if test="queryRemarks != null and queryRemarks != ''">
+                AND a.remarks LIKE CONCAT('%', #{queryRemarks}, '%')
             </if>
         </where>
         ORDER BY a.lft

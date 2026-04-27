@@ -33,7 +33,7 @@ public final class OfficePersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -56,7 +56,6 @@ public final class OfficePersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -71,25 +70,12 @@ public final class OfficePersistenceAssembler {
         return entities;
     }
 
-    private static OfficeDO.Query toDataObjectQuery(Office.Query query) {
+    private static void copyQuery(Office.Query query, OfficeDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        OfficeDO.Query dataObjectQuery = new OfficeDO.Query();
-        dataObjectQuery.setParentId(query.getParentId());
-        dataObjectQuery.setName(query.getName());
-        dataObjectQuery.setRemarks(query.getRemarks());
-        return dataObjectQuery;
-    }
-
-    private static Office.Query toEntityQuery(OfficeDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Office.Query entityQuery = new Office.Query();
-        entityQuery.setParentId(query.getParentId());
-        entityQuery.setName(query.getName());
-        entityQuery.setRemarks(query.getRemarks());
-        return entityQuery;
+        dataObject.setQueryParentId(query.getParentId());
+        dataObject.setQueryName(query.getName());
+        dataObject.setQueryRemarks(query.getRemarks());
     }
 }

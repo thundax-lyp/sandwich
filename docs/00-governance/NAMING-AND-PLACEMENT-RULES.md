@@ -52,6 +52,7 @@
 - `PATH_INFRA_PERSISTENCE_OWNERSHIP`：DAO implementation、MyBatis Mapper、Mapper XML、`DO/DataObject`、`PersistenceAssembler` 固定归属 `sandwish-infra`
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
+- `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
 
 ### Layer
 
@@ -59,6 +60,9 @@
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装，不把入口模型下沉到 Service
 - `LAYER_SERVICE_ENTITY_MODEL`：Service 固定使用 Entity 或稳定业务参数，不直接依赖 API `Request` / `Response`
+- `LAYER_ENTITY_NO_API_RESPONSE`：业务 Entity 不作为公开 HTTP 响应模型直接暴露
+- `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
+- `LAYER_INTERFACE_ASSEMBLER_NO_DO`：`InterfaceAssembler` 不转换 `DO` / `DataObject`
 - `LAYER_DAO_NO_WEB`：DAO / Mapper 不感知 HTTP、Session 和权限适配
 - `LAYER_NO_SERVER_PAGE`：不得新增服务端页面模板、页面装饰器或标签库作为业务入口
 - `LAYER_NO_EXTRA_ARCH_DEFAULT`：不得默认新增 `interfaces / application / domain / facade / repository` 等额外分层目录
@@ -94,7 +98,7 @@
 
 - Controller 优先完成参数接收、基础校验和响应组装
 - Service 优先表达业务动作，避免让 Controller 感知过多持久化细节
-- `InterfaceAssembler` 只做 API 模型与 Service 入参/Entity/业务结果之间的转换，不调用 Service、DAO 或 Mapper
+- `InterfaceAssembler` 按对应 API 入口模块的现有包结构放置，优先使用 `assembler` 包
 - DAO / Mapper 查询、分页、过滤、排序优先下推到数据库
 - VO / DTO 不写复杂业务流程
 

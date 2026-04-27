@@ -20,11 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `docs/00-governance`：固化 Controller / Service 模型边界规则
-  - 范围对象：`ARCHITECTURE.md`、`NAMING-AND-PLACEMENT-RULES.md`
-  - 处理动作：固定 `Controller=Request/Response`、`Service=Entity`；固定 `InterfaceAssembler` 的放置、命名和禁止事项
-  - 验收点：后续 API 入口迁移不需要重新讨论 `Request/Response`、`Entity` 和 `InterfaceAssembler` 的归属
-
 - [ ] `TODO.md`：按 API 入口拆分 Controller / Service 模型隔离任务
   - 范围对象：后台与前台 Controller/API 入口
   - 处理动作：按 `docs/30-designs/MODEL-SEPARATION-RUNBOOK.md` 的 TODO 模板，为每个入口列出当前 API 模型泄漏点、待新增或收窄的 `Request/Response`、待新增 `InterfaceAssembler`、Service 方法签名是否需要调整

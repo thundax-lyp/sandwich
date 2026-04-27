@@ -176,6 +176,9 @@ Sandwich 固定采用三层 API 架构。
 - 不直接访问 DAO / Mapper。
 - 不直接拼接复杂 SQL。
 - 不承载核心业务规则。
+- 固定接收 API `Request` 或基础请求参数，固定输出 API `Response` 或统一 API 响应包装。
+- 不直接暴露业务 `Entity` 作为公开 HTTP 响应模型。
+- 不把 API `Request` / `Response` 下沉到 Service。
 
 ### Service
 
@@ -184,6 +187,9 @@ Sandwich 固定采用三层 API 架构。
 - 可以依赖 `sandwish-common` 的通用工具和基础服务。
 - 对外提供稳定业务方法，避免让 Controller 感知过多持久化细节。
 - 跨模块业务复用优先放在 `sandwish-biz` 的 Service。
+- 固定使用业务 `Entity` 或稳定业务参数作为方法入参和返回结果。
+- 不直接依赖 API `Request` / `Response`。
+- 不负责 API 响应字段裁剪、HTTP 状态语义或入口展示模型组装。
 
 ### DAO / Mapper
 
@@ -202,6 +208,17 @@ Sandwich 固定采用三层 API 架构。
 - VO / DTO 用于入口响应、页面展示或跨层传输。
 - 不在 VO / DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
+
+### Request / Response / InterfaceAssembler
+
+- `Request` 固定表达 API 入参，归属对应 API 入口模块。
+- `Response` 固定表达 API 出参，归属对应 API 入口模块。
+- `InterfaceAssembler` 固定归属对应 API 入口模块，命名以 `InterfaceAssembler` 结尾。
+- `InterfaceAssembler` 只负责 API `Request` / `Response` 与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换。
+- `InterfaceAssembler` 不调用 Service、DAO 或 Mapper。
+- `InterfaceAssembler` 不处理事务、权限、数据库查询或核心业务规则。
+- `InterfaceAssembler` 不转换 `DO` / `DataObject`。
+- Service 与 DAO/Mapper 不依赖 `InterfaceAssembler`。
 
 ### Static
 

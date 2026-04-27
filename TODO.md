@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `archunit-response-annotation-rule`：新增 Response 类级注解白名单门禁
-  - 依赖前置：完成 `archunit-response-annotation-baseline`
-  - 范围对象：承载架构测试的模块、ArchUnit 测试类
-  - 处理动作：将 Response 类级注解固定为且仅为 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)`
-  - 验收点：Response 缺少必需注解或存在额外类级注解时会被测试拦截
 - [ ] `response-required-annotation-migration`：迁移现有 Response 到注解白名单形态
   - 依赖前置：完成 `archunit-response-annotation-rule`
   - 范围对象：现有 `Response` 类及其必要 import

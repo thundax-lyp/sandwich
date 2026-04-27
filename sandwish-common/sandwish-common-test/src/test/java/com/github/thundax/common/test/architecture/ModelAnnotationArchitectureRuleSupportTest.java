@@ -31,4 +31,28 @@ public class ModelAnnotationArchitectureRuleSupportTest extends AbstractArchitec
         ModelAnnotationArchitectureRuleSupport.requestClassAnnotationsRequired(FIXTURE_PACKAGE)
                 .check(classes);
     }
+
+    @Test
+    public void shouldPassWhenResponseClassAnnotationsMatchRequiredSet() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".response.valid");
+
+        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectResponseClassWithMissingAnnotations() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".response.missing");
+
+        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectResponseClassWithExtraAnnotations() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".response.extra");
+
+        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
 }

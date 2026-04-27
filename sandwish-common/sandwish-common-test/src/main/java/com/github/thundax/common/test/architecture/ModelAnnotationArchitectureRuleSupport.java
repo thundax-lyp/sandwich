@@ -22,8 +22,16 @@ import java.util.Set;
 public final class ModelAnnotationArchitectureRuleSupport {
 
     public static final String NAME_REQUEST_REQUIRED_ANNOTATIONS = "MODEL_REQUEST_REQUIRED_ANNOTATIONS";
+    public static final String NAME_RESPONSE_REQUIRED_ANNOTATIONS = "MODEL_RESPONSE_REQUIRED_ANNOTATIONS";
 
     private static final Set<String> REQUEST_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
+            "lombok.Getter",
+            "lombok.Setter",
+            "io.swagger.annotations.ApiModel",
+            "com.fasterxml.jackson.annotation.JsonInclude",
+            "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
+
+    private static final Set<String> RESPONSE_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
             "lombok.Getter",
             "lombok.Setter",
             "io.swagger.annotations.ApiModel",
@@ -36,34 +44,58 @@ public final class ModelAnnotationArchitectureRuleSupport {
     }
 
     public static ArchRule requestClassAnnotationsRequired(String basePackage) {
+        return modelClassAnnotationsRequired(
+                basePackage,
+                ".request",
+                "Request",
+                REQUEST_REQUIRED_ANNOTATIONS,
+                NAME_REQUEST_REQUIRED_ANNOTATIONS);
+    }
+
+    public static ArchRule responseClassAnnotationsRequired(String basePackage) {
+        return modelClassAnnotationsRequired(
+                basePackage,
+                ".response",
+                "Response",
+                RESPONSE_REQUIRED_ANNOTATIONS,
+                NAME_RESPONSE_REQUIRED_ANNOTATIONS);
+    }
+
+    private static ArchRule modelClassAnnotationsRequired(
+            final String basePackage,
+            final String packageSegment,
+            final String simpleNameSuffix,
+            final Set<String> requiredAnnotations,
+            final String ruleName) {
         return ArchRuleDefinition.classes()
-                .should(new ArchCondition<JavaClass>("declare required Request class annotations only") {
+                .should(new ArchCondition<JavaClass>("declare required model class annotations only") {
                     @Override
                     public void check(JavaClass item, ConditionEvents events) {
-                        if (!isRequestClassUnder(item, basePackage)) {
+                        if (!isModelClassUnder(item, basePackage, packageSegment, simpleNameSuffix)) {
                             return;
                         }
                         Set<String> actualAnnotations = annotationTypeNames(item);
-                        Set<String> missingAnnotations = missingAnnotations(actualAnnotations, REQUEST_REQUIRED_ANNOTATIONS);
-                        Set<String> extraAnnotations = missingAnnotations(REQUEST_REQUIRED_ANNOTATIONS, actualAnnotations);
+                        Set<String> missingAnnotations = missingAnnotations(actualAnnotations, requiredAnnotations);
+                        Set<String> extraAnnotations = missingAnnotations(requiredAnnotations, actualAnnotations);
 
                         if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
                             events.add(SimpleConditionEvent.violated(
                                     item,
-                                    "[" + NAME_REQUEST_REQUIRED_ANNOTATIONS + "] " + item.getFullName()
-                                            + " violates Request class annotations: missing="
+                                    "[" + ruleName + "] " + item.getFullName()
+                                            + " violates model class annotations: missing="
                                             + missingAnnotations + ", extra=" + extraAnnotations));
                         }
                     }
                 })
                 .allowEmptyShould(true)
-                .because("RULE " + NAME_REQUEST_REQUIRED_ANNOTATIONS);
+                .because("RULE " + ruleName);
     }
 
-    private static boolean isRequestClassUnder(JavaClass item, String basePackage) {
+    private static boolean isModelClassUnder(
+            JavaClass item, String basePackage, String packageSegment, String simpleNameSuffix) {
         return item.getPackageName().startsWith(basePackage + ".")
-                && item.getPackageName().contains(".request")
-                && item.getSimpleName().endsWith("Request");
+                && item.getPackageName().contains(packageSegment)
+                && item.getSimpleName().endsWith(simpleNameSuffix);
     }
 
     private static Set<String> annotationTypeNames(JavaClass item) {

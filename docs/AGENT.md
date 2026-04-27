@@ -51,6 +51,8 @@
   Common 聚合模块。
 - `sandwish-common-core`:
   通用工具、基础 Web、加密、i18n、Redis、存储和线程等非持久化公共技术能力。
+- `sandwish-common-cache`:
+  通用 JetCache 基线配置和缓存基础设施，不承载业务 key、TTL、版本和失效语义。
 - `sandwish-common-mybatis`:
   通用持久化对象、DAO / Service 基类、MyBatis 扫描标记、PageHelper 和数据库方言支撑。
 - `sandwish-common-security`:

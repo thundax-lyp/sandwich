@@ -18,6 +18,7 @@
 - packaging:
   - `sandwish-common`: pom
   - `sandwish-common-core`: jar
+  - `sandwish-common-cache`: jar
   - `sandwish-common-mybatis`: jar
   - `sandwish-common-security`: jar
   - `sandwish-biz`: jar
@@ -92,6 +93,22 @@ Sandwich 固定采用三层 API 架构。
 - 不承载具体业务流程。
 - 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 - 新增通用能力前，必须确认不是某个业务模块的专用逻辑。
+
+### `sandwish-common-cache`
+
+职责：
+
+- 通用 JetCache 基线配置
+- 缓存基础设施自动配置
+- 极薄通用 cache operation
+
+边界：
+
+- 可以依赖 `sandwish-common-core`。
+- 不承载业务 cache support。
+- 不承载具体业务 key、TTL、版本号、回源和失效策略。
+- 不暴露 Redis API、`StringRedisTemplate`、`RedisTemplate` 或 `RedisClient` 替代封装。
+- 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-mybatis`
 

@@ -20,5 +20,6 @@
         <module>sandwish-common-mybatis</module>
         <module>sandwish-common-test</module>
         <module>sandwish-common-security</module>
+        <module>sandwish-common-cache</module>
     </modules>
 </project>

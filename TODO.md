@@ -26,15 +26,8 @@
 - JetCache 只能出现在 `sandwish-common-cache`、`sandwish-infra` 的实现细节，不能外泄到 Controller、Service、Entity、Request、Response。
 - 迁移期允许 `RedisClient` 暂存；新增或改造代码不得新增 `RedisClient` 调用点。
 
-- [ ] `common-cache-jetcache-baseline`：建立 `sandwish-common-cache` JetCache 基线模块
-  - 依赖前置：`docs/30-designs/COMMON-CACHE-JETCACHE-RUNBOOK.md`
-  - 范围对象：root `pom.xml`、`sandwish-common/pom.xml`、`sandwish-common-cache`、必要的 JetCache auto configuration
-  - 处理动作：参考 `../bacon` 的 JetCache 基线，新增 common-cache 模块；启用 JetCache 注解；不把 RedisClient 能力原样迁入 common-cache
-  - 允许引入 JetCache：是
-  - 允许删除 `RedisClient`：否
-  - 验收点：`mvn -q -pl sandwish-common/sandwish-common-cache -am compile -DskipTests` 通过，common-cache 不依赖业务/infra/API 模块
 - [ ] `common-cache-application-wiring`：后台/前台应用接入 common-cache
-  - 依赖前置：完成 `common-cache-jetcache-baseline`
+  - 依赖前置：`sandwish-common-cache` 基线模块已存在
   - 范围对象：`sandwish-admin-api`、`sandwish-front-api` Maven 依赖和运行配置
   - 处理动作：应用依赖 `sandwish-common-cache`；补齐 JetCache local/remote 配置；迁移期允许 RedisClient 继续存在
   - 允许引入 JetCache：是

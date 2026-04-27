@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.servlet;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -1,6 +1,7 @@
 package com.github.thundax.common.utils;
 
 import com.github.thundax.common.utils.encrypt.SM4Util;
+import org.apache.commons.lang3.StringUtils;
 
 public class EncryptUtils {
 

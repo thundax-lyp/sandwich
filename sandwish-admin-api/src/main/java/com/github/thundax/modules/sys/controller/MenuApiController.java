@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
@@ -8,7 +7,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
@@ -23,6 +22,7 @@ import com.github.thundax.modules.sys.service.MenuService;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,7 +70,9 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         }
         query.setQuery(queryCondition);
 
-        return ListUtils.map(menuService.findList(query), menuInterfaceAssembler::toResponse);
+        return menuService.findList(query).stream()
+                .map(menu -> menuInterfaceAssembler.toResponse(menu))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -158,7 +160,13 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
     public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.findList(new Menu());
 
-        Set<String> excludeIds = new HashSet<>(ListUtils.map(excludeList, MenuIdRequest::getId));
+        Set<String> excludeIds =
+                excludeList == null
+                        ? new HashSet<>()
+                        : new HashSet<>(
+                                excludeList.stream()
+                                        .map(request -> request.getId())
+                                        .collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(
@@ -182,7 +190,9 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
                 },
                 excludeIds);
 
-        return ListUtils.map(beanList, menuInterfaceAssembler::toTreeResponse);
+        return beanList.stream()
+                .map(menu -> menuInterfaceAssembler.toTreeResponse(menu))
+                .collect(Collectors.toList());
     }
 
     @Override

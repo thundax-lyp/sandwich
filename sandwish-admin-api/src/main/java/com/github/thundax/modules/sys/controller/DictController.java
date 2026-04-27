@@ -1,9 +1,8 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.DictServiceApi;
@@ -16,6 +15,7 @@ import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
 import com.github.thundax.modules.sys.service.DictService;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +43,9 @@ public class DictController extends BaseApiController implements DictServiceApi 
     @Override
     public List<DictResponse> list(@RequestBody DictQueryRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
-        return ListUtils.map(dictService.findList(query), dictInterfaceAssembler::toResponse);
+        return dictService.findList(query).stream()
+                .map(dict -> dictInterfaceAssembler.toResponse(dict))
+                .collect(Collectors.toList());
     }
 
     @Override

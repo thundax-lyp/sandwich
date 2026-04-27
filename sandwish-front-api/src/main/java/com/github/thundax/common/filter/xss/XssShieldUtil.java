@@ -1,6 +1,6 @@
 package com.github.thundax.common.filter.xss;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

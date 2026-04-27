@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
@@ -58,7 +57,7 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
         }
 
         dao.deleteUserRole(user);
-        if (ListUtils.isNotEmpty(user.getRoleIdList())) {
+        if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
             dao.insertUserRole(user);
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.servlet;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.servlet.captcha.mp3.Mp3Builder;
 import com.google.common.collect.Lists;
 import java.io.IOException;

@@ -5,17 +5,18 @@ import static com.github.thundax.modules.sys.entity.Menu.PERM_SEPARATOR;
 import static com.github.thundax.modules.sys.entity.Menu.PERM_SUPER;
 import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -94,9 +95,10 @@ public class PermissionServiceImpl implements PermissionService {
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
-        ListUtils.forEach(
-                UserServiceHolder.findMenuList(user),
-                menu -> {
+        List<Menu> menuList = UserServiceHolder.findMenuList(user);
+        if (menuList != null && !menuList.isEmpty()) {
+            menuList.forEach(
+                    menu -> {
                     if (StringUtils.isNotBlank(menu.getPerms())) {
                         for (String permission :
                                 StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
@@ -107,7 +109,8 @@ public class PermissionServiceImpl implements PermissionService {
                             }
                         }
                     }
-                });
+                    });
+        }
 
         permissions.add(PERM_USER);
         if (user.isSuper()) {

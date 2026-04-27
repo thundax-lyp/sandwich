@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.utils;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
-import com.github.thundax.common.web.RequestUtils;
+import com.github.thundax.modules.utils.IPUtils;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
@@ -25,7 +25,7 @@ public class AuthUtils {
 
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 
-        String remoteAddr = RequestUtils.getRemoteAddr(request);
+        String remoteAddr = IPUtils.getIpAddr(request);
         if (StringUtils.isBlank(remoteAddr)) {
             return null;
         }

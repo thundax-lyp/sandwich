@@ -3,7 +3,6 @@ package com.github.thundax.common.utils;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -22,10 +21,6 @@ public class SpringContextHolder {
         applicationContext = context;
     }
 
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
     public static void clearHolder() {
         if (logger.isDebugEnabled()) {
             logger.debug("清除SpringContextHolder中的ApplicationContext:" + applicationContext);
@@ -33,26 +28,10 @@ public class SpringContextHolder {
         applicationContext = null;
     }
 
-    /** 根据名称获取bean */
-    @SuppressWarnings("unchecked")
-    public static <T> T getBean(String name) {
-        try {
-            return applicationContext == null ? null : (T) applicationContext.getBean(name);
-        } catch (BeansException e) {
-            return null;
-        }
-    }
-
     /** 根据Class类型获取bean */
     @NonNull
     public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
-    }
-
-    /** 根据名称＋class类型获取bean */
-    @NonNull
-    public static <T> T getBean(String name, Class<T> requiredType) {
-        return applicationContext.getBean(name, requiredType);
     }
 
     /**

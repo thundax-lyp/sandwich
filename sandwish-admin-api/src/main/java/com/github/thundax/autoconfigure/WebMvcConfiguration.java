@@ -1,6 +1,5 @@
 package com.github.thundax.autoconfigure;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.auth.filter.ResponseWrapperFilter;
@@ -62,7 +61,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         FilterRegistrationBean<ResponseWrapperFilter> bean = new FilterRegistrationBean<>();
         bean.setFilter(new ResponseWrapperFilter(wrapperFilterProperties));
 
-        if (ListUtils.isNotEmpty(wrapperFilterProperties.getUrlPatterns())) {
+        if (wrapperFilterProperties.getUrlPatterns() != null
+                && !wrapperFilterProperties.getUrlPatterns().isEmpty()) {
             bean.setUrlPatterns(wrapperFilterProperties.getUrlPatterns());
         } else {
             bean.addUrlPatterns("/api/*");

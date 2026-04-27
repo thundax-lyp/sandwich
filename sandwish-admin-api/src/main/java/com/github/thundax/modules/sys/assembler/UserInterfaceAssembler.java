@@ -1,19 +1,19 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.persistence.DataEntity;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.request.UserRoleRequest;
 import com.github.thundax.modules.sys.request.UserSaveRequest;
 import com.github.thundax.modules.sys.response.UserOfficeResponse;
 import com.github.thundax.modules.sys.response.UserResponse;
 import com.github.thundax.modules.sys.response.UserRoleResponse;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +47,12 @@ public class UserInterfaceAssembler {
         response.setLastLoginIp(entity.getLastLoginIp());
 
         response.setOffice(toOfficeResponse(entity.getOffice()));
-        response.setRoleList(ListUtils.map(entity.getRoleList(), this::toRoleResponse));
+        response.setRoleList(
+                entity.getRoleList() == null
+                        ? new ArrayList<>()
+                        : entity.getRoleList().stream()
+                                .map(role -> this.toRoleResponse(role))
+                                .collect(Collectors.toList()));
 
         return response;
     }
@@ -101,7 +106,12 @@ public class UserInterfaceAssembler {
         entity.setEnableFlag(
                 Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
 
-        entity.setRoleIdList(ListUtils.map(request.getRoleList(), UserRoleRequest::getId));
+        entity.setRoleIdList(
+                request.getRoleList() == null
+                        ? new ArrayList<>()
+                        : request.getRoleList().stream()
+                                .map(role -> role.getId())
+                                .collect(Collectors.toList()));
 
         return entity;
     }

@@ -29,17 +29,6 @@ public class CookieUtils {
      *
      * @param name 名称
      * @param value 值
-     */
-    public static void setCookie(
-            HttpServletResponse response, String name, String value, String path) {
-        setCookie(response, name, value, path, 60 * 60 * 24);
-    }
-
-    /**
-     * 设置 Cookie
-     *
-     * @param name 名称
-     * @param value 值
      * @param maxAge 生存时间（单位秒）
      */
     public static void setCookie(
@@ -75,17 +64,6 @@ public class CookieUtils {
      */
     public static String getCookie(HttpServletRequest request, String name) {
         return getCookie(request, null, name, false);
-    }
-
-    /**
-     * 获得指定Cookie的值，并删除。
-     *
-     * @param name 名称
-     * @return 值
-     */
-    public static String getCookie(
-            HttpServletRequest request, HttpServletResponse response, String name) {
-        return getCookie(request, response, name, true);
     }
 
     /**

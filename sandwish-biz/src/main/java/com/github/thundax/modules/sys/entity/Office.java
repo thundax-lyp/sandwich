@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseOffice;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.google.common.collect.Lists;

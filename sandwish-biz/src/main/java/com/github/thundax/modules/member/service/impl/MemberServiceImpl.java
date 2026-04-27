@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;

@@ -2,7 +2,7 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.api.CaptchaServiceApi;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;

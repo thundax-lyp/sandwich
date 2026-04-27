@@ -2,7 +2,7 @@ package com.github.thundax.common.utils.redis;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

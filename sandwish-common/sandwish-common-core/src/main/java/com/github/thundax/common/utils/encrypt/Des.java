@@ -1,8 +1,5 @@
 package com.github.thundax.common.utils.encrypt;
 
-import static com.github.thundax.common.utils.StringUtils.byte2hex;
-import static com.github.thundax.common.utils.StringUtils.hex2byte;
-
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +12,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 /** @author thundax */
 public class Des {
@@ -66,15 +65,19 @@ public class Des {
     public static String encrypt(String dataSource, String password) {
         byte[] bytes = encrypt(dataSource.getBytes(), password.getBytes(StandardCharsets.UTF_8));
         if (bytes != null) {
-            return byte2hex(bytes);
+            return Hex.encodeHexString(bytes);
         }
         return null;
     }
 
     public static String decrypt(String hexText, String password) {
-        byte[] bytes = decrypt(hex2byte(hexText), password.getBytes(StandardCharsets.UTF_8));
-        if (bytes != null) {
-            return new String(bytes, StandardCharsets.UTF_8);
+        try {
+            byte[] bytes = decrypt(Hex.decodeHex(hexText), password.getBytes(StandardCharsets.UTF_8));
+            if (bytes != null) {
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
+        } catch (DecoderException e) {
+            e.printStackTrace();
         }
         return null;
     }

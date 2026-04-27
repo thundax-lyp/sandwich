@@ -1,7 +1,7 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;

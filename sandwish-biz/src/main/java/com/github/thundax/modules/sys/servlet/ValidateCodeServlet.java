@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.servlet;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;

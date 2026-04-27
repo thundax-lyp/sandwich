@@ -1,7 +1,7 @@
 package com.github.thundax.modules.assist.service.impl;
 
-import com.github.thundax.common.codec.digest.DigestUtils;
-import com.github.thundax.common.utils.StringUtils;
+import com.github.thundax.common.codec.Sm3Utils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
 import org.slf4j.Logger;
@@ -63,6 +63,6 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
     }
 
     private String createSignature(String body) {
-        return DigestUtils.sm3Hex(body);
+        return Sm3Utils.sm3Hex(body);
     }
 }

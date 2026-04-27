@@ -4,7 +4,7 @@ import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;

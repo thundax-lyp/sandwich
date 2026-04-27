@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Menu;

@@ -1,8 +1,9 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.utils.DateFormatUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.beans.PropertyEditorSupport;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.sql.Timestamp;
 import java.util.Date;
 import org.slf4j.Logger;
@@ -14,6 +15,14 @@ import org.springframework.web.bind.annotation.InitBinder;
 public abstract class BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private static final String SHORT_DATE_PATTERN = "yyyy-MM-dd";
+    private static final String YEAR_PATTERN = "yyyy";
+    private static final String MONTH_PATTERN = "yyyy-MM";
+    private static final int SHORT_DATE_LENGTH = 10;
+    private static final int YEAR_LENGTH = 4;
+    private static final int MONTH_LENGTH = 7;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -29,7 +38,7 @@ public abstract class BaseController {
                         if (StringUtils.isBlank(text)) {
                             setValue(null);
                         } else {
-                            Date value = DateFormatUtils.parseDate(text);
+                            Date value = parseDate(text);
                             if (value == null) {
                                 setValue(null);
                             } else {
@@ -41,8 +50,26 @@ public abstract class BaseController {
                     @Override
                     public String getAsText() {
                         Date value = (Date) getValue();
-                        return (value != null ? DateFormatUtils.format(value) : "");
+                        return (value != null
+                                ? new SimpleDateFormat(DATE_TIME_PATTERN).format(value)
+                                : "");
                     }
                 });
+    }
+
+    private static Date parseDate(String text) {
+        text = text.trim();
+        try {
+            if (text.length() <= YEAR_LENGTH) {
+                return new SimpleDateFormat(YEAR_PATTERN).parse(text);
+            } else if (text.length() <= MONTH_LENGTH) {
+                return new SimpleDateFormat(MONTH_PATTERN).parse(text);
+            } else if (text.length() <= SHORT_DATE_LENGTH) {
+                return new SimpleDateFormat(SHORT_DATE_PATTERN).parse(text);
+            }
+            return new SimpleDateFormat(DATE_TIME_PATTERN).parse(text);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Could not parse date: " + e.getMessage(), e);
+        }
     }
 }

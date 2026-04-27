@@ -1,13 +1,12 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.OfficeServiceApi;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
@@ -21,6 +20,7 @@ import com.github.thundax.modules.sys.service.OfficeService;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,7 +67,9 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         queryCondition.setRemarks(request.getRemarks());
         query.setQuery(queryCondition);
 
-        return ListUtils.map(officeService.findList(query), officeInterfaceAssembler::toResponse);
+        return officeService.findList(query).stream()
+                .map(office -> officeInterfaceAssembler.toResponse(office))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -135,7 +137,13 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
     public List<OfficeResponse> tree(@RequestBody List<OfficeIdRequest> excludeList) {
         List<Office> beanList = officeService.findList(new Office());
 
-        Set<String> excludeIds = new HashSet<>(ListUtils.map(excludeList, OfficeIdRequest::getId));
+        Set<String> excludeIds =
+                excludeList == null
+                        ? new HashSet<>()
+                        : new HashSet<>(
+                                excludeList.stream()
+                                        .map(request -> request.getId())
+                                        .collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(
@@ -159,7 +167,9 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
                 },
                 excludeIds);
 
-        return ListUtils.map(beanList, officeInterfaceAssembler::toTreeResponse);
+        return beanList.stream()
+                .map(office -> officeInterfaceAssembler.toTreeResponse(office))
+                .collect(Collectors.toList());
     }
 
     @Override

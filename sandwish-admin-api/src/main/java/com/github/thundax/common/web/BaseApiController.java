@@ -1,6 +1,5 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.EmptyCollectionException;
 import com.github.thundax.common.exception.InvalidBeanException;
@@ -9,7 +8,7 @@ import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.function.ThrowableBiConsumer;
 import com.github.thundax.common.utils.function.ThrowableBiPredicate;
 import com.github.thundax.common.utils.function.ThrowableFunction;
@@ -25,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import org.slf4j.Logger;
@@ -99,7 +99,7 @@ public abstract class BaseApiController extends BaseController {
             ThrowableBiPredicate<E, V> validator,
             ThrowableBiConsumer<E, V> processor)
             throws ApiException {
-        if (ListUtils.isEmpty(sourceList)) {
+        if (sourceList == null || sourceList.isEmpty()) {
             throw new EmptyCollectionException();
         }
 
@@ -169,7 +169,11 @@ public abstract class BaseApiController extends BaseController {
             @NonNull RemoveTreeNodeSupport<T> support,
             @NonNull Set<String> excludeIds) {
         // 创建id-data映射表，用于快速查询pid对应的数据
-        Set<String> ids = new HashSet<>(ListUtils.map(nodeList, support::getId));
+        Set<String> ids =
+                new HashSet<>(
+                        nodeList.stream()
+                                .map(node -> support.getId(node))
+                                .collect(Collectors.toList()));
 
         int size = 0;
         while (size != nodeList.size()) {
@@ -265,7 +269,12 @@ public abstract class BaseApiController extends BaseController {
         pageVo.setTotalPage(page.getTotalPage());
         pageVo.setCount(page.getCount());
 
-        pageVo.setRecords(ListUtils.map(page.getList(), mappingFunction));
+        pageVo.setRecords(
+                page.getList() == null
+                        ? new ArrayList<>()
+                        : page.getList().stream()
+                                .map(item -> mappingFunction.apply(item))
+                                .collect(Collectors.toList()));
 
         return pageVo;
     }

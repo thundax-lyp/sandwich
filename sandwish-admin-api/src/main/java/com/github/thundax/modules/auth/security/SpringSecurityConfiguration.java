@@ -1,7 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
@@ -34,7 +33,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         List<String> excludePaths = properties.getAccessTokenFilter().getExcludePath();
-        if (ListUtils.isNotEmpty(excludePaths)) {
+        if (excludePaths != null && !excludePaths.isEmpty()) {
             web.ignoring().antMatchers(excludePaths.toArray(new String[0]));
         }
     }

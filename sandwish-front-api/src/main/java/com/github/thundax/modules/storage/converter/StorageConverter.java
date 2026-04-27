@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.converter;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import com.github.thundax.modules.storage.utils.StorageServiceHolder;

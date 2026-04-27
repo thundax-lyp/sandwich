@@ -1,20 +1,20 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.persistence.DataEntity;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.request.RoleMenuRequest;
 import com.github.thundax.modules.sys.request.RoleSaveRequest;
 import com.github.thundax.modules.sys.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.response.RoleOfficeResponse;
 import com.github.thundax.modules.sys.response.RoleResponse;
 import com.github.thundax.modules.sys.response.RoleUserResponse;
 import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,12 @@ public class RoleInterfaceAssembler {
         response.setName(entity.getName());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
-        response.setMenuList(ListUtils.map(entity.getMenuList(), this::toMenuResponse));
+        response.setMenuList(
+                entity.getMenuList() == null
+                        ? new ArrayList<>()
+                        : entity.getMenuList().stream()
+                                .map(menu -> this.toMenuResponse(menu))
+                                .collect(Collectors.toList()));
 
         return response;
     }
@@ -109,7 +114,12 @@ public class RoleInterfaceAssembler {
         entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
         entity.setEnableFlag(
                 Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
-        entity.setMenuIdList(ListUtils.map(request.getMenuList(), RoleMenuRequest::getId));
+        entity.setMenuIdList(
+                request.getMenuList() == null
+                        ? new ArrayList<>()
+                        : request.getMenuList().stream()
+                                .map(menu -> menu.getId())
+                                .collect(Collectors.toList()));
 
         return entity;
     }

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.member.security.shiro.session;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;

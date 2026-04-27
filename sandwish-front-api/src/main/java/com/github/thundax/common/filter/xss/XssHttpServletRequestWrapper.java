@@ -1,6 +1,5 @@
 package com.github.thundax.common.filter.xss;
 
-import com.github.thundax.common.web.RequestUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -158,7 +158,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
         Map<String, String[]> map = new HashMap<>();
         try {
-            map = RequestUtils.parseQueryString(params);
+            map = parseQueryString(params);
             for (Map.Entry<String, String[]> entry : map.entrySet()) {
                 int len = entry.getValue().length;
                 if (len == 1) {
@@ -201,6 +201,34 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             return ((XssHttpServletRequestWrapper) request).getOrgRequest();
         }
         return request;
+    }
+
+    private Map<String, String[]> parseQueryString(String queryString) {
+        if (queryString == null) {
+            throw new IllegalArgumentException();
+        }
+
+        Map<String, String[]> result = new HashMap<>(16);
+        StringTokenizer tokenizer = new StringTokenizer(queryString, "&");
+        while (tokenizer.hasMoreTokens()) {
+            String pair = tokenizer.nextToken();
+            int pos = pair.indexOf('=');
+            if (pos == -1) {
+                continue;
+            }
+            String key = pair.substring(0, pos);
+            String value = pair.substring(pos + 1);
+            String[] oldValues = result.get(key);
+            if (oldValues == null) {
+                result.put(key, new String[] {value});
+            } else {
+                String[] values = new String[oldValues.length + 1];
+                System.arraycopy(oldValues, 0, values, 0, oldValues.length);
+                values[oldValues.length] = value;
+                result.put(key, values);
+            }
+        }
+        return result;
     }
 
     /**

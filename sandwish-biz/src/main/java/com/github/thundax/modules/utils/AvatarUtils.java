@@ -1,8 +1,6 @@
 package com.github.thundax.modules.utils;
 
-import com.github.thundax.common.storage.MetaFile;
-import com.github.thundax.common.utils.FileUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.io.FileUtils;
 
 /** @author wdit */
 public class AvatarUtils {
@@ -38,7 +37,7 @@ public class AvatarUtils {
     }
 
     public static String getAvatarFilename(String userId) {
-        return MetaFile.SEPARATOR + userId + MetaFile.SEPARATOR + AVATAR_FILENAME;
+        return "/" + userId + "/" + AVATAR_FILENAME;
     }
 
     public static boolean existAvatar(String userId) {

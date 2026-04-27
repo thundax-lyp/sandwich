@@ -3,7 +3,7 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.api.KeypairServiceApi;
 import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;

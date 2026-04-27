@@ -2,7 +2,7 @@ package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.service.StorageService;
 import java.util.HashMap;

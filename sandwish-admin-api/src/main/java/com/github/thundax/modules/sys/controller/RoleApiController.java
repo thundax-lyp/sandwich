@@ -1,12 +1,11 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.RoleServiceApi;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
@@ -35,6 +34,7 @@ import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -93,7 +93,9 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         }
         query.setQuery(queryCondition);
 
-        return ListUtils.map(roleService.findList(query), roleInterfaceAssembler::toResponse);
+        return roleService.findList(query).stream()
+                .map(role -> roleInterfaceAssembler.toResponse(role))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -181,8 +183,9 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role')")
     public List<RoleMenuResponse> menuTree() {
-        return ListUtils.map(
-                menuService.findList(new Menu()), roleInterfaceAssembler::toMenuResponse);
+        return menuService.findList(new Menu()).stream()
+                .map(menu -> roleInterfaceAssembler.toMenuResponse(menu))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -191,19 +194,20 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
         list.addAll(
-                ListUtils.map(
-                        officeService.findList(new Office()),
-                        office -> {
-                            return roleInterfaceAssembler.toOfficeTreeNode(
-                                    OFFICE_ID_PREFIX + office.getId(), office);
-                        }));
+                officeService.findList(new Office()).stream()
+                        .map(
+                                office ->
+                                        roleInterfaceAssembler.toOfficeTreeNode(
+                                                OFFICE_ID_PREFIX + office.getId(), office))
+                        .collect(Collectors.toList()));
 
         list.addAll(
-                ListUtils.map(
-                        userService.findList(new User()),
-                        user -> {
-                            return roleInterfaceAssembler.toUserTreeNode(OFFICE_ID_PREFIX, user);
-                        }));
+                userService.findList(new User()).stream()
+                        .map(
+                                user ->
+                                        roleInterfaceAssembler.toUserTreeNode(
+                                                OFFICE_ID_PREFIX, user))
+                        .collect(Collectors.toList()));
 
         return list;
     }
@@ -216,9 +220,12 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
         }
 
-        return ListUtils.map(
-                roleService.findRoleUser(bean),
-                user -> roleInterfaceAssembler.toUserResponse(UserServiceHolder.get(user.getId())));
+        return roleService.findRoleUser(bean).stream()
+                .map(
+                        user ->
+                                roleInterfaceAssembler.toUserResponse(
+                                        UserServiceHolder.get(user.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -230,7 +237,10 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         Assert.notNull(roleBean, "role can not be null");
 
         roleService.updateUserList(
-                roleBean, ListUtils.map(request.getUsers(), vo -> new User(vo.getId())));
+                roleBean,
+                request.getUsers().stream()
+                        .map(vo -> new User(vo.getId()))
+                        .collect(Collectors.toList()));
 
         return true;
     }
@@ -243,7 +253,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
             throw new NullBeanException(Role.BEAN_NAME, request.getRoleId());
         }
 
-        if (ListUtils.isEmpty(request.getUsers())) {
+        if (request.getUsers() == null || request.getUsers().isEmpty()) {
             throw new InvalidParameterException("users");
         }
 
@@ -256,7 +266,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     }
 
     private void validateMenus(List<RoleMenuRequest> requestList) throws ApiException {
-        if (ListUtils.isEmpty(requestList)) {
+        if (requestList == null || requestList.isEmpty()) {
             return;
         }
         for (RoleMenuRequest request : requestList) {

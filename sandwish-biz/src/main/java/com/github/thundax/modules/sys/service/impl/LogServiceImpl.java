@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,7 @@ public class LogServiceImpl extends CrudServiceImpl<LogDao, Log> implements LogS
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertList(List<Log> list) {
-        if (ListUtils.isEmpty(list)) {
+        if (list == null || list.isEmpty()) {
             return 0;
         }
 
@@ -45,8 +45,10 @@ public class LogServiceImpl extends CrudServiceImpl<LogDao, Log> implements LogS
         int pageSize = BATCH_INSERT_SIZE;
         int totalPage = (list.size() + pageSize - 1) / pageSize;
         for (int pageNo = 0; pageNo < totalPage; pageNo++) {
-            List<Log> subList = ListUtils.subList(list, pageSize * pageNo, pageSize);
-            ListUtils.forEach(subList, Log::preInsert);
+            int fromIndex = pageSize * pageNo;
+            int toIndex = Math.min(fromIndex + pageSize, list.size());
+            List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
+            subList.forEach(Log::preInsert);
             count += dao.insertList(subList);
         }
 

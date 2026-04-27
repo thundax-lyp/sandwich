@@ -3,7 +3,7 @@ package com.github.thundax.modules.assist.service.impl;
 import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.plugins.koal.sign.SignRequestParam;
 import com.github.thundax.modules.assist.plugins.koal.sign.SignResponseParam;

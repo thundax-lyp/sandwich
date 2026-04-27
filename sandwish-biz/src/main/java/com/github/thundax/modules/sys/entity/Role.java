@@ -3,10 +3,9 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseRole;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
@@ -17,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -55,8 +55,9 @@ public class Role extends BaseRole {
                 this.menuIdList = new ArrayList<>();
             } else {
                 this.menuIdList =
-                        ListUtils.map(
-                                RoleServiceHolder.getService().findRoleMenu(this), Menu::getId);
+                        RoleServiceHolder.getService().findRoleMenu(this).stream()
+                                .map(menu -> menu.getId())
+                                .collect(Collectors.toList());
             }
         }
         return this.menuIdList;
@@ -68,11 +69,18 @@ public class Role extends BaseRole {
 
     @JsonIgnore
     public List<Menu> getMenuList() {
-        return ListUtils.map(getMenuIdList(), MenuServiceHolder::get);
+        return getMenuIdList().stream()
+                .map(menuId -> MenuServiceHolder.get(menuId))
+                .collect(Collectors.toList());
     }
 
     public void setMenuList(List<Menu> menuList) {
-        this.menuIdList = ListUtils.map(menuList, Menu::getId);
+        this.menuIdList =
+                menuList == null
+                        ? new ArrayList<>()
+                        : menuList.stream()
+                                .map(menu -> menu.getId())
+                                .collect(Collectors.toList());
     }
 
     @JsonIgnore

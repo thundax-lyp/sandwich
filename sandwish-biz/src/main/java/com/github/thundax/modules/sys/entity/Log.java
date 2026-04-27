@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseLog;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
@@ -82,14 +82,18 @@ public class Log extends BaseLog {
                 if (param.getValue() != null && param.getValue().length > 0) {
                     paramValue = param.getValue()[0];
                 }
+                String safeParamValue =
+                        StringUtils.endsWithIgnoreCase(param.getKey(), "password")
+                                ? ""
+                                : paramValue;
                 params.append(
-                        StringUtils.abbr(
-                                StringUtils.endsWithIgnoreCase(param.getKey(), "password")
-                                        ? ""
-                                        : paramValue,
-                                100));
+                        safeParamValue.length() > 100
+                                ? safeParamValue.substring(0, 100)
+                                : safeParamValue);
             }
-            this.setRequestParams(StringUtils.abbr(params.toString(), 300));
+            String requestParams = params.toString();
+            this.setRequestParams(
+                    requestParams.length() > 300 ? requestParams.substring(0, 300) : requestParams);
         }
     }
 

@@ -2,12 +2,11 @@ package com.github.thundax.common.service.impl;
 
 import com.github.pagehelper.ISelect;
 import com.github.pagehelper.PageHelper;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.impl.support.PageHelperResult;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -197,7 +196,7 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
 
     protected int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
-        if (ListUtils.isNotEmpty(collection)) {
+        if (collection != null && !collection.isEmpty()) {
             for (T entity : collection) {
                 count += operator.apply(entity);
             }

@@ -1,12 +1,12 @@
 package com.github.thundax.modules.sys.aop;
 
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.web.RequestUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
+import com.github.thundax.modules.utils.IPUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /** @author wdit */
 public class SysLogMethodInterceptor implements MethodInterceptor {
@@ -97,7 +99,9 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
     }
 
     private void writeLog(String[] modules, String value, String category, Object requestBody) {
-        HttpServletRequest currentRequest = RequestUtils.currentRequest();
+        HttpServletRequest currentRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                        .getRequest();
 
         List<String> titleParts = new ArrayList<>(Arrays.asList(modules));
         titleParts.add(value);
@@ -108,7 +112,7 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
 
         log.setLogDate(new Date());
 
-        log.setRemoteAddr(RequestUtils.getRemoteAddr(currentRequest));
+        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());

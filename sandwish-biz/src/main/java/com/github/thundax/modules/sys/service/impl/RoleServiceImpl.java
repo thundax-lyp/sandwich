@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.thread.PooledThreadLocal;
@@ -14,6 +13,7 @@ import com.github.thundax.modules.sys.service.RoleService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +57,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
         }
 
         dao.deleteRoleMenu(role);
-        if (ListUtils.isNotEmpty(role.getMenuIdList())) {
+        if (role.getMenuIdList() != null && !role.getMenuIdList().isEmpty()) {
             dao.insertRoleMenu(role);
         }
 
@@ -70,7 +70,7 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
     public void updateUserList(Role role, List<User> userList) {
         dao.deleteRoleUser(role);
 
-        if (ListUtils.isNotEmpty(userList)) {
+        if (userList != null && !userList.isEmpty()) {
             dao.insertRoleUser(role, userList);
         }
 
@@ -117,9 +117,12 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
                         .computeIfAbsent(HashMap::new)
                         .computeIfAbsent(
                                 role.getId(),
-                                roleId -> ListUtils.map(dao.findRoleUser(role), User::getId));
+                                roleId ->
+                                        dao.findRoleUser(role).stream()
+                                                .map(user -> user.getId())
+                                                .collect(Collectors.toList()));
 
-        return ListUtils.map(userIdList, User::new);
+        return userIdList.stream().map(userId -> new User(userId)).collect(Collectors.toList());
     }
 
     @Override
@@ -129,9 +132,12 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
                         .computeIfAbsent(HashMap::new)
                         .computeIfAbsent(
                                 String.valueOf(role.getId()),
-                                roleId -> ListUtils.map(dao.findRoleMenu(role), Menu::getId));
+                                roleId ->
+                                        dao.findRoleMenu(role).stream()
+                                                .map(menu -> menu.getId())
+                                                .collect(Collectors.toList()));
 
-        return ListUtils.map(menuIdList, Menu::new);
+        return menuIdList.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
     }
 
     private void notifyCacheChanged() {

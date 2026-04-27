@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
 import com.github.pagehelper.Page;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -13,6 +12,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.RoleMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 /** 角色 DAO 实现。 */
@@ -135,7 +135,7 @@ public class RoleDaoImpl implements RoleDao {
             menuIds = mapper.findRoleMenu(RolePersistenceAssembler.toDataObject(role));
             cacheSupport.putRoleMenuIds(role.getId(), menuIds);
         }
-        return ListUtils.map(menuIds, Menu::new);
+        return menuIds.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
     }
 
     @Override
@@ -157,7 +157,7 @@ public class RoleDaoImpl implements RoleDao {
             userIds = mapper.findRoleUser(RolePersistenceAssembler.toDataObject(role));
             cacheSupport.putRoleUserIds(role.getId(), userIds);
         }
-        return ListUtils.map(userIds, User::new);
+        return userIds.stream().map(userId -> new User(userId)).collect(Collectors.toList());
     }
 
     @Override

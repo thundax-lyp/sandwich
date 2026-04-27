@@ -1,11 +1,10 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
@@ -30,9 +29,11 @@ import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -152,18 +153,25 @@ public class PersonalApiController extends BaseApiController implements Personal
             Menu parent = menuList.get(idx);
 
             List<Menu> childList =
-                    ListUtils.filter(
-                            allMenuList,
-                            item ->
-                                    item.isDisplay()
-                                            && Objects.equals(item.getParentId(), parent.getId()));
+                    allMenuList == null
+                            ? new ArrayList<>()
+                            : allMenuList.stream()
+                                    .filter(
+                                            item ->
+                                                    item.isDisplay()
+                                                            && Objects.equals(
+                                                                    item.getParentId(),
+                                                                    parent.getId()))
+                                    .collect(Collectors.toList());
 
             menuList.addAll(idx + 1, childList);
         }
         // 移除根节点
         menuList.remove(0);
 
-        return ListUtils.map(menuList, personalInterfaceAssembler::toMenuResponse);
+        return menuList.stream()
+                .map(menu -> personalInterfaceAssembler.toMenuResponse(menu))
+                .collect(Collectors.toList());
     }
 
     @Override

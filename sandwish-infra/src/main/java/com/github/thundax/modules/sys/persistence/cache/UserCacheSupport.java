@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.persistence.cache;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.IdGen;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.List;

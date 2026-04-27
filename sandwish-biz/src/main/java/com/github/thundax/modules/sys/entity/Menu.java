@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseMenu;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.google.common.collect.Maps;

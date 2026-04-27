@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.config;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** auth配置。 */

@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.utils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
 import com.google.common.collect.Lists;

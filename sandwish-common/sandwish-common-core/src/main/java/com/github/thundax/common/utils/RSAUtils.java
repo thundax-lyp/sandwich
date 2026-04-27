@@ -1,13 +1,7 @@
 package com.github.thundax.common.utils;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,9 +12,9 @@ import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
 import javax.crypto.Cipher;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class RSAUtils {
@@ -61,31 +55,6 @@ public class RSAUtils {
                     publicKeyText, modulus, publicKeyExponent, privateKeyExponent);
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e.getMessage());
-        }
-    }
-
-    /**
-     * 编码
-     *
-     * @param plainText 原文
-     */
-    public static String encrypt(String plainText, ReadableKeyPair keyPair) {
-        if (StringUtils.isBlank(plainText) || keyPair == null || keyPair.getModulus() == null) {
-            return StringUtils.EMPTY;
-        }
-        try {
-            BigInteger modulus = new BigInteger(keyPair.getModulus(), 16);
-            BigInteger publicKeyExponent = new BigInteger(keyPair.getPublicKeyExponent(), 16);
-            KeyFactory keyFactory = KeyFactory.getInstance(ALGOR);
-            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, publicKeyExponent);
-            RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
-
-            Cipher cipher = Cipher.getInstance(CLIPHER_TRANSFORMATION, PROVIDER);
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-            return Base64.encodeBase64String(encryptedBytes);
-        } catch (Exception e) {
-            return StringUtils.EMPTY;
         }
     }
 
@@ -176,27 +145,5 @@ public class RSAUtils {
         public void setPublicKeyExponent(String publicKeyExponent) {
             this.publicKeyExponent = publicKeyExponent;
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        int port = 8899;
-        // 定义一个ServerSocket监听在端口8899上
-        ServerSocket server = new ServerSocket(port);
-        // server尝试接收其他Socket的连接请求，server的accept方法是阻塞式的
-        Socket socket = server.accept();
-        // 跟客户端建立好连接之后，我们就可以获取socket的InputStream，并从中读取客户端发过来的信息了。
-        Reader reader = new InputStreamReader(socket.getInputStream());
-        char[] chars = new char[12800];
-        int len;
-        StringBuilder sb = new StringBuilder();
-        while ((len = reader.read(chars)) != -1) {
-            sb.append(new String(chars, 0, len));
-            System.out.println("from client: " + sb);
-            System.out.println("from client: " + sb);
-        }
-        System.out.println("from client: " + sb);
-        reader.close();
-        socket.close();
-        server.close();
     }
 }

@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.utils;
 
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.OfficeService;
 import java.util.HashMap;

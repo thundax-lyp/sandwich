@@ -1,7 +1,7 @@
 package com.github.thundax.common.persistence.entity;
 
 import com.github.thundax.common.utils.EncryptUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

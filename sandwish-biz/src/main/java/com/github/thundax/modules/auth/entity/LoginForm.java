@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import java.io.Serializable;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.github.thundax.modules.member.security;
 
-import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.web.RequestUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.member.utils.RsaSessionUtils;
+import com.github.thundax.modules.utils.IPUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
         String username = getUsername(request);
         String password = getPassword(request);
         boolean rememberMe = isRememberMe(request);
-        String host = RequestUtils.getRemoteAddr((HttpServletRequest) request);
+        String host = IPUtils.getIpAddr((HttpServletRequest) request);
         String captcha = getCaptcha(request);
 
         return new MemberAuthenticationToken(

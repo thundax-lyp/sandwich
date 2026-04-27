@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class ProcessTimeFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) req;
 
-        String remoteAddr = RequestUtils.getRemoteAddr(request);
+        String remoteAddr = getRemoteAddr(request);
 
         long time = System.currentTimeMillis();
         request.setAttribute(START_TIME, time);
@@ -49,5 +50,29 @@ public class ProcessTimeFilter implements Filter {
 
         time = System.currentTimeMillis() - time;
         log.debug("process {} ms[{}] from[{}]", request.getRequestURI(), time, remoteAddr);
+    }
+
+    private String getRemoteAddr(HttpServletRequest request) {
+        String remoteAddr = request.getHeader("X-Real-IP");
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            return remoteAddr;
+        }
+
+        remoteAddr = request.getHeader("X-Forwarded-For");
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            return remoteAddr;
+        }
+
+        remoteAddr = request.getHeader("Proxy-Client-IP");
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            return remoteAddr;
+        }
+
+        remoteAddr = request.getHeader("WL-Proxy-Client-IP");
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            return remoteAddr;
+        }
+
+        return request.getRemoteAddr();
     }
 }

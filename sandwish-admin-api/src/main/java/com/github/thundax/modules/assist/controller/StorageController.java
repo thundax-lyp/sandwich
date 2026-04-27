@@ -1,11 +1,10 @@
 package com.github.thundax.modules.assist.controller;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.IdGen;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseAdminController;
 import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
@@ -219,7 +219,9 @@ public class StorageController extends BaseAdminController {
 
         int count =
                 storageService.delete(
-                        ListUtils.map(new ArrayList<>(Arrays.asList(ids)), Storage::new));
+                        new ArrayList<>(Arrays.asList(ids)).stream()
+                                .map(id -> new Storage(id))
+                                .collect(Collectors.toList()));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
         return "redirect:" + modulePath + "/list?reload";
@@ -229,9 +231,9 @@ public class StorageController extends BaseAdminController {
     @RequestMapping(value = "treeData")
     @ResponseBody
     public List<StorageTreeNodeResponse> treeData() {
-        return ListUtils.map(
-                storageService.findBusinessTypeList(),
-                storageInterfaceAssembler::toBusinessTypeTreeNode);
+        return storageService.findBusinessTypeList().stream()
+                .map(businessType -> storageInterfaceAssembler.toBusinessTypeTreeNode(businessType))
+                .collect(Collectors.toList());
     }
 
     @NotNull

@@ -4,10 +4,9 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.entity.AccessToken;
@@ -25,10 +24,13 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
+import com.github.thundax.modules.utils.IPUtils;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,7 +75,9 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
     public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request)
             throws ApiException {
         validate(request);
-        HttpServletRequest currentRequest = RequestUtils.currentRequest();
+        HttpServletRequest currentRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                        .getRequest();
         if (!authService.validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
             // 刷新验证码
             authService.createCaptcha(request.getLoginToken());
@@ -155,7 +159,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         Log log = new Log();
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
-        log.setRemoteAddr(RequestUtils.getRemoteAddr(currentRequest));
+        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());

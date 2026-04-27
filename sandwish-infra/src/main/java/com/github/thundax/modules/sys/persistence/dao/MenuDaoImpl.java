@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.github.pagehelper.Page;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssembler;

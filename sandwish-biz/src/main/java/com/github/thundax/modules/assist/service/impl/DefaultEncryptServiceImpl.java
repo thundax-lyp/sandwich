@@ -1,7 +1,7 @@
 package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.utils.EncryptUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.service.EncryptService;
 
 /**

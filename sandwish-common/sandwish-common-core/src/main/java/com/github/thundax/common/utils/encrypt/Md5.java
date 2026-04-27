@@ -1,14 +1,13 @@
 package com.github.thundax.common.utils.encrypt;
 
-import static com.github.thundax.common.utils.StringUtils.byte2hex;
-
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.apache.commons.codec.binary.Hex;
 
 /** @author thundax */
 public class Md5 {
@@ -25,7 +24,7 @@ public class Md5 {
             while ((readBytes = bis.read(buffer)) > 0) {
                 digest.update(buffer, 0, readBytes);
             }
-            return byte2hex(digest.digest());
+            return Hex.encodeHexString(digest.digest());
 
         } catch (NoSuchAlgorithmException | IOException e) {
             return StringUtils.EMPTY;
@@ -39,7 +38,7 @@ public class Md5 {
     public static String encrypt(byte[] input) {
         try {
             MessageDigest digest = MessageDigest.getInstance(ALGORITHM_MD5);
-            return byte2hex(digest.digest(input));
+            return Hex.encodeHexString(digest.digest(input));
 
         } catch (NoSuchAlgorithmException e) {
             return StringUtils.EMPTY;

@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
 import com.github.pagehelper.Page;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -12,6 +11,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 /** 用户 DAO 实现。 */
@@ -158,14 +158,15 @@ public class UserDaoImpl implements UserDao {
         List<String> roleIds = cacheSupport.getUserRoleIds(user.getId());
         if (roleIds == null) {
             roleIds =
-                    ListUtils.map(
-                            UserPersistenceAssembler.toRoleList(
+                    UserPersistenceAssembler.toRoleList(
                                     mapper.findUserRole(
-                                            UserPersistenceAssembler.toDataObject(user))),
-                            Role::getId);
+                                            UserPersistenceAssembler.toDataObject(user)))
+                            .stream()
+                            .map(role -> role.getId())
+                            .collect(Collectors.toList());
             cacheSupport.putUserRoleIds(user.getId(), roleIds);
         }
-        return ListUtils.map(roleIds, Role::new);
+        return roleIds.stream().map(roleId -> new Role(roleId)).collect(Collectors.toList());
     }
 
     @Override

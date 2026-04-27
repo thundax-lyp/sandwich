@@ -1,7 +1,7 @@
 package com.github.thundax.modules.assist.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.base.BaseAsyncTask;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Objects;

@@ -1,7 +1,7 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 
 /**

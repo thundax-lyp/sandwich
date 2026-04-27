@@ -1,8 +1,7 @@
 package com.github.thundax.modules.auth.persistence.dao;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
@@ -68,7 +67,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
     @Override
     public void save(LoginForm form) {
         Assert.isTrue(
-                ListUtils.isNotEmpty(form.getRefreshTokenList()),
+                form.getRefreshTokenList() != null && !form.getRefreshTokenList().isEmpty(),
                 "refreshTokenList can not be null");
 
         Set<String> removeTokens = new HashSet<>();
@@ -119,9 +118,12 @@ public class LoginFormDaoImpl implements LoginFormDao {
         LoginForm form = getByToken(loginToken);
         if (form != null) {
             redisClient.delete(TOKEN_PREFIX + loginToken);
-            ListUtils.forEach(
-                    form.getRefreshTokenList(),
-                    refreshToken -> redisClient.delete(REFRESH_TOKEN_PREFIX + refreshToken));
+            if (form.getRefreshTokenList() != null && !form.getRefreshTokenList().isEmpty()) {
+                form.getRefreshTokenList()
+                        .forEach(
+                                refreshToken ->
+                                        redisClient.delete(REFRESH_TOKEN_PREFIX + refreshToken));
+            }
         }
     }
 

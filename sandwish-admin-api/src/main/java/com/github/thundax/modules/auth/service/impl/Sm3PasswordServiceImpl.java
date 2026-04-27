@@ -1,7 +1,7 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.codec.digest.DigestUtils;
-import com.github.thundax.common.utils.StringUtils;
+import com.github.thundax.common.codec.Sm3Utils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.service.PasswordService;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -27,7 +27,7 @@ public class Sm3PasswordServiceImpl implements PasswordService {
 
     private String encrypt(String plainPassword, String salt) {
         String encryptedPassword =
-                DigestUtils.sm3Hex(
+                Sm3Utils.sm3Hex(
                         (salt + ARG_SEPARATOR + plainPassword).getBytes(StandardCharsets.UTF_8));
         return PREFIX + salt + ARG_SEPARATOR + encryptedPassword + SUFFIX;
     }
@@ -40,7 +40,9 @@ public class Sm3PasswordServiceImpl implements PasswordService {
     public boolean validate(String plainPassword, String encryptedPassword) {
         if (StringUtils.startsWithIgnoreCase(encryptedPassword, PREFIX)
                 && StringUtils.endsWithIgnoreCase(encryptedPassword, SUFFIX)) {
-            String queryString = StringUtils.unwrapIgnoreCase(encryptedPassword, PREFIX, SUFFIX);
+            String queryString =
+                    encryptedPassword.substring(
+                            PREFIX.length(), encryptedPassword.length() - SUFFIX.length());
             String[] args = StringUtils.split(queryString, ARG_SEPARATOR);
             if (args.length != ARG_SIZE) {
                 return false;
@@ -51,7 +53,7 @@ public class Sm3PasswordServiceImpl implements PasswordService {
             return StringUtils.equals(encrypt(plainPassword, salt), encryptedPassword);
         }
 
-        return StringUtils.equals(DigestUtils.sm3Hex(plainPassword), encryptedPassword);
+        return StringUtils.equals(Sm3Utils.sm3Hex(plainPassword), encryptedPassword);
     }
 
     public static void main(String[] argv) {

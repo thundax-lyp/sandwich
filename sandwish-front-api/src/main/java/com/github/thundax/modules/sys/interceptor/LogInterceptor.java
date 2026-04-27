@@ -10,7 +10,6 @@
 // import org.springframework.web.servlet.ModelAndView;
 //
 // import com.github.thundax.common.service.BaseService;
-// import com.github.thundax.common.utils.DateUtils;
 // import com.github.thundax.modules.sys.utils.LogUtils;
 //
 /// **
@@ -61,7 +60,7 @@
 //            logger.debug("计时结束：{}  耗时：{}  URI: {}  最大内存: {}m  已分配内存: {}m  已分配内存中的剩余空间: {}m
 // 最大可用内存: {}m",
 //                    new SimpleDateFormat("hh:mm:ss.SSS").format(endTime),
-// DateUtils.formatDateTime(endTime - beginTime),
+//                    (endTime - beginTime) + "ms",
 //                    request.getRequestURI(), Runtime.getRuntime().maxMemory() / 1024 / 1024,
 //                    Runtime.getRuntime().totalMemory() / 1024 / 1024,
 // Runtime.getRuntime().freeMemory() / 1024 / 1024,

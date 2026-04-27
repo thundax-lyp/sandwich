@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.auth.service.PasswordService;
 import java.nio.charset.StandardCharsets;

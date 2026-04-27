@@ -1,9 +1,8 @@
 package com.github.thundax.modules.sys.utils;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.MenuService;
@@ -46,11 +45,13 @@ public class MenuServiceHolder {
 
     public static String getMenuIcon(String targetUrl) {
         Menu menu =
-                ListUtils.find(
-                        getService().findList(User.MAX_RANKS),
-                        item ->
-                                StringUtils.isNotEmpty(item.getUrl())
-                                        && targetUrl.endsWith(item.getUrl()));
+                getService().findList(User.MAX_RANKS).stream()
+                        .filter(
+                                item ->
+                                        StringUtils.isNotEmpty(item.getUrl())
+                                                && targetUrl.endsWith(item.getUrl()))
+                        .findFirst()
+                        .orElse(null);
         if (menu != null) {
             return (String) menu.getDisplayParam("icon", StringUtils.EMPTY);
         }

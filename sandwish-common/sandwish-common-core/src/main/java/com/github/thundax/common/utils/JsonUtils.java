@@ -16,7 +16,7 @@ public class JsonUtils {
 
     private static ObjectMapper mapper = null;
 
-    public static ObjectMapper getMapper() {
+    private static ObjectMapper getMapper() {
         if (mapper == null) {
             mapper = new ObjectMapper();
             // 忽略目标对象没有的属性
@@ -52,34 +52,4 @@ public class JsonUtils {
         }
     }
 
-    public static String toPrettyJson(Object bean) {
-        try {
-            return getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(bean);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return StringUtils.EMPTY;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T clone(T bean) {
-        if (bean == null) {
-            return null;
-        }
-        return (T) fromJson(toJson(bean), bean.getClass());
-    }
-
-    public static <T, R> R clone(T bean, Class<R> clazz) {
-        if (bean == null) {
-            return null;
-        }
-        return fromJson(toJson(bean), clazz);
-    }
-
-    public static <T, R> R clone(T bean, TypeReference<R> typeReference) {
-        if (bean == null) {
-            return null;
-        }
-        return fromJson(toJson(bean), typeReference);
-    }
 }

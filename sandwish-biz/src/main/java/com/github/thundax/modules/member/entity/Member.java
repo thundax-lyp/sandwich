@@ -3,12 +3,12 @@ package com.github.thundax.modules.member.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.config.Global;
-import com.github.thundax.common.utils.DateUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.member.entity.base.BaseMember;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.commons.lang3.time.DateUtils;
 
 /** @author wdit */
 public class Member extends BaseMember {

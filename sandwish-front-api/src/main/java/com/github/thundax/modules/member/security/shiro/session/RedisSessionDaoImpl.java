@@ -1,14 +1,13 @@
 package com.github.thundax.modules.member.security.shiro.session;
 
 import com.github.thundax.common.config.Global;
-import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.web.Servlets;
 import com.google.common.collect.Sets;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
@@ -19,6 +18,8 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 系统安全认证实现类
@@ -58,11 +59,11 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
             return;
         }
 
-        HttpServletRequest request = Servlets.getRequest();
+        HttpServletRequest request = getRequest();
         if (request != null) {
             String uri = request.getServletPath();
             // 如果是静态文件，则不更新SESSION
-            if (Servlets.isStaticFile(uri)) {
+            if (isStaticFile(uri)) {
                 return;
             }
             // 手动控制不更新SESSION
@@ -90,11 +91,11 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
 
     @Override
     protected Serializable doCreate(Session session) {
-        HttpServletRequest request = Servlets.getRequest();
+        HttpServletRequest request = getRequest();
         if (request != null) {
             String uri = request.getServletPath();
             // 如果是静态文件，则不创建SESSION
-            if (Servlets.isStaticFile(uri)) {
+            if (isStaticFile(uri)) {
                 return null;
             }
         }
@@ -115,7 +116,7 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
     public Session readSession(Serializable sessionId) throws UnknownSessionException {
         try {
             Session s = null;
-            HttpServletRequest request = Servlets.getRequest();
+            HttpServletRequest request = getRequest();
             if (request != null) {
                 s = (Session) request.getAttribute("session_" + sessionId);
             }
@@ -190,5 +191,20 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
 
     private String createCacheKey(Serializable sessionId) {
         return CACHE_PREFIX + sessionId;
+    }
+
+    private HttpServletRequest getRequest() {
+        try {
+            return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                    .getRequest();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isStaticFile(String uri) {
+        return StringUtils.endsWithAny(
+                uri, ".css", ".js", ".png", ".jpg", ".gif", ".jpeg", ".bmp", ".ico", ".swf", ".psd",
+                ".htc", ".crx", ".xpi");
     }
 }

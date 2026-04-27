@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
@@ -8,12 +7,10 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.utils.FileUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.sys.api.UserServiceApi;
@@ -38,13 +35,16 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
+import com.github.thundax.modules.utils.IPUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +53,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 /** @author thundax */
@@ -104,7 +106,9 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         User query = readQuery(request);
 
-        return ListUtils.map(userService.findList(query), userInterfaceAssembler::toResponse);
+        return userService.findList(query).stream()
+                .map(user -> userInterfaceAssembler.toResponse(user))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -151,7 +155,10 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
 
         entity.setRegisterDate(new Date());
-        entity.setRegisterIp(RequestUtils.getRemoteAddr());
+        HttpServletRequest currentRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                        .getRequest();
+        entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
         userService.save(entity);
 
@@ -293,8 +300,9 @@ public class UserApiController extends BaseApiController implements UserServiceA
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserOfficeResponse> officeTree() {
-        return ListUtils.map(
-                officeService.findList(new Office()), userInterfaceAssembler::toOfficeResponse);
+        return officeService.findList(new Office()).stream()
+                .map(office -> userInterfaceAssembler.toOfficeResponse(office))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -305,7 +313,9 @@ public class UserApiController extends BaseApiController implements UserServiceA
         queryCondition.setEnableFlag(Global.ENABLE);
         query.setQuery(queryCondition);
 
-        return ListUtils.map(roleService.findList(query), userInterfaceAssembler::toRoleResponse);
+        return roleService.findList(query).stream()
+                .map(role -> userInterfaceAssembler.toRoleResponse(role))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -371,7 +381,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     }
 
     private void validateRoles(List<UserRoleRequest> requestList) throws ApiException {
-        if (ListUtils.isEmpty(requestList)) {
+        if (requestList == null || requestList.isEmpty()) {
             return;
         }
         for (UserRoleRequest request : requestList) {

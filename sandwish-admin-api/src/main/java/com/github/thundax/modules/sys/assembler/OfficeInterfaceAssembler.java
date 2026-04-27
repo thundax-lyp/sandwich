@@ -1,7 +1,7 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.persistence.DataEntity;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;

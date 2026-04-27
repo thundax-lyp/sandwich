@@ -2,10 +2,10 @@ package com.github.thundax.common.web;
 
 import com.github.thundax.common.exception.WebMvcException;
 import com.github.thundax.common.utils.CookieUtils;
-import com.github.thundax.common.utils.DateUtils;
-import com.github.thundax.common.utils.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,6 +22,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,6 +41,21 @@ public class BaseAdminController extends BaseController {
     protected static final String MESSAGE_SUCCESS = "success";
     protected static final String MESSAGE_WARN = "warning";
     protected static final String MESSAGE_ERROR = "error";
+
+    private static final String[] DATE_PARSE_PATTERNS = {
+        "yyyy-MM-dd",
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd HH:mm",
+        "yyyy-MM",
+        "yyyy/MM/dd",
+        "yyyy/MM/dd HH:mm:ss",
+        "yyyy/MM/dd HH:mm",
+        "yyyy/MM",
+        "yyyy.MM.dd",
+        "yyyy.MM.dd HH:mm:ss",
+        "yyyy.MM.dd HH:mm",
+        "yyyy.MM"
+    };
 
     protected String modulePath;
     protected Validator validator;
@@ -202,11 +218,15 @@ public class BaseAdminController extends BaseController {
 
     /** 将requestParams装配到model */
     protected void setupParamsModel(HttpServletRequest request, Model model) {
-        RequestUtils.getQueryParams(request)
+        request.getParameterMap()
                 .forEach(
-                        (name, value) -> {
-                            if (StringUtils.isNotBlank(name) && value != null) {
-                                model.addAttribute(name, value);
+                        (name, values) -> {
+                            if (StringUtils.isNotBlank(name) && values != null) {
+                                if (values.length == 1) {
+                                    model.addAttribute(name, values[0]);
+                                } else if (values.length > 1) {
+                                    model.addAttribute(name, values);
+                                }
                             }
                         });
     }
@@ -250,16 +270,24 @@ public class BaseAdminController extends BaseController {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNotEmpty(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
-            return DateUtils.parseDate(paramValue);
+            return parseReloadDateValue(paramValue);
 
         } else if (request.getParameter(PARAM_RELOAD) != null) {
             paramValue = CookieUtils.getCookie(request, cookieName);
             if (StringUtils.isNotEmpty(paramValue)) {
-                return DateUtils.parseDate(paramValue);
+                return parseReloadDateValue(paramValue);
             }
         }
         CookieUtils.setCookie(response, cookieName, StringUtils.EMPTY, 0);
         return null;
+    }
+
+    private static Date parseReloadDateValue(String value) {
+        try {
+            return DateUtils.parseDate(value, DATE_PARSE_PATTERNS);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     protected static String readReloadString(

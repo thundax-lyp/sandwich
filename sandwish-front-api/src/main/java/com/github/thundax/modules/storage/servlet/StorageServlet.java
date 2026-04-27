@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.servlet;
 
-import com.github.thundax.common.utils.FileUtils;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.io.File;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 

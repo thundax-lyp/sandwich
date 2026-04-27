@@ -90,23 +90,23 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public Integer getMaxPosition(Menu node) {
-        return mapper.getMaxPosition(MenuPersistenceAssembler.toDataObject(node));
+    public Integer getMaxPosition() {
+        return mapper.getMaxPosition();
     }
 
     @Override
-    public void moveTreeRgts(Menu node, Integer from, Integer offset) {
-        mapper.moveTreeRgts(MenuPersistenceAssembler.toDataObject(node), from, offset);
+    public void moveTreeRgts(Integer from, Integer offset) {
+        mapper.moveTreeRgts(from, offset);
     }
 
     @Override
-    public void moveTreeLfts(Menu node, Integer from, Integer offset) {
-        mapper.moveTreeLfts(MenuPersistenceAssembler.toDataObject(node), from, offset);
+    public void moveTreeLfts(Integer from, Integer offset) {
+        mapper.moveTreeLfts(from, offset);
     }
 
     @Override
-    public void moveTreeNodes(Menu node, Integer from, Integer to, Integer offset) {
-        mapper.moveTreeNodes(MenuPersistenceAssembler.toDataObject(node), from, to, offset);
+    public void moveTreeNodes(Integer from, Integer to, Integer offset) {
+        mapper.moveTreeNodes(from, to, offset);
     }
 
     @Override

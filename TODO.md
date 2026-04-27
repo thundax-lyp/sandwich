@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `common-tree-dao-contract`：收敛通用 Tree DAO 契约
-  - 范围对象：`sandwish-common/.../TreeDao.java`、`MenuDao`、菜单树 Mapper XML、已显式化的 `OfficeDao` 对照实现
-  - 当前依赖：`TreeDao<T>` 继承 `CrudDao<T>`，并通过 `@Param("node")` 传递树节点对象，统一要求 `getTreeNode`、`updateLftRgt`、`updateParent`、`getMaxPosition`、`moveTreeRgts`、`moveTreeLfts`、`moveTreeNodes`；当前仅 `MenuDao` 仍继承 `TreeDao`
-  - 处理动作：参考 `OfficeDao` 显式树方法改造经验，评估 `MenuDao` 是否下沉显式树方法；移除公共树契约对 `CrudDao`、父类字段和嵌套集字段命名的隐式假设；保持菜单树移动、删除、插入语义
-  - 验收点：树 DAO 契约不再强制所有树对象共享同一 Mapper 参数结构；菜单与机构树链路编译通过
-
 - [ ] `common-entity-query-contract`：收敛公共实体 query 契约
   - 范围对象：`BaseEntity`、`DataEntity`、`TreeEntity`、`AdminDataEntity`、`AdminTreeEntity`、剩余 `Entity.Query` / `DO.Query` 使用点
   - 当前依赖：`DataEntity` 持有通用 `Object query`，并提供 `createQueryObject`、`setQueryProp`、`getQueryProp` 反射入口；`AdminDataEntity` / `AdminTreeEntity` 叠加创建人、更新人和签名能力；剩余 DO 继承集中在 `SignatureDO`、`AsyncTaskDO`、`StorageDO`、`StorageBusinessDO`、`MemberDO`

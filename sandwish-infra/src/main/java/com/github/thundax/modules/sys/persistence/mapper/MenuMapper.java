@@ -36,13 +36,13 @@ public interface MenuMapper {
 
     void updateParent(@Param("node") MenuDO node);
 
-    Integer getMaxPosition(@Param("node") MenuDO node);
+    Integer getMaxPosition();
 
-    void moveTreeRgts(@Param("node") MenuDO node, @Param("from") Integer from, @Param("offset") Integer offset);
+    void moveTreeRgts(@Param("from") Integer from, @Param("offset") Integer offset);
 
-    void moveTreeLfts(@Param("node") MenuDO node, @Param("from") Integer from, @Param("offset") Integer offset);
+    void moveTreeLfts(@Param("from") Integer from, @Param("offset") Integer offset);
 
-    void moveTreeNodes(@Param("node") MenuDO node, @Param("from") Integer from, @Param("to") Integer to,
+    void moveTreeNodes(@Param("from") Integer from, @Param("to") Integer to,
                        @Param("offset") Integer offset);
 
     /**

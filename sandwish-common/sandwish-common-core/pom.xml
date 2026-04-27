@@ -114,5 +114,10 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

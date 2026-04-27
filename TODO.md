@@ -20,11 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `common-test-baseline-module`：建立基础测试规约模块
-  - 参考对象：`../bacon/bacon-common/bacon-common-test`
-  - 范围对象：`sandwish-common` 聚合模块、根 `pom.xml`、`sandwish-common/sandwish-common-test`、基础 ArchUnit testcase 目录、各可测试 Maven 子模块 `pom.xml`
-  - 处理动作：新增 `sandwish-common-test` 模块，用于承载基础规约、ArchUnit testcase 和跨模块测试支撑；各模块统一以 test scope 引入 `sandwish-common-test`；只建立最小可编译测试骨架，不迁移具体业务规则
-  - 验收点：后续 ArchUnit 规则有统一落点；`sandwish-common-core`、`sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api` 均已引入 `sandwish-common-test`
 - [ ] `archunit-request-annotation-baseline`：盘点 Request 注解规约适用范围
   - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：后台与前台 API 入口模块中的 `Request` 类、复用请求模型和历史非标准请求对象

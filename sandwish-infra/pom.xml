@@ -26,6 +26,11 @@
             <artifactId>sandwish-common-mybatis</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

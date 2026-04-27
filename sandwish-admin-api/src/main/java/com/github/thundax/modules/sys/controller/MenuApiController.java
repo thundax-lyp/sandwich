@@ -5,16 +5,20 @@ import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.vo.query.MoveTreeNodeQueryParam;
+import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
+import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
-import com.github.thundax.modules.sys.api.query.MenuQueryParam;
-import com.github.thundax.modules.sys.api.vo.MenuVo;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.request.MenuDisplayRequest;
+import com.github.thundax.modules.sys.request.MenuIdRequest;
+import com.github.thundax.modules.sys.request.MenuMoveRequest;
+import com.github.thundax.modules.sys.request.MenuQueryRequest;
+import com.github.thundax.modules.sys.request.MenuSaveRequest;
+import com.github.thundax.modules.sys.response.MenuResponse;
 import com.github.thundax.modules.sys.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,47 +33,51 @@ import java.util.Set;
 public class MenuApiController extends BaseApiController implements MenuServiceApi {
 
     private final MenuService menuService;
+    private final MenuInterfaceAssembler menuInterfaceAssembler;
 
     @Autowired
-    public MenuApiController(MenuService menuService, Validator validator) {
+    public MenuApiController(MenuService menuService,
+                             Validator validator,
+                             MenuInterfaceAssembler menuInterfaceAssembler) {
         super(validator);
         this.menuService = menuService;
+        this.menuInterfaceAssembler = menuInterfaceAssembler;
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public MenuVo get(@RequestBody MenuVo vo) throws ApiException {
-        Menu bean = menuService.get(vo.getId());
+    public MenuResponse get(@RequestBody MenuIdRequest request) throws ApiException {
+        Menu bean = menuService.get(request.getId());
         if (bean == null) {
-            throw new NullBeanException(Menu.BEAN_NAME, vo.getId());
+            throw new NullBeanException(Menu.BEAN_NAME, request.getId());
         }
-        return entityToVo(bean);
+        return menuInterfaceAssembler.toResponse(bean);
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public List<MenuVo> list(@RequestBody MenuQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public List<MenuResponse> list(@RequestBody MenuQueryRequest request) throws ApiException {
+        validate(request);
 
         Menu query = new Menu();
 
-        query.setQueryProp(Menu.Query.PROP_PARENT_ID, queryParam.getParentId());
-        if (queryParam.getDisplay() != null) {
-            query.setQueryProp(Menu.Query.PROP_DISPLAY_FLAG, queryParam.getDisplay() ? Global.SHOW : Global.HIDE);
+        query.setQueryProp(Menu.Query.PROP_PARENT_ID, request.getParentId());
+        if (request.getDisplay() != null) {
+            query.setQueryProp(Menu.Query.PROP_DISPLAY_FLAG, request.getDisplay() ? Global.SHOW : Global.HIDE);
         }
 
-        return ListUtils.map(menuService.findList(query), this::entityToVo);
+        return ListUtils.map(menuService.findList(query), menuInterfaceAssembler::toResponse);
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public MenuVo add(@RequestBody MenuVo vo) throws ApiException {
-        validate(vo);
+    public MenuResponse add(@RequestBody MenuSaveRequest request) throws ApiException {
+        validate(request);
 
-        Menu entity = voToEntity(new Menu(), vo);
+        Menu entity = menuInterfaceAssembler.toEntity(new Menu(), request);
         if (StringUtils.isNotEmpty(entity.getId())) {
             Menu bean = menuService.get(entity.getId());
             if (bean != null) {
@@ -87,38 +95,38 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
         menuService.save(entity);
 
-        return entityToVo(entity);
+        return menuInterfaceAssembler.toResponse(entity);
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public MenuVo update(@RequestBody MenuVo vo) throws ApiException {
-        validate(vo);
+    public MenuResponse update(@RequestBody MenuSaveRequest request) throws ApiException {
+        validate(request);
 
-        Menu bean = menuService.get(vo.getId());
+        Menu bean = menuService.get(request.getId());
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
-        if (StringUtils.isNotEmpty(vo.getParentId())) {
-            Menu parent = menuService.get(vo.getParentId());
+        if (StringUtils.isNotEmpty(request.getParentId())) {
+            Menu parent = menuService.get(request.getParentId());
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        Menu entity = voToEntity(bean, vo);
+        Menu entity = menuInterfaceAssembler.toEntity(bean, request);
 
         menuService.save(entity);
 
-        return entityToVo(entity);
+        return menuInterfaceAssembler.toResponse(entity);
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public Boolean updateDisplayFlag(@RequestBody List<MenuVo> list) throws ApiException {
+    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = validateList(list,
                 vo -> menuService.get(vo.getId()),
                 null,
@@ -132,7 +140,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
     @Override
     @RequiresPermissions("super")
-    public Boolean delete(@RequestBody List<MenuVo> list) throws ApiException {
+    public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
         List<Menu> beanList = validateList(list, vo -> menuService.get(vo.getId()), null, null);
 
         menuService.delete(beanList);
@@ -142,10 +150,10 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
     @Override
     @RequiresPermissions("super")
-    public List<MenuVo> tree(@RequestBody List<MenuVo> excludeList) {
+    public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.findList(new Menu());
 
-        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, MenuVo::getId));
+        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, MenuIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(beanList, new RemoveTreeNodeSupport<Menu>() {
@@ -167,78 +175,44 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
         }, excludeIds);
 
-        return ListUtils.map(beanList, entity -> {
-            MenuVo vo = new MenuVo(entity.getId());
-            vo.setParentId(entity.getParentId());
-            vo.setName(entity.getName());
-            return vo;
-        });
+        return ListUtils.map(beanList, menuInterfaceAssembler::toTreeResponse);
     }
 
 
     @Override
     @RequiresPermissions("super")
-    public Boolean move(@RequestBody MoveTreeNodeQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public Boolean move(@RequestBody MenuMoveRequest request) throws ApiException {
+        validate(request);
 
-        Menu fromBean = menuService.get(queryParam.getFromNodeId());
+        Menu fromBean = menuService.get(request.getFromNodeId());
         if (fromBean == null) {
-            throw new NullBeanException(Menu.BEAN_NAME, queryParam.getFromNodeId());
+            throw new NullBeanException(Menu.BEAN_NAME, request.getFromNodeId());
         }
 
-        Menu toBean = menuService.get(queryParam.getToNodeId());
+        Menu toBean = menuService.get(request.getToNodeId());
         if (toBean == null) {
-            throw new NullBeanException(Menu.BEAN_NAME, queryParam.getToNodeId());
+            throw new NullBeanException(Menu.BEAN_NAME, request.getToNodeId());
         }
 
         if (toBean.equals(fromBean) || toBean.isChildOf(fromBean, null)) {
-            throw new MoveTreeNodeException(Menu.BEAN_NAME, queryParam.getFromNodeId(), queryParam.getToNodeId());
+            throw new MoveTreeNodeException(Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
-        menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(queryParam));
+        menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));
 
         return true;
     }
 
-
-    @NonNull
-    private MenuVo entityToVo(Menu entity) {
-        if (entity == null) {
-            return new MenuVo();
+    private TreeService.MoveTreeNodeType readMoveTreeNodeType(MenuMoveRequest request) {
+        switch (request.getType()) {
+            case MenuMoveRequest.TYPE_BEFORE:
+                return TreeService.MoveTreeNodeType.BEFORE;
+            case MenuMoveRequest.TYPE_INSIDE:
+                return TreeService.MoveTreeNodeType.INSIDE;
+            case MenuMoveRequest.TYPE_INSIDE_LAST:
+                return TreeService.MoveTreeNodeType.INSIDE_LAST;
+            default:
+                return TreeService.MoveTreeNodeType.AFTER;
         }
-
-        MenuVo vo = baseEntityToVo(new MenuVo(), entity);
-
-        if (StringUtils.isNotEmpty(entity.getParentId())) {
-            vo.setParentId(entity.getParentId());
-        }
-        vo.setName(entity.getName());
-        vo.setPerms(entity.getPerms());
-        vo.setRanks(entity.getRanks());
-
-        vo.setDisplay(entity.isDisplay());
-        vo.setDisplayParams(entity.getDisplayParams());
-        vo.setUrl(entity.getUrl());
-
-        return vo;
     }
-
-    @NonNull
-    private Menu voToEntity(@NonNull Menu entity, @NonNull MenuVo vo) {
-        baseVoToEntity(entity, vo);
-
-        if (StringUtils.isNotEmpty(vo.getParentId())) {
-            entity.setParentId(vo.getParentId());
-        }
-        entity.setName(vo.getName());
-        entity.setPerms(vo.getPerms());
-        entity.setRanks(vo.getRanks());
-
-        entity.setDisplayFlag(Boolean.TRUE.equals(vo.getDisplay()) ? Global.SHOW : Global.HIDE);
-        entity.setDisplayParams(vo.getDisplayParams());
-        entity.setUrl(vo.getUrl());
-
-        return entity;
-    }
-
 }

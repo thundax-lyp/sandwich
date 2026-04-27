@@ -98,6 +98,7 @@
 处理动作：
 
 - 新增 `FrontSpringSecurityConfiguration`。
+- `FrontSpringSecurityConfiguration` 固定挂在 `front-spring-security` profile 下，迁移期默认不接管 Shiro 流量。
 - 建立与 Shiro chain definition 等价的路径规则。
 - 固定匿名路径：`/static/**`、`/servlet/**`、`/auth/register`。
 - 固定登录路径：`/auth/login`。

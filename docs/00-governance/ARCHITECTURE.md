@@ -201,6 +201,9 @@ Sandwich 固定采用三层 API 架构。
 - DAO interface 固定归属 `sandwish-biz`。
 - DAO implementation、MyBatis Mapper、Mapper XML 和 `DO` / `DataObject` 固定归属 `sandwish-infra`。
 - `PersistenceAssembler` 固定归属 `sandwish-infra`，只负责 `Entity <-> DO/DataObject` 转换。
+- DAO / Mapper 方法优先使用显式业务语义命名，不以通用 `findList(T entity)` 或无条件语义方法承载新增查询。
+- Mapper XML 查询条件固定读取一级方法参数或 infra 内部 persistence 参数对象，不依赖通用 `query.*` 容器。
+- Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper 或 Mapper XML。
 
 ### Entity / VO / DTO
 
@@ -208,6 +211,9 @@ Sandwich 固定采用三层 API 架构。
 - VO / DTO 用于入口响应、页面展示或跨层传输。
 - 不在 VO / DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
+- 业务 `Entity` 可以保留 Service 可理解的业务查询模型。
+- `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。
+- `PersistenceAssembler` 不回填查询对象；查询条件从 Service 到 DAO / Mapper 时必须显式拆解或转换为 infra 内部 persistence 参数对象。
 
 ### Request / Response / InterfaceAssembler
 

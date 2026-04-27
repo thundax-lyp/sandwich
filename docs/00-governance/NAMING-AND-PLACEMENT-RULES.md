@@ -78,6 +78,8 @@
 - `NAME_MAPPER`：Mapper 命名以 `Mapper` 结尾
 - `NAME_ENTITY`：Entity 命名表达业务对象，不使用无意义泛化名称
 - `NAME_DATA_OBJECT`：持久化对象命名以 `DO` 或 `DataObject` 结尾
+- `NAME_DATA_OBJECT_QUERY_FIELD`：`DO/DataObject` 中用于持久化查询的字段必须显式命名，不使用通用 `query`
+- `NAME_DAO_MAPPER_METHOD`：DAO / Mapper 查询方法名必须表达动作和条件，不新增无条件语义的通用查询方法
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾
 - `NAME_INTERFACE_ASSEMBLER`：API 模型装配器命名以 `InterfaceAssembler` 结尾
 - `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾
@@ -101,12 +103,15 @@
 - `InterfaceAssembler` 按对应 API 入口模块的现有包结构放置，优先使用 `assembler` 包
 - DAO / Mapper 查询、分页、过滤、排序优先下推到数据库
 - VO / DTO 不写复杂业务流程
+- `PersistenceAssembler` 只做 `Entity <-> DO/DataObject` 字段转换，查询条件从业务 `Entity.Query` 到持久化参数的拆解不回填到 `DO`
 
 ### Naming & Placement
 
 - 命名应表达职责与层次，避免泛化命名
 - 新增目录前先确认现有目录无法承载
 - 历史包名与现有模块风格冲突时，优先保持当前模块内部一致
+- `DO/DataObject` 显式查询字段按对应业务字段命名，必要时使用 `query` 前缀区分非表字段
+- DAO / Mapper 方法使用 `getBy...`、`listBy...`、`pageBy...`、`countBy...`、`existsBy...` 表达查询语义
 
 ## Open Items
 

@@ -20,31 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-## P0 - 持久化表达改造
-
-- [ ] `docs/30-designs`：持久化迁移手册收尾
-  - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`TODO.md`、治理文档
-  - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
-  - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
-
-- [ ] `docs-architecture-persistence-boundary`：同步架构文档中的持久化边界规则
-  - 范围对象：`docs/00-governance/ARCHITECTURE.md`
-  - 当前依赖：架构文档已固定 `DAO implementation`、Mapper、Mapper XML、`DO/DataObject`、`PersistenceAssembler` 归属 `sandwish-infra`，但尚未明确 `DO` 不承载业务 query、`PersistenceAssembler` 不回填查询对象、Mapper 方法优先显式表达业务语义
-  - 处理动作：在持久化表达改造完成后，将稳定规则补入 `DAO / Mapper` 与 `Entity / VO / DTO` 小节；明确 Redis DAO 属于 infra 持久化实现但不要求新增 Mapper / XML
-  - 验收点：架构文档能指导后续新链路按三层边界落位，不再需要临时迁移手册解释持久化边界
-
-- [ ] `docs-database-query-model-rules`：同步数据库规则中的查询模型和 DO 规则
-  - 范围对象：`docs/00-governance/DATABASE-RULES.md`
-  - 当前依赖：数据库规则已定义 `Entity`、`DO/DataObject`、Mapper XML 和 `PersistenceAssembler` 归属；`Document Requirements` 已要求业务域数据库文档包含 `Query Model Rules`，但尚未固定 DO 查询字段、Mapper 参数和方言 XML 差异处理规则
-  - 处理动作：在各业务域 DO query 消除后，补充 `DO/DataObject` 使用显式字段承载持久化查询条件、Mapper XML 不依赖通用 `query.*` 容器、方言 SQL 差异必须保留并说明的规则
-  - 验收点：数据库治理文档能约束新增或修改 Mapper XML 时的查询条件表达和多方言同步要求
-
-- [ ] `docs-naming-persistence-placement`：同步命名目录规则中的持久化对象细则
-  - 范围对象：`docs/00-governance/NAMING-AND-PLACEMENT-RULES.md`
-  - 当前依赖：命名目录规则已固定 `DO/DataObject`、Mapper、DAO implementation、`PersistenceAssembler` 目录和命名；尚未明确 `DO` 与业务 `Entity` 查询模型的命名边界、显式查询字段命名、公共 DAO 契约收敛后的放置口径
-  - 处理动作：在公共契约和装配器收敛后，补充 DO 显式字段、查询字段命名、DAO / Mapper 显式方法命名和 `PersistenceAssembler` 单向 query 复制规则；同步删除过时的开放项或收窄为具体命名决策
-  - 验收点：命名目录规则能作为新增持久化类、Mapper 方法和装配器方法的直接命名依据
-
 ## P0 - Common / MyBatis-Plus / XML 演进
 
 - [ ] `tree-persistence-boundary-stage-1`：将树嵌套集索引迁入 infra

@@ -76,6 +76,12 @@
 - DAO implementation 负责调用 MyBatis Mapper 并通过 `PersistenceAssembler` 完成模型转换。
 - Service 不感知 `DO/DataObject`。
 - Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
+- `DO/DataObject` 只承载数据库字段、必要关系字段和持久化查询所需的显式字段。
+- `DO/DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不通过父类继承公共查询容器。
+- Mapper 方法查询参数固定为一级显式参数或 `sandwish-infra` 内部 persistence 参数对象。
+- Mapper XML 固定读取一级参数或 persistence 参数对象字段，不读取通用 `query.*`。
+- `PersistenceAssembler` 不负责 `Entity.query` 与 `DO.query` 互转；业务查询条件必须在 Service / DAO implementation 中显式拆解。
+- 多方言 Mapper XML 必须同步维护同一业务语义；确有 SQL 差异时，差异必须保留在对应方言 XML 中，不通过牺牲方言能力强行统一。
 
 ## Index And Uniqueness
 

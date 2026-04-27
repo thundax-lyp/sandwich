@@ -60,7 +60,6 @@ public class DictDaoImpl implements DictDao {
         return mapper.updatePriority(DictPersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Dict entity) {
         return 0;
     }

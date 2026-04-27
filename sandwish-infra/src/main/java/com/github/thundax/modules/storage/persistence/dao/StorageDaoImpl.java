@@ -61,7 +61,6 @@ public class StorageDaoImpl implements StorageDao {
         return 0;
     }
 
-    @Override
     public int updateStatus(Storage entity) {
         return 0;
     }

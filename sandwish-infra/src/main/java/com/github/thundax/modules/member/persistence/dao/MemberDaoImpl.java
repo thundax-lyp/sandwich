@@ -60,7 +60,6 @@ public class MemberDaoImpl implements MemberDao {
         return mapper.updatePriority(MemberPersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Member entity) {
         return 0;
     }

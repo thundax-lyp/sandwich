@@ -61,7 +61,6 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
         return 0;
     }
 
-    @Override
     public int updateStatus(UserEncrypt entity) {
         return 0;
     }

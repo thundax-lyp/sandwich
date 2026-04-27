@@ -60,7 +60,6 @@ public class OfficeDaoImpl implements OfficeDao {
         return mapper.updatePriority(OfficePersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Office entity) {
         return mapper.updateStatus(OfficePersistenceAssembler.toDataObject(entity));
     }

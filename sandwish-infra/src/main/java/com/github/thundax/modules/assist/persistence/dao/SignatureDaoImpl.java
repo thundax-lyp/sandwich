@@ -60,7 +60,6 @@ public class SignatureDaoImpl implements SignatureDao {
         return 0;
     }
 
-    @Override
     public int updateStatus(Signature entity) {
         return 0;
     }

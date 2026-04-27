@@ -60,7 +60,6 @@ public class UploadFileDaoImpl implements UploadFileDao {
         return 0;
     }
 
-    @Override
     public int updateStatus(UploadFile entity) {
         return 0;
     }

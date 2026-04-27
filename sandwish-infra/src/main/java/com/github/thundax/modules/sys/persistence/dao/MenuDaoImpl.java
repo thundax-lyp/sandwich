@@ -60,7 +60,6 @@ public class MenuDaoImpl implements MenuDao {
         return mapper.updatePriority(MenuPersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Menu entity) {
         return mapper.updateStatus(MenuPersistenceAssembler.toDataObject(entity));
     }

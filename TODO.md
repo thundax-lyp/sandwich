@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `common-crud-dao-contract`：收敛通用 Crud DAO 契约
-  - 范围对象：`sandwish-common/.../CrudDao.java`、仍继承 `CrudDao` 的业务 DAO / Mapper、相关 `CrudServiceImpl` 调用点
-  - 当前依赖：`CrudDao<T>` 固定暴露 `get`、`getMany`、`findList`、`insert`、`update`、`updatePriority`、`updateStatus`、`updateDelFlag`、`delete`；剩余继承点包括 `SignatureDao`、`MemberDao`、`StorageDao`、`UserDao`、`RoleDao`、`UserEncryptDao`、`DictDao`、`LogDao`、`UploadFileDao`、`OfficeDao` 以及 `SignatureMapper`、`MemberMapper`、`StorageMapper`
-  - 处理动作：在各业务链路完成显式 Mapper / DAO 方法后，盘点仍需保留的通用读写方法；将无业务语义或只由旧 XML 模板支撑的方法从公共契约中拆出或下沉到具体 DAO；同步 `CrudServiceImpl` 依赖
-  - 验收点：公共 Crud 契约只保留跨业务真实共享的方法；所有剩余继承点有明确业务理由；Admin / Front 包编译通过
-
 - [ ] `common-tree-dao-contract`：收敛通用 Tree DAO 契约
   - 范围对象：`sandwish-common/.../TreeDao.java`、`MenuDao`、菜单树 Mapper XML、已显式化的 `OfficeDao` 对照实现
   - 当前依赖：`TreeDao<T>` 继承 `CrudDao<T>`，并通过 `@Param("node")` 传递树节点对象，统一要求 `getTreeNode`、`updateLftRgt`、`updateParent`、`getMaxPosition`、`moveTreeRgts`、`moveTreeLfts`、`moveTreeNodes`；当前仅 `MenuDao` 仍继承 `TreeDao`

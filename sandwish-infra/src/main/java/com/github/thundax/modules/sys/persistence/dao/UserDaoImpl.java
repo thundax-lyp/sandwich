@@ -61,7 +61,6 @@ public class UserDaoImpl implements UserDao {
         return mapper.updatePriority(UserPersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(User entity) {
         return 0;
     }

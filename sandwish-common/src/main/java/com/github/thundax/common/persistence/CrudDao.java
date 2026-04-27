@@ -61,14 +61,6 @@ public interface CrudDao<T> extends BaseDao {
     int updatePriority(T entity);
 
     /**
-     * 更新状态
-     *
-     * @param entity entity
-     * @return 影响数据数
-     */
-    int updateStatus(T entity);
-
-    /**
      * 更新删除标记
      *
      * @param entity entity

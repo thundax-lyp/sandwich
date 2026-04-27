@@ -60,7 +60,6 @@ public class LogDaoImpl implements LogDao {
         return mapper.updatePriority(LogPersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Log entity) {
         return mapper.updateStatus(LogPersistenceAssembler.toDataObject(entity));
     }

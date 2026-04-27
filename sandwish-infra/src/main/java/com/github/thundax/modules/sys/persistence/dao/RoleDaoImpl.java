@@ -63,7 +63,6 @@ public class RoleDaoImpl implements RoleDao {
         return mapper.updatePriority(RolePersistenceAssembler.toDataObject(entity));
     }
 
-    @Override
     public int updateStatus(Role entity) {
         return mapper.updateStatus(RolePersistenceAssembler.toDataObject(entity));
     }

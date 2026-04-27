@@ -1,10 +1,15 @@
 package com.github.thundax.modules.sys.persistence.cache;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.Dict;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /** 字典缓存支撑。 */
@@ -16,44 +21,61 @@ public class DictCacheSupport {
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.dict.";
     private static final String ID_PREFIX = "id_";
     private static final String VERSION_KEY = "version";
+    private static final String KEY_INDEX = "keys";
 
-    private final RedisClient redisClient;
+    @CreateCache(
+            name = CACHE_SECTION,
+            cacheType = CacheType.REMOTE,
+            expire = OBJECT_EXPIRE_SECONDS,
+            timeUnit = TimeUnit.SECONDS)
+    private Cache<String, Object> cache;
 
-    public DictCacheSupport(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
+    @CreateCache(
+            name = CACHE_SECTION + "keys.",
+            cacheType = CacheType.REMOTE,
+            expire = VERSION_EXPIRE_SECONDS,
+            timeUnit = TimeUnit.SECONDS)
+    private Cache<String, Set<String>> keyIndexCache;
 
     public Dict getById(String id) {
-        return redisClient.get(objectKey(id), Dict.class);
+        return (Dict) cache.get(objectKey(id));
     }
 
     public void putById(Dict dict) {
         if (dict != null && StringUtils.isNotBlank(dict.getId())) {
-            redisClient.set(objectKey(dict.getId()), dict, OBJECT_EXPIRE_SECONDS);
+            String key = objectKey(dict.getId());
+            cache.put(key, dict, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            rememberKey(key);
         }
     }
 
     public void removeById(String id) {
-        redisClient.delete(objectKey(id));
+        String key = objectKey(id);
+        cache.remove(key);
+        forgetKey(key);
         touchVersion();
     }
 
     public void removeAll() {
-        redisClient.deleteByPattern(CACHE_SECTION + "*");
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys != null && !keys.isEmpty()) {
+            cache.removeAll(keys);
+        }
+        keyIndexCache.remove(KEY_INDEX);
         touchVersion();
     }
 
     public String currentVersion() {
-        String version = redisClient.get(versionKey());
+        String version = (String) cache.get(versionKey());
         if (StringUtils.isBlank(version)) {
             version = IdGen.uuid();
-            redisClient.set(versionKey(), version);
+            cache.put(versionKey(), version);
         }
         return version;
     }
 
     public void touchVersion() {
-        redisClient.set(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS);
+        cache.put(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(String id) {
@@ -62,5 +84,25 @@ public class DictCacheSupport {
 
     private String versionKey() {
         return CACHE_SECTION + VERSION_KEY;
+    }
+
+    private void rememberKey(String key) {
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys == null) {
+            keys = new HashSet<>();
+        }
+        if (keys.add(key)) {
+            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        }
+    }
+
+    private void forgetKey(String key) {
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys == null) {
+            return;
+        }
+        if (keys.remove(key)) {
+            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        }
     }
 }

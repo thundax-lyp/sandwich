@@ -1,12 +1,16 @@
 package com.github.thundax.modules.sys.persistence.cache;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /** 用户缓存支撑。 */
@@ -19,56 +23,78 @@ public class UserCacheSupport {
     private static final String ID_PREFIX = "id_";
     private static final String VERSION_KEY = "version";
     private static final String ROLES_PREFIX = ".roles_";
+    private static final String KEY_INDEX = "keys";
 
-    private final RedisClient redisClient;
+    @CreateCache(
+            name = CACHE_SECTION,
+            cacheType = CacheType.REMOTE,
+            expire = OBJECT_EXPIRE_SECONDS,
+            timeUnit = TimeUnit.SECONDS)
+    private Cache<String, Object> cache;
 
-    public UserCacheSupport(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
+    @CreateCache(
+            name = CACHE_SECTION + ".keys.",
+            cacheType = CacheType.REMOTE,
+            expire = VERSION_EXPIRE_SECONDS,
+            timeUnit = TimeUnit.SECONDS)
+    private Cache<String, Set<String>> keyIndexCache;
 
     public User getById(String id) {
-        return redisClient.get(objectKey(id), User.class);
+        return (User) cache.get(objectKey(id));
     }
 
     public void putById(User user) {
         if (user != null && StringUtils.isNotBlank(user.getId())) {
-            redisClient.set(objectKey(user.getId()), user, OBJECT_EXPIRE_SECONDS);
+            String key = objectKey(user.getId());
+            cache.put(key, user, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            rememberKey(key);
         }
     }
 
     public void removeById(String id) {
-        redisClient.delete(objectKey(id));
+        String key = objectKey(id);
+        cache.remove(key);
+        forgetKey(key);
         touchVersion();
     }
 
     public void removeAll() {
-        redisClient.deleteByPattern(CACHE_SECTION + "*");
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys != null && !keys.isEmpty()) {
+            cache.removeAll(keys);
+        }
+        keyIndexCache.remove(KEY_INDEX);
         touchVersion();
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getUserRoleIds(String userId) {
-        return redisClient.get(userRoleIdsKey(userId), new TypeReference<List<String>>() {});
+        return (List<String>) cache.get(userRoleIdsKey(userId));
     }
 
     public void putUserRoleIds(String userId, List<String> roleIds) {
-        redisClient.set(userRoleIdsKey(userId), roleIds);
+        String key = userRoleIdsKey(userId);
+        cache.put(key, roleIds);
+        rememberKey(key);
     }
 
     public void removeUserRoleIds(String userId) {
-        redisClient.delete(userRoleIdsKey(userId));
+        String key = userRoleIdsKey(userId);
+        cache.remove(key);
+        forgetKey(key);
     }
 
     public String currentVersion() {
-        String version = redisClient.get(versionKey());
+        String version = (String) cache.get(versionKey());
         if (StringUtils.isBlank(version)) {
             version = IdGen.uuid();
-            redisClient.set(versionKey(), version);
+            cache.put(versionKey(), version);
         }
         return version;
     }
 
     public void touchVersion() {
-        redisClient.set(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS);
+        cache.put(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(String id) {
@@ -81,5 +107,25 @@ public class UserCacheSupport {
 
     private String versionKey() {
         return CACHE_SECTION + VERSION_KEY;
+    }
+
+    private void rememberKey(String key) {
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys == null) {
+            keys = new HashSet<>();
+        }
+        if (keys.add(key)) {
+            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        }
+    }
+
+    private void forgetKey(String key) {
+        Set<String> keys = keyIndexCache.get(KEY_INDEX);
+        if (keys == null) {
+            return;
+        }
+        if (keys.remove(key)) {
+            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        }
     }
 }

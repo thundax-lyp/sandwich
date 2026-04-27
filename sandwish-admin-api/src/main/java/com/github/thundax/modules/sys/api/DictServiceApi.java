@@ -4,8 +4,11 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
-import com.github.thundax.modules.sys.api.query.DictQueryParam;
-import com.github.thundax.modules.sys.api.vo.DictVo;
+import com.github.thundax.modules.sys.request.DictIdRequest;
+import com.github.thundax.modules.sys.request.DictPageRequest;
+import com.github.thundax.modules.sys.request.DictQueryRequest;
+import com.github.thundax.modules.sys.request.DictSaveRequest;
+import com.github.thundax.modules.sys.response.DictResponse;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +27,7 @@ public interface DictServiceApi {
     /**
      * 获取对象
      *
-     * @param dict 字典
+     * @param request 字典标识请求
      * @return 字典
      * @throws ApiException API异常
      */
@@ -34,13 +37,13 @@ public interface DictServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    DictVo get(@RequestBody @ApiParam("字典") DictVo dict) throws ApiException;
+    DictResponse get(@RequestBody @ApiParam("字典标识请求") DictIdRequest request) throws ApiException;
 
 
     /**
      * 获取列表
      *
-     * @param queryParam 字典查询参数
+     * @param request 字典查询请求
      * @return 字典列表
      * @throws ApiException API异常
      */
@@ -50,13 +53,13 @@ public interface DictServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<DictVo> list(@RequestBody @ApiParam("字典查询参数") DictQueryParam queryParam) throws ApiException;
+    List<DictResponse> list(@RequestBody @ApiParam("字典查询请求") DictQueryRequest request) throws ApiException;
 
 
     /**
      * 获取分页列表
      *
-     * @param queryParam 字典查询参数
+     * @param request 字典分页查询请求
      * @return 分页
      * @throws ApiException API异常
      */
@@ -66,13 +69,13 @@ public interface DictServiceApi {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<DictVo> page(@RequestBody @ApiParam("字典查询参数") DictQueryParam queryParam) throws ApiException;
+    PageVo<DictResponse> page(@RequestBody @ApiParam("字典分页查询请求") DictPageRequest request) throws ApiException;
 
 
     /**
      * 添加
      *
-     * @param dict 字典
+     * @param request 字典保存请求
      * @return 字典
      * @throws ApiException API异常
      */
@@ -82,13 +85,13 @@ public interface DictServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    DictVo add(@RequestBody @ApiParam("字典") DictVo dict) throws ApiException;
+    DictResponse add(@RequestBody @ApiParam("字典保存请求") DictSaveRequest request) throws ApiException;
 
 
     /**
      * 更新
      *
-     * @param dict 字典
+     * @param request 字典保存请求
      * @return 字典
      * @throws ApiException API异常
      */
@@ -98,12 +101,12 @@ public interface DictServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    DictVo update(@RequestBody @ApiParam("字典") DictVo dict) throws ApiException;
+    DictResponse update(@RequestBody @ApiParam("字典保存请求") DictSaveRequest request) throws ApiException;
 
     /**
      * 删除
      *
-     * @param list 字典列表
+     * @param list 字典标识请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -113,7 +116,7 @@ public interface DictServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("字典列表") List<DictVo> list) throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("字典标识请求列表") List<DictIdRequest> list) throws ApiException;
 
 
 }

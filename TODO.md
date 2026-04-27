@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `sys-dict-api`：隔离字典管理 API 模型试点
-  - 范围入口：`DictController`
-  - 当前 API 模型泄漏点：入口直接使用 `DictVo`、`DictQueryParam`；Controller 内存在 `Dict` 到 API 模型转换；新增和更新入口直接复用 `DictVo`
-  - 需要新增或收窄的 `Request`：字典详情、列表查询、分页查询、创建、更新、删除请求
-  - 需要新增或收窄的 `Response`：字典详情响应、字典列表响应、字典分页响应
-  - 需要新增的 `InterfaceAssembler`：`DictInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；验收时 Service 只接收 `Dict` 或稳定业务参数
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `sys-personal-api`：隔离个人中心 API 模型
   - 范围入口：`PersonalApiController`
   - 当前 API 模型泄漏点：入口直接使用 `UserVo`、`UpdatePasswordQueryParam`、`MenuVo`；Controller 内存在当前用户 `User` 到 API 模型转换和菜单响应组装

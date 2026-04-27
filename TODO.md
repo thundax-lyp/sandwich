@@ -20,16 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-current-usage-inventory`：盘点 CrudService 缓存现状
-  - 参考手册：`docs/30-designs/CACHE-INFRA-BOUNDARY-RUNBOOK.md`
-  - 范围对象：`CrudServiceImpl`、12 个直接继承 `CrudServiceImpl` 的 Service、6 条已启用 Redis 缓存的链路、`*ServiceHolder` 缓存方法、非 CrudService 的 `RedisClient` 调用点
-  - 已知启用缓存链路：`Dict`、`Storage`、`Office`、`Menu`、`Role`、`User`
-  - 已知未启用缓存链路：`Member`、`Signature`、`Log`、`UploadFile`、`DefaultUserEncrypt`、`DatabaseUserEncrypt`
-  - 已知公共缓存方法调用：`removeAllCache`、`preload`、`getCacheVersion`
-  - 处理动作：只输出详细现状、调用方、缓存 key/TTL/失效触发点和首条迁移链路建议；不改代码
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：后续迁移链路顺序和不迁移范围明确；非 CrudService 的认证、会话、验证码、登录锁等 Redis 用法被标记为不在本轮范围
 - [ ] `cache-infra-contract-design`：固定 infra 缓存支撑契约
   - 参考手册：`docs/30-designs/CACHE-INFRA-BOUNDARY-RUNBOOK.md`
   - 范围对象：缓存支撑对象命名、包路径、key、TTL、命中、回源、回填、失效和版本策略

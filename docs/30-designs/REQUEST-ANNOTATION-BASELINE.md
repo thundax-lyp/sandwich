@@ -1,24 +1,24 @@
-# Request Annotation Baseline
+# Request 注解规约基线
 
-## Scope
+## 适用范围
 
-Request annotation governance applies to Java classes that match both conditions:
+Request 注解规约适用于同时满足以下条件的 Java 类：
 
-- File name ends with `Request.java`
-- File path is under an API request package, currently `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/request/`
+- 文件名以 `Request.java` 结尾
+- 文件路径位于 API 请求包下，当前为 `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/request/`
 
-Current scan result:
+当前扫描结果：
 
-- Total Request classes: 43
-- Admin API Request classes: 43
-- Front API Request classes: 0
-- Shared, business, infra Request classes: 0
+- Request 类总数：43
+- Admin API Request 类：43
+- Front API Request 类：0
+- Shared、business、infra Request 类：0
 
-If future frontend or shared request models are added under API request packages, they should be included in the same rule unless a separate TODO explicitly narrows the scope.
+如果后续在前台 API 或共享包中新增 API 请求模型，默认纳入同一规约；除非单独 TODO 明确收窄扫描范围。
 
-## Required Class Annotations
+## 必需类级注解
 
-Each Request class should have exactly these class-level annotations:
+每个 Request 类应且仅应声明以下类级注解：
 
 - `@Getter`
 - `@Setter`
@@ -26,16 +26,16 @@ Each Request class should have exactly these class-level annotations:
 - `@JsonInclude(JsonInclude.Include.NON_NULL)`
 - `@JsonIgnoreProperties(ignoreUnknown = true)`
 
-Field-level annotations, such as `@ApiModelProperty`, are outside this baseline and should not be checked by the Request class-level rule.
+字段级注解不属于本基线范围，例如 `@ApiModelProperty` 不应由 Request 类级注解规则检查。
 
-## Current Gaps
+## 当前缺口
 
 `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/request/PersonalAvatarUploadRequest.java`
 
-- Has `@Getter`
-- Has `@Setter`
-- Has `@ApiModel`
-- Missing `@JsonInclude(JsonInclude.Include.NON_NULL)`
-- Missing `@JsonIgnoreProperties(ignoreUnknown = true)`
+- 已有 `@Getter`
+- 已有 `@Setter`
+- 已有 `@ApiModel`
+- 缺少 `@JsonInclude(JsonInclude.Include.NON_NULL)`
+- 缺少 `@JsonIgnoreProperties(ignoreUnknown = true)`
 
-No Request class currently has extra class-level annotations outside the required set.
+当前没有 Request 类声明必需集合外的额外类级注解。

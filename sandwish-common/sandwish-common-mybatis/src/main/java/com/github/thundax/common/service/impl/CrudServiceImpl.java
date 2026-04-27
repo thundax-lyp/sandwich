@@ -2,15 +2,12 @@ package com.github.thundax.common.service.impl;
 
 import com.github.pagehelper.ISelect;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -30,25 +27,13 @@ import java.util.function.Function;
 @Transactional(readOnly = true)
 public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity<T>> extends BaseServiceImpl {
 
-    protected static final int MAX_BATCH_COUNT = 500;
-    private static final int DEFAULT_CACHE_EXPIRE_SECONDS = 3600;
-
-    private static final String CACHE_VERSION = "version";
-
-    public CrudServiceImpl(D dao, RedisClient redisClient) {
+    public CrudServiceImpl(D dao) {
         this.dao = dao;
-        this.redisClient = redisClient;
     }
 
     private Class<T> elementType;
 
     protected D dao;
-
-    protected RedisClient redisClient;
-
-    protected String cacheSection;
-    protected String cacheKeyPrefix;
-    protected int cacheExpireSeconds;
 
     @PostConstruct
     @SuppressWarnings("unchecked")
@@ -59,13 +44,6 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
             if (params[1] instanceof Class) {
                 elementType = (Class<T>) params[1];
             }
-        }
-
-        if (isRedisCacheEnabled()) {
-            cacheSection = this.getCacheSection();
-            cacheKeyPrefix = this.getCacheKeyPrefix();
-            cacheExpireSeconds = this.getCacheExpireSeconds();
-            redisClient.delete(this.cacheSection);
         }
 
         initialize();
@@ -90,138 +68,11 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
 
     }
 
-    // 是否开启redis缓存
-
-    /**
-     * 是否开启redis缓存
-     *
-     * @return true:开启；false:不开启
-     */
-    protected boolean isRedisCacheEnabled() {
-        return false;
-    }
-
-    /**
-     * 设置Cache域名
-     *
-     * @return cache域名，一般设置为Constance.CACHE_PREFIX + sectionName
-     */
-    protected String getCacheSection() {
-        return getClass().getName() + "_";
-    }
-
-    protected String getCacheKey(T entity) {
-        return String.valueOf(entity.getId());
-    }
-
-    /**
-     * 获取对象的Cache key
-     */
-    private String getCacheKeyPrefix() {
-        return "id_";
-    }
-
-    /**
-     * 获取对象的Cache的expire seconds
-     */
-    protected int getCacheExpireSeconds() {
-        return DEFAULT_CACHE_EXPIRE_SECONDS;
-    }
-
-    private T getRedisCache(T entity) {
-        return redisClient.get(cacheSection + cacheKeyPrefix + getCacheKey(entity), elementType);
-    }
-
-    protected void putRedisCache(T entity) {
-        redisClient.set(cacheSection + cacheKeyPrefix + getCacheKey(entity), entity, cacheExpireSeconds);
-    }
-
-    protected void removeRedisCache(T entity) {
-        redisClient.delete(cacheSection + cacheKeyPrefix + getCacheKey(entity));
-        updateCacheVersion();
-    }
-
-    public void removeAllCache() {
-        if (isRedisCacheEnabled()) {
-            redisClient.deleteByPattern(cacheSection + "*");
-            updateCacheVersion();
-        }
-    }
-
-    private void updateCacheVersion() {
-        redisClient.set(cacheSection + CACHE_VERSION, IdGen.uuid(), cacheExpireSeconds + 5);
-    }
-
-    public String getCacheVersion() {
-        String cacheVersion = redisClient.get(cacheSection + CACHE_VERSION);
-        if (StringUtils.isBlank(cacheVersion)) {
-            cacheVersion = IdGen.uuid();
-            redisClient.set(getCacheSection() + CACHE_VERSION, cacheVersion);
-        }
-        return cacheVersion;
-    }
-
-    protected void putCache(T entity) {
-        if (isRedisCacheEnabled()) {
-            putRedisCache(entity);
-        }
-    }
-
-    protected void removeCache(T entity) {
-        if (isRedisCacheEnabled()) {
-            removeRedisCache(entity);
-        }
-    }
-
-    /**
-     * 预加载数据
-     */
-    public void preload(Collection<String> ids) {
-        if (!isRedisCacheEnabled()) {
-            logger.warn("called [preload], but redis cache is disabled.");
-            return;
-        }
-
-        List<String> uncachedIdList = Lists.newArrayList();
-
-        ids.forEach(id -> {
-            T entity = getRedisCache(newEntity(id));
-            if (entity == null) {
-                uncachedIdList.add(id);
-            }
-        });
-
-        if (ListUtils.isNotEmpty(uncachedIdList)) {
-            int pageSize = MAX_BATCH_COUNT;
-            int totalPage = (uncachedIdList.size() + pageSize - 1) / pageSize;
-            for (int pageNo = 0; pageNo < totalPage; pageNo++) {
-                List<String> pageIdList = ListUtils.subList(uncachedIdList, pageSize * pageNo, pageSize);
-                dao.getMany(pageIdList).forEach(this::putCache);
-            }
-        }
-    }
-
     /**
      * 获取单条数据
      */
     public T get(T query) {
-        T entity;
-
-        if (isRedisCacheEnabled()) {
-            entity = getRedisCache(query);
-            if (entity != null) {
-                return entity;
-            }
-        }
-
-        entity = dao.get(query);
-        if (entity != null) {
-            if (isRedisCacheEnabled()) {
-                putRedisCache(entity);
-            }
-        }
-
-        return entity;
+        return dao.get(query);
     }
 
 
@@ -240,35 +91,7 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
      * 获取单条数据
      */
     public List<T> getMany(List<String> ids) {
-        List<T> entities = ListUtils.newArrayList();
-
-        List<String> uncachedIdList = Lists.newArrayList();
-        for (String id : ids) {
-            T entity = null;
-            T query = newEntity(id);
-
-            if (isRedisCacheEnabled()) {
-                entity = getRedisCache(query);
-                if (entity != null) {
-                    entities.add(entity);
-                }
-            }
-
-            if (entity == null) {
-                uncachedIdList.add(id);
-            }
-        }
-
-        if (ListUtils.isNotEmpty(uncachedIdList)) {
-            dao.getMany(uncachedIdList).forEach(entity -> {
-                if (isRedisCacheEnabled()) {
-                    putRedisCache(entity);
-                }
-                entities.add(entity);
-            });
-        }
-
-        return entities;
+        return dao.getMany(ids);
     }
 
 
@@ -341,8 +164,6 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
             entity.preUpdate();
             dao.update(entity);
         }
-
-        removeCache(entity);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -350,9 +171,6 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
         entity.preUpdate();
 
         int count = dao.updatePriority(entity);
-
-        removeCache(entity);
-
         return count;
     }
 
@@ -366,9 +184,6 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
         entity.preUpdate();
 
         int count = dao.updateDelFlag(entity);
-
-        removeCache(entity);
-
         return count;
     }
 
@@ -380,9 +195,6 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
     @Transactional(rollbackFor = Exception.class)
     public int delete(T entity) {
         int count = dao.delete(entity);
-
-        removeCache(entity);
-
         return count;
     }
 

@@ -5,7 +5,6 @@ import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -26,8 +25,8 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
     private final SignService signService;
 
     @Autowired
-    public MenuServiceImpl(MenuDao dao, RedisClient redisClient, SignService signService) {
-        super(dao, redisClient);
+    public MenuServiceImpl(MenuDao dao, SignService signService) {
+        super(dao);
         this.signService = signService;
     }
 

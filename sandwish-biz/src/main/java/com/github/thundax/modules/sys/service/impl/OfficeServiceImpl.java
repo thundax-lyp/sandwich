@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.OfficeService;
@@ -15,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implements OfficeService {
 
-    public OfficeServiceImpl(OfficeDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public OfficeServiceImpl(OfficeDao dao) {
+        super(dao);
     }
 
     @Override

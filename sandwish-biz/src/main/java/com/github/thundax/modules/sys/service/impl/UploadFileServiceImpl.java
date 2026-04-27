@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.service.UploadFileService;
@@ -17,8 +16,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UploadFileServiceImpl extends CrudServiceImpl<UploadFileDao, UploadFile> implements UploadFileService {
 
-    public UploadFileServiceImpl(UploadFileDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public UploadFileServiceImpl(UploadFileDao dao) {
+        super(dao);
     }
 
     @Override

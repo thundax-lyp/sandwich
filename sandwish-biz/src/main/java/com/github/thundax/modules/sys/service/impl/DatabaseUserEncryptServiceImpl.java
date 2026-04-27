@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
@@ -31,8 +30,8 @@ public class DatabaseUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptD
     public static final String QUEUE_ENCRYPT_QUERY = QUEUE_PREFIX + "encrypt.db.query";
     protected final AmqpTemplate amqpTemplate;
 
-    public DatabaseUserEncryptServiceImpl(UserEncryptDao dao, RedisClient redisClient, AmqpTemplate amqpTemplate) {
-        super(dao, redisClient);
+    public DatabaseUserEncryptServiceImpl(UserEncryptDao dao, AmqpTemplate amqpTemplate) {
+        super(dao);
         this.amqpTemplate = amqpTemplate;
     }
 

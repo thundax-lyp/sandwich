@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
@@ -20,8 +19,8 @@ import java.util.List;
 public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implements MemberService {
 
     @Autowired
-    public MemberServiceImpl(MemberDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public MemberServiceImpl(MemberDao dao) {
+        super(dao);
     }
 
     @Override

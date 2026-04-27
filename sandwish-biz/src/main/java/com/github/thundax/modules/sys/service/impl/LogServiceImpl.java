@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
@@ -22,8 +21,8 @@ public class LogServiceImpl extends CrudServiceImpl<LogDao, Log> implements LogS
     private static final int BATCH_INSERT_SIZE = 50;
     private final SignService signService;
 
-    public LogServiceImpl(LogDao dao, RedisClient redisClient, SignService signService) {
-        super(dao, redisClient);
+    public LogServiceImpl(LogDao dao, SignService signService) {
+        super(dao);
         this.signService = signService;
     }
 

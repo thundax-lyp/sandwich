@@ -6,7 +6,6 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -37,8 +36,8 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
      */
     private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
-    public RoleServiceImpl(RoleDao dao, RedisClient redisClient, SignService signService) {
-        super(dao, redisClient);
+    public RoleServiceImpl(RoleDao dao, SignService signService) {
+        super(dao);
         this.signService = signService;
     }
 

@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
@@ -25,8 +24,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
     private final SignService signService;
     private final UserEncryptService userEncryptService;
 
-    public UserServiceImpl(UserDao dao, RedisClient redisClient, SignService signService, UserEncryptService userEncryptService) {
-        super(dao, redisClient);
+    public UserServiceImpl(UserDao dao, SignService signService, UserEncryptService userEncryptService) {
+        super(dao);
         this.signService = signService;
         this.userEncryptService = userEncryptService;
     }

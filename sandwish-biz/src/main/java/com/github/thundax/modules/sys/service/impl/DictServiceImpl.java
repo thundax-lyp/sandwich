@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
@@ -19,8 +18,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements DictService {
 
-    public DictServiceImpl(DictDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public DictServiceImpl(DictDao dao) {
+        super(dao);
     }
 
     @Override

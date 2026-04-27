@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -18,8 +17,8 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class StorageServiceImpl extends CrudServiceImpl<StorageDao, Storage> implements StorageService {
 
-    public StorageServiceImpl(StorageDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public StorageServiceImpl(StorageDao dao) {
+        super(dao);
     }
 
     @Override

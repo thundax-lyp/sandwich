@@ -2,7 +2,6 @@ package com.github.thundax.common.service;
 
 import com.github.thundax.common.persistence.Page;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,13 +24,6 @@ public interface CrudService<T> extends BaseService {
      * @return 对象
      */
     T newEntity(String id);
-
-    /**
-     * 如果设置了缓存，则预加载数据
-     *
-     * @param idList id list
-     */
-    void preload(Collection<String> idList);
 
     /**
      * 获取对象
@@ -144,17 +136,5 @@ public interface CrudService<T> extends BaseService {
      * @return 影响记录数
      */
     int updateDelFlag(List<T> list);
-
-    /**
-     * 清除缓存
-     */
-    void removeAllCache();
-
-    /**
-     * 获取版本号
-     *
-     * @return 版本号
-     */
-    String getCacheVersion();
 
 }

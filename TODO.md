@@ -19,11 +19,3 @@
    - 按任务补测试、文档同步和小步提交
 
 ## P0 - Cache / Infra 边界演进
-
-- [ ] `crud-service-cache-method-removal`：删除 CrudService 缓存公共契约
-  - 依赖前置：完成所有 CrudService 缓存链路迁移和 Holder 缓存入口收窄
-  - 范围对象：`CrudService`、`CrudServiceImpl` 中的缓存字段、构造器参数和方法
-  - 处理动作：删除 `removeAllCache`、`preload`、`getCacheVersion`、`isRedisCacheEnabled`、Redis cache get/put/remove/version 相关实现；同步调整构造器依赖
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：是
-  - 验收点：`CrudServiceImpl` 不再依赖 `RedisClient`，Service 公共契约不再暴露缓存能力

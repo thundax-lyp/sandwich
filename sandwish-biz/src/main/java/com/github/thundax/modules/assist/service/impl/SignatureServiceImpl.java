@@ -2,7 +2,6 @@ package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
@@ -18,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature> implements SignatureService {
 
-    public SignatureServiceImpl(SignatureDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public SignatureServiceImpl(SignatureDao dao) {
+        super(dao);
     }
 
 

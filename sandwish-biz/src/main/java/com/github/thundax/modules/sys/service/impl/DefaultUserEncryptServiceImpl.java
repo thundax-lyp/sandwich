@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.service.impl.CrudServiceImpl;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
@@ -18,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DefaultUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt> implements UserEncryptService {
 
 
-    public DefaultUserEncryptServiceImpl(UserEncryptDao dao, RedisClient redisClient) {
-        super(dao, redisClient);
+    public DefaultUserEncryptServiceImpl(UserEncryptDao dao) {
+        super(dao);
     }
 
 

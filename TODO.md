@@ -18,9 +18,15 @@
 4. 质量与交付闭环
    - 按任务补测试、文档同步和小步提交
 
-## P0 - ArchUnit / 模型注解规约
+## P0 - Common Test / ArchUnit 模型注解规约
 
+- [ ] `common-test-baseline-module`：建立基础测试规约模块
+  - 参考对象：`../bacon/bacon-common/bacon-common-test`
+  - 范围对象：`sandwish-common` 聚合模块、根 `pom.xml`、`sandwish-common/sandwish-common-test`、基础 ArchUnit testcase 目录、各可测试 Maven 子模块 `pom.xml`
+  - 处理动作：新增 `sandwish-common-test` 模块，用于承载基础规约、ArchUnit testcase 和跨模块测试支撑；各模块统一以 test scope 引入 `sandwish-common-test`；只建立最小可编译测试骨架，不迁移具体业务规则
+  - 验收点：后续 ArchUnit 规则有统一落点；`sandwish-common-core`、`sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api` 均已引入 `sandwish-common-test`
 - [ ] `archunit-request-annotation-baseline`：盘点 Request 注解规约适用范围
+  - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：后台与前台 API 入口模块中的 `Request` 类、复用请求模型和历史非标准请求对象
   - 处理动作：确认哪些类应受 `NAME_REQUEST_REQUIRED_ANNOTATIONS` 约束，并识别已有额外类级注解或缺失注解
   - 验收点：Request 注解门禁的扫描范围明确，额外注解处理方式明确
@@ -35,6 +41,7 @@
   - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
   - 验收点：ArchUnit 规则通过；Request 序列化和反序列化语义保持稳定
 - [ ] `archunit-response-annotation-baseline`：盘点 Response 注解规约适用范围
+  - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：后台与前台 API 入口模块中的 `Response` 类、复用响应模型和历史非标准响应对象
   - 处理动作：确认哪些类应受 `NAME_RESPONSE_REQUIRED_ANNOTATIONS` 约束，并识别已有额外类级注解或缺失注解
   - 验收点：Response 注解门禁的扫描范围明确，额外注解处理方式明确
@@ -49,6 +56,7 @@
   - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
   - 验收点：ArchUnit 规则通过；Response 序列化语义保持稳定
 - [ ] `archunit-do-annotation-baseline`：盘点 DO 注解规约适用范围
+  - 依赖前置：完成 `common-test-baseline-module`
   - 范围对象：`sandwish-infra` 下 `persistence.dataobject` 包、现有 `DO/DataObject`、Redis 持久化对象和数据库表映射对象
   - 处理动作：确认哪些对象必须补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`，并记录 Redis-only DO 是否需要改名或迁移出 DO 命名体系
   - 验收点：ArchUnit 规则的扫描范围和例外边界明确，不在实现阶段临时扩大或缩小口径

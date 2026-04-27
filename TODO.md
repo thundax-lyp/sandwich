@@ -27,15 +27,8 @@
 - 前台 session/cache 使用 `sandwish-common-cache` 的 JetCache 基线，不直接接触 Redis。
 - 每一步完成后删除、拆分或收窄对应 TODO，并小步提交。
 
-- [ ] `front-member-authentication-provider`：迁移会员认证到 Spring Security
-  - 依赖前置：已建立 `front-spring-security` profile 下的 Spring Security filter chain 基线
-  - 范围对象：`MemberAuthenticationFilter`、`MemberAuthorizingRealm`、会员认证 provider/service
-  - 处理动作：将会员装载、启用状态校验、默认密码兼容、RSA 解密和登录失败语义迁到 Spring Security 认证链路
-  - 允许删除 Shiro：否
-  - 允许删除 Redis：否
-  - 验收点：登录认证不依赖 `AuthorizingRealm`
 - [ ] `front-member-security-context-migration`：迁移前台会员上下文读取
-  - 依赖前置：完成 `front-member-authentication-provider`
+  - 依赖前置：`front-spring-security` profile 下的登录认证已迁到 Spring Security provider/filter
   - 范围对象：`LoginController`、`LogoutController`、`MemberAccessServiceImpl`、`ShiroUtils` 调用点
   - 处理动作：用 Spring Security principal 和 `SecurityContextHolder` 替代 Shiro `Subject` / `Session` 读取；`testlogin` 改为 Spring Security 方式或删除
   - 允许删除 Shiro：否

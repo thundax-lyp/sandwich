@@ -21,13 +21,13 @@
 ## P0 - Cache / Infra 边界演进
 
 - [ ] `spring-security-permission-migration`：用 Spring Security 替换后台自研权限链路
-  - 依赖前置：`sandwish-common-security` 已提供权限前缀匹配规则
-  - 范围对象：后台 token filter、权限注解、`PermissionService`、权限 Redis DAO/infra 实现、旧 `Subject` 权限链路
-  - 处理动作：保留 `role -> menu -> permissions`、默认 `user/admin/super` 和冒号前缀权限语义；登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`
+  - 依赖前置：`PermissionService -> PermissionDao -> PermissionDaoImpl` 已提供权限会话和 Redis TTL/touch 能力
+  - 范围对象：后台 token filter、权限注解、旧 `Subject` 权限链路、旧权限 AOP、失效权限/Redis 迁移 runbook
+  - 处理动作：登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`；删除旧 `RequiresRoles`、`Logical.OR`、旧权限 AOP、`SubjectServiceImpl` 权限缓存链路；删除或收窄已失效的 Redis subject cache runbook 内容
   - 允许引入 Spring Security：是
   - 允许迁移 `RequiresRoles`：否
   - 允许删除旧权限 AOP：完成新注解全量替换后允许
-  - 验收点：后台 Controller 不再依赖自研权限 AOP，权限会话由 `PermissionService -> PermissionDao -> PermissionDaoImpl` 管理，controller/service 不直接触碰 Redis
+  - 验收点：后台 Controller 不再依赖自研权限 AOP，权限会话由 `PermissionService -> PermissionDao -> PermissionDaoImpl` 管理，controller/service 不直接触碰 Redis；全仓无旧权限注解 import；失效 runbook 和 TODO 不再指向旧 Subject Redis 迁移
 - [ ] `redis-client-front-session-dict-migration`：移除前台工具对 RedisClient 的直接依赖
   - 依赖前置：完成后台权限整改中的权限会话 Redis 收敛
   - 范围对象：`SessionCacheServiceImpl`、Session 存储实现、`DictUtils`

@@ -10,7 +10,7 @@ import java.util.List;
  * @param <T>
  * @author thundax
  */
-public interface CrudDao<T> extends BaseDao {
+public interface CrudDao<T> {
 
     /**
      * 获取单条数据

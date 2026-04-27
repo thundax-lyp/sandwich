@@ -27,15 +27,8 @@
 - 前台 session/cache 使用 `sandwish-common-cache` 的 JetCache 基线，不直接接触 Redis。
 - 每一步完成后删除、拆分或收窄对应 TODO，并小步提交。
 
-- [ ] `front-security-dependency-baseline`：建立 front-api Spring Security 依赖基线
-  - 依赖前置：`docs/30-designs/FRONT-SPRING-SECURITY-RUNBOOK.md`
-  - 范围对象：`sandwish-front-api/pom.xml`、`docs/00-governance/ARCHITECTURE.md`
-  - 处理动作：增加 `sandwish-common-security` 和 `spring-boot-starter-security` 依赖；架构文档放开 `sandwish-front-api -> sandwish-common-security -> sandwish-common-core`
-  - 允许删除 Shiro：否
-  - 允许删除 Redis：否
-  - 验收点：`mvn -q -pl sandwish-front-api -am compile -DskipTests` 通过
 - [ ] `front-security-filter-baseline`：建立前台 Spring Security filter chain 基线
-  - 依赖前置：完成 `front-security-dependency-baseline`
+  - 依赖前置：front-api 已接入 `sandwish-common-security` 和 `spring-boot-starter-security`
   - 范围对象：`FrontSpringSecurityConfiguration`、前台路径访问规则
   - 处理动作：建立与现有 Shiro chain 等价的路径规则；匿名、登录、登出、会员保护路径固定；迁移期避免两个安全过滤器不可解释地处理同一路径
   - 允许删除 Shiro：否

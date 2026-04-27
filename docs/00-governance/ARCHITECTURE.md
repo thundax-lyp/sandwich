@@ -237,6 +237,8 @@ Spring Security 迁移链路允许入口模块依赖：
 
 `sandwish-admin-api -> sandwish-common-security -> sandwish-common-core`
 
+`sandwish-front-api -> sandwish-common-security -> sandwish-common-core`
+
 禁止依赖方向：
 
 - `sandwish-common` 及其子模块不得依赖任何业务或入口模块。

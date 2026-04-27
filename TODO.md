@@ -83,6 +83,12 @@
 
 ## P0 - Common / MyBatis-Plus / XML 演进
 
+- [ ] `tree-persistence-boundary-stage-1`：将树嵌套集索引迁入 infra
+  - 参考手册：`docs/30-designs/TREE-PERSISTENCE-BOUNDARY-RUNBOOK.md`
+  - 范围对象：`Office` / `Menu` 树链路、`TreeEntity`、`AdminTreeEntity`、`TreeServiceImpl`、`TreeDao`、`OfficeDO`、`MenuDO`、`OfficeMapper`、`MenuMapper`
+  - 处理动作：先迁移 `Office`，再迁移 `Menu`；`parentId` 保留在业务实体中；`lft` / `rgt` 只保留在 DO、Mapper 和 infra 树持久化实现中；Service 不再计算 nested-set 区间
+  - 验收点：Admin / Front 包编译通过；业务实体不再暴露 `lft` / `rgt`；现有 XML 尚未删除；MyBatis-Plus 尚未引入
+
 - [ ] `common-split-stage-1`：执行 common 第一阶段分拆
   - 参考手册：`docs/30-designs/COMMON-SPLIT-RUNBOOK.md`
   - 范围对象：root `pom.xml`、`sandwish-common`、新增 `sandwish-common-core`、新增 `sandwish-common-mybatis`、依赖 `sandwish-common` 的业务模块

@@ -2,8 +2,8 @@ package com.github.thundax.modules.assist.api;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.modules.assist.api.vo.PublicKeyVo;
-import com.github.thundax.modules.auth.api.vo.AccessTokenVo;
+import com.github.thundax.modules.assist.request.KeypairPublicKeyRequest;
+import com.github.thundax.modules.assist.response.KeypairPublicKeyResponse;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,7 +24,7 @@ public interface KeypairServiceApi {
     /**
      * 获取公钥
      *
-     * @param token 用户令牌
+     * @param request 公钥获取请求
      * @return 公钥
      * @throws ApiException API异常
      */
@@ -34,7 +34,7 @@ public interface KeypairServiceApi {
     })
     @SysLogger("获取公钥")
     @RequestMapping(value = "public", method = RequestMethod.POST)
-    PublicKeyVo publicKey(@RequestBody AccessTokenVo token) throws ApiException;
+    KeypairPublicKeyResponse publicKey(@RequestBody KeypairPublicKeyRequest request) throws ApiException;
 
 
 

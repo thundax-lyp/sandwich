@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `assist-keypair-api`：隔离密钥 API 模型
-  - 范围入口：`KeypairApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `AccessTokenVo`、`PublicKeyVo`；Controller 内存在令牌校验和公钥响应组装
-  - 需要新增或收窄的 `Request`：公钥获取请求
-  - 需要新增或收窄的 `Response`：公钥响应
-  - 需要新增的 `InterfaceAssembler`：`KeypairInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；认证令牌转换保持在入口模块
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `assist-async-task-api`：隔离异步任务 API 模型
   - 范围入口：`AsyncTaskApiController`
   - 当前 API 模型泄漏点：入口直接使用 `AsyncTaskVo`；Controller 内存在 `AsyncTask` 到 API 模型转换

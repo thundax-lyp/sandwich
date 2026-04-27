@@ -244,7 +244,7 @@ TTL 常量归属对应 `<BusinessObject>CacheSupport`。
 
 本设计为 `common-cache-boundary-decision` 提供以下判断输入：
 
-- 原始可落地方案不要求先建立 `sandwish-common-cache`；当前 RedisClient 替换主线已改为先建立 common-cache JetCache 基线。
+- 缓存基础设施固定由 `sandwish-common-cache` 提供 JetCache 基线，业务缓存语义仍归属 infra DAO/cache support。
 - 首条 `Dict` 迁移只需要一个业务专用 `DictCacheSupport`。
 - `Storage`、`Office`、`Menu`、`Role`、`User` 后续可能复用 key、TTL 和缓存操作抽象，但复用价值必须在至少一条链路迁移后再判断。
 - 当前阶段缓存 key、失效时机和版本策略均带业务语义，固定留在 infra。

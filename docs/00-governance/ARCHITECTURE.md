@@ -106,7 +106,7 @@ Sandwich 固定采用三层 API 架构。
 - 可以依赖 `sandwish-common-core`。
 - 不承载业务 cache support。
 - 不承载具体业务 key、TTL、版本号、回源和失效策略。
-- 不暴露 Redis API、`StringRedisTemplate`、`RedisTemplate` 或 `RedisClient` 替代封装。
+- 不暴露 Redis API、`StringRedisTemplate`、`RedisTemplate` 或通用 Redis 客户端替代封装。
 - 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-mybatis`

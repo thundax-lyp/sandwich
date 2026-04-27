@@ -207,6 +207,23 @@ rg -n "com.github.thundax.common.utils.redis.RedisClient|RedisClient" sandwish-c
 mvn -q -pl sandwish-admin-api,sandwish-front-api -am compile -DskipTests
 ```
 
+### Step 10: Cleanup Migration Scene
+
+删除 RedisClient 后做现场清理：
+
+- 删除或收窄过期 RedisClient runbook。
+- 清理 `TODO.md` 中已完成的迁移任务，只保留下一阶段明确任务。
+- 移除不再需要的 Redis Maven 依赖和配置。
+- 清理空包目录、无效 `.gitkeep` 和过时说明。
+- 保留本文档作为 common-cache 最终运行说明。
+
+验收：
+
+```bash
+rg -n "RedisClient|common.utils.redis" docs TODO.md sandwish-common sandwish-biz sandwish-infra sandwish-admin-api sandwish-front-api -g '*.java' -g '*.md' -g 'pom.xml'
+git status --short
+```
+
 ## 5. Verification
 
 每一步至少运行：

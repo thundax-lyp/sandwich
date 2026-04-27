@@ -89,6 +89,13 @@
   - 允许引入 JetCache：否
   - 允许删除 `RedisClient`：是
   - 验收点：全仓无 `com.github.thundax.common.utils.redis.RedisClient` import，common-core 不再暴露 Redis 客户端封装
+- [ ] `common-cache-migration-cleanup`：收尾清理 common-cache 迁移现场
+  - 依赖前置：完成 `redis-client-common-deletion`
+  - 范围对象：过期 RedisClient runbook、缓存边界文档、TODO 已完成项、Maven 依赖、应用配置、无效 package 和 `.gitkeep`
+  - 处理动作：删除或收窄旧 RedisClient/infra adapter 文档；移除不再需要的 `spring-boot-starter-data-redis` 依赖；删除完成的 TODO 项或改写为下一阶段明确任务；清理空目录占位文件；保留 `COMMON-CACHE-JETCACHE-RUNBOOK.md` 作为最终运行说明
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：已完成后执行
+  - 验收点：`rg -n "RedisClient|common.utils.redis" docs TODO.md sandwish-common sandwish-biz sandwish-infra sandwish-admin-api sandwish-front-api -g '*.java' -g '*.md' -g 'pom.xml'` 仅保留历史说明或无输出；`git status --short` 干净
 
 ## P0 - Security / Permission 收敛
 

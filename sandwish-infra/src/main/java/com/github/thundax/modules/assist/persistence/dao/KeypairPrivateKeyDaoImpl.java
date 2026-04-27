@@ -1,27 +1,27 @@
 package com.github.thundax.modules.assist.persistence.dao;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
 /** 公私钥私钥临时存储 Redis DAO 实现。 */
 @Repository
 public class KeypairPrivateKeyDaoImpl implements KeypairPrivateKeyDao {
 
-    private final RedisClient redisClient;
-
-    public KeypairPrivateKeyDaoImpl(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
+    @CreateCache(name = Constants.CACHE_PRIVATE_KEY, cacheType = CacheType.REMOTE)
+    private Cache<String, String> cache;
 
     @Override
     public void save(String token, String privateKey, int expiredSeconds) {
-        redisClient.set(Constants.CACHE_PRIVATE_KEY + token, privateKey, expiredSeconds);
+        cache.put(token, privateKey, expiredSeconds, TimeUnit.SECONDS);
     }
 
     @Override
     public String getByToken(String token) {
-        return redisClient.get(Constants.CACHE_PRIVATE_KEY + token);
+        return cache.get(token);
     }
 }

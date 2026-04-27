@@ -1,11 +1,14 @@
 package com.github.thundax.modules.assist.persistence.dao;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersistenceAssembler;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
 /** 异步任务 Redis DAO 实现。 */
@@ -14,29 +17,26 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "assist.asyncTask.";
 
-    private final RedisClient redisClient;
-
-    public AsyncTaskDaoImpl(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
+    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
+    private Cache<String, AsyncTaskDO> cache;
 
     @Override
     public AsyncTask get(String id) {
-        return AsyncTaskPersistenceAssembler.toEntity(
-                redisClient.get(cacheKey(id), AsyncTaskDO.class));
+        return AsyncTaskPersistenceAssembler.toEntity(cache.get(cacheKey(id)));
     }
 
     @Override
     public void save(AsyncTask asyncTask) {
-        redisClient.set(
+        cache.put(
                 cacheKey(asyncTask.getId()),
                 AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
-                asyncTask.getExpiredSeconds());
+                asyncTask.getExpiredSeconds(),
+                TimeUnit.SECONDS);
     }
 
     @Override
     public void delete(AsyncTask asyncTask) {
-        redisClient.delete(cacheKey(asyncTask.getId()));
+        cache.remove(cacheKey(asyncTask.getId()));
     }
 
     private String cacheKey(String id) {

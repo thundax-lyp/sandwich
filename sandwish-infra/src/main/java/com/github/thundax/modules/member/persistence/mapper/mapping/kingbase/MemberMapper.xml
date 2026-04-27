@@ -83,28 +83,26 @@
         FROM tb_member a
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.enableFlag != null and query.enableFlag != ''">
-                    AND a.enable_flag = #{query.enableFlag}
-                </if>
-                <if test="query.email != null and query.email != ''">
-                    AND a.email LIKE CONCAT('%', #{query.email}, '%')
-                </if>
-                <if test="query.name != null and query.name != ''">
-                    AND a.name LIKE CONCAT('%', #{query.name}, '%')
-                </if>
-                <if test="query.remarks != null and query.remarks != ''">
-                    AND a.remarks LIKE CONCAT('%', #{query.remarks}, '%')
-                </if>
-                <if test="query.beginRegisterDate != null and query.endRegisterDate != null">
-                    AND a.register_date BETWEEN #{query.beginRegisterDate} AND #{query.endRegisterDate}
-                </if>
-                <if test="query.beginLoginDate != null and query.endLoginDate != null">
-                    AND a.last_login_date BETWEEN #{query.beginLoginDate} AND #{query.endLoginDate}
-                </if>
-                <if test="query.mobile != null and query.mobile != ''">
-                    and a.mobile = #{query.mobile}
-                </if>
+            <if test="queryEnableFlag != null and queryEnableFlag != ''">
+                AND a.enable_flag = #{queryEnableFlag}
+            </if>
+            <if test="queryEmail != null and queryEmail != ''">
+                AND a.email LIKE CONCAT('%', #{queryEmail}, '%')
+            </if>
+            <if test="queryName != null and queryName != ''">
+                AND a.name LIKE CONCAT('%', #{queryName}, '%')
+            </if>
+            <if test="queryRemarks != null and queryRemarks != ''">
+                AND a.remarks LIKE CONCAT('%', #{queryRemarks}, '%')
+            </if>
+            <if test="queryBeginRegisterDate != null and queryEndRegisterDate != null">
+                AND a.register_date BETWEEN #{queryBeginRegisterDate} AND #{queryEndRegisterDate}
+            </if>
+            <if test="queryBeginLoginDate != null and queryEndLoginDate != null">
+                AND a.last_login_date BETWEEN #{queryBeginLoginDate} AND #{queryEndLoginDate}
+            </if>
+            <if test="queryMobile != null and queryMobile != ''">
+                and a.mobile = #{queryMobile}
             </if>
         </where>
         ORDER BY a.priority, a.email
@@ -236,7 +234,7 @@
         SELECT
         <include refid="memberColumns" />
         FROM tb_member a
-        WHERE a.zjhm = #{query.zjhm}
+        WHERE a.zjhm = #{queryZjhm}
     </select>
 
 </mapper>

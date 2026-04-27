@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `member-persistence`：收敛会员持久化表达
-  - 范围对象：`MemberService`、`MemberServiceImpl`、`MemberDao`、`MemberDaoImpl`、`MemberMapper`、`mapper/mapping/mysql/MemberMapper.xml`、`mapper/mapping/dameng/MemberMapper.xml`、`mapper/mapping/kingbase/MemberMapper.xml`、`MemberDO`、`MemberPersistenceAssembler`
-  - 当前依赖：`MemberService extends CrudService<Member>`；`MemberServiceImpl extends CrudServiceImpl<MemberDao, Member>`；`MemberDao extends CrudDao<Member>`；`MemberMapper extends CrudDao<MemberDO>`；`MemberDO extends AdminDataEntity<MemberDO>`；`MemberDO.Query` 承载 `enableFlag`、`email`、`name`、`remarks`、`beginRegisterDate`、`endRegisterDate`、`beginLoginDate`、`endLoginDate`、`ywtbId`、`zjhm`、`mobile` 查询条件；`MemberPersistenceAssembler` 负责 `Member.Query <-> MemberDO.Query` 转换
-  - 处理动作：显式化会员 Mapper 方法；拉平 `MemberDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get`、`getMany`、`findList`、`insert`、`update`、`delete`、`updatePriority`、`findByLoginName`、`findByEmail`、`updateLoginInfo`、`updateInfo`、`updateLoginPass`、`updateEnableFlag`、`getByZjhm`、`getByYwtbId` 能力；保持 MySQL / 达梦 / Kingbase 三方言 SQL 语义一致
-  - 验收点：会员链路不再依赖通用查询契约、`MemberDO.Query` 或 `MemberDO extends AdminDataEntity`；Front 包编译通过
-
 - [ ] `common-crud-dao-contract`：收敛通用 Crud DAO 契约
   - 范围对象：`sandwish-common/.../CrudDao.java`、仍继承 `CrudDao` 的业务 DAO / Mapper、相关 `CrudServiceImpl` 调用点
   - 当前依赖：`CrudDao<T>` 固定暴露 `get`、`getMany`、`findList`、`insert`、`update`、`updatePriority`、`updateStatus`、`updateDelFlag`、`delete`；剩余继承点包括 `SignatureDao`、`MemberDao`、`StorageDao`、`UserDao`、`RoleDao`、`UserEncryptDao`、`DictDao`、`LogDao`、`UploadFileDao`、`OfficeDao` 以及 `SignatureMapper`、`MemberMapper`、`StorageMapper`

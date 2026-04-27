@@ -43,7 +43,7 @@ public final class MemberPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -76,7 +76,6 @@ public final class MemberPersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -91,41 +90,20 @@ public final class MemberPersistenceAssembler {
         return entities;
     }
 
-    private static MemberDO.Query toDataObjectQuery(Member.Query query) {
+    private static void copyQuery(Member.Query query, MemberDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        MemberDO.Query dataObjectQuery = new MemberDO.Query();
-        dataObjectQuery.setEnableFlag(query.getEnableFlag());
-        dataObjectQuery.setEmail(query.getEmail());
-        dataObjectQuery.setName(query.getName());
-        dataObjectQuery.setRemarks(query.getRemarks());
-        dataObjectQuery.setBeginRegisterDate(query.getBeginRegisterDate());
-        dataObjectQuery.setEndRegisterDate(query.getEndRegisterDate());
-        dataObjectQuery.setBeginLoginDate(query.getBeginLoginDate());
-        dataObjectQuery.setEndLoginDate(query.getEndLoginDate());
-        dataObjectQuery.setYwtbId(query.getYwtbId());
-        dataObjectQuery.setZjhm(query.getZjhm());
-        dataObjectQuery.setMobile(query.getMobile());
-        return dataObjectQuery;
-    }
-
-    private static Member.Query toEntityQuery(MemberDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Member.Query entityQuery = new Member.Query();
-        entityQuery.setEnableFlag(query.getEnableFlag());
-        entityQuery.setEmail(query.getEmail());
-        entityQuery.setName(query.getName());
-        entityQuery.setRemarks(query.getRemarks());
-        entityQuery.setBeginRegisterDate(query.getBeginRegisterDate());
-        entityQuery.setEndRegisterDate(query.getEndRegisterDate());
-        entityQuery.setBeginLoginDate(query.getBeginLoginDate());
-        entityQuery.setEndLoginDate(query.getEndLoginDate());
-        entityQuery.setYwtbId(query.getYwtbId());
-        entityQuery.setZjhm(query.getZjhm());
-        entityQuery.setMobile(query.getMobile());
-        return entityQuery;
+        dataObject.setQueryEnableFlag(query.getEnableFlag());
+        dataObject.setQueryEmail(query.getEmail());
+        dataObject.setQueryName(query.getName());
+        dataObject.setQueryRemarks(query.getRemarks());
+        dataObject.setQueryBeginRegisterDate(query.getBeginRegisterDate());
+        dataObject.setQueryEndRegisterDate(query.getEndRegisterDate());
+        dataObject.setQueryBeginLoginDate(query.getBeginLoginDate());
+        dataObject.setQueryEndLoginDate(query.getEndLoginDate());
+        dataObject.setQueryYwtbId(query.getYwtbId());
+        dataObject.setQueryZjhm(query.getZjhm());
+        dataObject.setQueryMobile(query.getMobile());
     }
 }

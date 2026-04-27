@@ -1,17 +1,19 @@
 package com.github.thundax.modules.member.persistence.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.persistence.AdminDataEntity;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 会员持久化对象。
  */
 @NoArgsConstructor
-public class MemberDO extends AdminDataEntity<MemberDO> {
+public class MemberDO {
+
+    public static final String DEL_FLAG_NORMAL = "0";
+
+    private String id;
+    private boolean isNewRecord;
 
     private String loginName;
     private String loginPass;
@@ -28,23 +30,43 @@ public class MemberDO extends AdminDataEntity<MemberDO> {
     private Date lastLoginDate;
     private String ywtbId;
     private int loginCount;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private String createUserId;
+    private Date updateDate;
+    private String updateUserId;
+    private String delFlag;
+    private String queryEnableFlag;
+    private String queryEmail;
+    private String queryName;
+    private String queryRemarks;
+    private Date queryBeginRegisterDate;
+    private Date queryEndRegisterDate;
+    private Date queryBeginLoginDate;
+    private Date queryEndLoginDate;
+    private String queryYwtbId;
+    private String queryZjhm;
+    private String queryMobile;
 
     public MemberDO(String id) {
-        super(id);
+        this.id = id;
     }
 
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
+    public String getId() {
+        return id;
     }
 
-    @JsonIgnore
-    public Query getQuery() {
-        return (Query) this.query;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public boolean getIsNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setIsNewRecord(boolean isNewRecord) {
+        this.isNewRecord = isNewRecord;
     }
 
     public String getLoginName() {
@@ -167,106 +189,147 @@ public class MemberDO extends AdminDataEntity<MemberDO> {
         this.loginCount = loginCount;
     }
 
-    public static class Query implements Serializable {
+    public Integer getPriority() {
+        return priority;
+    }
 
-        private String enableFlag;
-        private String email;
-        private String name;
-        private String remarks;
-        private Date beginRegisterDate;
-        private Date endRegisterDate;
-        private Date beginLoginDate;
-        private Date endLoginDate;
-        private String ywtbId;
-        private String zjhm;
-        private String mobile;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
-        public String getEnableFlag() {
-            return enableFlag;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public void setEnableFlag(String enableFlag) {
-            this.enableFlag = enableFlag;
-        }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-        public String getEmail() {
-            return email;
-        }
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-        public void setEmail(String email) {
-            this.email = email;
-        }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-        public String getName() {
-            return name;
-        }
+    public String getCreateUserId() {
+        return createUserId;
+    }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
 
-        public String getRemarks() {
-            return remarks;
-        }
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-        public void setRemarks(String remarks) {
-            this.remarks = remarks;
-        }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
-        public Date getBeginRegisterDate() {
-            return beginRegisterDate;
-        }
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
 
-        public void setBeginRegisterDate(Date beginRegisterDate) {
-            this.beginRegisterDate = beginRegisterDate;
-        }
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
+    }
 
-        public Date getEndRegisterDate() {
-            return endRegisterDate;
-        }
+    public String getDelFlag() {
+        return delFlag;
+    }
 
-        public void setEndRegisterDate(Date endRegisterDate) {
-            this.endRegisterDate = endRegisterDate;
-        }
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
 
-        public Date getBeginLoginDate() {
-            return beginLoginDate;
-        }
+    public String getQueryEnableFlag() {
+        return queryEnableFlag;
+    }
 
-        public void setBeginLoginDate(Date beginLoginDate) {
-            this.beginLoginDate = beginLoginDate;
-        }
+    public void setQueryEnableFlag(String queryEnableFlag) {
+        this.queryEnableFlag = queryEnableFlag;
+    }
 
-        public Date getEndLoginDate() {
-            return endLoginDate;
-        }
+    public String getQueryEmail() {
+        return queryEmail;
+    }
 
-        public void setEndLoginDate(Date endLoginDate) {
-            this.endLoginDate = endLoginDate;
-        }
+    public void setQueryEmail(String queryEmail) {
+        this.queryEmail = queryEmail;
+    }
 
-        public String getYwtbId() {
-            return ywtbId;
-        }
+    public String getQueryName() {
+        return queryName;
+    }
 
-        public void setYwtbId(String ywtbId) {
-            this.ywtbId = ywtbId;
-        }
+    public void setQueryName(String queryName) {
+        this.queryName = queryName;
+    }
 
-        public String getZjhm() {
-            return zjhm;
-        }
+    public String getQueryRemarks() {
+        return queryRemarks;
+    }
 
-        public void setZjhm(String zjhm) {
-            this.zjhm = zjhm;
-        }
+    public void setQueryRemarks(String queryRemarks) {
+        this.queryRemarks = queryRemarks;
+    }
 
-        public String getMobile() {
-            return mobile;
-        }
+    public Date getQueryBeginRegisterDate() {
+        return queryBeginRegisterDate;
+    }
 
-        public void setMobile(String mobile) {
-            this.mobile = mobile;
-        }
+    public void setQueryBeginRegisterDate(Date queryBeginRegisterDate) {
+        this.queryBeginRegisterDate = queryBeginRegisterDate;
+    }
+
+    public Date getQueryEndRegisterDate() {
+        return queryEndRegisterDate;
+    }
+
+    public void setQueryEndRegisterDate(Date queryEndRegisterDate) {
+        this.queryEndRegisterDate = queryEndRegisterDate;
+    }
+
+    public Date getQueryBeginLoginDate() {
+        return queryBeginLoginDate;
+    }
+
+    public void setQueryBeginLoginDate(Date queryBeginLoginDate) {
+        this.queryBeginLoginDate = queryBeginLoginDate;
+    }
+
+    public Date getQueryEndLoginDate() {
+        return queryEndLoginDate;
+    }
+
+    public void setQueryEndLoginDate(Date queryEndLoginDate) {
+        this.queryEndLoginDate = queryEndLoginDate;
+    }
+
+    public String getQueryYwtbId() {
+        return queryYwtbId;
+    }
+
+    public void setQueryYwtbId(String queryYwtbId) {
+        this.queryYwtbId = queryYwtbId;
+    }
+
+    public String getQueryZjhm() {
+        return queryZjhm;
+    }
+
+    public void setQueryZjhm(String queryZjhm) {
+        this.queryZjhm = queryZjhm;
+    }
+
+    public String getQueryMobile() {
+        return queryMobile;
+    }
+
+    public void setQueryMobile(String queryMobile) {
+        this.queryMobile = queryMobile;
     }
 }

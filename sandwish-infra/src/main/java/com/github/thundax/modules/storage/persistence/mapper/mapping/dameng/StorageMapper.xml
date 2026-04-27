@@ -75,25 +75,23 @@
         FROM assist_storage a
         <where>
             del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.mimeType != null and query.mimeType != ''">
-                    AND mime_type = #{query.mimeType}
-                </if>
-                <if test="query.ownerId != null and query.ownerId != ''">
-                    AND owner_id = #{query.ownerId}
-                </if>
-                <if test="query.ownerType != null and query.ownerType != ''">
-                    AND owner_type = #{query.ownerType}
-                </if>
-                <if test="query.enableFlag != null and query.enableFlag != ''">
-                    AND enable_flag = #{query.enableFlag}
-                </if>
-                <if test="query.name != null and query.name != ''">
-                    AND name LIKE CONCAT('%', #{query.name}, '%')
-                </if>
-                <if test="query.remarks != null and query.remarks != ''">
-                    AND remarks LIKE CONCAT('%', #{query.remarks}, '%')
-                </if>
+            <if test="queryMimeType != null and queryMimeType != ''">
+                AND mime_type = #{queryMimeType}
+            </if>
+            <if test="queryOwnerId != null and queryOwnerId != ''">
+                AND owner_id = #{queryOwnerId}
+            </if>
+            <if test="queryOwnerType != null and queryOwnerType != ''">
+                AND owner_type = #{queryOwnerType}
+            </if>
+            <if test="queryEnableFlag != null and queryEnableFlag != ''">
+                AND enable_flag = #{queryEnableFlag}
+            </if>
+            <if test="queryName != null and queryName != ''">
+                AND name LIKE CONCAT('%', #{queryName}, '%')
+            </if>
+            <if test="queryRemarks != null and queryRemarks != ''">
+                AND remarks LIKE CONCAT('%', #{queryRemarks}, '%')
             </if>
         </where>
         ORDER BY a.create_date DESC, a.priority

@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `storage-file-persistence`：收敛存储文件持久化表达
-  - 范围对象：`StorageService`、`StorageServiceImpl`、`StorageDao`、`StorageDaoImpl`、`StorageMapper`、`mapper/mapping/mysql/StorageMapper.xml`、`mapper/mapping/dameng/StorageMapper.xml`、`StorageDO`、`StoragePersistenceAssembler`
-  - 当前依赖：`StorageService extends CrudService<Storage>`；`StorageServiceImpl extends CrudServiceImpl<StorageDao, Storage>`；`StorageDao extends CrudDao<Storage>`；`StorageMapper extends CrudDao<StorageDO>`；`StorageDO extends DataEntity<StorageDO>`；`StorageDO.Query` 承载 `mimeType`、`businessId`、`businessType`、`ownerId`、`ownerType`、`enableFlag`、`publicFlag`、`name`、`remarks` 查询条件；`StoragePersistenceAssembler` 负责 `Storage.Query <-> StorageDO.Query` 转换
-  - 处理动作：显式化文件主表 Mapper 方法；拉平 `StorageDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get`、`getMany`、`findList`、`insert`、`update`、`delete`、`findMimeTypeList`、`findBusinessTypeList`、`updateEnableFlag`、`updatePublicFlag` 能力；核对 MySQL 与达梦在业务字段查询、`publicFlag`、`business_type` 来源表上的现有差异，未确认前不改变方言语义
-  - 验收点：存储文件链路不再依赖通用查询契约、`StorageDO.Query` 或 `StorageDO extends DataEntity`；Admin 包编译通过
-
 - [ ] `storage-business-persistence`：收敛存储业务绑定持久化表达
   - 范围对象：`StorageDao` 业务绑定方法、`StorageDaoImpl`、`StorageMapper`、`mapper/mapping/mysql/StorageMapper.xml`、`mapper/mapping/dameng/StorageMapper.xml`、`StorageBusinessDO`、`StoragePersistenceAssembler`、`StorageBusiness`
   - 当前依赖：`StorageBusinessDO extends DataEntity<StorageBusinessDO>`；`StorageBusinessDO.Query` 承载 `businessId`、`businessType`、`businessParams`、`publicFlag` 查询条件；`StoragePersistenceAssembler` 负责 `StorageBusiness.Query <-> StorageBusinessDO.Query` 转换；MySQL 将业务绑定字段直接更新在 `assist_storage`，达梦使用 `assist_storage_business` 关系表

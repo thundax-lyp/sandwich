@@ -34,7 +34,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -56,7 +56,6 @@ public final class StoragePersistenceAssembler {
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -133,38 +132,19 @@ public final class StoragePersistenceAssembler {
         return entities;
     }
 
-    private static StorageDO.Query toDataObjectQuery(Storage.Query query) {
+    private static void copyQuery(Storage.Query query, StorageDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        StorageDO.Query dataObjectQuery = new StorageDO.Query();
-        dataObjectQuery.setMimeType(query.getMimeType());
-        dataObjectQuery.setBusinessId(query.getBusinessId());
-        dataObjectQuery.setBusinessType(query.getBusinessType());
-        dataObjectQuery.setOwnerId(query.getOwnerId());
-        dataObjectQuery.setOwnerType(query.getOwnerType());
-        dataObjectQuery.setEnableFlag(query.getEnableFlag());
-        dataObjectQuery.setPublicFlag(query.getPublicFlag());
-        dataObjectQuery.setName(query.getName());
-        dataObjectQuery.setRemarks(query.getRemarks());
-        return dataObjectQuery;
-    }
-
-    private static Storage.Query toEntityQuery(StorageDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Storage.Query entityQuery = new Storage.Query();
-        entityQuery.setMimeType(query.getMimeType());
-        entityQuery.setBusinessId(query.getBusinessId());
-        entityQuery.setBusinessType(query.getBusinessType());
-        entityQuery.setOwnerId(query.getOwnerId());
-        entityQuery.setOwnerType(query.getOwnerType());
-        entityQuery.setEnableFlag(query.getEnableFlag());
-        entityQuery.setPublicFlag(query.getPublicFlag());
-        entityQuery.setName(query.getName());
-        entityQuery.setRemarks(query.getRemarks());
-        return entityQuery;
+        dataObject.setQueryMimeType(query.getMimeType());
+        dataObject.setQueryBusinessId(query.getBusinessId());
+        dataObject.setQueryBusinessType(query.getBusinessType());
+        dataObject.setQueryOwnerId(query.getOwnerId());
+        dataObject.setQueryOwnerType(query.getOwnerType());
+        dataObject.setQueryEnableFlag(query.getEnableFlag());
+        dataObject.setQueryPublicFlag(query.getPublicFlag());
+        dataObject.setQueryName(query.getName());
+        dataObject.setQueryRemarks(query.getRemarks());
     }
 
     private static StorageBusinessDO.Query toBusinessDataObjectQuery(StorageBusiness.Query query) {

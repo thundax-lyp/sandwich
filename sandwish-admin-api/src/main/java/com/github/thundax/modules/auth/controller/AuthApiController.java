@@ -4,20 +4,21 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
+import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
-import com.github.thundax.modules.auth.api.querry.UsernameLoginQueryParam;
-import com.github.thundax.modules.auth.api.vo.AccessTokenVo;
-import com.github.thundax.modules.auth.api.vo.LoginFormVo;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
+import com.github.thundax.modules.auth.request.AuthLoginFormRefreshRequest;
+import com.github.thundax.modules.auth.request.AuthLoginRequest;
+import com.github.thundax.modules.auth.request.AuthLogoutRequest;
+import com.github.thundax.modules.auth.response.AuthAccessTokenResponse;
+import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.Log;
@@ -25,7 +26,6 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,60 +41,63 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
 
     private final AuthService authService;
     private final UserService userService;
+    private final AuthInterfaceAssembler authInterfaceAssembler;
 
     @Autowired
     public AuthApiController(Validator validator,
                              AuthService authService,
-                             UserService userService) {
+                             UserService userService,
+                             AuthInterfaceAssembler authInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
         this.userService = userService;
+        this.authInterfaceAssembler = authInterfaceAssembler;
     }
 
     @Override
-    public LoginFormVo loginForm() throws ApiException {
-        return entityToVo(authService.createLoginForm());
+    public AuthLoginFormResponse loginForm() throws ApiException {
+        return authInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
     }
 
 
     @Override
-    public LoginFormVo refreshLoginForm(@RequestBody LoginFormVo form) throws ApiException {
-        if (StringUtils.isBlank(form.getRefreshToken())) {
+    public AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request) throws ApiException {
+        if (StringUtils.isBlank(request.getRefreshToken())) {
             throw new InvalidParameterException("refreshToken");
         }
 
-        return entityToVo(authService.refreshLoginForm(form.getRefreshToken()));
+        return authInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
     }
 
 
     @Override
-    public AccessTokenVo login(@RequestBody UsernameLoginQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException {
+        validate(request);
         HttpServletRequest currentRequest = RequestUtils.currentRequest();
-        if (!authService.validateCaptcha(queryParam.getLoginToken(), queryParam.getCaptcha())) {
+        if (!authService.validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
             //刷新验证码
-            authService.createCaptcha(queryParam.getLoginToken());
-            writeLog(currentRequest, "验证码失败", queryParam);
+            authService.createCaptcha(request.getLoginToken());
+            writeLog(currentRequest, "验证码失败", request);
             throw new InvalidCaptchaException();
         }
         //刷新验证码
-        authService.createCaptcha(queryParam.getLoginToken());
+        authService.createCaptcha(request.getLoginToken());
 
-        User user = userService.getByLoginName(queryParam.getUsername());
+        User user = userService.getByLoginName(request.getUsername());
         if (user == null) {
-            writeLog(currentRequest, "用户失败", queryParam);
+            writeLog(currentRequest, "用户失败", request);
             throw new InvalidUsernamePasswordException();
         }
 
         if (!user.isEnable()) {
-            writeLog(currentRequest, "用户失败", queryParam);
+            writeLog(currentRequest, "用户失败", request);
             throw new BannedAccountException();
         }
 
-        String privateKey = authService.getPrivateKey(queryParam.getLoginToken());
+        String privateKey = authService.getPrivateKey(request.getLoginToken());
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(queryParam.getPassword(), privateKey);
+        String password = Sm2.decrypt(request.getPassword(), privateKey);
 
         try {
             authService.validatePassword(user, password);
@@ -103,15 +106,15 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
                     && user != null
                     && StringUtils.isNotBlank(user.getLoginName())) {
                 if (e.getMessage() != null && e.getMessage().contains("锁定")) {
-                    writeLog(currentRequest, "用户锁定", queryParam);
+                    writeLog(currentRequest, "用户锁定", request);
                 } else {
-                    writeLog(currentRequest, "密码输入错误", queryParam);
+                    writeLog(currentRequest, "密码输入错误", request);
                 }
             }
             throw e;
         }
 
-        authService.deleteLoginForm(queryParam.getLoginToken());
+        authService.deleteLoginForm(request.getLoginToken());
 
         AccessToken accessToken = authService.findByUserId(user.getId());
         if (accessToken != null) {
@@ -123,17 +126,17 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
         userService.updateLoginInfo(user);
 
-        return entityToVo(authService.createAccessToken(user.getId()));
+        return authInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(user.getId()));
     }
 
 
     @Override
-    public Boolean logout(@RequestBody AccessTokenVo token) throws ApiException {
-        if (StringUtils.isEmpty(token.getToken())) {
+    public Boolean logout(@RequestBody AuthLogoutRequest request) throws ApiException {
+        if (StringUtils.isEmpty(request.getToken())) {
             throw new InvalidTokenException();
         }
 
-        AccessToken accessToken = authService.getAccessToken(token.getToken());
+        AccessToken accessToken = authService.getAccessToken(request.getToken());
         if (accessToken == null) {
             throw new InvalidTokenException();
         }
@@ -147,30 +150,11 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         return true;
     }
 
-    @NonNull
-    private LoginFormVo entityToVo(LoginForm entity) {
-        LoginFormVo vo = new LoginFormVo();
-        vo.setLoginToken(entity.getLoginToken());
-        vo.setRefreshToken(entity.getRefreshTokenList().get(0));
-        vo.setExpireSeconds(entity.getExpiredSeconds());
-        vo.setPublicKey(entity.getPublicKey());
-        return vo;
-    }
-
-    @NonNull
-    private AccessTokenVo entityToVo(AccessToken entity) {
-        AccessTokenVo vo = new AccessTokenVo();
-        if (entity != null) {
-            vo.setToken(entity.getToken());
-        }
-        return vo;
-    }
-
     /**
      * 记录登录日志
      *
      */
-    private void writeLog(HttpServletRequest currentRequest, String title, UsernameLoginQueryParam queryParam) {
+    private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
         Log log = new Log();
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
@@ -179,10 +163,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
         log.setType("1");
-        if (queryParam != null) {
-            queryParam.setPassword("******");
-            log.setRequestParams(JsonUtils.toJson(queryParam));
-        }
+        log.setRequestParams(authInterfaceAssembler.toLogJson(request));
         log.setSignable(true);
         SysLogUtils.saveLog(log);
     }

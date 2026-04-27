@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `auth-admin-api`：隔离后台认证 API 模型
-  - 范围入口：`AuthApiController`、`CaptchaApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `LoginFormVo`、`AccessTokenVo`、`UsernameLoginQueryParam`；Controller 内存在 `LoginForm`、`AccessToken` 到 API 模型转换；验证码刷新请求仍复用 `LoginFormVo`
-  - 需要新增或收窄的 `Request`：登录、刷新登录表单、刷新验证码、退出登录请求
-  - 需要新增或收窄的 `Response`：登录表单响应、访问令牌响应、验证码响应
-  - 需要新增的 `InterfaceAssembler`：`AuthInterfaceAssembler`、`CaptchaInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；认证 Service 保持接收 `LoginForm`、`AccessToken` 或稳定业务参数
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `assist-signature-api`：隔离签名 API 模型
   - 范围入口：`SignatureApiController`
   - 当前 API 模型泄漏点：入口直接使用 `SignatureQueryParam`、`SignatureVo`；Controller 内存在 `Signature` 到 API 模型转换；签名校验入口直接复用 `SignatureVo`

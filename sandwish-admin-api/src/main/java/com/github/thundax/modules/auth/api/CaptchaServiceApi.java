@@ -1,7 +1,8 @@
 package com.github.thundax.modules.auth.api;
 
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.modules.auth.api.vo.LoginFormVo;
+import com.github.thundax.modules.auth.request.CaptchaRefreshRequest;
+import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +35,12 @@ public interface CaptchaServiceApi {
     /**
      * 刷新图形验证码
      *
-     * @param form 登录表单
+     * @param request 图形验证码刷新请求
      * @return 成功:true
      * @throws ApiException API异常
      */
     @ApiOperation(value = "刷新图形验证码", notes = "ignore")
     @PostMapping(value = "captcha/refresh")
-    Boolean refreshCaptcha(@RequestBody LoginFormVo form) throws ApiException;
+    CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException;
 
 }

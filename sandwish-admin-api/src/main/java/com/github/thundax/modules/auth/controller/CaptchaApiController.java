@@ -4,8 +4,10 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.api.CaptchaServiceApi;
-import com.github.thundax.modules.auth.api.vo.LoginFormVo;
+import com.github.thundax.modules.auth.request.CaptchaRefreshRequest;
+import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
 import com.github.thundax.modules.auth.service.AuthService;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +40,16 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     private static final int MAX_COLOR = 255;
 
     private final AuthService authService;
+    private final CaptchaInterfaceAssembler captchaInterfaceAssembler;
 
     @Autowired
-    public CaptchaApiController(Validator validator, AuthService authService) {
+    public CaptchaApiController(Validator validator,
+                                AuthService authService,
+                                CaptchaInterfaceAssembler captchaInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
+        this.captchaInterfaceAssembler = captchaInterfaceAssembler;
     }
 
     @Override
@@ -95,14 +101,14 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     @Override
-    public Boolean refreshCaptcha(@RequestBody LoginFormVo form) throws ApiException {
-        if (StringUtils.isBlank(form.getLoginToken())) {
+    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException {
+        if (StringUtils.isBlank(request.getLoginToken())) {
             throw new InvalidParameterException("loginToken");
         }
 
-        authService.createCaptcha(form.getLoginToken());
+        authService.createCaptcha(request.getLoginToken());
 
-        return true;
+        return captchaInterfaceAssembler.toRefreshResponse(true);
     }
 
     private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {

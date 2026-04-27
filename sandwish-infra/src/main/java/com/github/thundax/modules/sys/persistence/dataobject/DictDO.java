@@ -1,37 +1,52 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.persistence.AdminDataEntity;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 字典持久化对象。
  */
 @NoArgsConstructor
-public class DictDO extends AdminDataEntity<DictDO> {
+public class DictDO {
+
+    public static final String DEL_FLAG_NORMAL = "0";
+
+    private String id;
+    private boolean isNewRecord;
 
     private String type;
     private String label;
     private String value;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private String createUserId;
+    private Date updateDate;
+    private String updateUserId;
+    private String delFlag;
+    private String queryType;
+    private String queryRemarks;
+    private String queryLabel;
 
     public DictDO(String id) {
-        super(id);
+        this.id = id;
     }
 
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
+    public String getId() {
+        return id;
     }
 
-    @JsonIgnore
-    public Query getQuery() {
-        return (Query) this.query;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public boolean getIsNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setIsNewRecord(boolean isNewRecord) {
+        this.isNewRecord = isNewRecord;
     }
 
     public String getType() {
@@ -58,34 +73,83 @@ public class DictDO extends AdminDataEntity<DictDO> {
         this.value = value;
     }
 
-    public static class Query implements Serializable {
+    public Integer getPriority() {
+        return priority;
+    }
 
-        private String type;
-        private String remarks;
-        private String label;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
-        public String getType() {
-            return type;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public void setType(String type) {
-            this.type = type;
-        }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-        public String getRemarks() {
-            return remarks;
-        }
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-        public void setRemarks(String remarks) {
-            this.remarks = remarks;
-        }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-        public String getLabel() {
-            return label;
-        }
+    public String getCreateUserId() {
+        return createUserId;
+    }
 
-        public void setLabel(String label) {
-            this.label = label;
-        }
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
+
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
+    }
+
+    public String getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public String getQueryType() {
+        return queryType;
+    }
+
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
+    }
+
+    public String getQueryRemarks() {
+        return queryRemarks;
+    }
+
+    public void setQueryRemarks(String queryRemarks) {
+        this.queryRemarks = queryRemarks;
+    }
+
+    public String getQueryLabel() {
+        return queryLabel;
+    }
+
+    public void setQueryLabel(String queryLabel) {
+        this.queryLabel = queryLabel;
     }
 }

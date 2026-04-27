@@ -39,13 +39,11 @@
         FROM sys_dict a
         <where>
             del_flag = #{DEL_FLAG_NORMAL}
-            <if test="query != null">
-                <if test="query.type != null and query.type != ''">
-                    AND type = #{query.type}
-                </if>
-                <if test="query.remarks != null and query.remarks != ''">
-                    AND remarks LIKE CONCAT('%', #{query.remarks}, '%')
-                </if>
+            <if test="queryType != null and queryType != ''">
+                AND type = #{queryType}
+            </if>
+            <if test="queryRemarks != null and queryRemarks != ''">
+                AND remarks LIKE CONCAT('%', #{queryRemarks}, '%')
             </if>
         </where>
         ORDER BY a.type, a.priority, a.create_date

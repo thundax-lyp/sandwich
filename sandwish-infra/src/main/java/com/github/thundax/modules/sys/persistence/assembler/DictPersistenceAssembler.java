@@ -31,7 +31,7 @@ public final class DictPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -52,7 +52,6 @@ public final class DictPersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -67,25 +66,12 @@ public final class DictPersistenceAssembler {
         return entities;
     }
 
-    private static DictDO.Query toDataObjectQuery(Dict.Query query) {
+    private static void copyQuery(Dict.Query query, DictDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        DictDO.Query dataObjectQuery = new DictDO.Query();
-        dataObjectQuery.setType(query.getType());
-        dataObjectQuery.setRemarks(query.getRemarks());
-        dataObjectQuery.setLabel(query.getLabel());
-        return dataObjectQuery;
-    }
-
-    private static Dict.Query toEntityQuery(DictDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Dict.Query entityQuery = new Dict.Query();
-        entityQuery.setType(query.getType());
-        entityQuery.setRemarks(query.getRemarks());
-        entityQuery.setLabel(query.getLabel());
-        return entityQuery;
+        dataObject.setQueryType(query.getType());
+        dataObject.setQueryRemarks(query.getRemarks());
+        dataObject.setQueryLabel(query.getLabel());
     }
 }

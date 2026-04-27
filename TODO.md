@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `sys-dict-persistence`：改造字典持久化表达
-  - 范围对象：`DictService`、`DictServiceImpl`、`DictDao`、`DictDaoImpl`、`DictMapper`、`mysql/dameng/kingbase/DictMapper.xml`、`DictDO`、`DictPersistenceAssembler`
-  - 当前依赖：`DictService extends CrudService<Dict>`；`DictServiceImpl extends CrudServiceImpl<DictDao, Dict>`；`DictDao extends CrudDao<Dict>`；`DictMapper extends CrudDao<DictDO>`；`Dict extends BaseDict extends AdminDataEntity<Dict>`；`DictDO extends AdminDataEntity<DictDO>`；存在 `Dict.Query <-> DictDO.Query`
-  - 处理动作：收敛字典查询、字典类型列表查询和排序/状态/删除标记更新的持久化表达；拆除或替换本链路对通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 的依赖
-  - 验收点：`findTypeList` 仍由持久化层完成；DAO implementation 完成 Entity/DO 转换；字典链路不暴露 `DO`
-
 - [ ] `sys-upload-file`：改造上传文件持久化表达
   - 范围对象：`UploadFileService`、`UploadFileServiceImpl`、`UploadFileDao`、`UploadFileDaoImpl`、`UploadFileMapper`、`mysql/dameng/UploadFileMapper.xml`、`UploadFileDO`、`UploadFilePersistenceAssembler`
   - 当前依赖：`UploadFileService extends CrudService<UploadFile>`；`UploadFileServiceImpl extends CrudServiceImpl<UploadFileDao, UploadFile>`；`UploadFileDao extends CrudDao<UploadFile>`；`UploadFileMapper extends CrudDao<UploadFileDO>`；`UploadFile extends BaseUploadFile extends AdminDataEntity<UploadFile>`；`UploadFileDO extends AdminDataEntity<UploadFileDO>`；当前无独立 `Query`；当前未发现 `kingbase/UploadFileMapper.xml`

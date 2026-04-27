@@ -24,7 +24,7 @@
   - `sandwish-admin-api`: jar
   - `sandwish-front-api`: jar
 - base package: `com.github.thundax`
-- persistence: MyBatis + PageHelper
+- persistence: MyBatis + MyBatis-Plus + PageHelper
 - api docs: Swagger / Springfox
 
 ## Architecture Shape
@@ -89,12 +89,15 @@ Sandwich 固定采用三层 API 架构。
 - 通用持久化基础设施
 - 通用 Service 基类
 - MyBatis 扫描标记
+- MyBatis-Plus 基础配置
 - PageHelper 迁移期支撑
 - 数据库方言类
 
 边界：
 
 - 可以依赖 `sandwish-common-core`。
+- MyBatis-Plus 分页插件固定使用 `DbType.DM`。
+- PageHelper 只服务尚未迁移到 MyBatis-Plus 的旧分页链路。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 

@@ -45,6 +45,7 @@
 
         <!-- framework version setting -->
         <mybatis.version>3.5.5</mybatis.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <pagehelper.version>5.1.8</pagehelper.version>
 
         <java.version>1.8</java.version>
@@ -77,6 +78,11 @@
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
             </dependency>
 
             <dependency>

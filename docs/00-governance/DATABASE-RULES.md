@@ -85,6 +85,8 @@
 - 树结构中 `parentId` 是业务关系字段，可以存在于 `Entity`、`DO/DataObject` 和 API 模型中。
 - 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
+- 新增 MyBatis-Plus 链路固定以达梦行为为标准，分页插件固定使用 `DbType.DM`。
+- PageHelper 与 MyBatis-Plus 分页不得在同一查询链路混用。
 
 ## Index And Uniqueness
 

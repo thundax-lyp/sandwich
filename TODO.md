@@ -22,12 +22,6 @@
 
 ## P0 - Common / MyBatis-Plus / XML 演进
 
-- [ ] `mybatis-plus-introduction`：在 common-mybatis 中引入 MyBatis-Plus
-  - 参考手册：`docs/30-designs/MYBATIS-PLUS-INTRODUCTION-RUNBOOK.md`
-  - 范围对象：root `pom.xml`、`sandwish-common-mybatis`、MyBatis / PageHelper 依赖声明、MyBatis-Plus 基础配置
-  - 处理动作：引入 `com.baomidou:mybatis-plus-boot-starter:3.5.5`；达梦分页插件固定 `DbType.DM`；保持现有 XML 和 Mapper 扫描行为不变；避免 MyBatis starter 重复竞争自动配置
-  - 验收点：Admin / Front 包编译通过；现有 XML 链路可继续运行；未迁移任何具体业务 Mapper
-
 - [ ] `xml-elimination-first-chain`：选择首条达梦标准链路消灭 XML
   - 参考手册：`docs/30-designs/XML-ELIMINATION-RUNBOOK.md`
   - 范围对象：一条已完成 DAO 显式化和 DO query 收敛的简单持久化链路、对应 Mapper interface、DAO implementation、DO、`PersistenceAssembler`、`mapping/mysql`、`mapping/dameng`、`mapping/kingbase` XML

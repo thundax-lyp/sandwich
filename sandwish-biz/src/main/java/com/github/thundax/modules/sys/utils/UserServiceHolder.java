@@ -50,10 +50,6 @@ public class UserServiceHolder {
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
-    public static void removeAllCache() {
-        getService().removeAllCache();
-    }
-
     /**
      * 获取用户菜单
      *

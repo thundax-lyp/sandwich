@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-user-chain-migration`：迁移 User 缓存链路到 infra
-  - 依赖前置：完成 `cache-role-chain-migration`
-  - 范围对象：`UserServiceImpl`、`UserDao`、`UserDaoImpl`、`UserMapper`、`UserServiceHolder`
-  - 处理动作：将 User 单对象缓存及用户角色缓存迁入 infra；不改变登录名、SSO、密码和启用状态相关查询写入语义
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：User Service 不再直接读写 `redisClient`，不再调用 `removeAllCache`
 - [ ] `cache-holder-contract-cleanup`：收窄 ServiceHolder 缓存入口
   - 依赖前置：完成所有已启用缓存链路迁移
   - 范围对象：`DictServiceHolder`、`StorageServiceHolder`、`OfficeServiceHolder`、`MenuServiceHolder`、`RoleServiceHolder`、`UserServiceHolder`、`MemberServiceHolder`

@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `assist-storage-entry`：明确存储入口模型隔离边界
-  - 范围入口：`StorageController`
-  - 当前 API 模型泄漏点：入口混合服务端视图返回、`HttpServletRequest` 查询读取、`StorageVo` 上传测试响应和 `Storage` 查询对象组装
-  - 需要新增或收窄的 `Request`：上传测试、列表查询、删除请求；服务端页面入口继续保留时，必须单独标明不是核心 API 模型隔离目标
-  - 需要新增或收窄的 `Response`：上传响应、树数据响应、预览/删除结果响应
-  - 需要新增的 `InterfaceAssembler`：`StorageInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；页面入口继续直接使用 `HttpServletRequest` 组装查询时，先拆出 API 与页面/支撑入口边界
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `front-member-entry`：明确前台会员登录入口模型隔离边界
   - 范围入口：`LoginController`、`LogoutController`
   - 当前 API 模型泄漏点：入口主要返回字符串视图/状态并直接使用 `HttpServletRequest`、`HttpServletResponse`、`Model`；当前未通过 Service 暴露业务 `Entity`

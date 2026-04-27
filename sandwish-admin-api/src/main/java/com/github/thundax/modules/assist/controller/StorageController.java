@@ -1,20 +1,20 @@
 package com.github.thundax.modules.assist.controller;
 
-import com.google.common.collect.Maps;
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseAdminController;
+import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
+import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
+import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.StorageServiceHolder;
 import com.github.thundax.modules.storage.utils.StorageUtils;
-import com.github.thundax.modules.storage.vo.StorageVo;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,14 +45,17 @@ public class StorageController extends BaseAdminController {
 
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
+    private final StorageInterfaceAssembler storageInterfaceAssembler;
 
     @Autowired
     public StorageController(VltavaProperties properties,
                              StorageService storageService,
-                             Validator validator) {
+                             Validator validator,
+                             StorageInterfaceAssembler storageInterfaceAssembler) {
         super(validator);
         this.properties = properties.getUpload();
         this.storageService = storageService;
+        this.storageInterfaceAssembler = storageInterfaceAssembler;
     }
 
     //@RequiresPermissions("assist:storage:view")
@@ -62,6 +65,7 @@ public class StorageController extends BaseAdminController {
     }
 
 
+    // 服务端页面入口保留旧查询适配，不作为本轮核心 API 模型隔离目标。
     //@RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "list")
     public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -101,7 +105,7 @@ public class StorageController extends BaseAdminController {
 
     @ResponseBody
     @RequestMapping(value = "test-upload", method = RequestMethod.POST)
-    public StorageVo uploadTest(MultipartFile file) throws ApiException {
+    public StorageUploadResponse uploadTest(MultipartFile file) throws ApiException {
         Storage storage = new Storage();
 
         storage.setOwnerType(Storage.OWNER_TYPE_USER);
@@ -115,7 +119,7 @@ public class StorageController extends BaseAdminController {
 //        storageBusiness.setBusinessId("");
 //        storageBusiness.setBusinessParams("");
 
-        return StorageUtils.entityToVo(storage);
+        return storageInterfaceAssembler.toUploadResponse(storage);
     }
 
 
@@ -123,15 +127,13 @@ public class StorageController extends BaseAdminController {
     //@RequiresPermissions("user")
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     @ResponseBody
-    public Object upload(HttpServletRequest request) {
-        Map<String, Object> result = Maps.newHashMap();
-
+    public StorageUploadResponse upload(HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
-            result.put("error", "错误的请求格式");
-            return result;
+            return storageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
 
         } else {
             Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
+            StorageUploadResponse response = new StorageUploadResponse();
             for (MultipartFile file : fileMap.values()) {
                 try {
                     String originalFilename = file.getOriginalFilename();
@@ -139,8 +141,7 @@ public class StorageController extends BaseAdminController {
                     List<String> validExtNameList = properties.getAllowSuffix();
                     String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
                     if (!validExtNameList.contains(extendName)) {
-                        result.put("error", "无效的后缀名");
-                        return result;
+                        return storageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
                     }
 
                     Storage storage = new Storage();
@@ -160,22 +161,19 @@ public class StorageController extends BaseAdminController {
 //                    file.transferTo(localFile);
                     storageService.save(storage);
 
-                    result.put("id", storage.getId());
-                    result.put("name", storage.getName());
-                    result.put("extendName", storage.getExtendName());
+                    response = storageInterfaceAssembler.toUploadResponse(storage);
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    result.put("error", "系统错误");
-                    return result;
+                    return storageInterfaceAssembler.toUploadErrorResponse("系统错误");
                 }
             }
+            return response;
         }
-
-        return result;
     }
 
 
+    // 文件预览是静态资源支撑入口，保持 HttpServletResponse 流式输出边界。
     @RequestMapping(value = "file/{id}.{extendName}")
     public void preview(@PathVariable("id") String id,
                         @PathVariable("extendName") String extendName,
@@ -206,6 +204,7 @@ public class StorageController extends BaseAdminController {
     }
 
 
+    // 服务端页面删除入口保留 RedirectAttributes 跳转反馈，不作为本轮核心 API 模型隔离目标。
     //@RequiresPermissions("member:member:edit")
     @RequestMapping(value = "delete")
     public String delete(String[] ids, RedirectAttributes redirectAttributes) {
@@ -221,14 +220,10 @@ public class StorageController extends BaseAdminController {
 
     //@RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "treeData")
-    public List<Map<String, Object>> treeData() {
-        return ListUtils.map(storageService.findBusinessTypeList(), businessType -> {
-            Map<String, Object> map = MapUtils.newHashMap();
-            map.put("id", businessType);
-            map.put("pId", "ROOT");
-            map.put("name", businessType);
-            return map;
-        });
+    @ResponseBody
+    public List<StorageTreeNodeResponse> treeData() {
+        return ListUtils.map(storageService.findBusinessTypeList(),
+                storageInterfaceAssembler::toBusinessTypeTreeNode);
     }
 
     @NotNull

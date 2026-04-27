@@ -17,9 +17,11 @@ public interface DictDao extends CrudDao<Dict> {
      */
     List<String> findTypeList();
 
-
-
-
-
+    /**
+     * 获取字典修订号。
+     *
+     * @return 字典修订号
+     */
+    String getDictionaryRevision();
 
 }

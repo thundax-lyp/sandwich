@@ -52,12 +52,8 @@ public class DictServiceHolder {
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
-    public static void removeAllCache() {
-        getService().removeAllCache();
-    }
-
     public static synchronized List<Dict> getDictList(String type) {
-        String currentCacheVersion = CACHE_VERSION_HOLDER.computeIfAbsent(() -> getService().getCacheVersion());
+        String currentCacheVersion = CACHE_VERSION_HOLDER.computeIfAbsent(() -> getService().getDictionaryRevision());
 
         if (!StringUtils.equals(currentCacheVersion, lastCacheVersion)) {
             TYPE_DICT_MAP.clear();

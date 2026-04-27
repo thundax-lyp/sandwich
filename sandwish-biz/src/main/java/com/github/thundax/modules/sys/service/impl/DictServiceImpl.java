@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
@@ -22,22 +21,6 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
 
     public DictServiceImpl(DictDao dao, RedisClient redisClient) {
         super(dao, redisClient);
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        removeAllCache();
-    }
-
-    @Override
-    protected boolean isRedisCacheEnabled() {
-        return true;
-    }
-
-    @Override
-    protected String getCacheSection() {
-        return Constants.CACHE_PREFIX + "sys.dict.";
     }
 
     @Override
@@ -69,8 +52,8 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
     }
 
     @Override
-    public void removeCache(Dict dict) {
-        super.removeAllCache();
+    public String getDictionaryRevision() {
+        return dao.getDictionaryRevision();
     }
 
 }

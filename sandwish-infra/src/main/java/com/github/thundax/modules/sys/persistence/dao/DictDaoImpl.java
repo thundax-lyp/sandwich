@@ -5,10 +5,12 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.cache.DictCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,19 +20,46 @@ import java.util.List;
 public class DictDaoImpl implements DictDao {
 
     private final DictMapper mapper;
+    private final DictCacheSupport cacheSupport;
 
-    public DictDaoImpl(DictMapper mapper) {
+    public DictDaoImpl(DictMapper mapper, DictCacheSupport cacheSupport) {
         this.mapper = mapper;
+        this.cacheSupport = cacheSupport;
     }
 
     @Override
     public Dict get(Dict entity) {
-        return DictPersistenceAssembler.toEntity(mapper.selectById(entity.getId()));
+        Dict dict = cacheSupport.getById(entity.getId());
+        if (dict != null) {
+            return dict;
+        }
+
+        dict = DictPersistenceAssembler.toEntity(mapper.selectById(entity.getId()));
+        cacheSupport.putById(dict);
+        return dict;
     }
 
     @Override
     public List<Dict> getMany(List<String> idList) {
-        return DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
+        List<Dict> dictList = new ArrayList<>();
+        List<String> uncachedIdList = new ArrayList<>();
+        for (String id : idList) {
+            Dict dict = cacheSupport.getById(id);
+            if (dict == null) {
+                uncachedIdList.add(id);
+            } else {
+                dictList.add(dict);
+            }
+        }
+
+        if (!uncachedIdList.isEmpty()) {
+            List<Dict> uncachedDictList = DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            for (Dict dict : uncachedDictList) {
+                cacheSupport.putById(dict);
+                dictList.add(dict);
+            }
+        }
+        return dictList;
     }
 
     @Override
@@ -49,17 +78,23 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public int insert(Dict entity) {
-        return mapper.insert(DictPersistenceAssembler.toDataObject(entity));
+        int count = mapper.insert(DictPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public int update(Dict entity) {
-        return mapper.update(DictPersistenceAssembler.toDataObject(entity));
+        int count = mapper.update(DictPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public int updatePriority(Dict entity) {
-        return mapper.updatePriority(DictPersistenceAssembler.toDataObject(entity));
+        int count = mapper.updatePriority(DictPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     public int updateStatus(Dict entity) {
@@ -68,17 +103,26 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public int updateDelFlag(Dict entity) {
-        return mapper.updateDelFlag(DictPersistenceAssembler.toDataObject(entity));
+        int count = mapper.updateDelFlag(DictPersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public int delete(Dict entity) {
-        return mapper.deleteById(entity.getId());
+        int count = mapper.deleteById(entity.getId());
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public List<String> findTypeList() {
         return mapper.findTypeList();
+    }
+
+    @Override
+    public String getDictionaryRevision() {
+        return cacheSupport.currentVersion();
     }
 
     private QueryWrapper<DictDO> buildQueryWrapper(DictDO query) {

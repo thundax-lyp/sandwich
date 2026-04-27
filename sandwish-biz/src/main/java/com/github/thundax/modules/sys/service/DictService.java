@@ -24,4 +24,11 @@ public interface DictService extends CrudService<Dict> {
      */
     List<String> findLabelList(String type);
 
+    /**
+     * 获取字典修订号。
+     *
+     * @return 字典修订号
+     */
+    String getDictionaryRevision();
+
 }

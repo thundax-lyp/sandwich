@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-dict-chain-migration`：迁移 Dict 缓存链路到 infra
-  - 依赖前置：完成 `cache-current-usage-inventory`、`cache-infra-contract-design`
-  - 范围对象：`DictServiceImpl`、`DictDao`、`DictDaoImpl`、`DictMapper`、`DictServiceHolder` 中和 Dict 缓存直接相关的调用
-  - 处理动作：新增 infra 内部 `DictCacheSupport`，将 Dict 的缓存命中、回源、回填、失效和版本维护迁入 infra；Service 不再直接调用缓存相关方法
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：Dict 对外查询语义不变；`DictServiceImpl` 不再覆写 `isRedisCacheEnabled`，不再调用 `removeAllCache` 或 `getCacheVersion`
 - [ ] `cache-storage-chain-migration`：迁移 Storage 缓存链路到 infra
   - 依赖前置：完成 `cache-dict-chain-migration`
   - 范围对象：`StorageServiceImpl`、`StorageDao`、`StorageDaoImpl`、`StorageMapper`、`StorageServiceHolder`

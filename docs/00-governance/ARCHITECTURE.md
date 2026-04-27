@@ -204,6 +204,7 @@ Sandwich 固定采用三层 API 架构。
 - DAO / Mapper 方法优先使用显式业务语义命名，不以通用 `findList(T entity)` 或无条件语义方法承载新增查询。
 - Mapper XML 查询条件固定读取一级方法参数或 infra 内部 persistence 参数对象，不依赖通用 `query.*` 容器。
 - Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper 或 Mapper XML。
+- 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
 
 ### Entity / VO / DTO
 
@@ -214,6 +215,7 @@ Sandwich 固定采用三层 API 架构。
 - 业务 `Entity` 可以保留 Service 可理解的业务查询模型。
 - `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。
 - `PersistenceAssembler` 不回填查询对象；查询条件从 Service 到 DAO / Mapper 时必须显式拆解或转换为 infra 内部 persistence 参数对象。
+- 树业务 `Entity` 只表达 `parentId` 等业务关系字段，不暴露 `lft` / `rgt` 或 nested-set 区间计算方法。
 
 ### Request / Response / InterfaceAssembler
 

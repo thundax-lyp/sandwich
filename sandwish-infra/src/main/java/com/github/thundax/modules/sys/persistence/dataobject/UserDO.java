@@ -43,8 +43,6 @@ public class UserDO {
     private String updateUserId;
     private String delFlag;
     private String queryOfficeId;
-    private Integer queryOfficeTreeLeft;
-    private Integer queryOfficeTreeRight;
     private String queryLoginName;
     private String queryName;
     private String queryEnableFlag;
@@ -280,22 +278,6 @@ public class UserDO {
 
     public void setQueryOfficeId(String queryOfficeId) {
         this.queryOfficeId = queryOfficeId;
-    }
-
-    public Integer getQueryOfficeTreeLeft() {
-        return queryOfficeTreeLeft;
-    }
-
-    public void setQueryOfficeTreeLeft(Integer queryOfficeTreeLeft) {
-        this.queryOfficeTreeLeft = queryOfficeTreeLeft;
-    }
-
-    public Integer getQueryOfficeTreeRight() {
-        return queryOfficeTreeRight;
-    }
-
-    public void setQueryOfficeTreeRight(Integer queryOfficeTreeRight) {
-        this.queryOfficeTreeRight = queryOfficeTreeRight;
     }
 
     public String getQueryLoginName() {

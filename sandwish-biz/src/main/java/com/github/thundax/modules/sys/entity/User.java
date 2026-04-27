@@ -167,8 +167,6 @@ public class User extends BaseUser {
         private static final long serialVersionUID = 1L;
 
         public static final String PROP_OFFICE_ID = "officeId";
-        public static final String PROP_OFFICE_TREE_LEFT = "officeTreeLeft";
-        public static final String PROP_OFFICE_TREE_RIGHT = "officeTreeRight";
         public static final String PROP_LOGIN_NAME = "loginName";
         public static final String PROP_NAME = "name";
         public static final String PROP_ENABLE_FLAG = "enableFlag";
@@ -176,8 +174,6 @@ public class User extends BaseUser {
         public static final String PROP_ORDER_BY = "orderBy";
 
         private String officeId; // 按照机构查询
-        private Integer officeTreeLeft; // 按照机构查询
-        private Integer officeTreeRight; // 按照机构查询
         private String loginName; // 按照登录名查询
         private String name; // 按照姓名名查询
         private String enableFlag; // 按照enableFlag查询
@@ -185,30 +181,12 @@ public class User extends BaseUser {
 
         private String orderBy;
 
-        // 查询时转换为officeTreeLeft - officeTreeRight
         public String getOfficeId() {
             return this.officeId;
         }
 
         public void setOfficeId(String officeId) {
             this.officeId = officeId;
-        }
-
-        // o.lft BETWEEN #{query.officeTreeLeft} AND #{query.officeTreeRight}
-        public Integer getOfficeTreeLeft() {
-            return this.officeTreeLeft;
-        }
-
-        public void setOfficeTreeLeft(Integer officeTreeLeft) {
-            this.officeTreeLeft = officeTreeLeft;
-        }
-
-        public Integer getOfficeTreeRight() {
-            return this.officeTreeRight;
-        }
-
-        public void setOfficeTreeRight(Integer officeTreeRight) {
-            this.officeTreeRight = officeTreeRight;
         }
 
         // a.login_name LIKE '%'+#{query.loginName}+'%'

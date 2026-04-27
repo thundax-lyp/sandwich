@@ -82,6 +82,9 @@
 - Mapper XML 固定读取一级参数或 persistence 参数对象字段，不读取通用 `query.*`。
 - `PersistenceAssembler` 不负责 `Entity.query` 与 `DO.query` 互转；业务查询条件必须在 Service / DAO implementation 中显式拆解。
 - 多方言 Mapper XML 必须同步维护同一业务语义；确有 SQL 差异时，差异必须保留在对应方言 XML 中，不通过牺牲方言能力强行统一。
+- 树结构中 `parentId` 是业务关系字段，可以存在于 `Entity`、`DO/DataObject` 和 API 模型中。
+- 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
+- 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
 
 ## Index And Uniqueness
 

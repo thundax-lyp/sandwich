@@ -100,8 +100,9 @@
         SELECT
         <include refid="userColumns"/>
         FROM sys_user a
-        <if test="queryOfficeTreeLeft != null and queryOfficeTreeRight != null">
-            JOIN sys_office o ON o.id = a.office_id AND o.lft BETWEEN #{queryOfficeTreeLeft} AND #{queryOfficeTreeRight}
+        <if test="queryOfficeId != null and queryOfficeId != ''">
+            JOIN sys_office query_office ON query_office.id = #{queryOfficeId}
+            JOIN sys_office o ON o.id = a.office_id AND o.lft BETWEEN query_office.lft AND query_office.rgt
         </if>
         <where>
             a.del_flag = #{DEL_FLAG_NORMAL}
@@ -116,9 +117,6 @@
             </if>
             <if test="querySuperFlag != null and querySuperFlag != ''">
                 AND a.super_flag = #{querySuperFlag}
-            </if>
-            <if test="queryOfficeId != null and queryOfficeId != ''">
-                AND a.office_id = #{queryOfficeId}
             </if>
         </where>
         ORDER BY

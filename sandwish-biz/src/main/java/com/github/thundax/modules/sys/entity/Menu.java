@@ -107,7 +107,28 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
 
     @Override
     public int compareTo(Menu that) {
-        return this.getLft() - that.getLft();
+        int priorityCompare = compareInteger(this.getPriority(), that.getPriority());
+        if (priorityCompare != 0) {
+            return priorityCompare;
+        }
+        int ranksCompare = compareInteger(this.getRanks(), that.getRanks());
+        if (ranksCompare != 0) {
+            return ranksCompare;
+        }
+        return StringUtils.compare(this.getName(), that.getName());
+    }
+
+    private static int compareInteger(Integer left, Integer right) {
+        if (left == null && right == null) {
+            return 0;
+        }
+        if (left == null) {
+            return -1;
+        }
+        if (right == null) {
+            return 1;
+        }
+        return left.compareTo(right);
     }
 
     @Override

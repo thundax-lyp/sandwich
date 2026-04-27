@@ -119,8 +119,6 @@ public final class UserPersistenceAssembler {
             return;
         }
         dataObject.setQueryOfficeId(query.getOfficeId());
-        dataObject.setQueryOfficeTreeLeft(query.getOfficeTreeLeft());
-        dataObject.setQueryOfficeTreeRight(query.getOfficeTreeRight());
         dataObject.setQueryLoginName(query.getLoginName());
         dataObject.setQueryName(query.getName());
         dataObject.setQueryEnableFlag(query.getEnableFlag());

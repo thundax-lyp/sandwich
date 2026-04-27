@@ -102,7 +102,6 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
         map.put("id", idPrefix + this.getId());
         map.put("pId", this.getParentId() == null ? "0" : idPrefix + this.getParentId());
         map.put("name", this.getName());
-        map.put("isParent", this.hasChild());
         return map;
     }
 

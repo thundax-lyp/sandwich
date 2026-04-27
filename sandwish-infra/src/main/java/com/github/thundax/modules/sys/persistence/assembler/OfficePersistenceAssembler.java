@@ -22,8 +22,6 @@ public final class OfficePersistenceAssembler {
         dataObject.setId(entity.getId());
         dataObject.setIsNewRecord(entity.getIsNewRecord());
         dataObject.setParentId(entity.getParentId());
-        dataObject.setLft(entity.getLft());
-        dataObject.setRgt(entity.getRgt());
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
         dataObject.setPriority(entity.getPriority());
@@ -45,8 +43,6 @@ public final class OfficePersistenceAssembler {
         entity.setId(dataObject.getId());
         entity.setIsNewRecord(dataObject.getIsNewRecord());
         entity.setParentId(dataObject.getParentId());
-        entity.setLft(dataObject.getLft());
-        entity.setRgt(dataObject.getRgt());
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());
         entity.setPriority(dataObject.getPriority());

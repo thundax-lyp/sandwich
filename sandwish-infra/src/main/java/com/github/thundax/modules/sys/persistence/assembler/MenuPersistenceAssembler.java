@@ -22,8 +22,6 @@ public final class MenuPersistenceAssembler {
         dataObject.setId(entity.getId());
         dataObject.setIsNewRecord(entity.getIsNewRecord());
         dataObject.setParentId(entity.getParentId());
-        dataObject.setLft(entity.getLft());
-        dataObject.setRgt(entity.getRgt());
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
         dataObject.setRanks(entity.getRanks());
@@ -50,8 +48,6 @@ public final class MenuPersistenceAssembler {
         entity.setId(dataObject.getId());
         entity.setIsNewRecord(dataObject.getIsNewRecord());
         entity.setParentId(dataObject.getParentId());
-        entity.setLft(dataObject.getLft());
-        entity.setRgt(dataObject.getRgt());
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
         entity.setRanks(dataObject.getRanks());

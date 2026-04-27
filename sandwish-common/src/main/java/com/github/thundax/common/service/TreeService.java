@@ -35,10 +35,12 @@ public interface TreeService<T> extends CrudService<T> {
     void moveTreeNode(T fromBean, T toBean, MoveTreeNodeType moveType);
 
     /**
-     * 更新左右树结构，只在初始化时使用
+     * 判断 child 是否为 parent 的子孙节点。
      *
-     * @param entity entity
+     * @param child  子节点
+     * @param parent 父节点
+     * @return 是否为子孙节点
      */
-    void updateLftRgt(T entity);
+    boolean isChildOf(T child, T parent);
 
 }

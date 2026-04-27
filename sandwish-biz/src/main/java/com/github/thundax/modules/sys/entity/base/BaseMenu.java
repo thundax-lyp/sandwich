@@ -9,8 +9,6 @@ import com.github.thundax.modules.sys.entity.Menu;
 public abstract class BaseMenu extends AdminTreeEntity<Menu> {
 
     private String parentId;
-    private Integer lft;
-    private Integer rgt;
 
     private String name;
     private String perms;
@@ -36,26 +34,6 @@ public abstract class BaseMenu extends AdminTreeEntity<Menu> {
     @Override
     public void setParentId(String parentId) {
         this.parentId = parentId;
-    }
-
-    @Override
-    public Integer getLft() {
-        return lft;
-    }
-
-    @Override
-    public void setLft(Integer lft) {
-        this.lft = lft;
-    }
-
-    @Override
-    public Integer getRgt() {
-        return rgt;
-    }
-
-    @Override
-    public void setRgt(Integer rgt) {
-        this.rgt = rgt;
     }
 
     @Override

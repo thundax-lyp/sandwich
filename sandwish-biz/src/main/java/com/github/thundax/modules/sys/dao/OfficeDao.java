@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
+import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Office;
 
 /**
@@ -8,18 +9,8 @@ import com.github.thundax.modules.sys.entity.Office;
  */
 public interface OfficeDao extends CrudDao<Office> {
 
-    Office getTreeNode(String id);
+    void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
 
-    void updateLftRgt(Office node);
-
-    void updateParent(Office node);
-
-    Integer getMaxPosition();
-
-    void moveTreeRgts(Integer from, Integer offset);
-
-    void moveTreeLfts(Integer from, Integer offset);
-
-    void moveTreeNodes(Integer from, Integer to, Integer offset);
+    boolean isChildOf(String childId, String parentId);
 
 }

@@ -9,6 +9,8 @@ Sandwich 的目标是在现有 Java 8、Spring Boot 2、jar 应用和三层 API 
 本文档只解释以下意图：
 
 - 为什么保持三层架构
+- 为什么先修模型边界再替换持久化工具
+- 为什么业务语义和持久化机制要分离
 - 为什么控制抽象新增
 - 为什么采用小步提交
 - 为什么 `commit message` 是工程记忆
@@ -21,7 +23,22 @@ Sandwich 固定以现有三层架构为主线：
 
 治理目标是让这条链路更清晰，并保持文档、代码、测试和提交记录之间的闭环。
 
-## 3. Small Step Commit Intent
+## 3. Persistence Evolution Intent
+
+Sandwich 的持久化演进不是为了追逐某个工具或单纯减少文件数量，而是为了让业务语义留在业务层，让持久化复杂性收敛到 infra。
+
+在引入 MyBatis-Plus、拆分 common 或删除 Mapper XML 之前，必须先判断现有模型边界是否干净。工具替换不能固化旧边界泄漏；如果 domain / Service 已经承载了持久化索引、分页方言或 SQL 维护算法，应先收敛边界，再替换工具。
+
+业务字段和持久化机制固定分开理解：
+
+- 业务关系字段表达业务事实，可以进入 Entity、Service 参数和 API 模型。
+- 持久化索引、分页方言、批量 SQL、upsert、树区间维护等机制服务于数据库访问，不应进入 domain 或 Controller。
+
+复杂持久化机制固定归属 infra。Service 负责业务动作、事务边界和编排；infra 负责把这些动作转换为数据库可执行的查询、更新和索引维护。
+
+消灭 Mapper XML 不等于消灭复杂性。复杂 SQL 不能因为去 XML 而被挤入 Controller、Service、大段注解 SQL 或脆弱 Wrapper。迁移后的复杂性必须仍然有明确的持久化实现归属，并保持三层边界可读、可验证。
+
+## 4. Small Step Commit Intent
 
 小步提交不是单纯的 Git 使用习惯，而是本项目控制复杂度的一部分。
 
@@ -35,7 +52,7 @@ Sandwich 固定以现有三层架构为主线：
 
 因此，AI 和开发者都不应把不相关修改堆叠到同一个提交里，也不应使用失去语义的 `commit message`。提交历史在本项目中承担的是“可回放的决策轨迹”，而不只是代码快照存档。
 
-## 4. Commit Message Shape
+## 5. Commit Message Shape
 
 本项目固定提交格式：
 
@@ -47,6 +64,6 @@ Sandwich 固定以现有三层架构为主线：
 - `domain` 表达业务域、模块或治理域，例如 `admin`、`front`、`biz`、`common`、`storage`、`sys`、`governance`
 - 中文说明表达具体能力变化，不写空泛的“调整”“优化”“修改”
 
-## 5. Open Items
+## 6. Open Items
 
 无

@@ -1,5 +1,9 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
@@ -8,11 +12,15 @@ import java.util.Date;
  * 字典持久化对象。
  */
 @NoArgsConstructor
+@TableName("sys_dict")
 public class DictDO {
 
+    @TableField(exist = false)
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+    @TableField(exist = false)
     private boolean isNewRecord;
 
     private String type;
@@ -21,12 +29,17 @@ public class DictDO {
     private Integer priority;
     private String remarks;
     private Date createDate;
+    @TableField("create_by")
     private String createUserId;
     private Date updateDate;
+    @TableField("update_by")
     private String updateUserId;
     private String delFlag;
+    @TableField(exist = false)
     private String queryType;
+    @TableField(exist = false)
     private String queryRemarks;
+    @TableField(exist = false)
     private String queryLabel;
 
     public DictDO(String id) {

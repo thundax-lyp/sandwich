@@ -40,22 +40,20 @@
         <include refid="signatureColumns"/>
         FROM tb_assist_signature a
         <where>
-            <if test="query != null">
-                <if test="query.businessType != null and query.businessType != ''">
-                    AND a.business_type = #{query.businessType}
-                </if>
-                <if test="query.businessId != null and query.businessId != ''">
-                    AND a.business_id = #{query.businessId}
-                </if>
-                <if test="query.businessIdList != null">
-                    AND a.business_id IN
-                    <foreach collection="query.businessIdList" item="item" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-                <if test="query.isVerifySign != null and query.isVerifySign != ''">
-                    AND a.is_verify_sign = #{query.isVerifySign}
-                </if>
+            <if test="queryBusinessType != null and queryBusinessType != ''">
+                AND a.business_type = #{queryBusinessType}
+            </if>
+            <if test="queryBusinessId != null and queryBusinessId != ''">
+                AND a.business_id = #{queryBusinessId}
+            </if>
+            <if test="queryBusinessIdList != null">
+                AND a.business_id IN
+                <foreach collection="queryBusinessIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="queryIsVerifySign != null and queryIsVerifySign != ''">
+                AND a.is_verify_sign = #{queryIsVerifySign}
             </if>
         </where>
     </select>

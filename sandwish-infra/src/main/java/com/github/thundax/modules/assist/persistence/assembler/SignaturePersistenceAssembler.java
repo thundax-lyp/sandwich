@@ -30,7 +30,7 @@ public final class SignaturePersistenceAssembler {
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -50,7 +50,6 @@ public final class SignaturePersistenceAssembler {
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -65,27 +64,13 @@ public final class SignaturePersistenceAssembler {
         return entities;
     }
 
-    private static SignatureDO.Query toDataObjectQuery(Signature.Query query) {
+    private static void copyQuery(Signature.Query query, SignatureDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        SignatureDO.Query dataObjectQuery = new SignatureDO.Query();
-        dataObjectQuery.setBusinessType(query.getBusinessType());
-        dataObjectQuery.setBusinessId(query.getBusinessId());
-        dataObjectQuery.setIsVerifySign(query.getIsVerifySign());
-        dataObjectQuery.setBusinessIdList(query.getBusinessIdList());
-        return dataObjectQuery;
-    }
-
-    private static Signature.Query toEntityQuery(SignatureDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Signature.Query entityQuery = new Signature.Query();
-        entityQuery.setBusinessType(query.getBusinessType());
-        entityQuery.setBusinessId(query.getBusinessId());
-        entityQuery.setIsVerifySign(query.getIsVerifySign());
-        entityQuery.setBusinessIdList(query.getBusinessIdList());
-        return entityQuery;
+        dataObject.setQueryBusinessType(query.getBusinessType());
+        dataObject.setQueryBusinessId(query.getBusinessId());
+        dataObject.setQueryIsVerifySign(query.getIsVerifySign());
+        dataObject.setQueryBusinessIdList(query.getBusinessIdList());
     }
 }

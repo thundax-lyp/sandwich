@@ -47,12 +47,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `assist-signature-persistence`：收敛签名持久化表达
-  - 范围对象：`SignatureService`、`SignatureServiceImpl`、`SignatureDao`、`SignatureDaoImpl`、`SignatureMapper`、`mapper/mapping/mysql/SignatureMapper.xml`、`mapper/mapping/dameng/SignatureMapper.xml`、`mapper/mapping/kingbase/SignatureMapper.xml`、`SignatureDO`、`SignaturePersistenceAssembler`
-  - 当前依赖：`SignatureService extends CrudService<Signature>`；`SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature>`；`SignatureDao extends CrudDao<Signature>`；`SignatureMapper extends CrudDao<SignatureDO>`；`SignatureDO extends DataEntity<SignatureDO>`；`SignatureDO.Query` 承载 `businessType`、`businessId`、`businessIdList`、`isVerifySign` 查询条件；`SignaturePersistenceAssembler` 负责 `Signature.Query <-> SignatureDO.Query` 转换
-  - 处理动作：显式化签名 Mapper 方法；拉平 `SignatureDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get` 使用 `businessType + businessId` 查询、`getMany` 使用 `business_id` 集合查询、`findList`、`insert`、`update`、`delete`、`insertOrUpdate` 能力；分别保持 MySQL `ON DUPLICATE KEY UPDATE` 和达梦 / Kingbase `MERGE INTO` 语义
-  - 验收点：签名链路不再依赖通用查询契约、`SignatureDO.Query` 或 `SignatureDO extends DataEntity`；Admin 包编译通过
-
 - [ ] `assist-async-task-persistence`：收敛异步任务 Redis 持久化表达
   - 范围对象：`AsyncTaskService`、`AsyncTaskServiceImpl`、`AsyncTaskDao`、`AsyncTaskDaoImpl`、`AsyncTaskDO`、`AsyncTaskPersistenceAssembler`
   - 当前依赖：`AsyncTaskDao` 为自定义 Redis DAO，不存在 Mapper / Mapper XML；`AsyncTaskDO extends AdminDataEntity<AsyncTaskDO>`；`AsyncTaskPersistenceAssembler` 复制 `AdminDataEntity` 父类字段；Redis key 前缀为 `Constants.CACHE_PREFIX + "assist.asyncTask."`，保存时使用 `expiredSeconds`

@@ -1,39 +1,51 @@
 package com.github.thundax.modules.assist.persistence.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.persistence.DataEntity;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
  * 签名持久化对象。
  */
 @NoArgsConstructor
-public class SignatureDO extends DataEntity<SignatureDO> {
+public class SignatureDO {
+
+    private String id;
+    private boolean isNewRecord;
 
     private String businessType;
     private String businessId;
     private String signature;
     private String isVerifySign;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String delFlag;
+    private String queryBusinessType;
+    private String queryBusinessId;
+    private String queryIsVerifySign;
+    private List<String> queryBusinessIdList;
 
     public SignatureDO(String id) {
-        super(id);
+        this.id = id;
     }
 
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
+    public String getId() {
+        return id;
     }
 
-    @JsonIgnore
-    public Query getQuery() {
-        return (Query) this.query;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public boolean getIsNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setIsNewRecord(boolean isNewRecord) {
+        this.isNewRecord = isNewRecord;
     }
 
     public String getBusinessType() {
@@ -68,43 +80,75 @@ public class SignatureDO extends DataEntity<SignatureDO> {
         this.isVerifySign = isVerifySign;
     }
 
-    public static class Query implements Serializable {
+    public Integer getPriority() {
+        return priority;
+    }
 
-        private String businessType;
-        private String businessId;
-        private String isVerifySign;
-        private List<String> businessIdList;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
-        public String getBusinessType() {
-            return businessType;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public void setBusinessType(String businessType) {
-            this.businessType = businessType;
-        }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-        public String getBusinessId() {
-            return businessId;
-        }
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-        public void setBusinessId(String businessId) {
-            this.businessId = businessId;
-        }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-        public String getIsVerifySign() {
-            return isVerifySign;
-        }
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-        public void setIsVerifySign(String isVerifySign) {
-            this.isVerifySign = isVerifySign;
-        }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
-        public List<String> getBusinessIdList() {
-            return businessIdList;
-        }
+    public String getDelFlag() {
+        return delFlag;
+    }
 
-        public void setBusinessIdList(List<String> businessIdList) {
-            this.businessIdList = businessIdList;
-        }
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public String getQueryBusinessType() {
+        return queryBusinessType;
+    }
+
+    public void setQueryBusinessType(String queryBusinessType) {
+        this.queryBusinessType = queryBusinessType;
+    }
+
+    public String getQueryBusinessId() {
+        return queryBusinessId;
+    }
+
+    public void setQueryBusinessId(String queryBusinessId) {
+        this.queryBusinessId = queryBusinessId;
+    }
+
+    public String getQueryIsVerifySign() {
+        return queryIsVerifySign;
+    }
+
+    public void setQueryIsVerifySign(String queryIsVerifySign) {
+        this.queryIsVerifySign = queryIsVerifySign;
+    }
+
+    public List<String> getQueryBusinessIdList() {
+        return queryBusinessIdList;
+    }
+
+    public void setQueryBusinessIdList(List<String> queryBusinessIdList) {
+        this.queryBusinessIdList = queryBusinessIdList;
     }
 }

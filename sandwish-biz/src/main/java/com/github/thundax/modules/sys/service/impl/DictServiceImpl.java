@@ -49,7 +49,9 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
     public List<String> findLabelList(String type){
       List<String> result=new ArrayList<String>();
         Dict query=new Dict();
-        query.setQueryProp(Dict.Query.PROP_TYPE,type);
+        Dict.Query queryCondition = new Dict.Query();
+        queryCondition.setType(type);
+        query.setQuery(queryCondition);
         List<Dict> list=dao.findList(query);
         String s = "";
         for (Dict item : list) {

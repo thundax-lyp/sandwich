@@ -3,7 +3,6 @@ package com.github.thundax.common.persistence;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.utils.IdGen;
-import com.github.thundax.common.utils.Reflections;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
@@ -23,8 +22,6 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
     protected Date createDate;
     protected Date updateDate;
     protected String delFlag;
-
-    protected Object query;
 
     public DataEntity() {
         super();
@@ -111,25 +108,6 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
     @JsonIgnore
     public boolean isDeleted() {
         return StringUtils.equals(getDelFlag(), DEL_FLAG_DELETE);
-    }
-
-    protected Object createQueryObject() {
-        return null;
-    }
-
-    public void setQueryProp(String propertyName, Object propertyValue) {
-        if (this.query == null) {
-            this.query = createQueryObject();
-        }
-        Reflections.invokeSetter(this.query, propertyName, propertyValue);
-    }
-
-    public Object getQueryProp(String propertyName) {
-        if (this.query == null) {
-            return null;
-        } else {
-            return Reflections.invokeGetter(this.query, propertyName);
-        }
     }
 
 }

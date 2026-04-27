@@ -131,17 +131,11 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return JsonUtils.toJson(map);
     }
 
-    /**
-     * 定义查询条件
-     */
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
-    }
+    private Query query;
 
     @JsonIgnore
     public Query getQuery() {
-        return (Query) this.query;
+        return this.query;
     }
 
     public void setQuery(Query query) {

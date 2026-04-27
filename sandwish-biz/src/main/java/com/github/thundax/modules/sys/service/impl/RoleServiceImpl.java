@@ -60,7 +60,9 @@ public class RoleServiceImpl extends CrudServiceImpl<RoleDao, Role> implements R
     @Override
     public List<Role> findValidList() {
         Role query = new Role();
-        query.setQueryProp(Role.Query.PROP_ENABLE_FLAG, Global.ENABLE);
+        Role.Query queryCondition = new Role.Query();
+        queryCondition.setEnableFlag(Global.ENABLE);
+        query.setQuery(queryCondition);
         return this.findList(query);
     }
 

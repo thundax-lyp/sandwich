@@ -6,10 +6,12 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.persistence.assembler.OfficePersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.cache.OfficeCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
 import com.github.thundax.modules.sys.persistence.mapper.OfficeMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,19 +21,46 @@ import java.util.List;
 public class OfficeDaoImpl implements OfficeDao {
 
     private final OfficeMapper mapper;
+    private final OfficeCacheSupport cacheSupport;
 
-    public OfficeDaoImpl(OfficeMapper mapper) {
+    public OfficeDaoImpl(OfficeMapper mapper, OfficeCacheSupport cacheSupport) {
         this.mapper = mapper;
+        this.cacheSupport = cacheSupport;
     }
 
     @Override
     public Office get(Office entity) {
-        return OfficePersistenceAssembler.toEntity(mapper.get(OfficePersistenceAssembler.toDataObject(entity)));
+        Office office = cacheSupport.getById(entity.getId());
+        if (office != null) {
+            return office;
+        }
+
+        office = OfficePersistenceAssembler.toEntity(mapper.get(OfficePersistenceAssembler.toDataObject(entity)));
+        cacheSupport.putById(office);
+        return office;
     }
 
     @Override
     public List<Office> getMany(List<String> idList) {
-        return OfficePersistenceAssembler.toEntityList(mapper.getMany(idList));
+        List<Office> officeList = new ArrayList<>();
+        List<String> uncachedIdList = new ArrayList<>();
+        for (String id : idList) {
+            Office office = cacheSupport.getById(id);
+            if (office == null) {
+                uncachedIdList.add(id);
+            } else {
+                officeList.add(office);
+            }
+        }
+
+        if (!uncachedIdList.isEmpty()) {
+            List<Office> uncachedOfficeList = OfficePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            for (Office office : uncachedOfficeList) {
+                cacheSupport.putById(office);
+                officeList.add(office);
+            }
+        }
+        return officeList;
     }
 
     @Override
@@ -57,7 +86,9 @@ public class OfficeDaoImpl implements OfficeDao {
         dataObject.setRgt(newPosition + 1);
         mapper.moveTreeRgts(newPosition, 2);
         mapper.moveTreeLfts(newPosition, 2);
-        return mapper.insert(dataObject);
+        int count = mapper.insert(dataObject);
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
@@ -69,12 +100,16 @@ public class OfficeDaoImpl implements OfficeDao {
         if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
-        return mapper.update(dataObject);
+        int count = mapper.update(dataObject);
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
     public int updatePriority(Office entity) {
-        return mapper.updatePriority(OfficePersistenceAssembler.toDataObject(entity));
+        int count = mapper.updatePriority(OfficePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     public int updateStatus(Office entity) {
@@ -83,7 +118,9 @@ public class OfficeDaoImpl implements OfficeDao {
 
     @Override
     public int updateDelFlag(Office entity) {
-        return mapper.updateDelFlag(OfficePersistenceAssembler.toDataObject(entity));
+        int count = mapper.updateDelFlag(OfficePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     @Override
@@ -94,7 +131,9 @@ public class OfficeDaoImpl implements OfficeDao {
         }
         mapper.moveTreeRgts(node.getLft(), -treeSpan(node));
         mapper.moveTreeLfts(node.getLft(), -treeSpan(node));
-        return mapper.delete(OfficePersistenceAssembler.toDataObject(entity));
+        int count = mapper.delete(OfficePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeAll();
+        return count;
     }
 
     @Override
@@ -132,6 +171,7 @@ public class OfficeDaoImpl implements OfficeDao {
         parentUpdate.setId(fromId);
         parentUpdate.setParentId(newParentId);
         mapper.updateParent(parentUpdate);
+        cacheSupport.removeAll();
     }
 
     @Override

@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-office-chain-migration`：迁移 Office 缓存链路到 infra
-  - 依赖前置：完成 `cache-infra-contract-design`
-  - 范围对象：`OfficeServiceImpl`、`OfficeDao`、`OfficeDaoImpl`、`OfficeMapper`、`OfficeServiceHolder`
-  - 处理动作：将 Office 缓存迁入 infra；树结构写操作后的失效策略必须显式记录
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：Office 树查询和移动语义不变；Service 不再直接操作缓存
 - [ ] `cache-menu-chain-migration`：迁移 Menu 缓存链路到 infra
   - 依赖前置：完成 `cache-office-chain-migration`
   - 范围对象：`MenuServiceImpl`、`MenuDao`、`MenuDaoImpl`、`MenuMapper`、`MenuServiceHolder`、`UserServiceHolder` 中的 `preload` 调用

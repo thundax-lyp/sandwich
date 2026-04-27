@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.dao.OfficeDao;
@@ -21,16 +20,6 @@ public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implem
     }
 
     @Override
-    protected boolean isRedisCacheEnabled() {
-        return true;
-    }
-
-    @Override
-    protected String getCacheSection() {
-        return Constants.CACHE_PREFIX + "SYS_OFFICE_";
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(Office entity) {
         if (entity.getIsNewRecord()) {
@@ -40,8 +29,6 @@ public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implem
             entity.preUpdate();
             dao.update(entity);
         }
-
-        removeAllCache();
     }
 
     @Override
@@ -54,8 +41,6 @@ public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implem
 
         int count = dao.delete(bean);
 
-        removeAllCache();
-
         return count;
     }
 
@@ -63,7 +48,6 @@ public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implem
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {
         dao.moveTreeNode(from.getId(), to.getId(), moveType);
-        removeAllCache();
     }
 
     @Override

@@ -1,10 +1,7 @@
 package com.github.thundax.modules.sys.servlet;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.common.utils.SpringContextHolder;
-import org.apache.commons.lang3.StringUtils;
-import com.github.thundax.common.utils.redis.RedisClient;
+import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -14,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 生成随机验证码
@@ -27,13 +25,14 @@ public class SmsValidateCodeServlet extends HttpServlet {
 
     public static final int CODE_LENGTH = 6;
 
-    public static final String CACHE_MOBILE = Constants.CACHE_PREFIX + "smsValidateMobile.";
     public static final int CACHE_EXPIRED_SECONDS = 1;
 
     private static String whiteCaptcha;
+    private final SmsValidateCodeDao smsValidateCodeDao;
 
-    public SmsValidateCodeServlet() {
+    public SmsValidateCodeServlet(SmsValidateCodeDao smsValidateCodeDao) {
         super();
+        this.smsValidateCodeDao = smsValidateCodeDao;
     }
 
     @Override
@@ -102,14 +101,14 @@ public class SmsValidateCodeServlet extends HttpServlet {
             return;
         }
 
-        if (getRedisClient().exists(CACHE_MOBILE + validateMobile)) {
+        if (!smsValidateCodeDao.canSend(validateMobile)) {
             sendResult(response, false, "手机号发送过于频繁");
             return;
         }
 
         sendMessage(request);
 
-        getRedisClient().set(CACHE_MOBILE + validateMobile, "1", CACHE_EXPIRED_SECONDS);
+        smsValidateCodeDao.markSent(validateMobile, CACHE_EXPIRED_SECONDS);
 
         sendResult(response, true, "验证码已发送");
     }
@@ -147,7 +146,4 @@ public class SmsValidateCodeServlet extends HttpServlet {
         return s.toString();
     }
 
-    private RedisClient getRedisClient() {
-        return SpringContextHolder.getBean(RedisClient.class);
-    }
 }

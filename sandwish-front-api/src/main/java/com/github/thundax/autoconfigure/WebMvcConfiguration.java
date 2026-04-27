@@ -5,6 +5,7 @@ import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
+import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
 import com.github.thundax.modules.sys.servlet.SmsValidateCodeServlet;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
 import java.util.HashMap;
@@ -36,11 +37,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public ServletRegistrationBean<SmsValidateCodeServlet>
-            smsValidateCodeServletServletRegistrationBean(VltavaProperties properties) {
+            smsValidateCodeServletServletRegistrationBean(
+                    VltavaProperties properties, SmsValidateCodeDao smsValidateCodeDao) {
         SmsValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
 
         ServletRegistrationBean<SmsValidateCodeServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new SmsValidateCodeServlet());
+        bean.setServlet(new SmsValidateCodeServlet(smsValidateCodeDao));
         bean.addUrlMappings("/servlet/smsValidateCodeServlet");
         return bean;
     }

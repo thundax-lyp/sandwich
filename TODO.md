@@ -19,3 +19,11 @@
    - 按任务补测试、文档同步和小步提交
 
 ## P0 - Controller / Service 模型职责隔离
+
+## P0 - Cache / Infra 边界演进
+
+- [ ] `cache-infra-boundary-split-todo`：拆分缓存迁移执行子任务
+  - 参考手册：`docs/30-designs/CACHE-INFRA-BOUNDARY-RUNBOOK.md`
+  - 范围对象：`TODO.md`、`CrudServiceImpl` 缓存职责、直接继承 `CrudServiceImpl` 的缓存链路、`RedisClient` 调用点
+  - 处理动作：只盘点和拆分 TODO；按手册生成可审阅的子任务，第一项必须是现状盘点；不得直接引入 JetCache；不得直接改代码
+  - 验收点：缓存迁移不再是笼统大任务；TODO 中每个后续执行项都能独立验收、独立提交，并明确是否允许引入 JetCache 或删除 `CrudServiceImpl` 方法

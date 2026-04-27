@@ -111,14 +111,37 @@ During migration, `sandwish-infra` may still use Redis directly, but not through
 - Session state lives behind session-specific service contracts.
 - `RedisClient` is deleted from `sandwish-common-core`.
 
+### 4.4 Service And DAO Addition Rules
+
+RedisClient migration may add Service, DAO or Store contracts, but the added type must match the responsibility being moved.
+
+Fixed rules:
+
+- Add a business DAO or Store interface when the responsibility is state persistence, lookup, TTL, lock, token, session attribute, async task state, or temporary key storage.
+- Add a Service only when the caller needs business orchestration, validation, permission adaptation, key generation flow, or cross-DAO coordination.
+- Do not add a Service that only forwards `get`, `set`, `delete`, `exists`, `expire`, or `keys` to Redis.
+- Do not add a generic `RedisService`, `CacheService`, `RedisStore`, `CacheStore`, `RedisRepository`, or `CacheRepository`.
+- DAO or Store interfaces live in `sandwish-biz` when business-facing code needs them.
+- Implementations live in `sandwish-infra`.
+- Infra-only replacement adapters must stay narrowly scoped and must not become a new common client.
+
+Applied examples:
+
+- SM2 private key storage needs a business-facing Store and may need a Service only if key generation/decryption flow is moved out of Controller.
+- Subject remote cache needs a Store below `SubjectServiceImpl`; `SubjectServiceImpl` remains the business/security orchestration point.
+- Login token, login form, login lock, async task and SMS send marker are state persistence concerns and should be modeled as DAO/Store responsibilities.
+- `<BusinessObject>CacheSupport` does not need a new Service or DAO just to replace its backing Redis implementation.
+
 ## 5. Migration Order
 
 ### Step 1: Keypair Private Key Store
 
-Create a business semantic interface for SM2 private key storage. Recommended shape:
+Create a business semantic interface for SM2 private key storage. Fixed shape:
 
 - interface in `sandwish-biz`: `KeypairPrivateKeyStore`
 - implementation in `sandwish-infra`: Redis-backed private key store
+
+If key generation and private-key storage remain coupled in the controller, add a small business Service to own that flow. The Store still owns TTL persistence.
 
 Move `KeypairApiController`, `UserApiController`, and `PersonalApiController` from `RedisClient` to that semantic interface.
 
@@ -140,15 +163,17 @@ For `DictUtils`, prefer replacing the legacy map cache with the existing `DictDa
 
 Move SMS validation rate-limit state out of `SmsValidateCodeServlet`.
 
-Recommended shape:
+Fixed shape:
 
-- business interface in `sandwish-biz`
-- infra implementation stores rate-limit state
+- business DAO or Store interface in `sandwish-biz`
+- infra implementation stores rate-limit state and TTL
 - servlet calls semantic method such as `canSend` / `markSent`
 
 ### Step 5: Infra DAO Redis Adapter
 
 Replace infra DAO direct `RedisClient` usage with an infra-local adapter or typed store implementation.
+
+Existing business DAO interfaces should remain the semantic boundary for `AccessTokenDao`, `LoginFormDao`, `LoginLockDao`, and `AsyncTaskDao`. Do not add an extra Service for these if the flow is still only persistence.
 
 Do not move `RedisClient` into infra under the same generic name. If an adapter is needed, keep it package-private or narrowly named by responsibility.
 

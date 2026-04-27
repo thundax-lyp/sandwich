@@ -26,13 +26,6 @@
 - JetCache 只能出现在 `sandwish-common-cache`、`sandwish-infra` 的实现细节，不能外泄到 Controller、Service、Entity、Request、Response。
 - 迁移期允许 `RedisClient` 暂存；新增或改造代码不得新增 `RedisClient` 调用点。
 
-- [ ] `redis-client-front-session-dict-jetcache-migration`：移除 front-api 对 RedisClient 的直接依赖
-  - 依赖前置：后台/前台应用已接入 `sandwish-common-cache`
-  - 范围对象：`SessionCacheServiceImpl`、`DictUtils`
-  - 处理动作：前台会话/字典缓存迁到业务 Store/DAO 或已有缓存路径；入口模块不直接注入 JetCache
-  - 允许引入 JetCache：是
-  - 允许删除 `RedisClient`：否
-  - 验收点：`sandwish-front-api` 不再直接 import `RedisClient`
 - [ ] `redis-client-biz-sms-state-jetcache-migration`：移除短信验证码 Servlet 对 RedisClient 的直接依赖
   - 依赖前置：后台/前台应用已接入 `sandwish-common-cache`
   - 范围对象：`SmsValidateCodeServlet`

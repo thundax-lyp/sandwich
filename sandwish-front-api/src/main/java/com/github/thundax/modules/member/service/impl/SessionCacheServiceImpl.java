@@ -1,13 +1,15 @@
 package com.github.thundax.modules.member.service.impl;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.thread.PooledThreadLocal;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.member.service.SessionCacheService;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
 /** @author wdit */
@@ -16,15 +18,11 @@ public class SessionCacheServiceImpl implements SessionCacheService {
 
     private static final String CACHE_KEY_FORMAT = Constants.CACHE_PREFIX + "admin.session.%s.%s";
 
-    private final RedisClient redisClient;
+    @CreateCache(name = Constants.CACHE_PREFIX + "front.session.", cacheType = CacheType.REMOTE)
+    private Cache<String, Object> cache;
 
     private final PooledThreadLocal<Map<String, Object>> localCacheHandler =
             new PooledThreadLocal<>();
-
-    @Autowired
-    public SessionCacheServiceImpl(RedisClient redisClient) {
-        this.redisClient = redisClient;
-    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -34,7 +32,7 @@ public class SessionCacheServiceImpl implements SessionCacheService {
                         .computeIfAbsent(HashMap::new)
                         .computeIfAbsent(
                                 createCacheKey(sessionId, key),
-                                cacheKey -> redisClient.get(createCacheKey(sessionId, key), clazz));
+                                cacheKey -> cache.get(createCacheKey(sessionId, key)));
 
         return (T) value;
     }
@@ -47,7 +45,7 @@ public class SessionCacheServiceImpl implements SessionCacheService {
                         .computeIfAbsent(HashMap::new)
                         .computeIfAbsent(
                                 createCacheKey(sessionId, key),
-                                cacheKey -> redisClient.get(createCacheKey(sessionId, key), type));
+                                cacheKey -> cache.get(createCacheKey(sessionId, key)));
 
         return (T) value;
     }
@@ -57,10 +55,10 @@ public class SessionCacheServiceImpl implements SessionCacheService {
         String cacheKey = createCacheKey(sessionId, key);
 
         if (expireSeconds < 0) {
-            redisClient.set(cacheKey, value);
+            cache.put(cacheKey, value);
 
         } else {
-            redisClient.set(cacheKey, value, expireSeconds);
+            cache.put(cacheKey, value, expireSeconds, TimeUnit.SECONDS);
         }
 
         localCacheHandler.computeIfAbsent(HashMap::new).put(cacheKey, value);
@@ -70,7 +68,7 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     public void remove(String sessionId, String key) {
         String cacheKey = createCacheKey(sessionId, key);
 
-        redisClient.delete(cacheKey);
+        cache.remove(cacheKey);
 
         localCacheHandler.computeIfAbsent(HashMap::new).remove(cacheKey);
     }

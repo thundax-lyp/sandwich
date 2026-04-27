@@ -51,7 +51,7 @@ jasypt:
 logging:
   config: classpath:config/logback-spring.xml
   level:
-    com.wdit: DEBUG
+    com.wdit: INFO
 
 swagger:
   base-package: com.github.thundax.modules

@@ -51,7 +51,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <logger name="com.netflix.config.sources.URLConfigurationSource" level="ERROR"/>
     <logger name="org.springframework.boot.web.embedded" level="INFO"/>
-    <logger name="org.springframework.web.reactive.DispatcherHandler" level="DEBUG"/>
-    <logger name="com.wdit" level="DEBUG"/>
+    <logger name="org.springframework.web.reactive.DispatcherHandler" level="INFO"/>
+    <logger name="com.wdit" level="INFO"/>
 
 </configuration>

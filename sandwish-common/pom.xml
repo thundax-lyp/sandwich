@@ -19,5 +19,6 @@
         <module>sandwish-common-core</module>
         <module>sandwish-common-mybatis</module>
         <module>sandwish-common-test</module>
+        <module>sandwish-common-security</module>
     </modules>
 </project>

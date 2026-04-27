@@ -21,22 +21,15 @@
 ## P0 - Cache / Infra 边界演进
 
 - [ ] `spring-security-permission-migration`：用 Spring Security 替换后台自研权限链路
-  - 依赖前置：完成 `docs/30-designs/SPRING-SECURITY-PERMISSION-RUNBOOK.md` 的人工审阅
-  - 范围对象：`common-security`、后台 token filter、权限注解、权限匹配规则、`PermissionService`、权限 Redis DAO/infra 实现、旧 `Subject` 权限链路
-  - 处理动作：新增 `sandwish-common-security` 并同步 project baseline；保留 `role -> menu -> permissions`、默认 `user/admin/super` 和冒号前缀权限语义；登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`
+  - 依赖前置：`sandwish-common-security` 已提供权限前缀匹配规则
+  - 范围对象：后台 token filter、权限注解、`PermissionService`、权限 Redis DAO/infra 实现、旧 `Subject` 权限链路
+  - 处理动作：保留 `role -> menu -> permissions`、默认 `user/admin/super` 和冒号前缀权限语义；登录成功写入权限会话；请求认证恢复权限并 touch TTL；逐步替换旧 `RequiresPermissions`
   - 允许引入 Spring Security：是
   - 允许迁移 `RequiresRoles`：否
   - 允许删除旧权限 AOP：完成新注解全量替换后允许
   - 验收点：后台 Controller 不再依赖自研权限 AOP，权限会话由 `PermissionService -> PermissionDao -> PermissionDaoImpl` 管理，controller/service 不直接触碰 Redis
-- [ ] `redis-client-subject-cache-migration`：移除 SubjectService 对 RedisClient 的直接依赖
-  - 依赖前置：后台密钥接口已完成 RedisClient 迁移
-  - 范围对象：`SubjectServiceImpl`、subject/version 远端缓存 Store/DAO、infra 或安全适配实现
-  - 处理动作：保留本地 subject map 和业务编排语义，将远端 subject/version 读写、TTL 和全量失效移出 admin-api service 实现；不新增只转发 Redis 操作的 Service
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：否
-  - 验收点：`sandwish-admin-api` 不再直接 import `RedisClient`
 - [ ] `redis-client-front-session-dict-migration`：移除前台工具对 RedisClient 的直接依赖
-  - 依赖前置：完成 `redis-client-subject-cache-migration`
+  - 依赖前置：完成后台权限整改中的权限会话 Redis 收敛
   - 范围对象：`SessionCacheServiceImpl`、Session 存储实现、`DictUtils`
   - 处理动作：Session 缓存进入明确的会话 Store/DAO 实现；`DictUtils` 复用现有 Dict DAO/cache 路径或删除无效旧缓存；不新增通用 CacheService
   - 允许引入 JetCache：否

@@ -19,6 +19,7 @@
   - `sandwish-common`: pom
   - `sandwish-common-core`: jar
   - `sandwish-common-mybatis`: jar
+  - `sandwish-common-security`: jar
   - `sandwish-biz`: jar
   - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
@@ -99,6 +100,23 @@ Sandwich 固定采用三层 API 架构。
 - MyBatis-Plus 分页插件固定使用 `DbType.DM`。
 - PageHelper 只服务尚未迁移到 MyBatis-Plus 的旧分页链路。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
+### `sandwish-common-security`
+
+职责：
+
+- 通用安全框架接入
+- Spring Security 基础契约
+- 通用权限匹配规则
+- 不依赖业务数据的认证上下文模型
+
+边界：
+
+- 可以依赖 `sandwish-common-core`。
+- 不承载具体登录流程。
+- 不承载用户、角色、菜单装载逻辑。
+- 不访问 Redis、数据库或业务 DAO。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-biz`
@@ -188,6 +206,10 @@ Sandwich 固定采用三层 API 架构。
 `sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
 `sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
+
+Spring Security 迁移链路允许入口模块依赖：
+
+`sandwish-admin-api -> sandwish-common-security -> sandwish-common-core`
 
 禁止依赖方向：
 

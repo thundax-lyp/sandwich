@@ -3,8 +3,11 @@ package com.github.thundax.modules.assist.api;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.vo.PageVo;
-import com.github.thundax.modules.assist.api.query.SignatureQueryParam;
-import com.github.thundax.modules.assist.api.vo.SignatureVo;
+import com.github.thundax.modules.assist.request.SignatureDeleteRequest;
+import com.github.thundax.modules.assist.request.SignaturePageRequest;
+import com.github.thundax.modules.assist.request.SignatureVerifyRequest;
+import com.github.thundax.modules.assist.response.SignatureResponse;
+import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +27,7 @@ public interface SignatureServiceApi {
     /**
      * 获取列表
      *
-     * @param queryParam 查询参数
+     * @param request 签名分页查询请求
      * @return 列表
      * @throws ApiException API异常
      */
@@ -34,14 +37,14 @@ public interface SignatureServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<SignatureVo> page(@RequestBody @ApiParam("查询参数") SignatureQueryParam queryParam) throws ApiException;
+    PageVo<SignatureResponse> page(@RequestBody @ApiParam("签名分页查询请求") SignaturePageRequest request) throws ApiException;
 
 
     /**
      * 更新
      *
-     * @param vo 对象
-     * @return 成功:true, 失败:false
+     * @param request 签名验签请求
+     * @return 签名验签响应
      * @throws ApiException API异常
      */
     @ApiOperation(value = "校验", notes = "assist:signature:view")
@@ -50,13 +53,13 @@ public interface SignatureServiceApi {
     })
     @SysLogger("校验")
     @RequestMapping(value = "verify", method = RequestMethod.POST)
-    Boolean verify(@RequestBody @ApiParam("对象") SignatureVo vo) throws ApiException;
+    SignatureVerifyResponse verify(@RequestBody @ApiParam("签名验签请求") SignatureVerifyRequest request) throws ApiException;
 
 
     /**
      * 删除
      *
-     * @param list 列表
+     * @param list 签名删除请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -66,6 +69,6 @@ public interface SignatureServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("列表") List<SignatureVo> list) throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("签名删除请求列表") List<SignatureDeleteRequest> list) throws ApiException;
 
 }

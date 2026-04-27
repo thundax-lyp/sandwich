@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `assist-signature-api`：隔离签名 API 模型
-  - 范围入口：`SignatureApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `SignatureQueryParam`、`SignatureVo`；Controller 内存在 `Signature` 到 API 模型转换；签名校验入口直接复用 `SignatureVo`
-  - 需要新增或收窄的 `Request`：签名分页查询、验签、删除请求
-  - 需要新增或收窄的 `Response`：签名分页响应、验签结果响应
-  - 需要新增的 `InterfaceAssembler`：`SignatureInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；`SignService` 只接收签名业务参数或 `Signature`
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `assist-keypair-api`：隔离密钥 API 模型
   - 范围入口：`KeypairApiController`
   - 当前 API 模型泄漏点：入口直接使用 `AccessTokenVo`、`PublicKeyVo`；Controller 内存在令牌校验和公钥响应组装

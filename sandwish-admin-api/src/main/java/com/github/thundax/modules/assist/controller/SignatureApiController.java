@@ -1,13 +1,18 @@
 package com.github.thundax.modules.assist.controller;
 
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.api.SignatureServiceApi;
-import com.github.thundax.modules.assist.api.query.SignatureQueryParam;
-import com.github.thundax.modules.assist.api.vo.SignatureVo;
 import com.github.thundax.modules.assist.entity.Signature;
+import com.github.thundax.modules.assist.request.SignatureDeleteRequest;
+import com.github.thundax.modules.assist.request.SignaturePageRequest;
+import com.github.thundax.modules.assist.request.SignatureVerifyRequest;
+import com.github.thundax.modules.assist.response.SignatureResponse;
+import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
 import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
@@ -20,7 +25,6 @@ import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,51 +39,56 @@ public class SignatureApiController extends BaseApiController implements Signatu
 
     private final SignatureService signatureService;
     private final SignService signService;
+    private final SignatureInterfaceAssembler signatureInterfaceAssembler;
 
     @Autowired
     public SignatureApiController(SignatureService signatureService,
                                   SignService signService,
-                                  Validator validator) {
+                                  Validator validator,
+                                  SignatureInterfaceAssembler signatureInterfaceAssembler) {
         super(validator);
 
         this.signatureService = signatureService;
         this.signService = signService;
+        this.signatureInterfaceAssembler = signatureInterfaceAssembler;
     }
 
 
     @Override
     @RequiresPermissions("assist:signature:view")
-    public PageVo<SignatureVo> page(@RequestBody SignatureQueryParam queryParam) throws ApiException {
-        validate(queryParam);
+    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request) throws ApiException {
+        validate(request);
 
         Signature query = new Signature();
-        query.setQueryProp(Signature.Query.PROP_BUSINESS_TYPE, queryParam.getBusinessType());
+        query.setQueryProp(Signature.Query.PROP_BUSINESS_TYPE, request.getBusinessType());
 
-        return entityPageToVo(signatureService.findPage(query, readPage(queryParam)), this::entityToVo);
+        return entityPageToVo(signatureService.findPage(query, readSignaturePage(request)), this::entityToResponse);
     }
 
 
     @Override
     @RequiresPermissions("assist:signature:view")
-    public Boolean verify(@RequestBody SignatureVo vo) throws ApiException {
-        Signature bean = signatureService.find(vo.getBusinessType(), vo.getBusinessId());
+    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request) throws ApiException {
+        validate(request);
+        Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
 
         if (bean == null) {
-            return false;
+            return signatureInterfaceAssembler.toVerifyResponse(false);
         }
 
         Signable signable = findSignable(bean);
         if (signable == null) {
-            return false;
+            return signatureInterfaceAssembler.toVerifyResponse(false);
         }
 
-        return signService.verifySign(signable.getSignName(), signable.getSignId(), signable.getSignBody());
+        return signatureInterfaceAssembler.toVerifyResponse(
+                signService.verifySign(signable.getSignName(), signable.getSignId(), signable.getSignBody()));
     }
 
 
     @Override
     @RequiresPermissions("assist:signature:edit")
-    public Boolean delete(@RequestBody List<SignatureVo> list) throws ApiException {
+    public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
         List<Signature> beanList = validateList(list,
                 vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
 
@@ -105,24 +114,26 @@ public class SignatureApiController extends BaseApiController implements Signatu
     }
 
 
-    @NonNull
-    private SignatureVo entityToVo(Signature entity) {
-        if (entity == null) {
-            return new SignatureVo();
+    private SignatureResponse entityToResponse(Signature entity) {
+        return signatureInterfaceAssembler.toResponse(entity, findSignable(entity));
+    }
+
+    private Page<Signature> readSignaturePage(SignaturePageRequest request) {
+        Integer pageNo = request.getPageNo();
+        Integer pageSize = request.getPageSize();
+
+        if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
+            pageNo = Page.FIRST_PAGE_INDEX;
         }
 
-        SignatureVo vo = baseEntityToVo(new SignatureVo(), entity);
-
-        vo.setBusinessType(entity.getBusinessType());
-        vo.setBusinessId(entity.getBusinessId());
-        vo.setSignature(entity.getSignature());
-
-        Signable signable = findSignable(entity);
-        if (signable != null) {
-            vo.setBodyParams(signable.getSignBody());
+        if (pageSize == null || pageSize <= 0) {
+            pageSize = Page.DEFAULT_PAGE_SIZE;
         }
 
-        return vo;
+        Page<Signature> page = new Page<>();
+        page.setPageNo(pageNo);
+        page.setPageSize(pageSize);
+        return page;
     }
 
 }

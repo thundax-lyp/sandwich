@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 
 /**
+ * 服务端标签选择视图支撑入口，不承载核心业务 API 规则。
+ *
  * @author wdit
  */
 @Controller

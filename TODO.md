@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `legacy-support-controllers`：明确非业务 API Controller 的处理口径
-  - 范围入口：`TagController`、已注释的 `UploadController`
-  - 当前 API 模型泄漏点：`TagController` 返回服务端视图；`UploadController` 当前整体注释，包含旧上传和文件输出逻辑
-  - 需要新增或收窄的 `Request`：无；先判断保留、迁移到静态支撑、删除或另行拆任务
-  - 需要新增或收窄的 `Response`：无；转为 API 入口时再新增响应模型
-  - 需要新增的 `InterfaceAssembler`：无；后续确认转为业务 API 时再新增
-  - Service 方法签名是否需要调整：当前不调整
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `docs/30-designs`：模型隔离迁移收尾
   - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`MODEL-SEPARATION-RUNBOOK.md`、`TODO.md`、治理文档
   - 处理动作：两套迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档

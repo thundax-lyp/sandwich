@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `assist-async-task-api`：隔离异步任务 API 模型
-  - 范围入口：`AsyncTaskApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `AsyncTaskVo`；Controller 内存在 `AsyncTask` 到 API 模型转换
-  - 需要新增或收窄的 `Request`：异步任务详情请求
-  - 需要新增或收窄的 `Response`：异步任务详情响应
-  - 需要新增的 `InterfaceAssembler`：`AsyncTaskInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；Service 继续使用 `AsyncTask`
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `assist-storage-entry`：明确存储入口模型隔离边界
   - 范围入口：`StorageController`
   - 当前 API 模型泄漏点：入口混合服务端视图返回、`HttpServletRequest` 查询读取、`StorageVo` 上传测试响应和 `Storage` 查询对象组装

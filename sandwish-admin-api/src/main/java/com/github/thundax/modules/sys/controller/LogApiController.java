@@ -41,16 +41,18 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         validate(request);
 
         Log query = new Log();
+        Log.Query queryCondition = new Log.Query();
 
-        query.setQueryProp(Log.Query.PROP_TITLE, request.getTitle());
-        query.setQueryProp(Log.Query.PROP_REMOTE_ADDR, request.getRemoteAddr());
-        query.setQueryProp(Log.Query.PROP_REQUEST_URI, request.getRequestUri());
+        queryCondition.setTitle(request.getTitle());
+        queryCondition.setRemoteAddr(request.getRemoteAddr());
+        queryCondition.setRequestUri(request.getRequestUri());
 
-        query.setQueryProp(Log.Query.PROP_USER_LOGIN_NAME, request.getUserLoginName());
-        query.setQueryProp(Log.Query.PROP_USER_NAME, request.getUserName());
+        queryCondition.setUserLoginName(request.getUserLoginName());
+        queryCondition.setUserName(request.getUserName());
 
-        query.setQueryProp(Log.Query.PROP_BEGIN_DATE, request.getBeginDate());
-        query.setQueryProp(Log.Query.PROP_END_DATE, request.getEndDate());
+        queryCondition.setBeginDate(request.getBeginDate());
+        queryCondition.setEndDate(request.getEndDate());
+        query.setQuery(queryCondition);
 
         return entityPageToVo(logService.findPage(query, readLogPage(request)), logInterfaceAssembler::toResponse);
     }

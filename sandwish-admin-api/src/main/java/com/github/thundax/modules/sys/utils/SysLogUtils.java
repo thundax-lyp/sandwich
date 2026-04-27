@@ -101,8 +101,10 @@ public class SysLogUtils {
     @Scheduled(cron = "0 0 0/4 * * ?")
     void doTask() {
         Log query = new Log();
-        query.setQueryProp(Log.Query.PROP_BEGIN_DATE, DateUtils.addDays(new Date(), -9999));
-        query.setQueryProp(Log.Query.PROP_END_DATE, DateUtils.addDays(new Date(), -properties.getAliveDays()));
+        Log.Query queryCondition = new Log.Query();
+        queryCondition.setBeginDate(DateUtils.addDays(new Date(), -9999));
+        queryCondition.setEndDate(DateUtils.addDays(new Date(), -properties.getAliveDays()));
+        query.setQuery(queryCondition);
         LogServiceHolder.getService().batchDelete(query);
     }
 

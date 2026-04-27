@@ -229,24 +229,20 @@ public class StorageController extends BaseAdminController {
     @NotNull
     private Storage readQuery(HttpServletRequest request, HttpServletResponse response) {
         Storage query = new Storage();
+        Storage.Query queryCondition = new Storage.Query();
 
-        query.setQueryProp(Storage.Query.PROP_MIME_TYPE,
-                readReloadString("query.mimeType", "storage.query.mimeType", request, response));
+        queryCondition.setMimeType(readReloadString("query.mimeType", "storage.query.mimeType", request, response));
 
-        query.setQueryProp(Storage.Query.PROP_BUSINESS_TYPE,
-                readReloadString("query.businessId", "storage.query.businessId", request, response));
+        queryCondition.setBusinessType(readReloadString("query.businessId", "storage.query.businessId", request, response));
 
-        query.setQueryProp(Storage.Query.PROP_ENABLE_FLAG,
-                readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
+        queryCondition.setEnableFlag(readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
 
-        query.setQueryProp(Storage.Query.PROP_PUBLIC_FLAG,
-                readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
+        queryCondition.setPublicFlag(readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
 
-        query.setQueryProp(Storage.Query.PROP_NAME,
-                readReloadString("query.name", "storage.query.name", request, response));
+        queryCondition.setName(readReloadString("query.name", "storage.query.name", request, response));
 
-        query.setQueryProp(Storage.Query.PROP_REMARKS,
-                readReloadString("query.remarks", "storage.query.remarks", request, response));
+        queryCondition.setRemarks(readReloadString("query.remarks", "storage.query.remarks", request, response));
+        query.setQuery(queryCondition);
 
         return query;
     }

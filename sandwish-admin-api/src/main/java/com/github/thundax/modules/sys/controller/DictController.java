@@ -83,15 +83,17 @@ public class DictController extends BaseApiController implements DictServiceApi 
 
     private Dict readQuery(String label, String type, String remarks) {
         Dict query = new Dict();
+        Dict.Query queryCondition = new Dict.Query();
         if (StringUtils.isNotEmpty(label)) {
-            query.setQueryProp(Dict.Query.PROP_LABEL, label);
+            queryCondition.setLabel(label);
         }
         if (StringUtils.isNotEmpty(type)) {
-            query.setQueryProp(Dict.Query.PROP_TYPE, type);
+            queryCondition.setType(type);
         }
         if (StringUtils.isNotEmpty(remarks)) {
-            query.setQueryProp(Dict.Query.PROP_REMARKS, remarks);
+            queryCondition.setRemarks(remarks);
         }
+        query.setQuery(queryCondition);
         return query;
     }
 

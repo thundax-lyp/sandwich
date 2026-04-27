@@ -60,10 +60,12 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         validate(request);
 
         Office query = new Office();
+        Office.Query queryCondition = new Office.Query();
 
-        query.setQueryProp(Office.Query.PROP_PARENT_ID, request.getParentId());
-        query.setQueryProp(Office.Query.PROP_NAME, request.getName());
-        query.setQueryProp(Office.Query.PROP_REMARKS, request.getRemarks());
+        queryCondition.setParentId(request.getParentId());
+        queryCondition.setName(request.getName());
+        queryCondition.setRemarks(request.getRemarks());
+        query.setQuery(queryCondition);
 
         return ListUtils.map(officeService.findList(query), officeInterfaceAssembler::toResponse);
     }
@@ -178,7 +180,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
             throw new NullBeanException(Office.BEAN_NAME, request.getToNodeId());
         }
 
-        if (toBean.equals(fromBean) || toBean.isChildOf(fromBean, null)) {
+        if (toBean.equals(fromBean) || officeService.isChildOf(toBean, fromBean)) {
             throw new MoveTreeNodeException(Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 

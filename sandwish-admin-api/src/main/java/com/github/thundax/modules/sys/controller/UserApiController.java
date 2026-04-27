@@ -291,7 +291,9 @@ public class UserApiController extends BaseApiController implements UserServiceA
     @RequiresPermissions("sys:user:view")
     public List<UserRoleResponse> roleList() {
         Role query = new Role();
-        query.setQueryProp(Role.Query.PROP_ENABLE_FLAG, Global.ENABLE);
+        Role.Query queryCondition = new Role.Query();
+        queryCondition.setEnableFlag(Global.ENABLE);
+        query.setQuery(queryCondition);
 
         return ListUtils.map(roleService.findList(query), userInterfaceAssembler::toRoleResponse);
     }
@@ -323,12 +325,13 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     private User readQuery(UserQueryRequest request) throws ApiException {
         User query = new User();
+        User.Query queryCondition = new User.Query();
 
-        query.setQueryProp(User.Query.PROP_LOGIN_NAME, request.getLoginName());
-        query.setQueryProp(User.Query.PROP_NAME, request.getName());
+        queryCondition.setLoginName(request.getLoginName());
+        queryCondition.setName(request.getName());
 
         if (request.getEnable() != null) {
-            query.setQueryProp(User.Query.PROP_ENABLE_FLAG, request.getEnable() ? Global.ENABLE : Global.DISABLE);
+            queryCondition.setEnableFlag(request.getEnable() ? Global.ENABLE : Global.DISABLE);
         }
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {
@@ -337,11 +340,11 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
 
-            query.setQueryProp(User.Query.PROP_OFFICE_TREE_LEFT, office.getLft());
-            query.setQueryProp(User.Query.PROP_OFFICE_TREE_RIGHT, office.getRgt());
+            queryCondition.setOfficeId(office.getId());
         }
 
-        query.setQueryProp(User.Query.PROP_ORDER_BY, request.getOrderBy());
+        queryCondition.setOrderBy(request.getOrderBy());
+        query.setQuery(queryCondition);
 
         return query;
     }

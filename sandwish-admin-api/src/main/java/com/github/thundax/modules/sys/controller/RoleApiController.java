@@ -90,9 +90,11 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         validate(request);
 
         Role query = new Role();
+        Role.Query queryCondition = new Role.Query();
         if (request.getEnable() != null) {
-            query.setQueryProp(Role.Query.PROP_ENABLE_FLAG, request.getEnable() ? Global.ENABLE : Global.DISABLE);
+            queryCondition.setEnableFlag(request.getEnable() ? Global.ENABLE : Global.DISABLE);
         }
+        query.setQuery(queryCondition);
 
         return ListUtils.map(roleService.findList(query), roleInterfaceAssembler::toResponse);
     }

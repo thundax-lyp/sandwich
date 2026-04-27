@@ -62,11 +62,13 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         validate(request);
 
         Menu query = new Menu();
+        Menu.Query queryCondition = new Menu.Query();
 
-        query.setQueryProp(Menu.Query.PROP_PARENT_ID, request.getParentId());
+        queryCondition.setParentId(request.getParentId());
         if (request.getDisplay() != null) {
-            query.setQueryProp(Menu.Query.PROP_DISPLAY_FLAG, request.getDisplay() ? Global.SHOW : Global.HIDE);
+            queryCondition.setDisplayFlag(request.getDisplay() ? Global.SHOW : Global.HIDE);
         }
+        query.setQuery(queryCondition);
 
         return ListUtils.map(menuService.findList(query), menuInterfaceAssembler::toResponse);
     }
@@ -194,7 +196,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
             throw new NullBeanException(Menu.BEAN_NAME, request.getToNodeId());
         }
 
-        if (toBean.equals(fromBean) || toBean.isChildOf(fromBean, null)) {
+        if (toBean.equals(fromBean) || menuService.isChildOf(toBean, fromBean)) {
             throw new MoveTreeNodeException(Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 

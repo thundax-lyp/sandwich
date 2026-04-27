@@ -20,15 +20,131 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `TODO.md`：按 API 入口拆分 Controller / Service 模型隔离任务
-  - 范围对象：后台与前台 Controller/API 入口
-  - 处理动作：按 `docs/30-designs/MODEL-SEPARATION-RUNBOOK.md` 的 TODO 模板，为每个入口列出当前 API 模型泄漏点、待新增或收窄的 `Request/Response`、待新增 `InterfaceAssembler`、Service 方法签名是否需要调整
-  - 验收点：每个入口都有可独立验收的模型隔离 TODO；TODO 不包含 Mapper/XML/DAO implementation 迁移
+- [ ] `sys-user-api`：隔离用户管理 API 模型
+  - 范围入口：`UserApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `UserVo`、`UserQueryParam`、`OfficeVo`、`RoleVo`；Controller 内存在 `readQuery`、`entityToVo`、`voToEntity` 和校验辅助方法；Service 调用已基本使用 `User`、`Office`、`Role`
+  - 需要新增或收窄的 `Request`：用户查询、创建、更新、头像删除/查看、启停、删除、登录名检查请求
+  - 需要新增或收窄的 `Response`：用户详情/列表/分页响应、机构树响应、角色列表响应、头像地址响应
+  - 需要新增的 `InterfaceAssembler`：`UserInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；验收时不得保留 `UserQueryParam` 下沉到 Service，存在时改为 `User` 或稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
 
-- [ ] `sys-dict`：拆分 Controller / Service 模型职责隔离试点任务
-  - 范围对象：`Dict` 相关 Controller/API、Service、Entity、API 查询与响应模型
-  - 处理动作：先盘点 `dict` 入口的 API 模型泄漏点，拆出后续试点 TODO，标明需要新增或收窄的 `Request/Response`、`InterfaceAssembler` 和 Service 方法签名调整点；不迁移 Mapper/XML/DAO implementation
-  - 验收点：`sys-dict` 形成可执行的 Controller / Service 模型隔离试点清单；本项不直接改造任何入口代码
+- [ ] `sys-role-api`：隔离角色管理 API 模型
+  - 范围入口：`RoleApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `RoleVo`、`RoleQueryParam`、`AssignUserQueryParam`、`MenuVo`、`OfficeVo`、`UserTreeNodeVo`、`UserVo`；Controller 内存在多组 `entityToVo`、`voToEntity` 和菜单/分配用户校验
+  - 需要新增或收窄的 `Request`：角色查询、创建、更新、启停、排序、删除、分配用户请求
+  - 需要新增或收窄的 `Response`：角色详情/列表响应、菜单树响应、用户树响应、已分配用户响应
+  - 需要新增的 `InterfaceAssembler`：`RoleInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；分配用户链路保持 Service 接收 `Role` 或稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `sys-office-api`：隔离机构管理 API 模型
+  - 范围入口：`OfficeApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `OfficeVo`、`OfficeQueryParam`、`MoveTreeNodeQueryParam`；Controller 内存在树过滤、`entityToVo`、`voToEntity`
+  - 需要新增或收窄的 `Request`：机构查询、创建、更新、删除、树排除、树节点移动请求
+  - 需要新增或收窄的 `Response`：机构详情/列表/树响应
+  - 需要新增的 `InterfaceAssembler`：`OfficeInterfaceAssembler`
+  - Service 方法签名是否需要调整：验收时不得让 Service 依赖通用 `MoveTreeNodeQueryParam`，存在时收敛为稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `sys-menu-api`：隔离菜单管理 API 模型
+  - 范围入口：`MenuApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `MenuVo`、`MenuQueryParam`、`MoveTreeNodeQueryParam`；Controller 内存在树过滤、`entityToVo`、`voToEntity`
+  - 需要新增或收窄的 `Request`：菜单查询、创建、更新、显示状态、删除、树排除、树节点移动请求
+  - 需要新增或收窄的 `Response`：菜单详情/列表/树响应
+  - 需要新增的 `InterfaceAssembler`：`MenuInterfaceAssembler`
+  - Service 方法签名是否需要调整：验收时不得让 Service 依赖通用 `MoveTreeNodeQueryParam`，存在时收敛为稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `sys-log-api`：隔离日志查询 API 模型
+  - 范围入口：`LogApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `LogQueryParam`、`LogVo`、`OfficeVo`、`UserVo`；Controller 内存在 `Log`、`Office`、`User` 到 API 模型转换
+  - 需要新增或收窄的 `Request`：日志分页查询请求
+  - 需要新增或收窄的 `Response`：日志分页响应、日志用户摘要响应、日志机构摘要响应
+  - 需要新增的 `InterfaceAssembler`：`LogInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；分页查询保持 Service 接收 `Log` 或稳定查询参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `sys-dict-api`：隔离字典管理 API 模型试点
+  - 范围入口：`DictController`
+  - 当前 API 模型泄漏点：入口直接使用 `DictVo`、`DictQueryParam`；Controller 内存在 `Dict` 到 API 模型转换；新增和更新入口直接复用 `DictVo`
+  - 需要新增或收窄的 `Request`：字典详情、列表查询、分页查询、创建、更新、删除请求
+  - 需要新增或收窄的 `Response`：字典详情响应、字典列表响应、字典分页响应
+  - 需要新增的 `InterfaceAssembler`：`DictInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；验收时 Service 只接收 `Dict` 或稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `sys-personal-api`：隔离个人中心 API 模型
+  - 范围入口：`PersonalApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `UserVo`、`UpdatePasswordQueryParam`、`MenuVo`；Controller 内存在当前用户 `User` 到 API 模型转换和菜单响应组装
+  - 需要新增或收窄的 `Request`：个人资料更新、密码更新、头像上传、头像删除请求
+  - 需要新增或收窄的 `Response`：个人信息响应、头像响应、菜单响应、权限编码响应
+  - 需要新增的 `InterfaceAssembler`：`PersonalInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；密码更新继续通过稳定业务参数传给 `PasswordService`
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `auth-admin-api`：隔离后台认证 API 模型
+  - 范围入口：`AuthApiController`、`CaptchaApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `LoginFormVo`、`AccessTokenVo`、`UsernameLoginQueryParam`；Controller 内存在 `LoginForm`、`AccessToken` 到 API 模型转换；验证码刷新请求仍复用 `LoginFormVo`
+  - 需要新增或收窄的 `Request`：登录、刷新登录表单、刷新验证码、退出登录请求
+  - 需要新增或收窄的 `Response`：登录表单响应、访问令牌响应、验证码响应
+  - 需要新增的 `InterfaceAssembler`：`AuthInterfaceAssembler`、`CaptchaInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；认证 Service 保持接收 `LoginForm`、`AccessToken` 或稳定业务参数
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `assist-signature-api`：隔离签名 API 模型
+  - 范围入口：`SignatureApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `SignatureQueryParam`、`SignatureVo`；Controller 内存在 `Signature` 到 API 模型转换；签名校验入口直接复用 `SignatureVo`
+  - 需要新增或收窄的 `Request`：签名分页查询、验签、删除请求
+  - 需要新增或收窄的 `Response`：签名分页响应、验签结果响应
+  - 需要新增的 `InterfaceAssembler`：`SignatureInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；`SignService` 只接收签名业务参数或 `Signature`
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `assist-keypair-api`：隔离密钥 API 模型
+  - 范围入口：`KeypairApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `AccessTokenVo`、`PublicKeyVo`；Controller 内存在令牌校验和公钥响应组装
+  - 需要新增或收窄的 `Request`：公钥获取请求
+  - 需要新增或收窄的 `Response`：公钥响应
+  - 需要新增的 `InterfaceAssembler`：`KeypairInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；认证令牌转换保持在入口模块
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `assist-async-task-api`：隔离异步任务 API 模型
+  - 范围入口：`AsyncTaskApiController`
+  - 当前 API 模型泄漏点：入口直接使用 `AsyncTaskVo`；Controller 内存在 `AsyncTask` 到 API 模型转换
+  - 需要新增或收窄的 `Request`：异步任务详情请求
+  - 需要新增或收窄的 `Response`：异步任务详情响应
+  - 需要新增的 `InterfaceAssembler`：`AsyncTaskInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；Service 继续使用 `AsyncTask`
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `assist-storage-entry`：明确存储入口模型隔离边界
+  - 范围入口：`StorageController`
+  - 当前 API 模型泄漏点：入口混合服务端视图返回、`HttpServletRequest` 查询读取、`StorageVo` 上传测试响应和 `Storage` 查询对象组装
+  - 需要新增或收窄的 `Request`：上传测试、列表查询、删除请求；服务端页面入口继续保留时，必须单独标明不是核心 API 模型隔离目标
+  - 需要新增或收窄的 `Response`：上传响应、树数据响应、预览/删除结果响应
+  - 需要新增的 `InterfaceAssembler`：`StorageInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前不调整；页面入口继续直接使用 `HttpServletRequest` 组装查询时，先拆出 API 与页面/支撑入口边界
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
+
+- [ ] `front-member-entry`：明确前台会员登录入口模型隔离边界
+  - 范围入口：`LoginController`、`LogoutController`
+  - 当前 API 模型泄漏点：入口主要返回字符串视图/状态并直接使用 `HttpServletRequest`、`HttpServletResponse`、`Model`；当前未通过 Service 暴露业务 `Entity`
+  - 需要新增或收窄的 `Request`：登录检查、退出登录请求；页面入口继续保留时，先明确是否迁移为 API Request
+  - 需要新增或收窄的 `Response`：登录状态响应、退出结果响应；页面入口继续保留时，先明确响应模型边界
+  - 需要新增的 `InterfaceAssembler`：改造为 API 响应模型时新增 `MemberLoginInterfaceAssembler`
+  - Service 方法签名是否需要调整：当前无明确 Service 调用，本项不调整 Service
+  - 验收命令：`mvn -pl sandwish-front-api -am -DskipTests package`
+
+- [ ] `legacy-support-controllers`：明确非业务 API Controller 的处理口径
+  - 范围入口：`TagController`、已注释的 `UploadController`
+  - 当前 API 模型泄漏点：`TagController` 返回服务端视图；`UploadController` 当前整体注释，包含旧上传和文件输出逻辑
+  - 需要新增或收窄的 `Request`：无；先判断保留、迁移到静态支撑、删除或另行拆任务
+  - 需要新增或收窄的 `Response`：无；转为 API 入口时再新增响应模型
+  - 需要新增的 `InterfaceAssembler`：无；后续确认转为业务 API 时再新增
+  - Service 方法签名是否需要调整：当前不调整
+  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
 
 - [ ] `docs/30-designs`：模型隔离迁移收尾
   - 范围对象：`INFRA-SPLIT-RUNBOOK.md`、`MODEL-SEPARATION-RUNBOOK.md`、`TODO.md`、治理文档

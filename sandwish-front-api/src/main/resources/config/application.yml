@@ -35,14 +35,9 @@ spring:
   profiles:
     active: vastbase-dev
 
-shiro:
-  loginUrl: /auth/login
-  successUrl: /user/index
-  sessionManager:
-    sessionIdUrlRewritingEnabled: false
-    sessionIdCookieEnabled: true
-    cookie:
-      name: interaction.sid
+front:
+  security:
+    success-url: /user/index
 
 jasypt:
   encryptor:

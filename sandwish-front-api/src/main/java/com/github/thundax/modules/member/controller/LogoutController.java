@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/auth")
 public class LogoutController {
 
-    @Value("${shiro.successUrl}")
+    @Value("${front.security.success-url}")
     private String successUrl;
 
     private final YwtbProperties properties;

@@ -164,6 +164,7 @@
 - 删除 `MemberAuthorizingRealm`、`MemberAuthenticationToken`、`ShiroUtils` 和仅服务 Shiro 的异常/过滤器。
 - 删除 `shiro-spring-boot-web-starter` 依赖。
 - 删除不再使用的 `shiro.*` 配置项。
+- 删除迁移期 Spring Security 旁路配置，让 `FrontSpringSecurityConfiguration` 成为默认前台安全配置。
 
 验收：
 

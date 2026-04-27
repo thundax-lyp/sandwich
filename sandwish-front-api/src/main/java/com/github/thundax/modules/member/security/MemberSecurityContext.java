@@ -1,6 +1,5 @@
 package com.github.thundax.modules.member.security;
 
-import com.github.thundax.modules.member.utils.ShiroUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
@@ -22,11 +21,7 @@ public final class MemberSecurityContext {
             return (MemberSpringPrincipal) authentication.getPrincipal();
         }
 
-        MemberPrincipal shiroPrincipal = ShiroUtils.getPrincipal();
-        if (shiroPrincipal == null) {
-            return null;
-        }
-        return new MemberSpringPrincipal(shiroPrincipal.getId());
+        return null;
     }
 
     public static String getCurrentMemberId() {

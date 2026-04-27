@@ -92,13 +92,6 @@
         </dependency>
         <!-- Spring Boot end -->
 
-        <!-- shiro begin -->
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-spring-boot-web-starter</artifactId>
-            <version>1.9.1</version>
-        </dependency>
-
         <!-- APACHE POI begin -->
         <dependency>
             <groupId>org.apache.poi</groupId>

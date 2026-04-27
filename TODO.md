@@ -27,15 +27,8 @@
 - 前台 session/cache 使用 `sandwish-common-cache` 的 JetCache 基线，不直接接触 Redis。
 - 每一步完成后删除、拆分或收窄对应 TODO，并小步提交。
 
-- [ ] `front-shiro-runtime-deletion`：删除 front-api Shiro 运行时
-  - 依赖前置：前台 session/cache 已迁到 JetCache
-  - 范围对象：`ShiroConfiguration`、Shiro session/cache 类、Shiro 工具类、Shiro 依赖和配置
-  - 处理动作：删除 Shiro 配置、过滤器、Realm、session/cache、仅服务 Shiro 的异常/工具类；删除 `shiro-spring-boot-web-starter`
-  - 允许删除 Shiro：是
-  - 允许删除 Redis：否
-  - 验收点：`sandwish-front-api` 无 `org.apache.shiro` import，pom 无 Shiro starter，`mvn -q -pl sandwish-front-api -am compile -DskipTests` 通过
 - [ ] `front-security-migration-cleanup`：清理前台 Spring Security 迁移现场
-  - 依赖前置：完成 `front-shiro-runtime-deletion`
+  - 依赖前置：Shiro runtime 已删除
   - 范围对象：过期 Shiro 说明、TODO 已完成项、临时兼容类、空 package、无效配置、front-api Redis Maven 依赖
   - 处理动作：删除或收窄过期 runbook/TODO；删除不再使用的配置项和空目录；删除 `sandwish-front-api` 中不再需要的 `spring-boot-starter-data-redis`
   - 允许删除 Shiro：已完成后执行

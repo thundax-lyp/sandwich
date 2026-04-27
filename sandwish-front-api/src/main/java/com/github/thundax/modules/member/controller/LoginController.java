@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value = "/auth")
 public class LoginController extends BaseFrontController {
 
-    @Value("${shiro.successUrl}")
+    @Value("${front.security.success-url}")
     private String successUrl;
 
     private final YwtbProperties properties;

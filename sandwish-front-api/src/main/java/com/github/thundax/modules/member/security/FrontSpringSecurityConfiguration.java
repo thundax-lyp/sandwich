@@ -1,15 +1,13 @@
 package com.github.thundax.modules.member.security;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/** 前台 Spring Security 迁移期配置。 */
+/** 前台 Spring Security 配置。 */
 @Configuration
-@Profile("front-spring-security")
 public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final MemberSpringAuthenticationProvider authenticationProvider;

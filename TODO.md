@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-holder-contract-cleanup`：收窄 ServiceHolder 缓存入口
-  - 依赖前置：完成所有已启用缓存链路迁移
-  - 范围对象：`DictServiceHolder`、`StorageServiceHolder`、`OfficeServiceHolder`、`MenuServiceHolder`、`RoleServiceHolder`、`UserServiceHolder`、`MemberServiceHolder`
-  - 处理动作：删除或收窄迁移后不再需要的 `removeAllCache`、`preload`、`getCacheVersion` 间接入口；不改变 Holder 获取 Service 的职责
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：业务代码不再通过 Holder 间接调用 CrudService 缓存方法
 - [ ] `cache-jetcache-introduction`：评估并引入 JetCache 作为 infra 实现细节
   - 依赖前置：至少完成一条缓存链路迁入 infra，并确认 infra 缓存契约稳定
   - 范围对象：最窄可行依赖模块、配置项、infra CacheSupport 实现

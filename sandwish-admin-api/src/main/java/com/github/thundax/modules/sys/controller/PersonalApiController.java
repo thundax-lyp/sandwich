@@ -8,8 +8,8 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.security.SecurityUtils;
 import com.github.thundax.modules.auth.security.subject.Subject;
@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.github.thundax.common.Constants.CACHE_PRIVATE_KEY_;
-
 /**
  * @author thundax
  */
@@ -50,19 +48,19 @@ public class PersonalApiController extends BaseApiController implements Personal
 
     private final UserService userService;
     private final PasswordService passwordService;
-    private final RedisClient redisClient;
+    private final KeypairService keypairService;
     private final PersonalInterfaceAssembler personalInterfaceAssembler;
 
     public PersonalApiController(Validator validator,
                                  UserService userService,
                                  PasswordService passwordService,
-                                 RedisClient redisClient,
+                                 KeypairService keypairService,
                                  PersonalInterfaceAssembler personalInterfaceAssembler) {
         super(validator);
 
         this.userService = userService;
         this.passwordService = passwordService;
-        this.redisClient = redisClient;
+        this.keypairService = keypairService;
         this.personalInterfaceAssembler = personalInterfaceAssembler;
     }
 
@@ -95,8 +93,9 @@ public class PersonalApiController extends BaseApiController implements Personal
     public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(request.getPassword(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
-        String oldPassword = Sm2.decrypt(request.getOldPassword(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
+        String privateKey = keypairService.getPrivateKey(request.getToken());
+        String password = Sm2.decrypt(request.getPassword(), privateKey);
+        String oldPassword = Sm2.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);
         request.setOldPassword(oldPassword);
         validate(request);

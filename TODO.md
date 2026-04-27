@@ -20,15 +20,8 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `redis-client-keypair-store-migration`：移除后台密钥接口对 RedisClient 的直接依赖
-  - 依赖前置：完成 `REDIS-CLIENT-INFRA-RUNBOOK`
-  - 范围对象：`KeypairApiController`、`UserApiController`、`PersonalApiController`、后台密钥存取 Store/DAO、必要时补 Keypair 业务 Service、infra 实现
-  - 处理动作：将 SM2 private key 的 `get/set/TTL` 收敛到业务语义 Store/DAO 与 infra 实现；若 Controller 同时承担生成与存储编排，则补 Service 承接编排；Controller 不再拼 Redis key
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：否
-  - 验收点：上述 Controller 不再 import `RedisClient`
 - [ ] `redis-client-subject-cache-migration`：移除 SubjectService 对 RedisClient 的直接依赖
-  - 依赖前置：完成 `redis-client-keypair-store-migration`
+  - 依赖前置：后台密钥接口已完成 RedisClient 迁移
   - 范围对象：`SubjectServiceImpl`、subject/version 远端缓存 Store/DAO、infra 或安全适配实现
   - 处理动作：保留本地 subject map 和业务编排语义，将远端 subject/version 读写、TTL 和全量失效移出 admin-api service 实现；不新增只转发 Redis 操作的 Service
   - 允许引入 JetCache：否

@@ -8,10 +8,10 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.FileUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
+import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
@@ -53,8 +53,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import static com.github.thundax.common.Constants.CACHE_PRIVATE_KEY_;
-
 /**
  * @author thundax
  */
@@ -66,7 +64,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     private final UserService userService;
     private final OfficeService officeService;
     private final RoleService roleService;
-    private final RedisClient redisClient;
+    private final KeypairService keypairService;
     private final PasswordService passwordService;
     private final UserInterfaceAssembler userInterfaceAssembler;
 
@@ -75,7 +73,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                              OfficeService officeService,
                              RoleService roleService,
                              Validator validator,
-                             RedisClient redisClient,
+                             KeypairService keypairService,
                              PasswordService passwordService,
                              UserInterfaceAssembler userInterfaceAssembler) {
         super(validator);
@@ -83,7 +81,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         this.userService = userService;
         this.officeService = officeService;
         this.roleService = roleService;
-        this.redisClient = redisClient;
+        this.keypairService = keypairService;
         this.passwordService = passwordService;
         this.userInterfaceAssembler = userInterfaceAssembler;
     }
@@ -127,7 +125,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     @RequiresPermissions("sys:user:edit")
     public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(request.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
+        String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validate(request);
         validateOffice(request.getOffice());
@@ -166,7 +164,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password = Sm2.decrypt(request.getLoginPass(), redisClient.get(CACHE_PRIVATE_KEY_ + request.getToken()));
+            String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }

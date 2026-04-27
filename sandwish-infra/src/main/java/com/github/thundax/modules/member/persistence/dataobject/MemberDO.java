@@ -1,13 +1,21 @@
 package com.github.thundax.modules.member.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 /**
  * 会员持久化对象。
  */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@TableName("tb_member")
 public class MemberDO {
 
     public static final String DEL_FLAG_NORMAL = "0";

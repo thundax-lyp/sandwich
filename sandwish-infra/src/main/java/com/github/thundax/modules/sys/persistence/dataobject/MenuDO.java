@@ -1,13 +1,21 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 /**
  * 菜单持久化对象。
  */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@TableName("sys_menu")
 public class MenuDO {
 
     public static final String DEL_FLAG_NORMAL = "0";

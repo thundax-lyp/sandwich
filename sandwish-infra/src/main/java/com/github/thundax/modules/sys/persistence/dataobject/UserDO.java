@@ -1,7 +1,11 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.thundax.common.collect.ListUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
@@ -9,7 +13,11 @@ import java.util.List;
 /**
  * 用户持久化对象。
  */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@TableName("sys_user")
 public class UserDO {
 
     public static final String DEL_FLAG_NORMAL = "0";

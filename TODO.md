@@ -20,12 +20,6 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `do-required-annotation-migration`：迁移现有 DO 到必需注解形态
-  - 依赖前置：完成 `archunit-do-annotation-rule`
-  - 范围对象：现有数据库表映射 DO 类、`sandwish-infra` 架构测试及其必要 import
-  - 处理动作：补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`，并接入 DO 注解门禁；不顺手删除手写 getter/setter，除非单独拆出重构任务
-  - 验收点：ArchUnit 规则通过；迁移不改变 DAO、Mapper、XML 和 Service 行为
-
 ## P0 - Cache / Infra 边界演进
 
 - [ ] `cache-infra-boundary-split-todo`：拆分缓存迁移执行子任务

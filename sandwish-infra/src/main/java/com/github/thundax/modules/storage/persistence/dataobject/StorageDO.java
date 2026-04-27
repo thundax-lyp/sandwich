@@ -1,13 +1,21 @@
 package com.github.thundax.modules.storage.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 /**
  * 存储文件持久化对象。
  */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@TableName("assist_storage")
 public class StorageDO {
 
     public static final String DEL_FLAG_NORMAL = "0";

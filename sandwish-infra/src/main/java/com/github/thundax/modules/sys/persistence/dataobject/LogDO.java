@@ -1,13 +1,21 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
 /**
  * 日志持久化对象。
  */
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@TableName("sys_log")
 public class LogDO {
 
     private String id;

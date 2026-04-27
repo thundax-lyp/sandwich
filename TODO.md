@@ -27,15 +27,8 @@
 - 前台 session/cache 使用 `sandwish-common-cache` 的 JetCache 基线，不直接接触 Redis。
 - 每一步完成后删除、拆分或收窄对应 TODO，并小步提交。
 
-- [ ] `front-session-cache-jetcache-migration`：迁移前台 session/cache 到 JetCache
-  - 依赖前置：前台 Controller 和 `MemberAccessServiceImpl` 已迁到 `MemberSecurityContext`
-  - 范围对象：Shiro session/cache、前台 session attribute、登录态保存和过期语义
-  - 处理动作：建立 JetCache-backed 前台 session/cache 语义边界；删除 `RedisTemplate` 直连；不让 `common-cache` 承载前台 session 业务规则
-  - 允许删除 Shiro：完成替代链路后允许
-  - 允许删除 Redis：完成替代链路后允许
-  - 验收点：前台 session/cache 不再使用 `RedisTemplate`、`StringRedisTemplate` 或 `org.springframework.data.redis`
 - [ ] `front-shiro-runtime-deletion`：删除 front-api Shiro 运行时
-  - 依赖前置：完成 `front-session-cache-jetcache-migration`
+  - 依赖前置：前台 session/cache 已迁到 JetCache
   - 范围对象：`ShiroConfiguration`、Shiro session/cache 类、Shiro 工具类、Shiro 依赖和配置
   - 处理动作：删除 Shiro 配置、过滤器、Realm、session/cache、仅服务 Shiro 的异常/工具类；删除 `shiro-spring-boot-web-starter`
   - 允许删除 Shiro：是

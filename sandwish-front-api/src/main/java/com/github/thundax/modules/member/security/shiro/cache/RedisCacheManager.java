@@ -7,15 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * 自定义授权缓存管理类
@@ -26,16 +20,12 @@ public class RedisCacheManager implements CacheManager {
 
     private static final String CACHE_PREFIX = Constants.CACHE_PREFIX + "interaction-shiro.";
 
-    private RedisTemplate<String, Object> redisTemplate;
     private long expireSeconds = 1200;
+    private ShiroJetCacheStore cacheStore;
 
     @Override
     public <K, V> Cache<K, V> getCache(String name) throws CacheException {
-        return new RedisSessionCache<>(CACHE_PREFIX + name, redisTemplate, expireSeconds);
-    }
-
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+        return new RedisSessionCache<>(CACHE_PREFIX + name, cacheStore, expireSeconds);
     }
 
     public long getExpireSeconds() {
@@ -46,10 +36,14 @@ public class RedisCacheManager implements CacheManager {
         this.expireSeconds = expireSeconds;
     }
 
+    public void setCacheStore(ShiroJetCacheStore cacheStore) {
+        this.cacheStore = cacheStore;
+    }
+
     /** SESSION缓存管理类 */
     public static class RedisSessionCache<K, V> implements Cache<K, V> {
 
-        private final RedisTemplate<String, Object> redisTemplate;
+        private final ShiroJetCacheStore cacheStore;
         private final long expireSeconds;
         private final String cacheKeyPrefix;
 
@@ -58,19 +52,11 @@ public class RedisCacheManager implements CacheManager {
 
         public RedisSessionCache(
                 String cacheKeyPrefix,
-                RedisTemplate<String, Object> redisTemplate,
+                ShiroJetCacheStore cacheStore,
                 long expireSeconds) {
             this.cacheKeyPrefix = cacheKeyPrefix;
-            this.redisTemplate = redisTemplate;
+            this.cacheStore = cacheStore;
             this.expireSeconds = expireSeconds;
-
-            RedisSerializer<String> keySerializer = new StringRedisSerializer();
-            this.redisTemplate.setKeySerializer(keySerializer);
-            this.redisTemplate.setHashKeySerializer(keySerializer);
-
-            RedisSerializer<Object> valueSerializer = new JdkSerializationRedisSerializer();
-            this.redisTemplate.setValueSerializer(valueSerializer);
-            this.redisTemplate.setHashValueSerializer(valueSerializer);
         }
 
         @SuppressWarnings("unchecked")
@@ -84,10 +70,7 @@ public class RedisCacheManager implements CacheManager {
 
             return localCache.computeIfAbsent(
                     createCacheKey(key),
-                    cacheKey -> {
-                        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-                        return (V) valueOps.get(cacheKey);
-                    });
+                    cacheKey -> (V) cacheStore.get(cacheKey));
         }
 
         @Override
@@ -101,14 +84,13 @@ public class RedisCacheManager implements CacheManager {
             Map<String, V> localCache = localCacheHandler.computeIfAbsent(HashMap::new);
 
             if (value == null) {
-                redisTemplate.delete(cacheKey);
+                cacheStore.remove(cacheKey);
+                forgetKey(cacheKey);
                 localCache.remove(cacheKey);
 
             } else {
-                ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-                valueOps.set(cacheKey, value);
-                redisTemplate.expire(cacheKey, expireSeconds, TimeUnit.SECONDS);
-
+                cacheStore.put(cacheKey, value, expireSeconds);
+                rememberKey(cacheKey);
                 localCache.put(cacheKey, value);
             }
 
@@ -124,7 +106,8 @@ public class RedisCacheManager implements CacheManager {
             V value = get(key);
 
             String cacheKey = createCacheKey(key);
-            redisTemplate.delete(cacheKey);
+            cacheStore.remove(cacheKey);
+            forgetKey(cacheKey);
 
             Map<String, V> localCache = localCacheHandler.computeIfAbsent(HashMap::new);
             localCache.remove(cacheKey);
@@ -134,9 +117,10 @@ public class RedisCacheManager implements CacheManager {
 
         @Override
         public void clear() throws CacheException {
-            Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (keys != null && !keys.isEmpty()) {
-                redisTemplate.delete(keys);
+            Set<String> keys = cacheStore.getIndex(createIndexKey());
+            if (keys != null) {
+                cacheStore.removeAll(keys);
+                cacheStore.removeIndex(createIndexKey());
             }
 
             localCacheHandler.remove();
@@ -144,20 +128,14 @@ public class RedisCacheManager implements CacheManager {
 
         @Override
         public int size() {
-            Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            return keys == null ? 0 : keys.size();
+            return activeKeys().size();
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public Set<K> keys() {
-            Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (keys == null || keys.isEmpty()) {
-                return new HashSet<>();
-            }
-
             Set<K> result = new HashSet<>();
-            for (String key : keys) {
+            for (String key : activeKeys()) {
                 result.add((K) key.substring(cacheKeyPrefix.length()));
             }
             return result;
@@ -166,16 +144,9 @@ public class RedisCacheManager implements CacheManager {
         @SuppressWarnings("unchecked")
         @Override
         public Collection<V> values() {
-            Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (keys == null || keys.isEmpty()) {
-                return new HashSet<>();
-            }
-
-            ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-
             Set<V> values = new HashSet<>();
-            for (String key : keys) {
-                values.add((V) valueOps.get(key));
+            for (String key : activeKeys()) {
+                values.add((V) cacheStore.get(key));
             }
 
             return values;
@@ -186,6 +157,56 @@ public class RedisCacheManager implements CacheManager {
                 return null;
             }
             return this.cacheKeyPrefix + key;
+        }
+
+        private String createIndexKey() {
+            return this.cacheKeyPrefix;
+        }
+
+        private void rememberKey(String cacheKey) {
+            Set<String> keys = cacheStore.getIndex(createIndexKey());
+            if (keys == null) {
+                keys = new HashSet<>();
+            }
+            keys.add(cacheKey);
+            cacheStore.putIndex(createIndexKey(), keys, expireSeconds);
+        }
+
+        private void forgetKey(String cacheKey) {
+            Set<String> keys = cacheStore.getIndex(createIndexKey());
+            if (keys == null) {
+                return;
+            }
+
+            keys.remove(cacheKey);
+            if (keys.isEmpty()) {
+                cacheStore.removeIndex(createIndexKey());
+            } else {
+                cacheStore.putIndex(createIndexKey(), keys, expireSeconds);
+            }
+        }
+
+        private Set<String> activeKeys() {
+            Set<String> keys = cacheStore.getIndex(createIndexKey());
+            if (keys == null || keys.isEmpty()) {
+                return new HashSet<>();
+            }
+
+            Set<String> activeKeys = new HashSet<>();
+            for (String key : keys) {
+                if (cacheStore.get(key) != null) {
+                    activeKeys.add(key);
+                }
+            }
+
+            if (activeKeys.size() != keys.size()) {
+                if (activeKeys.isEmpty()) {
+                    cacheStore.removeIndex(createIndexKey());
+                } else {
+                    cacheStore.putIndex(createIndexKey(), activeKeys, expireSeconds);
+                }
+            }
+            return activeKeys;
         }
     }
 }

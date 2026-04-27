@@ -3,6 +3,7 @@ package com.github.thundax.autoconfigure.shiro;
 import com.github.thundax.modules.member.security.MemberAuthenticationFilter;
 import com.github.thundax.modules.member.security.MemberAuthorizingRealm;
 import com.github.thundax.modules.member.security.shiro.cache.RedisCacheManager;
+import com.github.thundax.modules.member.security.shiro.cache.ShiroJetCacheStore;
 import com.github.thundax.modules.member.security.shiro.session.MemberSessionDao;
 import com.github.thundax.modules.member.security.shiro.session.RedisSessionDaoImpl;
 import com.github.thundax.modules.member.security.shiro.session.ShiroSessionListener;
@@ -23,13 +24,10 @@ import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 
 /** @author wdit */
 @Configuration
@@ -60,29 +58,18 @@ public class ShiroConfiguration {
         return realm;
     }
 
-    @Bean("shiroRedisTemplate")
-    public RedisTemplate<String, Object> shiroRedisTemplate(
-            RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(connectionFactory);
-        return redisTemplate;
-    }
-
     @Bean
-    public MemberSessionDao sessionDAO(
-            @Qualifier("shiroRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
+    public MemberSessionDao sessionDAO() {
         RedisSessionDaoImpl sessionDao = new RedisSessionDaoImpl();
         sessionDao.setActiveSessionsCacheName("interaction-shiro-activeSessionCache");
-        sessionDao.setRedisTemplate(redisTemplate);
         sessionDao.setExpireSeconds(1200);
         return sessionDao;
     }
 
     @Bean
-    public RedisCacheManager redisCacheManager(
-            @Qualifier("shiroRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
+    public RedisCacheManager redisCacheManager(ShiroJetCacheStore cacheStore) {
         RedisCacheManager redisCacheManager = new RedisCacheManager();
-        redisCacheManager.setRedisTemplate(redisTemplate);
+        redisCacheManager.setCacheStore(cacheStore);
         redisCacheManager.setExpireSeconds(1200);
         return redisCacheManager;
     }

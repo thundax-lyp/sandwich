@@ -1,5 +1,8 @@
 package com.github.thundax.modules.member.security.shiro.session;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.config.Global;
 import com.google.common.collect.Sets;
 import java.io.Serializable;
@@ -13,11 +16,6 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -30,23 +28,13 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
 
     private static final String CACHE_PREFIX = "interaction-shiro.";
 
-    private RedisTemplate<String, Object> redisTemplate;
     private long expireSeconds;
+
+    @CreateCache(name = CACHE_PREFIX, cacheType = CacheType.REMOTE)
+    private Cache<String, Object> cache;
 
     public RedisSessionDaoImpl() {
         super();
-    }
-
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-
-        RedisSerializer<String> keySerializer = new StringRedisSerializer();
-        this.redisTemplate.setKeySerializer(keySerializer);
-        this.redisTemplate.setHashKeySerializer(keySerializer);
-
-        RedisSerializer<Object> valueSerializer = new JdkSerializationRedisSerializer();
-        this.redisTemplate.setValueSerializer(valueSerializer);
-        this.redisTemplate.setHashValueSerializer(valueSerializer);
     }
 
     public void setExpireSeconds(long expireSeconds) {
@@ -74,9 +62,7 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
         }
 
         String cacheKey = createCacheKey(session.getId());
-        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-        valueOps.set(cacheKey, session);
-        redisTemplate.expire(cacheKey, expireSeconds, TimeUnit.SECONDS);
+        cache.put(cacheKey, session, expireSeconds, TimeUnit.SECONDS);
     }
 
     @Override
@@ -86,7 +72,7 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
         }
 
         String cacheKey = createCacheKey(session.getId());
-        redisTemplate.delete(cacheKey);
+        cache.remove(cacheKey);
     }
 
     @Override
@@ -107,8 +93,7 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Me
     @Override
     protected Session doReadSession(Serializable sessionId) {
         String cacheKey = createCacheKey(sessionId);
-        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-        Object value = valueOps.get(cacheKey);
+        Object value = cache.get(cacheKey);
         return (Session) value;
     }
 

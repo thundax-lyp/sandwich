@@ -19,6 +19,7 @@ import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
@@ -54,19 +55,22 @@ public class AuthServiceImpl implements AuthService {
     private final AccessTokenDao accessTokenDao;
     private final LoginLockDao loginLockDao;
     private final PasswordService passwordService;
+    private final PermissionService permissionService;
 
     public AuthServiceImpl(AuthProperties properties,
                            LoginProperties loginProperties,
                            LoginFormDao loginFormDao,
                            AccessTokenDao accessTokenDao,
                            LoginLockDao loginLockDao,
-                           PasswordService passwordService) {
+                           PasswordService passwordService,
+                           PermissionService permissionService) {
         this.properties = properties;
         this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
         this.accessTokenDao = accessTokenDao;
         this.loginLockDao = loginLockDao;
         this.passwordService = passwordService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -229,6 +233,7 @@ public class AuthServiceImpl implements AuthService {
         accessToken.setCheckCode(AuthUtils.currentCheckCode());
 
         accessTokenDao.save(accessToken);
+        permissionService.createSession(token, userId);
 
         return accessToken;
     }
@@ -256,11 +261,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void activeAccessToken(AccessToken accessToken) {
         accessTokenDao.active(accessToken);
+        permissionService.touch(accessToken.getToken());
     }
 
     @Override
     public void deleteAccessToken(AccessToken accessToken) {
         accessTokenDao.delete(accessToken);
+        permissionService.release(accessToken.getToken());
     }
 
     @Override

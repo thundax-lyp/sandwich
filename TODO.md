@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-storage-chain-migration`：迁移 Storage 缓存链路到 infra
-  - 依赖前置：完成 `cache-dict-chain-migration`
-  - 范围对象：`StorageServiceImpl`、`StorageDao`、`StorageDaoImpl`、`StorageMapper`、`StorageServiceHolder`
-  - 处理动作：将 Storage 单对象缓存和写后失效迁入 infra；不改变文件存储、预览 URL 或业务绑定逻辑
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：Storage Service 不再直接调用 `removeAllCache`；非 CrudService 的文件处理逻辑不被改动
 - [ ] `cache-office-chain-migration`：迁移 Office 缓存链路到 infra
   - 依赖前置：完成 `cache-infra-contract-design`
   - 范围对象：`OfficeServiceImpl`、`OfficeDao`、`OfficeDaoImpl`、`OfficeMapper`、`OfficeServiceHolder`

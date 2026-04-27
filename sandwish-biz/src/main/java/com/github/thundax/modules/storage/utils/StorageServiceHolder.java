@@ -39,8 +39,4 @@ public class StorageServiceHolder {
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
-    public static void removeAllCache() {
-        getService().removeAllCache();
-    }
-
 }

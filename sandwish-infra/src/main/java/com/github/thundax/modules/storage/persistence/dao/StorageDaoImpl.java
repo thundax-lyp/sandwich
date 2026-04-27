@@ -4,10 +4,12 @@ import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
+import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,19 +19,46 @@ import java.util.List;
 public class StorageDaoImpl implements StorageDao {
 
     private final StorageMapper mapper;
+    private final StorageCacheSupport cacheSupport;
 
-    public StorageDaoImpl(StorageMapper mapper) {
+    public StorageDaoImpl(StorageMapper mapper, StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
+        this.cacheSupport = cacheSupport;
     }
 
     @Override
     public Storage get(Storage entity) {
-        return StoragePersistenceAssembler.toEntity(mapper.get(StoragePersistenceAssembler.toDataObject(entity)));
+        Storage storage = cacheSupport.getById(entity.getId());
+        if (storage != null) {
+            return storage;
+        }
+
+        storage = StoragePersistenceAssembler.toEntity(mapper.get(StoragePersistenceAssembler.toDataObject(entity)));
+        cacheSupport.putById(storage);
+        return storage;
     }
 
     @Override
     public List<Storage> getMany(List<String> idList) {
-        return StoragePersistenceAssembler.toEntityList(mapper.getMany(idList));
+        List<Storage> storageList = new ArrayList<>();
+        List<String> uncachedIdList = new ArrayList<>();
+        for (String id : idList) {
+            Storage storage = cacheSupport.getById(id);
+            if (storage == null) {
+                uncachedIdList.add(id);
+            } else {
+                storageList.add(storage);
+            }
+        }
+
+        if (!uncachedIdList.isEmpty()) {
+            List<Storage> uncachedStorageList = StoragePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            for (Storage storage : uncachedStorageList) {
+                cacheSupport.putById(storage);
+                storageList.add(storage);
+            }
+        }
+        return storageList;
     }
 
     @Override
@@ -48,16 +77,21 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public int insert(Storage entity) {
-        return mapper.insert(StoragePersistenceAssembler.toDataObject(entity));
+        int count = mapper.insert(StoragePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     @Override
     public int update(Storage entity) {
-        return mapper.update(StoragePersistenceAssembler.toDataObject(entity));
+        int count = mapper.update(StoragePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     @Override
     public int updatePriority(Storage entity) {
+        cacheSupport.removeById(entity.getId());
         return 0;
     }
 
@@ -67,12 +101,15 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public int updateDelFlag(Storage entity) {
+        cacheSupport.removeById(entity.getId());
         return 0;
     }
 
     @Override
     public int delete(Storage entity) {
-        return mapper.delete(StoragePersistenceAssembler.toDataObject(entity));
+        int count = mapper.delete(StoragePersistenceAssembler.toDataObject(entity));
+        cacheSupport.removeById(entity.getId());
+        return count;
     }
 
     @Override
@@ -87,12 +124,16 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public int updateEnableFlag(Storage storage) {
-        return mapper.updateEnableFlag(StoragePersistenceAssembler.toDataObject(storage));
+        int count = mapper.updateEnableFlag(StoragePersistenceAssembler.toDataObject(storage));
+        cacheSupport.removeById(storage.getId());
+        return count;
     }
 
     @Override
     public int updatePublicFlag(Storage storage) {
-        return mapper.updatePublicFlag(StoragePersistenceAssembler.toDataObject(storage));
+        int count = mapper.updatePublicFlag(StoragePersistenceAssembler.toDataObject(storage));
+        cacheSupport.removeById(storage.getId());
+        return count;
     }
 
     @Override

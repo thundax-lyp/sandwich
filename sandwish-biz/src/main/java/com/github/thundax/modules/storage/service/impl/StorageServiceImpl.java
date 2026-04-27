@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.service.impl;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.storage.dao.StorageDao;
@@ -21,22 +20,6 @@ public class StorageServiceImpl extends CrudServiceImpl<StorageDao, Storage> imp
 
     public StorageServiceImpl(StorageDao dao, RedisClient redisClient) {
         super(dao, redisClient);
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        removeAllCache();
-    }
-
-    @Override
-    protected boolean isRedisCacheEnabled() {
-        return true;
-    }
-
-    @Override
-    protected String getCacheSection() {
-        return Constants.CACHE_PREFIX + "assist.storage.";
     }
 
     @Override

@@ -31,11 +31,6 @@
         SELECT
         <include refid="uploadFileColumns"/>
         FROM sys_upload_file a
-        <where>
-            1=1
-            <if test="query != null">
-            </if>
-        </where>
         ORDER BY a.create_date
     </select>
 

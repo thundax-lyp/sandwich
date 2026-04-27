@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `sys-upload-file`：改造上传文件持久化表达
-  - 范围对象：`UploadFileService`、`UploadFileServiceImpl`、`UploadFileDao`、`UploadFileDaoImpl`、`UploadFileMapper`、`mysql/dameng/UploadFileMapper.xml`、`UploadFileDO`、`UploadFilePersistenceAssembler`
-  - 当前依赖：`UploadFileService extends CrudService<UploadFile>`；`UploadFileServiceImpl extends CrudServiceImpl<UploadFileDao, UploadFile>`；`UploadFileDao extends CrudDao<UploadFile>`；`UploadFileMapper extends CrudDao<UploadFileDO>`；`UploadFile extends BaseUploadFile extends AdminDataEntity<UploadFile>`；`UploadFileDO extends AdminDataEntity<UploadFileDO>`；当前无独立 `Query`；当前未发现 `kingbase/UploadFileMapper.xml`
-  - 处理动作：收敛上传文件基础查询、文件内容查询和按文件 ID 批量查询的持久化表达；拆除或替换本链路对 `CrudDao` 通用契约和 `DO extends AdminDataEntity` 的依赖；确认是否需要补齐或明确不支持 Kingbase 上传文件 Mapper XML
-  - 验收点：文件内容查询仍在 Mapper XML 层完成；Service 不感知 `DO`；Kingbase 方言缺口有明确处理结果
-
 - [ ] `storage`：拆分存储域持久化表达改造任务
   - 范围对象：存储文件、存储业务绑定相关持久化链路
   - 处理动作：先横向盘点 `storage` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`

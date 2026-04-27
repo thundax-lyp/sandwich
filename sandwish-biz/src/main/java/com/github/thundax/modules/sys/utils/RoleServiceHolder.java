@@ -44,7 +44,4 @@ public class RoleServiceHolder {
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
-    public static void removeAllCache() {
-        getService().removeAllCache();
-    }
 }

@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-role-chain-migration`：迁移 Role 缓存链路到 infra
-  - 依赖前置：完成 `cache-menu-chain-migration`
-  - 范围对象：`RoleServiceImpl`、`RoleDao`、`RoleDaoImpl`、`RoleMapper`、`RoleServiceHolder`
-  - 处理动作：将 Role 单对象缓存及角色关联用户、菜单缓存迁入 infra；不改变角色授权关系写入语义
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：Role Service 不再直接读写 `redisClient`，不再调用 `removeAllCache`
 - [ ] `cache-user-chain-migration`：迁移 User 缓存链路到 infra
   - 依赖前置：完成 `cache-role-chain-migration`
   - 范围对象：`UserServiceImpl`、`UserDao`、`UserDaoImpl`、`UserMapper`、`UserServiceHolder`

@@ -26,15 +26,8 @@
 - JetCache 只能出现在 `sandwish-common-cache`、`sandwish-infra` 的实现细节，不能外泄到 Controller、Service、Entity、Request、Response。
 - 迁移期允许 `RedisClient` 暂存；新增或改造代码不得新增 `RedisClient` 调用点。
 
-- [ ] `redis-client-common-deletion`：删除 common-core RedisClient
-  - 依赖前置：完成所有 RedisClient 调用点迁移
-  - 范围对象：`sandwish-common-core` RedisClient 类、相关 Maven 依赖、相关文档
-  - 处理动作：删除 `com.github.thundax.common.utils.redis.RedisClient`；同步移除 common-core 中 Redis client 职责
-  - 允许引入 JetCache：否
-  - 允许删除 `RedisClient`：是
-  - 验收点：全仓无 `com.github.thundax.common.utils.redis.RedisClient` import，common-core 不再暴露 Redis 客户端封装
 - [ ] `common-cache-migration-cleanup`：收尾清理 common-cache 迁移现场
-  - 依赖前置：完成 `redis-client-common-deletion`
+  - 依赖前置：common-core 已删除 `RedisClient`
   - 范围对象：过期 RedisClient runbook、缓存边界文档、TODO 已完成项、Maven 依赖、应用配置、无效 package 和 `.gitkeep`
   - 处理动作：删除或收窄旧 RedisClient/infra adapter 文档；移除不再需要的 `spring-boot-starter-data-redis` 依赖；删除完成的 TODO 项或改写为下一阶段明确任务；清理空目录占位文件；保留 `COMMON-CACHE-JETCACHE-RUNBOOK.md` 作为最终运行说明
   - 允许引入 JetCache：否

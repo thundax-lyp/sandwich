@@ -22,34 +22,40 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getMany" resultType="com.github.thundax.modules.sys.persistence.dataobject.LogDO">
+        SELECT
+        <include refid="logColumns"/>
+        FROM sys_log a
+        WHERE a.id IN
+        <foreach collection="idList" item="item" open="(" separator="," close=")">#{item}</foreach>
+    </select>
+
     <select id="findList" resultType="com.github.thundax.modules.sys.persistence.dataobject.LogDO">
         SELECT
         <include refid="logColumns"/>
         FROM sys_log a
         LEFT JOIN sys_user u ON u.id = a.user_id
         <where>
-            <if test="query != null">
-                <if test="query.type != null and query.type != ''">
-                    AND a.type = #{query.type}
-                </if>
-                <if test="query.remoteAddr != null and query.remoteAddr != ''">
-                    AND a.remote_addr = #{query.remoteAddr}
-                </if>
-                <if test="query.userLoginName != null and query.userLoginName != ''">
-                    AND u.login_name LIKE CONCAT('%', #{query.userLoginName}, '%')
-                </if>
-                <if test="query.userName != null and query.userName != ''">
-                    AND u.name LIKE CONCAT('%', #{query.userName}, '%')
-                </if>
-                <if test="query.title != null and query.title != ''">
-                    AND a.title LIKE CONCAT('%', #{query.title}, '%')
-                </if>
-                <if test="query.requestUri != null and query.requestUri != ''">
-                    AND a.request_uri LIKE CONCAT('%', #{query.requestUri}, '%')
-                </if>
-                <if test="query.beginDate != null and query.endDate != null">
-                    AND a.log_date BETWEEN #{query.beginDate} AND #{query.endDate}
-                </if>
+            <if test="queryType != null and queryType != ''">
+                AND a.type = #{queryType}
+            </if>
+            <if test="queryRemoteAddr != null and queryRemoteAddr != ''">
+                AND a.remote_addr = #{queryRemoteAddr}
+            </if>
+            <if test="queryUserLoginName != null and queryUserLoginName != ''">
+                AND u.login_name LIKE CONCAT('%', #{queryUserLoginName}, '%')
+            </if>
+            <if test="queryUserName != null and queryUserName != ''">
+                AND u.name LIKE CONCAT('%', #{queryUserName}, '%')
+            </if>
+            <if test="queryTitle != null and queryTitle != ''">
+                AND a.title LIKE CONCAT('%', #{queryTitle}, '%')
+            </if>
+            <if test="queryRequestUri != null and queryRequestUri != ''">
+                AND a.request_uri LIKE CONCAT('%', #{queryRequestUri}, '%')
+            </if>
+            <if test="queryBeginDate != null and queryEndDate != null">
+                AND a.log_date BETWEEN #{queryBeginDate} AND #{queryEndDate}
             </if>
         </where>
         ORDER BY a.log_date DESC
@@ -58,22 +64,20 @@
     <delete id="batchDelete">
         DELETE FROM sys_log a
         <where>
-            <if test="query != null">
-                <if test="query.type != null and query.type != ''">
-                    AND a.type = #{query.type}
-                </if>
-                <if test="query.remoteAddr != null and query.remoteAddr != ''">
-                    AND a.remote_addr = #{query.remoteAddr}
-                </if>
-                <if test="query.title != null and query.title != ''">
-                    AND a.title LIKE CONCAT('%', #{query.title}, '%')
-                </if>
-                <if test="query.requestUri != null and query.requestUri != ''">
-                    AND a.request_uri LIKE CONCAT('%', #{query.requestUri}, '%')
-                </if>
-                <if test="query.beginDate != null and query.endDate != null">
-                    AND a.log_date BETWEEN #{query.beginDate} AND #{query.endDate}
-                </if>
+            <if test="queryType != null and queryType != ''">
+                AND a.type = #{queryType}
+            </if>
+            <if test="queryRemoteAddr != null and queryRemoteAddr != ''">
+                AND a.remote_addr = #{queryRemoteAddr}
+            </if>
+            <if test="queryTitle != null and queryTitle != ''">
+                AND a.title LIKE CONCAT('%', #{queryTitle}, '%')
+            </if>
+            <if test="queryRequestUri != null and queryRequestUri != ''">
+                AND a.request_uri LIKE CONCAT('%', #{queryRequestUri}, '%')
+            </if>
+            <if test="queryBeginDate != null and queryEndDate != null">
+                AND a.log_date BETWEEN #{queryBeginDate} AND #{queryEndDate}
             </if>
         </where>
     </delete>

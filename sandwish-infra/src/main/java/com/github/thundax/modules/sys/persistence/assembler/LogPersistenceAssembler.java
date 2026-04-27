@@ -37,7 +37,7 @@ public final class LogPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        dataObject.setQuery(toDataObjectQuery(entity.getQuery()));
+        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -64,7 +64,6 @@ public final class LogPersistenceAssembler {
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateUserId());
         entity.setDelFlag(dataObject.getDelFlag());
-        entity.setQuery(toEntityQuery(dataObject.getQuery()));
         return entity;
     }
 
@@ -90,35 +89,17 @@ public final class LogPersistenceAssembler {
         return dataObjects;
     }
 
-    private static LogDO.Query toDataObjectQuery(Log.Query query) {
+    private static void copyQuery(Log.Query query, LogDO dataObject) {
         if (query == null) {
-            return null;
+            return;
         }
-        LogDO.Query dataObjectQuery = new LogDO.Query();
-        dataObjectQuery.setType(query.getType());
-        dataObjectQuery.setRemoteAddr(query.getRemoteAddr());
-        dataObjectQuery.setTitle(query.getTitle());
-        dataObjectQuery.setRequestUri(query.getRequestUri());
-        dataObjectQuery.setUserLoginName(query.getUserLoginName());
-        dataObjectQuery.setUserName(query.getUserName());
-        dataObjectQuery.setBeginDate(query.getBeginDate());
-        dataObjectQuery.setEndDate(query.getEndDate());
-        return dataObjectQuery;
-    }
-
-    private static Log.Query toEntityQuery(LogDO.Query query) {
-        if (query == null) {
-            return null;
-        }
-        Log.Query entityQuery = new Log.Query();
-        entityQuery.setType(query.getType());
-        entityQuery.setRemoteAddr(query.getRemoteAddr());
-        entityQuery.setTitle(query.getTitle());
-        entityQuery.setRequestUri(query.getRequestUri());
-        entityQuery.setUserLoginName(query.getUserLoginName());
-        entityQuery.setUserName(query.getUserName());
-        entityQuery.setBeginDate(query.getBeginDate());
-        entityQuery.setEndDate(query.getEndDate());
-        return entityQuery;
+        dataObject.setQueryType(query.getType());
+        dataObject.setQueryRemoteAddr(query.getRemoteAddr());
+        dataObject.setQueryTitle(query.getTitle());
+        dataObject.setQueryRequestUri(query.getRequestUri());
+        dataObject.setQueryUserLoginName(query.getUserLoginName());
+        dataObject.setQueryUserName(query.getUserName());
+        dataObject.setQueryBeginDate(query.getBeginDate());
+        dataObject.setQueryEndDate(query.getEndDate());
     }
 }

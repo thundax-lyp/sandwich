@@ -27,12 +27,6 @@
   - 处理动作：持久化迁移完成后删除临时手册；删除或收窄已完成 TODO；将稳定规则沉淀到治理文档
   - 验收点：持久化临时手册不再保留，完成历史只存在于 commit / PR 中
 
-- [ ] `sys-log`：改造日志持久化表达
-  - 范围对象：`LogService`、`LogServiceImpl`、`LogDao`、`LogDaoImpl`、`LogMapper`、`mysql/dameng/kingbase/LogMapper.xml`、`LogDO`、`LogPersistenceAssembler`
-  - 当前依赖：`LogService extends CrudService<Log>`；`LogServiceImpl extends CrudServiceImpl<LogDao, Log>`；`LogDao extends CrudDao<Log>`；`LogMapper extends CrudDao<LogDO>`；`Log extends BaseLog extends AdminDataEntity<Log>`；`LogDO extends AdminDataEntity<LogDO>`；存在 `Log.Query <-> LogDO.Query`
-  - 处理动作：收敛日志查询、批量插入和批量删除的持久化表达；拆除或替换本链路对通用查询契约、`DO.query` 和 `DO extends AdminDataEntity` 的依赖
-  - 验收点：日志批量写入和删除 SQL 仍由 Mapper XML 承担；Service 不直接感知持久化实现对象
-
 - [ ] `sys-dict-persistence`：改造字典持久化表达
   - 范围对象：`DictService`、`DictServiceImpl`、`DictDao`、`DictDaoImpl`、`DictMapper`、`mysql/dameng/kingbase/DictMapper.xml`、`DictDO`、`DictPersistenceAssembler`
   - 当前依赖：`DictService extends CrudService<Dict>`；`DictServiceImpl extends CrudServiceImpl<DictDao, Dict>`；`DictDao extends CrudDao<Dict>`；`DictMapper extends CrudDao<DictDO>`；`Dict extends BaseDict extends AdminDataEntity<Dict>`；`DictDO extends AdminDataEntity<DictDO>`；存在 `Dict.Query <-> DictDO.Query`

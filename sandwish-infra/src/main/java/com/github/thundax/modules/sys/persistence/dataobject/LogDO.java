@@ -1,17 +1,17 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.persistence.AdminDataEntity;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 日志持久化对象。
  */
 @NoArgsConstructor
-public class LogDO extends AdminDataEntity<LogDO> {
+public class LogDO {
+
+    private String id;
+    private boolean isNewRecord;
 
     private String userId;
     private String type;
@@ -22,23 +22,40 @@ public class LogDO extends AdminDataEntity<LogDO> {
     private String method;
     private String requestUri;
     private String requestParams;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private String createUserId;
+    private Date updateDate;
+    private String updateUserId;
+    private String delFlag;
+    private String queryType;
+    private String queryRemoteAddr;
+    private String queryTitle;
+    private String queryRequestUri;
+    private String queryUserLoginName;
+    private String queryUserName;
+    private Date queryBeginDate;
+    private Date queryEndDate;
 
     public LogDO(String id) {
-        super(id);
+        this.id = id;
     }
 
-    @Override
-    protected Object createQueryObject() {
-        return new Query();
+    public String getId() {
+        return id;
     }
 
-    @JsonIgnore
-    public Query getQuery() {
-        return (Query) this.query;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public boolean getIsNewRecord() {
+        return isNewRecord;
+    }
+
+    public void setIsNewRecord(boolean isNewRecord) {
+        this.isNewRecord = isNewRecord;
     }
 
     public String getUserId() {
@@ -113,79 +130,123 @@ public class LogDO extends AdminDataEntity<LogDO> {
         this.requestParams = requestParams;
     }
 
-    public static class Query implements Serializable {
+    public Integer getPriority() {
+        return priority;
+    }
 
-        private String type;
-        private String remoteAddr;
-        private String title;
-        private String requestUri;
-        private String userLoginName;
-        private String userName;
-        private Date beginDate;
-        private Date endDate;
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 
-        public String getType() {
-            return type;
-        }
+    public String getRemarks() {
+        return remarks;
+    }
 
-        public void setType(String type) {
-            this.type = type;
-        }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
 
-        public String getRemoteAddr() {
-            return remoteAddr;
-        }
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-        public void setRemoteAddr(String remoteAddr) {
-            this.remoteAddr = remoteAddr;
-        }
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-        public String getTitle() {
-            return title;
-        }
+    public String getCreateUserId() {
+        return createUserId;
+    }
 
-        public void setTitle(String title) {
-            this.title = title;
-        }
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
+    }
 
-        public String getRequestUri() {
-            return requestUri;
-        }
+    public Date getUpdateDate() {
+        return updateDate;
+    }
 
-        public void setRequestUri(String requestUri) {
-            this.requestUri = requestUri;
-        }
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
 
-        public String getUserLoginName() {
-            return userLoginName;
-        }
+    public String getUpdateUserId() {
+        return updateUserId;
+    }
 
-        public void setUserLoginName(String userLoginName) {
-            this.userLoginName = userLoginName;
-        }
+    public void setUpdateUserId(String updateUserId) {
+        this.updateUserId = updateUserId;
+    }
 
-        public String getUserName() {
-            return userName;
-        }
+    public String getDelFlag() {
+        return delFlag;
+    }
 
-        public void setUserName(String userName) {
-            this.userName = userName;
-        }
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
 
-        public Date getBeginDate() {
-            return beginDate;
-        }
+    public String getQueryType() {
+        return queryType;
+    }
 
-        public void setBeginDate(Date beginDate) {
-            this.beginDate = beginDate;
-        }
+    public void setQueryType(String queryType) {
+        this.queryType = queryType;
+    }
 
-        public Date getEndDate() {
-            return endDate;
-        }
+    public String getQueryRemoteAddr() {
+        return queryRemoteAddr;
+    }
 
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
+    public void setQueryRemoteAddr(String queryRemoteAddr) {
+        this.queryRemoteAddr = queryRemoteAddr;
+    }
+
+    public String getQueryTitle() {
+        return queryTitle;
+    }
+
+    public void setQueryTitle(String queryTitle) {
+        this.queryTitle = queryTitle;
+    }
+
+    public String getQueryRequestUri() {
+        return queryRequestUri;
+    }
+
+    public void setQueryRequestUri(String queryRequestUri) {
+        this.queryRequestUri = queryRequestUri;
+    }
+
+    public String getQueryUserLoginName() {
+        return queryUserLoginName;
+    }
+
+    public void setQueryUserLoginName(String queryUserLoginName) {
+        this.queryUserLoginName = queryUserLoginName;
+    }
+
+    public String getQueryUserName() {
+        return queryUserName;
+    }
+
+    public void setQueryUserName(String queryUserName) {
+        this.queryUserName = queryUserName;
+    }
+
+    public Date getQueryBeginDate() {
+        return queryBeginDate;
+    }
+
+    public void setQueryBeginDate(Date queryBeginDate) {
+        this.queryBeginDate = queryBeginDate;
+    }
+
+    public Date getQueryEndDate() {
+        return queryEndDate;
+    }
+
+    public void setQueryEndDate(Date queryEndDate) {
+        this.queryEndDate = queryEndDate;
     }
 }

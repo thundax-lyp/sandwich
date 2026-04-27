@@ -1,6 +1,8 @@
 package com.github.thundax.modules.member.controller;
 
 import com.github.thundax.common.web.BaseFrontController;
+import com.github.thundax.modules.member.assembler.MemberLoginInterfaceAssembler;
+import com.github.thundax.modules.member.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.member.security.MemberAuthenticationToken;
 import com.github.thundax.modules.member.security.MemberPrincipal;
 import com.github.thundax.modules.member.utils.ShiroUtils;
@@ -30,13 +32,17 @@ public class LoginController extends BaseFrontController {
     private String successUrl;
 
     private final YwtbProperties properties;
+    private final MemberLoginInterfaceAssembler memberLoginInterfaceAssembler;
 
     @Autowired
-    public LoginController(YwtbProperties properties) {
+    public LoginController(YwtbProperties properties,
+                           MemberLoginInterfaceAssembler memberLoginInterfaceAssembler) {
         this.properties = properties;
+        this.memberLoginInterfaceAssembler = memberLoginInterfaceAssembler;
     }
 
 
+    // 第三方登录页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。
     @RequestMapping(value = "login", method = RequestMethod.GET)
     public String login(HttpServletRequest request,Model model) throws Exception {
         MemberPrincipal principal = ShiroUtils.getPrincipal();
@@ -60,6 +66,7 @@ public class LoginController extends BaseFrontController {
     /**
      * 登录失败，真正登录的POST请求由Filter完成
      */
+    // 第三方登录失败页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public String loginFail(HttpServletRequest request, Model model) throws Exception {
         MemberPrincipal principal = ShiroUtils.getPrincipal();
@@ -77,21 +84,21 @@ public class LoginController extends BaseFrontController {
 
     @RequestMapping("check-login")
     @ResponseBody
-    public String checkLogin(){
-        return ShiroUtils.getPrincipal() == null ? "false" : "true";
+    public MemberLoginStatusResponse checkLogin(){
+        return memberLoginInterfaceAssembler.toLoginStatusResponse(ShiroUtils.getPrincipal() != null);
     }
 
 
     @ResponseBody
     @RequestMapping("testlogin")
-    public String testLogin(){
+    public MemberLoginStatusResponse testLogin(){
         //登录
         MemberAuthenticationToken token = new MemberAuthenticationToken();
         token.setUsername("4f379cdb-76c6-4fed-8455-ffc9f32e3aa0");
         // 自动登录的话，需要使用默认密码登录
         token.setPassword("7D@&wweR".toCharArray());
         ShiroUtils.getSubject().login(token);
-        return "true";
+        return memberLoginInterfaceAssembler.toLoginStatusResponse(true);
     }
 
 }

@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `front-member-entry`：明确前台会员登录入口模型隔离边界
-  - 范围入口：`LoginController`、`LogoutController`
-  - 当前 API 模型泄漏点：入口主要返回字符串视图/状态并直接使用 `HttpServletRequest`、`HttpServletResponse`、`Model`；当前未通过 Service 暴露业务 `Entity`
-  - 需要新增或收窄的 `Request`：登录检查、退出登录请求；页面入口继续保留时，先明确是否迁移为 API Request
-  - 需要新增或收窄的 `Response`：登录状态响应、退出结果响应；页面入口继续保留时，先明确响应模型边界
-  - 需要新增的 `InterfaceAssembler`：改造为 API 响应模型时新增 `MemberLoginInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前无明确 Service 调用，本项不调整 Service
-  - 验收命令：`mvn -pl sandwish-front-api -am -DskipTests package`
-
 - [ ] `legacy-support-controllers`：明确非业务 API Controller 的处理口径
   - 范围入口：`TagController`、已注释的 `UploadController`
   - 当前 API 模型泄漏点：`TagController` 返回服务端视图；`UploadController` 当前整体注释，包含旧上传和文件输出逻辑

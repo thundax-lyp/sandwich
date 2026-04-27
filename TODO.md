@@ -20,15 +20,10 @@
 
 ## P0 - Common Test / ArchUnit 模型注解规约
 
-- [ ] `archunit-do-annotation-rule`：引入 ArchUnit 并新增 DO 注解门禁
-  - 依赖前置：完成 `archunit-do-annotation-baseline`
-  - 范围对象：`sandwish-common/sandwish-common-test`、`sandwish-infra` 架构测试
-  - 处理动作：将 `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS` 固化为自动化规则；规则仅扫描数据库表映射 DO，排除 Redis-only DO
-  - 验收点：数据库表映射 DO 缺少任一必需注解会被测试拦截；Redis-only DO 不因缺少 `@TableName` 被误伤
 - [ ] `do-required-annotation-migration`：迁移现有 DO 到必需注解形态
   - 依赖前置：完成 `archunit-do-annotation-rule`
-  - 范围对象：现有数据库表映射 DO 类及其必要 import
-  - 处理动作：补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`；不顺手删除手写 getter/setter，除非单独拆出重构任务
+  - 范围对象：现有数据库表映射 DO 类、`sandwish-infra` 架构测试及其必要 import
+  - 处理动作：补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`，并接入 DO 注解门禁；不顺手删除手写 getter/setter，除非单独拆出重构任务
   - 验收点：ArchUnit 规则通过；迁移不改变 DAO、Mapper、XML 和 Service 行为
 
 ## P0 - Cache / Infra 边界演进

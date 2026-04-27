@@ -55,4 +55,38 @@ public class ModelAnnotationArchitectureRuleSupportTest extends AbstractArchitec
         ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(FIXTURE_PACKAGE)
                 .check(classes);
     }
+
+    @Test
+    public void shouldPassWhenDataObjectClassAnnotationsMatchRequiredSet() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".persistence.dataobject.valid");
+
+        ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectDataObjectClassWithMissingAnnotations() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".persistence.dataobject.missing");
+
+        ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectDataObjectClassWithExtraAnnotations() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".persistence.dataobject.extra");
+
+        ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(FIXTURE_PACKAGE)
+                .check(classes);
+    }
+
+    @Test
+    public void shouldIgnoreExcludedDataObjectClass() {
+        JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".persistence.dataobject.redis");
+
+        ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(
+                        FIXTURE_PACKAGE,
+                        FIXTURE_PACKAGE + ".persistence.dataobject.redis.RedisOnlyFixtureDO")
+                .check(classes);
+    }
 }

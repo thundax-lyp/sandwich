@@ -23,6 +23,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
 
     public static final String NAME_REQUEST_REQUIRED_ANNOTATIONS = "MODEL_REQUEST_REQUIRED_ANNOTATIONS";
     public static final String NAME_RESPONSE_REQUIRED_ANNOTATIONS = "MODEL_RESPONSE_REQUIRED_ANNOTATIONS";
+    public static final String NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS = "MODEL_DATA_OBJECT_REQUIRED_ANNOTATIONS";
 
     private static final Set<String> REQUEST_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
             "lombok.Getter",
@@ -37,6 +38,13 @@ public final class ModelAnnotationArchitectureRuleSupport {
             "io.swagger.annotations.ApiModel",
             "com.fasterxml.jackson.annotation.JsonInclude",
             "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
+
+    private static final Set<String> DATA_OBJECT_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
+            "lombok.Getter",
+            "lombok.Setter",
+            "lombok.NoArgsConstructor",
+            "lombok.AllArgsConstructor",
+            "com.baomidou.mybatisplus.annotation.TableName"));
 
     private static final String SOURCE_ROOTS_PROPERTY = "sandwish.architecture.sourceRoots";
 
@@ -59,6 +67,34 @@ public final class ModelAnnotationArchitectureRuleSupport {
                 "Response",
                 RESPONSE_REQUIRED_ANNOTATIONS,
                 NAME_RESPONSE_REQUIRED_ANNOTATIONS);
+    }
+
+    public static ArchRule dataObjectClassAnnotationsRequired(String basePackage, String... excludedClassNames) {
+        return ArchRuleDefinition.classes()
+                .should(new ArchCondition<JavaClass>("declare required data object class annotations only") {
+                    @Override
+                    public void check(JavaClass item, ConditionEvents events) {
+                        if (!isDataObjectClassUnder(item, basePackage)
+                                || Arrays.asList(excludedClassNames).contains(item.getFullName())) {
+                            return;
+                        }
+                        Set<String> actualAnnotations = annotationTypeNames(item);
+                        Set<String> missingAnnotations =
+                                missingAnnotations(actualAnnotations, DATA_OBJECT_REQUIRED_ANNOTATIONS);
+                        Set<String> extraAnnotations =
+                                missingAnnotations(DATA_OBJECT_REQUIRED_ANNOTATIONS, actualAnnotations);
+
+                        if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
+                            events.add(SimpleConditionEvent.violated(
+                                    item,
+                                    "[" + NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS + "] " + item.getFullName()
+                                            + " violates data object class annotations: missing="
+                                            + missingAnnotations + ", extra=" + extraAnnotations));
+                        }
+                    }
+                })
+                .allowEmptyShould(true)
+                .because("RULE " + NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS);
     }
 
     private static ArchRule modelClassAnnotationsRequired(
@@ -96,6 +132,12 @@ public final class ModelAnnotationArchitectureRuleSupport {
         return item.getPackageName().startsWith(basePackage + ".")
                 && item.getPackageName().contains(packageSegment)
                 && item.getSimpleName().endsWith(simpleNameSuffix);
+    }
+
+    private static boolean isDataObjectClassUnder(JavaClass item, String basePackage) {
+        return item.getPackageName().startsWith(basePackage + ".")
+                && item.getPackageName().contains(".persistence.dataobject")
+                && (item.getSimpleName().endsWith("DO") || item.getSimpleName().endsWith("DataObject"));
     }
 
     private static Set<String> annotationTypeNames(JavaClass item) {

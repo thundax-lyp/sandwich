@@ -19,3 +19,53 @@
    - 按任务补测试、文档同步和小步提交
 
 ## P0 - Cache / Infra 边界演进
+
+- [ ] `redis-client-keypair-store-migration`：移除后台密钥接口对 RedisClient 的直接依赖
+  - 依赖前置：完成 `REDIS-CLIENT-INFRA-RUNBOOK`
+  - 范围对象：`KeypairApiController`、`UserApiController`、`PersonalApiController`、后台密钥存取语义接口、infra 实现
+  - 处理动作：将 SM2 private key 的 `get/set/TTL` 收敛到业务语义接口与 infra 实现；Controller 不再拼 Redis key
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：否
+  - 验收点：上述 Controller 不再 import `RedisClient`
+- [ ] `redis-client-subject-cache-migration`：移除 SubjectService 对 RedisClient 的直接依赖
+  - 依赖前置：完成 `redis-client-keypair-store-migration`
+  - 范围对象：`SubjectServiceImpl`、subject/version 远端缓存存储语义接口、infra 或安全适配实现
+  - 处理动作：保留本地 subject map 语义，将远端 subject/version 读写、TTL 和全量失效移出 admin-api service 实现
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：否
+  - 验收点：`sandwish-admin-api` 不再直接 import `RedisClient`
+- [ ] `redis-client-front-session-dict-migration`：移除前台工具对 RedisClient 的直接依赖
+  - 依赖前置：完成 `redis-client-subject-cache-migration`
+  - 范围对象：`SessionCacheServiceImpl`、`DictUtils`
+  - 处理动作：Session 缓存进入明确的会话存储实现；`DictUtils` 复用现有 Dict DAO/cache 路径或删除无效旧缓存
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：否
+  - 验收点：`sandwish-front-api` 不再直接 import `RedisClient`
+- [ ] `redis-client-sms-state-migration`：移除短信验证码 Servlet 对 RedisClient 的直接依赖
+  - 依赖前置：完成 `redis-client-front-session-dict-migration`
+  - 范围对象：`SmsValidateCodeServlet`、短信发送限流状态语义接口、infra 实现
+  - 处理动作：将 `CACHE_MOBILE` 的 `exists/set/TTL` 收敛到业务语义接口；Servlet 不再通过 `SpringContextHolder` 获取 RedisClient
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：否
+  - 验收点：`sandwish-biz` 不再直接 import `RedisClient`
+- [ ] `redis-client-infra-dao-adapter-migration`：替换 infra DAO 对 common RedisClient 的依赖
+  - 依赖前置：完成上层所有 RedisClient 直接依赖迁移
+  - 范围对象：`AsyncTaskDaoImpl`、`AccessTokenDaoImpl`、`LoginFormDaoImpl`、`LoginLockDaoImpl`
+  - 处理动作：用 infra-local 语义存储或窄 adapter 承接 Redis 操作；不把通用 RedisClient 原样搬到 infra
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：否
+  - 验收点：infra DAO 不再 import `com.github.thundax.common.utils.redis.RedisClient`
+- [ ] `redis-client-cache-support-migration`：替换 CacheSupport 对 common RedisClient 的依赖
+  - 依赖前置：完成 `redis-client-infra-dao-adapter-migration`
+  - 范围对象：`StorageCacheSupport`、`DictCacheSupport`、`MenuCacheSupport`、`OfficeCacheSupport`、`RoleCacheSupport`、`UserCacheSupport`
+  - 处理动作：在 CacheSupport 内部替换 RedisClient，优先评估 JetCache 或 infra-local 窄 adapter；不改变现有 key、TTL 和失效语义
+  - 允许引入 JetCache：是
+  - 允许删除 `RedisClient`：否
+  - 验收点：CacheSupport 不再 import common RedisClient，JetCache 类型不外泄到 Service/Controller/Entity/Request/Response
+- [ ] `redis-client-common-deletion`：删除 common-core RedisClient
+  - 依赖前置：完成所有 RedisClient 调用点迁移
+  - 范围对象：`sandwish-common-core` RedisClient 类、相关文档和依赖描述
+  - 处理动作：删除 `com.github.thundax.common.utils.redis.RedisClient`；同步移除或收窄 common-core 中 Redis client 职责表述
+  - 允许引入 JetCache：否
+  - 允许删除 `RedisClient`：是
+  - 验收点：全仓无 `com.github.thundax.common.utils.redis.RedisClient` import，common 不再暴露 Redis 客户端封装

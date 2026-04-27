@@ -37,8 +37,16 @@
   - 允许引入 JetCache：否
   - 允许删除 `CrudServiceImpl` 缓存方法：否
   - 验收点：Service、DAO interface、infra DAO implementation、CacheSupport、Mapper 的职责边界明确
-- [ ] `cache-dict-chain-migration`：迁移 Dict 缓存链路到 infra
+- [ ] `common-cache-boundary-decision`：判断是否建立 common-cache 模块
+  - 参考手册：`docs/30-designs/COMMON-CACHE-RUNBOOK.md`
   - 依赖前置：完成 `cache-current-usage-inventory`、`cache-infra-contract-design`
+  - 范围对象：`sandwish-common-cache` 候选模块、common 缓存抽象、infra 业务缓存支撑、JetCache 候选适配边界
+  - 处理动作：按 RUNBOOK 判断是否建立 `sandwish-common-cache`；若建立则拆分后续 common-cache 子任务，若不建立则收窄为 infra 内部缓存支撑任务；本项完成时删除 `COMMON-CACHE-RUNBOOK.md`
+  - 允许引入 JetCache：否
+  - 允许删除 `CrudServiceImpl` 缓存方法：否
+  - 验收点：common-cache 是否建模块已有结论；TODO 已新增或收窄后续执行项；`docs/30-designs/COMMON-CACHE-RUNBOOK.md` 已在同一提交中删除
+- [ ] `cache-dict-chain-migration`：迁移 Dict 缓存链路到 infra
+  - 依赖前置：完成 `cache-current-usage-inventory`、`cache-infra-contract-design`、`common-cache-boundary-decision`
   - 范围对象：`DictServiceImpl`、`DictDao`、`DictDaoImpl`、`DictMapper`、`DictServiceHolder` 中和 Dict 缓存直接相关的调用
   - 处理动作：将 Dict 的缓存命中、回源、回填、失效和版本维护迁入 infra；Service 不再直接调用缓存相关方法
   - 允许引入 JetCache：否

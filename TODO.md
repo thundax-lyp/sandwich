@@ -39,10 +39,17 @@
   - 处理动作：拉平 `StorageBusinessDO` 父类字段；移除业务绑定 DO query 转换；显式保留 `findBusiness`、`insertBusiness`、`deleteBusiness`、`deleteBusinessByBusiness` 方法；分别保持 MySQL 更新主表和达梦维护关系表的现有 SQL 语义
   - 验收点：存储业务绑定链路不再依赖 `StorageBusinessDO.Query` 或 `StorageBusinessDO extends DataEntity`；Admin 包编译通过
 
-- [ ] `assist`：拆分辅助域持久化表达改造任务
-  - 范围对象：签名、异步任务相关持久化链路
-  - 处理动作：先横向盘点 `assist` 域每条持久化链路，按对象或清晰子链路拆出后续持久化表达改造 TODO，标明各自涉及的 `Service`、Dao interface、DaoImpl、Mapper、Mapper XML、`DO` 和 `PersistenceAssembler`，以及是否依赖通用查询契约、`DO.query`、`DO extends ...`
-  - 验收点：辅助域形成可逐条执行的持久化表达改造任务清单；本项不直接改造任何单条持久化链路代码
+- [ ] `assist-signature-persistence`：收敛签名持久化表达
+  - 范围对象：`SignatureService`、`SignatureServiceImpl`、`SignatureDao`、`SignatureDaoImpl`、`SignatureMapper`、`mapper/mapping/mysql/SignatureMapper.xml`、`mapper/mapping/dameng/SignatureMapper.xml`、`mapper/mapping/kingbase/SignatureMapper.xml`、`SignatureDO`、`SignaturePersistenceAssembler`
+  - 当前依赖：`SignatureService extends CrudService<Signature>`；`SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature>`；`SignatureDao extends CrudDao<Signature>`；`SignatureMapper extends CrudDao<SignatureDO>`；`SignatureDO extends DataEntity<SignatureDO>`；`SignatureDO.Query` 承载 `businessType`、`businessId`、`businessIdList`、`isVerifySign` 查询条件；`SignaturePersistenceAssembler` 负责 `Signature.Query <-> SignatureDO.Query` 转换
+  - 处理动作：显式化签名 Mapper 方法；拉平 `SignatureDO` 父类字段；将 `DO.query` 替换为显式查询字段；保留 `get` 使用 `businessType + businessId` 查询、`getMany` 使用 `business_id` 集合查询、`findList`、`insert`、`update`、`delete`、`insertOrUpdate` 能力；分别保持 MySQL `ON DUPLICATE KEY UPDATE` 和达梦 / Kingbase `MERGE INTO` 语义
+  - 验收点：签名链路不再依赖通用查询契约、`SignatureDO.Query` 或 `SignatureDO extends DataEntity`；Admin 包编译通过
+
+- [ ] `assist-async-task-persistence`：收敛异步任务 Redis 持久化表达
+  - 范围对象：`AsyncTaskService`、`AsyncTaskServiceImpl`、`AsyncTaskDao`、`AsyncTaskDaoImpl`、`AsyncTaskDO`、`AsyncTaskPersistenceAssembler`
+  - 当前依赖：`AsyncTaskDao` 为自定义 Redis DAO，不存在 Mapper / Mapper XML；`AsyncTaskDO extends AdminDataEntity<AsyncTaskDO>`；`AsyncTaskPersistenceAssembler` 复制 `AdminDataEntity` 父类字段；Redis key 前缀为 `Constants.CACHE_PREFIX + "assist.asyncTask."`，保存时使用 `expiredSeconds`
+  - 处理动作：拉平 `AsyncTaskDO` 父类字段；保持 `get`、`save`、`delete` Redis 语义和过期时间语义；移除对 `AdminDataEntity` 父类字段的持久化对象依赖；不新增 Mapper 或数据库表
+  - 验收点：异步任务 Redis 链路不再依赖 `AsyncTaskDO extends AdminDataEntity`；Admin 包编译通过
 
 - [ ] `member`：拆分会员域持久化表达改造任务
   - 范围对象：会员查询、会员资料相关持久化链路

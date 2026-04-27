@@ -18,8 +18,36 @@
 4. 质量与交付闭环
    - 按任务补测试、文档同步和小步提交
 
-## P0 - ArchUnit / DO 注解规约
+## P0 - ArchUnit / 模型注解规约
 
+- [ ] `archunit-request-annotation-baseline`：盘点 Request 注解规约适用范围
+  - 范围对象：后台与前台 API 入口模块中的 `Request` 类、复用请求模型和历史非标准请求对象
+  - 处理动作：确认哪些类应受 `NAME_REQUEST_REQUIRED_ANNOTATIONS` 约束，并识别已有额外类级注解或缺失注解
+  - 验收点：Request 注解门禁的扫描范围明确，额外注解处理方式明确
+- [ ] `archunit-request-annotation-rule`：新增 Request 类级注解白名单门禁
+  - 依赖前置：完成 `archunit-request-annotation-baseline`
+  - 范围对象：承载架构测试的模块、ArchUnit 测试类
+  - 处理动作：将 Request 类级注解固定为且仅为 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)`
+  - 验收点：Request 缺少必需注解或存在额外类级注解时会被测试拦截
+- [ ] `request-required-annotation-migration`：迁移现有 Request 到注解白名单形态
+  - 依赖前置：完成 `archunit-request-annotation-rule`
+  - 范围对象：现有 `Request` 类及其必要 import
+  - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
+  - 验收点：ArchUnit 规则通过；Request 序列化和反序列化语义保持稳定
+- [ ] `archunit-response-annotation-baseline`：盘点 Response 注解规约适用范围
+  - 范围对象：后台与前台 API 入口模块中的 `Response` 类、复用响应模型和历史非标准响应对象
+  - 处理动作：确认哪些类应受 `NAME_RESPONSE_REQUIRED_ANNOTATIONS` 约束，并识别已有额外类级注解或缺失注解
+  - 验收点：Response 注解门禁的扫描范围明确，额外注解处理方式明确
+- [ ] `archunit-response-annotation-rule`：新增 Response 类级注解白名单门禁
+  - 依赖前置：完成 `archunit-response-annotation-baseline`
+  - 范围对象：承载架构测试的模块、ArchUnit 测试类
+  - 处理动作：将 Response 类级注解固定为且仅为 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)`
+  - 验收点：Response 缺少必需注解或存在额外类级注解时会被测试拦截
+- [ ] `response-required-annotation-migration`：迁移现有 Response 到注解白名单形态
+  - 依赖前置：完成 `archunit-response-annotation-rule`
+  - 范围对象：现有 `Response` 类及其必要 import
+  - 处理动作：补齐必需类级注解，移除不在白名单内的类级注解；不调整字段、方法和接口行为
+  - 验收点：ArchUnit 规则通过；Response 序列化语义保持稳定
 - [ ] `archunit-do-annotation-baseline`：盘点 DO 注解规约适用范围
   - 范围对象：`sandwish-infra` 下 `persistence.dataobject` 包、现有 `DO/DataObject`、Redis 持久化对象和数据库表映射对象
   - 处理动作：确认哪些对象必须补齐 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`、`@TableName`，并记录 Redis-only DO 是否需要改名或迁移出 DO 命名体系

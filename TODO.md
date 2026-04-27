@@ -20,13 +20,6 @@
 
 ## P0 - Cache / Infra 边界演进
 
-- [ ] `cache-infra-contract-design`：固定 infra 缓存支撑契约
-  - 参考手册：`docs/30-designs/CACHE-INFRA-BOUNDARY-RUNBOOK.md`
-  - 范围对象：缓存支撑对象命名、包路径、key、TTL、命中、回源、回填、失效和版本策略
-  - 处理动作：只设计 infra 缓存支撑形态和迁移接口；不迁移业务链路
-  - 允许引入 JetCache：否
-  - 允许删除 `CrudServiceImpl` 缓存方法：否
-  - 验收点：Service、DAO interface、infra DAO implementation、CacheSupport、Mapper 的职责边界明确
 - [ ] `common-cache-boundary-decision`：判断是否建立 common-cache 模块
   - 参考手册：`docs/30-designs/COMMON-CACHE-RUNBOOK.md`
   - 依赖前置：完成 `cache-current-usage-inventory`、`cache-infra-contract-design`

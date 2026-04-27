@@ -2,13 +2,17 @@ package com.github.thundax.modules.sys.api;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.vo.UserVo;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
-import com.github.thundax.modules.sys.api.query.AssignUserQueryParam;
-import com.github.thundax.modules.sys.api.query.RoleQueryParam;
-import com.github.thundax.modules.sys.api.vo.MenuVo;
-import com.github.thundax.modules.sys.api.vo.RoleVo;
-import com.github.thundax.modules.sys.api.vo.UserTreeNodeVo;
+import com.github.thundax.modules.sys.request.RoleAssignUserRequest;
+import com.github.thundax.modules.sys.request.RoleIdRequest;
+import com.github.thundax.modules.sys.request.RolePriorityRequest;
+import com.github.thundax.modules.sys.request.RoleQueryRequest;
+import com.github.thundax.modules.sys.request.RoleSaveRequest;
+import com.github.thundax.modules.sys.request.RoleStatusRequest;
+import com.github.thundax.modules.sys.response.RoleMenuResponse;
+import com.github.thundax.modules.sys.response.RoleResponse;
+import com.github.thundax.modules.sys.response.RoleUserResponse;
+import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +31,7 @@ public interface RoleServiceApi {
     /**
      * 获取对象
      *
-     * @param role 权限
+     * @param request 角色标识请求
      * @return 权限
      * @throws ApiException API异常
      */
@@ -38,13 +42,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    RoleVo get(@RequestBody @ApiParam("权限") RoleVo role) throws ApiException;
+    RoleResponse get(@RequestBody @ApiParam("角色标识请求") RoleIdRequest request) throws ApiException;
 
 
     /**
      * 获取列表
      *
-     * @param queryParam 权限查询参数
+     * @param request 角色查询请求
      * @return 列表
      * @throws ApiException API异常
      */
@@ -54,13 +58,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<RoleVo> list(@RequestBody @ApiParam("查询参数") RoleQueryParam queryParam) throws ApiException;
+    List<RoleResponse> list(@RequestBody @ApiParam("角色查询请求") RoleQueryRequest request) throws ApiException;
 
 
     /**
      * 添加
      *
-     * @param role 权限
+     * @param request 角色保存请求
      * @return 权限
      * @throws ApiException API异常
      */
@@ -70,13 +74,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    RoleVo add(@RequestBody @ApiParam(value = "权限") RoleVo role) throws ApiException;
+    RoleResponse add(@RequestBody @ApiParam(value = "角色保存请求") RoleSaveRequest request) throws ApiException;
 
 
     /**
      * 更新
      *
-     * @param role 权限
+     * @param request 角色保存请求
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -86,13 +90,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    RoleVo update(@RequestBody @ApiParam("权限") RoleVo role) throws ApiException;
+    RoleResponse update(@RequestBody @ApiParam("角色保存请求") RoleSaveRequest request) throws ApiException;
 
 
     /**
      * 启用/禁用
      *
-     * @param list 权限列表
+     * @param list 角色状态请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -102,13 +106,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("权限列表") List<RoleVo> list) throws ApiException;
+    Boolean updateEnableFlag(@RequestBody @ApiParam("角色状态请求列表") List<RoleStatusRequest> list) throws ApiException;
 
 
     /**
      * 排序
      *
-     * @param list 权限列表
+     * @param list 角色排序请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -118,13 +122,13 @@ public interface RoleServiceApi {
     })
     @SysLogger("排序")
     @RequestMapping(value = "priority", method = RequestMethod.POST)
-    Boolean updatePriority(@RequestBody @ApiParam("权限列表") List<RoleVo> list) throws ApiException;
+    Boolean updatePriority(@RequestBody @ApiParam("角色排序请求列表") List<RolePriorityRequest> list) throws ApiException;
 
 
     /**
      * 删除
      *
-     * @param list 权限列表
+     * @param list 角色标识请求列表
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -134,7 +138,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("权限列表") List<RoleVo> list) throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("角色标识请求列表") List<RoleIdRequest> list) throws ApiException;
 
 
     /**
@@ -148,7 +152,7 @@ public interface RoleServiceApi {
 
     })
     @RequestMapping(value = "menu/tree", method = RequestMethod.POST)
-    List<MenuVo> menuTree();
+    List<RoleMenuResponse> menuTree();
 
 
     /**
@@ -162,13 +166,13 @@ public interface RoleServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "user/tree", method = RequestMethod.POST)
-    List<UserTreeNodeVo> userTree() throws ApiException;
+    List<RoleUserTreeNodeResponse> userTree() throws ApiException;
 
 
     /**
      * 获取权限用户列表
      *
-     * @param role 权限
+     * @param request 角色标识请求
      * @return 权限
      * @throws ApiException API异常
      */
@@ -177,13 +181,13 @@ public interface RoleServiceApi {
             @ApiImplicitParam(name = Constants.HEADER_TOKEN, value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "user/list", method = RequestMethod.POST)
-    List<UserVo> userList(@RequestBody @ApiParam("权限") RoleVo role) throws ApiException;
+    List<RoleUserResponse> userList(@RequestBody @ApiParam("角色标识请求") RoleIdRequest request) throws ApiException;
 
 
     /**
      * 授权用户
      *
-     * @param queryParam 授权参数
+     * @param request 角色授权用户请求
      * @return 成功:true, 失败:false
      * @throws ApiException API异常
      */
@@ -194,6 +198,6 @@ public interface RoleServiceApi {
     })
     @SysLogger("授权")
     @RequestMapping(value = "user/assign", method = RequestMethod.POST)
-    Boolean assignUser(@RequestBody @ApiParam("授权参数") AssignUserQueryParam queryParam) throws ApiException;
+    Boolean assignUser(@RequestBody @ApiParam("角色授权用户请求") RoleAssignUserRequest request) throws ApiException;
 
 }

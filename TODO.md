@@ -20,15 +20,6 @@
 
 ## P0 - Controller / Service 模型职责隔离
 
-- [ ] `sys-role-api`：隔离角色管理 API 模型
-  - 范围入口：`RoleApiController`
-  - 当前 API 模型泄漏点：入口直接使用 `RoleVo`、`RoleQueryParam`、`AssignUserQueryParam`、`MenuVo`、`OfficeVo`、`UserTreeNodeVo`、`UserVo`；Controller 内存在多组 `entityToVo`、`voToEntity` 和菜单/分配用户校验
-  - 需要新增或收窄的 `Request`：角色查询、创建、更新、启停、排序、删除、分配用户请求
-  - 需要新增或收窄的 `Response`：角色详情/列表响应、菜单树响应、用户树响应、已分配用户响应
-  - 需要新增的 `InterfaceAssembler`：`RoleInterfaceAssembler`
-  - Service 方法签名是否需要调整：当前不调整；分配用户链路保持 Service 接收 `Role` 或稳定业务参数
-  - 验收命令：`mvn -pl sandwish-admin-api -am -DskipTests package`
-
 - [ ] `sys-office-api`：隔离机构管理 API 模型
   - 范围入口：`OfficeApiController`
   - 当前 API 模型泄漏点：入口直接使用 `OfficeVo`、`OfficeQueryParam`、`MoveTreeNodeQueryParam`；Controller 内存在树过滤、`entityToVo`、`voToEntity`

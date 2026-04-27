@@ -1,11 +1,11 @@
 package com.github.thundax.common.utils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Cookie工具类
@@ -17,7 +17,7 @@ public class CookieUtils {
     /**
      * 设置 Cookie（生成时间为1天）
      *
-     * @param name  名称
+     * @param name 名称
      * @param value 值
      */
     public static void setCookie(HttpServletResponse response, String name, String value) {
@@ -27,32 +27,35 @@ public class CookieUtils {
     /**
      * 设置 Cookie
      *
-     * @param name  名称
+     * @param name 名称
      * @param value 值
      */
-    public static void setCookie(HttpServletResponse response, String name, String value, String path) {
+    public static void setCookie(
+            HttpServletResponse response, String name, String value, String path) {
         setCookie(response, name, value, path, 60 * 60 * 24);
     }
 
     /**
      * 设置 Cookie
      *
-     * @param name   名称
-     * @param value  值
+     * @param name 名称
+     * @param value 值
      * @param maxAge 生存时间（单位秒）
      */
-    public static void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    public static void setCookie(
+            HttpServletResponse response, String name, String value, int maxAge) {
         setCookie(response, name, value, "/", maxAge);
     }
 
     /**
      * 设置 Cookie
      *
-     * @param name   名称
-     * @param value  值
+     * @param name 名称
+     * @param value 值
      * @param maxAge 生存时间（单位秒）
      */
-    public static void setCookie(HttpServletResponse response, String name, String value, String path, int maxAge) {
+    public static void setCookie(
+            HttpServletResponse response, String name, String value, String path, int maxAge) {
         Cookie cookie = new Cookie(name, null);
         cookie.setPath(path);
         cookie.setMaxAge(maxAge);
@@ -80,20 +83,25 @@ public class CookieUtils {
      * @param name 名称
      * @return 值
      */
-    public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public static String getCookie(
+            HttpServletRequest request, HttpServletResponse response, String name) {
         return getCookie(request, response, name, true);
     }
 
     /**
      * 获得指定Cookie的值
      *
-     * @param request  请求对象
+     * @param request 请求对象
      * @param response 响应对象
-     * @param name     名字
+     * @param name 名字
      * @param isRemove 是否移除
      * @return 值
      */
-    public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name, boolean isRemove) {
+    public static String getCookie(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String name,
+            boolean isRemove) {
         String value = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

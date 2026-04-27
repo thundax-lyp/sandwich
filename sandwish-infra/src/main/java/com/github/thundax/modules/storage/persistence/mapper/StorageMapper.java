@@ -3,13 +3,10 @@ package com.github.thundax.modules.storage.persistence.mapper;
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 存储文件 MyBatis Mapper。
- */
+/** 存储文件 MyBatis Mapper。 */
 @MyBatisDao
 public interface StorageMapper {
 
@@ -39,5 +36,6 @@ public interface StorageMapper {
 
     void deleteBusiness(StorageDO entity);
 
-    int deleteBusinessByBusiness(@Param("businessType") String businessType, @Param("businessId") String businessId);
+    int deleteBusinessByBusiness(
+            @Param("businessType") String businessType, @Param("businessId") String businessId);
 }

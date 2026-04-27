@@ -2,9 +2,7 @@ package com.github.thundax.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class ApiException extends Exception {
 
     private static final long serialVersionUID = 1L;

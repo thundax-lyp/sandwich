@@ -1,18 +1,17 @@
 package com.github.thundax.common.web;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * HttpServletRequest帮助类
@@ -24,7 +23,8 @@ public class RequestUtils {
     private static final Logger log = LoggerFactory.getLogger(RequestUtils.class);
 
     public static HttpServletRequest currentRequest() {
-        return ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        return ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+                .getRequest();
     }
 
     /**
@@ -32,7 +32,7 @@ public class RequestUtils {
      * 那么将通过HttpServletRequest#getParameter获取。
      *
      * @param request web请求
-     * @param name    参数名称
+     * @param name 参数名称
      */
     public static String getQueryParam(HttpServletRequest request, String name) {
         if (StringUtils.isBlank(name)) {
@@ -113,26 +113,25 @@ public class RequestUtils {
     }
 
     /**
-     * Parses a query string passed from the client to the server and builds a
-     * <code>HashTable</code> object with key-value pairs. The query string
-     * should be in the form of a string packaged by the GET or POST method,
-     * that is, it should have key-value pairs in the form <i>key=value</i>,
-     * with each pair separated from the next by a &amp; character.
-     * <p/>
-     * <p/>
-     * A key can appear more than once in the query string with different
-     * values. However, the key appears only once in the hashtable, with its
-     * value being an array of strings containing the multiple values sent by
-     * the query string.
-     * <p/>
-     * <p/>
-     * The keys and values in the hashtable are stored in their decoded form, so
-     * any + characters are converted to spaces, and characters sent in
-     * hexadecimal notation (like <i>%xx</i>) are converted to ASCII characters.
+     * Parses a query string passed from the client to the server and builds a <code>HashTable
+     * </code> object with key-value pairs. The query string should be in the form of a string
+     * packaged by the GET or POST method, that is, it should have key-value pairs in the form
+     * <i>key=value</i>, with each pair separated from the next by a &amp; character.
+     *
+     * <p>
+     *
+     * <p>A key can appear more than once in the query string with different values. However, the
+     * key appears only once in the hashtable, with its value being an array of strings containing
+     * the multiple values sent by the query string.
+     *
+     * <p>
+     *
+     * <p>The keys and values in the hashtable are stored in their decoded form, so any + characters
+     * are converted to spaces, and characters sent in hexadecimal notation (like <i>%xx</i>) are
+     * converted to ASCII characters.
      *
      * @param s a string containing the query to be parsed
-     * @return a <code>HashTable</code> object built from the parsed key-value
-     * pairs
+     * @return a <code>HashTable</code> object built from the parsed key-value pairs
      * @throws IllegalArgumentException if the query string is invalid
      */
     public static Map<String, String[]> parseQueryString(String s) {
@@ -166,9 +165,8 @@ public class RequestUtils {
         return ht;
     }
 
-    public static Map<String, String> getRequestParamMap(HttpServletRequest request,
-                                                         String prefix,
-                                                         boolean nameWithPrefix) {
+    public static Map<String, String> getRequestParamMap(
+            HttpServletRequest request, String prefix, boolean nameWithPrefix) {
         Map<String, String> map = new HashMap<>(16);
         Enumeration<String> names = request.getParameterNames();
         String name, key, value;
@@ -187,11 +185,11 @@ public class RequestUtils {
 
     /**
      * 获取访问者IP
-     * <p/>
-     * 在一般情况下使用Request.getRemoteAddr()即可，但是经过nginx等反向代理软件后，这个方法会失效。
-     * <p/>
-     * 本方法先从Header中获取X-Real-IP，如果不存在再从X-Forwarded-For获得第一个IP(用,分割)，
-     * 如果还不存在则调用Request .getRemoteAddr()。
+     *
+     * <p>在一般情况下使用Request.getRemoteAddr()即可，但是经过nginx等反向代理软件后，这个方法会失效。
+     *
+     * <p>本方法先从Header中获取X-Real-IP，如果不存在再从X-Forwarded-For获得第一个IP(用,分割)， 如果还不存在则调用Request
+     * .getRemoteAddr()。
      */
     public static String getRemoteAddr(HttpServletRequest request) {
         String remoteAddr = request.getHeader("X-Real-IP");
@@ -221,7 +219,6 @@ public class RequestUtils {
         return getRemoteAddr(currentRequest());
     }
 
-
     public static boolean isGet(HttpServletRequest request) {
         return "get".equalsIgnoreCase(request.getMethod());
     }
@@ -229,5 +226,4 @@ public class RequestUtils {
     public static boolean isPost(HttpServletRequest request) {
         return "post".equalsIgnoreCase(request.getMethod());
     }
-
 }

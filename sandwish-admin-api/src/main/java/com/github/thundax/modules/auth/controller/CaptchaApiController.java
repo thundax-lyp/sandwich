@@ -4,30 +4,29 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.api.CaptchaServiceApi;
+import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
 import com.github.thundax.modules.auth.service.AuthService;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Random;
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Validator;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Random;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class CaptchaApiController extends BaseApiController implements CaptchaServiceApi {
 
@@ -43,9 +42,10 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     private final CaptchaInterfaceAssembler captchaInterfaceAssembler;
 
     @Autowired
-    public CaptchaApiController(Validator validator,
-                                AuthService authService,
-                                CaptchaInterfaceAssembler captchaInterfaceAssembler) {
+    public CaptchaApiController(
+            Validator validator,
+            AuthService authService,
+            CaptchaInterfaceAssembler captchaInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
@@ -53,7 +53,8 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     @Override
-    public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void captcha(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         String loginToken = request.getParameter("loginToken");
         if (StringUtils.isBlank(loginToken)) {
             writeResponse(response, -1, "invalidate login token");
@@ -101,7 +102,8 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     @Override
-    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException {
+    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request)
+            throws ApiException {
         if (StringUtils.isBlank(request.getLoginToken())) {
             throw new InvalidParameterException("loginToken");
         }
@@ -111,11 +113,14 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
         return captchaInterfaceAssembler.toRefreshResponse(true);
     }
 
-    private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {
+    private void writeResponse(HttpServletResponse response, int code, String message)
+            throws IOException {
         response.getWriter().print("{\"code\":" + code + ",\"message\":\"" + message + "\"}");
     }
 
-    private void writeImage(HttpServletRequest request, HttpServletResponse response, String captcha) throws IOException {
+    private void writeImage(
+            HttpServletRequest request, HttpServletResponse response, String captcha)
+            throws IOException {
 
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
@@ -156,7 +161,6 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
         OutputStream out = response.getOutputStream();
         ImageIO.write(image, "JPEG", out);
         out.close();
-
     }
 
     private Color getRandColor(int fc, int bc) {
@@ -169,9 +173,8 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
         if (b > MAX_COLOR) {
             b = MAX_COLOR;
         }
-        return new Color(f + random.nextInt(b - f),
-                f + random.nextInt(b - f),
-                f + random.nextInt(b - f));
+        return new Color(
+                f + random.nextInt(b - f), f + random.nextInt(b - f), f + random.nextInt(b - f));
     }
 
     private void createBackground(Graphics graphics, int width, int height) {
@@ -191,9 +194,7 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     private void drawCharacter(Graphics graphics, int width, int height, String captcha) {
-        String[] fontTypes = {
-                "Arial", "Arial Black", "AvantGarde Bk BT", "Calibri"
-        };
+        String[] fontTypes = {"Arial", "Arial Black", "AvantGarde Bk BT", "Calibri"};
 
         char[] codes = captcha.toCharArray();
 
@@ -209,12 +210,11 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
             graphics.setColor(getRandColor(50, 100));
             graphics.setFont(font);
 
-            //只有数字，字符高度取 fontMetrics.getAscent()
+            // 只有数字，字符高度取 fontMetrics.getAscent()
             int fontHeight = graphics.getFontMetrics().getAscent();
 
             int yOffset = height < fontHeight ? 0 : random.nextInt(height - fontHeight);
             graphics.drawString(code, charWidth * idx + 10, height - 5 - yOffset);
         }
     }
-
 }

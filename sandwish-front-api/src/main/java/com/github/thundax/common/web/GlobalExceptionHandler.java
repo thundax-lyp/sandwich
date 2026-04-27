@@ -1,15 +1,12 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.collect.MapUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @ControllerAdvice
 @ResponseBody
 public class GlobalExceptionHandler {
@@ -18,10 +15,9 @@ public class GlobalExceptionHandler {
     public Object exceptionHandle(Exception e) {
         e.printStackTrace();
 
-        Map<String, Object> map = MapUtils.newHashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("code", 500);
         map.put("message", "error");
         return map;
     }
-
 }

@@ -2,15 +2,13 @@ package com.github.thundax.common.service.impl;
 
 import com.github.pagehelper.ISelect;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Maps;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.service.impl.support.PageHelperResult;
 import com.github.thundax.common.utils.StringUtils;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
+import com.google.common.collect.Maps;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.annotation.PostConstruct;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @param <D>
@@ -25,7 +25,8 @@ import java.util.function.Function;
  * @author thundax
  */
 @Transactional(readOnly = true)
-public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity<T>> extends BaseServiceImpl {
+public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity<T>>
+        extends BaseServiceImpl {
 
     public CrudServiceImpl(D dao) {
         this.dao = dao;
@@ -64,21 +65,14 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
         return null;
     }
 
-    protected void initialize() {
+    protected void initialize() {}
 
-    }
-
-    /**
-     * 获取单条数据
-     */
+    /** 获取单条数据 */
     public T get(T query) {
         return dao.get(query);
     }
 
-
-    /**
-     * 获取单条数据
-     */
+    /** 获取单条数据 */
     public T get(String id) {
         if (StringUtils.isBlank(id)) {
             return null;
@@ -86,14 +80,10 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
         return get(newEntity(id));
     }
 
-
-    /**
-     * 获取单条数据
-     */
+    /** 获取单条数据 */
     public List<T> getMany(List<String> ids) {
         return dao.getMany(ids);
     }
-
 
     /**
      * 查询列表数据
@@ -115,11 +105,12 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
 
     public T findOne(ISelect select) {
         try {
-            com.github.pagehelper.Page<T> helperPage = PageHelper.startPage(Page.FIRST_PAGE_INDEX, 1, false);
+            PageHelperResult<T> helperPage =
+                    PageHelperResult.startPage(Page.FIRST_PAGE_INDEX, 1, false);
 
             select.doSelect();
 
-            return helperPage.size() > 0 ? helperPage.get(0) : null;
+            return helperPage.getFirst();
 
         } finally {
             PageHelper.clearPage();
@@ -132,14 +123,15 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
 
     public Page<T> findPage(Page<T> page, ISelect select) {
         try {
-            com.github.pagehelper.Page<T> helperPage = PageHelper.startPage(page.getPageNo(), page.getPageSize());
+            PageHelperResult<T> helperPage =
+                    PageHelperResult.startPage(page.getPageNo(), page.getPageSize());
 
             select.doSelect();
 
-            page.setPageNo(helperPage.getPageNum());
+            page.setPageNo(helperPage.getPageNo());
             page.setPageSize(helperPage.getPageSize());
             page.setCount(helperPage.getTotal());
-            page.setList(new ArrayList<>(helperPage));
+            page.setList(new ArrayList<>(helperPage.getList()));
 
         } finally {
             PageHelper.clearPage();
@@ -222,5 +214,4 @@ public abstract class CrudServiceImpl<D extends CrudDao<T>, T extends DataEntity
         }
         return result;
     }
-
 }

@@ -1,22 +1,24 @@
 package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.common.utils.StringUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author: someone
  * @date: 2023/7/25
- **/
+ */
 public class HtmlResourceUtils {
 
     private static final String SERVLET_PREFIX = "/servlet/storage";
 
     /**
      * html 保存时调用
+     *
      * @param html
      * @return
      */
@@ -25,11 +27,12 @@ public class HtmlResourceUtils {
             return html;
         }
 
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
 
-        org.jsoup.nodes.Document doc = Jsoup.parse(html);
-        for (org.jsoup.nodes.Element ele : doc.select("img, a, audio, video")) {
+        Document doc = Jsoup.parse(html);
+        for (Element ele : doc.select("img, a, audio, video")) {
             String resourceUrl = StringUtils.EMPTY;
             if (StringUtils.equalsIgnoreCase(ele.tagName(), "img")) {
                 resourceUrl = ele.attr("src");
@@ -47,15 +50,19 @@ public class HtmlResourceUtils {
             if (!isContextPath(resourceUrl, request.getContextPath())) {
                 continue;
             }
-            html = StringUtils.replace(html, resourceUrl, StringUtils.replace(resourceUrl,request.getContextPath(),""));
+            html =
+                    StringUtils.replace(
+                            html,
+                            resourceUrl,
+                            StringUtils.replace(resourceUrl, request.getContextPath(), ""));
         }
 
         return html;
     }
 
-
     /**
      * html 预览时调用
+     *
      * @param html
      * @return
      */
@@ -65,11 +72,12 @@ public class HtmlResourceUtils {
             return html;
         }
 
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
 
-        org.jsoup.nodes.Document doc = Jsoup.parse(html);
-        for (org.jsoup.nodes.Element ele : doc.select("img, a, audio, video")) {
+        Document doc = Jsoup.parse(html);
+        for (Element ele : doc.select("img, a, audio, video")) {
             String resourceUrl = StringUtils.EMPTY;
             if (StringUtils.equalsIgnoreCase(ele.tagName(), "img")) {
                 resourceUrl = ele.attr("src");
@@ -90,10 +98,9 @@ public class HtmlResourceUtils {
         }
 
         return html;
-
     }
 
-    private static boolean isContextPath(String path,String contextPath) {
+    private static boolean isContextPath(String path, String contextPath) {
         if (StringUtils.isAnyEmpty(path, contextPath)) {
             return false;
         }

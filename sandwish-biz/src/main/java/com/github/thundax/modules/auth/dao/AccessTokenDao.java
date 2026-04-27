@@ -2,9 +2,7 @@ package com.github.thundax.modules.auth.dao;
 
 import com.github.thundax.modules.auth.entity.AccessToken;
 
-/**
- * access token DAO。
- */
+/** access token DAO。 */
 public interface AccessTokenDao {
 
     /**

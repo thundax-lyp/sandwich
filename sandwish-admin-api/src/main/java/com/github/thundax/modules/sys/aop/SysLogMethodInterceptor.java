@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.aop;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.RequestUtils;
@@ -8,6 +7,13 @@ import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,15 +21,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public class SysLogMethodInterceptor implements MethodInterceptor {
 
     private static final String TITLE_SEPARATOR = "-";
@@ -50,7 +48,8 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
             Class<?> clazz = methodInvocation.getClass();
             System.out.println(clazz);
 
-            SysLogger parentAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), SysLogger.class);
+            SysLogger parentAnnotation =
+                    AnnotationUtils.findAnnotation(method.getDeclaringClass(), SysLogger.class);
             Assert.notNull(parentAnnotation, "modules of annotation '@SysLogger' is empty");
 
             if (StringUtils.isEmpty(value)) {
@@ -100,7 +99,7 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
     private void writeLog(String[] modules, String value, String category, Object requestBody) {
         HttpServletRequest currentRequest = RequestUtils.currentRequest();
 
-        List<String> titleParts = ListUtils.newArrayList(modules);
+        List<String> titleParts = new ArrayList<>(Arrays.asList(modules));
         titleParts.add(value);
 
         Log log = new Log();
@@ -126,5 +125,4 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
 
         SysLogUtils.saveLog(log);
     }
-
 }

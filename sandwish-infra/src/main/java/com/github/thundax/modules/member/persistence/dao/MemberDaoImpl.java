@@ -1,17 +1,15 @@
 package com.github.thundax.modules.member.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import com.github.thundax.modules.member.persistence.mapper.MemberMapper;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * 会员 DAO 实现。
- */
+/** 会员 DAO 实现。 */
 @Repository
 public class MemberDaoImpl implements MemberDao {
 
@@ -23,7 +21,8 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public Member get(Member entity) {
-        return MemberPersistenceAssembler.toEntity(mapper.get(MemberPersistenceAssembler.toDataObject(entity)));
+        return MemberPersistenceAssembler.toEntity(
+                mapper.get(MemberPersistenceAssembler.toDataObject(entity)));
     }
 
     @Override
@@ -34,9 +33,10 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Member> findList(Member entity) {
-        List<MemberDO> dataObjects = mapper.findList(MemberPersistenceAssembler.toDataObject(entity));
+        List<MemberDO> dataObjects =
+                mapper.findList(MemberPersistenceAssembler.toDataObject(entity));
         List<Member> entities = MemberPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);
@@ -106,11 +106,13 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public Member getByZjhm(Member member) {
-        return MemberPersistenceAssembler.toEntity(mapper.getByZjhm(MemberPersistenceAssembler.toDataObject(member)));
+        return MemberPersistenceAssembler.toEntity(
+                mapper.getByZjhm(MemberPersistenceAssembler.toDataObject(member)));
     }
 
     @Override
     public Member getByYwtbId(Member member) {
-        return MemberPersistenceAssembler.toEntity(mapper.getByYwtbId(MemberPersistenceAssembler.toDataObject(member)));
+        return MemberPersistenceAssembler.toEntity(
+                mapper.getByYwtbId(MemberPersistenceAssembler.toDataObject(member)));
     }
 }

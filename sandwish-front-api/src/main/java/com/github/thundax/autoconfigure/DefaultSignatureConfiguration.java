@@ -1,6 +1,5 @@
 package com.github.thundax.autoconfigure;
 
-
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
 import com.github.thundax.modules.assist.service.impl.DefaultSignServiceImpl;
@@ -21,5 +20,4 @@ public class DefaultSignatureConfiguration {
     public SignService signService(SignatureService signatureService) {
         return new DefaultSignServiceImpl(signatureService);
     }
-
 }

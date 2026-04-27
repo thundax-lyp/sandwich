@@ -5,8 +5,8 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.api.SignatureServiceApi;
+import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.request.SignatureDeleteRequest;
 import com.github.thundax.modules.assist.request.SignaturePageRequest;
@@ -15,7 +15,6 @@ import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
-import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -24,16 +23,14 @@ import com.github.thundax.modules.sys.utils.LogServiceHolder;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
+import java.util.List;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-import java.util.List;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class SignatureApiController extends BaseApiController implements SignatureServiceApi {
 
@@ -42,10 +39,11 @@ public class SignatureApiController extends BaseApiController implements Signatu
     private final SignatureInterfaceAssembler signatureInterfaceAssembler;
 
     @Autowired
-    public SignatureApiController(SignatureService signatureService,
-                                  SignService signService,
-                                  Validator validator,
-                                  SignatureInterfaceAssembler signatureInterfaceAssembler) {
+    public SignatureApiController(
+            SignatureService signatureService,
+            SignService signService,
+            Validator validator,
+            SignatureInterfaceAssembler signatureInterfaceAssembler) {
         super(validator);
 
         this.signatureService = signatureService;
@@ -53,10 +51,10 @@ public class SignatureApiController extends BaseApiController implements Signatu
         this.signatureInterfaceAssembler = signatureInterfaceAssembler;
     }
 
-
     @Override
-    @RequiresPermissions("assist:signature:view")
-    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request) throws ApiException {
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
+    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request)
+            throws ApiException {
         validate(request);
 
         Signature query = new Signature();
@@ -64,13 +62,15 @@ public class SignatureApiController extends BaseApiController implements Signatu
         queryCondition.setBusinessType(request.getBusinessType());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(signatureService.findPage(query, readSignaturePage(request)), this::entityToResponse);
+        return entityPageToVo(
+                signatureService.findPage(query, readSignaturePage(request)),
+                this::entityToResponse);
     }
 
-
     @Override
-    @RequiresPermissions("assist:signature:view")
-    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request) throws ApiException {
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
+    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request)
+            throws ApiException {
         validate(request);
         Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
 
@@ -84,21 +84,22 @@ public class SignatureApiController extends BaseApiController implements Signatu
         }
 
         return signatureInterfaceAssembler.toVerifyResponse(
-                signService.verifySign(signable.getSignName(), signable.getSignId(), signable.getSignBody()));
+                signService.verifySign(
+                        signable.getSignName(), signable.getSignId(), signable.getSignBody()));
     }
 
-
     @Override
-    @RequiresPermissions("assist:signature:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
-        List<Signature> beanList = validateList(list,
-                vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
+        List<Signature> beanList =
+                validateList(
+                        list,
+                        vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
 
         signatureService.delete(beanList);
 
         return true;
     }
-
 
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
@@ -114,7 +115,6 @@ public class SignatureApiController extends BaseApiController implements Signatu
                 return null;
         }
     }
-
 
     private SignatureResponse entityToResponse(Signature entity) {
         return signatureInterfaceAssembler.toResponse(entity, findSignable(entity));
@@ -137,5 +137,4 @@ public class SignatureApiController extends BaseApiController implements Signatu
         page.setPageSize(pageSize);
         return page;
     }
-
 }

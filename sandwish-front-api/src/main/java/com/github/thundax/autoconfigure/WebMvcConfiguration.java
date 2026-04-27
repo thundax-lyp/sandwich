@@ -1,6 +1,5 @@
 package com.github.thundax.autoconfigure;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.filter.xss.XssFilter;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
@@ -8,6 +7,9 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
 import com.github.thundax.modules.sys.servlet.SmsValidateCodeServlet;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.DispatcherType;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -16,19 +18,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.DispatcherType;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Configuration
 @EnableWebMvc
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
-    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(VltavaProperties properties) {
+    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(
+            VltavaProperties properties) {
         ValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
 
         ServletRegistrationBean<ValidateCodeServlet> bean = new ServletRegistrationBean<>();
@@ -37,9 +34,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-
     @Bean
-    public ServletRegistrationBean<SmsValidateCodeServlet> smsValidateCodeServletServletRegistrationBean(VltavaProperties properties) {
+    public ServletRegistrationBean<SmsValidateCodeServlet>
+            smsValidateCodeServletServletRegistrationBean(VltavaProperties properties) {
         SmsValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
 
         ServletRegistrationBean<SmsValidateCodeServlet> bean = new ServletRegistrationBean<>();
@@ -48,16 +45,15 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-
     @Bean
-    public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(VltavaProperties properties, StorageConverter converter) {
+    public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(
+            VltavaProperties properties, StorageConverter converter) {
         ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
         bean.setServlet(new StorageServlet(converter));
         VltavaProperties.UploadProperties upload = properties.getUpload();
         bean.addUrlMappings(upload.getServletPath() + "*");
         return bean;
     }
-
 
     @Bean
     public FilterRegistrationBean<PooledThreadLocalFilter> polledThreadFilterRegistrationBean() {
@@ -66,7 +62,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         bean.addUrlPatterns("/*");
         return bean;
     }
-
 
     @Bean
     public FilterRegistrationBean<ProcessTimeFilter> processTimeFilterRegistrationBean() {
@@ -77,7 +72,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(VltavaProperties properties) {
+    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(
+            VltavaProperties properties) {
         FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
@@ -93,14 +89,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return registration;
     }
 
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
 
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/favicon.ico");
     }
-
 }

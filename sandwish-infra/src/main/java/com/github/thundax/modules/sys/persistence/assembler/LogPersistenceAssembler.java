@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 日志业务模型与持久化对象转换器。
- */
+/** 日志业务模型与持久化对象转换器。 */
 public final class LogPersistenceAssembler {
 
-    private LogPersistenceAssembler() {
-    }
+    private LogPersistenceAssembler() {}
 
     public static LogDO toDataObject(Log entity) {
         if (entity == null) {
@@ -71,7 +67,7 @@ public final class LogPersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Log> entities = ListUtils.newArrayList();
+        List<Log> entities = new ArrayList<>();
         for (LogDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
@@ -82,7 +78,7 @@ public final class LogPersistenceAssembler {
         if (entities == null) {
             return null;
         }
-        List<LogDO> dataObjects = ListUtils.newArrayList();
+        List<LogDO> dataObjects = new ArrayList<>();
         for (Log entity : entities) {
             dataObjects.add(toDataObject(entity));
         }

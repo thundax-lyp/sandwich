@@ -3,9 +3,7 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.modules.auth.service.UserAccessService;
 import org.springframework.stereotype.Service;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 public class UserAccessServiceImpl implements UserAccessService {
 
@@ -20,8 +18,5 @@ public class UserAccessServiceImpl implements UserAccessService {
     }
 
     @Override
-    public void setSessionCache(String name, Object value) {
-
-    }
-
+    public void setSessionCache(String name, Object value) {}
 }

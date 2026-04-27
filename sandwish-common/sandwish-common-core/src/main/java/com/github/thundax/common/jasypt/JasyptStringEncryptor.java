@@ -42,5 +42,4 @@ public class JasyptStringEncryptor implements StringEncryptor {
         }
         return Des.decrypt(encryptedMessage.substring(prefix.length()), password);
     }
-
 }

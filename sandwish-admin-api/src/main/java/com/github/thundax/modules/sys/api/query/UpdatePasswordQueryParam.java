@@ -6,14 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "UpdatePasswordQueryParam", description = "更新密码参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -34,11 +31,12 @@ public class UpdatePasswordQueryParam implements Serializable {
         this.oldPassword = oldPassword;
     }
 
-
     @ApiModelProperty(name = "password", value = "新密码")
     @JsonProperty("password")
     @NotEmpty(message = "\"新密码\"不能为空")
-    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
+    @Pattern(
+            regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN,
+            message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     public String getPassword() {
         return password;
     }
@@ -57,5 +55,4 @@ public class UpdatePasswordQueryParam implements Serializable {
     public void setToken(String token) {
         this.token = token;
     }
-
 }

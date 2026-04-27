@@ -7,9 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 加密服务默认配置。
- */
+/** 加密服务默认配置。 */
 @Configuration
 public class DefaultEncryptConfiguration {
 
@@ -18,5 +16,4 @@ public class DefaultEncryptConfiguration {
     public UserEncryptService userEncryptService(UserEncryptDao dao) {
         return new DefaultUserEncryptServiceImpl(dao);
     }
-
 }

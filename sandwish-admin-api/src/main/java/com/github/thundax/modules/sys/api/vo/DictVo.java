@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "DictVo", description = "字段")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

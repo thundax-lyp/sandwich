@@ -7,9 +7,7 @@ import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @ApiModel(value = "Storage", description = "存储资源")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -138,7 +136,6 @@ public class StorageVo extends BaseVo {
     public void setPublic(Boolean aPublic) {
         isPublic = aPublic;
     }
-
 
     @ApiModelProperty(name = "url", value = "URL")
     @JsonProperty("url")

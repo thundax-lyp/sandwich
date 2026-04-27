@@ -5,14 +5,10 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import com.github.thundax.modules.storage.utils.StorageServiceHolder;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
+import java.io.File;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-
-/**
- * @author
- */
+/** @author */
 @Service
 public class StorageConverter {
 
@@ -43,5 +39,4 @@ public class StorageConverter {
     public File toFile(Storage storage) {
         return new File(this.storagePath + storage.getPathName());
     }
-
 }

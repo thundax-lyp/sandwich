@@ -2,13 +2,10 @@ package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.modules.sys.entity.Log;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface LogDao extends CrudDao<Log> {
 
     /**
@@ -26,5 +23,4 @@ public interface LogDao extends CrudDao<Log> {
      * @return 影响记录数
      */
     int batchDelete(Log log);
-
 }

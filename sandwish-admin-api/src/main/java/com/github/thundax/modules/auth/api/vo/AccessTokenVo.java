@@ -5,12 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "Token", description = "会话令牌")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,9 +17,7 @@ public class AccessTokenVo implements Serializable {
 
     private String token;
 
-    public AccessTokenVo() {
-
-    }
+    public AccessTokenVo() {}
 
     @ApiModelProperty(name = "token", value = "令牌")
     @JsonProperty("token")
@@ -33,5 +28,4 @@ public class AccessTokenVo implements Serializable {
     public void setToken(String token) {
         this.token = token;
     }
-
 }

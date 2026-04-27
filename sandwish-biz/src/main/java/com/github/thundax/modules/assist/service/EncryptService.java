@@ -22,5 +22,4 @@ public interface EncryptService {
      * @return 解密结果
      */
     String decrypt(String encryptedValue);
-
 }

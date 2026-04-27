@@ -5,17 +5,56 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class WaveBuilder {
 
     private static final int WAVE_FILE_HEADER_SIZE = 44;
 
     private static final byte[] WAVE_FILE_HEADER = {
-            'R', 'I', 'F', 'F', 0, 0, 0, 0, 'W', 'A', 'V', 'E', 'f', 'm', 't', ' ',
-            16, 0, 0, 0, 1, 0, 1, 0, 0x40, 0x1f, 0, 0, (byte) 0x80, 0x3e, 0, 0, 2, 0, 16, 0, 'd', 'a', 't', 'a', 0, 0,
-            0, 0
+        'R',
+        'I',
+        'F',
+        'F',
+        0,
+        0,
+        0,
+        0,
+        'W',
+        'A',
+        'V',
+        'E',
+        'f',
+        'm',
+        't',
+        ' ',
+        16,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0x40,
+        0x1f,
+        0,
+        0,
+        (byte) 0x80,
+        0x3e,
+        0,
+        0,
+        2,
+        0,
+        16,
+        0,
+        'd',
+        'a',
+        't',
+        'a',
+        0,
+        0,
+        0,
+        0
     };
 
     public static byte[] buildAudio(String[] filenames) throws IOException {
@@ -52,5 +91,4 @@ public class WaveBuilder {
 
         return buffer;
     }
-
 }

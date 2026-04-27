@@ -9,14 +9,15 @@ import com.github.thundax.modules.sys.api.vo.RoleVo;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.*;
 import java.util.Date;
 import java.util.List;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "User", description = "用户")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,7 +61,6 @@ public class UserVo extends BaseVo {
         super(id);
     }
 
-
     @ApiModelProperty(name = "loginName", value = "登录名")
     @JsonProperty("loginName")
     @NotEmpty(message = "\"登录名\"不能为空")
@@ -73,10 +73,11 @@ public class UserVo extends BaseVo {
         this.loginName = loginName;
     }
 
-
     @ApiModelProperty(name = "loginPass", value = "登录密码")
     @JsonProperty("loginPass")
-    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
+    @Pattern(
+            regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN,
+            message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     public String getLoginPass() {
         return loginPass;
     }
@@ -84,7 +85,6 @@ public class UserVo extends BaseVo {
     public void setLoginPass(String loginPass) {
         this.loginPass = loginPass;
     }
-
 
     @ApiModelProperty(name = "ranks", value = "等级")
     @JsonProperty("ranks")
@@ -98,7 +98,6 @@ public class UserVo extends BaseVo {
         this.ranks = ranks;
     }
 
-
     @ApiModelProperty(name = "name", value = "姓名")
     @JsonProperty("name")
     @NotEmpty(message = "\"姓名\"不能为空")
@@ -111,7 +110,6 @@ public class UserVo extends BaseVo {
         this.name = name;
     }
 
-
     @ApiModelProperty(name = "email", value = "邮箱")
     @JsonProperty("email")
     @Size(max = 50, message = "\"邮箱\"长度不能超过 50")
@@ -122,7 +120,6 @@ public class UserVo extends BaseVo {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     @ApiModelProperty(name = "mobile", value = "手机号")
     @JsonProperty("mobile")
@@ -135,7 +132,6 @@ public class UserVo extends BaseVo {
         this.mobile = mobile;
     }
 
-
     @ApiModelProperty(name = "avatar", value = "头像链接地址")
     @JsonProperty("avatar")
     public String getAvatar() {
@@ -145,7 +141,6 @@ public class UserVo extends BaseVo {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
-
 
     @ApiModelProperty(name = "superAdmin", value = "是否系统管理员")
     @JsonProperty("superAdmin")
@@ -157,7 +152,6 @@ public class UserVo extends BaseVo {
         isSuper = aSuper;
     }
 
-
     @ApiModelProperty(name = "admin", value = "是否管理员")
     @JsonProperty("admin")
     public Boolean getAdmin() {
@@ -168,7 +162,6 @@ public class UserVo extends BaseVo {
         isAdmin = admin;
     }
 
-
     @ApiModelProperty(name = "enable", value = "启用/禁用")
     @JsonProperty("enable")
     public Boolean getEnable() {
@@ -178,7 +171,6 @@ public class UserVo extends BaseVo {
     public void setEnable(Boolean enable) {
         isEnable = enable;
     }
-
 
     @ApiModelProperty(name = "registerDate", value = "注册时间")
     @JsonProperty("registerDate")
@@ -191,7 +183,6 @@ public class UserVo extends BaseVo {
         this.registerDate = registerDate;
     }
 
-
     @ApiModelProperty(name = "registerIp", value = "注册IP")
     @JsonProperty("registerIp")
     public String getRegisterIp() {
@@ -201,7 +192,6 @@ public class UserVo extends BaseVo {
     public void setRegisterIp(String registerIp) {
         this.registerIp = registerIp;
     }
-
 
     @ApiModelProperty(name = "lastLoginDate", value = "最后登录时间")
     @JsonProperty("lastLoginDate")
@@ -214,7 +204,6 @@ public class UserVo extends BaseVo {
         this.lastLoginDate = lastLoginDate;
     }
 
-
     @ApiModelProperty(name = "lastLoginIp", value = "最后登录IP")
     @JsonProperty("lastLoginIp")
     public String getLastLoginIp() {
@@ -225,7 +214,6 @@ public class UserVo extends BaseVo {
         this.lastLoginIp = lastLoginIp;
     }
 
-
     @ApiModelProperty(name = "office", value = "归属组织机构")
     @JsonProperty("office")
     public OfficeVo getOffice() {
@@ -235,7 +223,6 @@ public class UserVo extends BaseVo {
     public void setOffice(OfficeVo office) {
         this.office = office;
     }
-
 
     @ApiModelProperty(name = "roles", value = "权限")
     @JsonProperty("roles")

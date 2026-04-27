@@ -7,9 +7,7 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.Menu;
 import org.springframework.stereotype.Component;
 
-/**
- * 菜单缓存支撑。
- */
+/** 菜单缓存支撑。 */
 @Component
 public class MenuCacheSupport {
 

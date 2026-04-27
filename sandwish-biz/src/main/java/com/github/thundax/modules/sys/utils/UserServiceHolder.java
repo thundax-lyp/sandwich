@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.utils;
 
-import com.google.common.collect.Sets;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
@@ -10,24 +8,25 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
+import com.google.common.collect.Sets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Lazy(false)
 public class UserServiceHolder {
 
     private static UserService service;
 
-    private static final PooledThreadLocal<Map<String, User>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<String, User>> ID_OBJECT_HOLDER =
+            new PooledThreadLocal<>();
 
     @Autowired
     public UserServiceHolder(UserService targetService) {
@@ -46,7 +45,7 @@ public class UserServiceHolder {
             return null;
         }
         return ID_OBJECT_HOLDER
-                .computeIfAbsent(MapUtils::newHashMap)
+                .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
@@ -61,11 +60,12 @@ public class UserServiceHolder {
 
         if (user.isSuper()) {
             // 超级管理员可以看到全部菜单
-            menuIdList = ListUtils.map(MenuServiceHolder.getService().findList(new Menu()), Menu::getId);
+            menuIdList =
+                    ListUtils.map(MenuServiceHolder.getService().findList(new Menu()), Menu::getId);
 
         } else {
-            List<Role> roleList = ListUtils.map(user.getRoleList(),
-                    role -> RoleServiceHolder.get(role.getId()));
+            List<Role> roleList =
+                    ListUtils.map(user.getRoleList(), role -> RoleServiceHolder.get(role.getId()));
             boolean isAdmin = user.isAdmin();
             if (!isAdmin) {
                 // 如果在admin组里，也认为是admin
@@ -74,7 +74,10 @@ public class UserServiceHolder {
 
             if (isAdmin) {
                 // 一般管理员可以看到比自己级别低的菜单
-                menuIdList = ListUtils.map(MenuServiceHolder.getService().findList(user.getRanks()), Menu::getId);
+                menuIdList =
+                        ListUtils.map(
+                                MenuServiceHolder.getService().findList(user.getRanks()),
+                                Menu::getId);
 
             } else {
                 // 普通用户只能看到role中指定，且级别比自己低的菜单
@@ -83,12 +86,13 @@ public class UserServiceHolder {
                     menuIds.addAll(ListUtils.map(role.getMenuList(), Menu::getId));
                 }
 
-                menuIds.removeIf(menuId -> {
-                    Menu menuBean = MenuServiceHolder.get(menuId);
-                    return menuBean == null || menuBean.getRanks() > user.getRanks();
-                });
+                menuIds.removeIf(
+                        menuId -> {
+                            Menu menuBean = MenuServiceHolder.get(menuId);
+                            return menuBean == null || menuBean.getRanks() > user.getRanks();
+                        });
 
-                menuIdList = ListUtils.newArrayList(menuIds);
+                menuIdList = new ArrayList<>(menuIds);
             }
         }
 
@@ -98,5 +102,4 @@ public class UserServiceHolder {
 
         return menuList;
     }
-
 }

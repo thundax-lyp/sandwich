@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature> implements SignatureService {
+public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature>
+        implements SignatureService {
 
     public SignatureServiceImpl(SignatureDao dao) {
         super(dao);
     }
-
 
     @Override
     public Signature find(String businessType, String businessId) {
@@ -40,5 +40,4 @@ public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signatur
         entity.preUpdate();
         dao.insertOrUpdate(entity);
     }
-
 }

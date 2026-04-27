@@ -1,19 +1,15 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 角色业务模型与持久化对象转换器。
- */
+/** 角色业务模型与持久化对象转换器。 */
 public final class RolePersistenceAssembler {
 
-    private RolePersistenceAssembler() {
-    }
+    private RolePersistenceAssembler() {}
 
     public static RoleDO toDataObject(Role entity) {
         if (entity == null) {
@@ -69,7 +65,7 @@ public final class RolePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Role> entities = ListUtils.newArrayList();
+        List<Role> entities = new ArrayList<>();
         for (RoleDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
@@ -80,7 +76,7 @@ public final class RolePersistenceAssembler {
         if (userIds == null) {
             return null;
         }
-        List<User> users = ListUtils.newArrayList();
+        List<User> users = new ArrayList<>();
         for (String userId : userIds) {
             users.add(new User(userId));
         }
@@ -91,7 +87,7 @@ public final class RolePersistenceAssembler {
         if (users == null) {
             return null;
         }
-        List<String> userIds = ListUtils.newArrayList();
+        List<String> userIds = new ArrayList<>();
         for (User user : users) {
             userIds.add(user.getId());
         }

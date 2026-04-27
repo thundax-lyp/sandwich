@@ -5,9 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SysLogger {
@@ -32,5 +30,4 @@ public @interface SysLogger {
      * @return 分类
      */
     String category() default "";
-
 }

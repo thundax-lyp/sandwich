@@ -9,15 +9,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @Service
 @Lazy(false)
 public class InitApplicationContext implements ApplicationContextAware, DisposableBean {
 
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext)
+            throws BeansException {
         SpringContextHolder.setApplicationContext(applicationContext);
     }
 
@@ -25,5 +24,4 @@ public class InitApplicationContext implements ApplicationContextAware, Disposab
     public void destroy() {
         SpringContextHolder.clearHolder();
     }
-
 }

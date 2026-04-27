@@ -7,9 +7,7 @@ import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "PublicKeyVo", description = "公钥")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,7 +23,6 @@ public class PublicKeyVo extends BaseVo {
         super(id);
     }
 
-
     @ApiModelProperty(name = "publicKey", value = "公钥")
     @JsonProperty("publicKey")
     public String getPublicKey() {
@@ -35,5 +32,4 @@ public class PublicKeyVo extends BaseVo {
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
     }
-
 }

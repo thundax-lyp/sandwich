@@ -4,21 +4,18 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.api.LogServiceApi;
+import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.request.LogPageRequest;
 import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.service.LogService;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @RestController
 public class LogApiController extends BaseApiController implements LogServiceApi {
 
@@ -26,17 +23,17 @@ public class LogApiController extends BaseApiController implements LogServiceApi
     private final LogInterfaceAssembler logInterfaceAssembler;
 
     @Autowired
-    public LogApiController(LogService logService,
-                            Validator validator,
-                            LogInterfaceAssembler logInterfaceAssembler) {
+    public LogApiController(
+            LogService logService,
+            Validator validator,
+            LogInterfaceAssembler logInterfaceAssembler) {
         super(validator);
         this.logService = logService;
         this.logInterfaceAssembler = logInterfaceAssembler;
     }
 
-
     @Override
-//    @RequiresPermissions("super")
+    //    @RequiresPermissions("super")
     public PageVo<LogResponse> page(@RequestBody LogPageRequest request) throws ApiException {
         validate(request);
 
@@ -54,7 +51,9 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         queryCondition.setEndDate(request.getEndDate());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(logService.findPage(query, readLogPage(request)), logInterfaceAssembler::toResponse);
+        return entityPageToVo(
+                logService.findPage(query, readLogPage(request)),
+                logInterfaceAssembler::toResponse);
     }
 
     private Page<Log> readLogPage(LogPageRequest request) {
@@ -74,5 +73,4 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         page.setPageSize(pageSize);
         return page;
     }
-
 }

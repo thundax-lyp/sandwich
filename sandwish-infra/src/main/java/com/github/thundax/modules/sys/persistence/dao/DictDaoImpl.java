@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.Page;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -8,14 +9,11 @@ import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssem
 import com.github.thundax.modules.sys.persistence.cache.DictCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 字典 DAO 实现。
- */
+/** 字典 DAO 实现。 */
 @Repository
 public class DictDaoImpl implements DictDao {
 
@@ -53,7 +51,8 @@ public class DictDaoImpl implements DictDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Dict> uncachedDictList = DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            List<Dict> uncachedDictList =
+                    DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (Dict dict : uncachedDictList) {
                 cacheSupport.putById(dict);
                 dictList.add(dict);
@@ -65,9 +64,10 @@ public class DictDaoImpl implements DictDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Dict> findList(Dict entity) {
-        List<DictDO> dataObjects = mapper.selectList(buildQueryWrapper(DictPersistenceAssembler.toDataObject(entity)));
+        List<DictDO> dataObjects =
+                mapper.selectList(buildQueryWrapper(DictPersistenceAssembler.toDataObject(entity)));
         List<Dict> entities = DictPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

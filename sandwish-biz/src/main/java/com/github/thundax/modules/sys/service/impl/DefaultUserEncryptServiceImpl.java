@@ -14,13 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class DefaultUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt> implements UserEncryptService {
-
+public class DefaultUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt>
+        implements UserEncryptService {
 
     public DefaultUserEncryptServiceImpl(UserEncryptDao dao) {
         super(dao);
     }
-
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

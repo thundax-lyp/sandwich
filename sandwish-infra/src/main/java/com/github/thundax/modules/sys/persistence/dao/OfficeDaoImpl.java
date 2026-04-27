@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.utils.StringUtils;
@@ -9,14 +10,11 @@ import com.github.thundax.modules.sys.persistence.assembler.OfficePersistenceAss
 import com.github.thundax.modules.sys.persistence.cache.OfficeCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
 import com.github.thundax.modules.sys.persistence.mapper.OfficeMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 机构 DAO 实现。
- */
+/** 机构 DAO 实现。 */
 @Repository
 public class OfficeDaoImpl implements OfficeDao {
 
@@ -35,7 +33,9 @@ public class OfficeDaoImpl implements OfficeDao {
             return office;
         }
 
-        office = OfficePersistenceAssembler.toEntity(mapper.get(OfficePersistenceAssembler.toDataObject(entity)));
+        office =
+                OfficePersistenceAssembler.toEntity(
+                        mapper.get(OfficePersistenceAssembler.toDataObject(entity)));
         cacheSupport.putById(office);
         return office;
     }
@@ -54,7 +54,8 @@ public class OfficeDaoImpl implements OfficeDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Office> uncachedOfficeList = OfficePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            List<Office> uncachedOfficeList =
+                    OfficePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
             for (Office office : uncachedOfficeList) {
                 cacheSupport.putById(office);
                 officeList.add(office);
@@ -66,9 +67,10 @@ public class OfficeDaoImpl implements OfficeDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Office> findList(Office entity) {
-        List<OfficeDO> dataObjects = mapper.findList(OfficePersistenceAssembler.toDataObject(entity));
+        List<OfficeDO> dataObjects =
+                mapper.findList(OfficePersistenceAssembler.toDataObject(entity));
         List<Office> entities = OfficePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);
@@ -97,7 +99,8 @@ public class OfficeDaoImpl implements OfficeDao {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null
+                && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(dataObject);
@@ -178,7 +181,8 @@ public class OfficeDaoImpl implements OfficeDao {
     public boolean isChildOf(String childId, String parentId) {
         OfficeDO child = mapper.getTreeNode(childId);
         OfficeDO parent = mapper.getTreeNode(parentId);
-        return child != null && parent != null
+        return child != null
+                && parent != null
                 && child.getLft() > parent.getLft()
                 && child.getRgt() < parent.getRgt();
     }
@@ -224,8 +228,9 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     private static void normalizeParentId(OfficeDO node) {
-        if (node != null && (StringUtils.isBlank(node.getParentId())
-                || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
+        if (node != null
+                && (StringUtils.isBlank(node.getParentId())
+                        || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
             node.setParentId(null);
         }
     }

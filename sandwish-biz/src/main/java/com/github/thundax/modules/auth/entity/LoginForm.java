@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.auth.utils.AuthUtils;
-
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * login form实体。
- */
+/** login form实体。 */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginForm implements Serializable {
@@ -20,24 +17,24 @@ public class LoginForm implements Serializable {
 
     private static final String NULL_CAPTCHA = "null";
 
-    /*** 登录令牌 ***/
+    /** * 登录令牌 ** */
     private String loginToken;
-    /*** 刷新令牌，最多5个，按时间倒序存放 ***/
+    /** * 刷新令牌，最多5个，按时间倒序存放 ** */
     private List<String> refreshTokenList;
-    /*** 验证码 ***/
+    /** * 验证码 ** */
     private String captcha;
-    /*** 手机号码 ***/
+    /** * 手机号码 ** */
     private String mobile;
-    /*** 短信验证码 ***/
+    /** * 短信验证码 ** */
     private String mobileValidateCode;
-    /*** 超时时间 ***/
+    /** * 超时时间 ** */
     private Integer expiredSeconds;
-    /*** 校验码，由 AuthUtils.currentCheckCode 生成 ***/
+    /** * 校验码，由 AuthUtils.currentCheckCode 生成 ** */
     private String checkCode;
 
-    /*** 加密传输的公钥 ***/
+    /** * 加密传输的公钥 ** */
     private String publicKey;
-    /*** 加密传输的私钥 ***/
+    /** * 加密传输的私钥 ** */
     private String privateKey;
 
     public LoginForm() {

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.service;
 
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
@@ -21,14 +22,12 @@ public interface AuthService {
      *
      * @return 登录令牌
      * @throws TooManyLoginRequestException 登录请求过多
-     * @throws TooManyOnlineUserException   在线用户过多
+     * @throws TooManyOnlineUserException 在线用户过多
      */
     LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException;
 
-
     /**
-     * 刷新登录令牌
-     * 刷新后，refreshToken并未立即消失，而是指向新的Token位置，直到60秒后，此时可能有多个refreshToken指向同一个token。
+     * 刷新登录令牌 刷新后，refreshToken并未立即消失，而是指向新的Token位置，直到60秒后，此时可能有多个refreshToken指向同一个token。
      * 这样处理是未了避免"于前端的网络延迟而导致refresh丢失"。
      *
      * @param refreshToken 刷新令牌
@@ -37,7 +36,6 @@ public interface AuthService {
      */
     LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException;
 
-
     /**
      * 删除登录令牌
      *
@@ -45,7 +43,6 @@ public interface AuthService {
      * @throws InvalidTokenException 无效的token
      */
     void deleteLoginForm(String loginToken) throws InvalidTokenException;
-
 
     /**
      * 创建验证码
@@ -61,7 +58,7 @@ public interface AuthService {
      *
      * @param loginToken 登录令牌
      * @return captcha
-     * @throws InvalidTokenException   token不正确
+     * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
     String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
@@ -70,48 +67,47 @@ public interface AuthService {
      * 校验图形验证码
      *
      * @param loginToken 登录令牌
-     * @param captcha    验证码
+     * @param captcha 验证码
      * @return 正确:true；不正确:false
-     * @throws InvalidTokenException   token不正确
+     * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
-    boolean validateCaptcha(String loginToken, String captcha) throws InvalidTokenException, InvalidCaptchaException;
-
+    boolean validateCaptcha(String loginToken, String captcha)
+            throws InvalidTokenException, InvalidCaptchaException;
 
     /**
      * 创建短信验证码
      *
      * @param loginToken 登录令牌
-     * @param mobile     手机号码
+     * @param mobile 手机号码
      * @return 短信验证码
      * @throws InvalidTokenException token不正确
      */
     String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException;
-
 
     /**
      * 获取当前短信验证码
      *
      * @param loginToken 登录令牌
      * @return captcha
-     * @throws InvalidTokenException   token不正确
+     * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
-    String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
-
+    String getSmsValidateCode(String loginToken)
+            throws InvalidTokenException, InvalidCaptchaException;
 
     /**
      * 校验短信验证码
      *
-     * @param loginToken   登录令牌
-     * @param mobile       手机号码
+     * @param loginToken 登录令牌
+     * @param mobile 手机号码
      * @param validateCode 短信验证码
      * @return 正确:true；不正确:false
-     * @throws InvalidTokenException   token不正确
+     * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
-    boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode) throws InvalidTokenException, InvalidCaptchaException;
-
+    boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
+            throws InvalidTokenException, InvalidCaptchaException;
 
     /**
      * 创建JWToken
@@ -165,9 +161,9 @@ public interface AuthService {
      *
      * @param user 用户
      * @param plainPassword 明文密码
-     * @throws com.github.thundax.common.exception.ApiException 业务异常
+     * @throws ApiException 业务异常
      */
-    void validatePassword(User user, String plainPassword) throws com.github.thundax.common.exception.ApiException;
+    void validatePassword(User user, String plainPassword) throws ApiException;
 
     /**
      * 获取 PrivateKey
@@ -177,5 +173,4 @@ public interface AuthService {
      * @throws InvalidTokenException token不正确
      */
     String getPrivateKey(String loginToken) throws InvalidTokenException;
-
 }

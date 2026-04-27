@@ -6,18 +6,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.storage.entity.base.BaseStorageBusiness;
-
 import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StorageBusiness extends BaseStorageBusiness {
 
     public static final String BEAN_NAME = "ResourceBusiness";
-
 
     public StorageBusiness() {
         super();
@@ -99,5 +95,4 @@ public class StorageBusiness extends BaseStorageBusiness {
             this.publicFlag = publicFlag;
         }
     }
-
 }

@@ -1,46 +1,41 @@
 package com.github.thundax.common.filter.xss;
 
-import org.apache.commons.lang3.StringUtils;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * XssFilter
+ *
  * @author wdit
  */
 public class XssFilter implements Filter {
 
-    /**
-     * 例外urls
-     */
+    /** 例外urls */
     private List<String> urlExcludes = new ArrayList<>();
 
-    /**
-     * 例外标签
-     */
+    /** 例外标签 */
     private List<String> excludeTags = new ArrayList<>();
 
-    /**
-     * 需要过滤标签
-     */
+    /** 需要过滤标签 */
     private List<String> includeTags = new ArrayList<>();
 
-    /**
-     * 开关
-     */
+    /** 开关 */
     public boolean enabled = false;
 
-    /**
-     * 编码
-     */
+    /** 编码 */
     private String encoding = "UTF-8";
 
     @Override
@@ -73,11 +68,11 @@ public class XssFilter implements Filter {
         if (StringUtils.isNotEmpty(encodingStr)) {
             this.encoding = encodingStr;
         }
-
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
         if (handleExcludeUrls(req, resp)) {
@@ -85,18 +80,18 @@ public class XssFilter implements Filter {
             return;
         }
 
-        XssHttpServletRequestWrapper xssRequest = new XssHttpServletRequestWrapper((HttpServletRequest) request, encoding, excludeTags, includeTags );
+        XssHttpServletRequestWrapper xssRequest =
+                new XssHttpServletRequestWrapper(
+                        (HttpServletRequest) request, encoding, excludeTags, includeTags);
         chain.doFilter(xssRequest, response);
-
     }
 
     @Override
-    public void destroy() {
-
-    }
+    public void destroy() {}
 
     /**
      * 是否过滤
+     *
      * @param request
      * @param response
      * @return

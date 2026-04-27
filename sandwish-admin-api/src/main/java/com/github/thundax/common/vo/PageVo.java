@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "Page", description = "分页")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -26,9 +23,7 @@ public class PageVo<T> implements Serializable {
     private String orderBy;
     private List<T> records;
 
-    public PageVo() {
-
-    }
+    public PageVo() {}
 
     @ApiModelProperty(name = "pageNo", value = "页码，从 1 开始")
     @JsonProperty("pageNo")
@@ -89,5 +84,4 @@ public class PageVo<T> implements Serializable {
     public void setRecords(List<T> records) {
         this.records = records;
     }
-
 }

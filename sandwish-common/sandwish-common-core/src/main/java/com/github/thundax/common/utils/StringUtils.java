@@ -1,15 +1,13 @@
 package com.github.thundax.common.utils;
 
-import org.apache.commons.text.StringEscapeUtils;
-
+import com.github.thundax.common.utils.ext.StringUtilEx;
 import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.text.StringEscapeUtils;
 
-/**
- * @author thundax
- */
-public class StringUtils extends org.apache.commons.lang3.StringUtils {
+/** @author thundax */
+public class StringUtils extends StringUtilEx {
 
     public static String unwrap(String str, String prefix, String suffix) {
         return unwrap(str, prefix, suffix, false);
@@ -22,7 +20,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     /**
      * 缩略字符串（不区分中英文字符）
      *
-     * @param str    目标字符串
+     * @param str 目标字符串
      * @param length 截取长度
      */
     public static String abbr(String str, int length) {
@@ -60,9 +58,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return join(s1, s2);
     }
 
-    /**
-     * 替换掉HTML标签方法
-     */
+    /** 替换掉HTML标签方法 */
     public static String replaceHtml(String html) {
         if (isBlank(html)) {
             return "";
@@ -72,7 +68,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         Matcher m = p.matcher(html);
         return m.replaceAll("");
     }
-
 
     public static String byte2hex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
@@ -140,5 +135,4 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
         return str.substring(startIndex, endIndex);
     }
-
 }

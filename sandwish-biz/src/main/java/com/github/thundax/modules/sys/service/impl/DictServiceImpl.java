@@ -5,15 +5,12 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements DictService {
@@ -27,14 +24,13 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
         return dao.findTypeList();
     }
 
-
-    public List<String> findLabelList(String type){
-      List<String> result=new ArrayList<String>();
-        Dict query=new Dict();
+    public List<String> findLabelList(String type) {
+        List<String> result = new ArrayList<String>();
+        Dict query = new Dict();
         Dict.Query queryCondition = new Dict.Query();
         queryCondition.setType(type);
         query.setQuery(queryCondition);
-        List<Dict> list=dao.findList(query);
+        List<Dict> list = dao.findList(query);
         String s = "";
         for (Dict item : list) {
             s = item.getLabel();
@@ -42,7 +38,7 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
                 result.add(s);
             }
         }
-      return result;
+        return result;
     }
 
     @Override
@@ -54,5 +50,4 @@ public class DictServiceImpl extends CrudServiceImpl<DictDao, Dict> implements D
     public String getDictionaryRevision() {
         return dao.getDictionaryRevision();
     }
-
 }

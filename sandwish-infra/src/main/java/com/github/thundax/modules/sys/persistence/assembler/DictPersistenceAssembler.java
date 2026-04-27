@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 字典业务模型与持久化对象转换器。
- */
+/** 字典业务模型与持久化对象转换器。 */
 public final class DictPersistenceAssembler {
 
-    private DictPersistenceAssembler() {
-    }
+    private DictPersistenceAssembler() {}
 
     public static DictDO toDataObject(Dict entity) {
         if (entity == null) {
@@ -59,7 +55,7 @@ public final class DictPersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Dict> entities = ListUtils.newArrayList();
+        List<Dict> entities = new ArrayList<>();
         for (DictDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

@@ -1,24 +1,19 @@
 package com.github.thundax.modules.sys.aop;
 
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @SuppressWarnings({"unchecked"})
 public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
 
-    private static final Class<? extends Annotation>[] ANNOTATION_CLASSES = new Class[]{
-            SysLogger.class
-    };
+    private static final Class<? extends Annotation>[] ANNOTATION_CLASSES =
+            new Class[] {SysLogger.class};
 
     public SysLogPointcutAdvisor() {
         setAdvice(new SysLogMethodInterceptor());
@@ -38,8 +33,8 @@ public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
                 return isAnnotationPresent(m);
 
             } catch (NoSuchMethodException ignored) {
-                //default return value is false.  If we can't find the method, then obviously
-                //there is no annotation, so just use the default return value.
+                // default return value is false.  If we can't find the method, then obviously
+                // there is no annotation, so just use the default return value.
             }
         }
 
@@ -65,5 +60,4 @@ public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
         }
         return false;
     }
-
 }

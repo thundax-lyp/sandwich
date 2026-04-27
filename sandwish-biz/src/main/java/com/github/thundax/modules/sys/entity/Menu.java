@@ -4,22 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseMenu;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
-
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Menu extends BaseMenu implements Comparable<Menu> {
@@ -81,9 +78,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return Global.SHOW.equals(this.getDisplayFlag());
     }
 
-    /**
-     * 获取指定显示参数
-     */
+    /** 获取指定显示参数 */
     public Object getDisplayParam(String paramName, Object defaultValue) {
         Map<String, Object> map = getDisplayParamMap();
         if (!map.containsKey(paramName)) {
@@ -92,17 +87,14 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return map.get(paramName);
     }
 
-    /**
-     * 获取指定显示参数集
-     */
+    /** 获取指定显示参数集 */
     @JsonIgnore
     public Map<String, Object> getDisplayParamMap() {
         String displayParams = this.getDisplayParams();
         if (StringUtils.isEmpty(displayParams)) {
             return Maps.newHashMap();
         }
-        return JsonUtils.fromJson(displayParams, new TypeReference<Map<String, Object>>() {
-        });
+        return JsonUtils.fromJson(displayParams, new TypeReference<Map<String, Object>>() {});
     }
 
     @Override
@@ -140,7 +132,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     @Override
     @JsonIgnore
     public String getSignBody() {
-        Map<String, Object> map = MapUtils.newLinkedHashMap();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("name", this.getName());
         map.put("parentId", this.getParentId());
         map.put("perms", this.getPerms());
@@ -199,5 +191,4 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
             this.maxRank = maxRank;
         }
     }
-
 }

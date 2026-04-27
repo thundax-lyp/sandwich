@@ -15,30 +15,33 @@ import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.StorageServiceHolder;
 import com.github.thundax.modules.storage.utils.StorageUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @Controller
 @RequestMapping(value = "/api/assist/storage")
 public class StorageController extends BaseAdminController {
@@ -48,25 +51,25 @@ public class StorageController extends BaseAdminController {
     private final StorageInterfaceAssembler storageInterfaceAssembler;
 
     @Autowired
-    public StorageController(VltavaProperties properties,
-                             StorageService storageService,
-                             Validator validator,
-                             StorageInterfaceAssembler storageInterfaceAssembler) {
+    public StorageController(
+            VltavaProperties properties,
+            StorageService storageService,
+            Validator validator,
+            StorageInterfaceAssembler storageInterfaceAssembler) {
         super(validator);
         this.properties = properties.getUpload();
         this.storageService = storageService;
         this.storageInterfaceAssembler = storageInterfaceAssembler;
     }
 
-    //@RequiresPermissions("assist:storage:view")
+    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = {"", "index"})
     public String index() {
         return "modules/assist/storageIndex";
     }
 
-
     // 服务端页面入口保留旧查询适配，不作为本轮核心 API 模型隔离目标。
-    //@RequiresPermissions("assist:storage:view")
+    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "list")
     public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
         Storage storage = readQuery(request, response);
@@ -79,13 +82,13 @@ public class StorageController extends BaseAdminController {
         return "modules/assist/storageList";
     }
 
-
-    //@RequiresPermissions("user")
+    // @RequiresPermissions("user")
     @RequestMapping(value = "upload")
-    public String uploadForm(@RequestParam(required = false) String theme,
-                             @RequestParam(required = false) String allowedFileSuffix,
-                             @RequestParam(required = false) Integer maxFileCount,
-                             Model model) {
+    public String uploadForm(
+            @RequestParam(required = false) String theme,
+            @RequestParam(required = false) String allowedFileSuffix,
+            @RequestParam(required = false) Integer maxFileCount,
+            Model model) {
         if (StringUtils.isBlank(theme)) {
             theme = StringUtils.EMPTY;
         }
@@ -112,19 +115,17 @@ public class StorageController extends BaseAdminController {
         storage.setOwnerId(UserAccessHolder.currentUserId());
         StorageUtils.saveFile(file, storage);
 
-        //TODO 保存关系
-//        StorageBusiness storageBusiness = new StorageBusiness();
-//        storageBusiness.setPublicFlag(Global.NO);
-//        storageBusiness.setBusinessType("");
-//        storageBusiness.setBusinessId("");
-//        storageBusiness.setBusinessParams("");
+        // TODO 保存关系
+        //        StorageBusiness storageBusiness = new StorageBusiness();
+        //        storageBusiness.setPublicFlag(Global.NO);
+        //        storageBusiness.setBusinessType("");
+        //        storageBusiness.setBusinessId("");
+        //        storageBusiness.setBusinessParams("");
 
         return storageInterfaceAssembler.toUploadResponse(storage);
     }
 
-
-
-    //@RequiresPermissions("user")
+    // @RequiresPermissions("user")
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     @ResponseBody
     public StorageUploadResponse upload(HttpServletRequest request) {
@@ -132,14 +133,16 @@ public class StorageController extends BaseAdminController {
             return storageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
 
         } else {
-            Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
+            Map<String, MultipartFile> fileMap =
+                    ((MultipartHttpServletRequest) request).getFileMap();
             StorageUploadResponse response = new StorageUploadResponse();
             for (MultipartFile file : fileMap.values()) {
                 try {
                     String originalFilename = file.getOriginalFilename();
 
                     List<String> validExtNameList = properties.getAllowSuffix();
-                    String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
+                    String extendName =
+                            StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
                     if (!validExtNameList.contains(extendName)) {
                         return storageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
                     }
@@ -155,10 +158,11 @@ public class StorageController extends BaseAdminController {
                     storage.setOwnerType(Storage.OWNER_TYPE_USER);
                     storage.setOwnerId(currentUser().getId());
 
-//                    File localFile = new File(properties.getStoragePath() + storage.getFilename());
-//                    localFile.getParentFile().mkdirs();
+                    //                    File localFile = new File(properties.getStoragePath() +
+                    // storage.getFilename());
+                    //                    localFile.getParentFile().mkdirs();
 
-//                    file.transferTo(localFile);
+                    //                    file.transferTo(localFile);
                     storageService.save(storage);
 
                     response = storageInterfaceAssembler.toUploadResponse(storage);
@@ -172,14 +176,16 @@ public class StorageController extends BaseAdminController {
         }
     }
 
-
     // 文件预览是静态资源支撑入口，保持 HttpServletResponse 流式输出边界。
     @RequestMapping(value = "file/{id}.{extendName}")
-    public void preview(@PathVariable("id") String id,
-                        @PathVariable("extendName") String extendName,
-                        HttpServletResponse response) throws IOException {
+    public void preview(
+            @PathVariable("id") String id,
+            @PathVariable("extendName") String extendName,
+            HttpServletResponse response)
+            throws IOException {
         Storage storage = StorageServiceHolder.get(id);
-        if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
+        if (storage == null
+                || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
@@ -203,26 +209,28 @@ public class StorageController extends BaseAdminController {
         outputStream.close();
     }
 
-
     // 服务端页面删除入口保留 RedirectAttributes 跳转反馈，不作为本轮核心 API 模型隔离目标。
-    //@RequiresPermissions("member:member:edit")
+    // @RequiresPermissions("member:member:edit")
     @RequestMapping(value = "delete")
     public String delete(String[] ids, RedirectAttributes redirectAttributes) {
         if (!validateDelete(ids, redirectAttributes)) {
             return "redirect:" + modulePath + "/list?reload";
         }
 
-        int count = storageService.delete(ListUtils.map(ListUtils.newArrayList(ids), Storage::new));
+        int count =
+                storageService.delete(
+                        ListUtils.map(new ArrayList<>(Arrays.asList(ids)), Storage::new));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
         return "redirect:" + modulePath + "/list?reload";
     }
 
-    //@RequiresPermissions("assist:storage:view")
+    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "treeData")
     @ResponseBody
     public List<StorageTreeNodeResponse> treeData() {
-        return ListUtils.map(storageService.findBusinessTypeList(),
+        return ListUtils.map(
+                storageService.findBusinessTypeList(),
                 storageInterfaceAssembler::toBusinessTypeTreeNode);
     }
 
@@ -231,17 +239,26 @@ public class StorageController extends BaseAdminController {
         Storage query = new Storage();
         Storage.Query queryCondition = new Storage.Query();
 
-        queryCondition.setMimeType(readReloadString("query.mimeType", "storage.query.mimeType", request, response));
+        queryCondition.setMimeType(
+                readReloadString("query.mimeType", "storage.query.mimeType", request, response));
 
-        queryCondition.setBusinessType(readReloadString("query.businessId", "storage.query.businessId", request, response));
+        queryCondition.setBusinessType(
+                readReloadString(
+                        "query.businessId", "storage.query.businessId", request, response));
 
-        queryCondition.setEnableFlag(readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
+        queryCondition.setEnableFlag(
+                readReloadString(
+                        "query.enableFlag", "storage.query.enableFlag", request, response));
 
-        queryCondition.setPublicFlag(readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
+        queryCondition.setPublicFlag(
+                readReloadString(
+                        "query.publicFlag", "storage.query.publicFlag", request, response));
 
-        queryCondition.setName(readReloadString("query.name", "storage.query.name", request, response));
+        queryCondition.setName(
+                readReloadString("query.name", "storage.query.name", request, response));
 
-        queryCondition.setRemarks(readReloadString("query.remarks", "storage.query.remarks", request, response));
+        queryCondition.setRemarks(
+                readReloadString("query.remarks", "storage.query.remarks", request, response));
         query.setQuery(queryCondition);
 
         return query;
@@ -275,5 +292,4 @@ public class StorageController extends BaseAdminController {
         }
         return true;
     }
-
 }

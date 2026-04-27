@@ -1,22 +1,19 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.google.common.collect.Lists;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
-import com.github.thundax.modules.auth.security.SecurityUtils;
-import com.github.thundax.modules.auth.security.subject.Subject;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
 import com.github.thundax.modules.sys.api.PersonalServiceApi;
+import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.PersonalAvatarDeleteRequest;
@@ -31,18 +28,18 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
+import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import javax.validation.Validator;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class PersonalApiController extends BaseApiController implements PersonalServiceApi {
 
@@ -51,11 +48,12 @@ public class PersonalApiController extends BaseApiController implements Personal
     private final KeypairService keypairService;
     private final PersonalInterfaceAssembler personalInterfaceAssembler;
 
-    public PersonalApiController(Validator validator,
-                                 UserService userService,
-                                 PasswordService passwordService,
-                                 KeypairService keypairService,
-                                 PersonalInterfaceAssembler personalInterfaceAssembler) {
+    public PersonalApiController(
+            Validator validator,
+            UserService userService,
+            PasswordService passwordService,
+            KeypairService keypairService,
+            PersonalInterfaceAssembler personalInterfaceAssembler) {
         super(validator);
 
         this.userService = userService;
@@ -63,7 +61,6 @@ public class PersonalApiController extends BaseApiController implements Personal
         this.keypairService = keypairService;
         this.personalInterfaceAssembler = personalInterfaceAssembler;
     }
-
 
     @Override
     public PersonalInfoResponse info() throws ApiException {
@@ -75,9 +72,9 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
-
     @Override
-    public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request) throws ApiException {
+    public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request)
+            throws ApiException {
         validate(request);
 
         User currentUser = UserAccessHolder.currentUser();
@@ -88,9 +85,9 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
-
     @Override
-    public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
+    public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request)
+            throws ApiException {
 
         // 解密密码（数据需要加密传输）
         String privateKey = keypairService.getPrivateKey(request.getToken());
@@ -118,9 +115,9 @@ public class PersonalApiController extends BaseApiController implements Personal
         return true;
     }
 
-
     @Override
-    public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request) throws ApiException {
+    public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request)
+            throws ApiException {
         validate(request);
         User currentUser = UserAccessHolder.currentUser();
 
@@ -133,16 +130,15 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
-
     @Override
-    public PersonalAvatarResponse deleteAvatar(@RequestBody(required = false) PersonalAvatarDeleteRequest request) {
+    public PersonalAvatarResponse deleteAvatar(
+            @RequestBody(required = false) PersonalAvatarDeleteRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
         AvatarUtils.deleteAvatar(currentUser.getId());
 
         return personalInterfaceAssembler.toAvatarResponse(currentUser);
     }
-
 
     @Override
     public List<PersonalMenuResponse> menus() {
@@ -155,8 +151,12 @@ public class PersonalApiController extends BaseApiController implements Personal
         for (int idx = 0; idx < menuList.size(); idx++) {
             Menu parent = menuList.get(idx);
 
-            List<Menu> childList = ListUtils.filter(allMenuList, item ->
-                    item.isDisplay() && Objects.equals(item.getParentId(), parent.getId()));
+            List<Menu> childList =
+                    ListUtils.filter(
+                            allMenuList,
+                            item ->
+                                    item.isDisplay()
+                                            && Objects.equals(item.getParentId(), parent.getId()));
 
             menuList.addAll(idx + 1, childList);
         }
@@ -166,16 +166,15 @@ public class PersonalApiController extends BaseApiController implements Personal
         return ListUtils.map(menuList, personalInterfaceAssembler::toMenuResponse);
     }
 
-
     @Override
     public PersonalPermsResponse perms() {
-        Subject subject = SecurityUtils.getSubject();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (subject == null) {
-            return personalInterfaceAssembler.toPermsResponse(SetUtils.newHashSet());
+        if (authentication == null) {
+            return personalInterfaceAssembler.toPermsResponse(new HashSet<>());
         }
 
-        return personalInterfaceAssembler.toPermsResponse(subject.getPermissions());
+        return personalInterfaceAssembler.toPermsResponse(
+                PermissionAuthorities.toPermissions(authentication.getAuthorities()));
     }
-
 }

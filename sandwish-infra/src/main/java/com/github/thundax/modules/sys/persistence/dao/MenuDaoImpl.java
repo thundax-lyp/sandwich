@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.utils.StringUtils;
@@ -9,14 +10,11 @@ import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssem
 import com.github.thundax.modules.sys.persistence.cache.MenuCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 菜单 DAO 实现。
- */
+/** 菜单 DAO 实现。 */
 @Repository
 public class MenuDaoImpl implements MenuDao {
 
@@ -35,7 +33,9 @@ public class MenuDaoImpl implements MenuDao {
             return menu;
         }
 
-        menu = MenuPersistenceAssembler.toEntity(mapper.get(MenuPersistenceAssembler.toDataObject(entity)));
+        menu =
+                MenuPersistenceAssembler.toEntity(
+                        mapper.get(MenuPersistenceAssembler.toDataObject(entity)));
         cacheSupport.putById(menu);
         return menu;
     }
@@ -54,7 +54,8 @@ public class MenuDaoImpl implements MenuDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Menu> uncachedMenuList = MenuPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            List<Menu> uncachedMenuList =
+                    MenuPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
             for (Menu menu : uncachedMenuList) {
                 cacheSupport.putById(menu);
                 menuList.add(menu);
@@ -68,7 +69,7 @@ public class MenuDaoImpl implements MenuDao {
     public List<Menu> findList(Menu entity) {
         List<MenuDO> dataObjects = mapper.findList(MenuPersistenceAssembler.toDataObject(entity));
         List<Menu> entities = MenuPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);
@@ -97,7 +98,8 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null
+                && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(dataObject);
@@ -178,7 +180,8 @@ public class MenuDaoImpl implements MenuDao {
     public boolean isChildOf(String childId, String parentId) {
         MenuDO child = mapper.getTreeNode(childId);
         MenuDO parent = mapper.getTreeNode(parentId);
-        return child != null && parent != null
+        return child != null
+                && parent != null
                 && child.getLft() > parent.getLft()
                 && child.getRgt() < parent.getRgt();
     }
@@ -236,8 +239,9 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     private static void normalizeParentId(MenuDO node) {
-        if (node != null && (StringUtils.isBlank(node.getParentId())
-                || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
+        if (node != null
+                && (StringUtils.isBlank(node.getParentId())
+                        || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
             node.setParentId(null);
         }
     }

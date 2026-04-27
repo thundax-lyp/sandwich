@@ -10,11 +10,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @SpringBootApplication
-@MapperScan(basePackages = {"com.github.thundax.modules"}, annotationClass = MyBatisDao.class)
+@MapperScan(
+        basePackages = {"com.github.thundax.modules"},
+        annotationClass = MyBatisDao.class)
 @EnableConfigurationProperties(value = {VltavaProperties.class})
 @EnableScheduling
 public class FrontApplication extends SpringBootServletInitializer {
@@ -28,7 +28,4 @@ public class FrontApplication extends SpringBootServletInitializer {
         this.setRegisterErrorPageFilter(false);
         return builder.sources(FrontApplication.class);
     }
-
 }
-
-

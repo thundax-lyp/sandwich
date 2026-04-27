@@ -3,12 +3,9 @@ package com.github.thundax.modules.sys.service;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface UserService extends CrudService<User> {
 
     /**
@@ -18,7 +15,6 @@ public interface UserService extends CrudService<User> {
      * @return 用户
      */
     User getByLoginName(String loginName);
-
 
     /**
      * 根据ssoLoginName获取
@@ -65,5 +61,4 @@ public interface UserService extends CrudService<User> {
      * @return 权限列表
      */
     List<Role> findUserRole(User user);
-
 }

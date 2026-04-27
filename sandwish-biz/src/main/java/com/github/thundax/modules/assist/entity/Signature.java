@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.modules.assist.entity.base.BaseSignature;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -85,5 +84,4 @@ public class Signature extends BaseSignature {
             this.businessIdList = businessIdList;
         }
     }
-
 }

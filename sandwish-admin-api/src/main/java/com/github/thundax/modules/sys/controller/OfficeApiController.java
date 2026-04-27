@@ -1,14 +1,16 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.exception.*;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
-import com.github.thundax.common.utils.StringUtils;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.MoveTreeNodeException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
-import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
 import com.github.thundax.modules.sys.api.OfficeServiceApi;
+import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeIdRequest;
 import com.github.thundax.modules.sys.request.OfficeMoveRequest;
@@ -16,17 +18,16 @@ import com.github.thundax.modules.sys.request.OfficeQueryRequest;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Set;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class OfficeApiController extends BaseApiController implements OfficeServiceApi {
 
@@ -34,17 +35,17 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
     private final OfficeInterfaceAssembler officeInterfaceAssembler;
 
     @Autowired
-    public OfficeApiController(OfficeService officeService,
-                               Validator validator,
-                               OfficeInterfaceAssembler officeInterfaceAssembler) {
+    public OfficeApiController(
+            OfficeService officeService,
+            Validator validator,
+            OfficeInterfaceAssembler officeInterfaceAssembler) {
         super(validator);
         this.officeService = officeService;
         this.officeInterfaceAssembler = officeInterfaceAssembler;
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
         Office bean = officeService.get(request.getId());
         if (bean == null) {
@@ -53,9 +54,8 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(bean);
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public List<OfficeResponse> list(@RequestBody OfficeQueryRequest request) throws ApiException {
         validate(request);
 
@@ -70,9 +70,8 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return ListUtils.map(officeService.findList(query), officeInterfaceAssembler::toResponse);
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public OfficeResponse add(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
 
@@ -97,9 +96,8 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
 
@@ -122,9 +120,8 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
         List<Office> beanList = validateList(list, vo -> officeService.get(vo.getId()), null, null);
 
@@ -133,40 +130,40 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return true;
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public List<OfficeResponse> tree(@RequestBody List<OfficeIdRequest> excludeList) {
         List<Office> beanList = officeService.findList(new Office());
 
-        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, OfficeIdRequest::getId));
+        Set<String> excludeIds = new HashSet<>(ListUtils.map(excludeList, OfficeIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
-        removeTreeNode(beanList, new RemoveTreeNodeSupport<Office>() {
+        removeTreeNode(
+                beanList,
+                new RemoveTreeNodeSupport<Office>() {
 
-            @Override
-            public String getId(Office entity) {
-                return entity.getId();
-            }
+                    @Override
+                    public String getId(Office entity) {
+                        return entity.getId();
+                    }
 
-            @Override
-            public String getParentId(Office entity) {
-                return entity.getParentId();
-            }
+                    @Override
+                    public String getParentId(Office entity) {
+                        return entity.getParentId();
+                    }
 
-            @Override
-            public boolean isRoot(Office entity) {
-                return StringUtils.isBlank(entity.getParentId());
-            }
-
-        }, excludeIds);
+                    @Override
+                    public boolean isRoot(Office entity) {
+                        return StringUtils.isBlank(entity.getParentId());
+                    }
+                },
+                excludeIds);
 
         return ListUtils.map(beanList, officeInterfaceAssembler::toTreeResponse);
     }
 
-
     @Override
-    @RequiresPermissions("sys:office:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
         validate(request);
 
@@ -181,7 +178,8 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         }
 
         if (toBean.equals(fromBean) || officeService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(
+                    Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
         officeService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

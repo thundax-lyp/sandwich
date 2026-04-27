@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.dao;
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-
 import java.util.List;
 
 /**
@@ -72,5 +71,4 @@ public interface UserDao extends CrudDao<User> {
      * @param user 用户
      */
     void insertUserRole(User user);
-
 }

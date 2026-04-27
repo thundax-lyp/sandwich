@@ -1,25 +1,18 @@
 package com.github.thundax.modules.utils;
 
 import com.github.thundax.common.utils.HttpUtils;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @Auther: zhangrudong
- * @Date: 2021/10/29 15:32
- * @Description:
- */
+/** @Auther: zhangrudong @Date: 2021/10/29 15:32 @Description: */
 public class SmsUtils {
     private static Logger logger = LoggerFactory.getLogger(SmsUtils.class);
 
     private static SmsProperties properties;
-
 
     private static SmsProperties getProperties() {
         if (properties == null) {
@@ -28,25 +21,26 @@ public class SmsUtils {
         return properties;
     }
 
-    public static Boolean sendMessage(String mobile,String message){
-        logger.info("发送号码mobile：{},发送内容content：{}",mobile,message);
-        if(StringUtils.isEmpty(mobile) || StringUtils.isEmpty(message)){
+    public static Boolean sendMessage(String mobile, String message) {
+        logger.info("发送号码mobile：{},发送内容content：{}", mobile, message);
+        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(message)) {
             return false;
         }
-//        System.out.println(getProperties().getUsername());
-//        System.out.println(getProperties().getPassword());
-//        SmsContent smsContent = create(mobile, message);
-//        logger.info("发送内容：{}",JsonUtils.toJson(smsContent));
+        //        System.out.println(getProperties().getUsername());
+        //        System.out.println(getProperties().getPassword());
+        //        SmsContent smsContent = create(mobile, message);
+        //        logger.info("发送内容：{}",JsonUtils.toJson(smsContent));
         try {
-            String result = HttpUtils.post(getProperties().getUrl(), generateParams(mobile, message));
-            logger.info("发送结果：{}",result);
-            if(StringUtils.containsIgnoreCase(result,"success")){
+            String result =
+                    HttpUtils.post(getProperties().getUrl(), generateParams(mobile, message));
+            logger.info("发送结果：{}", result);
+            if (StringUtils.containsIgnoreCase(result, "success")) {
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
         return false;
     }
@@ -58,7 +52,7 @@ public class SmsUtils {
      * @param content
      * @return
      */
-    private static SmsContent create(String mobile,String content){
+    private static SmsContent create(String mobile, String content) {
         SmsContent smsContent = new SmsContent();
         smsContent.setUserName(getProperties().getUsername());
         smsContent.setPassword(getProperties().getPassword());

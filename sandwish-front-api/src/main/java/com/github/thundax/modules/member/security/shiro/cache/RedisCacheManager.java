@@ -1,8 +1,13 @@
 package com.github.thundax.modules.member.security.shiro.cache;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
@@ -11,12 +16,6 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义授权缓存管理类
@@ -47,19 +46,20 @@ public class RedisCacheManager implements CacheManager {
         this.expireSeconds = expireSeconds;
     }
 
-
-    /**
-     * SESSION缓存管理类
-     */
+    /** SESSION缓存管理类 */
     public static class RedisSessionCache<K, V> implements Cache<K, V> {
 
         private final RedisTemplate<String, Object> redisTemplate;
         private final long expireSeconds;
         private final String cacheKeyPrefix;
 
-        private final PooledThreadLocal<Map<String, V>> localCacheHandler = new PooledThreadLocal<>();
+        private final PooledThreadLocal<Map<String, V>> localCacheHandler =
+                new PooledThreadLocal<>();
 
-        public RedisSessionCache(String cacheKeyPrefix, RedisTemplate<String, Object> redisTemplate, long expireSeconds) {
+        public RedisSessionCache(
+                String cacheKeyPrefix,
+                RedisTemplate<String, Object> redisTemplate,
+                long expireSeconds) {
             this.cacheKeyPrefix = cacheKeyPrefix;
             this.redisTemplate = redisTemplate;
             this.expireSeconds = expireSeconds;
@@ -82,10 +82,12 @@ public class RedisCacheManager implements CacheManager {
 
             Map<String, V> localCache = localCacheHandler.computeIfAbsent(HashMap::new);
 
-            return localCache.computeIfAbsent(createCacheKey(key), cacheKey -> {
-                ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
-                return (V) valueOps.get(cacheKey);
-            });
+            return localCache.computeIfAbsent(
+                    createCacheKey(key),
+                    cacheKey -> {
+                        ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
+                        return (V) valueOps.get(cacheKey);
+                    });
         }
 
         @Override
@@ -133,7 +135,7 @@ public class RedisCacheManager implements CacheManager {
         @Override
         public void clear() throws CacheException {
             Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (SetUtils.isNotEmpty(keys)) {
+            if (keys != null && !keys.isEmpty()) {
                 redisTemplate.delete(keys);
             }
 
@@ -150,11 +152,11 @@ public class RedisCacheManager implements CacheManager {
         @Override
         public Set<K> keys() {
             Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (SetUtils.isEmpty(keys)) {
-                return SetUtils.newHashSet();
+            if (keys == null || keys.isEmpty()) {
+                return new HashSet<>();
             }
 
-            Set<K> result = SetUtils.newHashSet();
+            Set<K> result = new HashSet<>();
             for (String key : keys) {
                 result.add((K) key.substring(cacheKeyPrefix.length()));
             }
@@ -165,13 +167,13 @@ public class RedisCacheManager implements CacheManager {
         @Override
         public Collection<V> values() {
             Set<String> keys = redisTemplate.keys(cacheKeyPrefix + "*");
-            if (SetUtils.isEmpty(keys)) {
-                return SetUtils.newHashSet();
+            if (keys == null || keys.isEmpty()) {
+                return new HashSet<>();
             }
 
             ValueOperations<String, Object> valueOps = redisTemplate.opsForValue();
 
-            Set<V> values = SetUtils.newHashSet();
+            Set<V> values = new HashSet<>();
             for (String key : keys) {
                 values.add((V) valueOps.get(key));
             }
@@ -185,6 +187,5 @@ public class RedisCacheManager implements CacheManager {
             }
             return this.cacheKeyPrefix + key;
         }
-
     }
 }

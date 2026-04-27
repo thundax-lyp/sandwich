@@ -1,12 +1,10 @@
 package com.github.thundax.modules.auth.filter;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -14,10 +12,11 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * 包装API返回值
@@ -26,26 +25,19 @@ import java.util.List;
  */
 public class ResponseWrapperFilter extends OncePerRequestFilter {
 
-    /**
-     * {"code":
-     */
+    /** {"code": */
     private static final byte[] WRAPPED_RESPONSE_PREFIX = {
-            '{', '\"', 'c', 'o', 'd', 'e', '\"', ':'
+        '{', '\"', 'c', 'o', 'd', 'e', '\"', ':'
     };
 
-    /**
-     * {"code":0,"message":"success","data":
-     */
+    /** {"code":0,"message":"success","data": */
     private static final byte[] RESPONSE_BODY_PREFIX = {
-            '{',
-            '\"', 'c', 'o', 'd', 'e', '\"', ':', '0', ',',
-            '\"', 'm', 'e', 's', 's', 'a', 'g', 'e', '\"', ':', '\"', 's', 'u', 'c', 'c', 'e', 's', 's', '\"', ',',
-            '\"', 'd', 'a', 't', 'a', '\"', ':'
+        '{', '\"', 'c', 'o', 'd', 'e', '\"', ':', '0', ',', '\"', 'm', 'e', 's', 's', 'a', 'g', 'e',
+        '\"', ':', '\"', 's', 'u', 'c', 'c', 'e', 's', 's', '\"', ',', '\"', 'd', 'a', 't', 'a',
+        '\"', ':'
     };
 
-    private static final byte[] RESPONSE_BODY_SUFFIX = {
-            '}'
-    };
+    private static final byte[] RESPONSE_BODY_SUFFIX = {'}'};
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludePatternList = new ArrayList<>();
@@ -68,9 +60,11 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
         ResponseWrapper responseWrapper = new ResponseWrapper(response);
 
         filterChain.doFilter(request, responseWrapper);
@@ -93,7 +87,10 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
             outputStream.write(responseBody);
 
         } else {
-            response.setContentLength(responseBody.length + RESPONSE_BODY_PREFIX.length + RESPONSE_BODY_SUFFIX.length);
+            response.setContentLength(
+                    responseBody.length
+                            + RESPONSE_BODY_PREFIX.length
+                            + RESPONSE_BODY_SUFFIX.length);
             outputStream.write(RESPONSE_BODY_PREFIX);
             outputStream.write(responseBody);
             outputStream.write(RESPONSE_BODY_SUFFIX);
@@ -131,21 +128,21 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
         @Override
         public ServletOutputStream getOutputStream() {
             if (servletOutputStream == null) {
-                servletOutputStream = new ServletOutputStream() {
-                    @Override
-                    public void write(int b) {
-                        byteArrayOutputStream.write(b);
-                    }
+                servletOutputStream =
+                        new ServletOutputStream() {
+                            @Override
+                            public void write(int b) {
+                                byteArrayOutputStream.write(b);
+                            }
 
-                    @Override
-                    public boolean isReady() {
-                        return false;
-                    }
+                            @Override
+                            public boolean isReady() {
+                                return false;
+                            }
 
-                    @Override
-                    public void setWriteListener(WriteListener listener) {
-                    }
-                };
+                            @Override
+                            public void setWriteListener(WriteListener listener) {}
+                        };
             }
             return servletOutputStream;
         }
@@ -154,5 +151,4 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
             return byteArrayOutputStream.toByteArray();
         }
     }
-
 }

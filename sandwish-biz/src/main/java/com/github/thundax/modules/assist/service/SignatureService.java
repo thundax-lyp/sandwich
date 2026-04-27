@@ -14,9 +14,8 @@ public interface SignatureService extends CrudService<Signature> {
      * 通过业务分类和业务主键查找签名结果
      *
      * @param businessType 业务分类
-     * @param businessId   业务主键
-     * @return Signature   签名结果
+     * @param businessId 业务主键
+     * @return Signature 签名结果
      */
     Signature find(String businessType, String businessId);
-
 }

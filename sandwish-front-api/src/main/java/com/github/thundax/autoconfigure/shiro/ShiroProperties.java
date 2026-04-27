@@ -1,12 +1,9 @@
 package com.github.thundax.autoconfigure.shiro;
 
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @ConfigurationProperties(prefix = "vltava.shiro")
 public class ShiroProperties {
 
@@ -19,5 +16,4 @@ public class ShiroProperties {
     public void setChainDefinition(Map<String, String> chainDefinition) {
         this.chainDefinition = chainDefinition;
     }
-
 }

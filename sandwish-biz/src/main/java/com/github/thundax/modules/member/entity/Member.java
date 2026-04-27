@@ -6,14 +6,11 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.DateUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.member.entity.base.BaseMember;
-
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class Member extends BaseMember {
 
     public static final String BEAN_NAME = "Member";
@@ -31,7 +28,8 @@ public class Member extends BaseMember {
 
     @Override
     public void setEnableFlag(String enableFlag) {
-        super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
+        super.setEnableFlag(
+                StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
     }
 
     public boolean isEnable() {
@@ -76,14 +74,10 @@ public class Member extends BaseMember {
         private Date endRegisterDate;
         private Date beginLoginDate;
         private Date endLoginDate;
-        /**
-         * 一网通办id
-         */
+        /** 一网通办id */
         private String ywtbId;
 
-        /**
-         * 证件号码
-         */
+        /** 证件号码 */
         private String zjhm;
 
         private String mobile;
@@ -139,7 +133,8 @@ public class Member extends BaseMember {
 
         public void setEndRegisterDate(Date endRegisterDate) {
             if (endRegisterDate != null) {
-                endRegisterDate = DateUtils.addSeconds(DateUtils.ceiling(endRegisterDate, Calendar.DATE), -1);
+                endRegisterDate =
+                        DateUtils.addSeconds(DateUtils.ceiling(endRegisterDate, Calendar.DATE), -1);
             }
             this.endRegisterDate = endRegisterDate;
         }
@@ -163,7 +158,8 @@ public class Member extends BaseMember {
 
         public void setEndLoginDate(Date endLoginDate) {
             if (endLoginDate != null) {
-                endLoginDate = DateUtils.addSeconds(DateUtils.ceiling(endLoginDate, Calendar.DATE), -1);
+                endLoginDate =
+                        DateUtils.addSeconds(DateUtils.ceiling(endLoginDate, Calendar.DATE), -1);
             }
             this.endLoginDate = endLoginDate;
         }
@@ -192,5 +188,4 @@ public class Member extends BaseMember {
             this.mobile = mobile;
         }
     }
-
 }

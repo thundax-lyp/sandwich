@@ -2,7 +2,6 @@ package com.github.thundax.modules.assist.plugins.koal.sign;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 
 /**
@@ -14,11 +13,11 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SignRequestParam implements Serializable {
 
-    /** B64签名原文（必传） **/
+    /** B64签名原文（必传） * */
     private String b64OriginData;
-    /** 证书别名（非必传） **/
+    /** 证书别名（非必传） * */
     private String certAlias;
-    /** 服务名称（非必传） **/
+    /** 服务名称（非必传） * */
     private String serviceName;
 
     public SignRequestParam(String b64OriginData) {

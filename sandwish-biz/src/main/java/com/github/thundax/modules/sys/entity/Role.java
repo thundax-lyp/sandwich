@@ -4,23 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseRole;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
-
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Role extends BaseRole {
@@ -54,9 +52,11 @@ public class Role extends BaseRole {
     public List<String> getMenuIdList() {
         if (this.menuIdList == null) {
             if (this.getIsNewRecord()) {
-                this.menuIdList = ListUtils.newArrayList();
+                this.menuIdList = new ArrayList<>();
             } else {
-                this.menuIdList = ListUtils.map(RoleServiceHolder.getService().findRoleMenu(this), Menu::getId);
+                this.menuIdList =
+                        ListUtils.map(
+                                RoleServiceHolder.getService().findRoleMenu(this), Menu::getId);
             }
         }
         return this.menuIdList;
@@ -80,12 +80,10 @@ public class Role extends BaseRole {
         return RoleServiceHolder.getService().findRoleUser(this);
     }
 
-    /**
-     * 获取全部权限字符串
-     */
+    /** 获取全部权限字符串 */
     @JsonIgnore
     public Set<String> getPerms() {
-        Set<String> allPerms = SetUtils.newHashSet();
+        Set<String> allPerms = new HashSet<>();
         for (Menu menu : this.getMenuList()) {
             allPerms.addAll(menu.getAllPerms());
         }
@@ -98,16 +96,15 @@ public class Role extends BaseRole {
         return BEAN_NAME;
     }
 
-
     @Override
     @JsonIgnore
     public String getSignBody() {
-        Map<String, Object> map = MapUtils.newLinkedHashMap();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("name", this.getName());
         map.put("admin", this.isAdmin());
         map.put("enable", this.isEnable());
 
-        List<String> menuIds = ListUtils.newArrayList(this.getMenuIdList());
+        List<String> menuIds = new ArrayList<>(this.getMenuIdList());
         menuIds.sort(StringUtils::compare);
         map.put("menus", menuIds);
 
@@ -141,5 +138,4 @@ public class Role extends BaseRole {
             this.enableFlag = enableFlag;
         }
     }
-
 }

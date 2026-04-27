@@ -1,12 +1,9 @@
 package com.github.thundax.modules.assist.persistence.dataobject;
 
+import java.util.Date;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
-/**
- * 异步任务持久化对象。
- */
+/** 异步任务持久化对象。 */
 @NoArgsConstructor
 public class AsyncTaskDO {
 

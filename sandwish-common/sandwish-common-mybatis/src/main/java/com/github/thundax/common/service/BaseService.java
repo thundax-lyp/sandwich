@@ -1,8 +1,4 @@
 package com.github.thundax.common.service;
 
-/**
- * @author thundax
- */
-public interface BaseService {
-
-}
+/** @author thundax */
+public interface BaseService {}

@@ -1,12 +1,12 @@
-//package com.github.thundax.modules.sys.listener;
+// package com.github.thundax.modules.sys.listener;
 //
-//import javax.servlet.ServletContext;
+// import javax.servlet.ServletContext;
 //
-//import org.springframework.web.context.WebApplicationContext;
+// import org.springframework.web.context.WebApplicationContext;
 //
-//import com.github.thundax.common.config.Global;
+// import com.github.thundax.common.config.Global;
 //
-//public class WebContextListener extends org.springframework.web.context.ContextLoaderListener {
+// public class WebContextListener extends org.springframework.web.context.ContextLoaderListener {
 //
 //    @Override
 //    public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
@@ -16,4 +16,4 @@
 //
 //        return super.initWebApplicationContext(servletContext);
 //    }
-//}
+// }

@@ -4,12 +4,9 @@ import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface RoleService extends CrudService<Role> {
 
     /**
@@ -27,7 +24,6 @@ public interface RoleService extends CrudService<Role> {
      */
     int updateEnableFlag(Role role);
 
-
     /**
      * 启用/禁用
      *
@@ -39,7 +35,7 @@ public interface RoleService extends CrudService<Role> {
     /**
      * 更新用户列表
      *
-     * @param role     权限
+     * @param role 权限
      * @param userList 用户列表
      */
     void updateUserList(Role role, List<User> userList);
@@ -59,5 +55,4 @@ public interface RoleService extends CrudService<Role> {
      * @return 菜单列表
      */
     List<Menu> findRoleMenu(Role role);
-
 }

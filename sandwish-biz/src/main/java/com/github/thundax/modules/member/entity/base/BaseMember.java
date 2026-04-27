@@ -2,12 +2,9 @@ package com.github.thundax.modules.member.entity.base;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.member.entity.Member;
-
 import java.util.Date;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class BaseMember extends AdminDataEntity<Member> {
 
     private String loginName;
@@ -26,11 +23,10 @@ public class BaseMember extends AdminDataEntity<Member> {
     private Date registerDate;
     private String lastLoginIp;
     private Date lastLoginDate;
-    /***一网通办id*/
+    /** *一网通办id */
     private String ywtbId;
-    /**登录次数**/
+    /** 登录次数* */
     private int loginCount;
-
 
     public BaseMember() {
         super();

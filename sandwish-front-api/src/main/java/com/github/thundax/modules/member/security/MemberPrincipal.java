@@ -1,12 +1,9 @@
 package com.github.thundax.modules.member.security;
 
 import com.github.thundax.modules.member.entity.Member;
-
 import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class MemberPrincipal implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,5 +26,4 @@ public class MemberPrincipal implements Serializable {
     public String toString() {
         return id;
     }
-
 }

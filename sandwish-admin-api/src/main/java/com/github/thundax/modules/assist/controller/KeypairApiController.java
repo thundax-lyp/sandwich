@@ -5,22 +5,19 @@ import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
 import com.github.thundax.modules.assist.api.KeypairServiceApi;
+import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
 import com.github.thundax.modules.assist.request.KeypairPublicKeyRequest;
 import com.github.thundax.modules.assist.response.KeypairPublicKeyResponse;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-
-/**
- * 公私钥接口入口。
- */
+/** 公私钥接口入口。 */
 @RestController
 public class KeypairApiController extends BaseApiController implements KeypairServiceApi {
 
@@ -29,10 +26,11 @@ public class KeypairApiController extends BaseApiController implements KeypairSe
     private final KeypairInterfaceAssembler keypairInterfaceAssembler;
 
     @Autowired
-    public KeypairApiController(Validator validator,
-                                AuthService authService,
-                                KeypairService keypairService,
-                                KeypairInterfaceAssembler keypairInterfaceAssembler) {
+    public KeypairApiController(
+            Validator validator,
+            AuthService authService,
+            KeypairService keypairService,
+            KeypairInterfaceAssembler keypairInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
@@ -40,14 +38,13 @@ public class KeypairApiController extends BaseApiController implements KeypairSe
         this.keypairInterfaceAssembler = keypairInterfaceAssembler;
     }
 
-
     /**
      * 获取公钥
      *
      * @param request 公钥获取请求
      * @return 公钥
      * @throws ApiException API异常
-    */
+     */
     @Override
     public KeypairPublicKeyResponse publicKey(KeypairPublicKeyRequest request) throws ApiException {
         validate(request);

@@ -5,15 +5,12 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implements MemberService {
@@ -79,5 +76,4 @@ public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implem
         member.preUpdate();
         dao.updateLoginPass(member);
     }
-
 }

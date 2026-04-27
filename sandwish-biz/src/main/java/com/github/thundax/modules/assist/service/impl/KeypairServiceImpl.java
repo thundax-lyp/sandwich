@@ -7,9 +7,7 @@ import com.github.thundax.modules.auth.config.AuthProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
-/**
- * 公私钥对服务实现。
- */
+/** 公私钥对服务实现。 */
 @Service
 @EnableConfigurationProperties(AuthProperties.class)
 public class KeypairServiceImpl implements KeypairService {
@@ -19,7 +17,8 @@ public class KeypairServiceImpl implements KeypairService {
     private final KeypairPrivateKeyDao keypairPrivateKeyDao;
     private final AuthProperties properties;
 
-    public KeypairServiceImpl(KeypairPrivateKeyDao keypairPrivateKeyDao, AuthProperties properties) {
+    public KeypairServiceImpl(
+            KeypairPrivateKeyDao keypairPrivateKeyDao, AuthProperties properties) {
         this.keypairPrivateKeyDao = keypairPrivateKeyDao;
         this.properties = properties;
     }
@@ -27,7 +26,9 @@ public class KeypairServiceImpl implements KeypairService {
     @Override
     public String createPublicKey(String token) {
         Sm2.StringKeyPair keyPair = Sm2.generateKeyPair();
-        keypairPrivateKeyDao.save(token, keyPair.getPrivateKey(),
+        keypairPrivateKeyDao.save(
+                token,
+                keyPair.getPrivateKey(),
                 properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         return keyPair.getPublicKey();
     }

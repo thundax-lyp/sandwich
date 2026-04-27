@@ -1,6 +1,7 @@
 package com.github.thundax.modules.member.utils;
 
 import com.github.thundax.modules.member.security.MemberPrincipal;
+import java.util.Iterator;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -10,16 +11,10 @@ import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
-import java.util.Iterator;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public class ShiroUtils {
 
-    /**
-     * 获取当前登录者对象
-     */
+    /** 获取当前登录者对象 */
     public static MemberPrincipal getPrincipal() {
         try {
             Subject subject = SecurityUtils.getSubject();
@@ -33,13 +28,10 @@ public class ShiroUtils {
         return null;
     }
 
-    /**
-     * 获取授权主要对象
-     */
+    /** 获取授权主要对象 */
     public static Subject getSubject() {
         return SecurityUtils.getSubject();
     }
-
 
     public static boolean hasAnyPermission(String... permissions) {
         Subject subject = getSubject();
@@ -66,7 +58,6 @@ public class ShiroUtils {
         }
     }
 
-
     public static String getHost() {
         Session session = getSession();
         return session == null ? null : session.getHost();
@@ -75,7 +66,8 @@ public class ShiroUtils {
     public static void reloadAuthorizing() {
         Subject subject = SecurityUtils.getSubject();
 
-        RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
+        RealmSecurityManager securityManager =
+                (RealmSecurityManager) SecurityUtils.getSecurityManager();
 
         Iterator<Realm> iterator = securityManager.getRealms().iterator();
         for (Realm realm = iterator.next(); iterator.hasNext(); ) {
@@ -111,5 +103,4 @@ public class ShiroUtils {
             session.removeAttribute(key);
         }
     }
-
 }

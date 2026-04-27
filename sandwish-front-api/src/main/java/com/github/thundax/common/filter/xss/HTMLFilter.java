@@ -1,6 +1,10 @@
 package com.github.thundax.common.filter.xss;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
@@ -8,56 +12,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * HTML filtering utility for protecting against XSS (Cross Site Scripting).
  *
- * This code is licensed LGPLv3
+ * <p>This code is licensed LGPLv3
  *
- * This code is a Java port of the original work in PHP by Cal Hendersen.
+ * <p>This code is a Java port of the original work in PHP by Cal Hendersen.
  * http://code.iamcal.com/php/lib_filter/
  *
- * The trickiest part of the translation was handling the differences in regex
- * handling
- * between PHP and Java. These resources were helpful in the process:
+ * <p>The trickiest part of the translation was handling the differences in regex handling between
+ * PHP and Java. These resources were helpful in the process:
  *
- * http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
+ * <p>http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
  * http://us2.php.net/manual/en/reference.pcre.pattern.modifiers.php
  * http://www.regular-expressions.info/modifiers.html
  *
- * A note on naming conventions: instance variables are prefixed with a "v";
- * global
- * constants are in all caps.
+ * <p>A note on naming conventions: instance variables are prefixed with a "v"; global constants are
+ * in all caps.
  *
- * Sample use:
- * String input = ...
- * String clean = new HTMLFilter().filter( input );
+ * <p>Sample use: String input = ... String clean = new HTMLFilter().filter( input );
  *
- * The class is not thread safe. Create a new instance if in doubt.
+ * <p>The class is not thread safe. Create a new instance if in doubt.
  *
- * If you find bugs or have suggestions on improvement (especially regarding
- * performance), please contact us. The latest version of this
- * source, and our contact details, can be found at
+ * <p>If you find bugs or have suggestions on improvement (especially regarding performance), please
+ * contact us. The latest version of this source, and our contact details, can be found at
  * http://xss-html-filter.sf.net
- *
- *
  */
 public final class HTMLFilter {
 
-    /** regex flag union representing /si modifiers in php **/
+    /** regex flag union representing /si modifiers in php * */
     private static final int REGEX_FLAGS_SI = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+
     private static final Pattern P_COMMENTS = Pattern.compile("<!--(.*?)-->", Pattern.DOTALL);
     private static final Pattern P_COMMENT = Pattern.compile("^!--(.*)--$", REGEX_FLAGS_SI);
     private static final Pattern P_TAGS = Pattern.compile("<(.*?)>", Pattern.DOTALL);
     private static final Pattern P_END_TAG = Pattern.compile("^/([a-z0-9]+)", REGEX_FLAGS_SI);
-    private static final Pattern P_START_TAG = Pattern.compile("^([a-z0-9]+)(.*?)(/?)$", REGEX_FLAGS_SI);
-    private static final Pattern P_QUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)=([\"'])(.*?)\\2", REGEX_FLAGS_SI);
-    private static final Pattern P_UNQUOTED_ATTRIBUTES = Pattern.compile("([a-z0-9]+)(=)([^\"\\s']+)", REGEX_FLAGS_SI);
+    private static final Pattern P_START_TAG =
+            Pattern.compile("^([a-z0-9]+)(.*?)(/?)$", REGEX_FLAGS_SI);
+    private static final Pattern P_QUOTED_ATTRIBUTES =
+            Pattern.compile("([a-z0-9]+)=([\"'])(.*?)\\2", REGEX_FLAGS_SI);
+    private static final Pattern P_UNQUOTED_ATTRIBUTES =
+            Pattern.compile("([a-z0-9]+)(=)([^\"\\s']+)", REGEX_FLAGS_SI);
     private static final Pattern P_PROTOCOL = Pattern.compile("^([^:]+):", REGEX_FLAGS_SI);
     private static final Pattern P_ENTITY = Pattern.compile("&#(\\d+);?");
     private static final Pattern P_ENTITY_UNICODE = Pattern.compile("&#x([0-9a-f]+);?");
     private static final Pattern P_ENCODE = Pattern.compile("%([0-9a-f]{2});?");
     private static final Pattern P_VALID_ENTITIES = Pattern.compile("&([^&;]*)(?=(;|&|$))");
-    private static final Pattern P_VALID_QUOTES = Pattern.compile("(>|^)([^<]+?)(<|$)", Pattern.DOTALL);
+    private static final Pattern P_VALID_QUOTES =
+            Pattern.compile("(>|^)([^<]+?)(<|$)", Pattern.DOTALL);
     private static final Pattern P_END_ARROW = Pattern.compile("^>");
     private static final Pattern P_BODY_TO_END = Pattern.compile("<([^>]*?)(?=<|$)");
     private static final Pattern P_XML_CONTENT = Pattern.compile("(^|>)([^<]*?)(?=>)");
@@ -71,106 +72,91 @@ public final class HTMLFilter {
     private static final Pattern P_DOUBLE_QUOT = Pattern.compile("&quot;");
 
     // @xxx could grow large... maybe use sesat's ReferenceMap
-    private static final ConcurrentMap<String, Pattern> P_REMOVE_PAIR_BLANKS = new ConcurrentHashMap<String, Pattern>();
-    private static final ConcurrentMap<String, Pattern> P_REMOVE_SELF_BLANKS = new ConcurrentHashMap<String, Pattern>();
+    private static final ConcurrentMap<String, Pattern> P_REMOVE_PAIR_BLANKS =
+            new ConcurrentHashMap<String, Pattern>();
+    private static final ConcurrentMap<String, Pattern> P_REMOVE_SELF_BLANKS =
+            new ConcurrentHashMap<String, Pattern>();
 
-    /**
-     * set of allowed html elements, along with allowed attributes for each
-     * element
-     **/
+    /** set of allowed html elements, along with allowed attributes for each element */
     private final Map<String, List<String>> vAllowed;
-    /** counts of open tags for each (allowable) html element **/
+    /** counts of open tags for each (allowable) html element * */
     private final Map<String, Integer> vTagCounts = new HashMap<String, Integer>();
 
-    /** html elements which must always be self-closing (e.g. "<img />") **/
+    /** html elements which must always be self-closing (e.g. "<img />") * */
     private final String[] vSelfClosingTags;
-    /**
-     * html elements which must always have separate opening and closing tags
-     * (e.g. "<b></b>")
-     **/
+    /** html elements which must always have separate opening and closing tags (e.g. "<b></b>") */
     private final String[] vNeedClosingTags;
-    /** set of disallowed html elements **/
+    /** set of disallowed html elements * */
     private final String[] vDisallowed;
-    /** attributes which should be checked for valid protocols **/
+    /** attributes which should be checked for valid protocols * */
     private final String[] vProtocolAtts;
-    /** allowed protocols **/
+    /** allowed protocols * */
     private final String[] vAllowedProtocols;
-    /**
-     * tags which should be removed if they contain no content (e.g. "<b></b>"
-     * or "<b />")
-     **/
+    /** tags which should be removed if they contain no content (e.g. "<b></b>" or "<b />") */
     private final String[] vRemoveBlanks;
-    /** entities allowed within html markup **/
+    /** entities allowed within html markup * */
     private final String[] vAllowedEntities;
     /** flag determining whether comments are allowed in input String. */
     private final boolean stripComment;
+
     private final boolean encodeQuotes;
     private boolean vDebug = false;
     /**
-     * flag determining whether to try to make tags when presented with
-     * "unbalanced"
-     * angle brackets (e.g. "<b text </b>" becomes "<b> text </b>"). If set to
-     * false,
-     * unbalanced angle brackets will be html escaped.
+     * flag determining whether to try to make tags when presented with "unbalanced" angle brackets
+     * (e.g. "<b text </b>" becomes "<b> text </b>"). If set to false, unbalanced angle brackets
+     * will be html escaped.
      */
     private final boolean alwaysMakeTags;
 
-    /**
-     * Default constructor.
-     *
-     */
+    /** Default constructor. */
     public HTMLFilter() {
         vAllowed = new HashMap<>();
 
-//        final ArrayList<String> a_atts = new ArrayList<String>();
-//        a_atts.add("href");
-//        a_atts.add("target");
-//        vAllowed.put("a", a_atts);
-//
-//        final ArrayList<String> img_atts = new ArrayList<String>();
-//        img_atts.add("src");
-//        img_atts.add("width");
-//        img_atts.add("height");
-//        img_atts.add("alt");
-//        vAllowed.put("img", img_atts);
-//
-//        final ArrayList<String> no_atts = new ArrayList<String>();
-//        vAllowed.put("b", no_atts);
-//        vAllowed.put("strong", no_atts);
-//        vAllowed.put("i", no_atts);
-//        vAllowed.put("em", no_atts);
+        //        final ArrayList<String> a_atts = new ArrayList<String>();
+        //        a_atts.add("href");
+        //        a_atts.add("target");
+        //        vAllowed.put("a", a_atts);
+        //
+        //        final ArrayList<String> img_atts = new ArrayList<String>();
+        //        img_atts.add("src");
+        //        img_atts.add("width");
+        //        img_atts.add("height");
+        //        img_atts.add("alt");
+        //        vAllowed.put("img", img_atts);
+        //
+        //        final ArrayList<String> no_atts = new ArrayList<String>();
+        //        vAllowed.put("b", no_atts);
+        //        vAllowed.put("strong", no_atts);
+        //        vAllowed.put("i", no_atts);
+        //        vAllowed.put("em", no_atts);
 
-        vSelfClosingTags = new String[]{"img", "input"};
-        vNeedClosingTags = new String[]{"a", "b", "strong", "i", "em"};
-        vDisallowed = new String[]{};
+        vSelfClosingTags = new String[] {"img", "input"};
+        vNeedClosingTags = new String[] {"a", "b", "strong", "i", "em"};
+        vDisallowed = new String[] {};
         // no ftp.
-        vAllowedProtocols = new String[]{"http", "mailto", "https"};
-        vProtocolAtts = new String[]{"src", "href"};
-        vRemoveBlanks = new String[]{"a", "b", "strong", "i", "em"};
-        vAllowedEntities = new String[]{"amp", "gt", "lt", "quot"};
+        vAllowedProtocols = new String[] {"http", "mailto", "https"};
+        vProtocolAtts = new String[] {"src", "href"};
+        vRemoveBlanks = new String[] {"a", "b", "strong", "i", "em"};
+        vAllowedEntities = new String[] {"amp", "gt", "lt", "quot"};
         stripComment = true;
         encodeQuotes = true;
         alwaysMakeTags = true;
     }
 
     /**
-     * Set debug flag to true. Otherwise use default settings. See the default
-     * constructor.
+     * Set debug flag to true. Otherwise use default settings. See the default constructor.
      *
-     * @param debug
-     *            turn debug on with a true argument
+     * @param debug turn debug on with a true argument
      */
     public HTMLFilter(final boolean debug) {
         this();
         vDebug = debug;
-
     }
 
     /**
      * Map-parameter configurable constructor.
      *
-     * @param conf
-     *            map containing configuration. keys match field names.
+     * @param conf map containing configuration. keys match field names.
      */
     @SuppressWarnings("unchecked")
     public HTMLFilter(final Map<String, Object> conf) {
@@ -184,7 +170,8 @@ public final class HTMLFilter {
         assert conf.containsKey("vRemoveBlanks") : "configuration requires vRemoveBlanks";
         assert conf.containsKey("vAllowedEntities") : "configuration requires vAllowedEntities";
 
-        vAllowed = Collections.unmodifiableMap((HashMap<String, List<String>>) conf.get("vAllowed"));
+        vAllowed =
+                Collections.unmodifiableMap((HashMap<String, List<String>>) conf.get("vAllowed"));
         vSelfClosingTags = (String[]) conf.get("vSelfClosingTags");
         vNeedClosingTags = (String[]) conf.get("vNeedClosingTags");
         vDisallowed = (String[]) conf.get("vDisallowed");
@@ -194,7 +181,8 @@ public final class HTMLFilter {
         vAllowedEntities = (String[]) conf.get("vAllowedEntities");
         stripComment = conf.containsKey("stripComment") ? (Boolean) conf.get("stripComment") : true;
         encodeQuotes = conf.containsKey("encodeQuotes") ? (Boolean) conf.get("encodeQuotes") : true;
-        alwaysMakeTags = conf.containsKey("alwaysMakeTags") ? (Boolean) conf.get("alwaysMakeTags") : true;
+        alwaysMakeTags =
+                conf.containsKey("alwaysMakeTags") ? (Boolean) conf.get("alwaysMakeTags") : true;
     }
 
     private void reset() {
@@ -224,13 +212,10 @@ public final class HTMLFilter {
 
     // ---------------------------------------------------------------
     /**
-     * given a user submitted input String, filter out any invalid or restricted
-     * html.
+     * given a user submitted input String, filter out any invalid or restricted html.
      *
-     * @param input
-     *            text (i.e. submitted by a user) than may contain html
-     * @return "clean" version of input, with only valid, whitelisted html
-     *         elements allowed
+     * @param input text (i.e. submitted by a user) than may contain html
+     * @return "clean" version of input, with only valid, whitelisted html elements allowed
      */
     public String filter(final String input) {
         reset();
@@ -271,7 +256,8 @@ public final class HTMLFilter {
         final StringBuffer buf = new StringBuffer();
         if (m.find()) {
             final String match = m.group(1); // (.*?)
-            m.appendReplacement(buf, Matcher.quoteReplacement("<!--" + htmlSpecialChars(match) + "-->"));
+            m.appendReplacement(
+                    buf, Matcher.quoteReplacement("<!--" + htmlSpecialChars(match) + "-->"));
         }
         m.appendTail(buf);
 
@@ -333,7 +319,8 @@ public final class HTMLFilter {
         String result = s;
         for (String tag : vRemoveBlanks) {
             if (!P_REMOVE_PAIR_BLANKS.containsKey(tag)) {
-                P_REMOVE_PAIR_BLANKS.putIfAbsent(tag, Pattern.compile("<" + tag + "(\\s[^>]*)?></" + tag + ">"));
+                P_REMOVE_PAIR_BLANKS.putIfAbsent(
+                        tag, Pattern.compile("<" + tag + "(\\s[^>]*)?></" + tag + ">"));
             }
             result = regexReplace(P_REMOVE_PAIR_BLANKS.get(tag), "", result);
             if (!P_REMOVE_SELF_BLANKS.containsKey(tag)) {
@@ -345,8 +332,9 @@ public final class HTMLFilter {
         return result;
     }
 
-    private static String regexReplace(final Pattern regex_pattern, final String replacement, final String s) {
-        Matcher m = regex_pattern.matcher(s);
+    private static String regexReplace(
+            final Pattern regexPattern, final String replacement, final String s) {
+        Matcher m = regexPattern.matcher(s);
         return m.replaceAll(replacement);
     }
 
@@ -516,7 +504,10 @@ public final class HTMLFilter {
                 final String one = m.group(1); // (>|^)
                 final String two = m.group(2); // ([^<]+?)
                 final String three = m.group(3); // (<|$)
-                m.appendReplacement(buf, Matcher.quoteReplacement(one + regexReplace(P_QUOTE, "&quot;", two) + three));
+                m.appendReplacement(
+                        buf,
+                        Matcher.quoteReplacement(
+                                one + regexReplace(P_QUOTE, "&quot;", two) + three));
             }
             m.appendTail(buf);
             return buf.toString();
@@ -550,5 +541,4 @@ public final class HTMLFilter {
     private boolean allowedAttribute(final String name, final String paramName) {
         return allowed(name) && (vAllowed.isEmpty() || vAllowed.get(name).contains(paramName));
     }
-
 }

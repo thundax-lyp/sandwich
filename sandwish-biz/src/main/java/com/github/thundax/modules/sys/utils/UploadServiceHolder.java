@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Lazy(false)
 public class UploadServiceHolder {
@@ -26,6 +24,4 @@ public class UploadServiceHolder {
         }
         return service;
     }
-
-
 }

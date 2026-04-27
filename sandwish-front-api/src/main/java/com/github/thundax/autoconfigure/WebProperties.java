@@ -3,11 +3,7 @@ package com.github.thundax.autoconfigure;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * @Auther: zhangrudong
- * @Date: 2021/10/20 15:19
- * @Description:
- */
+/** @Auther: zhangrudong @Date: 2021/10/20 15:19 @Description: */
 @Component
 @ConfigurationProperties(prefix = "vltava.web")
 public class WebProperties {

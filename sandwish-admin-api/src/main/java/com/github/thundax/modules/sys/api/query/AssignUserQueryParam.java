@@ -6,11 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.UserVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 /**
  * AssignUserQueryParam

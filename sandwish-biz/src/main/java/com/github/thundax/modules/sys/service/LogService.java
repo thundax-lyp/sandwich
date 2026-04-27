@@ -2,12 +2,9 @@ package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Log;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface LogService extends CrudService<Log> {
 
     /**
@@ -25,5 +22,4 @@ public interface LogService extends CrudService<Log> {
      * @return 影响记录数
      */
     int batchDelete(Log log);
-
 }

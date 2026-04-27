@@ -3,6 +3,10 @@ package com.github.thundax.modules.member.security;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.member.utils.RsaSessionUtils;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -10,14 +14,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public class MemberAuthenticationFilter extends FormAuthenticationFilter {
 
     public static final String DEFAULT_CAPTCHA_PARAM = "validateCode";
@@ -32,7 +29,8 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
         String host = RequestUtils.getRemoteAddr((HttpServletRequest) request);
         String captcha = getCaptcha(request);
 
-        return new MemberAuthenticationToken(username, password.toCharArray(), rememberMe, host, captcha);
+        return new MemberAuthenticationToken(
+                username, password.toCharArray(), rememberMe, host, captcha);
     }
 
     public String getCaptchaParam() {
@@ -47,9 +45,7 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
         return DEFAULT_MESSAGE_PARAM;
     }
 
-    /**
-     * 登录成功之后跳转URL
-     */
+    /** 登录成功之后跳转URL */
     @Override
     public String getSuccessUrl() {
         return super.getSuccessUrl();
@@ -61,9 +57,9 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
         WebUtils.issueRedirect(request, response, getSuccessUrl(), null, true);
     }
 
-
     @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+            throws Exception {
 
         if (isLoginRequest(request, response)) {
             if (isLoginSubmission(request, response)) {
@@ -76,7 +72,7 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
             HttpServletRequest httpRequest = WebUtils.toHttp(request);
 
             if (isAjax(httpRequest)) {
-                HttpServletResponse httpServletResponse = (HttpServletResponse)response;
+                HttpServletResponse httpServletResponse = (HttpServletResponse) response;
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
                 saveRequestAndRedirectToLogin(request, response);
@@ -93,17 +89,17 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
      * @return
      */
     boolean isAjax(HttpServletRequest request) {
-        return (request.getHeader("X-Requested-With") != null && "XMLHttpRequest".equals(request.getHeader("X-Requested-With").toString()));
+        return (request.getHeader("X-Requested-With") != null
+                && "XMLHttpRequest".equals(request.getHeader("X-Requested-With").toString()));
     }
 
-    /**
-     * 登录失败调用事件
-     */
+    /** 登录失败调用事件 */
     @Override
-    protected boolean onLoginFailure(AuthenticationToken token,
-                                     AuthenticationException e,
-                                     ServletRequest request,
-                                     ServletResponse response) {
+    protected boolean onLoginFailure(
+            AuthenticationToken token,
+            AuthenticationException e,
+            ServletRequest request,
+            ServletResponse response) {
         String className = e.getClass().getName(), message;
         if (IncorrectCredentialsException.class.getName().equals(className)
                 || UnknownAccountException.class.getName().equals(className)) {
@@ -126,5 +122,4 @@ public class MemberAuthenticationFilter extends FormAuthenticationFilter {
         }
         return RsaSessionUtils.decryptRsaValue((HttpServletRequest) request, encryptedValue);
     }
-
 }

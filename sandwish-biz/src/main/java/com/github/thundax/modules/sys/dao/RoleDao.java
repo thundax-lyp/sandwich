@@ -4,13 +4,10 @@ import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface RoleDao extends CrudDao<Role> {
 
     /**
@@ -61,9 +58,8 @@ public interface RoleDao extends CrudDao<Role> {
     /**
      * 写入用户列表
      *
-     * @param role     权限
+     * @param role 权限
      * @param userList 用户列表
      */
     void insertRoleUser(@Param("role") Role role, @Param("userList") List<User> userList);
-
 }

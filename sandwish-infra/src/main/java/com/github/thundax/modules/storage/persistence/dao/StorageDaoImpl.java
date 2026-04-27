@@ -1,5 +1,6 @@
 package com.github.thundax.modules.storage.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -7,14 +8,11 @@ import com.github.thundax.modules.storage.persistence.assembler.StoragePersisten
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 存储文件 DAO 实现。
- */
+/** 存储文件 DAO 实现。 */
 @Repository
 public class StorageDaoImpl implements StorageDao {
 
@@ -33,7 +31,9 @@ public class StorageDaoImpl implements StorageDao {
             return storage;
         }
 
-        storage = StoragePersistenceAssembler.toEntity(mapper.get(StoragePersistenceAssembler.toDataObject(entity)));
+        storage =
+                StoragePersistenceAssembler.toEntity(
+                        mapper.get(StoragePersistenceAssembler.toDataObject(entity)));
         cacheSupport.putById(storage);
         return storage;
     }
@@ -52,7 +52,8 @@ public class StorageDaoImpl implements StorageDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Storage> uncachedStorageList = StoragePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            List<Storage> uncachedStorageList =
+                    StoragePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
             for (Storage storage : uncachedStorageList) {
                 cacheSupport.putById(storage);
                 storageList.add(storage);
@@ -64,9 +65,10 @@ public class StorageDaoImpl implements StorageDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Storage> findList(Storage entity) {
-        List<StorageDO> dataObjects = mapper.findList(StoragePersistenceAssembler.toDataObject(entity));
+        List<StorageDO> dataObjects =
+                mapper.findList(StoragePersistenceAssembler.toDataObject(entity));
         List<Storage> entities = StoragePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

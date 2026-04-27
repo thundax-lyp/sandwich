@@ -3,12 +3,7 @@ package com.github.thundax.modules.utils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @Auther: zhangrudong
- * @Date: 2021/11/17 13:52
- * @Description:
- */
-
+/** @Auther: zhangrudong @Date: 2021/11/17 13:52 @Description: */
 @Configuration
 @ConfigurationProperties(prefix = "vltava.sms")
 public class SmsProperties {

@@ -1,8 +1,6 @@
 package com.github.thundax.modules.assist.service;
 
-/**
- * 公私钥对服务。
- */
+/** 公私钥对服务。 */
 public interface KeypairService {
 
     /**

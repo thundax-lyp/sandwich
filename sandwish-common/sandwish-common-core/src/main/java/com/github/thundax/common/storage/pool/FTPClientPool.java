@@ -8,5 +8,4 @@ public class FTPClientPool extends GenericObjectPool<FTPClient> {
     public FTPClientPool(FTPClientFactory factory) {
         super(factory);
     }
-
 }

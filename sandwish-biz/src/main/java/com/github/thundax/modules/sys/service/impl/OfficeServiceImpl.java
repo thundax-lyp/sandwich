@@ -7,9 +7,7 @@ import com.github.thundax.modules.sys.service.OfficeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implements OfficeService {
@@ -53,5 +51,4 @@ public class OfficeServiceImpl extends CrudServiceImpl<OfficeDao, Office> implem
     public boolean isChildOf(Office child, Office parent) {
         return child != null && parent != null && dao.isChildOf(child.getId(), parent.getId());
     }
-
 }

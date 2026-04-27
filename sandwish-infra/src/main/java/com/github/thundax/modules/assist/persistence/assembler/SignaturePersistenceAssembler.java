@@ -1,18 +1,14 @@
 package com.github.thundax.modules.assist.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 签名业务模型与持久化对象转换器。
- */
+/** 签名业务模型与持久化对象转换器。 */
 public final class SignaturePersistenceAssembler {
 
-    private SignaturePersistenceAssembler() {
-    }
+    private SignaturePersistenceAssembler() {}
 
     public static SignatureDO toDataObject(Signature entity) {
         if (entity == null) {
@@ -57,7 +53,7 @@ public final class SignaturePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Signature> entities = ListUtils.newArrayList();
+        List<Signature> entities = new ArrayList<>();
         for (SignatureDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

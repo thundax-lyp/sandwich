@@ -3,9 +3,7 @@ package com.github.thundax.modules.auth.persistence.dataobject;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * login form DO。
- */
+/** login form DO。 */
 public class LoginFormDO implements Serializable {
 
     private String loginToken;

@@ -22,7 +22,9 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
 
     @Override
     public Boolean sign(String businessType, String businessId, String body) {
-        if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId) || StringUtils.isBlank(body)) {
+        if (StringUtils.isBlank(businessType)
+                || StringUtils.isBlank(businessId)
+                || StringUtils.isBlank(body)) {
             return null;
         }
 
@@ -38,7 +40,9 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
 
     @Override
     public Boolean verifySign(String businessType, String businessId, String body) {
-        if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId) || StringUtils.isBlank(body)) {
+        if (StringUtils.isBlank(businessType)
+                || StringUtils.isBlank(businessId)
+                || StringUtils.isBlank(body)) {
             return null;
         }
 
@@ -46,8 +50,9 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         if (signature == null) {
             return null;
         }
-        Boolean isSuccess = StringUtils.equalsIgnoreCase(createSignature(body), signature.getSignature());
-        if(isSuccess){
+        Boolean isSuccess =
+                StringUtils.equalsIgnoreCase(createSignature(body), signature.getSignature());
+        if (isSuccess) {
             signature.setIsVerifySign("1");
         } else {
             signature.setIsVerifySign("2");
@@ -60,5 +65,4 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
     private String createSignature(String body) {
         return DigestUtils.sm3Hex(body);
     }
-
 }

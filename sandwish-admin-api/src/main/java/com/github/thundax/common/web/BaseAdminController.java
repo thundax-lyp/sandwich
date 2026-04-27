@@ -1,15 +1,25 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
+import com.github.thundax.common.exception.WebMvcException;
 import com.github.thundax.common.utils.CookieUtils;
 import com.github.thundax.common.utils.DateUtils;
 import com.github.thundax.common.utils.StringUtils;
-import com.github.thundax.common.exception.WebMvcException;
-import com.github.thundax.common.web.BaseController;
-import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -18,18 +28,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import java.util.*;
-import java.util.function.Function;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 public class BaseAdminController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -77,18 +76,22 @@ public class BaseAdminController extends BaseController {
     protected <T> boolean validate(RedirectAttributes redirectAttributes, T object) {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() > 0) {
-            addWarningMessage(redirectAttributes, constraintViolations.iterator().next().getMessage());
+            addWarningMessage(
+                    redirectAttributes, constraintViolations.iterator().next().getMessage());
             return false;
         }
 
         return true;
     }
 
-    protected <T> boolean validate(RedirectAttributes redirectAttributes, T object, String... propertyNames) {
+    protected <T> boolean validate(
+            RedirectAttributes redirectAttributes, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
-                addWarningMessage(redirectAttributes, constraintViolations.iterator().next().getMessage());
+                addWarningMessage(
+                        redirectAttributes, constraintViolations.iterator().next().getMessage());
                 return false;
             }
         }
@@ -98,7 +101,8 @@ public class BaseAdminController extends BaseController {
     protected <T> boolean validate(Model model, T object) {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() > 0) {
-            addWarningMessage(model, "warning:" + constraintViolations.iterator().next().getMessage());
+            addWarningMessage(
+                    model, "warning:" + constraintViolations.iterator().next().getMessage());
             return false;
         }
 
@@ -107,7 +111,8 @@ public class BaseAdminController extends BaseController {
 
     protected <T> boolean validate(Model model, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 addWarningMessage(model, constraintViolations.iterator().next().getMessage());
                 return false;
@@ -134,11 +139,13 @@ public class BaseAdminController extends BaseController {
         }
     }
 
-    protected void addSuccessMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
+    protected void addSuccessMessage(
+            @NotNull RedirectAttributes redirectAttributes, String message) {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MESSAGE_SUCCESS + ":" + message);
     }
 
-    protected void addWarningMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
+    protected void addWarningMessage(
+            @NotNull RedirectAttributes redirectAttributes, String message) {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MESSAGE_WARN + ":" + message);
     }
 
@@ -149,19 +156,20 @@ public class BaseAdminController extends BaseController {
     /**
      * 移除树形结构的某分支
      *
-     * @param dataList   存放树形结构数据列表，数据结构存放在map中
-     * @param keyNameId  id在map中的key名
+     * @param dataList 存放树形结构数据列表，数据结构存放在map中
+     * @param keyNameId id在map中的key名
      * @param keyNamePid pid在map中的key名
-     * @param extId      要排除的id
+     * @param extId 要排除的id
      * @return 排除的数据结构数目
      */
-    protected List<Map<String, String>> removeTreeNode(List<Map<String, String>> dataList,
-                                                       String keyNameId,
-                                                       String keyNamePid,
-                                                       String rootId,
-                                                       String extId) {
+    protected List<Map<String, String>> removeTreeNode(
+            List<Map<String, String>> dataList,
+            String keyNameId,
+            String keyNamePid,
+            String rootId,
+            String extId) {
         // 创建id-data映射表，用于快速查询pid对应的数据
-        Set<String> ids = SetUtils.newHashSet();
+        Set<String> ids = new HashSet<>();
         for (Map<String, String> data : dataList) {
             String id = data.get(keyNameId);
             ids.add(id);
@@ -192,31 +200,28 @@ public class BaseAdminController extends BaseController {
         return dataList;
     }
 
-    /**
-     * 将requestParams装配到model
-     */
+    /** 将requestParams装配到model */
     protected void setupParamsModel(HttpServletRequest request, Model model) {
-        RequestUtils.getQueryParams(request).forEach((name, value) -> {
-            if (StringUtils.isNotBlank(name) && value != null) {
-                model.addAttribute(name, value);
-            }
-        });
+        RequestUtils.getQueryParams(request)
+                .forEach(
+                        (name, value) -> {
+                            if (StringUtils.isNotBlank(name) && value != null) {
+                                model.addAttribute(name, value);
+                            }
+                        });
     }
 
-
-    /**
-     * 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中
-     */
-    protected static Integer readReloadInteger(String paramName,
-                                               HttpServletRequest request,
-                                               HttpServletResponse response) {
+    /** 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中 */
+    protected static Integer readReloadInteger(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadInteger(paramName, paramName, request, response);
     }
 
-    protected static Integer readReloadInteger(String paramName,
-                                               String cookieName,
-                                               HttpServletRequest request,
-                                               HttpServletResponse response) {
+    protected static Integer readReloadInteger(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNumeric(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -232,16 +237,16 @@ public class BaseAdminController extends BaseController {
         return null;
     }
 
-    protected static Date readReloadDate(String paramName,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response) {
+    protected static Date readReloadDate(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadDate(paramName, paramName, request, response);
     }
 
-    protected static Date readReloadDate(String paramName,
-                                         String cookieName,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response) {
+    protected static Date readReloadDate(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNotEmpty(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -257,16 +262,16 @@ public class BaseAdminController extends BaseController {
         return null;
     }
 
-    protected static String readReloadString(String paramName,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response) {
+    protected static String readReloadString(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadString(paramName, paramName, request, response);
     }
 
-    protected static String readReloadString(String paramName,
-                                             String cookieName,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response) {
+    protected static String readReloadString(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (paramValue != null) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -279,14 +284,14 @@ public class BaseAdminController extends BaseController {
         return null;
     }
 
-
     @NonNull
-    protected <T> List<T> validateList(Integer[] ids, @NonNull Function<Integer, T> mappingFunction) throws WebMvcException {
+    protected <T> List<T> validateList(Integer[] ids, @NonNull Function<Integer, T> mappingFunction)
+            throws WebMvcException {
         if (ids == null || ids.length == 0) {
             throw new WebMvcException("参数不能为空。");
         }
 
-        List<T> list = ListUtils.newArrayList();
+        List<T> list = new ArrayList<>();
 
         for (int idx = 0; idx < ids.length; idx++) {
             T entity = mappingFunction.apply(idx);
@@ -298,5 +303,4 @@ public class BaseAdminController extends BaseController {
 
         return list;
     }
-
 }

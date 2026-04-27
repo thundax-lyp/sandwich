@@ -1,27 +1,25 @@
 package com.github.thundax.modules.sys.utils;
 
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.service.RoleService;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Lazy(false)
 public class RoleServiceHolder {
 
     private static RoleService service;
 
-    private static final PooledThreadLocal<Map<String, Role>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<String, Role>> ID_OBJECT_HOLDER =
+            new PooledThreadLocal<>();
 
     @Autowired
     public RoleServiceHolder(RoleService targetService) {
@@ -40,8 +38,7 @@ public class RoleServiceHolder {
             return null;
         }
         return ID_OBJECT_HOLDER
-                .computeIfAbsent(MapUtils::newHashMap)
+                .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
-
 }

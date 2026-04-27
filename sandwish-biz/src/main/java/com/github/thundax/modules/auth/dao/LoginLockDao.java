@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.dao;
 
-/**
- * 登录失败锁定 DAO。
- */
+/** 登录失败锁定 DAO。 */
 public interface LoginLockDao {
 
     /**

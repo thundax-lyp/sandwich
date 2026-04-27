@@ -1,19 +1,22 @@
 package com.github.thundax.common.utils.encrypt;
 
-import javax.crypto.*;
-import javax.crypto.spec.DESKeySpec;
+import static com.github.thundax.common.utils.StringUtils.byte2hex;
+import static com.github.thundax.common.utils.StringUtils.hex2byte;
+
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 
-import static com.github.thundax.common.utils.StringUtils.byte2hex;
-import static com.github.thundax.common.utils.StringUtils.hex2byte;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 public class Des {
 
     private static final String ALGORITHM_DES = "DES";
@@ -28,8 +31,12 @@ public class Des {
             cipher.init(Cipher.ENCRYPT_MODE, key, random);
             return cipher.doFinal(plainBytes);
 
-        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
-                | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (InvalidKeyException
+                | NoSuchAlgorithmException
+                | InvalidKeySpecException
+                | NoSuchPaddingException
+                | IllegalBlockSizeException
+                | BadPaddingException e) {
             e.printStackTrace();
         }
         return null;
@@ -45,8 +52,12 @@ public class Des {
             cipher.init(Cipher.DECRYPT_MODE, key, random);
             return cipher.doFinal(encryptedBytes);
 
-        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException
-                | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (InvalidKeyException
+                | NoSuchAlgorithmException
+                | InvalidKeySpecException
+                | NoSuchPaddingException
+                | IllegalBlockSizeException
+                | BadPaddingException e) {
             e.printStackTrace();
         }
         return null;
@@ -67,5 +78,4 @@ public class Des {
         }
         return null;
     }
-
 }

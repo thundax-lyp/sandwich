@@ -34,7 +34,8 @@ public class UserInterfaceAssembler {
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
-        response.setAvatar(UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
+        response.setAvatar(
+                UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
 
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
@@ -97,7 +98,8 @@ public class UserInterfaceAssembler {
         entity.setMobile(request.getMobile());
 
         entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setEnableFlag(
+                Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
 
         entity.setRoleIdList(ListUtils.map(request.getRoleList(), UserRoleRequest::getId));
 
@@ -113,7 +115,8 @@ public class UserInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, UserSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(
+            T entity, UserSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

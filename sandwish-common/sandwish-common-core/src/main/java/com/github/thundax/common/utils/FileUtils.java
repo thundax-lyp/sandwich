@@ -1,16 +1,13 @@
 package com.github.thundax.common.utils;
 
+import com.github.thundax.common.utils.ext.FileUtilEx;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author thundax
- */
-public class FileUtils extends org.apache.commons.io.FileUtils {
+/** @author thundax */
+public class FileUtils extends FileUtilEx {
 
-    /**
-     * copy a file to a new location
-     */
+    /** copy a file to a new location */
     public static void replaceCopyFile(String srcFilename, String destFilename, boolean replace)
             throws IOException {
         File srcFile = new File(srcFilename);
@@ -26,5 +23,4 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         }
         copyFile(srcFile, destFile);
     }
-
 }

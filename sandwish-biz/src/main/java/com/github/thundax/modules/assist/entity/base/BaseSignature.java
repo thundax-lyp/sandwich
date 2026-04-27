@@ -10,13 +10,13 @@ import com.github.thundax.modules.assist.entity.Signature;
  */
 public abstract class BaseSignature extends DataEntity<Signature> {
 
-    /** 业务分类 **/
+    /** 业务分类 * */
     private String businessType;
-    /** 业务主键 **/
+    /** 业务主键 * */
     private String businessId;
-    /** 签名数据 **/
+    /** 签名数据 * */
     private String signature;
-    /** 验签结果（0：未验签，1：验签成功，2：验签失败） **/
+    /** 验签结果（0：未验签，1：验签成功，2：验签失败） * */
     private String isVerifySign;
 
     public BaseSignature() {

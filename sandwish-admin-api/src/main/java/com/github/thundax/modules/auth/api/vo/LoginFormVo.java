@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.io.Serializable;
 import java.util.UUID;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "LoginForm", description = "登录表单")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -73,5 +70,4 @@ public class LoginFormVo implements Serializable {
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
     }
-
 }

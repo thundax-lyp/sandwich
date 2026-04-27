@@ -2,10 +2,7 @@ package com.github.thundax.common.storage;
 
 import com.github.thundax.common.storage.filter.ResourceFilter;
 
-/**
- * 资源过滤器：根据resource.extName过滤
- *
- */
+/** 资源过滤器：根据resource.extName过滤 */
 public class ExtNameFilter implements ResourceFilter {
 
     private String extName;
@@ -21,5 +18,4 @@ public class ExtNameFilter implements ResourceFilter {
         }
         return true;
     }
-
 }

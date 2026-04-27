@@ -8,9 +8,7 @@ import com.github.thundax.common.vo.UserVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "UserTreeNode", description = "组织机构-用户树节点")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

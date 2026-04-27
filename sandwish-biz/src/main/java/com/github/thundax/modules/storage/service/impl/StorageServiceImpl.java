@@ -5,17 +5,15 @@ import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.service.StorageService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
-public class StorageServiceImpl extends CrudServiceImpl<StorageDao, Storage> implements StorageService {
+public class StorageServiceImpl extends CrudServiceImpl<StorageDao, Storage>
+        implements StorageService {
 
     public StorageServiceImpl(StorageDao dao) {
         super(dao);

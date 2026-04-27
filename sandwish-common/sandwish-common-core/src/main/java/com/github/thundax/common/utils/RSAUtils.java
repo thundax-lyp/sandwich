@@ -1,8 +1,5 @@
 package com.github.thundax.common.utils;
 
-import org.apache.commons.codec.binary.Base64;
-
-import javax.crypto.Cipher;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -11,11 +8,20 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import javax.crypto.Cipher;
+import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class RSAUtils {
 
@@ -30,12 +36,11 @@ public class RSAUtils {
          * 这里需使用BouncyCastleProvider，作为编解码的内核，原因是：
          * 客户单的jsencrypt.js在作编码的时候，使用了随机数，对同一个pubkey的每次编码，会产生不同的结果
          */
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     /**
-     * 生成钥对，生成的数据存储在map<String, String>中
-     * RSAUtils.PUBKEY：base64编码的public key,用于发送给浏览器的jsencrypt.js
+     * 生成钥对，生成的数据存储在map<String, String>中 RSAUtils.PUBKEY：base64编码的public key,用于发送给浏览器的jsencrypt.js
      * RSAUtils.PUBKEY_MODULUS与RSAUtils.PRIKEY_EXPONENT用于存储在Session中，以解码时使用
      */
     public static ReadableKeyPair generateKeyPair() {
@@ -52,7 +57,8 @@ public class RSAUtils {
             String privateKeyExponent = privateKey.getPrivateExponent().toString(16);
             String publicKeyExponent = publicKey.getPublicExponent().toString(16);
 
-            return new ReadableKeyPair(publicKeyText, modulus, publicKeyExponent, privateKeyExponent);
+            return new ReadableKeyPair(
+                    publicKeyText, modulus, publicKeyExponent, privateKeyExponent);
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -89,7 +95,9 @@ public class RSAUtils {
      * @param encryptBase64Text base64编码后的加密数据
      */
     public static String decryptBase64(String encryptBase64Text, ReadableKeyPair keyPair) {
-        if (StringUtils.isBlank(encryptBase64Text) || keyPair == null || keyPair.getModulus() == null) {
+        if (StringUtils.isBlank(encryptBase64Text)
+                || keyPair == null
+                || keyPair.getModulus() == null) {
             return StringUtils.EMPTY;
         }
         try {
@@ -109,37 +117,31 @@ public class RSAUtils {
         }
     }
 
-    /**
-     * 存储生成好的public key（base64 encode），modulus,private key exponents
-     */
+    /** 存储生成好的public key（base64 encode），modulus,private key exponents */
     public static class ReadableKeyPair implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        /**
-         * Base64编码的公钥，用于发送给客户端的jsencrypt.js
-         */
+        /** Base64编码的公钥，用于发送给客户端的jsencrypt.js */
         private String publicKey;
-        /**
-         * public key modulus，用于存储在会话中，与privateKeyExponent一起用来还原key，以解密
-         */
+        /** public key modulus，用于存储在会话中，与privateKeyExponent一起用来还原key，以解密 */
         private String modulus;
-        /**
-         * private key exponent，用于存储在会话中，与modulus一起用来还原key，以解密
-         */
+        /** private key exponent，用于存储在会话中，与modulus一起用来还原key，以解密 */
         private String privateKeyExponent;
 
         private String publicKeyExponent;
 
-        public ReadableKeyPair(String publicKey, String modulus, String publicKeyExponent, String privateKeyExponent) {
+        public ReadableKeyPair(
+                String publicKey,
+                String modulus,
+                String publicKeyExponent,
+                String privateKeyExponent) {
             this.setPublicKey(publicKey);
             this.setModulus(modulus);
             this.setPublicKeyExponent(publicKeyExponent);
             this.setPrivateKeyExponent(privateKeyExponent);
         }
 
-        /**
-         * get/set publicKey
-         */
+        /** get/set publicKey */
         public String getPublicKey() {
             return this.publicKey;
         }
@@ -148,9 +150,7 @@ public class RSAUtils {
             this.publicKey = publicKey;
         }
 
-        /**
-         * get/set modulus
-         */
+        /** get/set modulus */
         public String getModulus() {
             return this.modulus;
         }
@@ -159,9 +159,7 @@ public class RSAUtils {
             this.modulus = modulus;
         }
 
-        /**
-         * get/set privateKeyExponent
-         */
+        /** get/set privateKeyExponent */
         public String getPrivateKeyExponent() {
             return this.privateKeyExponent;
         }
@@ -170,9 +168,7 @@ public class RSAUtils {
             this.privateKeyExponent = privateKeyExponent;
         }
 
-        /**
-         * get/set publicKeyExponent
-         */
+        /** get/set publicKeyExponent */
         public String getPublicKeyExponent() {
             return this.publicKeyExponent;
         }
@@ -184,11 +180,11 @@ public class RSAUtils {
 
     public static void main(String[] args) throws IOException {
         int port = 8899;
-        //定义一个ServerSocket监听在端口8899上
+        // 定义一个ServerSocket监听在端口8899上
         ServerSocket server = new ServerSocket(port);
-        //server尝试接收其他Socket的连接请求，server的accept方法是阻塞式的
+        // server尝试接收其他Socket的连接请求，server的accept方法是阻塞式的
         Socket socket = server.accept();
-        //跟客户端建立好连接之后，我们就可以获取socket的InputStream，并从中读取客户端发过来的信息了。
+        // 跟客户端建立好连接之后，我们就可以获取socket的InputStream，并从中读取客户端发过来的信息了。
         Reader reader = new InputStreamReader(socket.getInputStream());
         char[] chars = new char[12800];
         int len;
@@ -203,5 +199,4 @@ public class RSAUtils {
         socket.close();
         server.close();
     }
-
 }

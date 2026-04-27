@@ -6,13 +6,10 @@ import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.Role;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-/**
- * 角色缓存支撑。
- */
+/** 角色缓存支撑。 */
 @Component
 public class RoleCacheSupport {
 
@@ -51,8 +48,7 @@ public class RoleCacheSupport {
     }
 
     public List<String> getRoleUserIds(String roleId) {
-        return redisClient.get(roleUserIdsKey(roleId), new TypeReference<List<String>>() {
-        });
+        return redisClient.get(roleUserIdsKey(roleId), new TypeReference<List<String>>() {});
     }
 
     public void putRoleUserIds(String roleId, List<String> userIds) {
@@ -64,8 +60,7 @@ public class RoleCacheSupport {
     }
 
     public List<String> getRoleMenuIds(String roleId) {
-        return redisClient.get(roleMenuIdsKey(roleId), new TypeReference<List<String>>() {
-        });
+        return redisClient.get(roleMenuIdsKey(roleId), new TypeReference<List<String>>() {});
     }
 
     public void putRoleMenuIds(String roleId, List<String> menuIds) {

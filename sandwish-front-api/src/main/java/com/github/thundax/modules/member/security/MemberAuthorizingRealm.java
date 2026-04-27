@@ -7,6 +7,9 @@ import com.github.thundax.modules.member.security.exception.DisabledUserExceptio
 import com.github.thundax.modules.member.security.exception.InvalidUserOrPasswordException;
 import com.github.thundax.modules.member.service.MemberService;
 import com.github.thundax.modules.member.utils.ShiroUtils;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -19,10 +22,6 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 /**
  * 系统安全认证实现类
@@ -37,11 +36,10 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
     private final String whiteCaptcha;
     private final String defalutPassword;
 
-    public MemberAuthorizingRealm(String whiteCaptcha,String defalutPassword) {
+    public MemberAuthorizingRealm(String whiteCaptcha, String defalutPassword) {
         super();
         this.whiteCaptcha = whiteCaptcha;
         this.defalutPassword = defalutPassword;
-
     }
 
     public MemberService getMemberService() {
@@ -51,9 +49,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
         return memberService;
     }
 
-    /**
-     * 认证回调函数, 登录时调用
-     */
+    /** 认证回调函数, 登录时调用 */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
 
@@ -73,12 +69,11 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
             throw new DisabledUserException();
         }
         member.setLoginPass(Md5.encrypt(defalutPassword));
-        return new SimpleAuthenticationInfo(new MemberPrincipal(member), member.getLoginPass(), getName());
+        return new SimpleAuthenticationInfo(
+                new MemberPrincipal(member), member.getLoginPass(), getName());
     }
 
-    /**
-     * 授权查询回调函数, 进行鉴权但缓存中无用户的授权信息时调用
-     */
+    /** 授权查询回调函数, 进行鉴权但缓存中无用户的授权信息时调用 */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         MemberPrincipal principal = (MemberPrincipal) getAvailablePrincipal(principals);
@@ -92,7 +87,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
             member.setLastLoginDate(new Date());
             if (member.getLoginName() != null) {
                 member.setLoginCount(member.getLoginCount() + 1);
-            }else {
+            } else {
                 member.setLoginCount(0);
             }
             getMemberService().updateLoginInfo(member);
@@ -122,5 +117,4 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
     protected boolean isPermittedAll(Collection<Permission> permissions, AuthorizationInfo info) {
         return super.isPermittedAll(permissions, info);
     }
-
 }

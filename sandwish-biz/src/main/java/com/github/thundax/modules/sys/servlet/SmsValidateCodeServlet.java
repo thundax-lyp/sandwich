@@ -1,20 +1,19 @@
 package com.github.thundax.modules.sys.servlet;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
-
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Random;
 
 /**
  * 生成随机验证码
@@ -47,20 +46,26 @@ public class SmsValidateCodeServlet extends HttpServlet {
     }
 
     public static boolean validate(HttpServletRequest request) {
-        return validate(request, request.getParameter(SMS_VALIDATE_MOBILE), request.getParameter(SMS_VALIDATE_CODE));
+        return validate(
+                request,
+                request.getParameter(SMS_VALIDATE_MOBILE),
+                request.getParameter(SMS_VALIDATE_CODE));
     }
 
-    public static boolean validate(HttpServletRequest request, String validateMobile, String validateCode) {
+    public static boolean validate(
+            HttpServletRequest request, String validateMobile, String validateCode) {
         if (StringUtils.isEmpty(validateCode)) {
             return false;
         }
 
-        if (StringUtils.isNotBlank(whiteCaptcha) && StringUtils.equals(whiteCaptcha, validateCode)) {
+        if (StringUtils.isNotBlank(whiteCaptcha)
+                && StringUtils.equals(whiteCaptcha, validateCode)) {
             return true;
         }
 
         String mobile = (String) request.getSession().getAttribute(SMS_VALIDATE_MOBILE);
-        if (!StringUtils.isEmpty(validateMobile) && !StringUtils.equalsIgnoreCase(validateMobile, mobile)) {
+        if (!StringUtils.isEmpty(validateMobile)
+                && !StringUtils.equalsIgnoreCase(validateMobile, mobile)) {
             return false;
         }
 
@@ -79,11 +84,13 @@ public class SmsValidateCodeServlet extends HttpServlet {
         String validateCode = request.getParameter(SMS_VALIDATE_CODE);
 
         response.setContentType("text/html");
-        response.getOutputStream().print(validate(request, validateMobile, validateCode) ? "true" : "false");
+        response.getOutputStream()
+                .print(validate(request, validateMobile, validateCode) ? "true" : "false");
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         if (!ValidateCodeServlet.validate(request)) {
             sendResult(response, false, "验证码错误");
             return;
@@ -107,8 +114,9 @@ public class SmsValidateCodeServlet extends HttpServlet {
         sendResult(response, true, "验证码已发送");
     }
 
-    private void sendResult(HttpServletResponse response, boolean result, String message) throws IOException {
-        Map<String, Object> map = MapUtils.newHashMap();
+    private void sendResult(HttpServletResponse response, boolean result, String message)
+            throws IOException {
+        Map<String, Object> map = new HashMap<>();
         map.put("result", result);
         map.put("message", message);
 
@@ -129,9 +137,7 @@ public class SmsValidateCodeServlet extends HttpServlet {
     }
 
     private String createCharacter() {
-        char[] codeSeq = {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-        };
+        char[] codeSeq = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         Random random = new Random();
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < CODE_LENGTH; i++) {
@@ -144,5 +150,4 @@ public class SmsValidateCodeServlet extends HttpServlet {
     private RedisClient getRedisClient() {
         return SpringContextHolder.getBean(RedisClient.class);
     }
-
 }

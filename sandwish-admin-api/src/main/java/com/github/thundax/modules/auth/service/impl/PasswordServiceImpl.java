@@ -3,13 +3,10 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.auth.service.PasswordService;
+import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
@@ -29,4 +26,3 @@ public class PasswordServiceImpl implements PasswordService {
         System.out.println(service.encrypt("wdit@123"));
     }
 }
-

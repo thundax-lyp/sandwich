@@ -3,19 +3,16 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseLog;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
-
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Log extends BaseLog {
@@ -23,10 +20,9 @@ public class Log extends BaseLog {
     private static final long serialVersionUID = 1L;
     public static final String BEAN_NAME = "Log";
 
-    /**
-     * 日志类型（1：接入日志；2：错误日志）
-     */
+    /** 日志类型（1：接入日志；2：错误日志） */
     public static final String TYPE_ACCESS = "1";
+
     public static final String TYPE_EXCEPTION = "2";
     private boolean signable = false;
 
@@ -60,7 +56,7 @@ public class Log extends BaseLog {
     @Override
     @JsonIgnore
     public String getSignBody() {
-        Map<String, Object> map = MapUtils.newLinkedHashMap();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("userId", this.getUserId());
         map.put("type", this.getType());
         map.put("logDate", this.getLogDate());
@@ -86,8 +82,12 @@ public class Log extends BaseLog {
                 if (param.getValue() != null && param.getValue().length > 0) {
                     paramValue = param.getValue()[0];
                 }
-                params.append(StringUtils
-                        .abbr(StringUtils.endsWithIgnoreCase(param.getKey(), "password") ? "" : paramValue, 100));
+                params.append(
+                        StringUtils.abbr(
+                                StringUtils.endsWithIgnoreCase(param.getKey(), "password")
+                                        ? ""
+                                        : paramValue,
+                                100));
             }
             this.setRequestParams(StringUtils.abbr(params.toString(), 300));
         }
@@ -194,5 +194,4 @@ public class Log extends BaseLog {
             this.endDate = endDate;
         }
     }
-
 }

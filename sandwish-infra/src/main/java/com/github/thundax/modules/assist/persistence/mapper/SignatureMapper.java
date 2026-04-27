@@ -2,14 +2,10 @@ package com.github.thundax.modules.assist.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
-
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 签名 MyBatis Mapper。
- */
+/** 签名 MyBatis Mapper。 */
 @MyBatisDao
 public interface SignatureMapper {
 

@@ -1,12 +1,14 @@
 package com.github.thundax.modules.sys.ueditor.define;
 
 import com.github.thundax.modules.sys.ueditor.Encoder;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 多状态集合状态
- * 其包含了多个状态的集合, 其本身自己也是一个状态
+ * 多状态集合状态 其包含了多个状态的集合, 其本身自己也是一个状态
  *
  * @author hancong03@baidu.com
  */
@@ -41,9 +43,7 @@ public class MultiState implements State {
         stateList.add(state.toJson());
     }
 
-    /**
-     * 该方法调用无效果
-     */
+    /** 该方法调用无效果 */
     @Override
     public void putInfo(String name, String val) {
         this.infoMap.put(name, val);
@@ -66,7 +66,6 @@ public class MultiState implements State {
             stateVal = iterator.next();
 
             builder.append(",\"").append(stateVal).append("\": ").append(this.intMap.get(stateVal));
-
         }
 
         iterator = this.infoMap.keySet().iterator();
@@ -75,8 +74,11 @@ public class MultiState implements State {
 
             stateVal = iterator.next();
 
-            builder.append(",\"").append(stateVal).append("\": \"").append(this.infoMap.get(stateVal)).append("\"");
-
+            builder.append(",\"")
+                    .append(stateVal)
+                    .append("\": \"")
+                    .append(this.infoMap.get(stateVal))
+                    .append("\"");
         }
 
         builder.append(", list: [");
@@ -94,12 +96,10 @@ public class MultiState implements State {
         builder.append(" ]}");
 
         return Encoder.toUnicode(builder.toString());
-
     }
 
     @Override
     public void putInfo(String name, long val) {
         this.intMap.put(name, val);
     }
-
 }

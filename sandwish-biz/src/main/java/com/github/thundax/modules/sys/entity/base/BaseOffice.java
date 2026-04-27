@@ -3,9 +3,7 @@ package com.github.thundax.modules.sys.entity.base;
 import com.github.thundax.common.persistence.AdminTreeEntity;
 import com.github.thundax.modules.sys.entity.Office;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseOffice extends AdminTreeEntity<Office> {
 
     private String parentId;

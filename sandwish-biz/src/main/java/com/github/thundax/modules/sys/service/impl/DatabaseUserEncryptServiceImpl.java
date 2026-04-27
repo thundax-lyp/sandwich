@@ -1,5 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
+import static com.github.thundax.common.Constants.QUEUE_PREFIX;
+
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
@@ -12,21 +14,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 
-import static com.github.thundax.common.Constants.QUEUE_PREFIX;
-
 /**
- * 用户重要信息加密数据库加密服务
- * 数据库列加密
+ * 用户重要信息加密数据库加密服务 数据库列加密
  *
  * @author wdit
  */
 @Service
 @Transactional(readOnly = true)
-public class DatabaseUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt> implements UserEncryptService {
+public class DatabaseUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt>
+        implements UserEncryptService {
 
-    /** 加密保存队列名称 **/
+    /** 加密保存队列名称 * */
     public static final String QUEUE_ENCRYPT_SAVE = QUEUE_PREFIX + "encrypt.db.save";
-    public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS = QUEUE_PREFIX + "encrypt.db.update.login.pass";
+
+    public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS =
+            QUEUE_PREFIX + "encrypt.db.update.login.pass";
     public static final String QUEUE_ENCRYPT_QUERY = QUEUE_PREFIX + "encrypt.db.query";
     protected final AmqpTemplate amqpTemplate;
 
@@ -34,7 +36,6 @@ public class DatabaseUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptD
         super(dao);
         this.amqpTemplate = amqpTemplate;
     }
-
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

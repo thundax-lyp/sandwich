@@ -1,12 +1,11 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.collect.ListUtils;
+import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
@@ -22,12 +21,13 @@ import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 /**
  * AuthServiceImpl
@@ -40,14 +40,11 @@ public class AuthServiceImpl implements AuthService {
     private static final int CAPTCHA_LENGTH = 4;
     private static final int SMS_VALIDATE_CODE_LENGTH = 6;
 
-    private static final char[] VALIDATE_CAPTCHA_CODE = {
-            '2', '3', '4', '5', '6', '7', '8', '9'
-    };
+    private static final char[] VALIDATE_CAPTCHA_CODE = {'2', '3', '4', '5', '6', '7', '8', '9'};
 
     private static final char[] VALIDATE_SMS_VALIDATE_CODE = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
-
 
     private final AuthProperties properties;
     private final LoginProperties loginProperties;
@@ -57,13 +54,14 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordService passwordService;
     private final PermissionService permissionService;
 
-    public AuthServiceImpl(AuthProperties properties,
-                           LoginProperties loginProperties,
-                           LoginFormDao loginFormDao,
-                           AccessTokenDao accessTokenDao,
-                           LoginLockDao loginLockDao,
-                           PasswordService passwordService,
-                           PermissionService permissionService) {
+    public AuthServiceImpl(
+            AuthProperties properties,
+            LoginProperties loginProperties,
+            LoginFormDao loginFormDao,
+            AccessTokenDao accessTokenDao,
+            LoginLockDao loginLockDao,
+            PasswordService passwordService,
+            PermissionService permissionService) {
         this.properties = properties;
         this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
@@ -74,20 +72,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException {
-        //检测是否登录请求过多
+    public LoginForm createLoginForm()
+            throws TooManyLoginRequestException, TooManyOnlineUserException {
+        // 检测是否登录请求过多
         if (loginFormDao.getLoginCount() > properties.getMaxLoginCount()) {
             throw new TooManyLoginRequestException();
         }
 
-        //检测是否在线用户过多
+        // 检测是否在线用户过多
         if (accessTokenDao.getOnlineCount() > properties.getMaxOnlineCount()) {
             throw new TooManyOnlineUserException();
         }
 
         LoginForm form = new LoginForm();
         form.setLoginToken(IdGen.uuid());
-        form.setRefreshTokenList(ListUtils.newArrayList(IdGen.uuid()));
+        form.setRefreshTokenList(new ArrayList<>(Collections.singletonList(IdGen.uuid())));
         form.setExpiredSeconds(properties.getLoginExpiredSeconds());
         form.setCheckCode(AuthUtils.currentCheckCode());
         form.setCaptcha(createCode(VALIDATE_CAPTCHA_CODE, CAPTCHA_LENGTH));
@@ -103,16 +102,15 @@ public class AuthServiceImpl implements AuthService {
         return form;
     }
 
-
     @Override
     public LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException {
-        //检测refreshToken是否有效
+        // 检测refreshToken是否有效
         LoginForm form = loginFormDao.getByRefreshToken(refreshToken);
         if (form == null || !form.validateCheckCode()) {
             throw new InvalidTokenException();
         }
 
-        List<String> refreshTokenList = ListUtils.newArrayList(form.getRefreshTokenList());
+        List<String> refreshTokenList = new ArrayList<>(form.getRefreshTokenList());
         refreshTokenList.add(0, IdGen.uuid());
 
         form.setLoginToken(IdGen.uuid());
@@ -125,12 +123,10 @@ public class AuthServiceImpl implements AuthService {
         return form;
     }
 
-
     @Override
     public void deleteLoginForm(String loginToken) {
         loginFormDao.deleteByToken(loginToken);
     }
-
 
     @Override
     public String createCaptcha(String loginToken) throws InvalidTokenException {
@@ -146,7 +142,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
+    public String getCaptcha(String loginToken)
+            throws InvalidTokenException, InvalidCaptchaException {
         LoginForm form = loginFormDao.getByToken(loginToken);
         if (form == null || !form.validateCheckCode()) {
             throw new InvalidTokenException();
@@ -170,9 +167,9 @@ public class AuthServiceImpl implements AuthService {
         return StringUtils.equals(captcha, getCaptcha(loginToken));
     }
 
-
     @Override
-    public String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException {
+    public String createSmsValidateCode(String loginToken, String mobile)
+            throws InvalidTokenException {
         if (!loginFormDao.tokenExists(loginToken)) {
             throw new InvalidTokenException();
         }
@@ -185,9 +182,9 @@ public class AuthServiceImpl implements AuthService {
         return validateCode;
     }
 
-
     @Override
-    public String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
+    public String getSmsValidateCode(String loginToken)
+            throws InvalidTokenException, InvalidCaptchaException {
         LoginForm form = loginFormDao.getByToken(loginToken);
         if (form == null) {
             throw new InvalidTokenException();
@@ -199,7 +196,6 @@ public class AuthServiceImpl implements AuthService {
 
         return form.getMobileValidateCode();
     }
-
 
     @Override
     public boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
@@ -213,14 +209,14 @@ public class AuthServiceImpl implements AuthService {
         if (form == null) {
             throw new InvalidTokenException();
 
-        } else if (StringUtils.isEmpty(form.getMobile()) || StringUtils.isEmpty(form.getMobileValidateCode())) {
+        } else if (StringUtils.isEmpty(form.getMobile())
+                || StringUtils.isEmpty(form.getMobileValidateCode())) {
             throw new InvalidCaptchaException();
         }
 
         return StringUtils.equals(form.getMobile(), mobile)
                 && StringUtils.equals(form.getMobileValidateCode(), validateCode);
     }
-
 
     @Override
     @NonNull
@@ -303,12 +299,11 @@ public class AuthServiceImpl implements AuthService {
         return form.getPrivateKey();
     }
 
-
     /**
      * 创建验证码
      *
      * @param validateChars 许可的字符
-     * @param length        长度
+     * @param length 长度
      */
     private String createCode(char[] validateChars, int length) {
         Random random = new Random();
@@ -334,9 +329,13 @@ public class AuthServiceImpl implements AuthService {
             loginLockDao.deleteFailCount(user.getLoginName());
             throw new ApiException("帐号已被锁定，请等待（" + loginProperties.getLockTime() + "）秒后自动解锁!");
         } else {
-            String message = "密码输入错误" + loginProperties.getMaxFailCount() + "次后将被锁定，剩余" + (loginProperties.getMaxFailCount() - failCount) + "次";
+            String message =
+                    "密码输入错误"
+                            + loginProperties.getMaxFailCount()
+                            + "次后将被锁定，剩余"
+                            + (loginProperties.getMaxFailCount() - failCount)
+                            + "次";
             throw new ApiException(message);
         }
     }
-
 }

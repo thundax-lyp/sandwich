@@ -18,7 +18,7 @@ public interface State {
      * 设置数据
      *
      * @param name 名称
-     * @param val  数值
+     * @param val 数值
      */
     void putInfo(String name, String val);
 
@@ -26,7 +26,7 @@ public interface State {
      * 设置数据
      *
      * @param name 名称
-     * @param val  数值
+     * @param val 数值
      */
     void putInfo(String name, long val);
 
@@ -36,5 +36,4 @@ public interface State {
      * @return JSON字符串
      */
     String toJson();
-
 }

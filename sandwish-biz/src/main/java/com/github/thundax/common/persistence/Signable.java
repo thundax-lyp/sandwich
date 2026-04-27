@@ -33,5 +33,4 @@ public interface Signable {
     default String getSignBody() {
         return null;
     }
-
 }

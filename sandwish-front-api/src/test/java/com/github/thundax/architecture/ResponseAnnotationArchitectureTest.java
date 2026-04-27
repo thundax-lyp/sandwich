@@ -11,7 +11,8 @@ public class ResponseAnnotationArchitectureTest extends AbstractArchitectureTest
     public void shouldEnforceResponseClassAnnotations() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired("com.github.thundax.modules")
+        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(
+                        "com.github.thundax.modules")
                 .check(classes);
     }
 }

@@ -1,10 +1,5 @@
 package com.github.thundax.common.utils;
 
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -12,11 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.yaml.snakeyaml.Yaml;
 
-/**
- * Properties文件载入工具类. 可载入多个properties文件,
- * 相同的属性在最后载入的文件中的值将会覆盖之前的值，但以System的Property优先.
- */
+/** Properties文件载入工具类. 可载入多个properties文件, 相同的属性在最后载入的文件中的值将会覆盖之前的值，但以System的Property优先. */
 public class PropertiesLoader {
 
     private static ResourceLoader resourceLoader = new DefaultResourceLoader();
@@ -31,9 +27,7 @@ public class PropertiesLoader {
         return properties;
     }
 
-    /**
-     * 取出Property，但以System的Property优先,取不到返回空字符串.
-     */
+    /** 取出Property，但以System的Property优先,取不到返回空字符串. */
     private String getValue(String key) {
         String systemProperty = System.getProperty(key);
         if (systemProperty != null) {
@@ -45,9 +39,7 @@ public class PropertiesLoader {
         return "";
     }
 
-    /**
-     * 取出String类型的Property，但以System的Property优先,如果都为Null则抛出异常.
-     */
+    /** 取出String类型的Property，但以System的Property优先,如果都为Null则抛出异常. */
     public String getProperty(String key) {
         String value = getValue(key);
         if (value == null) {
@@ -56,17 +48,13 @@ public class PropertiesLoader {
         return value;
     }
 
-    /**
-     * 取出String类型的Property，但以System的Property优先.如果都为Null则返回Default值.
-     */
+    /** 取出String类型的Property，但以System的Property优先.如果都为Null则返回Default值. */
     public String getProperty(String key, String defaultValue) {
         String value = getValue(key);
         return value != null ? value : defaultValue;
     }
 
-    /**
-     * 取出Integer类型的Property，但以System的Property优先.如果都为Null或内容错误则抛出异常.
-     */
+    /** 取出Integer类型的Property，但以System的Property优先.如果都为Null或内容错误则抛出异常. */
     public Integer getInteger(String key) {
         String value = getValue(key);
         if (value == null) {
@@ -75,17 +63,13 @@ public class PropertiesLoader {
         return Integer.valueOf(value);
     }
 
-    /**
-     * 取出Integer类型的Property，但以System的Property优先.如果都为Null则返回Default值，如果内容错误则抛出异常
-     */
+    /** 取出Integer类型的Property，但以System的Property优先.如果都为Null则返回Default值，如果内容错误则抛出异常 */
     public Integer getInteger(String key, Integer defaultValue) {
         String value = getValue(key);
         return value != null ? Integer.valueOf(value) : defaultValue;
     }
 
-    /**
-     * 取出Double类型的Property，但以System的Property优先.如果都为Null或内容错误则抛出异常.
-     */
+    /** 取出Double类型的Property，但以System的Property优先.如果都为Null或内容错误则抛出异常. */
     public Double getDouble(String key) {
         String value = getValue(key);
         if (value == null) {
@@ -94,17 +78,13 @@ public class PropertiesLoader {
         return Double.valueOf(value);
     }
 
-    /**
-     * 取出Double类型的Property，但以System的Property优先.如果都为Null则返回Default值，如果内容错误则抛出异常
-     */
+    /** 取出Double类型的Property，但以System的Property优先.如果都为Null则返回Default值，如果内容错误则抛出异常 */
     public Double getDouble(String key, Integer defaultValue) {
         String value = getValue(key);
         return value != null ? Double.valueOf(value) : defaultValue;
     }
 
-    /**
-     * 取出Boolean类型的Property，但以System的Property优先.如果都为Null抛出异常,如果内容不是true/false则返回false.
-     */
+    /** 取出Boolean类型的Property，但以System的Property优先.如果都为Null抛出异常,如果内容不是true/false则返回false. */
     public Boolean getBoolean(String key) {
         String value = getValue(key);
         if (value == null) {
@@ -113,17 +93,13 @@ public class PropertiesLoader {
         return Boolean.valueOf(value);
     }
 
-    /**
-     * 取出Boolean类型的Property，但以System的Property优先.如果都为Null则返回Default值,如果内容不为true/false则返回false.
-     */
+    /** 取出Boolean类型的Property，但以System的Property优先.如果都为Null则返回Default值,如果内容不为true/false则返回false. */
     public Boolean getBoolean(String key, boolean defaultValue) {
         String value = getValue(key);
         return value != null ? Boolean.valueOf(value) : defaultValue;
     }
 
-    /**
-     * 载入多个文件, 文件路径使用Spring Resource格式.
-     */
+    /** 载入多个文件, 文件路径使用Spring Resource格式. */
     private Properties loadProperties(String... resourcesPaths) {
         Properties props = new Properties();
 
@@ -132,7 +108,9 @@ public class PropertiesLoader {
                 InputStreamReader reader = null;
                 try {
                     Resource resource = resourceLoader.getResource(location);
-                    reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+                    reader =
+                            new InputStreamReader(
+                                    resource.getInputStream(), StandardCharsets.UTF_8);
                     props.load(reader);
 
                 } catch (IOException ex) {
@@ -170,7 +148,6 @@ public class PropertiesLoader {
      * 递归解析map
      *
      * @param map yml初次解析的map
-     *
      * @return 解析后的map
      */
     private static Map<String, String> resolveYaml(Map<?, ?> map) {
@@ -190,5 +167,4 @@ public class PropertiesLoader {
         }
         return values;
     }
-
 }

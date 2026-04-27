@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * JSON工具类，使用jackson库
@@ -83,5 +82,4 @@ public class JsonUtils {
         }
         return fromJson(toJson(bean), typeReference);
     }
-
 }

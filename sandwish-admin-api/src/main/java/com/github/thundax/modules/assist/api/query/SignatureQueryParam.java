@@ -6,12 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.query.PageQueryParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import javax.validation.constraints.Size;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @ApiModel(value = "SignatureQueryParam", description = "辅助：签名查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,5 +26,4 @@ public class SignatureQueryParam extends PageQueryParam {
     public void setBusinessType(String businessType) {
         this.businessType = businessType;
     }
-
 }

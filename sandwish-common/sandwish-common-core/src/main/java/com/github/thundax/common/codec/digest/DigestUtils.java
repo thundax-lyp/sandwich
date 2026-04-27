@@ -1,25 +1,19 @@
 package com.github.thundax.common.codec.digest;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.StringUtils;
-import org.bouncycastle.crypto.digests.SM3Digest;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.StringUtils;
+import org.bouncycastle.crypto.digests.SM3Digest;
 
 /**
  * 数字签名工具类
  *
  * @author wdit
  */
-public class DigestUtils extends org.apache.commons.codec.digest.DigestUtils {
-
-    public DigestUtils(final MessageDigest digest) {
-        super(digest);
-    }
+public class DigestUtils {
 
     public static byte[] sm3(final byte[] data) {
         return Sm3.encrypt(data);

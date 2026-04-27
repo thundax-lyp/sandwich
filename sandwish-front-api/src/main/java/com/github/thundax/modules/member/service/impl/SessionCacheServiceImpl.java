@@ -5,15 +5,12 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.member.service.SessionCacheService;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 public class SessionCacheServiceImpl implements SessionCacheService {
 
@@ -21,7 +18,8 @@ public class SessionCacheServiceImpl implements SessionCacheService {
 
     private final RedisClient redisClient;
 
-    private final PooledThreadLocal<Map<String, Object>> localCacheHandler = new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<String, Object>> localCacheHandler =
+            new PooledThreadLocal<>();
 
     @Autowired
     public SessionCacheServiceImpl(RedisClient redisClient) {
@@ -31,8 +29,12 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String sessionId, String key, Class<T> clazz) {
-        Object value = localCacheHandler.computeIfAbsent(HashMap::new)
-                .computeIfAbsent(createCacheKey(sessionId, key), cacheKey -> redisClient.get(createCacheKey(sessionId, key), clazz));
+        Object value =
+                localCacheHandler
+                        .computeIfAbsent(HashMap::new)
+                        .computeIfAbsent(
+                                createCacheKey(sessionId, key),
+                                cacheKey -> redisClient.get(createCacheKey(sessionId, key), clazz));
 
         return (T) value;
     }
@@ -40,8 +42,12 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String sessionId, String key, TypeReference<T> type) {
-        Object value = localCacheHandler.computeIfAbsent(HashMap::new)
-                .computeIfAbsent(createCacheKey(sessionId, key), cacheKey -> redisClient.get(createCacheKey(sessionId, key), type));
+        Object value =
+                localCacheHandler
+                        .computeIfAbsent(HashMap::new)
+                        .computeIfAbsent(
+                                createCacheKey(sessionId, key),
+                                cacheKey -> redisClient.get(createCacheKey(sessionId, key), type));
 
         return (T) value;
     }

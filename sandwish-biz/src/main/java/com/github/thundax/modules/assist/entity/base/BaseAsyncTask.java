@@ -3,9 +3,7 @@ package com.github.thundax.modules.assist.entity.base;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class BaseAsyncTask extends AdminDataEntity<AsyncTask> {
 
     private String title;
@@ -17,9 +15,7 @@ public class BaseAsyncTask extends AdminDataEntity<AsyncTask> {
     private Boolean isPrivate;
     private Integer expiredSeconds;
 
-    public BaseAsyncTask() {
-
-    }
+    public BaseAsyncTask() {}
 
     public BaseAsyncTask(String id) {
         this.id = id;

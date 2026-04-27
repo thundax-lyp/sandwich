@@ -7,9 +7,7 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.Office;
 import org.springframework.stereotype.Component;
 
-/**
- * 机构缓存支撑。
- */
+/** 机构缓存支撑。 */
 @Component
 public class OfficeCacheSupport {
 

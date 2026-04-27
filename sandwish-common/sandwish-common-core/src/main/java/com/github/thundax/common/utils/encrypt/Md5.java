@@ -1,7 +1,8 @@
 package com.github.thundax.common.utils.encrypt;
 
-import com.github.thundax.common.utils.StringUtils;
+import static com.github.thundax.common.utils.StringUtils.byte2hex;
 
+import com.github.thundax.common.utils.StringUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static com.github.thundax.common.utils.StringUtils.byte2hex;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 public class Md5 {
 
     private static final String ALGORITHM_MD5 = "MD5";
@@ -52,5 +49,4 @@ public class Md5 {
     public static String encrypt16(String input) {
         return encrypt(input.getBytes(StandardCharsets.UTF_8)).substring(8, 24);
     }
-
 }

@@ -2,13 +2,10 @@ package com.github.thundax.modules.sys.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 上传文件 MyBatis Mapper。
- */
+/** 上传文件 MyBatis Mapper。 */
 @MyBatisDao
 public interface UploadFileMapper {
 

@@ -1,13 +1,10 @@
 package com.github.thundax.modules.sys.ueditor.define;
 
 import com.github.thundax.modules.sys.ueditor.Encoder;
-
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class BaseState implements State {
 
     private boolean state = false;
@@ -64,14 +61,16 @@ public class BaseState implements State {
         builder.append("{\"state\": \"").append(stateVal).append("\"");
 
         for (String key : this.infoMap.keySet()) {
-            builder.append(",\"").append(key).append("\": \"").append(this.infoMap.get(key)).append("\"");
-
+            builder.append(",\"")
+                    .append(key)
+                    .append("\": \"")
+                    .append(this.infoMap.get(key))
+                    .append("\"");
         }
 
         builder.append("}");
 
         return Encoder.toUnicode(builder.toString());
-
     }
 
     @Override
@@ -83,5 +82,4 @@ public class BaseState implements State {
     public void putInfo(String name, long val) {
         this.putInfo(name, val + "");
     }
-
 }

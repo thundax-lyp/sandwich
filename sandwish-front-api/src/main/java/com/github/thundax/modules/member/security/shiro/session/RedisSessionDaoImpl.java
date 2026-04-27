@@ -1,9 +1,14 @@
 package com.github.thundax.modules.member.security.shiro.session;
 
-import com.google.common.collect.Sets;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.Servlets;
+import com.google.common.collect.Sets;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
@@ -15,18 +20,12 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 /**
  * 系统安全认证实现类
  *
  * @author wdit
  */
-public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements SessionDAO {
+public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements MemberSessionDao {
 
     private static final String CACHE_PREFIX = "interaction-shiro.";
 
@@ -150,14 +149,13 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Se
     /**
      * 获取活动会话
      *
-     * @param includeLeave  是否包括离线（最后访问时间大于3分钟为离线会话）
-     * @param principal     根据登录者对象获取活动会话
+     * @param includeLeave 是否包括离线（最后访问时间大于3分钟为离线会话）
+     * @param principal 根据登录者对象获取活动会话
      * @param filterSession 不为空，则过滤掉（不包含）这个会话。
      */
     @Override
-    public Collection<Session> getActiveSessions(boolean includeLeave,
-                                                 Object principal,
-                                                 Session filterSession) {
+    public Collection<Session> getActiveSessions(
+            boolean includeLeave, Object principal, Session filterSession) {
         // 如果包括离线，并无登录者条件。
         if (includeLeave && principal == null) {
             return getActiveSessions();
@@ -167,10 +165,15 @@ public class RedisSessionDaoImpl extends EnterpriseCacheSessionDAO implements Se
             boolean isActiveSession = false;
             // 符合登陆者条件。
             if (principal != null) {
-                PrincipalCollection pc = (PrincipalCollection) session
-                        .getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
-                if (principal.toString().equals(
-                        pc != null ? pc.getPrimaryPrincipal().toString() : StringUtils.EMPTY)) {
+                PrincipalCollection pc =
+                        (PrincipalCollection)
+                                session.getAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY);
+                if (principal
+                        .toString()
+                        .equals(
+                                pc != null
+                                        ? pc.getPrimaryPrincipal().toString()
+                                        : StringUtils.EMPTY)) {
                     isActiveSession = true;
                 }
             }

@@ -2,15 +2,14 @@ package com.github.thundax.common.persistence.entity;
 
 import com.github.thundax.common.utils.EncryptUtils;
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.ibatis.type.BaseTypeHandler;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.MappedJdbcTypes;
-import org.apache.ibatis.type.MappedTypes;
-
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
 
 /**
  * 默认加密转换器
@@ -22,7 +21,9 @@ import java.sql.SQLException;
 public class DefaultEncryptTypeHandler extends BaseTypeHandler<String> {
 
     @Override
-    public void setNonNullParameter(PreparedStatement preparedStatement, int i, String s, JdbcType jdbcType) throws SQLException {
+    public void setNonNullParameter(
+            PreparedStatement preparedStatement, int i, String s, JdbcType jdbcType)
+            throws SQLException {
         preparedStatement.setString(i, encrypt(s));
     }
 
@@ -34,11 +35,11 @@ public class DefaultEncryptTypeHandler extends BaseTypeHandler<String> {
     @Override
     public String getNullableResult(ResultSet resultSet, int i) throws SQLException {
         return decrypt(resultSet.getString(i));
-
     }
 
     @Override
-    public String getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
+    public String getNullableResult(CallableStatement callableStatement, int i)
+            throws SQLException {
         return decrypt(callableStatement.getString(i));
     }
 
@@ -56,5 +57,4 @@ public class DefaultEncryptTypeHandler extends BaseTypeHandler<String> {
         }
         return EncryptUtils.sm4Decrypt(encryptedValue);
     }
-
 }

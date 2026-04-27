@@ -1,16 +1,20 @@
 package com.github.thundax.common.storage;
 
-import com.google.common.collect.Lists;
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.commons.io.FileUtils;
-import org.springframework.lang.NonNull;
-
-import java.io.*;
+import com.google.common.collect.Lists;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.io.FileUtils;
+import org.springframework.lang.NonNull;
 
 public class LocalFileService implements MetaFileService {
 
@@ -18,13 +22,9 @@ public class LocalFileService implements MetaFileService {
 
     private String pathPrefix = StringUtils.EMPTY;
 
-    public LocalFileService() {
+    public LocalFileService() {}
 
-    }
-
-    /**
-     * get/set pathPrefix
-     */
+    /** get/set pathPrefix */
     public String getPathPrefix() {
         return this.pathPrefix;
     }
@@ -76,7 +76,6 @@ public class LocalFileService implements MetaFileService {
         }
     }
 
-
     @Override
     public boolean ensureObject(MetaFile metaFile) {
         File file = this.metaFileToFile(metaFile);
@@ -88,13 +87,11 @@ public class LocalFileService implements MetaFileService {
         }
     }
 
-
     @Override
     public boolean exists(MetaFile metaFile) {
         File file = this.metaFileToFile(metaFile);
         return file.exists();
     }
-
 
     private List<MetaFile> list(MetaFile metaFolder, Function<File, Boolean> filter) {
         List<MetaFile> mfList = Lists.newArrayList();
@@ -118,24 +115,20 @@ public class LocalFileService implements MetaFileService {
         return mfList;
     }
 
-
     @Override
     public List<MetaFile> list(MetaFile metaFolder) {
         return list(metaFolder, null);
     }
-
 
     @Override
     public List<MetaFile> listFolders(MetaFile metaFolder) {
         return list(metaFolder, File::isDirectory);
     }
 
-
     @Override
     public List<MetaFile> listFiles(MetaFile metaFolder) {
         return list(metaFolder, File::isFile);
     }
-
 
     @Override
     public boolean rename(MetaFile src, MetaFile dest) {
@@ -279,5 +272,4 @@ public class LocalFileService implements MetaFileService {
     public InputStream readFileAsStream(MetaFile metaFile) throws IOException {
         return new FileInputStream(this.metaFileToFile(metaFile));
     }
-
 }

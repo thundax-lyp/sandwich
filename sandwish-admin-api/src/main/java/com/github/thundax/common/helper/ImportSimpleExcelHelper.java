@@ -1,16 +1,23 @@
 package com.github.thundax.common.helper;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.utils.Reflections;
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.lang.NonNull;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.lang.NonNull;
 
 /**
  * @param <T> Row对象
@@ -18,29 +25,21 @@ import java.util.List;
  */
 public class ImportSimpleExcelHelper<T> {
 
-    /**
-     * excel 工作薄对象
-     */
+    /** excel 工作薄对象 */
     private final Workbook workbook;
 
     private Integer sheetIndex = 0;
     private String sheetName;
 
-    /**
-     * cell表达式计算器
-     */
+    /** cell表达式计算器 */
     private final FormulaEvaluator evaluator;
 
-    /**
-     * cell格式化工具
-     */
+    /** cell格式化工具 */
     private final DataFormatter formatter;
 
     private final String[] properties;
 
-    /**
-     * 构造函数
-     */
+    /** 构造函数 */
     public ImportSimpleExcelHelper(InputStream inputStream, String[] properties)
             throws EncryptedDocumentException, IOException {
         this.workbook = WorkbookFactory.create(inputStream);
@@ -63,9 +62,7 @@ public class ImportSimpleExcelHelper<T> {
         this.sheetName = sheetName;
     }
 
-    /**
-     * 获取sheet数目
-     */
+    /** 获取sheet数目 */
     public int getSheetCount() {
         return this.workbook.getNumberOfSheets();
     }
@@ -88,7 +85,7 @@ public class ImportSimpleExcelHelper<T> {
         }
 
         int flushCount = 0, rowIndex = 0;
-        List<T> objectList = ListUtils.newArrayList();
+        List<T> objectList = new ArrayList<>();
 
         int startRows = tableRange.getFirstRow() + listener.getFirstRowNum();
         int stopRows = tableRange.getLastRow();
@@ -131,7 +128,8 @@ public class ImportSimpleExcelHelper<T> {
                     val = this.formatter.formatCellValue(cell);
                 }
 
-                if (propertyIdx < properties.length && StringUtils.isNotEmpty(properties[propertyIdx])) {
+                if (propertyIdx < properties.length
+                        && StringUtils.isNotEmpty(properties[propertyIdx])) {
                     Reflections.invokeSetter(object, properties[propertyIdx], val);
                 }
             }
@@ -170,8 +168,7 @@ public class ImportSimpleExcelHelper<T> {
     }
 
     /**
-     * 获取表格在sheet中的区域位置
-     * 获取每行的最左列和最右列位置，最小的“最左列位置”作为表格的“最左列位置”，最大的“最右列位置”作为表格的“最右列位置”
+     * 获取表格在sheet中的区域位置 获取每行的最左列和最右列位置，最小的“最左列位置”作为表格的“最左列位置”，最大的“最右列位置”作为表格的“最右列位置”
      *
      * @param sheet excel sheet
      */
@@ -200,7 +197,6 @@ public class ImportSimpleExcelHelper<T> {
         return new CellRangeAddress(firstRowNum, lastRowNum, firstCellNum, lastCellNum);
     }
 
-
     public interface PersistListener<T> {
         /**
          * 第一行数据位置
@@ -221,7 +217,7 @@ public class ImportSimpleExcelHelper<T> {
         /**
          * 校验对象
          *
-         * @param object   对象
+         * @param object 对象
          * @param rowIndex 所在行
          * @return 正确:true
          */
@@ -240,12 +236,10 @@ public class ImportSimpleExcelHelper<T> {
         /**
          * 进度
          *
-         * @param result  完成:true
-         * @param total   最大数据行
+         * @param result 完成:true
+         * @param total 最大数据行
          * @param current 当前处理行
          */
-        default void progress(boolean result, int total, int current) {
-
-        }
+        default void progress(boolean result, int total, int current) {}
     }
 }

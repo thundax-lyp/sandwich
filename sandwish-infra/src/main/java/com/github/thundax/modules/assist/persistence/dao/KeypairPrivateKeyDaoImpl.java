@@ -5,9 +5,7 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
 import org.springframework.stereotype.Repository;
 
-/**
- * 公私钥私钥临时存储 Redis DAO 实现。
- */
+/** 公私钥私钥临时存储 Redis DAO 实现。 */
 @Repository
 public class KeypairPrivateKeyDaoImpl implements KeypairPrivateKeyDao {
 
@@ -19,11 +17,11 @@ public class KeypairPrivateKeyDaoImpl implements KeypairPrivateKeyDao {
 
     @Override
     public void save(String token, String privateKey, int expiredSeconds) {
-        redisClient.set(Constants.CACHE_PRIVATE_KEY_ + token, privateKey, expiredSeconds);
+        redisClient.set(Constants.CACHE_PRIVATE_KEY + token, privateKey, expiredSeconds);
     }
 
     @Override
     public String getByToken(String token) {
-        return redisClient.get(Constants.CACHE_PRIVATE_KEY_ + token);
+        return redisClient.get(Constants.CACHE_PRIVATE_KEY + token);
     }
 }

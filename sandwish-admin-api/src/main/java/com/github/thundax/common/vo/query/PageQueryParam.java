@@ -5,14 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import java.io.Serializable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "PageQueryParam", description = "分页查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,7 +34,6 @@ public class PageQueryParam implements Serializable {
         this.pageNo = pageNo;
     }
 
-
     @ApiModelProperty(name = "pageSize", value = "单页记录数", example = "5")
     @JsonProperty("pageSize")
     @Min(value = 1, message = "单页记录数不能小于1")
@@ -49,5 +45,4 @@ public class PageQueryParam implements Serializable {
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
     }
-
 }

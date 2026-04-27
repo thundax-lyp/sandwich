@@ -6,13 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @ApiModel(value = "Signature", description = "辅助：数据签名")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -74,5 +71,4 @@ public class SignatureVo extends BaseVo {
     public void setSignature(String signature) {
         this.signature = signature;
     }
-
 }

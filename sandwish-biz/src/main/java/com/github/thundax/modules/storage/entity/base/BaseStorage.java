@@ -3,15 +3,12 @@ package com.github.thundax.modules.storage.entity.base;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.storage.entity.Storage;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseStorage extends DataEntity<Storage> {
 
     private static final long serialVersionUID = 1L;
 
-    public BaseStorage() {
-    }
+    public BaseStorage() {}
 
     public BaseStorage(String id) {
         super(id);
@@ -48,7 +45,6 @@ public abstract class BaseStorage extends DataEntity<Storage> {
         this.mimeType = mimeType;
     }
 
-
     public String getOwnerId() {
         return ownerId;
     }
@@ -72,5 +68,4 @@ public abstract class BaseStorage extends DataEntity<Storage> {
     public void setEnableFlag(String enableFlag) {
         this.enableFlag = enableFlag;
     }
-
 }

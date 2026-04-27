@@ -3,13 +3,10 @@ package com.github.thundax.common.vo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PageVo<T> implements Serializable {
@@ -23,9 +20,7 @@ public class PageVo<T> implements Serializable {
     private String orderBy;
     private List<T> records;
 
-    public PageVo() {
-
-    }
+    public PageVo() {}
 
     @JsonProperty("pageNo")
     public Integer getPageNo() {
@@ -80,5 +75,4 @@ public class PageVo<T> implements Serializable {
     public void setRecords(List<T> records) {
         this.records = records;
     }
-
 }

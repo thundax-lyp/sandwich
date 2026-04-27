@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -10,14 +11,11 @@ import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.RoleMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 角色 DAO 实现。
- */
+/** 角色 DAO 实现。 */
 @Repository
 public class RoleDaoImpl implements RoleDao {
 
@@ -25,7 +23,8 @@ public class RoleDaoImpl implements RoleDao {
     private final RoleCacheSupport cacheSupport;
     private final UserCacheSupport userCacheSupport;
 
-    public RoleDaoImpl(RoleMapper mapper, RoleCacheSupport cacheSupport, UserCacheSupport userCacheSupport) {
+    public RoleDaoImpl(
+            RoleMapper mapper, RoleCacheSupport cacheSupport, UserCacheSupport userCacheSupport) {
         this.mapper = mapper;
         this.cacheSupport = cacheSupport;
         this.userCacheSupport = userCacheSupport;
@@ -38,7 +37,9 @@ public class RoleDaoImpl implements RoleDao {
             return role;
         }
 
-        role = RolePersistenceAssembler.toEntity(mapper.get(RolePersistenceAssembler.toDataObject(entity)));
+        role =
+                RolePersistenceAssembler.toEntity(
+                        mapper.get(RolePersistenceAssembler.toDataObject(entity)));
         cacheSupport.putById(role);
         return role;
     }
@@ -57,7 +58,8 @@ public class RoleDaoImpl implements RoleDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Role> uncachedRoleList = RolePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            List<Role> uncachedRoleList =
+                    RolePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
             for (Role role : uncachedRoleList) {
                 cacheSupport.putById(role);
                 roleList.add(role);
@@ -71,7 +73,7 @@ public class RoleDaoImpl implements RoleDao {
     public List<Role> findList(Role entity) {
         List<RoleDO> dataObjects = mapper.findList(RolePersistenceAssembler.toDataObject(entity));
         List<Role> entities = RolePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);
@@ -166,7 +168,8 @@ public class RoleDaoImpl implements RoleDao {
 
     @Override
     public void insertRoleUser(Role role, List<User> userList) {
-        mapper.insertRoleUser(RolePersistenceAssembler.toDataObject(role),
+        mapper.insertRoleUser(
+                RolePersistenceAssembler.toDataObject(role),
                 RolePersistenceAssembler.toUserIdList(userList));
         removeRoleCaches(role);
     }

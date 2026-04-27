@@ -1,7 +1,6 @@
 package com.github.thundax.common.service;
 
 import com.github.thundax.common.persistence.Page;
-
 import java.util.List;
 
 /**
@@ -69,7 +68,7 @@ public interface CrudService<T> extends BaseService {
      * 获取分页数据
      *
      * @param entity 查询条件
-     * @param page   分页
+     * @param page 分页
      * @return 分页
      */
     Page<T> findPage(T entity, Page<T> page);
@@ -136,5 +135,4 @@ public interface CrudService<T> extends BaseService {
      * @return 影响记录数
      */
     int updateDelFlag(List<T> list);
-
 }

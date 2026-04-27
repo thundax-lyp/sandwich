@@ -3,13 +3,10 @@ package com.github.thundax.modules.assist.persistence.assembler;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 
-/**
- * 异步任务业务模型与持久化对象转换器。
- */
+/** 异步任务业务模型与持久化对象转换器。 */
 public final class AsyncTaskPersistenceAssembler {
 
-    private AsyncTaskPersistenceAssembler() {
-    }
+    private AsyncTaskPersistenceAssembler() {}
 
     public static AsyncTaskDO toDataObject(AsyncTask entity) {
         if (entity == null) {

@@ -7,9 +7,7 @@ import com.github.thundax.modules.auth.dao.LoginLockDao;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-/**
- * 登录失败锁定 Redis DAO 实现。
- */
+/** 登录失败锁定 Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 public class LoginLockDaoImpl implements LoginLockDao {

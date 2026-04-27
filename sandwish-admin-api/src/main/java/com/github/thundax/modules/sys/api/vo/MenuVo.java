@@ -6,14 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "Menu", description = "菜单")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,7 +32,6 @@ public class MenuVo extends BaseVo {
         super(id);
     }
 
-
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")
     @Size(max = 64, message = "父节点ID长度必须小于64")
@@ -46,7 +42,6 @@ public class MenuVo extends BaseVo {
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
-
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")
@@ -60,7 +55,6 @@ public class MenuVo extends BaseVo {
         this.name = name;
     }
 
-
     @ApiModelProperty(name = "perms", value = "权限")
     @JsonProperty("perms")
     public String getPerms() {
@@ -70,7 +64,6 @@ public class MenuVo extends BaseVo {
     public void setPerms(String perms) {
         this.perms = perms;
     }
-
 
     @ApiModelProperty(name = "ranks", value = "等级", example = "0")
     @JsonProperty("ranks")
@@ -83,7 +76,6 @@ public class MenuVo extends BaseVo {
         this.ranks = ranks;
     }
 
-
     @ApiModelProperty(name = "display", value = "显示/隐藏")
     @JsonProperty("display")
     public Boolean getDisplay() {
@@ -93,7 +85,6 @@ public class MenuVo extends BaseVo {
     public void setDisplay(Boolean display) {
         isDisplay = display;
     }
-
 
     @ApiModelProperty(name = "displayParams", value = "显示参数，前端使用")
     @JsonProperty("displayParams")
@@ -105,7 +96,6 @@ public class MenuVo extends BaseVo {
     public void setDisplayParams(String displayParams) {
         this.displayParams = displayParams;
     }
-
 
     @ApiModelProperty(name = "url", value = "URL")
     @JsonProperty("url")

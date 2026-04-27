@@ -2,12 +2,9 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.Log;
-
 import java.util.Date;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseLog extends AdminDataEntity<Log> {
 
     private static final long serialVersionUID = 1L;
@@ -102,5 +99,4 @@ public abstract class BaseLog extends AdminDataEntity<Log> {
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
 }

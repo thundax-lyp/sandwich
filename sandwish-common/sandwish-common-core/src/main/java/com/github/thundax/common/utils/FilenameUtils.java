@@ -1,21 +1,17 @@
 package com.github.thundax.common.utils;
 
-import com.github.thundax.common.collect.ListUtils;
+import com.github.thundax.common.utils.ext.FilenameUtilEx;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
-
-/**
- * @author thundax
- */
-public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
+/** @author thundax */
+public class FilenameUtils extends FilenameUtilEx {
 
     public static final char SEPARATOR_CHAR = '/';
     public static final String SEPARATOR = "/";
 
-    /**
-     * 获取规范路径名，去除路径中的".." "." "//"等重复字符，获取纯净路径名
-     */
+    /** 获取规范路径名，去除路径中的".." "." "//"等重复字符，获取纯净路径名 */
     @NonNull
     public static String getCanonicalPathname(String pathname) {
         pathname = StringUtils.trim(pathname);
@@ -23,7 +19,7 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
             return SEPARATOR;
         }
 
-        List<String> cleanNameList = ListUtils.newArrayList();
+        List<String> cleanNameList = new ArrayList<>();
 
         String[] names = StringUtils.split(pathname, SEPARATOR_CHAR);
         for (String name : names) {
@@ -47,5 +43,4 @@ public class FilenameUtils extends org.apache.commons.io.FilenameUtils {
         System.out.println(getCanonicalPathname("../../../a/b/c/../d/..//e/"));
         System.out.println(getCanonicalPathname("/../../../a/b/c/d/../e"));
     }
-
 }

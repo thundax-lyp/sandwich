@@ -1,17 +1,14 @@
 package com.github.thundax.autoconfigure;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.utils.StringUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
-import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @ConfigurationProperties(prefix = "vltava")
 public class VltavaProperties {
 
@@ -77,9 +74,7 @@ public class VltavaProperties {
         this.xssFilter = xssFilter;
     }
 
-    /**
-     * 产品名/版本
-     */
+    /** 产品名/版本 */
     public static class ProductProperties {
 
         private String name;
@@ -120,25 +115,22 @@ public class VltavaProperties {
         }
     }
 
-
-    /**
-     * 上传文件/图片设置
-     */
+    /** 上传文件/图片设置 */
     public static class UploadProperties {
 
-        //本地存储目录
+        // 本地存储目录
         private String servletPath;
-        //本地存储目录
+        // 本地存储目录
         private String storagePath;
-        //可上传的图片文件名后缀
+        // 可上传的图片文件名后缀
         private List<String> allowImageSuffix;
-        //可上传的文件名后缀
+        // 可上传的文件名后缀
         private List<String> allowSuffix;
-        //最大同时上传文件数
+        // 最大同时上传文件数
         private Integer maxFileCount;
-        //最大上传单个文件大小
+        // 最大上传单个文件大小
         private Long maxFileSize;
-        //图片压缩质量
+        // 图片压缩质量
         private Float imageQuality;
 
         public String getServletPath() {
@@ -170,7 +162,7 @@ public class VltavaProperties {
         @NonNull
         public List<String> getAllowImageSuffix() {
             if (allowImageSuffix == null) {
-                return ListUtils.newArrayList();
+                return new ArrayList<>();
             }
             return allowImageSuffix;
         }
@@ -187,7 +179,7 @@ public class VltavaProperties {
         @NonNull
         public List<String> getAllowSuffix() {
             if (allowSuffix == null) {
-                return ListUtils.newArrayList();
+                return new ArrayList<>();
             }
             return allowSuffix;
         }
@@ -242,7 +234,6 @@ public class VltavaProperties {
         }
     }
 
-
     public static class XssFilterProperties {
         private String enabled;
         private String tagExcludes;
@@ -290,6 +281,4 @@ public class VltavaProperties {
             this.urlExcludes = urlExcludes;
         }
     }
-
-
 }

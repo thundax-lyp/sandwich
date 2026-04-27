@@ -15,16 +15,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @Configuration
 @EnableWebMvc
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-
     @Bean
-    public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(VltavaProperties properties, StorageConverter converter) {
+    public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(
+            VltavaProperties properties, StorageConverter converter) {
         ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
         bean.setServlet(new StorageServlet(converter));
         VltavaProperties.UploadProperties upload = properties.getUpload();
@@ -33,7 +31,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(VltavaProperties properties) {
+    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(
+            VltavaProperties properties) {
         ValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
 
         ServletRegistrationBean<ValidateCodeServlet> bean = new ServletRegistrationBean<>();
@@ -42,22 +41,23 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-
-//    @Bean
-//    public ServletRegistrationBean<StorageServlet> storageServletServletRegistrationBean(VltavaProperties properties) {
-//        VltavaProperties.UploadProperties upload = properties.getUpload();
-//
-//        ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-//        bean.setServlet(new StorageServlet(upload.getStoragePath()));
-//        bean.addUrlMappings(upload.getServletPath() + "*");
-//
-//        return bean;
-//    }
-
+    //    @Bean
+    //    public ServletRegistrationBean<StorageServlet>
+    // storageServletServletRegistrationBean(VltavaProperties properties) {
+    //        VltavaProperties.UploadProperties upload = properties.getUpload();
+    //
+    //        ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
+    //        bean.setServlet(new StorageServlet(upload.getStoragePath()));
+    //        bean.addUrlMappings(upload.getServletPath() + "*");
+    //
+    //        return bean;
+    //    }
 
     @Bean
-    public FilterRegistrationBean<ResponseWrapperFilter> responseWrapperFilter(VltavaProperties properties) {
-        VltavaProperties.ResponseWrapperFilterProperties wrapperFilterProperties = properties.getResponseWrapperFilter();
+    public FilterRegistrationBean<ResponseWrapperFilter> responseWrapperFilter(
+            VltavaProperties properties) {
+        VltavaProperties.ResponseWrapperFilterProperties wrapperFilterProperties =
+                properties.getResponseWrapperFilter();
 
         FilterRegistrationBean<ResponseWrapperFilter> bean = new FilterRegistrationBean<>();
         bean.setFilter(new ResponseWrapperFilter(wrapperFilterProperties));
@@ -79,7 +79,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-
     @Bean
     public FilterRegistrationBean<ProcessTimeFilter> processTimeFilterRegistrationBean() {
         FilterRegistrationBean<ProcessTimeFilter> bean = new FilterRegistrationBean<>();
@@ -88,23 +87,18 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
 
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/favicon.ico");
 
-        registry.addResourceHandler("/testcase/**")
-                .addResourceLocations("classpath:/testcase/");
+        registry.addResourceHandler("/testcase/**").addResourceLocations("classpath:/testcase/");
 
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations(
-                "classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations(
-                "classpath:/META-INF/resources/webjars/");
-
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
-
 }

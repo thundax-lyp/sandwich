@@ -23,6 +23,9 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,10 +34,6 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class AuthPermissionLifecycleTest {
 
@@ -52,14 +51,15 @@ public class AuthPermissionLifecycleTest {
         authProperties.setLoginExpiredSeconds(60);
 
         permissionService = new PermissionServiceImpl(permissionDao, authProperties);
-        authService = new AuthServiceImpl(
-                authProperties,
-                new LoginProperties(),
-                new InMemoryLoginFormDaoImpl(),
-                accessTokenDao,
-                new InMemoryLoginLockDaoImpl(),
-                new PlainPasswordService(),
-                permissionService);
+        authService =
+                new AuthServiceImpl(
+                        authProperties,
+                        new LoginProperties(),
+                        new InMemoryLoginFormDaoImpl(),
+                        accessTokenDao,
+                        new InMemoryLoginLockDaoImpl(),
+                        new PlainPasswordService(),
+                        permissionService);
 
         new UserServiceHolder(new TestUserService());
         new MenuServiceHolder(new TestMenuService());
@@ -90,10 +90,11 @@ public class AuthPermissionLifecycleTest {
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1");
-        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(),
-                authService,
-                permissionService);
+        AccessTokenAuthenticationFilter filter =
+                new AccessTokenAuthenticationFilter(
+                        new VltavaProperties.AccessTokenFilterProperties(),
+                        authService,
+                        permissionService);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
@@ -102,7 +103,8 @@ public class AuthPermissionLifecycleTest {
 
         filter.doFilter(request, response, chain);
 
-        Assert.assertEquals("u1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Assert.assertEquals(
+                "u1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
@@ -110,10 +112,11 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldRejectRequestWithoutToken() throws Exception {
-        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(),
-                authService,
-                permissionService);
+        AccessTokenAuthenticationFilter filter =
+                new AccessTokenAuthenticationFilter(
+                        new VltavaProperties.AccessTokenFilterProperties(),
+                        authService,
+                        permissionService);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -152,12 +155,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void updatePassword(User user) {
-        }
+        public void updatePassword(User user) {}
 
         @Override
-        public void updateLoginInfo(User user) {
-        }
+        public void updateLoginInfo(User user) {}
 
         @Override
         public int updateEnableFlag(User user) {
@@ -220,8 +221,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void save(User entity) {
-        }
+        public void save(User entity) {}
 
         @Override
         public int delete(User entity) {
@@ -288,8 +288,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void moveTreeNode(Menu fromBean, Menu toBean, MoveTreeNodeType moveType) {
-        }
+        public void moveTreeNode(Menu fromBean, Menu toBean, MoveTreeNodeType moveType) {}
 
         @Override
         public boolean isChildOf(Menu child, Menu parent) {
@@ -342,8 +341,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void save(Menu entity) {
-        }
+        public void save(Menu entity) {}
 
         @Override
         public int delete(Menu entity) {

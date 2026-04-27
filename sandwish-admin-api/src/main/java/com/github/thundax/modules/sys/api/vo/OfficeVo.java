@@ -6,13 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "Office", description = "组织机构")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -54,7 +51,6 @@ public class OfficeVo extends BaseVo {
         this.name = name;
     }
 
-
     @ApiModelProperty(name = "namePath", value = "全名称")
     @JsonProperty("namePath")
     public String getNamePath() {
@@ -75,5 +71,4 @@ public class OfficeVo extends BaseVo {
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
-
 }

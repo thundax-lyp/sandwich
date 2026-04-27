@@ -5,13 +5,10 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import java.util.Date;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 public class AsyncTaskServiceImpl implements AsyncTaskService {
 
@@ -42,5 +39,4 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     public void delete(AsyncTask asyncTask) {
         asyncTaskDao.delete(asyncTask);
     }
-
 }

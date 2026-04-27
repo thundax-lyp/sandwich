@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "OfficeQueryParam", description = "组织机构查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -53,5 +50,4 @@ public class OfficeQueryParam implements Serializable {
     public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
-
 }

@@ -10,6 +10,15 @@ import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,19 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-/**
- * 使用 access token 恢复后台认证上下文。
- */
+/** 使用 access token 恢复后台认证上下文。 */
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String HEADER_TOKEN = Constants.HEADER_TOKEN;
@@ -43,9 +40,10 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final AuthService authService;
     private final PermissionService permissionService;
 
-    public AccessTokenAuthenticationFilter(VltavaProperties.AccessTokenFilterProperties properties,
-                                           AuthService authService,
-                                           PermissionService permissionService) {
+    public AccessTokenAuthenticationFilter(
+            VltavaProperties.AccessTokenFilterProperties properties,
+            AuthService authService,
+            PermissionService permissionService) {
         if (properties.getExcludePath() != null) {
             this.excludePatternList.addAll(properties.getExcludePath());
         }
@@ -67,9 +65,9 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String token = findToken(request);
         if (StringUtils.isBlank(token)) {
             writeError(response);
@@ -96,10 +94,12 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         authService.activeAccessToken(accessToken);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                accessToken.getUserId(),
-                token,
-                toAuthorities(session.getPermissions())));
+        SecurityContextHolder.getContext()
+                .setAuthentication(
+                        new UsernamePasswordAuthenticationToken(
+                                accessToken.getUserId(),
+                                token,
+                                toAuthorities(session.getPermissions())));
 
         filterChain.doFilter(request, response);
     }
@@ -126,7 +126,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void writeError(HttpServletResponse response) throws IOException {
-        String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
+        String jsonString =
+                JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
 
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

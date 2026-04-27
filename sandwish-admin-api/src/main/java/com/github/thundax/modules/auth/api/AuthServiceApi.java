@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @Api(tags = "01-01. 鉴权")
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
@@ -32,7 +30,6 @@ public interface AuthServiceApi {
     @SysLogger("请求登录令牌")
     AuthLoginFormResponse loginForm() throws ApiException;
 
-
     /**
      * 刷新登录令牌
      *
@@ -43,8 +40,8 @@ public interface AuthServiceApi {
     @ApiOperation(value = "刷新登录令牌", notes = "ignore")
     @PostMapping(value = "form/refresh")
     @SysLogger("刷新登录令牌")
-    AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request) throws ApiException;
-
+    AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request)
+            throws ApiException;
 
     /**
      * 用户/密码登录
@@ -58,7 +55,6 @@ public interface AuthServiceApi {
     @SysLogger("用户/密码登录")
     AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException;
 
-
     /**
      * 登出
      *
@@ -70,5 +66,4 @@ public interface AuthServiceApi {
     @PostMapping(value = "logout")
     @SysLogger("登出")
     Boolean logout(@RequestBody AuthLogoutRequest request) throws ApiException;
-
 }

@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 机构业务模型与持久化对象转换器。
- */
+/** 机构业务模型与持久化对象转换器。 */
 public final class OfficePersistenceAssembler {
 
-    private OfficePersistenceAssembler() {
-    }
+    private OfficePersistenceAssembler() {}
 
     public static OfficeDO toDataObject(Office entity) {
         if (entity == null) {
@@ -59,7 +55,7 @@ public final class OfficePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Office> entities = ListUtils.newArrayList();
+        List<Office> entities = new ArrayList<>();
         for (OfficeDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

@@ -36,5 +36,4 @@ public abstract class AbstractSignServiceImpl implements SignService {
 
         signatureService.delete(query);
     }
-
 }

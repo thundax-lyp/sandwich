@@ -11,17 +11,13 @@ public class Resource implements Comparable<Resource> {
 
     private MetaFile metaFile;
 
-    public Resource() {
-
-    }
+    public Resource() {}
 
     public Resource(MetaFile metaFile) {
         this.setMetaFile(metaFile);
     }
 
-    /**
-     * get/set metaFile
-     */
+    /** get/set metaFile */
     public MetaFile getMetaFile() {
         return this.metaFile;
     }
@@ -30,9 +26,7 @@ public class Resource implements Comparable<Resource> {
         this.metaFile = metaFile;
     }
 
-    /**
-     * get name
-     */
+    /** get name */
     public String getName() {
         return this.metaFile.getName();
     }
@@ -41,37 +35,27 @@ public class Resource implements Comparable<Resource> {
         return this.metaFile.getExtName();
     }
 
-    /**
-     * get path
-     */
+    /** get path */
     public String getPath() {
         return this.metaFile.getPath();
     }
 
-    /**
-     * get pathname
-     */
+    /** get pathname */
     public String getPathname() {
         return this.metaFile.getPathname();
     }
 
-    /**
-     * get lastModified
-     */
+    /** get lastModified */
     public Date getLastModified() {
         return this.metaFile.getLastModified();
     }
 
-    /**
-     * get length
-     */
+    /** get length */
     public long getLength() {
         return this.metaFile.getLength();
     }
 
-    /**
-     * is file/folder
-     */
+    /** is file/folder */
     public boolean isFile() {
         return this.metaFile.isFile();
     }
@@ -84,5 +68,4 @@ public class Resource implements Comparable<Resource> {
     public int compareTo(Resource that) {
         return getMetaFile().compareTo(that.getMetaFile());
     }
-
 }

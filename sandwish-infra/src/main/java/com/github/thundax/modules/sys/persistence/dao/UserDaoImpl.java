@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
@@ -9,14 +10,11 @@ import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
-/**
- * 用户 DAO 实现。
- */
+/** 用户 DAO 实现。 */
 @Repository
 public class UserDaoImpl implements UserDao {
 
@@ -24,7 +22,8 @@ public class UserDaoImpl implements UserDao {
     private final UserCacheSupport cacheSupport;
     private final RoleCacheSupport roleCacheSupport;
 
-    public UserDaoImpl(UserMapper mapper, UserCacheSupport cacheSupport, RoleCacheSupport roleCacheSupport) {
+    public UserDaoImpl(
+            UserMapper mapper, UserCacheSupport cacheSupport, RoleCacheSupport roleCacheSupport) {
         this.mapper = mapper;
         this.cacheSupport = cacheSupport;
         this.roleCacheSupport = roleCacheSupport;
@@ -37,7 +36,9 @@ public class UserDaoImpl implements UserDao {
             return user;
         }
 
-        user = UserPersistenceAssembler.toEntity(mapper.get(UserPersistenceAssembler.toDataObject(entity)));
+        user =
+                UserPersistenceAssembler.toEntity(
+                        mapper.get(UserPersistenceAssembler.toDataObject(entity)));
         cacheSupport.putById(user);
         return user;
     }
@@ -56,7 +57,8 @@ public class UserDaoImpl implements UserDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<User> uncachedUserList = UserPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+            List<User> uncachedUserList =
+                    UserPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
             for (User user : uncachedUserList) {
                 cacheSupport.putById(user);
                 userList.add(user);
@@ -70,7 +72,7 @@ public class UserDaoImpl implements UserDao {
     public List<User> findList(User entity) {
         List<UserDO> dataObjects = mapper.findList(UserPersistenceAssembler.toDataObject(entity));
         List<User> entities = UserPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);
@@ -155,9 +157,12 @@ public class UserDaoImpl implements UserDao {
     public List<Role> findUserRole(User user) {
         List<String> roleIds = cacheSupport.getUserRoleIds(user.getId());
         if (roleIds == null) {
-            roleIds = ListUtils.map(
-                    UserPersistenceAssembler.toRoleList(mapper.findUserRole(UserPersistenceAssembler.toDataObject(user))),
-                    Role::getId);
+            roleIds =
+                    ListUtils.map(
+                            UserPersistenceAssembler.toRoleList(
+                                    mapper.findUserRole(
+                                            UserPersistenceAssembler.toDataObject(user))),
+                            Role::getId);
             cacheSupport.putUserRoleIds(user.getId(), roleIds);
         }
         return ListUtils.map(roleIds, Role::new);

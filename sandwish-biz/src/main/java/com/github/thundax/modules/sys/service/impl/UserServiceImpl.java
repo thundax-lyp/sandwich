@@ -9,14 +9,11 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements UserService {
@@ -24,7 +21,8 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
     private final SignService signService;
     private final UserEncryptService userEncryptService;
 
-    public UserServiceImpl(UserDao dao, SignService signService, UserEncryptService userEncryptService) {
+    public UserServiceImpl(
+            UserDao dao, SignService signService, UserEncryptService userEncryptService) {
         super(dao);
         this.signService = signService;
         this.userEncryptService = userEncryptService;
@@ -129,5 +127,4 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
     public List<Role> findUserRole(User user) {
         return dao.findUserRole(user);
     }
-
 }

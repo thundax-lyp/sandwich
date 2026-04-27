@@ -4,8 +4,7 @@ public class LoginFialVo {
     private String usernme;
     private int count;
 
-    public LoginFialVo() {
-    }
+    public LoginFialVo() {}
 
     public LoginFialVo(String usernme, int count) {
         this.usernme = usernme;

@@ -16,5 +16,4 @@ public interface UserEncryptService extends CrudService<UserEncrypt> {
      * @param userEncrypt 用户
      */
     void updateLoginPass(UserEncrypt userEncrypt);
-
 }

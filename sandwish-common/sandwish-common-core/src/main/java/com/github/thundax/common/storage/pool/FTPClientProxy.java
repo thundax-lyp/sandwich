@@ -1,17 +1,14 @@
 package com.github.thundax.common.storage.pool;
 
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 
-/**
- * 代理FTPClient，处理命令编码，这里也可以使用AOP方式
- */
+/** 代理FTPClient，处理命令编码，这里也可以使用AOP方式 */
 public class FTPClientProxy {
 
     private FTPClient ftpClient;
@@ -20,9 +17,7 @@ public class FTPClientProxy {
         this.ftpClient = ftpClient;
     }
 
-    /**
-     * get/set ftpClient
-     */
+    /** get/set ftpClient */
     public FTPClient getFTPClient() {
         return this.ftpClient;
     }
@@ -69,5 +64,4 @@ public class FTPClientProxy {
         }
         return new String(appString.getBytes(), StandardCharsets.ISO_8859_1);
     }
-
 }

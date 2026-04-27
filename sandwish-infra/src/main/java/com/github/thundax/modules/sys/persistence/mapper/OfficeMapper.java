@@ -2,13 +2,10 @@ package com.github.thundax.modules.sys.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 机构 MyBatis Mapper。
- */
+/** 机构 MyBatis Mapper。 */
 @MyBatisDao
 public interface OfficeMapper {
 
@@ -42,5 +39,6 @@ public interface OfficeMapper {
 
     void moveTreeLfts(@Param("from") Integer from, @Param("offset") Integer offset);
 
-    void moveTreeNodes(@Param("from") Integer from, @Param("to") Integer to, @Param("offset") Integer offset);
+    void moveTreeNodes(
+            @Param("from") Integer from, @Param("to") Integer to, @Param("offset") Integer offset);
 }

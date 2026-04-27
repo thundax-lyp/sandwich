@@ -1,7 +1,5 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.service.impl.CrudServiceImpl;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
@@ -9,15 +7,13 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.service.MenuService;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements MenuService {
@@ -32,15 +28,14 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
 
     @Override
     public List<Menu> findList(Integer maxRank) {
-        List<Menu> menus = ListUtils.newArrayList(dao.findList(new Menu()));
+        List<Menu> menus = new ArrayList<>(dao.findList(new Menu()));
         menus.removeIf(menu -> menu.getRanks() > maxRank);
         return menus;
     }
 
-
     @Override
     public List<Menu> findChildList(String parentId) {
-        List<Menu> menus = ListUtils.newArrayList(dao.findList(new Menu()));
+        List<Menu> menus = new ArrayList<>(dao.findList(new Menu()));
         menus.removeIf(menu -> !StringUtils.equals(menu.getParentId(), parentId));
         return menus;
     }
@@ -60,7 +55,6 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
         notifyCacheChanged();
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateDisplayFlag(Menu menu) {
@@ -71,13 +65,11 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
         return result;
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateDisplayFlag(List<Menu> list) {
         return batchOperate(list, this::updateDisplayFlag);
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -109,14 +101,12 @@ public class MenuServiceImpl extends CrudServiceImpl<MenuDao, Menu> implements M
     }
 
     private void notifyCacheChanged() {
-        MapUtils.forEach(SpringContextHolder.getBeansOfType(CacheChangedListener.class),
-                (name, listener) -> listener.onMenuCacheChanged());
+        SpringContextHolder.getBeansOfType(CacheChangedListener.class)
+                .forEach((name, listener) -> listener.onMenuCacheChanged());
     }
 
     public interface CacheChangedListener {
-        /**
-         * cache changed event
-         */
+        /** cache changed event */
         void onMenuCacheChanged();
     }
 }

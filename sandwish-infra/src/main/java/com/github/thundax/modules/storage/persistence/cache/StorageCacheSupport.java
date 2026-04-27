@@ -7,9 +7,7 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.storage.entity.Storage;
 import org.springframework.stereotype.Component;
 
-/**
- * 存储文件缓存支撑。
- */
+/** 存储文件缓存支撑。 */
 @Component
 public class StorageCacheSupport {
 

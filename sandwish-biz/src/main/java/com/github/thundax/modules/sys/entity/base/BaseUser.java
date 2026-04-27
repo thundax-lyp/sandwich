@@ -2,12 +2,9 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.User;
-
 import java.util.Date;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseUser extends AdminDataEntity<User> {
 
     private static final long serialVersionUID = 1L;

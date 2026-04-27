@@ -1,19 +1,15 @@
 package com.github.thundax.common.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.text.StringEscapeUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-
 /**
- * 封装各种格式的编码解码工具类.
- * 1.Commons-Codec的 hex/base64 编码
- * 2.自制的base62 编码
- * 3.Commons-Lang的xml/html escape
+ * 封装各种格式的编码解码工具类. 1.Commons-Codec的 hex/base64 编码 2.自制的base62 编码 3.Commons-Lang的xml/html escape
  * 4.JDK提供的URLEncoder
  *
  * @author calvin
@@ -22,19 +18,15 @@ import java.net.URLEncoder;
 public class Encodes {
 
     private static final String DEFAULT_URL_ENCODING = "UTF-8";
-    private static final char[] BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            .toCharArray();
+    private static final char[] BASE62 =
+            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 
-    /**
-     * Hex编码.
-     */
+    /** Hex编码. */
     public static String encodeHex(byte[] input) {
         return new String(Hex.encodeHex(input));
     }
 
-    /**
-     * Hex解码.
-     */
+    /** Hex解码. */
     public static byte[] decodeHex(String input) {
         try {
             return Hex.decodeHex(input.toCharArray());
@@ -44,16 +36,12 @@ public class Encodes {
         return null;
     }
 
-    /**
-     * Base64编码.
-     */
+    /** Base64编码. */
     public static String encodeBase64(byte[] input) {
         return new String(Base64.encodeBase64(input));
     }
 
-    /**
-     * Base64编码.
-     */
+    /** Base64编码. */
     public static String encodeBase64(String input) {
         try {
             return new String(Base64.encodeBase64(input.getBytes(DEFAULT_URL_ENCODING)));
@@ -69,16 +57,12 @@ public class Encodes {
     // return Base64.encodeBase64URLSafe(input);
     // }
 
-    /**
-     * Base64解码.
-     */
+    /** Base64解码. */
     public static byte[] decodeBase64(String input) {
         return Base64.decodeBase64(input.getBytes());
     }
 
-    /**
-     * Base64解码.
-     */
+    /** Base64解码. */
     public static String decodeBase64String(String input) {
         try {
             return new String(Base64.decodeBase64(input.getBytes()), DEFAULT_URL_ENCODING);
@@ -87,9 +71,7 @@ public class Encodes {
         }
     }
 
-    /**
-     * Base62编码。
-     */
+    /** Base62编码。 */
     public static String encodeBase62(byte[] input) {
         char[] chars = new char[input.length];
         for (int i = 0; i < input.length; i++) {
@@ -98,37 +80,27 @@ public class Encodes {
         return new String(chars);
     }
 
-    /**
-     * Html 转码.
-     */
+    /** Html 转码. */
     public static String escapeHtml(String html) {
         return StringEscapeUtils.escapeHtml4(html);
     }
 
-    /**
-     * Html 解码.
-     */
+    /** Html 解码. */
     public static String unescapeHtml(String htmlEscaped) {
         return StringEscapeUtils.unescapeHtml4(htmlEscaped);
     }
 
-    /**
-     * Xml 转码.
-     */
+    /** Xml 转码. */
     public static String escapeXml(String xml) {
         return StringEscapeUtils.escapeXml10(xml);
     }
 
-    /**
-     * Xml 解码.
-     */
+    /** Xml 解码. */
     public static String unescapeXml(String xmlEscaped) {
         return StringEscapeUtils.unescapeXml(xmlEscaped);
     }
 
-    /**
-     * URL 编码, Encode默认为UTF-8.
-     */
+    /** URL 编码, Encode默认为UTF-8. */
     public static String urlEncode(String part) {
         if (StringUtils.isEmpty(part)) {
             return part;
@@ -140,9 +112,7 @@ public class Encodes {
         }
     }
 
-    /**
-     * URL 解码, Encode默认为UTF-8.
-     */
+    /** URL 解码, Encode默认为UTF-8. */
     public static String urlDecode(String part) {
         try {
             return URLDecoder.decode(part, DEFAULT_URL_ENCODING);

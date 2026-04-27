@@ -4,12 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.modules.sys.entity.base.BaseDict;
-
 import java.io.Serializable;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dict extends BaseDict {
@@ -71,5 +68,4 @@ public class Dict extends BaseDict {
             this.label = label;
         }
     }
-
 }

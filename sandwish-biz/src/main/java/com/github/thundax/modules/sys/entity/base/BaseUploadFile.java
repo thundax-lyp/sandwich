@@ -11,8 +11,7 @@ public class BaseUploadFile extends AdminDataEntity<UploadFile> {
     private String path;
     private byte[] content;
 
-    public BaseUploadFile() {
-    }
+    public BaseUploadFile() {}
 
     public BaseUploadFile(String id) {
         super(id);

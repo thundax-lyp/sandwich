@@ -1,9 +1,12 @@
-
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.exception.*;
 import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.FileUtils;
 import com.github.thundax.common.utils.StringUtils;
@@ -12,10 +15,9 @@ import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
 import com.github.thundax.modules.assist.service.KeypairService;
-import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
 import com.github.thundax.modules.auth.service.PasswordService;
-import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.api.UserServiceApi;
+import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -36,26 +38,24 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Validator;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class UserApiController extends BaseApiController implements UserServiceApi {
 
@@ -69,13 +69,14 @@ public class UserApiController extends BaseApiController implements UserServiceA
     private final UserInterfaceAssembler userInterfaceAssembler;
 
     @Autowired
-    public UserApiController(UserService userService,
-                             OfficeService officeService,
-                             RoleService roleService,
-                             Validator validator,
-                             KeypairService keypairService,
-                             PasswordService passwordService,
-                             UserInterfaceAssembler userInterfaceAssembler) {
+    public UserApiController(
+            UserService userService,
+            OfficeService officeService,
+            RoleService roleService,
+            Validator validator,
+            KeypairService keypairService,
+            PasswordService passwordService,
+            UserInterfaceAssembler userInterfaceAssembler) {
         super(validator);
 
         this.userService = userService;
@@ -86,9 +87,8 @@ public class UserApiController extends BaseApiController implements UserServiceA
         this.userInterfaceAssembler = userInterfaceAssembler;
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public UserResponse get(@RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.get(request.getId());
         if (bean == null) {
@@ -97,9 +97,8 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return userInterfaceAssembler.toResponse(bean);
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserResponse> list(@RequestBody UserQueryRequest request) throws ApiException {
         validate(request);
 
@@ -108,24 +107,25 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return ListUtils.map(userService.findList(query), userInterfaceAssembler::toResponse);
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public PageVo<UserResponse> page(@RequestBody UserQueryRequest request) throws ApiException {
         validate(request);
 
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
-        return entityPageToVo(userService.findPage(query, page), userInterfaceAssembler::toResponse);
+        return entityPageToVo(
+                userService.findPage(query, page), userInterfaceAssembler::toResponse);
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
+        String password =
+                Sm2.decrypt(
+                        request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validate(request);
         validateOffice(request.getOffice());
@@ -158,13 +158,15 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return userInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
+            String password =
+                    Sm2.decrypt(
+                            request.getLoginPass(),
+                            keypairService.getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }
@@ -176,7 +178,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new InvalidParameterException("loginName");
         }
 
-        if(!isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId())){
+        if (!isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId())) {
             throw new InvalidParameterException("ssoLoginName");
         }
 
@@ -185,16 +187,17 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
         // 非超管用户无权限开启/关闭管理员
-        if (!currentUser().isSuper() && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO).equals(bean.getAdminFlag())) {
+        if (!currentUser().isSuper()
+                && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO)
+                        .equals(bean.getAdminFlag())) {
             throw new PermissionDeniedException();
         }
         // 无权限修改超管/等级高于自身的用户信息
-        if(!currentUser().isSuper()){
+        if (!currentUser().isSuper()) {
             if (bean.isSuper() || (bean.getRanks() >= currentUser().getRanks())) {
                 throw new PermissionDeniedException();
             }
         }
-
 
         User entity = userInterfaceAssembler.toEntity(bean, request);
 
@@ -208,59 +211,67 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return userInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:edit")
-    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar)
+            throws ApiException {
         return true;
     }
 
     @Override
-    @RequiresPermissions("sys:user:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean deleteAvatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return true;
     }
 
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public String avatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return "";
     }
 
     @Override
-    @RequiresPermissions("sys:user:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean updateEnableFlag(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = currentUser();
 
-        List<User> beanList = validateList(list,
-                vo -> userService.get(vo.getId()),
-                (bean, vo) -> {
-                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                        throw new PermissionDeniedException();
-                    }
-                    return true;
-                },
-                (bean, vo) -> bean.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE));
+        List<User> beanList =
+                validateList(
+                        list,
+                        vo -> userService.get(vo.getId()),
+                        (bean, vo) -> {
+                            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                                throw new PermissionDeniedException();
+                            }
+                            return true;
+                        },
+                        (bean, vo) ->
+                                bean.setEnableFlag(
+                                        Boolean.TRUE.equals(vo.getEnable())
+                                                ? Global.ENABLE
+                                                : Global.DISABLE));
 
         userService.updateEnableFlag(beanList);
 
         return true;
     }
 
-
     @Override
-    @RequiresPermissions("sys:user:edit")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = currentUser();
 
-        List<User> beanList = validateList(list,
-                vo -> userService.get(vo.getId()),
-                (bean, vo) -> {
-                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                        throw new PermissionDeniedException();
-                    }
-                    return true;
-                }, null);
+        List<User> beanList =
+                validateList(
+                        list,
+                        vo -> userService.get(vo.getId()),
+                        (bean, vo) -> {
+                            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                                throw new PermissionDeniedException();
+                            }
+                            return true;
+                        },
+                        null);
 
         userService.delete(beanList);
 
@@ -268,25 +279,26 @@ public class UserApiController extends BaseApiController implements UserServiceA
     }
 
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public Boolean check(@RequestBody UserCheckRequest request) {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
 
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public Boolean checkSsoLoginName(@RequestBody UserCheckRequest request) {
         return isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId());
     }
 
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserOfficeResponse> officeTree() {
-        return ListUtils.map(officeService.findList(new Office()), userInterfaceAssembler::toOfficeResponse);
+        return ListUtils.map(
+                officeService.findList(new Office()), userInterfaceAssembler::toOfficeResponse);
     }
 
     @Override
-    @RequiresPermissions("sys:user:view")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserRoleResponse> roleList() {
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
@@ -297,8 +309,9 @@ public class UserApiController extends BaseApiController implements UserServiceA
     }
 
     @Override
-    @RequiresPermissions("user")
-    public void avatarImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
+    public void avatarImage(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         String userId = request.getParameter("id");
         if (StringUtils.isBlank(userId)) {
             response.sendError(HttpStatus.NOT_FOUND.value());
@@ -316,9 +329,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         response.setDateHeader("Expires", 0);
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 
-        IOUtils.write(
-                FileUtils.readFileToByteArray(avatarFile),
-                response.getOutputStream());
+        IOUtils.write(FileUtils.readFileToByteArray(avatarFile), response.getOutputStream());
     }
 
     private User readQuery(UserQueryRequest request) throws ApiException {
@@ -347,7 +358,6 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return query;
     }
 
-
     private void validateOffice(UserOfficeRequest request) throws ApiException {
         if (request == null || StringUtils.isBlank(request.getId())) {
             throw new InvalidParameterException("office.id");
@@ -359,7 +369,6 @@ public class UserApiController extends BaseApiController implements UserServiceA
             }
         }
     }
-
 
     private void validateRoles(List<UserRoleRequest> requestList) throws ApiException {
         if (ListUtils.isEmpty(requestList)) {
@@ -395,7 +404,6 @@ public class UserApiController extends BaseApiController implements UserServiceA
         page.setPageSize(pageSize);
         return page;
     }
-
 
     private boolean isLoginNameAvailable(String loginName, String id) {
         if (StringUtils.isBlank(loginName)) {

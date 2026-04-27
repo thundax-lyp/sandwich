@@ -6,9 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class Mp3Builder {
 
     private static final int FILE_HEADER_SIZE = 45;
@@ -43,5 +41,4 @@ public class Mp3Builder {
 
         return outputStream.toByteArray();
     }
-
 }

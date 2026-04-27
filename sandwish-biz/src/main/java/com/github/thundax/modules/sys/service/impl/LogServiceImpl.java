@@ -6,14 +6,11 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class LogServiceImpl extends CrudServiceImpl<LogDao, Log> implements LogService {
@@ -61,5 +58,4 @@ public class LogServiceImpl extends CrudServiceImpl<LogDao, Log> implements LogS
     public int batchDelete(Log log) {
         return dao.batchDelete(log);
     }
-
 }

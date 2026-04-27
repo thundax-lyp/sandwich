@@ -1,17 +1,14 @@
 package com.github.thundax.modules.sys.handler;
 
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @ControllerAdvice
 @ResponseBody
 public class GlobalExceptionHandler {
@@ -30,10 +27,9 @@ public class GlobalExceptionHandler {
             code = HttpStatus.INTERNAL_SERVER_ERROR.value();
         }
 
-        Map<String, Object> map = MapUtils.newHashMap();
+        Map<String, Object> map = new HashMap<>();
         map.put("code", code);
         map.put("message", message);
         return map;
     }
-
 }

@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.service;
 
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.member.entity.Member;
-
 import java.util.List;
 
 /**
@@ -65,13 +64,9 @@ public interface MemberService extends CrudService<Member> {
      */
     int updateEnableFlag(List<Member> list);
 
-    /**
-     * 根据证件号码查询
-     */
+    /** 根据证件号码查询 */
     Member getByZjhm(Member member);
 
-    /**
-     * 根据一网通办的id查询
-     */
+    /** 根据一网通办的id查询 */
     Member getByYwtbId(String ywtbUserId);
 }

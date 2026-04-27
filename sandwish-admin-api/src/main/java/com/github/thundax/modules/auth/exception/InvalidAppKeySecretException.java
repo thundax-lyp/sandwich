@@ -15,5 +15,4 @@ public class InvalidAppKeySecretException extends ApiException {
     public InvalidAppKeySecretException() {
         super(I18nMessages.getMessage("auth.exception.invalid-appKey-appSecret"));
     }
-
 }

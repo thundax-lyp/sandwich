@@ -1,34 +1,33 @@
 package com.github.thundax.modules.sys.utils;
 
-import com.google.common.collect.Lists;
-import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Lazy(false)
 public class DictServiceHolder {
 
     private static DictService service;
 
-    private static final Map<String, List<Dict>> TYPE_DICT_MAP = MapUtils.newConcurrentMap();
+    private static final Map<String, List<Dict>> TYPE_DICT_MAP = new ConcurrentHashMap<>();
     private static String lastCacheVersion = IdGen.uuid();
 
-    private static final PooledThreadLocal<Map<String, Dict>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<String, Dict>> ID_OBJECT_HOLDER =
+            new PooledThreadLocal<>();
     private static final PooledThreadLocal<String> CACHE_VERSION_HOLDER = new PooledThreadLocal<>();
 
     @Autowired
@@ -48,17 +47,18 @@ public class DictServiceHolder {
             return null;
         }
         return ID_OBJECT_HOLDER
-                .computeIfAbsent(MapUtils::newHashMap)
+                .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(id, (key) -> getService().get(id));
     }
 
     public static synchronized List<Dict> getDictList(String type) {
-        String currentCacheVersion = CACHE_VERSION_HOLDER.computeIfAbsent(() -> getService().getDictionaryRevision());
+        String currentCacheVersion =
+                CACHE_VERSION_HOLDER.computeIfAbsent(() -> getService().getDictionaryRevision());
 
         if (!StringUtils.equals(currentCacheVersion, lastCacheVersion)) {
             TYPE_DICT_MAP.clear();
             for (Dict dict : getService().findList(new Dict())) {
-                TYPE_DICT_MAP.computeIfAbsent(dict.getType(), key -> ListUtils.newArrayList()).add(dict);
+                TYPE_DICT_MAP.computeIfAbsent(dict.getType(), key -> new ArrayList<>()).add(dict);
             }
             lastCacheVersion = currentCacheVersion;
         }
@@ -80,5 +80,4 @@ public class DictServiceHolder {
         }
         return defaultValue;
     }
-
 }

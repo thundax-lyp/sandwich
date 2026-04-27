@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.vo.query.PageQueryParam;
 import io.swagger.annotations.ApiModel;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "DictQueryParam", description = "字典查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

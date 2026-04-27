@@ -5,9 +5,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @Configuration
 public class RabbitMqConfiguration {
 
@@ -15,5 +13,4 @@ public class RabbitMqConfiguration {
     public Queue saveLogQueue() {
         return new Queue(SysLogUtils.QUEUE_SAVE_LOG);
     }
-
 }

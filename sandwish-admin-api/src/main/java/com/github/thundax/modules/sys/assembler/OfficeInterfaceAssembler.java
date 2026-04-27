@@ -67,7 +67,8 @@ public class OfficeInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, OfficeSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(
+            T entity, OfficeSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

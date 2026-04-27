@@ -1,18 +1,20 @@
 package com.github.thundax.common.web;
 
-import com.google.common.net.HttpHeaders;
 import com.github.thundax.common.utils.Encodes;
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
+import com.google.common.net.HttpHeaders;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.util.Map.Entry;
+import org.apache.commons.lang3.Validate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Http与Servlet工具类.
@@ -23,20 +25,16 @@ public class Servlets {
 
     public static final long ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-    /**
-     * 设置客户端缓存过期时间 的Header.
-     */
+    /** 设置客户端缓存过期时间 的Header. */
     public static void setExpiresHeader(HttpServletResponse response, long expiresSeconds) {
         // Http 1.0 header, set a fix expires date.
-        response.setDateHeader(HttpHeaders.EXPIRES,
-                System.currentTimeMillis() + expiresSeconds * 1000);
+        response.setDateHeader(
+                HttpHeaders.EXPIRES, System.currentTimeMillis() + expiresSeconds * 1000);
         // Http 1.1 header, set a time after now.
         response.setHeader(HttpHeaders.CACHE_CONTROL, "private, max-age=" + expiresSeconds);
     }
 
-    /**
-     * 设置禁止客户端缓存的Header.
-     */
+    /** 设置禁止客户端缓存的Header. */
     public static void setNoCacheHeader(HttpServletResponse response) {
         // Http 1.0 header
         response.setDateHeader(HttpHeaders.EXPIRES, 1L);
@@ -45,16 +43,12 @@ public class Servlets {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0");
     }
 
-    /**
-     * 设置LastModified Header.
-     */
+    /** 设置LastModified Header. */
     public static void setLastModifiedHeader(HttpServletResponse response, long lastModifiedDate) {
         response.setDateHeader(HttpHeaders.LAST_MODIFIED, lastModifiedDate);
     }
 
-    /**
-     * 设置Etag Header.
-     */
+    /** 设置Etag Header. */
     public static void setEtag(HttpServletResponse response, String etag) {
         response.setHeader(HttpHeaders.ETAG, etag);
     }
@@ -68,7 +62,8 @@ public class Servlets {
         try {
             // 中文文件名支持
             String encodedFileName = new String(fileName.getBytes(), "ISO8859-1");
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+            response.setHeader(
+                    HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + encodedFileName + "\"");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -77,12 +72,12 @@ public class Servlets {
 
     /**
      * 取得带相同前缀的Request Parameters, copy from spring WebUtils.
-     * <p/>
-     * 返回的结果的Parameter名已去除前缀.
+     *
+     * <p>返回的结果的Parameter名已去除前缀.
      */
     @SuppressWarnings("rawtypes")
-    public static Map<String, Object> getParametersStartingWith(ServletRequest request,
-                                                                String prefix) {
+    public static Map<String, Object> getParametersStartingWith(
+            ServletRequest request, String prefix) {
         Validate.notNull(request, "Request must not be null");
         Enumeration paramNames = request.getParameterNames();
         Map<String, Object> params = new TreeMap<String, Object>();
@@ -95,12 +90,9 @@ public class Servlets {
             if ("".equals(pre) || paramName.startsWith(pre)) {
                 String unprefixed = paramName.substring(pre.length());
                 String[] values = request.getParameterValues(paramName);
-                if (values == null || values.length == 0) {
-
-                    // Do nothing, no values found at all.
-                } else if (values.length > 1) {
+                if (values != null && values.length > 1) {
                     params.put(unprefixed, values);
-                } else {
+                } else if (values != null && values.length == 1) {
                     params.put(unprefixed, values[0]);
                 }
             }
@@ -108,11 +100,9 @@ public class Servlets {
         return params;
     }
 
-    /**
-     * 组合Parameters生成Query String的Parameter部分,并在paramter name上加上prefix.
-     */
-    public static String encodeParameterStringWithPrefix(Map<String, Object> params,
-                                                         String prefix) {
+    /** 组合Parameters生成Query String的Parameter部分,并在paramter name上加上prefix. */
+    public static String encodeParameterStringWithPrefix(
+            Map<String, Object> params, String prefix) {
         StringBuilder queryStringBuilder = new StringBuilder();
 
         String pre = prefix;
@@ -122,7 +112,10 @@ public class Servlets {
         Iterator<Entry<String, Object>> it = params.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String, Object> entry = it.next();
-            queryStringBuilder.append(pre).append(entry.getKey()).append("=")
+            queryStringBuilder
+                    .append(pre)
+                    .append(entry.getKey())
+                    .append("=")
                     .append(entry.getValue());
             if (it.hasNext()) {
                 queryStringBuilder.append("&");
@@ -131,17 +124,13 @@ public class Servlets {
         return queryStringBuilder.toString();
     }
 
-    /**
-     * 客户端对Http Basic验证的 Header进行编码.
-     */
+    /** 客户端对Http Basic验证的 Header进行编码. */
     public static String encodeHttpBasic(String userName, String password) {
         String encode = userName + ":" + password;
         return "Basic " + Encodes.encodeBase64(encode.getBytes());
     }
 
-    /**
-     * 是否是Ajax异步请求
-     */
+    /** 是否是Ajax异步请求 */
     public static boolean isAjaxRequest(HttpServletRequest request) {
 
         String accept = request.getHeader("Accept");
@@ -152,9 +141,7 @@ public class Servlets {
                 || (xRequestedWith != null && xRequestedWith.contains("XMLHttpRequest"))));
     }
 
-    /**
-     * 获取当前请求对象
-     */
+    /** 获取当前请求对象 */
     public static HttpServletRequest getRequest() {
         try {
             return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
@@ -164,12 +151,10 @@ public class Servlets {
         }
     }
 
-    /**
-     * 判断访问URI是否是静态文件请求
-     */
+    /** 判断访问URI是否是静态文件请求 */
     public static boolean isStaticFile(String uri) {
-        return StringUtils.endsWithAny(uri,
-                ".css", ".js",
-                ".png", ".jpg", ".gif", ".jpeg", ".bmp", ".ico", ".swf", ".psd", ".htc", ".crx", ".xpi");
+        return StringUtils.endsWithAny(
+                uri, ".css", ".js", ".png", ".jpg", ".gif", ".jpeg", ".bmp", ".ico", ".swf", ".psd",
+                ".htc", ".crx", ".xpi");
     }
 }

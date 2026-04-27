@@ -1,8 +1,6 @@
 package com.github.thundax.modules.member.service;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface MemberAccessService {
 
     /**
@@ -23,9 +21,8 @@ public interface MemberAccessService {
     /**
      * 设置session缓存对象
      *
-     * @param name  名称
+     * @param name 名称
      * @param value 对象
      */
     void setSessionCache(String name, Object value);
-
 }

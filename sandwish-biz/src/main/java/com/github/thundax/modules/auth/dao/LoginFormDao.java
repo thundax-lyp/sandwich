@@ -2,9 +2,7 @@ package com.github.thundax.modules.auth.dao;
 
 import com.github.thundax.modules.auth.entity.LoginForm;
 
-/**
- * login form DAO。
- */
+/** login form DAO。 */
 public interface LoginFormDao {
 
     /**
@@ -55,7 +53,7 @@ public interface LoginFormDao {
     /**
      * 更新图形验证码
      *
-     * @param token   登录令牌
+     * @param token 登录令牌
      * @param captcha 验证码
      */
     void updateCaptcha(String token, String captcha);
@@ -63,8 +61,8 @@ public interface LoginFormDao {
     /**
      * 更新短信验证码
      *
-     * @param token        登录令牌
-     * @param mobile       手机号码
+     * @param token 登录令牌
+     * @param mobile 手机号码
      * @param validateCode 验证码
      */
     void updateSmsValidateCode(String token, String mobile, String validateCode);

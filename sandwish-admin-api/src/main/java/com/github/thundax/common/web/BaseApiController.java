@@ -1,7 +1,6 @@
 package com.github.thundax.common.web;
 
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.EmptyCollectionException;
 import com.github.thundax.common.exception.InvalidBeanException;
@@ -18,23 +17,21 @@ import com.github.thundax.common.vo.BaseVo;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.vo.query.MoveTreeNodeQueryParam;
 import com.github.thundax.common.vo.query.PageQueryParam;
-import com.github.thundax.common.web.BaseController;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.lang.NonNull;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseApiController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,7 +48,8 @@ public abstract class BaseApiController extends BaseController {
 
     protected <T> void validate(T object, String... propertyNames) throws ApiException {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 throw new ApiException(constraintViolations.iterator().next().getMessage());
             }
@@ -69,15 +67,16 @@ public abstract class BaseApiController extends BaseController {
      * 校验并转换 VO list
      *
      * @param sourceList VO list
-     * @param supplier   service.get(vo.getId())
-     * @param <E>        entity
-     * @param <V>        vo
+     * @param supplier service.get(vo.getId())
+     * @param <E> entity
+     * @param <V> vo
      * @return entiry list
      * @throws ApiException API异常
      */
     @NonNull
-    protected static <E, V> List<E> validateList(@NonNull List<V> sourceList,
-                                                 @NonNull ThrowableFunction<V, E> supplier) throws ApiException {
+    protected static <E, V> List<E> validateList(
+            @NonNull List<V> sourceList, @NonNull ThrowableFunction<V, E> supplier)
+            throws ApiException {
         return validateList(sourceList, supplier, null, null);
     }
 
@@ -85,24 +84,26 @@ public abstract class BaseApiController extends BaseController {
      * 校验并转换 VO list
      *
      * @param sourceList VO list
-     * @param supplier   service.get(vo.getId())
-     * @param validator  validate(bean, vo)
-     * @param processor  bean.setXXX(vo.getXXX)
-     * @param <E>        entity
-     * @param <V>        vo
+     * @param supplier service.get(vo.getId())
+     * @param validator validate(bean, vo)
+     * @param processor bean.setXXX(vo.getXXX)
+     * @param <E> entity
+     * @param <V> vo
      * @return entiry list
      * @throws ApiException API异常
      */
     @NonNull
-    protected static <E, V> List<E> validateList(@NonNull List<V> sourceList,
-                                                 @NonNull ThrowableFunction<V, E> supplier,
-                                                 ThrowableBiPredicate<E, V> validator,
-                                                 ThrowableBiConsumer<E, V> processor) throws ApiException {
+    protected static <E, V> List<E> validateList(
+            @NonNull List<V> sourceList,
+            @NonNull ThrowableFunction<V, E> supplier,
+            ThrowableBiPredicate<E, V> validator,
+            ThrowableBiConsumer<E, V> processor)
+            throws ApiException {
         if (ListUtils.isEmpty(sourceList)) {
             throw new EmptyCollectionException();
         }
 
-        List<E> beanList = ListUtils.newArrayList();
+        List<E> beanList = new ArrayList<>();
 
         try {
             for (V vo : sourceList) {
@@ -157,17 +158,18 @@ public abstract class BaseApiController extends BaseController {
     /**
      * 排除树形列表的节点
      *
-     * @param nodeList   树形列表
-     * @param support    支持类
+     * @param nodeList 树形列表
+     * @param support 支持类
      * @param excludeIds 排除id列表
-     * @param <T>        对象类
+     * @param <T> 对象类
      * @return 树形列表
      */
-    protected static <T> List<T> removeTreeNode(@NonNull List<T> nodeList,
-                                                @NonNull RemoveTreeNodeSupport<T> support,
-                                                @NonNull Set<String> excludeIds) {
+    protected static <T> List<T> removeTreeNode(
+            @NonNull List<T> nodeList,
+            @NonNull RemoveTreeNodeSupport<T> support,
+            @NonNull Set<String> excludeIds) {
         // 创建id-data映射表，用于快速查询pid对应的数据
-        Set<String> ids = SetUtils.newHashSet(ListUtils.map(nodeList, support::getId));
+        Set<String> ids = new HashSet<>(ListUtils.map(nodeList, support::getId));
 
         int size = 0;
         while (size != nodeList.size()) {
@@ -237,7 +239,6 @@ public abstract class BaseApiController extends BaseController {
         }
     }
 
-
     public static <T> Page<T> readPage(PageQueryParam queryParam) {
         Integer pageNo = queryParam.getPageNo();
         Integer pageSize = queryParam.getPageSize();
@@ -268,5 +269,4 @@ public abstract class BaseApiController extends BaseController {
 
         return pageVo;
     }
-
 }

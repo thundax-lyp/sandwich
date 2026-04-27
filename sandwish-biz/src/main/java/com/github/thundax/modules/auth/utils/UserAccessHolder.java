@@ -5,17 +5,13 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import org.springframework.lang.NonNull;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class UserAccessHolder {
 
     private static final PooledThreadLocal<String> USER_ID_HOLDER = new PooledThreadLocal<>();
     private static final PooledThreadLocal<String> TOKEN_HOLDER = new PooledThreadLocal<>();
 
-    /**
-     * 获取当前用户
-     */
+    /** 获取当前用户 */
     @NonNull
     public static User currentUser() {
         User user = UserServiceHolder.get(currentUserId());
@@ -46,5 +42,4 @@ public class UserAccessHolder {
     public static String getLoginName() {
         return currentUser().getLoginName();
     }
-
 }

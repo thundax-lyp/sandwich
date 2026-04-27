@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.persistence.dao;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -10,31 +9,25 @@ import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-import java.util.Set;
-
-/**
- * login form Redis DAO 实现。
- */
+/** login form Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)
 public class LoginFormDaoImpl implements LoginFormDao {
 
-    private static final String CACHE_ = Constants.CACHE_PREFIX + "AUTH_LOGIN_";
+    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "AUTH_LOGIN_";
 
-    /**
-     * CACHE_TOKEN_ + token : LoginForm
-     */
-    private static final String CACHE_TOKEN_ = CACHE_ + "TOKEN_";
-    /**
-     * CACHE_REFRESH_TOKEN_ + refreshToken : loginToken
-     */
-    private static final String CACHE_REFRESH_TOKEN_ = CACHE_ + "REFRESH_";
+    /** TOKEN_PREFIX + token : LoginForm */
+    private static final String TOKEN_PREFIX = CACHE_SECTION + "TOKEN_";
+    /** REFRESH_TOKEN_PREFIX + refreshToken : loginToken */
+    private static final String REFRESH_TOKEN_PREFIX = CACHE_SECTION + "REFRESH_";
 
     private static final int REFRESH_REMAIN_SECONDS = 60;
 
@@ -50,12 +43,12 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     @Override
     public int getLoginCount() {
-        return redisClient.keys(CACHE_REFRESH_TOKEN_).size();
+        return redisClient.keys(REFRESH_TOKEN_PREFIX).size();
     }
 
     @Override
     public LoginForm getByToken(String loginToken) {
-        LoginFormDO formDO = redisClient.get(CACHE_TOKEN_ + loginToken, LoginFormDO.class);
+        LoginFormDO formDO = redisClient.get(TOKEN_PREFIX + loginToken, LoginFormDO.class);
         LoginForm form = AuthPersistenceAssembler.toEntity(formDO);
         if (form != null) {
             form.setLoginToken(loginToken);
@@ -65,7 +58,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     @Override
     public LoginForm getByRefreshToken(String refreshToken) {
-        String token = redisClient.get(CACHE_REFRESH_TOKEN_ + refreshToken);
+        String token = redisClient.get(REFRESH_TOKEN_PREFIX + refreshToken);
         if (StringUtils.isEmpty(token)) {
             return null;
         }
@@ -74,11 +67,13 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     @Override
     public void save(LoginForm form) {
-        Assert.isTrue(ListUtils.isNotEmpty(form.getRefreshTokenList()), "refreshTokenList can not be null");
+        Assert.isTrue(
+                ListUtils.isNotEmpty(form.getRefreshTokenList()),
+                "refreshTokenList can not be null");
 
-        Set<String> removeTokens = SetUtils.newHashSet();
+        Set<String> removeTokens = new HashSet<>();
         for (String refreshToken : form.getRefreshTokenList()) {
-            String oldToken = redisClient.get(CACHE_REFRESH_TOKEN_ + refreshToken);
+            String oldToken = redisClient.get(REFRESH_TOKEN_PREFIX + refreshToken);
             if (!StringUtils.equals(oldToken, form.getLoginToken())) {
                 removeTokens.add(oldToken);
             }
@@ -87,45 +82,52 @@ public class LoginFormDaoImpl implements LoginFormDao {
         for (int idx = form.getRefreshTokenList().size() - 1; idx >= 0; idx--) {
             String refreshToken = form.getRefreshTokenList().get(idx);
             if (idx == 0) {
-                redisClient.set(CACHE_REFRESH_TOKEN_ + refreshToken, form.getLoginToken(),
+                redisClient.set(
+                        REFRESH_TOKEN_PREFIX + refreshToken,
+                        form.getLoginToken(),
                         properties.getLoginExpiredSeconds() + SAFETY_SECONDS);
 
             } else if (idx < LoginForm.REFRESH_TOKEN_SIZE) {
-                if (!redisClient.exists(CACHE_REFRESH_TOKEN_ + refreshToken)) {
+                if (!redisClient.exists(REFRESH_TOKEN_PREFIX + refreshToken)) {
                     form.getRefreshTokenList().remove(idx);
                 } else if (idx == 1) {
-                    redisClient.set(CACHE_REFRESH_TOKEN_ + refreshToken, form.getLoginToken(), REFRESH_REMAIN_SECONDS);
+                    redisClient.set(
+                            REFRESH_TOKEN_PREFIX + refreshToken,
+                            form.getLoginToken(),
+                            REFRESH_REMAIN_SECONDS);
                 } else {
-                    redisClient.set(CACHE_REFRESH_TOKEN_ + refreshToken, form.getLoginToken());
+                    redisClient.set(REFRESH_TOKEN_PREFIX + refreshToken, form.getLoginToken());
                 }
 
             } else {
-                redisClient.delete(CACHE_REFRESH_TOKEN_ + refreshToken);
+                redisClient.delete(REFRESH_TOKEN_PREFIX + refreshToken);
                 form.getRefreshTokenList().remove(idx);
             }
         }
 
         LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
-        redisClient.set(CACHE_TOKEN_ + form.getLoginToken(), formDO,
+        redisClient.set(
+                TOKEN_PREFIX + form.getLoginToken(),
+                formDO,
                 properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
 
-        SetUtils.forEach(removeTokens,
-                token -> redisClient.delete(CACHE_TOKEN_ + token));
+        removeTokens.forEach(token -> redisClient.delete(TOKEN_PREFIX + token));
     }
 
     @Override
     public void deleteByToken(String loginToken) {
         LoginForm form = getByToken(loginToken);
         if (form != null) {
-            redisClient.delete(CACHE_TOKEN_ + loginToken);
-            ListUtils.forEach(form.getRefreshTokenList(),
-                    refreshToken -> redisClient.delete(CACHE_REFRESH_TOKEN_ + refreshToken));
+            redisClient.delete(TOKEN_PREFIX + loginToken);
+            ListUtils.forEach(
+                    form.getRefreshTokenList(),
+                    refreshToken -> redisClient.delete(REFRESH_TOKEN_PREFIX + refreshToken));
         }
     }
 
     @Override
     public boolean tokenExists(String token) {
-        return redisClient.exists(CACHE_TOKEN_ + token);
+        return redisClient.exists(TOKEN_PREFIX + token);
     }
 
     @Override
@@ -134,7 +136,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
         if (form != null) {
             form.setCaptcha(captcha);
             LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
-            redisClient.set(CACHE_TOKEN_ + loginToken, formDO,
+            redisClient.set(
+                    TOKEN_PREFIX + loginToken,
+                    formDO,
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }
@@ -146,7 +150,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
             form.setMobile(mobile);
             form.setMobileValidateCode(validateCode);
             LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
-            redisClient.set(CACHE_TOKEN_ + loginToken, formDO,
+            redisClient.set(
+                    TOKEN_PREFIX + loginToken,
+                    formDO,
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         }
     }

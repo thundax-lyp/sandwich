@@ -1,17 +1,15 @@
 package com.github.thundax.modules.assist.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.persistence.assembler.SignaturePersistenceAssembler;
 import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
 import com.github.thundax.modules.assist.persistence.mapper.SignatureMapper;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * 签名 DAO 实现。
- */
+/** 签名 DAO 实现。 */
 @Repository
 public class SignatureDaoImpl implements SignatureDao {
 
@@ -23,7 +21,8 @@ public class SignatureDaoImpl implements SignatureDao {
 
     @Override
     public Signature get(Signature entity) {
-        return SignaturePersistenceAssembler.toEntity(mapper.get(SignaturePersistenceAssembler.toDataObject(entity)));
+        return SignaturePersistenceAssembler.toEntity(
+                mapper.get(SignaturePersistenceAssembler.toDataObject(entity)));
     }
 
     @Override
@@ -34,9 +33,10 @@ public class SignatureDaoImpl implements SignatureDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Signature> findList(Signature entity) {
-        List<SignatureDO> dataObjects = mapper.findList(SignaturePersistenceAssembler.toDataObject(entity));
+        List<SignatureDO> dataObjects =
+                mapper.findList(SignaturePersistenceAssembler.toDataObject(entity));
         List<Signature> entities = SignaturePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

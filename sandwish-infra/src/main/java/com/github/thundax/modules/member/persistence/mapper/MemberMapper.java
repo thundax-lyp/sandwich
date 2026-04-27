@@ -2,13 +2,10 @@ package com.github.thundax.modules.member.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 会员 MyBatis Mapper。
- */
+/** 会员 MyBatis Mapper。 */
 @MyBatisDao
 public interface MemberMapper {
 

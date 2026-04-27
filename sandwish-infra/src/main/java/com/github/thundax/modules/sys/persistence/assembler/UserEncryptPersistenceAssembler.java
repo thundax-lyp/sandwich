@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 用户加密信息业务模型与持久化对象转换器。
- */
+/** 用户加密信息业务模型与持久化对象转换器。 */
 public final class UserEncryptPersistenceAssembler {
 
-    private UserEncryptPersistenceAssembler() {
-    }
+    private UserEncryptPersistenceAssembler() {}
 
     public static UserEncryptDO toDataObject(UserEncrypt entity) {
         if (entity == null) {
@@ -60,7 +56,7 @@ public final class UserEncryptPersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<UserEncrypt> entities = ListUtils.newArrayList();
+        List<UserEncrypt> entities = new ArrayList<>();
         for (UserEncryptDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

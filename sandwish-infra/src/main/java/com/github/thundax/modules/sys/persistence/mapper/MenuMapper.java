@@ -2,13 +2,10 @@ package com.github.thundax.modules.sys.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 菜单 MyBatis Mapper。
- */
+/** 菜单 MyBatis Mapper。 */
 @MyBatisDao
 public interface MenuMapper {
 
@@ -42,8 +39,8 @@ public interface MenuMapper {
 
     void moveTreeLfts(@Param("from") Integer from, @Param("offset") Integer offset);
 
-    void moveTreeNodes(@Param("from") Integer from, @Param("to") Integer to,
-                       @Param("offset") Integer offset);
+    void moveTreeNodes(
+            @Param("from") Integer from, @Param("to") Integer to, @Param("offset") Integer offset);
 
     /**
      * 更新 displayFlag。

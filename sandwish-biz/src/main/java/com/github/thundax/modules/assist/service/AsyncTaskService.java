@@ -2,9 +2,7 @@ package com.github.thundax.modules.assist.service;
 
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface AsyncTaskService {
 
     /**
@@ -28,5 +26,4 @@ public interface AsyncTaskService {
      * @param asyncTask asyncTask
      */
     void delete(AsyncTask asyncTask);
-
 }

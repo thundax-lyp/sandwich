@@ -12,8 +12,5 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VerifySignResponseParam extends BaseResponse {
 
-    public VerifySignResponseParam() {
-
-    }
-
+    public VerifySignResponseParam() {}
 }

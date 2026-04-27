@@ -1,20 +1,16 @@
 package com.github.thundax.modules.storage.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 存储业务模型与持久化对象转换器。
- */
+/** 存储业务模型与持久化对象转换器。 */
 public final class StoragePersistenceAssembler {
 
-    private StoragePersistenceAssembler() {
-    }
+    private StoragePersistenceAssembler() {}
 
     public static StorageDO toDataObject(Storage entity) {
         if (entity == null) {
@@ -63,7 +59,7 @@ public final class StoragePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Storage> entities = ListUtils.newArrayList();
+        List<Storage> entities = new ArrayList<>();
         for (StorageDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
@@ -112,7 +108,7 @@ public final class StoragePersistenceAssembler {
         if (entities == null) {
             return null;
         }
-        List<StorageBusinessDO> dataObjects = ListUtils.newArrayList();
+        List<StorageBusinessDO> dataObjects = new ArrayList<>();
         for (StorageBusiness entity : entities) {
             dataObjects.add(toBusinessDataObject(entity));
         }
@@ -123,7 +119,7 @@ public final class StoragePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<StorageBusiness> entities = ListUtils.newArrayList();
+        List<StorageBusiness> entities = new ArrayList<>();
         for (StorageBusinessDO dataObject : dataObjects) {
             entities.add(toBusinessEntity(dataObject));
         }
@@ -144,5 +140,4 @@ public final class StoragePersistenceAssembler {
         dataObject.setQueryName(query.getName());
         dataObject.setQueryRemarks(query.getRemarks());
     }
-
 }

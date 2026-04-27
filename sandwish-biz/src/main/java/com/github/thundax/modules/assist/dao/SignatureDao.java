@@ -17,5 +17,4 @@ public interface SignatureDao extends CrudDao<Signature> {
      * @return 变更数量
      */
     int insertOrUpdate(Signature entity);
-
 }

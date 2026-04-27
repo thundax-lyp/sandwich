@@ -1,18 +1,14 @@
 package com.github.thundax.modules.member.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 会员业务模型与持久化对象转换器。
- */
+/** 会员业务模型与持久化对象转换器。 */
 public final class MemberPersistenceAssembler {
 
-    private MemberPersistenceAssembler() {
-    }
+    private MemberPersistenceAssembler() {}
 
     public static MemberDO toDataObject(Member entity) {
         if (entity == null) {
@@ -83,7 +79,7 @@ public final class MemberPersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Member> entities = ListUtils.newArrayList();
+        List<Member> entities = new ArrayList<>();
         for (MemberDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

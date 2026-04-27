@@ -4,21 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.assist.entity.base.BaseAsyncTask;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.Objects;
 import org.springframework.lang.NonNull;
 
-import java.util.Objects;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public class AsyncTask extends BaseAsyncTask {
 
     public static final int DEFAULT_EXPIRED_SECONDS = 1800;
 
-    /**
-     * 开始，激活，挂起，结束
-     */
+    /** 开始，激活，挂起，结束 */
     public static final String STATUS_IDLE = "idle";
+
     public static final String STATUS_ACTIVE = "active";
     public static final String STATUS_SUSPENDED = "suspended";
     public static final String STATUS_SUCCESS = "success";
@@ -70,5 +66,4 @@ public class AsyncTask extends BaseAsyncTask {
     public boolean isBelongTo(User user) {
         return user != null && Objects.equals(user.getId(), getCreateUserId());
     }
-
 }

@@ -1,15 +1,17 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.exception.*;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.config.Global;
-import com.github.thundax.common.utils.StringUtils;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.MoveTreeNodeException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
-import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
+import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.request.MenuDisplayRequest;
 import com.github.thundax.modules.sys.request.MenuIdRequest;
@@ -18,17 +20,16 @@ import com.github.thundax.modules.sys.request.MenuQueryRequest;
 import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
 import com.github.thundax.modules.sys.service.MenuService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Set;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class MenuApiController extends BaseApiController implements MenuServiceApi {
 
@@ -36,17 +37,17 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
     private final MenuInterfaceAssembler menuInterfaceAssembler;
 
     @Autowired
-    public MenuApiController(MenuService menuService,
-                             Validator validator,
-                             MenuInterfaceAssembler menuInterfaceAssembler) {
+    public MenuApiController(
+            MenuService menuService,
+            Validator validator,
+            MenuInterfaceAssembler menuInterfaceAssembler) {
         super(validator);
         this.menuService = menuService;
         this.menuInterfaceAssembler = menuInterfaceAssembler;
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse get(@RequestBody MenuIdRequest request) throws ApiException {
         Menu bean = menuService.get(request.getId());
         if (bean == null) {
@@ -55,9 +56,8 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         return menuInterfaceAssembler.toResponse(bean);
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> list(@RequestBody MenuQueryRequest request) throws ApiException {
         validate(request);
 
@@ -73,9 +73,8 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         return ListUtils.map(menuService.findList(query), menuInterfaceAssembler::toResponse);
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse add(@RequestBody MenuSaveRequest request) throws ApiException {
         validate(request);
 
@@ -100,9 +99,8 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         return menuInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse update(@RequestBody MenuSaveRequest request) throws ApiException {
         validate(request);
 
@@ -125,23 +123,28 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         return menuInterfaceAssembler.toResponse(entity);
     }
 
-
     @Override
-    @RequiresPermissions("super")
-    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
-        List<Menu> beanList = validateList(list,
-                vo -> menuService.get(vo.getId()),
-                null,
-                (bean, vo) -> bean.setDisplayFlag(Boolean.TRUE.equals(vo.getDisplay()) ? Global.SHOW : Global.HIDE));
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
+    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list)
+            throws ApiException {
+        List<Menu> beanList =
+                validateList(
+                        list,
+                        vo -> menuService.get(vo.getId()),
+                        null,
+                        (bean, vo) ->
+                                bean.setDisplayFlag(
+                                        Boolean.TRUE.equals(vo.getDisplay())
+                                                ? Global.SHOW
+                                                : Global.HIDE));
 
         menuService.updateDisplayFlag(beanList);
 
         return true;
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
         List<Menu> beanList = validateList(list, vo -> menuService.get(vo.getId()), null, null);
 
@@ -151,38 +154,39 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
     }
 
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.findList(new Menu());
 
-        Set<String> excludeIds = SetUtils.newHashSet(ListUtils.map(excludeList, MenuIdRequest::getId));
+        Set<String> excludeIds = new HashSet<>(ListUtils.map(excludeList, MenuIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
-        removeTreeNode(beanList, new RemoveTreeNodeSupport<Menu>() {
+        removeTreeNode(
+                beanList,
+                new RemoveTreeNodeSupport<Menu>() {
 
-            @Override
-            public String getId(Menu menu) {
-                return menu.getId();
-            }
+                    @Override
+                    public String getId(Menu menu) {
+                        return menu.getId();
+                    }
 
-            @Override
-            public String getParentId(Menu menu) {
-                return menu.getParentId();
-            }
+                    @Override
+                    public String getParentId(Menu menu) {
+                        return menu.getParentId();
+                    }
 
-            @Override
-            public boolean isRoot(Menu menu) {
-                return StringUtils.isBlank(menu.getParentId());
-            }
-
-        }, excludeIds);
+                    @Override
+                    public boolean isRoot(Menu menu) {
+                        return StringUtils.isBlank(menu.getParentId());
+                    }
+                },
+                excludeIds);
 
         return ListUtils.map(beanList, menuInterfaceAssembler::toTreeResponse);
     }
 
-
     @Override
-    @RequiresPermissions("super")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean move(@RequestBody MenuMoveRequest request) throws ApiException {
         validate(request);
 
@@ -197,7 +201,8 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         }
 
         if (toBean.equals(fromBean) || menuService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(
+                    Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
         menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

@@ -11,12 +11,11 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @SpringBootApplication
-@MapperScan(basePackages = {"com.github.thundax.modules"}, annotationClass = MyBatisDao.class)
+@MapperScan(
+        basePackages = {"com.github.thundax.modules"},
+        annotationClass = MyBatisDao.class)
 @EnableConfigurationProperties(value = {VltavaProperties.class})
 @EnableAsync
 @EnableScheduling
@@ -31,7 +30,4 @@ public class ApiApplication extends SpringBootServletInitializer {
         this.setRegisterErrorPageFilter(false);
         return builder.sources(ApiApplication.class);
     }
-
 }
-
-

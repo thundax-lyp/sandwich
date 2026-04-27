@@ -1,17 +1,15 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.persistence.assembler.UploadFilePersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
 import com.github.thundax.modules.sys.persistence.mapper.UploadFileMapper;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * 上传文件 DAO 实现。
- */
+/** 上传文件 DAO 实现。 */
 @Repository
 public class UploadFileDaoImpl implements UploadFileDao {
 
@@ -23,7 +21,8 @@ public class UploadFileDaoImpl implements UploadFileDao {
 
     @Override
     public UploadFile get(UploadFile entity) {
-        return UploadFilePersistenceAssembler.toEntity(mapper.get(UploadFilePersistenceAssembler.toDataObject(entity)));
+        return UploadFilePersistenceAssembler.toEntity(
+                mapper.get(UploadFilePersistenceAssembler.toDataObject(entity)));
     }
 
     @Override
@@ -34,9 +33,10 @@ public class UploadFileDaoImpl implements UploadFileDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<UploadFile> findList(UploadFile entity) {
-        List<UploadFileDO> dataObjects = mapper.findList(UploadFilePersistenceAssembler.toDataObject(entity));
+        List<UploadFileDO> dataObjects =
+                mapper.findList(UploadFilePersistenceAssembler.toDataObject(entity));
         List<UploadFile> entities = UploadFilePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

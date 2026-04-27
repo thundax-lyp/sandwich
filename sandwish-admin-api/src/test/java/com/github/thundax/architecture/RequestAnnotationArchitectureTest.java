@@ -11,7 +11,8 @@ public class RequestAnnotationArchitectureTest extends AbstractArchitectureTest 
     public void shouldEnforceRequestClassAnnotations() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        ModelAnnotationArchitectureRuleSupport.requestClassAnnotationsRequired("com.github.thundax.modules")
+        ModelAnnotationArchitectureRuleSupport.requestClassAnnotationsRequired(
+                        "com.github.thundax.modules")
                 .check(classes);
     }
 
@@ -19,7 +20,8 @@ public class RequestAnnotationArchitectureTest extends AbstractArchitectureTest 
     public void shouldEnforceResponseClassAnnotations() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired("com.github.thundax.modules")
+        ModelAnnotationArchitectureRuleSupport.responseClassAnnotationsRequired(
+                        "com.github.thundax.modules")
                 .check(classes);
     }
 }

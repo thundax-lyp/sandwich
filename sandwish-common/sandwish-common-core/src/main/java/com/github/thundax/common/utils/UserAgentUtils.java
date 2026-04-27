@@ -1,16 +1,14 @@
 package com.github.thundax.common.utils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
 
 public class UserAgentUtils {
 
-    /**
-     * 获取客户端浏览器信息
-     */
+    /** 获取客户端浏览器信息 */
     public static String getBrowserInfo(HttpServletRequest req) {
         String browserInfo = "other";
         String ua = req.getHeader("User-Agent").toLowerCase();
@@ -79,24 +77,28 @@ public class UserAgentUtils {
         return browserInfo;
     }
 
-    private static final Map<String, Pattern> CLIENT_OS_MAP = new HashMap<String, Pattern>() {{
-        put("Win 8", Pattern.compile(".*(Windows NT 6\\.2).*"));
-        put("Win 7", Pattern.compile(".*(Windows NT 6\\.1).*"));
-        put("WinXP", Pattern.compile(".*(Windows NT 5\\.1|Windows XP).*"));
-        put("Win2003", Pattern.compile(".*(Windows NT 5\\.2).*"));
-        put("Win2000", Pattern.compile(".*(Win2000|Windows 2000|Windows NT 5\\.0).*"));
-        put("MAC", Pattern.compile(".*(Mac|apple|MacOS8).*"));
-        put("WinNT", Pattern.compile(".*(WinNT|Windows NT).*"));
-        put("Linux", Pattern.compile(".*Linux.*"));
-        put("Mac68k", Pattern.compile(".*(68k|68000).*"));
-        put("Win9x", Pattern.compile(".*(9x 4.90|Win9(5|8)|Windows 9(5|8)|95/NT|Win32|32bit).*"));
-    }};
+    private static final Map<String, Pattern> CLIENT_OS_MAP =
+            new HashMap<String, Pattern>() {
+                {
+                    put("Win 8", Pattern.compile(".*(Windows NT 6\\.2).*"));
+                    put("Win 7", Pattern.compile(".*(Windows NT 6\\.1).*"));
+                    put("WinXP", Pattern.compile(".*(Windows NT 5\\.1|Windows XP).*"));
+                    put("Win2003", Pattern.compile(".*(Windows NT 5\\.2).*"));
+                    put("Win2000", Pattern.compile(".*(Win2000|Windows 2000|Windows NT 5\\.0).*"));
+                    put("MAC", Pattern.compile(".*(Mac|apple|MacOS8).*"));
+                    put("WinNT", Pattern.compile(".*(WinNT|Windows NT).*"));
+                    put("Linux", Pattern.compile(".*Linux.*"));
+                    put("Mac68k", Pattern.compile(".*(68k|68000).*"));
+                    put(
+                            "Win9x",
+                            Pattern.compile(
+                                    ".*(9x 4.90|Win9(5|8)|Windows 9(5|8)|95/NT|Win32|32bit).*"));
+                }
+            };
 
     private static final String CLIENT_OS_UNKNOWN = "unknown os";
 
-    /**
-     * 获取客户端操作系统信息
-     */
+    /** 获取客户端操作系统信息 */
     public static String getClientOs(HttpServletRequest req) {
         String userAgent = req.getHeader("User-Agent");
 
@@ -109,5 +111,4 @@ public class UserAgentUtils {
 
         return CLIENT_OS_UNKNOWN;
     }
-
 }

@@ -3,9 +3,7 @@ package com.github.thundax.modules.storage.entity.base;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseStorageBusiness extends DataEntity<StorageBusiness> {
 
     private String businessId;
@@ -52,5 +50,4 @@ public abstract class BaseStorageBusiness extends DataEntity<StorageBusiness> {
     public void setPublicFlag(String publicFlag) {
         this.publicFlag = publicFlag;
     }
-
 }

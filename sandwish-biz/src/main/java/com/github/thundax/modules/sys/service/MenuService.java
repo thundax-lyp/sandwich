@@ -2,12 +2,9 @@ package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface MenuService extends TreeService<Menu> {
 
     /**
@@ -41,5 +38,4 @@ public interface MenuService extends TreeService<Menu> {
      * @return 影响记录数
      */
     int updateDisplayFlag(List<Menu> list);
-
 }

@@ -1,13 +1,6 @@
 package com.github.thundax.common.filter.xss;
 
 import com.github.thundax.common.web.RequestUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,10 +9,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * XSS过滤处理
+ *
  * @author wdit
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
@@ -30,10 +29,9 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private HTMLFilter htmlFilter;
 
-    private final static String JSON_CONTENT_TYPE = "application/json";
+    private static final String JSON_CONTENT_TYPE = "application/json";
 
-    private final static String CONTENT_TYPE = "Content-Type";
-
+    private static final String CONTENT_TYPE = "Content-Type";
 
     /**
      * @param request HttpServletRequest
@@ -41,50 +39,52 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * @param excludeTags 例外的特定标签
      * @param includeTags 需要过滤的标签
      */
-    public XssHttpServletRequestWrapper(HttpServletRequest request, String encoding, List<String> excludeTags, List<String> includeTags ){
-        super( request );
+    public XssHttpServletRequestWrapper(
+            HttpServletRequest request,
+            String encoding,
+            List<String> excludeTags,
+            List<String> includeTags) {
+        super(request);
         orgRequest = request;
         this.encoding = encoding;
         this.htmlFilter = new HTMLFilter();
     }
 
     /**
-     *
      * @param request HttpServletRequest
      * @param encoding 编码
      */
-    public XssHttpServletRequestWrapper(HttpServletRequest request, String encoding ){
-        this( request, encoding, null, null );
+    public XssHttpServletRequestWrapper(HttpServletRequest request, String encoding) {
+        this(request, encoding, null, null);
     }
 
-    private String xssFilter( String input ){
-        return htmlFilter.filter( input );
+    private String xssFilter(String input) {
+        return htmlFilter.filter(input);
     }
 
     @Override
-    public ServletInputStream getInputStream() throws IOException{
+    public ServletInputStream getInputStream() throws IOException {
         // 非json处理
-        if( !JSON_CONTENT_TYPE.equalsIgnoreCase( super.getHeader( CONTENT_TYPE ) ) ){
+        if (!JSON_CONTENT_TYPE.equalsIgnoreCase(super.getHeader(CONTENT_TYPE))) {
             return super.getInputStream();
         }
         InputStream in = super.getInputStream();
-        String body = IOUtils.toString( in, encoding );
-        IOUtils.closeQuietly( in );
+        String body = IOUtils.toString(in, encoding);
+        IOUtils.closeQuietly(in);
 
-        //空串处理直接返回
-        if( StringUtils.isBlank( body ) ){
+        // 空串处理直接返回
+        if (StringUtils.isBlank(body)) {
             return super.getInputStream();
         }
 
         // xss过滤
         body = XssShieldUtil.stripXss(body);
         body = xssFilter(URLDecoder.decode(body, encoding));
-        return new RequestCachingInputStream( body.getBytes( encoding ) );
-
+        return new RequestCachingInputStream(body.getBytes(encoding));
     }
 
     @Override
-    public String getParameter( String name ){
+    public String getParameter(String name) {
         try {
             String value = super.getParameter(xssFilter(URLDecoder.decode(name, encoding)));
             if (StringUtils.isNotBlank(value)) {
@@ -99,12 +99,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public String[] getParameterValues( String name ){
-        String[] parameters = super.getParameterValues( name );
-        if( parameters == null || parameters.length == 0 ){
+    public String[] getParameterValues(String name) {
+        String[] parameters = super.getParameterValues(name);
+        if (parameters == null || parameters.length == 0) {
             return null;
         }
-        for( int i = 0; i < parameters.length; i++ ){
+        for (int i = 0; i < parameters.length; i++) {
             try {
                 parameters[i] = XssShieldUtil.stripXss(parameters[i]);
                 parameters[i] = xssFilter(URLDecoder.decode(parameters[i], encoding));
@@ -116,12 +116,12 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     }
 
     @Override
-    public Map<String, String[]> getParameterMap(){
+    public Map<String, String[]> getParameterMap() {
         Map<String, String[]> map = new LinkedHashMap<>();
         Map<String, String[]> parameters = super.getParameterMap();
-        for( String key : parameters.keySet() ){
-            String[] values = parameters.get( key );
-            for( int i = 0; i < values.length; i++ ){
+        for (String key : parameters.keySet()) {
+            String[] values = parameters.get(key);
+            for (int i = 0; i < values.length; i++) {
                 try {
                     values[i] = XssShieldUtil.stripXss(values[i]);
                     values[i] = xssFilter(URLDecoder.decode(values[i], encoding));
@@ -129,13 +129,13 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                     e.printStackTrace();
                 }
             }
-            map.put( key, values );
+            map.put(key, values);
         }
         return map;
     }
 
     @Override
-    public String getHeader( String name ){
+    public String getHeader(String name) {
         try {
             String value = super.getHeader(URLDecoder.decode(xssFilter(name), encoding));
             if (StringUtils.isNotBlank(value)) {
@@ -186,29 +186,26 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         return paramStr;
     }
 
-    /**
-     * <b>
-     * #获取最原始的request
-     * </b>
-     */
-    public HttpServletRequest getOrgRequest(){
+    /** <b> #获取最原始的request </b> */
+    public HttpServletRequest getOrgRequest() {
         return orgRequest;
     }
 
     /**
-     * <b>
-     * #获取最原始的request
-     * </b>
+     * <b> #获取最原始的request </b>
+     *
      * @param request HttpServletRequest
      */
-    public static HttpServletRequest getOrgRequest(HttpServletRequest request ){
-        if( request instanceof XssHttpServletRequestWrapper){
+    public static HttpServletRequest getOrgRequest(HttpServletRequest request) {
+        if (request instanceof XssHttpServletRequestWrapper) {
             return ((XssHttpServletRequestWrapper) request).getOrgRequest();
         }
         return request;
     }
 
     /**
+     *
+     *
      * <pre>
      * servlet中inputStream只能一次读取，后续不能再次读取inputStream
      * xss过滤body后，重新把流放入ServletInputStream中
@@ -216,7 +213,8 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      */
     private static class RequestCachingInputStream extends ServletInputStream {
         private final ByteArrayInputStream inputStream;
-        public RequestCachingInputStream(byte[] bytes) {
+
+        RequestCachingInputStream(byte[] bytes) {
             inputStream = new ByteArrayInputStream(bytes);
         }
 
@@ -236,7 +234,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         }
 
         @Override
-        public void setReadListener( ReadListener readListener ){
-        }
+        public void setReadListener(ReadListener readListener) {}
     }
 }

@@ -3,21 +3,17 @@ package com.github.thundax.modules.auth.utils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.common.web.RequestUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-
-/**
- * auth工具。
- */
+/** auth工具。 */
 public class AuthUtils {
 
     /**
-     * 获取当前检验码。
-     * 规则：MD5-16(remoteAddress + userAgent)
+     * 获取当前检验码。 规则：MD5-16(remoteAddress + userAgent)
      *
      * @return 当前检验码
      */

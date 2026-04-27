@@ -18,17 +18,13 @@ public class FTPClientFactory implements PooledObjectFactory<FTPClient> {
 
     private FTPClientConfig config;
 
-    public FTPClientFactory() {
-
-    }
+    public FTPClientFactory() {}
 
     public FTPClientFactory(FTPClientConfig config) {
         this.setConfig(config);
     }
 
-    /**
-     * get/set config
-     */
+    /** get/set config */
     public FTPClientConfig getConfig() {
         return this.config;
     }
@@ -110,7 +106,5 @@ public class FTPClientFactory implements PooledObjectFactory<FTPClient> {
     }
 
     @Override
-    public void passivateObject(PooledObject<FTPClient> obj) throws Exception {
-
-    }
+    public void passivateObject(PooledObject<FTPClient> obj) throws Exception {}
 }

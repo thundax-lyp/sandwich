@@ -4,28 +4,26 @@ import com.github.thundax.modules.sys.entity.base.BaseUploadFile;
 
 public class UploadFile extends BaseUploadFile {
 
-    public UploadFile() {
-    }
+    public UploadFile() {}
 
     public UploadFile(String id) {
         super(id);
     }
 
-    private static final String imgExt = "png,jpg,jpeg";
+    private static final String IMG_EXT = "png,jpg,jpeg";
 
-    public boolean isImage(){
+    public boolean isImage() {
         try {
-            String[] suffixes = imgExt.split(",");
+            String[] suffixes = IMG_EXT.split(",");
             String filename = getName().toLowerCase();
             for (String s : suffixes) {
                 if (filename.endsWith("." + s)) {
                     return true;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-
 }

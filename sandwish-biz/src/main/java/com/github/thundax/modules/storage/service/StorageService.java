@@ -3,12 +3,9 @@ package com.github.thundax.modules.storage.service;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface StorageService extends CrudService<Storage> {
 
     /**
@@ -45,23 +42,23 @@ public interface StorageService extends CrudService<Storage> {
      * 按业务删除
      *
      * @param businessType 业务类型
-     * @param businessId   业务id
+     * @param businessId 业务id
      * @return 影响记录数
      */
     int removeBusiness(String businessType, String businessId);
 
     /**
      * 插入关系
+     *
      * @param list
      */
     void insertBusiness(List<StorageBusiness> list);
 
     /**
      * 查找关系
+     *
      * @param entity
      * @return
      */
     List<StorageBusiness> findBusiness(Storage entity);
-
-
 }

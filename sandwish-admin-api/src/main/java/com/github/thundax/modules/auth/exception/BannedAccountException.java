@@ -15,5 +15,4 @@ public class BannedAccountException extends ApiException {
     public BannedAccountException() {
         super(I18nMessages.getMessage("auth.exception.banned-account"));
     }
-
 }

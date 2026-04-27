@@ -1,17 +1,14 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
-
+import com.google.common.collect.Maps;
 import java.util.Map;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signable {
 
     protected String createUserId;
@@ -32,9 +29,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
      */
     public abstract String getName();
 
-    /**
-     * 插入之前执行方法，需要手动调用
-     */
+    /** 插入之前执行方法，需要手动调用 */
     @Override
     public void preInsert() {
         super.preInsert();
@@ -44,9 +39,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
         this.updateUserId = this.createUserId;
     }
 
-    /**
-     * 更新之前执行方法，需要手动调用
-     */
+    /** 更新之前执行方法，需要手动调用 */
     @Override
     public void preUpdate() {
         super.preUpdate();
@@ -88,7 +81,6 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
     public void setUpdateBy(User updateBy) {
         this.setUpdateUserId(updateBy == null ? null : updateBy.getId());
     }
-
 
     public Map<String, Object> toTreeData() {
         return toTreeData(null);

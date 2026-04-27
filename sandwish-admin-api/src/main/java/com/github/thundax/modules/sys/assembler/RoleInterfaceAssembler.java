@@ -107,7 +107,8 @@ public class RoleInterfaceAssembler {
 
         entity.setName(request.getName());
         entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setEnableFlag(
+                Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
         entity.setMenuIdList(ListUtils.map(request.getMenuList(), RoleMenuRequest::getId));
 
         return entity;
@@ -126,7 +127,8 @@ public class RoleInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, RoleSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(
+            T entity, RoleSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

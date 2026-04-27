@@ -1,15 +1,14 @@
 package com.github.thundax.modules.sys.servlet;
 
-import com.google.common.collect.Lists;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.sys.servlet.captcha.mp3.Mp3Builder;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 生成验证码WAVE文件
@@ -35,14 +34,14 @@ public class WaveValidateCodeServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         sendWave(request, response);
     }
 
-    /**
-     * 发送语音流，这里需要对range=xxxx做处理
-     */
-    private void sendWave(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    /** 发送语音流，这里需要对range=xxxx做处理 */
+    private void sendWave(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         Integer[] range = getRange(request);
 
         response.setHeader("Pragma", "no-cache");
@@ -51,7 +50,8 @@ public class WaveValidateCodeServlet extends HttpServlet {
         response.setDateHeader("Expires", 0);
         response.setContentType("audio/mp3");
 
-        String validateCode = (String) request.getSession().getAttribute(ValidateCodeServlet.VALIDATE_CODE);
+        String validateCode =
+                (String) request.getSession().getAttribute(ValidateCodeServlet.VALIDATE_CODE);
 
         List<String> codeList = Lists.newArrayList();
         codeList.add("prefix");
@@ -69,7 +69,8 @@ public class WaveValidateCodeServlet extends HttpServlet {
             } else {
                 range[1] = Math.min(range[1], buffer.length - 1);
             }
-            response.setHeader("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + buffer.length);
+            response.setHeader(
+                    "Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + buffer.length);
             response.setContentLength(range[1] - range[0] + 1);
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 
@@ -88,9 +89,7 @@ public class WaveValidateCodeServlet extends HttpServlet {
         }
     }
 
-    /**
-     * 获取Range范围
-     */
+    /** 获取Range范围 */
     private static Integer[] getRange(HttpServletRequest request) {
         Integer[] range = new Integer[2];
         String rangeText = request.getHeader("range");
@@ -109,5 +108,4 @@ public class WaveValidateCodeServlet extends HttpServlet {
 
         return range;
     }
-
 }

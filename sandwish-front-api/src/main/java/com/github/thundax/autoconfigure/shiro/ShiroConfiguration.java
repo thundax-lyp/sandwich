@@ -1,13 +1,16 @@
 package com.github.thundax.autoconfigure.shiro;
 
-import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.modules.member.security.MemberAuthenticationFilter;
 import com.github.thundax.modules.member.security.MemberAuthorizingRealm;
 import com.github.thundax.modules.member.security.shiro.cache.RedisCacheManager;
+import com.github.thundax.modules.member.security.shiro.session.MemberSessionDao;
 import com.github.thundax.modules.member.security.shiro.session.RedisSessionDaoImpl;
-import com.github.thundax.modules.member.security.shiro.session.SessionDAO;
 import com.github.thundax.modules.member.security.shiro.session.ShiroSessionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.Filter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.session.SessionListener;
@@ -28,13 +31,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.servlet.Filter;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Configuration
 public class ShiroConfiguration {
 
@@ -58,22 +55,21 @@ public class ShiroConfiguration {
 
     @Bean
     public AuthorizingRealm authorizingRealm() {
-        MemberAuthorizingRealm realm = new MemberAuthorizingRealm(whiteCapture,defalutPassword);
+        MemberAuthorizingRealm realm = new MemberAuthorizingRealm(whiteCapture, defalutPassword);
         realm.setCredentialsMatcher(new HashedCredentialsMatcher("MD5"));
         return realm;
     }
 
-
     @Bean("shiroRedisTemplate")
-    public RedisTemplate<String, Object> shiroRedisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, Object> shiroRedisTemplate(
+            RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
         return redisTemplate;
     }
 
-
     @Bean
-    public SessionDAO sessionDAO(
+    public MemberSessionDao sessionDAO(
             @Qualifier("shiroRedisTemplate") RedisTemplate<String, Object> redisTemplate) {
         RedisSessionDaoImpl sessionDao = new RedisSessionDaoImpl();
         sessionDao.setActiveSessionsCacheName("interaction-shiro-activeSessionCache");
@@ -92,7 +88,7 @@ public class ShiroConfiguration {
     }
 
     @Bean
-    public DefaultWebSessionManager sessionManager(SessionDAO sessionDAO) {
+    public DefaultWebSessionManager sessionManager(MemberSessionDao sessionDAO) {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
 
         sessionManager.setSessionDAO(sessionDAO);
@@ -109,7 +105,7 @@ public class ShiroConfiguration {
 
         sessionManager.setSessionIdUrlRewritingEnabled(false);
 
-        List<SessionListener> sessionListenerList = ListUtils.newArrayList();
+        List<SessionListener> sessionListenerList = new ArrayList<>();
         sessionListenerList.add(new ShiroSessionListener(sessionDAO));
         sessionManager.setSessionListeners(sessionListenerList);
 
@@ -117,8 +113,8 @@ public class ShiroConfiguration {
     }
 
     @Bean
-    public DefaultWebSecurityManager securityManager(RedisCacheManager cacheManager,
-                                                     DefaultWebSessionManager sessionManager) {
+    public DefaultWebSecurityManager securityManager(
+            RedisCacheManager cacheManager, DefaultWebSessionManager sessionManager) {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
         securityManager.setRealm(authorizingRealm());
@@ -132,7 +128,7 @@ public class ShiroConfiguration {
     public ShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
 
-        if (MapUtils.isEmpty(properties.getChainDefinition())) {
+        if (properties.getChainDefinition() == null || properties.getChainDefinition().isEmpty()) {
             chainDefinition.addPathDefinition("/static/**", "anon");
             chainDefinition.addPathDefinition("/servlet/**", "anon");
             chainDefinition.addPathDefinition("/auth/register", "anon");
@@ -149,7 +145,7 @@ public class ShiroConfiguration {
 
     @Bean
     public Map<String, Filter> filterMap() {
-        Map<String, Filter> filterMap = MapUtils.newHashMap();
+        Map<String, Filter> filterMap = new HashMap<>();
 
         MemberAuthenticationFilter authcFilter = new MemberAuthenticationFilter();
         authcFilter.setLoginUrl(loginUrl);
@@ -164,15 +160,17 @@ public class ShiroConfiguration {
     }
 
     @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(WebSecurityManager securityManager,
-                                                         ShiroFilterChainDefinition shiroFilterChainDefinition) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(
+            WebSecurityManager securityManager,
+            ShiroFilterChainDefinition shiroFilterChainDefinition) {
         ShiroFilterFactoryBean filterFactoryBean = new ShiroFilterFactoryBean();
 
         filterFactoryBean.setLoginUrl(loginUrl);
         filterFactoryBean.setSuccessUrl(successUrl);
 
         filterFactoryBean.setSecurityManager(securityManager);
-        filterFactoryBean.setFilterChainDefinitionMap(shiroFilterChainDefinition.getFilterChainMap());
+        filterFactoryBean.setFilterChainDefinitionMap(
+                shiroFilterChainDefinition.getFilterChainMap());
         filterFactoryBean.setFilters(filterMap());
 
         return filterFactoryBean;
@@ -181,9 +179,9 @@ public class ShiroConfiguration {
     @Bean
     @DependsOn("lifecycleBeanPostProcessor")
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
-        DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
+        DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator =
+                new DefaultAdvisorAutoProxyCreator();
         advisorAutoProxyCreator.setProxyTargetClass(true);
         return advisorAutoProxyCreator;
     }
-
 }

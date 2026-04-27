@@ -2,9 +2,7 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.modules.auth.entity.PermissionSession;
 
-/**
- * 后台权限会话服务。
- */
+/** 后台权限会话服务。 */
 public interface PermissionService {
 
     PermissionSession createSession(String token, String userId);

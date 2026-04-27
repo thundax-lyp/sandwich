@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 菜单业务模型与持久化对象转换器。
- */
+/** 菜单业务模型与持久化对象转换器。 */
 public final class MenuPersistenceAssembler {
 
-    private MenuPersistenceAssembler() {
-    }
+    private MenuPersistenceAssembler() {}
 
     public static MenuDO toDataObject(Menu entity) {
         if (entity == null) {
@@ -69,7 +65,7 @@ public final class MenuPersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<Menu> entities = ListUtils.newArrayList();
+        List<Menu> entities = new ArrayList<>();
         for (MenuDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

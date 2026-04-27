@@ -4,16 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
-/**
- * 字典持久化对象。
- */
+/** 字典持久化对象。 */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +23,7 @@ public class DictDO {
 
     @TableId(type = IdType.INPUT)
     private String id;
+
     @TableField(exist = false)
     private boolean isNewRecord;
 
@@ -35,16 +33,23 @@ public class DictDO {
     private Integer priority;
     private String remarks;
     private Date createDate;
+
     @TableField("create_by")
     private String createUserId;
+
     private Date updateDate;
+
     @TableField("update_by")
     private String updateUserId;
+
     private String delFlag;
+
     @TableField(exist = false)
     private String queryType;
+
     @TableField(exist = false)
     private String queryRemarks;
+
     @TableField(exist = false)
     private String queryLabel;
 

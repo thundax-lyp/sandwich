@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.security;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface AcceptTokenType {
 
     /**
@@ -11,5 +9,4 @@ public interface AcceptTokenType {
      * @return token
      */
     Class<?> getAcceptTokenType();
-
 }

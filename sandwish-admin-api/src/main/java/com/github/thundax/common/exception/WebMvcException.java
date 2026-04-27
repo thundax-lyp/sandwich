@@ -1,8 +1,6 @@
 package com.github.thundax.common.exception;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 public class WebMvcException extends Exception {
 
     public WebMvcException() {
@@ -12,5 +10,4 @@ public class WebMvcException extends Exception {
     public WebMvcException(String message) {
         super(message);
     }
-
 }

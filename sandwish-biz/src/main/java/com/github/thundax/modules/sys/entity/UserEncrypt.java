@@ -27,5 +27,4 @@ public class UserEncrypt extends BaseUserEncrypt {
     protected void initialize() {
         super.initialize();
     }
-
 }

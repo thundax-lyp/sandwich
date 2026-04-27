@@ -56,7 +56,8 @@ public class MenuInterfaceAssembler {
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());
         entity.setRanks(request.getRanks());
-        entity.setDisplayFlag(Boolean.TRUE.equals(request.getDisplay()) ? Global.SHOW : Global.HIDE);
+        entity.setDisplayFlag(
+                Boolean.TRUE.equals(request.getDisplay()) ? Global.SHOW : Global.HIDE);
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
 
@@ -72,7 +73,8 @@ public class MenuInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, MenuSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(
+            T entity, MenuSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

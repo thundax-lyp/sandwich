@@ -5,10 +5,7 @@ import com.github.thundax.modules.member.service.MemberAccessService;
 import com.github.thundax.modules.member.utils.ShiroUtils;
 import org.springframework.stereotype.Service;
 
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 public class MemberAccessServiceImpl implements MemberAccessService {
 
@@ -31,5 +28,4 @@ public class MemberAccessServiceImpl implements MemberAccessService {
     public void setSessionCache(String name, Object value) {
         ShiroUtils.putSessionCache(name, value);
     }
-
 }

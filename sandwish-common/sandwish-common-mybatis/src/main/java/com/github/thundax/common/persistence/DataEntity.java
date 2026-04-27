@@ -3,10 +3,9 @@ package com.github.thundax.common.persistence;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.utils.IdGen;
+import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-
-import java.util.Date;
 
 /**
  * 数据Entity类
@@ -37,9 +36,7 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
         this.setPriority(0);
     }
 
-    /**
-     * 插入之前执行方法，需要手动调用
-     */
+    /** 插入之前执行方法，需要手动调用 */
     @Override
     public void preInsert() {
         if (StringUtils.isBlank(this.getId())) {
@@ -49,9 +46,7 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
         this.updateDate = this.createDate;
     }
 
-    /**
-     * 更新之前执行方法，需要手动调用
-     */
+    /** 更新之前执行方法，需要手动调用 */
     @Override
     public void preUpdate() {
         this.updateDate = new Date();
@@ -109,5 +104,4 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
     public boolean isDeleted() {
         return StringUtils.equals(getDelFlag(), DEL_FLAG_DELETE);
     }
-
 }

@@ -1,14 +1,10 @@
 package com.github.thundax.common.storage;
 
-import com.google.common.collect.Lists;
 import com.github.thundax.common.storage.pool.FTPClientPool;
 import com.github.thundax.common.storage.pool.FTPClientProxy;
 import com.github.thundax.common.utils.FilenameUtils;
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.springframework.lang.NonNull;
-
+import com.google.common.collect.Lists;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,6 +13,9 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.springframework.lang.NonNull;
 
 public class FtpFileService implements MetaFileService {
 
@@ -31,9 +30,7 @@ public class FtpFileService implements MetaFileService {
         this.pool = pool;
     }
 
-    /**
-     * get/set pathPrefix
-     */
+    /** get/set pathPrefix */
     public String getPathPrefix() {
         return this.pathPrefix;
     }
@@ -53,7 +50,7 @@ public class FtpFileService implements MetaFileService {
     }
 
     private void ftpFileToMetaFile(String path, FTPFile ftpFile, MetaFile metaFile) {
-        metaFile.setPathname(path + MetaFile.separator + ftpFile.getName());
+        metaFile.setPathname(path + MetaFile.SEPARATOR + ftpFile.getName());
         metaFile.setLength(ftpFile.getSize());
         if (ftpFile.isFile()) {
             metaFile.setType(MetaFile.TYPE_FILE);
@@ -70,7 +67,6 @@ public class FtpFileService implements MetaFileService {
         }
     }
 
-
     @Override
     public boolean ensureObject(MetaFile metaFile) {
         FTPClientProxy ftpClientProxy = getFTPClient();
@@ -79,7 +75,8 @@ public class FtpFileService implements MetaFileService {
         }
 
         try {
-            FTPFile[] ftpFiles = ftpClientProxy.listFiles(metaFilenameToFtpFilename(metaFile.getPath()));
+            FTPFile[] ftpFiles =
+                    ftpClientProxy.listFiles(metaFilenameToFtpFilename(metaFile.getPath()));
             for (FTPFile ftpFile : ftpFiles) {
                 if (metaFile.isFile() || metaFile.isFolder()) {
                     if (metaFile.isFile() && !ftpFile.isFile()) {
@@ -104,7 +101,6 @@ public class FtpFileService implements MetaFileService {
         }
     }
 
-
     @Override
     public boolean exists(MetaFile metaFile) {
         FTPClientProxy ftpClientProxy = getFTPClient();
@@ -113,7 +109,8 @@ public class FtpFileService implements MetaFileService {
         }
 
         try {
-            FTPFile[] ftpFiles = ftpClientProxy.listFiles(metaFilenameToFtpFilename(metaFile.getPath()));
+            FTPFile[] ftpFiles =
+                    ftpClientProxy.listFiles(metaFilenameToFtpFilename(metaFile.getPath()));
             for (FTPFile ftpFile : ftpFiles) {
                 if (metaFile.isFile() && !ftpFile.isFile()) {
                     continue;
@@ -135,7 +132,6 @@ public class FtpFileService implements MetaFileService {
         return false;
     }
 
-
     private List<MetaFile> list(MetaFile metaFolder, Function<FTPFile, Boolean> filter) {
         List<MetaFile> mfList = Lists.newArrayList();
         FTPClientProxy ftpClientProxy = getFTPClient();
@@ -148,7 +144,8 @@ public class FtpFileService implements MetaFileService {
             FTPFile[] ftpFiles = ftpClientProxy.listFiles(metaFilenameToFtpFilename(pathname));
             if (ftpFiles != null) {
                 for (FTPFile ftpFile : ftpFiles) {
-                    if (StringUtils.equals(ftpFile.getName(), ".") || StringUtils.equals(ftpFile.getName(), "..")) {
+                    if (StringUtils.equals(ftpFile.getName(), ".")
+                            || StringUtils.equals(ftpFile.getName(), "..")) {
                         continue;
                     }
                     if (filter == null || filter.apply(ftpFile)) {
@@ -166,7 +163,6 @@ public class FtpFileService implements MetaFileService {
 
         return mfList;
     }
-
 
     @Override
     public List<MetaFile> list(MetaFile metaFolder) {
@@ -191,7 +187,8 @@ public class FtpFileService implements MetaFileService {
         }
 
         try {
-            ftpClientProxy.rename(metaFilenameToFtpFilename(src.getPathname()),
+            ftpClientProxy.rename(
+                    metaFilenameToFtpFilename(src.getPathname()),
                     metaFilenameToFtpFilename(dest.getPathname()));
             return true;
 
@@ -212,7 +209,8 @@ public class FtpFileService implements MetaFileService {
 
         try {
             String pathname = metaFilenameToFtpFilename(folder.getPathname());
-            List<String> folders = Lists.newArrayList(StringUtils.split(pathname, MetaFile.separator));
+            List<String> folders =
+                    Lists.newArrayList(StringUtils.split(pathname, MetaFile.SEPARATOR));
             return createFolder(ftpClientProxy, folders);
 
         } catch (IOException e) {
@@ -223,15 +221,18 @@ public class FtpFileService implements MetaFileService {
         }
     }
 
-    private boolean createFolder(@NonNull FTPClientProxy ftpClientProxy, List<String> folders) throws IOException {
+    private boolean createFolder(@NonNull FTPClientProxy ftpClientProxy, List<String> folders)
+            throws IOException {
         if (folders.size() > 1) {
             List<String> parentFolders = folders.subList(0, folders.size() - 1);
-            String parent = MetaFile.separator + StringUtils.join(parentFolders, MetaFile.separator);
+            String parent =
+                    MetaFile.SEPARATOR + StringUtils.join(parentFolders, MetaFile.SEPARATOR);
             if (!(ftpClientProxy.changeWorkingDirectory(parent))) {
                 createFolder(ftpClientProxy, parentFolders);
             }
         }
-        return ftpClientProxy.makeDirectory(MetaFile.separator + StringUtils.join(folders, MetaFile.separator));
+        return ftpClientProxy.makeDirectory(
+                MetaFile.SEPARATOR + StringUtils.join(folders, MetaFile.SEPARATOR));
     }
 
     @Override
@@ -377,5 +378,4 @@ public class FtpFileService implements MetaFileService {
             e.printStackTrace();
         }
     }
-
 }

@@ -6,8 +6,8 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
 import com.github.thundax.modules.sys.api.DictServiceApi;
+import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.request.DictIdRequest;
 import com.github.thundax.modules.sys.request.DictPageRequest;
@@ -15,11 +15,10 @@ import com.github.thundax.modules.sys.request.DictQueryRequest;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
 import com.github.thundax.modules.sys.service.DictService;
+import java.util.List;
+import javax.validation.Validator;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Validator;
-import java.util.List;
 
 @RestController
 public class DictController extends BaseApiController implements DictServiceApi {
@@ -27,9 +26,10 @@ public class DictController extends BaseApiController implements DictServiceApi 
     private final DictService dictService;
     private final DictInterfaceAssembler dictInterfaceAssembler;
 
-    public DictController(Validator validator,
-                          DictService dictService,
-                          DictInterfaceAssembler dictInterfaceAssembler) {
+    public DictController(
+            Validator validator,
+            DictService dictService,
+            DictInterfaceAssembler dictInterfaceAssembler) {
         super(validator);
         this.dictService = dictService;
         this.dictInterfaceAssembler = dictInterfaceAssembler;
@@ -50,7 +50,8 @@ public class DictController extends BaseApiController implements DictServiceApi 
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         Page<Dict> page = readDictPage(request);
-        return entityPageToVo(dictService.findPage(query, page), dictInterfaceAssembler::toResponse);
+        return entityPageToVo(
+                dictService.findPage(query, page), dictInterfaceAssembler::toResponse);
     }
 
     @Override
@@ -73,13 +74,10 @@ public class DictController extends BaseApiController implements DictServiceApi 
 
     @Override
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList = validateList(list,
-                vo -> dictService.get(vo.getId()),
-                null, null);
+        List<Dict> beanList = validateList(list, vo -> dictService.get(vo.getId()), null, null);
         dictService.delete(beanList);
         return true;
     }
-
 
     private Dict readQuery(String label, String type, String remarks) {
         Dict query = new Dict();

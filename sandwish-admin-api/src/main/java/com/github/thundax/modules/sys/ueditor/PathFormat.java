@@ -5,9 +5,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class PathFormat {
 
     private static final String TIME = "time";
@@ -22,7 +20,8 @@ public class PathFormat {
 
     private static Date currentDate = null;
 
-    public static final Pattern PARSE_PATTERN = Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern PARSE_PATTERN =
+            Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
 
     public static String parse(String input) {
         Matcher matcher = PARSE_PATTERN.matcher(input);
@@ -34,7 +33,6 @@ public class PathFormat {
         while (matcher.find()) {
 
             matcher.appendReplacement(sb, PathFormat.getString(matcher.group(1)));
-
         }
 
         matcher.appendTail(sb);
@@ -46,14 +44,14 @@ public class PathFormat {
      * 格式化路径, 把windows路径替换成标准路径
      *
      * @param input 待格式化的路径
-     *
      * @return 格式化后的路径
      */
     public static String format(String input) {
         return input.replace("\\", "/");
     }
 
-    public static final Pattern PARSE_FILENAME_PATTERN = Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern PARSE_FILENAME_PATTERN =
+            Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
 
     public static String parse(String input, String filename) {
         Matcher matcher = PARSE_FILENAME_PATTERN.matcher(input);
@@ -145,5 +143,4 @@ public class PathFormat {
 
         return (Math.random() + "").replace(".", "").substring(0, length);
     }
-
 }

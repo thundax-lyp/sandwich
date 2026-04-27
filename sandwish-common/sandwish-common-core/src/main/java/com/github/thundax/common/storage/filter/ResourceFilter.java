@@ -4,9 +4,6 @@ import com.github.thundax.common.storage.Resource;
 
 public interface ResourceFilter {
 
-    /**
-     * 是否允许
-     */
+    /** 是否允许 */
     boolean test(Resource resource);
-
 }

@@ -1,8 +1,7 @@
 package com.github.thundax.common.persistence;
 
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * DAO支持类实现
@@ -75,5 +74,4 @@ public interface CrudDao<T> {
      * @return 影响数据数
      */
     int delete(T entity);
-
 }

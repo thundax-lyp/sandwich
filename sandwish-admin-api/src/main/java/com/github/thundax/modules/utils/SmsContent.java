@@ -14,8 +14,6 @@ public class SmsContent {
     private String kzzd3;
     private String kzzd4;
 
-
-
     public String getUserName() {
         return userName;
     }

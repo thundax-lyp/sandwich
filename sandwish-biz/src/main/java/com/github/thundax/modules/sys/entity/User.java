@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.MapUtils;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.StringUtils;
@@ -12,17 +11,16 @@ import com.github.thundax.modules.sys.entity.base.BaseUser;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
-import org.springframework.lang.NonNull;
-
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
+import org.springframework.lang.NonNull;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseUser {
@@ -81,9 +79,11 @@ public class User extends BaseUser {
     public List<String> getRoleIdList() {
         if (this.roleIdList == null) {
             if (this.getIsNewRecord()) {
-                this.roleIdList = ListUtils.newArrayList();
+                this.roleIdList = new ArrayList<>();
             } else {
-                this.roleIdList = ListUtils.map(UserServiceHolder.getService().findUserRole(this), Role::getId);
+                this.roleIdList =
+                        ListUtils.map(
+                                UserServiceHolder.getService().findUserRole(this), Role::getId);
             }
         }
         return this.roleIdList;
@@ -105,7 +105,8 @@ public class User extends BaseUser {
 
     @JsonIgnore
     public boolean hasRole(@NotNull Role target) {
-        return ListUtils.contains(getRoleIdList(), roleId -> StringUtils.equals(roleId, target.getId()));
+        return ListUtils.contains(
+                getRoleIdList(), roleId -> StringUtils.equals(roleId, target.getId()));
     }
 
     @JsonIgnore
@@ -132,7 +133,7 @@ public class User extends BaseUser {
     @Override
     @JsonIgnore
     public String getSignBody() {
-        Map<String, Object> map = MapUtils.newLinkedHashMap();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("officeId", this.getOfficeId());
         map.put("loginName", this.getLoginName());
         map.put("loginPass", this.getLoginPass());
@@ -233,5 +234,4 @@ public class User extends BaseUser {
             this.orderBy = orderBy;
         }
     }
-
 }

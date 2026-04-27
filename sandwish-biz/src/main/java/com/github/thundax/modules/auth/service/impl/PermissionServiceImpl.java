@@ -1,7 +1,11 @@
 package com.github.thundax.modules.auth.service.impl;
 
+import static com.github.thundax.modules.sys.entity.Menu.PERM_ADMIN;
+import static com.github.thundax.modules.sys.entity.Menu.PERM_SEPARATOR;
+import static com.github.thundax.modules.sys.entity.Menu.PERM_SUPER;
+import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
+
 import com.github.thundax.common.collect.ListUtils;
-import com.github.thundax.common.collect.SetUtils;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
 import com.github.thundax.common.utils.StringUtils;
@@ -11,21 +15,14 @@ import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Set;
-import java.util.UUID;
-
-import static com.github.thundax.modules.sys.entity.Menu.PERM_ADMIN;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_SEPARATOR;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_SUPER;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
-
-/**
- * 后台权限会话服务实现。
- */
+/** 后台权限会话服务实现。 */
 @Service
 @EnableConfigurationProperties(AuthProperties.class)
 public class PermissionServiceImpl implements PermissionService {
@@ -96,16 +93,21 @@ public class PermissionServiceImpl implements PermissionService {
         User user = UserServiceHolder.get(userId);
         Assert.notNull(user, "user can not be null");
 
-        Set<String> permissions = SetUtils.newHashSet();
-        ListUtils.forEach(UserServiceHolder.findMenuList(user), menu -> {
-            if (StringUtils.isNotBlank(menu.getPerms())) {
-                for (String permission : StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
-                    if (!PERM_USER.equals(permission) && !PERM_SUPER.equals(permission) && !PERM_ADMIN.equals(permission)) {
-                        permissions.add(permission);
+        Set<String> permissions = new HashSet<>();
+        ListUtils.forEach(
+                UserServiceHolder.findMenuList(user),
+                menu -> {
+                    if (StringUtils.isNotBlank(menu.getPerms())) {
+                        for (String permission :
+                                StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
+                            if (!PERM_USER.equals(permission)
+                                    && !PERM_SUPER.equals(permission)
+                                    && !PERM_ADMIN.equals(permission)) {
+                                permissions.add(permission);
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
 
         permissions.add(PERM_USER);
         if (user.isSuper()) {

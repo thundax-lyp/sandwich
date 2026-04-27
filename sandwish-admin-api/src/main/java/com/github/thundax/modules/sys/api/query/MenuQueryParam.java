@@ -5,13 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "MenuQueryParam", description = "菜单查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,7 +28,6 @@ public class MenuQueryParam implements Serializable {
         this.parentId = parentId;
     }
 
-
     @ApiModelProperty(name = "display", value = "显示/隐藏")
     @JsonProperty("display")
     public Boolean getDisplay() {
@@ -41,5 +37,4 @@ public class MenuQueryParam implements Serializable {
     public void setDisplay(Boolean display) {
         this.display = display;
     }
-
 }

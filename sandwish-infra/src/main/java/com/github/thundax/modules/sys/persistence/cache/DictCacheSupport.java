@@ -7,9 +7,7 @@ import com.github.thundax.common.utils.redis.RedisClient;
 import com.github.thundax.modules.sys.entity.Dict;
 import org.springframework.stereotype.Component;
 
-/**
- * 字典缓存支撑。
- */
+/** 字典缓存支撑。 */
 @Component
 public class DictCacheSupport {
 

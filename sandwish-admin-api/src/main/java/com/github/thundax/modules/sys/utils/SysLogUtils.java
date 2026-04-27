@@ -2,13 +2,18 @@ package com.github.thundax.modules.sys.utils;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.DateUtils;
 import com.github.thundax.common.utils.FileUtils;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -18,14 +23,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 @Service
 @Lazy(value = false)
 public class SysLogUtils {
@@ -42,8 +40,7 @@ public class SysLogUtils {
     private static AmqpTemplate template;
 
     @Autowired
-    public SysLogUtils(AmqpTemplate targetTemplate,
-                       VltavaProperties vltavaProperties) {
+    public SysLogUtils(AmqpTemplate targetTemplate, VltavaProperties vltavaProperties) {
         template = targetTemplate;
         properties = vltavaProperties.getLog();
     }
@@ -75,10 +72,12 @@ public class SysLogUtils {
                 LogServiceHolder.getService().save(log);
 
                 try {
-                    String filename = LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
+                    String filename =
+                            LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
 
-                    FileUtils.writeLines(new File(getProperties().getStoragePath(), filename),
-                            ListUtils.newArrayList(paramString),
+                    FileUtils.writeLines(
+                            new File(getProperties().getStoragePath(), filename),
+                            new ArrayList<>(Collections.singletonList(paramString)),
                             true);
 
                 } catch (Exception e) {
@@ -95,9 +94,7 @@ public class SysLogUtils {
         }
     }
 
-    /**
-     * 删除过期任务
-     */
+    /** 删除过期任务 */
     @Scheduled(cron = "0 0 0/4 * * ?")
     void doTask() {
         Log query = new Log();
@@ -107,5 +104,4 @@ public class SysLogUtils {
         query.setQuery(queryCondition);
         LogServiceHolder.getService().batchDelete(query);
     }
-
 }

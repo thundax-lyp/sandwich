@@ -15,5 +15,4 @@ public class InvalidWhiteIpException extends ApiException {
     public InvalidWhiteIpException() {
         super(I18nMessages.getMessage("auth.exception.invalid-ip"));
     }
-
 }

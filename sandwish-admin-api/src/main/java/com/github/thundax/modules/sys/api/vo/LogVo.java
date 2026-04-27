@@ -7,9 +7,7 @@ import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "Log", description = "日志")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,7 +28,6 @@ public class LogVo extends BaseVo {
     public LogVo(String id) {
         super(id);
     }
-
 
     @ApiModelProperty(name = "type", value = "类型")
     @JsonProperty("type")

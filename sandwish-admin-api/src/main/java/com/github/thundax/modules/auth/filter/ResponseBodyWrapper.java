@@ -3,9 +3,7 @@ package com.github.thundax.modules.auth.filter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseBodyWrapper {
@@ -14,9 +12,7 @@ public class ResponseBodyWrapper {
     private String message;
     private Object data;
 
-    public ResponseBodyWrapper() {
-
-    }
+    public ResponseBodyWrapper() {}
 
     public ResponseBodyWrapper(int code, String message) {
         this.code = code;
@@ -52,5 +48,4 @@ public class ResponseBodyWrapper {
     public void setData(Object data) {
         this.data = data;
     }
-
 }

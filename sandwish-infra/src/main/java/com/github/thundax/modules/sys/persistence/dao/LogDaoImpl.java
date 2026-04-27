@@ -1,17 +1,15 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import com.github.thundax.modules.sys.persistence.mapper.LogMapper;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * 日志 DAO 实现。
- */
+/** 日志 DAO 实现。 */
 @Repository
 public class LogDaoImpl implements LogDao {
 
@@ -23,7 +21,8 @@ public class LogDaoImpl implements LogDao {
 
     @Override
     public Log get(Log entity) {
-        return LogPersistenceAssembler.toEntity(mapper.get(LogPersistenceAssembler.toDataObject(entity)));
+        return LogPersistenceAssembler.toEntity(
+                mapper.get(LogPersistenceAssembler.toDataObject(entity)));
     }
 
     @Override
@@ -36,7 +35,7 @@ public class LogDaoImpl implements LogDao {
     public List<Log> findList(Log entity) {
         List<LogDO> dataObjects = mapper.findList(LogPersistenceAssembler.toDataObject(entity));
         List<Log> entities = LogPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

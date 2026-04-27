@@ -18,10 +18,9 @@ public interface PasswordService {
     /**
      * 校验
      *
-     * @param plainPassword     原始密码
+     * @param plainPassword 原始密码
      * @param encryptedPassword 密文
      * @return 正确:true, 其他:false
      */
     boolean validate(String plainPassword, String encryptedPassword);
-
 }

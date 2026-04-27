@@ -3,22 +3,19 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.api.AsyncTaskServiceApi;
+import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.request.AsyncTaskIdRequest;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
-import com.github.thundax.modules.auth.security.annotation.RequiresPermissions;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Validator;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class AsyncTaskApiController extends BaseApiController implements AsyncTaskServiceApi {
 
@@ -26,18 +23,18 @@ public class AsyncTaskApiController extends BaseApiController implements AsyncTa
     private final AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler;
 
     @Autowired
-    public AsyncTaskApiController(AsyncTaskService asyncTaskService,
-                                  Validator validator,
-                                  AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler) {
+    public AsyncTaskApiController(
+            AsyncTaskService asyncTaskService,
+            Validator validator,
+            AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler) {
         super(validator);
 
         this.asyncTaskService = asyncTaskService;
         this.asyncTaskInterfaceAssembler = asyncTaskInterfaceAssembler;
     }
 
-
     @Override
-    @RequiresPermissions("user")
+    @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
     public AsyncTaskResponse get(@RequestBody AsyncTaskIdRequest request) throws ApiException {
         validate(request);
 
@@ -52,5 +49,4 @@ public class AsyncTaskApiController extends BaseApiController implements AsyncTa
 
         return asyncTaskInterfaceAssembler.toResponse(bean);
     }
-
 }

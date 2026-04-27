@@ -11,7 +11,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ApiModel(value = "ExtraAnnotationFixtureResponse", description = "extra annotation fixture response")
+@ApiModel(
+        value = "ExtraAnnotationFixtureResponse",
+        description = "extra annotation fixture response")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExtraAnnotationFixtureResponse implements Serializable {

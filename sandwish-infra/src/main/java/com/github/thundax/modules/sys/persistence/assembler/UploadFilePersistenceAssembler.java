@@ -1,18 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.collect.ListUtils;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 上传文件业务模型与持久化对象转换器。
- */
+/** 上传文件业务模型与持久化对象转换器。 */
 public final class UploadFilePersistenceAssembler {
 
-    private UploadFilePersistenceAssembler() {
-    }
+    private UploadFilePersistenceAssembler() {}
 
     public static UploadFileDO toDataObject(UploadFile entity) {
         if (entity == null) {
@@ -64,7 +60,7 @@ public final class UploadFilePersistenceAssembler {
         if (dataObjects == null) {
             return null;
         }
-        List<UploadFile> entities = ListUtils.newArrayList();
+        List<UploadFile> entities = new ArrayList<>();
         for (UploadFileDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }

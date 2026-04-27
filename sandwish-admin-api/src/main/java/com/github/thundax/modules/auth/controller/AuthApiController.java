@@ -8,8 +8,8 @@ import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.RequestUtils;
-import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
+import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
@@ -25,17 +25,14 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Validator;
-import java.util.Date;
-
-/**
- * @author thundax
- */
+/** @author thundax */
 @RestController
 public class AuthApiController extends BaseApiController implements AuthServiceApi {
 
@@ -44,10 +41,11 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
     private final AuthInterfaceAssembler authInterfaceAssembler;
 
     @Autowired
-    public AuthApiController(Validator validator,
-                             AuthService authService,
-                             UserService userService,
-                             AuthInterfaceAssembler authInterfaceAssembler) {
+    public AuthApiController(
+            Validator validator,
+            AuthService authService,
+            UserService userService,
+            AuthInterfaceAssembler authInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
@@ -60,28 +58,29 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         return authInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
     }
 
-
     @Override
-    public AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request) throws ApiException {
+    public AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request)
+            throws ApiException {
         if (StringUtils.isBlank(request.getRefreshToken())) {
             throw new InvalidParameterException("refreshToken");
         }
 
-        return authInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
+        return authInterfaceAssembler.toLoginFormResponse(
+                authService.refreshLoginForm(request.getRefreshToken()));
     }
 
-
     @Override
-    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException {
+    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request)
+            throws ApiException {
         validate(request);
         HttpServletRequest currentRequest = RequestUtils.currentRequest();
         if (!authService.validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
-            //刷新验证码
+            // 刷新验证码
             authService.createCaptcha(request.getLoginToken());
             writeLog(currentRequest, "验证码失败", request);
             throw new InvalidCaptchaException();
         }
-        //刷新验证码
+        // 刷新验证码
         authService.createCaptcha(request.getLoginToken());
 
         User user = userService.getByLoginName(request.getUsername());
@@ -126,9 +125,9 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
         userService.updateLoginInfo(user);
 
-        return authInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(user.getId()));
+        return authInterfaceAssembler.toAccessTokenResponse(
+                authService.createAccessToken(user.getId()));
     }
-
 
     @Override
     public Boolean logout(@RequestBody AuthLogoutRequest request) throws ApiException {
@@ -150,11 +149,9 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         return true;
     }
 
-    /**
-     * 记录登录日志
-     *
-     */
-    private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
+    /** 记录登录日志 */
+    private void writeLog(
+            HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
         Log log = new Log();
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());

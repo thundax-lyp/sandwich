@@ -1,18 +1,15 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.thundax.common.collect.ListUtils;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.List;
-
-/**
- * 角色持久化对象。
- */
+/** 角色持久化对象。 */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -83,7 +80,7 @@ public class RoleDO {
 
     public List<String> getMenuIdList() {
         if (menuIdList == null) {
-            menuIdList = ListUtils.newArrayList();
+            menuIdList = new ArrayList<>();
         }
         return menuIdList;
     }

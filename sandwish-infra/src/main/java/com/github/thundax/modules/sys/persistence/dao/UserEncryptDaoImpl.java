@@ -1,17 +1,15 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
+import com.github.pagehelper.Page;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.persistence.assembler.UserEncryptPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserEncryptMapper;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-/**
- * 用户加密信息 DAO 实现。
- */
+/** 用户加密信息 DAO 实现。 */
 @Repository
 public class UserEncryptDaoImpl implements UserEncryptDao {
 
@@ -35,9 +33,10 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<UserEncrypt> findList(UserEncrypt entity) {
-        List<UserEncryptDO> dataObjects = mapper.findList(UserEncryptPersistenceAssembler.toDataObject(entity));
+        List<UserEncryptDO> dataObjects =
+                mapper.findList(UserEncryptPersistenceAssembler.toDataObject(entity));
         List<UserEncrypt> entities = UserEncryptPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof com.github.pagehelper.Page) {
+        if (dataObjects instanceof Page) {
             List rawPage = (List) dataObjects;
             rawPage.clear();
             rawPage.addAll(entities);

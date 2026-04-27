@@ -12,25 +12,19 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-/**
- * access token Redis DAO 实现。
- */
+/** access token Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)
 public class AccessTokenDaoImpl implements AccessTokenDao {
 
-    private static final String CACHE_ = Constants.CACHE_PREFIX + "AUTH_ONLINE_";
+    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "AUTH_ONLINE_";
 
-    /**
-     * CACHE_TOKEN_ + token : userId
-     */
-    private static final String CACHE_TOKEN_ = CACHE_ + "TOKEN_";
+    /** TOKEN_PREFIX + token : userId */
+    private static final String TOKEN_PREFIX = CACHE_SECTION + "TOKEN_";
 
-    /**
-     * CACHE_USER_ID_ + userId : AccessToken
-     */
-    private static final String CACHE_USER_ID_ = CACHE_ + "UID_";
+    /** USER_ID_PREFIX + userId : AccessToken */
+    private static final String USER_ID_PREFIX = CACHE_SECTION + "UID_";
 
     private static final int SAFETY_SECONDS = 5;
 
@@ -44,17 +38,17 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
     @Override
     public int getOnlineCount() {
-        return redisClient.keys(CACHE_TOKEN_).size();
+        return redisClient.keys(TOKEN_PREFIX).size();
     }
 
     @Override
     public String getUidByToken(String token) {
-        return redisClient.get(CACHE_TOKEN_ + token);
+        return redisClient.get(TOKEN_PREFIX + token);
     }
 
     @Override
     public AccessToken getByUserId(String userId) {
-        AccessTokenDO accessTokenDO = redisClient.get(CACHE_USER_ID_ + userId, AccessTokenDO.class);
+        AccessTokenDO accessTokenDO = redisClient.get(USER_ID_PREFIX + userId, AccessTokenDO.class);
         AccessToken accessToken = AuthPersistenceAssembler.toEntity(accessTokenDO);
         if (accessToken != null) {
             accessToken.setUserId(userId);
@@ -70,21 +64,22 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
         AccessTokenDO accessTokenDO = AuthPersistenceAssembler.toDataObject(accessToken);
-        redisClient.set(CACHE_TOKEN_ + accessToken.getToken(), accessToken.getUserId(), expiredSeconds);
-        redisClient.set(CACHE_USER_ID_ + accessToken.getUserId(), accessTokenDO, expiredSeconds);
+        redisClient.set(
+                TOKEN_PREFIX + accessToken.getToken(), accessToken.getUserId(), expiredSeconds);
+        redisClient.set(USER_ID_PREFIX + accessToken.getUserId(), accessTokenDO, expiredSeconds);
     }
 
     @Override
     public void active(AccessToken accessToken) {
         int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
-        redisClient.expire(CACHE_TOKEN_ + accessToken.getToken(), expiredSeconds);
-        redisClient.expire(CACHE_USER_ID_ + accessToken.getUserId(), expiredSeconds);
+        redisClient.expire(TOKEN_PREFIX + accessToken.getToken(), expiredSeconds);
+        redisClient.expire(USER_ID_PREFIX + accessToken.getUserId(), expiredSeconds);
     }
 
     @Override
     public void delete(AccessToken accessToken) {
-        redisClient.delete(CACHE_TOKEN_ + accessToken.getToken());
-        redisClient.delete(CACHE_USER_ID_ + accessToken.getUserId());
+        redisClient.delete(TOKEN_PREFIX + accessToken.getToken());
+        redisClient.delete(USER_ID_PREFIX + accessToken.getUserId());
     }
 }

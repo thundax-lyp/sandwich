@@ -1,16 +1,13 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
-/**
- * 机构持久化对象。
- */
+/** 机构持久化对象。 */
 @Getter
 @Setter
 @NoArgsConstructor

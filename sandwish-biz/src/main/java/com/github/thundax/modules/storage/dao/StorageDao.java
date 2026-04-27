@@ -3,13 +3,10 @@ package com.github.thundax.modules.storage.dao;
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface StorageDao extends CrudDao<Storage> {
 
     /**
@@ -68,9 +65,9 @@ public interface StorageDao extends CrudDao<Storage> {
      * 按业务删除
      *
      * @param businessType 业务类型
-     * @param businessId   业务id
+     * @param businessId 业务id
      * @return 影响记录数
      */
-    int deleteBusinessByBusiness(@Param("businessType") String businessType, @Param("businessId") String businessId);
-
+    int deleteBusinessByBusiness(
+            @Param("businessType") String businessType, @Param("businessId") String businessId);
 }

@@ -2,11 +2,10 @@ package com.github.thundax.modules.auth.testsupport;
 
 import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.entity.LoginForm;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Repository;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 @Profile("test")
 @Repository

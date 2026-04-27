@@ -2,12 +2,9 @@ package com.github.thundax.modules.member.dao;
 
 import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.modules.member.entity.Member;
-
 import java.util.List;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface MemberDao extends CrudDao<Member> {
 
     /**
@@ -55,13 +52,9 @@ public interface MemberDao extends CrudDao<Member> {
      */
     int updateEnableFlag(Member member);
 
-    /**
-     * 根据证件号码查询
-     */
+    /** 根据证件号码查询 */
     Member getByZjhm(Member member);
 
-    /**
-     * 根据一网通办的id查询
-     */
+    /** 根据一网通办的id查询 */
     Member getByYwtbId(Member member);
 }

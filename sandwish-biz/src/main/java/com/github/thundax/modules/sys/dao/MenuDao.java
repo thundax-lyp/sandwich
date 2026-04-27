@@ -4,9 +4,7 @@ import com.github.thundax.common.persistence.CrudDao;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public interface MenuDao extends CrudDao<Menu> {
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
@@ -27,5 +25,4 @@ public interface MenuDao extends CrudDao<Menu> {
      * @param menu 菜单
      */
     void deleteMenuRole(Menu menu);
-
 }

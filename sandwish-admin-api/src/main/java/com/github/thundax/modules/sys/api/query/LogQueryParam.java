@@ -7,13 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.vo.query.PageQueryParam;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Size;
 import java.util.Date;
+import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @ApiModel(value = "LogQueryParam", description = "日志查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -104,5 +101,4 @@ public class LogQueryParam extends PageQueryParam {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
-
 }

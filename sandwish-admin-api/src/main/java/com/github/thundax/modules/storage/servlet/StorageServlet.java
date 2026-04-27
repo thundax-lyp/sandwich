@@ -3,14 +3,13 @@ package com.github.thundax.modules.storage.servlet;
 import com.github.thundax.common.utils.FileUtils;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
-import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
-
+import java.io.File;
+import java.io.IOException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 
 /**
  * 提供附件
@@ -37,7 +36,8 @@ public class StorageServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         Storage storage = storageConverter.toEntity(request.getRequestURI());
 
@@ -59,5 +59,4 @@ public class StorageServlet extends HttpServlet {
 
         response.getOutputStream().write(FileUtils.readFileToByteArray(file));
     }
-
 }

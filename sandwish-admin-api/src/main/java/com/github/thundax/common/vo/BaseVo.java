@@ -5,15 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseVo implements Serializable {
@@ -29,9 +26,7 @@ public class BaseVo implements Serializable {
     private UserVo updateUser;
     private Date updateDate;
 
-    public BaseVo() {
-
-    }
+    public BaseVo() {}
 
     public BaseVo(String id) {
         this.id = id;
@@ -48,7 +43,6 @@ public class BaseVo implements Serializable {
         this.id = id;
     }
 
-
     @ApiModelProperty(name = "priority", value = "排序数", example = "0")
     @JsonProperty("priority")
     @Min(value = 0, message = "\"排序数\"必须不能小于 0")
@@ -59,7 +53,6 @@ public class BaseVo implements Serializable {
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
-
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
@@ -72,7 +65,6 @@ public class BaseVo implements Serializable {
         this.remarks = remarks;
     }
 
-
     @ApiModelProperty(name = "createUser", value = "创建人")
     @JsonProperty("createUser")
     public UserVo getCreateUser() {
@@ -82,7 +74,6 @@ public class BaseVo implements Serializable {
     public void setCreateUser(UserVo createUser) {
         this.createUser = createUser;
     }
-
 
     @ApiModelProperty(name = "createDate", value = "创建时间")
     @JsonProperty("createDate")
@@ -104,7 +95,6 @@ public class BaseVo implements Serializable {
     public void setUpdateUser(UserVo updateUser) {
         this.updateUser = updateUser;
     }
-
 
     @ApiModelProperty(name = "updateDate", value = "修改时间")
     @JsonProperty("updateDate")

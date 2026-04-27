@@ -1,19 +1,16 @@
 package com.github.thundax.common.utils;
 
-import org.springframework.util.StringUtils;
-
+import com.github.thundax.common.utils.ext.DateFormatUtilEx;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.springframework.util.StringUtils;
 
-/**
- * @author thundax
- */
-public class DateFormatUtils extends org.apache.commons.lang3.time.DateFormatUtils {
+/** @author thundax */
+public class DateFormatUtils extends DateFormatUtilEx {
 
-    private DateFormatUtils() {
-    }
+    private DateFormatUtils() {}
 
     public static String formatDate(Date date) {
         return DateFormat.getDateInstance().format(date);
@@ -45,11 +42,9 @@ public class DateFormatUtils extends org.apache.commons.lang3.time.DateFormatUti
         return result;
     }
 
-    /**
-     * 根据日期字符串长度判断是长日期还是短日期。只支持yyyy-MM-dd，yyyy-MM-dd HH:mm:ss两种格式。
-     * 扩展支持yyyy,yyyy-MM日期格式
-     */
+    /** 根据日期字符串长度判断是长日期还是短日期。只支持yyyy-MM-dd，yyyy-MM-dd HH:mm:ss两种格式。 扩展支持yyyy,yyyy-MM日期格式 */
     private static final DateFormat DF_LONG = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private static final DateFormat DF_SHORT = new SimpleDateFormat("yyyy-MM-dd");
     private static final DateFormat DF_YEAR = new SimpleDateFormat("yyyy");
     private static final DateFormat DF_MONTH = new SimpleDateFormat("yyyy-MM");
@@ -73,8 +68,8 @@ public class DateFormatUtils extends org.apache.commons.lang3.time.DateFormatUti
                     return DF_LONG.parse(text);
                 }
             } catch (ParseException ex) {
-                IllegalArgumentException iae = new IllegalArgumentException(
-                        "Could not parse date: " + ex.getMessage());
+                IllegalArgumentException iae =
+                        new IllegalArgumentException("Could not parse date: " + ex.getMessage());
                 iae.initCause(ex);
                 throw iae;
             }
@@ -84,5 +79,4 @@ public class DateFormatUtils extends org.apache.commons.lang3.time.DateFormatUti
     public static String format(Date date) {
         return DF_LONG.format(date);
     }
-
 }

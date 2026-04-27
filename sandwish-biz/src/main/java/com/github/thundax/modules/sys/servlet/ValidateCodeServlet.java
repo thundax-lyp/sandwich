@@ -1,18 +1,19 @@
 package com.github.thundax.modules.sys.servlet;
 
 import com.github.thundax.common.utils.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Random;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * 生成随机验证码
@@ -61,7 +62,8 @@ public class ValidateCodeServlet extends HttpServlet {
         if (validateCode == null) {
             return false;
         } else {
-            if (StringUtils.isNotBlank(whiteCaptcha) && StringUtils.equals(whiteCaptcha, validateCode)) {
+            if (StringUtils.isNotBlank(whiteCaptcha)
+                    && StringUtils.equals(whiteCaptcha, validateCode)) {
                 return true;
             }
             return StringUtils.equalsIgnoreCase(validateCode, code);
@@ -89,7 +91,8 @@ public class ValidateCodeServlet extends HttpServlet {
         createImage(request, response);
     }
 
-    private void createImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void createImage(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
@@ -132,7 +135,6 @@ public class ValidateCodeServlet extends HttpServlet {
         OutputStream out = response.getOutputStream();
         ImageIO.write(image, "JPEG", out);
         out.close();
-
     }
 
     private Color getRandColor(int fc, int bc) {
@@ -145,8 +147,8 @@ public class ValidateCodeServlet extends HttpServlet {
         if (b > MAX_COLOR) {
             b = MAX_COLOR;
         }
-        return new Color(f + random.nextInt(b - f), f + random.nextInt(b - f),
-                f + random.nextInt(b - f));
+        return new Color(
+                f + random.nextInt(b - f), f + random.nextInt(b - f), f + random.nextInt(b - f));
     }
 
     private void createBackground(Graphics g) {
@@ -171,23 +173,21 @@ public class ValidateCodeServlet extends HttpServlet {
          * 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2',
          * '3', '4', '5', '6', '7', '8', '9' };
          */
-        char[] codeSeq = {
-                '2', '3', '4', '5', '6', '7', '8', '9'
-        };
-        String[] fontTypes = {
-                "Arial", "Arial Black", "AvantGarde Bk BT", "Calibri"
-        };
+        char[] codeSeq = {'2', '3', '4', '5', '6', '7', '8', '9'};
+        String[] fontTypes = {"Arial", "Arial Black", "AvantGarde Bk BT", "Calibri"};
         Random random = new Random();
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < VALIDATE_CODE_LENGTH; i++) {
             String r = String.valueOf(codeSeq[random.nextInt(codeSeq.length)]);
-            g.setColor(new Color(50 + random.nextInt(100), 50 + random.nextInt(100),
-                    50 + random.nextInt(100)));
+            g.setColor(
+                    new Color(
+                            50 + random.nextInt(100),
+                            50 + random.nextInt(100),
+                            50 + random.nextInt(100)));
             g.setFont(new Font(fontTypes[random.nextInt(fontTypes.length)], Font.PLAIN, 40));
             g.drawString(r, 25 * i + 10, 35 + random.nextInt(10));
             s.append(r);
         }
         return s.toString();
     }
-
 }

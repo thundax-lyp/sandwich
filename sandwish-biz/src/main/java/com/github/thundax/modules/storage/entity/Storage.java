@@ -7,13 +7,10 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.modules.storage.entity.base.BaseStorage;
 import com.github.thundax.modules.storage.utils.MetaFile;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
-/**
- * @author
- */
+/** @author */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Storage extends BaseStorage {
@@ -43,14 +40,14 @@ public class Storage extends BaseStorage {
 
     @Override
     public void setEnableFlag(String enableFlag) {
-        super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
+        super.setEnableFlag(
+                StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
     }
 
     @JsonIgnore
     public boolean isEnable() {
         return StringUtils.equals(Global.ENABLE, getEnableFlag());
     }
-
 
     @JsonIgnore
     public String getFileName() {
@@ -64,7 +61,8 @@ public class Storage extends BaseStorage {
 
     @JsonIgnore
     public String getPathName() {
-        return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate()) + MetaFile.SEPARATOR
+        return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate())
+                + MetaFile.SEPARATOR
                 + this.getFileName();
     }
 
@@ -175,5 +173,4 @@ public class Storage extends BaseStorage {
             this.remarks = remarks;
         }
     }
-
 }

@@ -5,13 +5,10 @@ import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO;
 import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
 
-/**
- * auth Redis 持久化装配器。
- */
+/** auth Redis 持久化装配器。 */
 public final class AuthPersistenceAssembler {
 
-    private AuthPersistenceAssembler() {
-    }
+    private AuthPersistenceAssembler() {}
 
     public static AccessTokenDO toDataObject(AccessToken entity) {
         if (entity == null) {

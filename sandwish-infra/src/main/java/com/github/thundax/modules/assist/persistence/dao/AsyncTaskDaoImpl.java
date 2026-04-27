@@ -8,9 +8,7 @@ import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersiste
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 import org.springframework.stereotype.Repository;
 
-/**
- * 异步任务 Redis DAO 实现。
- */
+/** 异步任务 Redis DAO 实现。 */
 @Repository
 public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
@@ -24,12 +22,14 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     @Override
     public AsyncTask get(String id) {
-        return AsyncTaskPersistenceAssembler.toEntity(redisClient.get(cacheKey(id), AsyncTaskDO.class));
+        return AsyncTaskPersistenceAssembler.toEntity(
+                redisClient.get(cacheKey(id), AsyncTaskDO.class));
     }
 
     @Override
     public void save(AsyncTask asyncTask) {
-        redisClient.set(cacheKey(asyncTask.getId()),
+        redisClient.set(
+                cacheKey(asyncTask.getId()),
                 AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
                 asyncTask.getExpiredSeconds());
     }

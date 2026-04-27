@@ -3,15 +3,12 @@ package com.github.thundax.modules.sys.entity.base;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.Dict;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public abstract class BaseDict extends AdminDataEntity<Dict> {
 
     private static final long serialVersionUID = 1L;
 
-    public BaseDict() {
-    }
+    public BaseDict() {}
 
     public BaseDict(String id) {
         super(id);

@@ -2,12 +2,11 @@ package com.github.thundax.modules.sys.ueditor;
 
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.ueditor.define.ActionMap;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 配置管理器
@@ -66,5 +65,4 @@ public final class ConfigManager {
             this.config = null;
         }
     }
-
 }

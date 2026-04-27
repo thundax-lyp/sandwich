@@ -2,13 +2,10 @@ package com.github.thundax.modules.sys.persistence.mapper;
 
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-/**
- * 角色 MyBatis Mapper。
- */
+/** 角色 MyBatis Mapper。 */
 @MyBatisDao
 public interface RoleMapper {
 
@@ -78,7 +75,7 @@ public interface RoleMapper {
     /**
      * 写入用户列表。
      *
-     * @param role       权限
+     * @param role 权限
      * @param userIdList 用户 id 列表
      */
     void insertRoleUser(@Param("role") RoleDO role, @Param("userIdList") List<String> userIdList);

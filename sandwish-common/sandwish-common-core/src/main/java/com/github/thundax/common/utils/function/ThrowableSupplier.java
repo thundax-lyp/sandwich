@@ -16,6 +16,4 @@ public interface ThrowableSupplier<T> {
      * @throws Exception throwable
      */
     T get() throws Exception;
-
-
 }

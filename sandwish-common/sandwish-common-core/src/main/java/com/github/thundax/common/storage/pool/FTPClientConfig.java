@@ -13,13 +13,9 @@ public class FTPClientConfig {
     private boolean enableAsciiType = false;
     private boolean enablePassiveMode = true;
 
-    public FTPClientConfig() {
+    public FTPClientConfig() {}
 
-    }
-
-    /**
-     * get/set connectTimeout
-     */
+    /** get/set connectTimeout */
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
@@ -28,9 +24,7 @@ public class FTPClientConfig {
         return this.connectTimeout;
     }
 
-    /**
-     * get/set host
-     */
+    /** get/set host */
     public String getHost() {
         return this.host;
     }
@@ -39,9 +33,7 @@ public class FTPClientConfig {
         this.host = host;
     }
 
-    /**
-     * get/set port
-     */
+    /** get/set port */
     public int getPort() {
         return this.port;
     }
@@ -50,9 +42,7 @@ public class FTPClientConfig {
         this.port = port;
     }
 
-    /**
-     * get/set username
-     */
+    /** get/set username */
     public String getUsername() {
         return this.username;
     }
@@ -61,9 +51,7 @@ public class FTPClientConfig {
         this.username = username;
     }
 
-    /**
-     * get/set password
-     */
+    /** get/set password */
     public String getPassword() {
         return this.password;
     }
@@ -72,9 +60,7 @@ public class FTPClientConfig {
         this.password = password;
     }
 
-    /**
-     * get/set enableAsciiType
-     */
+    /** get/set enableAsciiType */
     public boolean getEnableAsciiType() {
         return this.enableAsciiType;
     }
@@ -83,9 +69,7 @@ public class FTPClientConfig {
         this.enableAsciiType = enableAsciiType;
     }
 
-    /**
-     * get/set enablePassiveMode
-     */
+    /** get/set enablePassiveMode */
     public boolean getEnablePassiveMode() {
         return this.enablePassiveMode;
     }
@@ -93,5 +77,4 @@ public class FTPClientConfig {
     public void setEnablePassiveMode(boolean enablePassiveMode) {
         this.enablePassiveMode = enablePassiveMode;
     }
-
 }

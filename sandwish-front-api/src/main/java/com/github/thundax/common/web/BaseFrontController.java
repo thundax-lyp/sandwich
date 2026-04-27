@@ -6,26 +6,22 @@ import com.github.thundax.common.utils.CookieUtils;
 import com.github.thundax.common.utils.DateUtils;
 import com.github.thundax.common.utils.StringUtils;
 import com.github.thundax.common.vo.PageVo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import java.util.Date;
+import java.util.Set;
+import java.util.function.Function;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.Set;
-import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * @author wdit
- */
+/** @author wdit */
 public class BaseFrontController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -44,8 +40,7 @@ public class BaseFrontController extends BaseController {
 
     protected Validator validator;
 
-    public BaseFrontController() {
-    }
+    public BaseFrontController() {}
 
     public BaseFrontController(Validator validator) {
         this.validator = validator;
@@ -66,11 +61,10 @@ public class BaseFrontController extends BaseController {
         }
     }
 
-//    @ModelAttribute("modulePath")
+    //    @ModelAttribute("modulePath")
     public String getModulePath() {
         return this.modulePath;
     }
-
 
     public <T> Page<T> readPage(HttpServletRequest request, HttpServletResponse response) {
         Page<T> page = new Page<>(request, response);
@@ -88,19 +82,17 @@ public class BaseFrontController extends BaseController {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, message);
     }
 
-    /**
-     * 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中
-     */
-    protected static Integer readReloadInteger(String paramName,
-                                               HttpServletRequest request,
-                                               HttpServletResponse response) {
+    /** 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中 */
+    protected static Integer readReloadInteger(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadInteger(paramName, paramName, request, response);
     }
 
-    protected static Integer readReloadInteger(String paramName,
-                                               String cookieName,
-                                               HttpServletRequest request,
-                                               HttpServletResponse response) {
+    protected static Integer readReloadInteger(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNumeric(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -116,16 +108,16 @@ public class BaseFrontController extends BaseController {
         return null;
     }
 
-    protected static Date readReloadDate(String paramName,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response) {
+    protected static Date readReloadDate(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadDate(paramName, paramName, request, response);
     }
 
-    protected static Date readReloadDate(String paramName,
-                                         String cookieName,
-                                         HttpServletRequest request,
-                                         HttpServletResponse response) {
+    protected static Date readReloadDate(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNotEmpty(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -141,16 +133,16 @@ public class BaseFrontController extends BaseController {
         return null;
     }
 
-    protected static String readReloadString(String paramName,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response) {
+    protected static String readReloadString(
+            String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadString(paramName, paramName, request, response);
     }
 
-    protected static String readReloadString(String paramName,
-                                             String cookieName,
-                                             HttpServletRequest request,
-                                             HttpServletResponse response) {
+    protected static String readReloadString(
+            String paramName,
+            String cookieName,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (paramValue != null) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -166,18 +158,22 @@ public class BaseFrontController extends BaseController {
     protected <T> boolean validate(RedirectAttributes redirectAttributes, T object) {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() > 0) {
-            addWarningMessage(redirectAttributes, constraintViolations.iterator().next().getMessage());
+            addWarningMessage(
+                    redirectAttributes, constraintViolations.iterator().next().getMessage());
             return false;
         }
 
         return true;
     }
 
-    protected <T> boolean validate(RedirectAttributes redirectAttributes, T object, String... propertyNames) {
+    protected <T> boolean validate(
+            RedirectAttributes redirectAttributes, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
-                addWarningMessage(redirectAttributes, constraintViolations.iterator().next().getMessage());
+                addWarningMessage(
+                        redirectAttributes, constraintViolations.iterator().next().getMessage());
                 return false;
             }
         }
@@ -187,7 +183,8 @@ public class BaseFrontController extends BaseController {
     protected <T> boolean validate(Model model, T object) {
         Set<ConstraintViolation<T>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() > 0) {
-            addWarningMessage(model, "warning:" + constraintViolations.iterator().next().getMessage());
+            addWarningMessage(
+                    model, "warning:" + constraintViolations.iterator().next().getMessage());
             return false;
         }
 
@@ -196,7 +193,8 @@ public class BaseFrontController extends BaseController {
 
     protected <T> boolean validate(Model model, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations =
+                    validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 addWarningMessage(model, constraintViolations.iterator().next().getMessage());
                 return false;
@@ -236,7 +234,7 @@ public class BaseFrontController extends BaseController {
         return pageVo;
     }
 
-    public static <T> Page<T> readPage(Integer pageNo,Integer pageSize) {
+    public static <T> Page<T> readPage(Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
             pageNo = Page.FIRST_PAGE_INDEX;
         }
@@ -250,7 +248,4 @@ public class BaseFrontController extends BaseController {
         page.setPageSize(pageSize);
         return page;
     }
-
-
-
 }

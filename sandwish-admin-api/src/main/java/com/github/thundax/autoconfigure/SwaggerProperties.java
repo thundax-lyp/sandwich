@@ -2,9 +2,7 @@ package com.github.thundax.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * @author thundax
- */
+/** @author thundax */
 @ConfigurationProperties(prefix = "swagger")
 public class SwaggerProperties {
 

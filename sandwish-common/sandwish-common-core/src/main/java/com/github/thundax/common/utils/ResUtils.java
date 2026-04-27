@@ -3,7 +3,7 @@ package com.github.thundax.common.utils;
 public class ResUtils {
     private String code;
     private String msg;
-    private Object rows=new Object();
+    private Object rows = new Object();
 
     public String getCode() {
         return code;

@@ -62,14 +62,12 @@ public class StorageController extends BaseAdminController {
         this.storageInterfaceAssembler = storageInterfaceAssembler;
     }
 
-    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = {"", "index"})
     public String index() {
         return "modules/assist/storageIndex";
     }
 
     // 服务端页面入口保留旧查询适配，不作为本轮核心 API 模型隔离目标。
-    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "list")
     public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
         Storage storage = readQuery(request, response);
@@ -82,7 +80,6 @@ public class StorageController extends BaseAdminController {
         return "modules/assist/storageList";
     }
 
-    // @RequiresPermissions("user")
     @RequestMapping(value = "upload")
     public String uploadForm(
             @RequestParam(required = false) String theme,
@@ -125,7 +122,6 @@ public class StorageController extends BaseAdminController {
         return storageInterfaceAssembler.toUploadResponse(storage);
     }
 
-    // @RequiresPermissions("user")
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     @ResponseBody
     public StorageUploadResponse upload(HttpServletRequest request) {
@@ -210,7 +206,6 @@ public class StorageController extends BaseAdminController {
     }
 
     // 服务端页面删除入口保留 RedirectAttributes 跳转反馈，不作为本轮核心 API 模型隔离目标。
-    // @RequiresPermissions("member:member:edit")
     @RequestMapping(value = "delete")
     public String delete(String[] ids, RedirectAttributes redirectAttributes) {
         if (!validateDelete(ids, redirectAttributes)) {
@@ -227,7 +222,6 @@ public class StorageController extends BaseAdminController {
         return "redirect:" + modulePath + "/list?reload";
     }
 
-    // @RequiresPermissions("assist:storage:view")
     @RequestMapping(value = "treeData")
     @ResponseBody
     public List<StorageTreeNodeResponse> treeData() {

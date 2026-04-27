@@ -33,7 +33,6 @@ public class LogApiController extends BaseApiController implements LogServiceApi
     }
 
     @Override
-    //    @RequiresPermissions("super")
     public PageVo<LogResponse> page(@RequestBody LogPageRequest request) throws ApiException {
         validate(request);
 

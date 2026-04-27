@@ -41,9 +41,6 @@ These callers must move behind business/application services before `RedisClient
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/PersonalApiController.java`
   - reads SM2 private key during password decrypt
   - current operations: `get`
-- `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/service/impl/SubjectServiceImpl.java`
-  - caches subject permissions and subject version
-  - current operations: `get`, `set`, `expire`, `delete`, `deleteByPattern`
 - `sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/DefaultEncryptConfiguration.java`
   - stale constructor injection surface for `UserEncryptService`
 
@@ -130,7 +127,7 @@ Fixed rules:
 Applied examples:
 
 - SM2 private key storage needs a business-facing Store and may need a Service only if key generation/decryption flow is moved out of Controller.
-- Subject remote cache needs a Store below `SubjectServiceImpl`; `SubjectServiceImpl` remains the business/security orchestration point.
+- Permission session storage is handled by `PermissionService -> PermissionDao -> PermissionDaoImpl`; the old Subject remote cache path is retired.
 - Login token, login form, login lock, async task and SMS send marker are state persistence concerns and should be modeled as DAO/Store responsibilities.
 - `<BusinessObject>CacheSupport` does not need a new Service or DAO just to replace its backing Redis implementation.
 
@@ -149,19 +146,13 @@ Move `KeypairApiController`, `UserApiController`, and `PersonalApiController` fr
 
 Do not expose Redis key names or TTL rules to controllers.
 
-### Step 2: Subject Cache Store
-
-Move `SubjectServiceImpl` remote subject/version storage behind an auth/security cache store.
-
-Keep local in-memory maps inside `SubjectServiceImpl` if needed, but remote persistence operations should not be direct Redis calls from admin API service code.
-
-### Step 3: Front Session And Legacy Dict Utilities
+### Step 2: Front Session And Legacy Dict Utilities
 
 Move front session cache storage behind an implementation detail outside direct `RedisClient` injection.
 
 For `DictUtils`, prefer replacing the legacy map cache with the existing `DictDao`/`DictCacheSupport` path or deleting the utility if unused. Do not create a new generic cache helper just for it.
 
-### Step 4: Biz Servlet SMS State
+### Step 3: Biz Servlet SMS State
 
 Move SMS validation rate-limit state out of `SmsValidateCodeServlet`.
 
@@ -171,7 +162,7 @@ Fixed shape:
 - infra implementation stores rate-limit state and TTL
 - servlet calls semantic method such as `canSend` / `markSent`
 
-### Step 5: Infra DAO Redis Adapter
+### Step 4: Infra DAO Redis Adapter
 
 Replace infra DAO direct `RedisClient` usage with an infra-local adapter or typed store implementation.
 
@@ -179,7 +170,7 @@ Existing business DAO interfaces should remain the semantic boundary for `Access
 
 Do not move `RedisClient` into infra under the same generic name. If an adapter is needed, keep it package-private or narrowly named by responsibility.
 
-### Step 6: CacheSupport Backing Migration
+### Step 5: CacheSupport Backing Migration
 
 Migrate `CacheSupport` internals away from common `RedisClient`.
 
@@ -190,7 +181,7 @@ Allowed options:
 
 Do not introduce a cross-business `CacheManager`, `CacheTemplate`, `CacheRepository`, or `CacheFacade`.
 
-### Step 7: Delete Common RedisClient
+### Step 6: Delete Common RedisClient
 
 After no imports remain:
 

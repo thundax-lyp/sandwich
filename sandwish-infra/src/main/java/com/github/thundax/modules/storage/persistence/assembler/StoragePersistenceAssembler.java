@@ -68,7 +68,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StorageBusinessDO dataObject = new StorageBusinessDO();
-        dataObject.setId(entity.getId());
+        dataObject.setStorageId(entity.getId());
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
@@ -86,7 +86,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StorageBusiness entity = new StorageBusiness();
-        entity.setId(dataObject.getId());
+        entity.setId(dataObject.getStorageId());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessParams(dataObject.getBusinessParams());

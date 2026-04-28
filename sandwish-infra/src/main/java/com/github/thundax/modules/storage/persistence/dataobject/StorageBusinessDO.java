@@ -19,7 +19,7 @@ import lombok.Setter;
 public class StorageBusinessDO {
 
     @TableId(value = "file_id", type = IdType.INPUT)
-    private String id;
+    private String storageId;
 
     @TableField("business_id")
     private String businessId;

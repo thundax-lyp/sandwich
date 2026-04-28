@@ -173,7 +173,7 @@ public class StorageDaoImpl implements StorageDao {
     @Override
     public List<StorageBusiness> findBusiness(Storage entity) {
         LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getId, entity.getId());
+        wrapper.eq(StorageBusinessDO::getStorageId, entity.getId());
         return StoragePersistenceAssembler.toBusinessEntityList(businessMapper.selectList(wrapper));
     }
 

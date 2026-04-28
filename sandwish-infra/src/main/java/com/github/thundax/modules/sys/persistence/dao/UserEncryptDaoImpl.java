@@ -91,7 +91,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
 
     private LambdaUpdateWrapper<UserEncryptDO> buildIdUpdateWrapper(UserEncryptDO dataObject) {
         LambdaUpdateWrapper<UserEncryptDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(UserEncryptDO::getId, dataObject.getId());
+        wrapper.eq(UserEncryptDO::getUserId, dataObject.getUserId());
         return wrapper;
     }
 }

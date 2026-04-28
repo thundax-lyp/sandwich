@@ -15,7 +15,7 @@ public final class UserEncryptPersistenceAssembler {
             return null;
         }
         UserEncryptDO dataObject = new UserEncryptDO();
-        dataObject.setId(entity.getId());
+        dataObject.setUserId(entity.getId());
         dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());
         dataObject.setMobile(entity.getMobile());
@@ -35,7 +35,7 @@ public final class UserEncryptPersistenceAssembler {
             return null;
         }
         UserEncrypt entity = new UserEncrypt();
-        entity.setId(dataObject.getId());
+        entity.setId(dataObject.getUserId());
         entity.setLoginPass(dataObject.getLoginPass());
         entity.setEmail(dataObject.getEmail());
         entity.setMobile(dataObject.getMobile());

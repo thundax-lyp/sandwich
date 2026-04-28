@@ -18,8 +18,8 @@ import lombok.Setter;
 @TableName("sys_user_encrypt")
 public class UserEncryptDO {
 
-    @TableId(type = IdType.INPUT)
-    private String id;
+    @TableId(value = "id", type = IdType.INPUT)
+    private String userId;
 
     @TableField("login_pass")
     private String loginPass;

@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class UploadFilePersistenceAssembler {
 
     private UploadFilePersistenceAssembler() {}

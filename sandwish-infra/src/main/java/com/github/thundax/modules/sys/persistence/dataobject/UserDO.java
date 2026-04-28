@@ -11,14 +11,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName(value = "sys_user", autoResultMap = true)
 public class UserDO {
-
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -67,5 +65,4 @@ public class UserDO {
     private Date updateDate;
 
     private String updateBy;
-
 }

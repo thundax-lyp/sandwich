@@ -5,7 +5,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.binary.StringUtils;
 import org.bouncycastle.crypto.digests.SM3Digest;
 
-
 public class Sm3Utils {
 
     public static String sm3Hex(final byte[] data) {

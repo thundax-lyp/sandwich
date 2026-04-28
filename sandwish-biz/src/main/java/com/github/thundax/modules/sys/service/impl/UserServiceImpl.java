@@ -229,6 +229,7 @@ public class UserServiceImpl implements UserService {
     public int updatePriority(List<User> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     private int batchOperate(Collection<User> collection, Function<User, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {

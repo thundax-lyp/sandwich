@@ -152,6 +152,7 @@ public class MenuServiceImpl implements MenuService {
     public int updatePriority(List<Menu> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Menu menu) {

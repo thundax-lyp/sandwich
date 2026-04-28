@@ -39,7 +39,6 @@ import java.util.regex.Pattern;
  */
 public final class HTMLFilter {
 
-
     private static final int REGEX_FLAGS_SI = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
 
     private static final Pattern P_COMMENTS = Pattern.compile("<!--(.*?)-->", Pattern.DOTALL);
@@ -71,11 +70,9 @@ public final class HTMLFilter {
     private static final ConcurrentMap<String, Pattern> P_REMOVE_PAIR_BLANKS = new ConcurrentHashMap<String, Pattern>();
     private static final ConcurrentMap<String, Pattern> P_REMOVE_SELF_BLANKS = new ConcurrentHashMap<String, Pattern>();
 
-
     private final Map<String, List<String>> vAllowed;
 
     private final Map<String, Integer> vTagCounts = new HashMap<String, Integer>();
-
 
     private final String[] vSelfClosingTags;
 
@@ -101,7 +98,6 @@ public final class HTMLFilter {
      * will be html escaped.
      */
     private final boolean alwaysMakeTags;
-
 
     public HTMLFilter() {
         vAllowed = new HashMap<>();

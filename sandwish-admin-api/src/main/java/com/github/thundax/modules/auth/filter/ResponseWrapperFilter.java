@@ -25,9 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public class ResponseWrapperFilter extends OncePerRequestFilter {
 
-
     private static final byte[] WRAPPED_RESPONSE_PREFIX = {'{', '\"', 'c', 'o', 'd', 'e', '\"', ':'};
-
 
     private static final byte[] RESPONSE_BODY_PREFIX = {
         '{', '\"', 'c', 'o', 'd', 'e', '\"', ':', '0', ',', '\"', 'm', 'e', 's', 's', 'a', 'g', 'e', '\"', ':', '\"',

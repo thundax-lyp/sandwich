@@ -2,7 +2,6 @@ package com.github.thundax.common.security.permission;
 
 import java.util.Collection;
 
-
 public class PrefixPermissionMatcher implements PermissionMatcher {
 
     private static final String PERMISSION_SEPARATOR = ":";

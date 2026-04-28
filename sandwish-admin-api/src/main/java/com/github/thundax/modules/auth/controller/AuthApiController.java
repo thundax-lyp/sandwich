@@ -148,7 +148,6 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         return true;
     }
 
-
     private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
         Log log = new Log();
         log.setTitle("系统-登录-" + title);

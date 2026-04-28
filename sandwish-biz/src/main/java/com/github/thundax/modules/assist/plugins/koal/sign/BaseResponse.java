@@ -16,7 +16,6 @@ public class BaseResponse implements Serializable {
 
     public static final String SUCCESS_CODE = "0";
 
-
     private String errorCode;
 
     public String getErrorCode() {

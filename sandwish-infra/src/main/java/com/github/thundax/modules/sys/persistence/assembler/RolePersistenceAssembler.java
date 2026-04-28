@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class RolePersistenceAssembler {
 
     private RolePersistenceAssembler() {}

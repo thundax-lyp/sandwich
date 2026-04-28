@@ -59,14 +59,16 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
 
         JavaClass userEncryptDO =
                 classByName(classes, "com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO");
-        assertFalse(userEncryptDO.getFullName() + " must not declare id field", userEncryptDO.tryGetField("id")
-                .isPresent());
+        assertFalse(
+                userEncryptDO.getFullName() + " must not declare id field",
+                userEncryptDO.tryGetField("id").isPresent());
         assertTableId(userEncryptDO, "userId", "id", IdType.INPUT);
 
         JavaClass storageBusinessDO =
                 classByName(classes, "com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO");
-        assertFalse(storageBusinessDO.getFullName() + " must not declare id field", storageBusinessDO.tryGetField("id")
-                .isPresent());
+        assertFalse(
+                storageBusinessDO.getFullName() + " must not declare id field",
+                storageBusinessDO.tryGetField("id").isPresent());
         assertTableId(storageBusinessDO, "storageId", "file_id", IdType.INPUT);
     }
 
@@ -78,12 +80,12 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             if (!isDataObjectClass(javaClass)) {
                 continue;
             }
-            assertFalse(javaClass.getFullName() + " must not declare createUserId field", javaClass
-                    .tryGetField("createUserId")
-                    .isPresent());
-            assertFalse(javaClass.getFullName() + " must not declare updateUserId field", javaClass
-                    .tryGetField("updateUserId")
-                    .isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare createUserId field",
+                    javaClass.tryGetField("createUserId").isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare updateUserId field",
+                    javaClass.tryGetField("updateUserId").isPresent());
         }
     }
 
@@ -95,17 +97,16 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             if (!isDataObjectClass(javaClass)) {
                 continue;
             }
-            assertFalse(javaClass.getFullName() + " must not declare delFlag field", javaClass.tryGetField("delFlag")
-                    .isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare delFlag field",
+                    javaClass.tryGetField("delFlag").isPresent());
             for (JavaField field : javaClass.getFields()) {
                 if (!field.isAnnotatedWith(TableField.class)) {
                     continue;
                 }
                 TableField tableField = field.getAnnotationOfType(TableField.class);
                 assertEquals(
-                        field.getFullName() + " TableField is only allowed for typeHandler",
-                        "",
-                        tableField.value());
+                        field.getFullName() + " TableField is only allowed for typeHandler", "", tableField.value());
                 assertEquals(
                         field.getFullName() + " TableField must map to a real database column",
                         true,
@@ -130,9 +131,10 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
 
     private void assertTableId(JavaClass javaClass, String fieldName, String columnName, IdType idType) {
         JavaField field = javaClass.getField(fieldName);
-        assertEquals(javaClass.getFullName() + "." + fieldName + " must be String", String.class.getName(), field
-                .getRawType()
-                .getFullName());
+        assertEquals(
+                javaClass.getFullName() + "." + fieldName + " must be String",
+                String.class.getName(),
+                field.getRawType().getFullName());
         TableId tableId = field.getAnnotationOfType(TableId.class);
         assertEquals(javaClass.getFullName() + "." + fieldName + " TableId value", columnName, tableId.value());
         assertEquals(javaClass.getFullName() + "." + fieldName + " TableId type", idType, tableId.type());
@@ -141,6 +143,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
     private boolean isDataObjectClass(JavaClass javaClass) {
         return javaClass.getPackageName().startsWith(BASE_PACKAGE + ".")
                 && javaClass.getPackageName().contains(".persistence.dataobject")
-                && (javaClass.getSimpleName().endsWith("DO") || javaClass.getSimpleName().endsWith("DataObject"));
+                && (javaClass.getSimpleName().endsWith("DO")
+                        || javaClass.getSimpleName().endsWith("DataObject"));
     }
 }

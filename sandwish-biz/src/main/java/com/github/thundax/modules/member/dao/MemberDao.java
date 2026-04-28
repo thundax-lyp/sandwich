@@ -88,9 +88,7 @@ public interface MemberDao {
      */
     int updateEnableFlag(Member member);
 
-
     Member getByZjhm(String zjhm);
-
 
     Member getByYwtbId(String ywtbId);
 }

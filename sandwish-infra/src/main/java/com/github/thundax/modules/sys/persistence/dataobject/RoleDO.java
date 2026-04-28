@@ -9,14 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("sys_role")
 public class RoleDO {
-
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -38,5 +36,4 @@ public class RoleDO {
     private Date updateDate;
 
     private String updateBy;
-
 }

@@ -3,7 +3,6 @@ package com.github.thundax.modules.assist.persistence.assembler;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 
-
 public final class AsyncTaskPersistenceAssembler {
 
     private AsyncTaskPersistenceAssembler() {}

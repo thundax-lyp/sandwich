@@ -13,7 +13,6 @@ public final class ActionMap {
 
     public static final Map<String, Integer> MAPPING;
 
-
     public static final int CONFIG = 0;
 
     public static final int UPLOAD_IMAGE = 1;

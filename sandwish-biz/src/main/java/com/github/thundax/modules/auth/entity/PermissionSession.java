@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.entity;
 import java.io.Serializable;
 import java.util.Set;
 
-
 public class PermissionSession implements Serializable {
 
     private String token;

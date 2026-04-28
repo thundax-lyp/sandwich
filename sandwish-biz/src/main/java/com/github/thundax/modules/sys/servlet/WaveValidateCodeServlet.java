@@ -38,7 +38,6 @@ public class WaveValidateCodeServlet extends HttpServlet {
         sendWave(request, response);
     }
 
-
     private void sendWave(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Integer[] range = getRange(request);
 
@@ -84,7 +83,6 @@ public class WaveValidateCodeServlet extends HttpServlet {
             outputStream.close();
         }
     }
-
 
     private static Integer[] getRange(HttpServletRequest request) {
         Integer[] range = new Integer[2];

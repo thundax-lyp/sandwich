@@ -105,7 +105,6 @@ public class Page<T> {
         }
     }
 
-
     public void initialize() {
         if (this.pageNo < FIRST_PAGE_INDEX) {
             this.pageNo = FIRST_PAGE_INDEX;
@@ -145,7 +144,6 @@ public class Page<T> {
         this.count = count;
     }
 
-
     @JsonIgnore
     public int getTotalPage() {
         if (pageSize > 0) {
@@ -173,17 +171,14 @@ public class Page<T> {
         return this.pageNo >= this.getTotalPage();
     }
 
-
     @JsonIgnore
     public boolean isNotCount() {
         return this.count == -1;
     }
 
-
     public int getFirstResult() {
         return (getPageNo() - 1) * getPageSize();
     }
-
 
     public int getMaxResults() {
         return getPageSize();

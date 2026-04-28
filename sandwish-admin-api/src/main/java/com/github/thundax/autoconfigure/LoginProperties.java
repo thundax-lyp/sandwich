@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 @ConfigurationProperties(prefix = "vltava.login")
 public class LoginProperties {

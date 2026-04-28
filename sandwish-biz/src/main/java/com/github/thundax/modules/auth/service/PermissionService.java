@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.modules.auth.entity.PermissionSession;
 
-
 public interface PermissionService {
 
     PermissionSession createSession(String token, String userId);

@@ -18,7 +18,6 @@ public class FileType {
         return FileType.TYPES.get(key);
     }
 
-
     public static String getSuffixByFilename(String filename) {
 
         return filename.substring(filename.lastIndexOf(".")).toLowerCase();

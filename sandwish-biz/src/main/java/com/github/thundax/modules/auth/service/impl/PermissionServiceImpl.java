@@ -23,7 +23,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-
 @Service
 @EnableConfigurationProperties(AuthProperties.class)
 public class PermissionServiceImpl implements PermissionService {

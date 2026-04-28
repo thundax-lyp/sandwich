@@ -13,7 +13,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VerifySignRequestParam implements Serializable {
 
-
     private String b64OriginData;
 
     private String b64SignedData;

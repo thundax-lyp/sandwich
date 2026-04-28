@@ -11,7 +11,6 @@ import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class AsyncTaskDaoImpl implements AsyncTaskDao {
 

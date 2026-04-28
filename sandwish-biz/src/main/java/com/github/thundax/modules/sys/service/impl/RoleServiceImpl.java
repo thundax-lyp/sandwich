@@ -28,7 +28,6 @@ public class RoleServiceImpl implements RoleService {
     private final RoleDao dao;
     private final SignService signService;
 
-
     private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler = new PooledThreadLocal<>();
 
     private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
@@ -227,6 +226,7 @@ public class RoleServiceImpl implements RoleService {
     public int updatePriority(List<Role> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     private int batchOperate(Collection<Role> collection, Function<Role, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {

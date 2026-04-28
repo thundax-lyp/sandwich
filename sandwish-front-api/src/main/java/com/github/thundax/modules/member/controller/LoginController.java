@@ -58,7 +58,6 @@ public class LoginController extends BaseFrontController {
         return "modules/member/login";
     }
 
-
     // 第三方登录失败页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public String loginFail(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {

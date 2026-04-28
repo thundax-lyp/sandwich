@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class MenuPersistenceAssembler {
 
     private MenuPersistenceAssembler() {}

@@ -43,7 +43,6 @@ public class MultiState implements State {
         stateList.add(state.toJson());
     }
 
-
     @Override
     public void putInfo(String name, String val) {
         this.infoMap.put(name, val);

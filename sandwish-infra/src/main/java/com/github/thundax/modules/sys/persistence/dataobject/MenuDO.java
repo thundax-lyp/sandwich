@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,7 +52,6 @@ public class MenuDO {
     private Date updateDate;
 
     private String updateBy;
-
 
     public Integer treeSpan() {
         return this.rgt - this.lft + 1;

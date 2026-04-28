@@ -7,7 +7,6 @@ package com.github.thundax.common.service;
 public interface TreeService<T> extends CrudService<T> {
 
     enum MoveTreeNodeType {
-
         BEFORE,
 
         AFTER,

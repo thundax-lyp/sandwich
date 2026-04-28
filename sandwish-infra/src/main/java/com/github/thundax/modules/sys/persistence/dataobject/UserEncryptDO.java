@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,8 +27,6 @@ public class UserEncryptDO {
 
     private String tel;
 
-
-
     private Date createDate;
 
     private String createBy;
@@ -37,5 +34,4 @@ public class UserEncryptDO {
     private Date updateDate;
 
     private String updateBy;
-
 }

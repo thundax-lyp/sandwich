@@ -98,7 +98,6 @@ public class BaseFrontController extends BaseController {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, message);
     }
 
-
     protected static Integer readReloadInteger(
             String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadInteger(paramName, paramName, request, response);

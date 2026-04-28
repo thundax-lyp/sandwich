@@ -83,7 +83,6 @@ public class Role extends BaseRole {
         return RoleServiceHolder.getService().findRoleUser(this);
     }
 
-
     @JsonIgnore
     public Set<String> getPerms() {
         Set<String> allPerms = new HashSet<>();

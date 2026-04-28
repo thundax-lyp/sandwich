@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public static final String DEFAULT_CAPTCHA_PARAM = "validateCode";

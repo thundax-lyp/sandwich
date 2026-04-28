@@ -132,6 +132,7 @@ public class OfficeServiceImpl implements OfficeService {
     public int updatePriority(List<Office> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {

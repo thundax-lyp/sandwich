@@ -149,6 +149,7 @@ public class DictServiceImpl implements DictService {
     public int updatePriority(List<Dict> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     @Override
     public String getDictionaryRevision() {
         return dao.getDictionaryRevision();

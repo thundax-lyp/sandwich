@@ -9,14 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("assist_storage")
 public class StorageDO {
-
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -26,9 +24,6 @@ public class StorageDO {
     private String extendName;
 
     private String mimeType;
-
-
-
 
     private String ownerId;
 
@@ -44,5 +39,4 @@ public class StorageDO {
     private Date createDate;
 
     private Date updateDate;
-
 }

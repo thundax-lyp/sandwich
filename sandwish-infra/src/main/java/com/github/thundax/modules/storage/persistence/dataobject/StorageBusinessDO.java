@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,9 +25,4 @@ public class StorageBusinessDO {
     private String businessParams;
 
     private String publicFlag;
-
-
-
-
-
 }

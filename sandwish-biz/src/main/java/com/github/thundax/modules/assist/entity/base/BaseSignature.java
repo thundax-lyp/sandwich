@@ -10,7 +10,6 @@ import com.github.thundax.modules.assist.entity.Signature;
  */
 public abstract class BaseSignature extends DataEntity<Signature> {
 
-
     private String businessType;
 
     private String businessId;

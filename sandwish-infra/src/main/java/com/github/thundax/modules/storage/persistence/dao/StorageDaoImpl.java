@@ -19,7 +19,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class StorageDaoImpl implements StorageDao {
 
@@ -105,7 +104,9 @@ public class StorageDaoImpl implements StorageDao {
         mapper.insert(dataObject);
         mapper.update(
                 null,
-                new UpdateWrapper<StorageDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                new UpdateWrapper<StorageDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
         return dataObject.getId();
     }

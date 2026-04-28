@@ -5,7 +5,6 @@ import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class SignaturePersistenceAssembler {
 
     private SignaturePersistenceAssembler() {}

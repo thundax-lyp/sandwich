@@ -92,7 +92,6 @@ public class SysLogUtils {
         }
     }
 
-
     @Scheduled(cron = "0 0 0/4 * * ?")
     void doTask() {
         Log query = new Log();

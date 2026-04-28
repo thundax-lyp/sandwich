@@ -95,7 +95,10 @@ public class OfficeDaoImpl implements OfficeDao {
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<OfficeDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<OfficeDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -131,6 +134,7 @@ public class OfficeDaoImpl implements OfficeDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
+
     @Override
     public int delete(String id) {
         OfficeDO node = getTreeNode(id);

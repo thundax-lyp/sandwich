@@ -7,7 +7,6 @@ import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class StoragePersistenceAssembler {
 
     private StoragePersistenceAssembler() {}

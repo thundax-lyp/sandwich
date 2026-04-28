@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class DictDaoImpl implements DictDao {
 
@@ -86,7 +85,10 @@ public class DictDaoImpl implements DictDao {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<DictDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<DictDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -124,6 +126,7 @@ public class DictDaoImpl implements DictDao {
     public int updateStatus(Dict entity) {
         return 0;
     }
+
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);

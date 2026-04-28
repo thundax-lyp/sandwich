@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class UserCacheSupport {
 

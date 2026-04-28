@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccessToken implements Serializable {
 
     public static final int REFRESH_TOKEN_SIZE = 5;
-
 
     private String token;
 

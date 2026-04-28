@@ -11,7 +11,6 @@ public abstract class BaseEntity<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     protected String id;
 
     public BaseEntity() {
@@ -23,7 +22,6 @@ public abstract class BaseEntity<T> implements Serializable {
         this.id = id;
     }
 
-
     protected abstract void initialize();
 
     public String getId() {
@@ -34,9 +32,7 @@ public abstract class BaseEntity<T> implements Serializable {
         this.id = id;
     }
 
-
     public abstract void preInsert();
-
 
     public abstract void preUpdate();
 
@@ -53,5 +49,4 @@ public abstract class BaseEntity<T> implements Serializable {
         }
         return this.getId().equals(((BaseEntity<?>) obj).getId());
     }
-
 }

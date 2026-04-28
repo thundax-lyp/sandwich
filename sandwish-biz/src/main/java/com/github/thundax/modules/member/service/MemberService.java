@@ -84,9 +84,7 @@ public interface MemberService {
      */
     int updateEnableFlag(List<Member> list);
 
-
     Member getByZjhm(Member member);
-
 
     Member getByYwtbId(String ywtbUserId);
 }

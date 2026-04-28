@@ -142,6 +142,7 @@ public class RoleServiceImplTest {
         public int updatePriority(Role role) {
             return 1;
         }
+
         @Override
         public int delete(String id) {
             this.deletedRoleId = id;

@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class UserPersistenceAssembler {
 
     private UserPersistenceAssembler() {}

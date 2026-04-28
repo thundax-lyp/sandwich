@@ -99,7 +99,10 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<MenuDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<MenuDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -143,6 +146,7 @@ public class MenuDaoImpl implements MenuDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
+
     @Override
     public int delete(String id) {
         MenuDO node = getTreeNode(id);

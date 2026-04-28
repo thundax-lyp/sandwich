@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class SignatureDaoImpl implements SignatureDao {
 

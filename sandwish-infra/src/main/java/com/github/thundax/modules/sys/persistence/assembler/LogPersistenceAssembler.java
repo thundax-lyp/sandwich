@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class LogPersistenceAssembler {
 
     private LogPersistenceAssembler() {}

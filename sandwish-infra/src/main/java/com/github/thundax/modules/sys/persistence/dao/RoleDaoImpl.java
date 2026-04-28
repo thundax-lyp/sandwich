@@ -98,7 +98,10 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<RoleDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<RoleDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
         return dataObject.getId();
     }
@@ -128,6 +131,7 @@ public class RoleDaoImpl implements RoleDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
+
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);

@@ -43,7 +43,6 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
         this.updateUserId = updateUserId;
     }
 
-
     @Override
     public void preInsert() {
         super.preInsert();
@@ -52,7 +51,6 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
         }
         this.updateUserId = this.createUserId;
     }
-
 
     @Override
     public void preUpdate() {

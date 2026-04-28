@@ -106,7 +106,10 @@ public class UserDaoImpl implements UserDao {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<UserDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<UserDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         removeUserCaches(dataObject.getId());
         return dataObject.getId();
     }
@@ -143,6 +146,7 @@ public class UserDaoImpl implements UserDao {
         removeUserCaches(entity.getId());
         return count;
     }
+
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);

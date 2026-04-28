@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginForm implements Serializable {
@@ -16,7 +15,6 @@ public class LoginForm implements Serializable {
     public static final int REFRESH_TOKEN_SIZE = 5;
 
     private static final String NULL_CAPTCHA = "null";
-
 
     private String loginToken;
 
@@ -31,7 +29,6 @@ public class LoginForm implements Serializable {
     private Integer expiredSeconds;
 
     private String checkCode;
-
 
     private String publicKey;
 

@@ -9,14 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("sys_office")
 public class OfficeDO {
-
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -42,5 +40,4 @@ public class OfficeDO {
     private Date updateDate;
 
     private String updateBy;
-
 }

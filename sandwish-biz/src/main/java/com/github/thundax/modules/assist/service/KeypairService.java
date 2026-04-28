@@ -1,6 +1,5 @@
 package com.github.thundax.modules.assist.service;
 
-
 public interface KeypairService {
 
     /**

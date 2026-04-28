@@ -5,7 +5,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 
-
 public final class PermissionAuthorities {
 
     private PermissionAuthorities() {}

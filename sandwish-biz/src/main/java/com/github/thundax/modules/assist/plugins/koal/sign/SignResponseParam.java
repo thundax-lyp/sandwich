@@ -12,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SignResponseParam extends BaseResponse {
 
-
     private String b64SignedData;
 
     private String b64Cert;

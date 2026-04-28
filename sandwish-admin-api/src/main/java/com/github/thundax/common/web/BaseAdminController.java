@@ -207,7 +207,6 @@ public class BaseAdminController extends BaseController {
         return dataList;
     }
 
-
     protected void setupParamsModel(HttpServletRequest request, Model model) {
         request.getParameterMap().forEach((name, values) -> {
             if (StringUtils.isNotBlank(name) && values != null) {
@@ -219,7 +218,6 @@ public class BaseAdminController extends BaseController {
             }
         });
     }
-
 
     protected static Integer readReloadInteger(
             String paramName, HttpServletRequest request, HttpServletResponse response) {

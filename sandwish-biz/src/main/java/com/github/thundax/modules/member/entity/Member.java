@@ -75,7 +75,6 @@ public class Member extends BaseMember {
 
         private String ywtbId;
 
-
         private String zjhm;
 
         private String mobile;

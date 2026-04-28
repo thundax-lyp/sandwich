@@ -83,10 +83,8 @@ public class RSAUtils {
         }
     }
 
-
     public static class ReadableKeyPair implements Serializable {
         private static final long serialVersionUID = 1L;
-
 
         private String publicKey;
 
@@ -103,7 +101,6 @@ public class RSAUtils {
             this.setPrivateKeyExponent(privateKeyExponent);
         }
 
-
         public String getPublicKey() {
             return this.publicKey;
         }
@@ -111,7 +108,6 @@ public class RSAUtils {
         public void setPublicKey(String publicKey) {
             this.publicKey = publicKey;
         }
-
 
         public String getModulus() {
             return this.modulus;
@@ -121,7 +117,6 @@ public class RSAUtils {
             this.modulus = modulus;
         }
 
-
         public String getPrivateKeyExponent() {
             return this.privateKeyExponent;
         }
@@ -129,7 +124,6 @@ public class RSAUtils {
         public void setPrivateKeyExponent(String privateKeyExponent) {
             this.privateKeyExponent = privateKeyExponent;
         }
-
 
         public String getPublicKeyExponent() {
             return this.publicKeyExponent;

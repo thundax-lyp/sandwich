@@ -14,7 +14,6 @@ public class Config implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     private Long imageMaxSize;
 
     private List<String> imageAllowFiles;
@@ -28,8 +27,6 @@ public class Config implements Serializable {
      * 会替换成两位日期 {hh} 会替换成两位小时 {ii} 会替换成两位分钟 {ss} 会替换成两位秒 非法字符 \ : * ? " < > | 具请体看线上文档:
      * fex.baidu.com/ueditor/#use-format_upload_filename
      */
-
-
     private String imageActionName;
 
     private String imageCompressEnable;

@@ -5,7 +5,6 @@ import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class MemberPersistenceAssembler {
 
     private MemberPersistenceAssembler() {}

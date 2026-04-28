@@ -5,7 +5,6 @@ import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO;
 import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
 
-
 public final class AuthPersistenceAssembler {
 
     private AuthPersistenceAssembler() {}

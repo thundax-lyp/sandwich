@@ -13,7 +13,6 @@ public class ExportWord {
 
     private FreeMarkerConfigurer configurer;
 
-
     public ExportWord() throws Exception {
         configurer = new FreeMarkerConfigurer();
 

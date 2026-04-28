@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,9 +20,6 @@ public class SignatureDO {
     private String signature;
     private String isVerifySign;
 
-
-
     private Date createDate;
     private Date updateDate;
-
 }

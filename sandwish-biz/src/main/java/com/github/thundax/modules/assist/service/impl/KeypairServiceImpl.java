@@ -7,7 +7,6 @@ import com.github.thundax.modules.auth.config.AuthProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @EnableConfigurationProperties(AuthProperties.class)
 public class KeypairServiceImpl implements KeypairService {

@@ -9,14 +9,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("sys_dict")
 public class DictDO {
-
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -33,5 +31,4 @@ public class DictDO {
     private Date updateDate;
 
     private String updateBy;
-
 }

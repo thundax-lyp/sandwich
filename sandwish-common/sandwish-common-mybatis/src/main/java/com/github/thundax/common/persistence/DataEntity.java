@@ -31,13 +31,11 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
         this.setPriority(0);
     }
 
-
     @Override
     public void preInsert() {
         this.createDate = new Date();
         this.updateDate = this.createDate;
     }
-
 
     @Override
     public void preUpdate() {

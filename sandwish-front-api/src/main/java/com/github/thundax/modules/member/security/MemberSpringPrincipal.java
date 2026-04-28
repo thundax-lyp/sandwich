@@ -3,7 +3,6 @@ package com.github.thundax.modules.member.security;
 import com.github.thundax.modules.member.entity.Member;
 import java.io.Serializable;
 
-
 public class MemberSpringPrincipal implements Serializable {
 
     private static final long serialVersionUID = 1L;

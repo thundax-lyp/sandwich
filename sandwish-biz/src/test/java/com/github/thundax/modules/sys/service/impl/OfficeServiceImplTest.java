@@ -168,6 +168,7 @@ public class OfficeServiceImplTest {
             this.priorityCalls++;
             return 1;
         }
+
         @Override
         public int delete(String id) {
             this.deletedId = id;

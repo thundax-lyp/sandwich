@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class MemberDaoImpl implements MemberDao {
 
@@ -97,7 +96,10 @@ public class MemberDaoImpl implements MemberDao {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
-                null, new UpdateWrapper<MemberDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
+                null,
+                new UpdateWrapper<MemberDO>()
+                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .eq("id", dataObject.getId()));
         return dataObject.getId();
     }
 

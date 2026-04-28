@@ -126,5 +126,4 @@ public interface CrudService<T> extends BaseService {
      * @return 影响记录数
      */
     int updatePriority(List<T> list);
-
 }

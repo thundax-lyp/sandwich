@@ -27,7 +27,6 @@ public class SpringContextHolder {
         applicationContext = null;
     }
 
-
     @NonNull
     public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);

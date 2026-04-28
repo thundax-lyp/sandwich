@@ -73,7 +73,6 @@ public class VltavaProperties {
         this.xssFilter = xssFilter;
     }
 
-
     public static class ProductProperties {
 
         private String name;
@@ -113,7 +112,6 @@ public class VltavaProperties {
             this.version = version;
         }
     }
-
 
     public static class UploadProperties {
 

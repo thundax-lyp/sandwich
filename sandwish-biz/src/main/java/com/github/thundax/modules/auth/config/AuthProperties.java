@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.config;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-
 @ConfigurationProperties(prefix = "vltava.auth")
 public class AuthProperties {
 

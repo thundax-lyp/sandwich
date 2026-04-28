@@ -22,7 +22,6 @@ public class TagController extends BaseAdminController {
         super(validator);
     }
 
-
     @RequestMapping(value = "treeSelector")
     public String treeSelector(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);
@@ -30,14 +29,12 @@ public class TagController extends BaseAdminController {
         return "modules/sys/tagTreeselect";
     }
 
-
     @RequestMapping(value = "iconSelector")
     public String iconSelector(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);
 
         return "modules/sys/tagIconSelector";
     }
-
 
     @RequestMapping(value = "locationSelector")
     public String locationSelector(HttpServletRequest request, Model model) {
@@ -49,7 +46,6 @@ public class TagController extends BaseAdminController {
 
         return "modules/sys/tagLocationSelector";
     }
-
 
     @RequestMapping(value = "codeditor")
     public String codeditor(HttpServletRequest request, Model model) {

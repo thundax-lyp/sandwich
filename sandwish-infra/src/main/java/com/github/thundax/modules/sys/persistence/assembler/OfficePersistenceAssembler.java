@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class OfficePersistenceAssembler {
 
     private OfficePersistenceAssembler() {}

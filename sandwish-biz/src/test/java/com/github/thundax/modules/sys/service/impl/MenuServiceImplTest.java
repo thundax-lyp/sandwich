@@ -190,6 +190,7 @@ public class MenuServiceImplTest {
         public int updatePriority(Menu menu) {
             return 1;
         }
+
         @Override
         public int delete(String id) {
             this.deletedId = id;

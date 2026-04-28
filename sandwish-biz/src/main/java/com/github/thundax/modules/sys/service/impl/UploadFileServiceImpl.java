@@ -117,6 +117,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     public int updatePriority(List<UploadFile> list) {
         return batchOperate(list, this::updatePriority);
     }
+
     @Override
     public UploadFile getContent(UploadFile uploadFile) {
         return uploadFile == null ? null : dao.getContent(uploadFile.getId());

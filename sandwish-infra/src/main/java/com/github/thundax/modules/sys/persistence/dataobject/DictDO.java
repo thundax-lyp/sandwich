@@ -43,13 +43,4 @@ public class DictDO {
     private String updateUserId;
 
     private String delFlag;
-
-    @TableField(exist = false)
-    private String queryType;
-
-    @TableField(exist = false)
-    private String queryRemarks;
-
-    @TableField(exist = false)
-    private String queryLabel;
 }

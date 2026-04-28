@@ -1,5 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -15,33 +18,56 @@ import lombok.Setter;
 @TableName("sys_log")
 public class LogDO {
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
+    @TableField("user_id")
     private String userId;
+
     private String type;
+
+    @TableField("log_date")
     private Date logDate;
+
     private String title;
+
+    @TableField("remote_addr")
     private String remoteAddr;
+
+    @TableField("user_agent")
     private String userAgent;
+
     private String method;
+
+    @TableField("request_uri")
     private String requestUri;
+
+    @TableField("request_params")
     private String requestParams;
+
+    @TableField(exist = false)
     private Integer priority;
+
+    @TableField(exist = false)
     private String remarks;
+
+    @TableField(exist = false)
     private Date createDate;
+
+    @TableField(exist = false)
     private String createUserId;
+
+    @TableField(exist = false)
     private Date updateDate;
+
+    @TableField(exist = false)
     private String updateUserId;
+
+    @TableField(exist = false)
     private String delFlag;
-    private String queryType;
-    private String queryRemoteAddr;
-    private String queryTitle;
-    private String queryRequestUri;
-    private String queryUserLoginName;
-    private String queryUserName;
-    private Date queryBeginDate;
-    private Date queryEndDate;
 
     public LogDO(String id) {
         this.id = id;
@@ -189,69 +215,5 @@ public class LogDO {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
-    }
-
-    public String getQueryType() {
-        return queryType;
-    }
-
-    public void setQueryType(String queryType) {
-        this.queryType = queryType;
-    }
-
-    public String getQueryRemoteAddr() {
-        return queryRemoteAddr;
-    }
-
-    public void setQueryRemoteAddr(String queryRemoteAddr) {
-        this.queryRemoteAddr = queryRemoteAddr;
-    }
-
-    public String getQueryTitle() {
-        return queryTitle;
-    }
-
-    public void setQueryTitle(String queryTitle) {
-        this.queryTitle = queryTitle;
-    }
-
-    public String getQueryRequestUri() {
-        return queryRequestUri;
-    }
-
-    public void setQueryRequestUri(String queryRequestUri) {
-        this.queryRequestUri = queryRequestUri;
-    }
-
-    public String getQueryUserLoginName() {
-        return queryUserLoginName;
-    }
-
-    public void setQueryUserLoginName(String queryUserLoginName) {
-        this.queryUserLoginName = queryUserLoginName;
-    }
-
-    public String getQueryUserName() {
-        return queryUserName;
-    }
-
-    public void setQueryUserName(String queryUserName) {
-        this.queryUserName = queryUserName;
-    }
-
-    public Date getQueryBeginDate() {
-        return queryBeginDate;
-    }
-
-    public void setQueryBeginDate(Date queryBeginDate) {
-        this.queryBeginDate = queryBeginDate;
-    }
-
-    public Date getQueryEndDate() {
-        return queryEndDate;
-    }
-
-    public void setQueryEndDate(Date queryEndDate) {
-        this.queryEndDate = queryEndDate;
     }
 }

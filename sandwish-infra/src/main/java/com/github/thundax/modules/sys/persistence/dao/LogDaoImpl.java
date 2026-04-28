@@ -1,15 +1,18 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import com.github.thundax.modules.sys.persistence.mapper.LogMapper;
+import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 日志 DAO 实现。 */
 @Repository
 public class LogDaoImpl implements LogDao {
 
@@ -20,28 +23,66 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public Log get(Log entity) {
-        return LogPersistenceAssembler.toEntity(
-                mapper.get(LogPersistenceAssembler.toDataObject(entity)));
+    public Log get(String id) {
+        return LogPersistenceAssembler.toEntity(mapper.selectById(id));
     }
 
     @Override
     public List<Log> getMany(List<String> idList) {
-        return LogPersistenceAssembler.toEntityList(mapper.getMany(idList));
+        return LogPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Log> findList(Log entity) {
-        List<LogDO> dataObjects = mapper.findList(LogPersistenceAssembler.toDataObject(entity));
-        List<Log> entities = LogPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<Log> findList(
+            String type,
+            String remoteAddr,
+            String userLoginName,
+            String userName,
+            String title,
+            String requestUri,
+            Date beginDate,
+            Date endDate) {
+        return LogPersistenceAssembler.toEntityList(
+                mapper.selectList(
+                        buildListWrapper(
+                                type,
+                                remoteAddr,
+                                userLoginName,
+                                userName,
+                                title,
+                                requestUri,
+                                beginDate,
+                                endDate)));
+    }
+
+    @Override
+    public Page<Log> findPage(
+            String type,
+            String remoteAddr,
+            String userLoginName,
+            String userName,
+            String title,
+            String requestUri,
+            Date beginDate,
+            Date endDate,
+            Page<Log> page) {
+        IPage<LogDO> dataObjectPage =
+                mapper.selectPage(
+                        LogPageFactory.create(page.getPageNo(), page.getPageSize()),
+                        buildListWrapper(
+                                type,
+                                remoteAddr,
+                                userLoginName,
+                                userName,
+                                title,
+                                requestUri,
+                                beginDate,
+                                endDate));
+        page.setPageNo((int) dataObjectPage.getCurrent());
+        page.setPageSize((int) dataObjectPage.getSize());
+        page.setCount(dataObjectPage.getTotal());
+        page.setList(LogPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return page;
     }
 
     @Override
@@ -50,36 +91,79 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int update(Log entity) {
-        return mapper.update(LogPersistenceAssembler.toDataObject(entity));
-    }
-
-    @Override
-    public int updatePriority(Log entity) {
-        return mapper.updatePriority(LogPersistenceAssembler.toDataObject(entity));
-    }
-
-    public int updateStatus(Log entity) {
-        return mapper.updateStatus(LogPersistenceAssembler.toDataObject(entity));
-    }
-
-    @Override
-    public int updateDelFlag(Log entity) {
-        return mapper.updateDelFlag(LogPersistenceAssembler.toDataObject(entity));
-    }
-
-    @Override
-    public int delete(Log entity) {
-        return mapper.delete(LogPersistenceAssembler.toDataObject(entity));
+    public int delete(String id) {
+        return mapper.deleteById(id);
     }
 
     @Override
     public int insertList(List<Log> list) {
-        return mapper.insertList(LogPersistenceAssembler.toDataObjectList(list));
+        int count = 0;
+        for (LogDO dataObject : LogPersistenceAssembler.toDataObjectList(list)) {
+            count += mapper.insert(dataObject);
+        }
+        return count;
     }
 
     @Override
-    public int batchDelete(Log log) {
-        return mapper.batchDelete(LogPersistenceAssembler.toDataObject(log));
+    public int batchDelete(
+            String type,
+            String remoteAddr,
+            String title,
+            String requestUri,
+            Date beginDate,
+            Date endDate) {
+        return mapper.delete(
+                buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate));
+    }
+
+    private QueryWrapper<LogDO> buildListWrapper(
+            String type,
+            String remoteAddr,
+            String userLoginName,
+            String userName,
+            String title,
+            String requestUri,
+            Date beginDate,
+            Date endDate) {
+        QueryWrapper<LogDO> wrapper =
+                buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate);
+        if (StringUtils.isNotBlank(userLoginName)) {
+            wrapper.apply(
+                    "user_id IN (SELECT id FROM sys_user WHERE login_name LIKE CONCAT('%', {0}, '%'))",
+                    userLoginName);
+        }
+        if (StringUtils.isNotBlank(userName)) {
+            wrapper.apply(
+                    "user_id IN (SELECT id FROM sys_user WHERE name LIKE CONCAT('%', {0}, '%'))",
+                    userName);
+        }
+        wrapper.orderByDesc("log_date");
+        return wrapper;
+    }
+
+    private QueryWrapper<LogDO> buildBatchDeleteWrapper(
+            String type,
+            String remoteAddr,
+            String title,
+            String requestUri,
+            Date beginDate,
+            Date endDate) {
+        QueryWrapper<LogDO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(type)) {
+            wrapper.eq("type", type);
+        }
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            wrapper.eq("remote_addr", remoteAddr);
+        }
+        if (StringUtils.isNotBlank(title)) {
+            wrapper.like("title", title);
+        }
+        if (StringUtils.isNotBlank(requestUri)) {
+            wrapper.like("request_uri", requestUri);
+        }
+        if (beginDate != null && endDate != null) {
+            wrapper.between("log_date", beginDate, endDate);
+        }
+        return wrapper;
     }
 }

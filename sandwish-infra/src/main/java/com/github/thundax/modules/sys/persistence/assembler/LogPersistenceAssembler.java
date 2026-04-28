@@ -33,7 +33,6 @@ public final class LogPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -85,17 +84,4 @@ public final class LogPersistenceAssembler {
         return dataObjects;
     }
 
-    private static void copyQuery(Log.Query query, LogDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryType(query.getType());
-        dataObject.setQueryRemoteAddr(query.getRemoteAddr());
-        dataObject.setQueryTitle(query.getTitle());
-        dataObject.setQueryRequestUri(query.getRequestUri());
-        dataObject.setQueryUserLoginName(query.getUserLoginName());
-        dataObject.setQueryUserName(query.getUserName());
-        dataObject.setQueryBeginDate(query.getBeginDate());
-        dataObject.setQueryEndDate(query.getEndDate());
-    }
 }

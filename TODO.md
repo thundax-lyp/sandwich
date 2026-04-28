@@ -19,49 +19,42 @@
 
 ### 第一批：有达梦 XML 的 entity
 
-1. 迁移 `Log` 持久化链路
-   - 以 `LogMapper.xml` 达梦实现为行为基准。
-   - 迁出旧 CRUD 基类，展开查询 DAO 参数。
-   - 仅 `insert` / `update` 使用 `Log` 实体参数。
-   - Mapper 保持最小 `BaseMapper<LogDO>` 定义，业务在 `DaoImpl` 中实现。
-   - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
-   - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-2. 迁移 `Menu` 持久化链路
+1. 迁移 `Menu` 持久化链路
    - 以 `MenuMapper.xml` 达梦实现为行为基准。
    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
    - 仅 `insert` / `update` 使用 `Menu` 实体参数。
    - Mapper 保持最小 `BaseMapper<MenuDO>` 定义，业务在 `DaoImpl` 中实现。
    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-3. 迁移 `Office` 持久化链路
+2. 迁移 `Office` 持久化链路
    - 以 `OfficeMapper.xml` 达梦实现为行为基准。
    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
    - 仅 `insert` / `update` 使用 `Office` 实体参数。
    - Mapper 保持最小 `BaseMapper<OfficeDO>` 定义，业务在 `DaoImpl` 中实现。
    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-4. 迁移 `Role` 持久化链路
+3. 迁移 `Role` 持久化链路
    - 以 `RoleMapper.xml` 达梦实现为行为基准。
    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
    - 仅 `insert` / `update` 使用 `Role` 实体参数。
    - Mapper 保持最小 `BaseMapper<RoleDO>` 定义，业务在 `DaoImpl` 中实现。
    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-5. 迁移 `UploadFile` 持久化链路
+4. 迁移 `UploadFile` 持久化链路
    - 以 `UploadFileMapper.xml` 达梦实现为行为基准。
    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
    - 仅 `insert` / `update` 使用 `UploadFile` 实体参数。
    - Mapper 保持最小 `BaseMapper<UploadFileDO>` 定义，业务在 `DaoImpl` 中实现。
    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-6. 迁移 `UserEncrypt` 持久化链路
+5. 迁移 `UserEncrypt` 持久化链路
    - 以 `UserEncryptMapper.xml` 达梦实现为行为基准。
    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
    - 仅 `insert` / `update` 使用 `UserEncrypt` 实体参数。
    - Mapper 保持最小 `BaseMapper<UserEncryptDO>` 定义，业务在 `DaoImpl` 中实现。
    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-7. 迁移 `User` 持久化链路
+6. 迁移 `User` 持久化链路
     - 以 `UserMapper.xml` 达梦实现为行为基准。
     - 迁出旧 CRUD 基类，展开查询 DAO 参数。
     - 仅 `insert` / `update` 使用 `User` 实体参数。

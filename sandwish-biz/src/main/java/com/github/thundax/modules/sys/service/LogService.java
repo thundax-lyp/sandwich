@@ -1,11 +1,21 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.service.CrudService;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.List;
 
 /** @author wdit */
-public interface LogService extends CrudService<Log> {
+public interface LogService {
+
+    Log get(String id);
+
+    List<Log> findList(Log log);
+
+    Page<Log> findPage(Log log, Page<Log> page);
+
+    void save(Log log);
+
+    int delete(Log log);
 
     /**
      * 写入

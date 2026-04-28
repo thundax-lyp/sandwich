@@ -52,7 +52,7 @@ public class LogServiceImplTest {
         query.setBeginDate(begin);
         query.setEndDate(end);
         log.setQuery(query);
-        Page<Log> page = new Page<>(2, 20);
+        Page<Log> page = new Page<>(2, 20, 100);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
         service.findPage(log, page);
@@ -65,7 +65,23 @@ public class LogServiceImplTest {
         assertEquals("/login", dao.requestUri);
         assertEquals(begin, dao.beginDate);
         assertEquals(end, dao.endDate);
-        assertSame(page, dao.page);
+        assertEquals(2, dao.pageNo);
+        assertEquals(20, dao.pageSize);
+        assertEquals(1L, page.getCount());
+    }
+
+    @Test
+    public void shouldNormalizeInvalidPageBeforeQuery() {
+        RecordingLogDao dao = new RecordingLogDao();
+        Page<Log> page = new Page<>();
+        page.setPageNo(0);
+        page.setPageSize(0);
+        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+
+        service.findPage(new Log(), page);
+
+        assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
+        assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
     }
 
     @Test
@@ -151,7 +167,8 @@ public class LogServiceImplTest {
         private String requestUri;
         private Date beginDate;
         private Date endDate;
-        private Page<Log> page;
+        private int pageNo;
+        private int pageSize;
         private Log inserted;
         private int insertListCalls;
         private int firstBatchSize;
@@ -192,7 +209,7 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public Page<Log> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Log> findPage(
                 String type,
                 String remoteAddr,
                 String userLoginName,
@@ -201,7 +218,8 @@ public class LogServiceImplTest {
                 String requestUri,
                 Date beginDate,
                 Date endDate,
-                Page<Log> page) {
+                int pageNo,
+                int pageSize) {
             recordFilters(
                     type,
                     remoteAddr,
@@ -211,8 +229,13 @@ public class LogServiceImplTest {
                     requestUri,
                     beginDate,
                     endDate);
-            this.page = page;
-            return page;
+            this.pageNo = pageNo;
+            this.pageSize = pageSize;
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Log> dataPage =
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                            pageNo, pageSize);
+            dataPage.setTotal(1);
+            return dataPage;
         }
 
         @Override

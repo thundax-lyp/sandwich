@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +31,8 @@ public interface LogDao {
             String requestUri,
             Date beginDate,
             Date endDate,
-            Page<Log> page);
+            int pageNo,
+            int pageSize);
 
     int insert(Log log);
 

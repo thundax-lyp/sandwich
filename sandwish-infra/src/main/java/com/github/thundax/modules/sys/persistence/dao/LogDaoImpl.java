@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
@@ -65,24 +65,25 @@ public class LogDaoImpl implements LogDao {
             String requestUri,
             Date beginDate,
             Date endDate,
-            Page<Log> page) {
+            int pageNo,
+            int pageSize) {
+        Page<LogDO> page = new Page<>(pageNo, pageSize);
         IPage<LogDO> dataObjectPage =
                 mapper.selectPage(
-                        LogPageFactory.create(page.getPageNo(), page.getPageSize()),
+                        page,
                         buildListWrapper(
-                                type,
-                                remoteAddr,
-                                userLoginName,
-                                userName,
-                                title,
-                                requestUri,
-                                beginDate,
-                                endDate));
-        page.setPageNo((int) dataObjectPage.getCurrent());
-        page.setPageSize((int) dataObjectPage.getSize());
-        page.setCount(dataObjectPage.getTotal());
-        page.setList(LogPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
-        return page;
+                        type,
+                        remoteAddr,
+                        userLoginName,
+                        userName,
+                        title,
+                        requestUri,
+                        beginDate,
+                        endDate));
+        Page<Log> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(LogPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override

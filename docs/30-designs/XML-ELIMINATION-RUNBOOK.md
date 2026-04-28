@@ -29,7 +29,7 @@
 - 不改变 Controller/API 行为。
 - 不引入新业务分层。
 - 不让 Controller 直接感知持久化实现。
-- 不让 `sandwish-biz` 直接依赖 MyBatis-Plus Mapper、Wrapper 或分页对象。
+- 不让 `sandwish-biz` 直接依赖 MyBatis-Plus Mapper 或 Wrapper。
 - 不维护 MySQL / Kingbase XML 的长期业务等价。
 
 ## 3. Final State
@@ -44,7 +44,8 @@
 - 业务 `ServiceImpl` 不继承旧 `CrudServiceImpl`。
 - `DaoImpl` 不依赖旧 CRUD 基类完成通用持久化。
 - `Mapper` 继承 `BaseMapper<DO>`，只在 `sandwish-infra` 内使用。
-- `QueryWrapper`、`LambdaQueryWrapper`、`Page`、`IPage` 不泄漏到 `sandwish-biz`。
+- `QueryWrapper`、`LambdaQueryWrapper` 和 MyBatis-Plus `Page` 不泄漏到 `sandwish-biz`。
+- DAO 分页返回使用 MyBatis-Plus `Page<Entity>`，由 Service 层装配当前对外分页模型。
 - `sandwish-common-mybatis` 只保留 MyBatis-Plus 基础配置、扫描标记、数据库方言和必要公共基础设施。
 - Mapper interface 使用标准 `@Mapper`，保持最小定义，不承载业务方法。
 
@@ -85,7 +86,7 @@
 
 - `findById(String id)`
 - `findList(String name, String status)`
-- `findPage(String name, String status, int pageNo, int pageSize)`
+- `Page<Entity> findPage(String name, String status, int pageNo, int pageSize)`
 - `countByStatus(String status)`
 - `existsByLoginName(String loginName)`
 
@@ -95,6 +96,8 @@
 - 禁止 `findPage(Page<Entity> page, Entity entity)`。
 - 禁止 `count(Entity entity)`。
 - 禁止用实体对象传递只服务查询的临时条件。
+- 禁止 DAO 分页方法接收或返回 `com.github.thundax.common.persistence.Page`。
+- DAO 分页方法只接收 `pageNo`、`pageSize` 基础参数；参数有效性在 `ServiceImpl` 里校验。
 
 只有写入类方法使用 `domain.Entity`：
 
@@ -129,7 +132,8 @@
 - 为了使用 Wrapper 改变达梦 SQL 语义。
 - 把数据库差异藏到 Controller 或 Service。
 - 把复杂业务规则下沉到 Mapper 或 SQL Provider。
-- 让 `sandwish-biz` 依赖 `BaseMapper`、`QueryWrapper`、`LambdaQueryWrapper`、`Page` 或 `IPage`。
+- 让 `sandwish-biz` 依赖 `BaseMapper`、`QueryWrapper`、`LambdaQueryWrapper` 或 MyBatis-Plus `Page`。
+- DAO 以外的 `sandwish-biz` 代码直接操作 MyBatis-Plus 分页实现。
 
 ## 8. Mapper Minimal Definition Rules
 
@@ -174,7 +178,7 @@ public interface PostMapper extends BaseMapper<PostDO> {}
 9. 让 `Mapper` 保持 `@Mapper public interface XxxMapper extends BaseMapper<XxxDO> {}` 最小定义。
 10. 用 `BaseMapper` 承接标准 CRUD。
 11. 用 `LambdaQueryWrapper` 承接单表条件查询。
-12. 用 MyBatis-Plus `Page` 承接分页查询。
+12. `ServiceImpl` 校验 `pageNo`、`pageSize`，DAO 使用 MyBatis-Plus `Page` 承接分页查询并返回 `Page<Entity>`。
 13. 在 `DaoImpl` 中用 Java 持久化实现承接复杂达梦 SQL。
 14. 保持 `PersistenceAssembler` 负责 `Entity <-> DO` 转换。
 15. 删除当前 entity 对应的 MySQL / Kingbase / 达梦 XML。
@@ -193,9 +197,12 @@ PageHelper 固定消灭，不作为迁移后的兼容层保留。
 - 禁止新增 `PageHelper.startPage`。
 - 禁止新增 `PageHelper.count`。
 - 禁止新增 `PageHelper.clearPage`。
-- DAO 内部使用 MyBatis-Plus `Page<DO>`。
-- DAO 对外返回项目自有分页模型或业务实体列表。
-- `IPage<DO>` 不得返回到 `sandwish-biz`。
+- DAO 方法签名使用 `Page<Entity> findPage(..., int pageNo, int pageSize)`。
+- DAO 内部直接 `new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize)`。
+- 不新增 `PageFactory.create()` 这类分页工厂。
+- DAO 不接收、不返回 `com.github.thundax.common.persistence.Page`，该类型未来会删除。
+- DAO 不返回 `Page<DO>`；`DaoImpl` 内部将 `Page<DO>` 转成 `Page<Entity>`。
+- Service 层负责校验 `pageNo`、`pageSize` 的有效性，并把 `Page<Entity>` 装配为当前对外分页模型。
 - 同一查询链路不得混用 PageHelper 和 MyBatis-Plus 分页。
 
 全局删除 PageHelper 的条件：
@@ -229,11 +236,11 @@ mvn -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
 ```bash
 rg "PageHelper" sandwish-*
 find sandwish-infra -path '*mapper/mapping*' -type f
-rg "extends CrudDao|extends CrudServiceImpl|BaseMapper|QueryWrapper|LambdaQueryWrapper|IPage" sandwish-biz
+rg "extends CrudDao|extends CrudServiceImpl|BaseMapper|QueryWrapper|LambdaQueryWrapper|Page<" sandwish-biz
 rg "@Select|@Update|@Insert|@Delete|Provider" sandwish-infra/src/main/java/com/github/thundax/modules/*/persistence/mapper
 ```
 
-允许 `BaseMapper`、`QueryWrapper`、`LambdaQueryWrapper`、`Page`、`IPage` 出现在 `sandwish-infra` 和 `sandwish-common-mybatis` 的基础设施中。
+允许 MyBatis-Plus `Page<Entity>` 出现在 `sandwish-biz` 的 DAO 分页签名和对应 Service 装配代码中。允许 `BaseMapper`、`QueryWrapper`、`LambdaQueryWrapper`、MyBatis-Plus `Page<DO>` 出现在 `sandwish-infra` 和 `sandwish-common-mybatis` 的基础设施中。
 
 ## 12. TODO Decomposition Rules
 

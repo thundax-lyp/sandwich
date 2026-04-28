@@ -4,7 +4,7 @@
 
 ## Purpose
 
-本文档固定数据库、持久化模型和查询映射的工程级规则，避免 Entity、DAO interface、DAO implementation、Mapper、Mapper XML 和 `DO/DataObject` 的职责混淆。
+本文档固定数据库、持久化模型和查询映射的工程级规则，避免 Entity、DAO interface、DAO implementation、Mapper 和 `DO/DataObject` 的职责混淆。
 
 ## Scope
 
@@ -12,7 +12,7 @@
 
 - 数据库平台默认规则
 - 表、字段、索引和关系约束
-- DAO / Mapper / Mapper XML 归属
+- DAO / Mapper 归属
 - Entity 与 `DO/DataObject` 的边界
 - `PersistenceAssembler` 职责
 - 数据库设计文档结构
@@ -65,13 +65,14 @@
 ## Persistence Layer Rules
 
 - `sandwish-biz` 固定保留 `Entity`、Service 和 DAO interface。
-- `sandwish-infra` 固定承载 `DO/DataObject`、DAO implementation、MyBatis Mapper、Mapper XML 和 `PersistenceAssembler`。
-- `Entity` 表达 Service 可使用的业务数据对象，不直接作为 MyBatis XML result type。
+- `sandwish-infra` 固定承载 `DO/DataObject`、DAO implementation、MyBatis-Plus Mapper 和 `PersistenceAssembler`。
+- `Entity` 表达 Service 可使用的业务数据对象，不直接作为 MyBatis-Plus Mapper 持久化对象。
 - `DO/DataObject` 表达持久化实现对象，不暴露给 Controller 或 Service。
 - DAO interface 不使用 MyBatis 扫描标记。
-- MyBatis Mapper interface 使用 MyBatis 扫描标记。
-- Mapper XML namespace 固定指向 `sandwish-infra` 中的 Mapper interface。
-- Mapper XML result type 固定指向 `DO/DataObject`。
+- MyBatis Mapper interface 使用标准 `@Mapper` 扫描标记。
+- Mapper interface 保持最小定义，固定形态为 `public interface XxxMapper extends BaseMapper<XxxDO> {}`。
+- 业务查询、排序、关系装载和分页逻辑固定在 DAO implementation 中通过 MyBatis-Plus API 或当前 entity 专用持久化 helper 完成。
+- 禁止新增 Mapper XML、注解 SQL 或 SQL Provider 作为业务持久化实现入口。
 - `PersistenceAssembler` 只负责 `Entity <-> DO/DataObject` 转换，不调用 Service、DAO 或 Mapper。
 - DAO implementation 负责调用 MyBatis Mapper 并通过 `PersistenceAssembler` 完成模型转换。
 - Service 不感知 `DO/DataObject`。
@@ -79,14 +80,15 @@
 - `DO/DataObject` 只承载数据库字段、必要关系字段和持久化查询所需的显式字段。
 - `DO/DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不通过父类继承公共查询容器。
 - Mapper 方法查询参数固定为一级显式参数或 `sandwish-infra` 内部 persistence 参数对象。
-- Mapper XML 固定读取一级参数或 persistence 参数对象字段，不读取通用 `query.*`。
 - `PersistenceAssembler` 不负责 `Entity.query` 与 `DO.query` 互转；业务查询条件必须在 Service / DAO implementation 中显式拆解。
-- 多方言 Mapper XML 必须同步维护同一业务语义；确有 SQL 差异时，差异必须保留在对应方言 XML 中，不通过牺牲方言能力强行统一。
 - 树结构中 `parentId` 是业务关系字段，可以存在于 `Entity`、`DO/DataObject` 和 API 模型中。
-- 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
+- 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
-- 新增 MyBatis-Plus 链路固定以达梦行为为标准，分页插件固定使用 `DbType.DM`。
-- PageHelper 与 MyBatis-Plus 分页不得在同一查询链路混用。
+- MyBatis-Plus 链路固定以达梦行为为标准，分页插件固定使用 `DbType.DM`。
+- PageHelper 已下线，禁止新增依赖、调用或兼容支撑。
+- 旧 `CrudDao` / `CrudServiceImpl` 基类已下线，禁止业务 DAO / Service 继承回流。
+- DAO 分页方法直接返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`。
+- `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。
 
 ## Index And Uniqueness
 

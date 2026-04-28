@@ -1,24 +1,3 @@
 # TODO List
 
-## 说明
-
-- `TODO.md` 是未关闭任务面板，不是完成历史。
-- 宏观任务必须先讨论边界，再拆解为可执行 TODO。
-- 已完成任务必须删除，不在 `TODO.md` 中打勾长期保留。
-- 完成历史保留在 commit 或 PR 中。
-
-## 当前主线顺序
-
-1. MyBatis XML 消灭迁移
-   - 按 [`docs/30-designs/XML-ELIMINATION-RUNBOOK.md`](docs/30-designs/XML-ELIMINATION-RUNBOOK.md) 执行。
-   - 手册按垂直域说明迁移方法。
-   - 任务按平行 entity 推进。
-   - 每个 entity 一个 TODO、一个闭环提交。
-
-## MyBatis XML 消灭迁移
-
-### 第一批：有达梦 XML 的 entity
-
-### 第三批：公共收口
-
-1. 同步长期数据库治理规则。
+当前无未关闭任务。

@@ -49,7 +49,7 @@
 - `PATH_ADMIN_API_OWNERSHIP`：后台接口入口和后台 API 支撑静态资源固定归属 `sandwish-admin-api`
 - `PATH_FRONT_API_OWNERSHIP`：前台接口入口和前台 API 支撑静态资源固定归属 `sandwish-front-api`
 - `PATH_SHARED_BUSINESS_OWNERSHIP`：前后台共享业务规则固定归属 `sandwish-biz`
-- `PATH_INFRA_PERSISTENCE_OWNERSHIP`：DAO implementation、MyBatis Mapper、Mapper XML、`DO/DataObject`、`PersistenceAssembler` 固定归属 `sandwish-infra`
+- `PATH_INFRA_PERSISTENCE_OWNERSHIP`：DAO implementation、MyBatis Mapper、`DO/DataObject`、`PersistenceAssembler` 固定归属 `sandwish-infra`
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 - `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`

@@ -26,7 +26,7 @@
   - `sandwish-admin-api`: jar
   - `sandwish-front-api`: jar
 - base package: `com.github.thundax`
-- persistence: MyBatis + MyBatis-Plus + PageHelper
+- persistence: MyBatis-Plus
 - api docs: Swagger / Springfox
 - formatter: Spotless
 - rule gate: Checkstyle
@@ -115,16 +115,14 @@ Sandwich 固定采用三层 API 架构。
 
 - 通用持久化基础设施
 - 通用 Service 基类
-- MyBatis 扫描标记
 - MyBatis-Plus 基础配置
-- PageHelper 迁移期支撑
 - 数据库方言类
 
 边界：
 
 - 可以依赖 `sandwish-common-core`。
 - MyBatis-Plus 分页插件固定使用 `DbType.DM`。
-- PageHelper 只服务尚未迁移到 MyBatis-Plus 的旧分页链路。
+- 不承载 PageHelper、旧 CRUD 基类或 MyBatis 扫描标记。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
@@ -175,10 +173,9 @@ Sandwich 固定采用三层 API 架构。
 - `DO` / `DataObject`
 - DAO implementation
 - MyBatis Mapper
-- Mapper XML
 - `PersistenceAssembler`
 - 数据库类型转换和分页查询实现
-- 业务 Redis 持久化实现、业务 Redis DAO implementation、Redis Mapper 和 Redis Mapper XML
+- 业务 Redis 持久化实现和业务 Redis DAO implementation
 
 边界：
 
@@ -278,14 +275,14 @@ Spring Security 迁移链路允许入口模块依赖：
 - 查询、分页、过滤、排序优先下推到持久化层。
 - 不承载业务流程。
 - 不处理 Web 会话、权限适配和页面语义。
-- SQL 变化必须同步检查实体、Mapper XML、Service 调用和数据库文档。
+- SQL 变化必须同步检查实体、DAO implementation、Mapper、Service 调用和数据库文档。
 - DAO interface 固定归属 `sandwish-biz`。
-- DAO implementation、MyBatis Mapper、Mapper XML 和 `DO` / `DataObject` 固定归属 `sandwish-infra`。
+- DAO implementation、MyBatis Mapper 和 `DO` / `DataObject` 固定归属 `sandwish-infra`。
 - `PersistenceAssembler` 固定归属 `sandwish-infra`，只负责 `Entity <-> DO/DataObject` 转换。
 - DAO / Mapper 方法优先使用显式业务语义命名，不以通用 `findList(T entity)` 或无条件语义方法承载新增查询。
-- Mapper XML 查询条件固定读取一级方法参数或 infra 内部 persistence 参数对象，不依赖通用 `query.*` 容器。
-- Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper 或 Mapper XML。
-- 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper、Mapper XML 和 infra DAO implementation 中。
+- Mapper interface 保持最小 `BaseMapper<DO>` 定义，业务查询逻辑固定在 DAO implementation 中。
+- Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper。
+- 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 当测试为生产 DAO implementation 提供 InMemory implementation 时，InMemory implementation 固定放在 `src/test/java` 并标记 `@Profile("test")`；对应生产 DAO implementation 必须标记 `@Profile("!test")`，防止测试上下文误加载生产实现。
 
 ### Entity / VO / DTO

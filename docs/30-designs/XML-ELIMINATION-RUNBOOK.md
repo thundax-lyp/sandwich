@@ -289,11 +289,11 @@ rg "@Select|@Update|@Insert|@Delete|Provider" sandwish-infra/src/main/java/com/g
 
 公共收口：
 
-1. 删除 PageHelper 依赖和公共支撑类。
-2. 删除旧 CRUD 基类或收窄为无业务调用的基础设施。
-3. 删除 Mapper XML 配置和空 mapping 目录。
-4. 增加禁止新增 XML、PageHelper、旧 CRUD 基类依赖的架构测试或静态检查。
-5. 同步长期数据库治理规则。
+- PageHelper 依赖和公共支撑类已删除。
+- 旧 `CrudDao` / `CrudServiceImpl` 基类已删除。
+- main source 中不存在业务 Mapper XML 或空 mapping 目录。
+- 已增加禁止 XML、PageHelper、旧 CRUD 基类依赖回流的架构测试。
+- 长期数据库治理规则已同步。
 
 ## 14. Completion Criteria
 

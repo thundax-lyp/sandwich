@@ -32,10 +32,6 @@ public abstract class BaseEntity<T> implements Serializable {
         this.id = id;
     }
 
-    public abstract void preInsert();
-
-    public abstract void preUpdate();
-
     @Override
     public boolean equals(Object obj) {
         if (null == obj) {

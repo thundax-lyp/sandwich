@@ -120,7 +120,7 @@ public class LogServiceImplTest {
         assertEquals(1, dao.secondBatchSize);
         for (Log log : logs) {
             assertNotNull(log.getId());
-            assertNotNull(log.getCreateDate());
+            assertEquals(null, log.getCreateDate());
         }
     }
 

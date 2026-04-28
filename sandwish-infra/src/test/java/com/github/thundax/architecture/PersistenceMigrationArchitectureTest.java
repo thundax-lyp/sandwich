@@ -97,7 +97,10 @@ public class PersistenceMigrationArchitectureTest {
     private boolean containsEntityPreWriteHook(Path path) {
         try {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            return content.contains(".preInsert()") || content.contains(".preUpdate()");
+            return content.contains(".preInsert()")
+                    || content.contains(".preUpdate()")
+                    || content.contains("::preInsert")
+                    || content.contains("::preUpdate");
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

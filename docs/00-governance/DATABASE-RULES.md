@@ -63,7 +63,7 @@
 - 独立数据库表的 `DO/DataObject` 主键字段固定命名为 `id`，Java 类型固定为 `String`。
 - 独立数据库表的 `DO/DataObject.id` 固定使用 `@TableId(type = IdType.ASSIGN_UUID)`，主键由 MyBatis-Plus 持久化层生成。
 - DAO `insert` 方法返回持久化后的主键；Service 在 `insert` 后负责把返回主键回填到业务 `Entity`，再继续编排关系表、签名、缓存或响应数据。
-- Service、Entity 和 `preInsert` 不负责为数据库主表生成 `id`。
+- Service 和 Entity 不负责为数据库主表生成 `id`。
 - 共享主键表、外部业务键主键表、关系表和非数据库 DO 不适用自动主键生成规则；这类表必须显式说明主键来源，并按来源使用 `IdType.INPUT` 或不声明 `@TableId`。
 - 共享主键表的 DO 字段名必须表达主键来源，例如用户扩展表使用 `userId`，存储业务绑定表使用 `storageId`；不得为了复用数据库列名在 DO 中继续声明泛化 `id` 字段。
 - 共享主键表不得用 `ASSIGN_UUID` 生成新主键，避免破坏与主对象的主键一致性。

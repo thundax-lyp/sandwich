@@ -43,16 +43,6 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
     }
 
     @Override
-    public void preInsert() {
-        super.preInsert();
-    }
-
-    @Override
-    public void preUpdate() {
-        super.preUpdate();
-    }
-
-    @Override
     @JsonIgnore
     public String getSignName() {
         return null;

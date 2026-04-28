@@ -27,16 +27,6 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
      */
     public abstract String getName();
 
-    @Override
-    public void preInsert() {
-        super.preInsert();
-    }
-
-    @Override
-    public void preUpdate() {
-        super.preUpdate();
-    }
-
     public String getCreateUserId() {
         return createUserId;
     }

@@ -109,7 +109,6 @@ public class LogServiceImpl implements LogService {
             int fromIndex = pageSize * pageNo;
             int toIndex = Math.min(fromIndex + pageSize, list.size());
             List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
-            subList.forEach(Log::preInsert);
             List<String> idList = dao.insertList(subList);
             for (int i = 0; i < idList.size(); i++) {
                 subList.get(i).setId(idList.get(i));

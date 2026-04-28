@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.persistence.dataobject;
 
 import java.io.Serializable;
 
-/** access token DO。 */
 public class AccessTokenDO implements Serializable {
 
     private String token;

@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-/** access token Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)

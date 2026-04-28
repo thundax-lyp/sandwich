@@ -27,7 +27,6 @@ public final class DictPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -62,12 +61,4 @@ public final class DictPersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Dict.Query query, DictDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryType(query.getType());
-        dataObject.setQueryRemarks(query.getRemarks());
-        dataObject.setQueryLabel(query.getLabel());
-    }
 }

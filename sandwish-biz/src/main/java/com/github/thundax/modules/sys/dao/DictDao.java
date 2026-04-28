@@ -1,11 +1,29 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.List;
 
 /** @author wdit */
-public interface DictDao extends CrudDao<Dict> {
+public interface DictDao {
+
+    Dict get(String id);
+
+    List<Dict> getMany(List<String> idList);
+
+    List<Dict> findList(String type, String label, String remarks);
+
+    Page<Dict> findPage(String type, String label, String remarks, int pageNo, int pageSize);
+
+    int insert(Dict dict);
+
+    int update(Dict dict);
+
+    int updatePriority(Dict dict);
+
+    int updateDelFlag(Dict dict);
+
+    int delete(String id);
 
     /**
      * 获取类型列表

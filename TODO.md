@@ -21,35 +21,31 @@
 
 ### 第二批：无达梦 XML 但需清理旧持久化形态的对象
 
-1. 迁移 `Dict` 持久化链路
+1. 迁移 `AsyncTask` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-2. 迁移 `AsyncTask` 持久化链路
+2. 迁移 `AccessToken` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-3. 迁移 `AccessToken` 持久化链路
+3. 迁移 `LoginForm` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-4. 迁移 `LoginForm` 持久化链路
+4. 迁移 `LoginLock` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-5. 迁移 `LoginLock` 持久化链路
+5. 迁移 `Permission` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-6. 迁移 `Permission` 持久化链路
+6. 迁移 `KeypairPrivateKey` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-7. 迁移 `KeypairPrivateKey` 持久化链路
-   - 清理旧 CRUD 基类和 PageHelper 依赖。
-   - 展开查询 DAO 参数。
-   - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-8. 迁移 `SmsValidateCode` 持久化链路
+7. 迁移 `SmsValidateCode` 持久化链路
    - 清理旧 CRUD 基类和 PageHelper 依赖。
    - 展开查询 DAO 参数。
    - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。

@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -11,6 +12,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 /** 字典 DAO 实现。 */
@@ -26,13 +28,13 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public Dict get(Dict entity) {
-        Dict dict = cacheSupport.getById(entity.getId());
+    public Dict get(String id) {
+        Dict dict = cacheSupport.getById(id);
         if (dict != null) {
             return dict;
         }
 
-        dict = DictPersistenceAssembler.toEntity(mapper.selectById(entity.getId()));
+        dict = DictPersistenceAssembler.toEntity(mapper.selectById(id));
         cacheSupport.putById(dict);
         return dict;
     }
@@ -62,18 +64,21 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Dict> findList(Dict entity) {
-        List<DictDO> dataObjects =
-                mapper.selectList(buildQueryWrapper(DictPersistenceAssembler.toDataObject(entity)));
-        List<Dict> entities = DictPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<Dict> findList(String type, String label, String remarks) {
+        return DictPersistenceAssembler.toEntityList(
+                mapper.selectList(buildQueryWrapper(type, label, remarks)));
+    }
+
+    @Override
+    public Page<Dict> findPage(
+            String type, String label, String remarks, int pageNo, int pageSize) {
+        Page<DictDO> dataObjectPage =
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildQueryWrapper(type, label, remarks));
+        Page<Dict> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(DictPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
@@ -85,14 +90,33 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public int update(Dict entity) {
-        int count = mapper.update(DictPersistenceAssembler.toDataObject(entity));
+        DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(DictDO::getValue, dataObject.getValue())
+                                .set(DictDO::getLabel, dataObject.getLabel())
+                                .set(DictDO::getType, dataObject.getType())
+                                .set(DictDO::getPriority, dataObject.getPriority())
+                                .set(DictDO::getRemarks, dataObject.getRemarks())
+                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId())
+                                .set(DictDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeAll();
         return count;
     }
 
     @Override
     public int updatePriority(Dict entity) {
-        int count = mapper.updatePriority(DictPersistenceAssembler.toDataObject(entity));
+        DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(DictDO::getPriority, dataObject.getPriority())
+                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeAll();
         return count;
     }
@@ -103,21 +127,30 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public int updateDelFlag(Dict entity) {
-        int count = mapper.updateDelFlag(DictPersistenceAssembler.toDataObject(entity));
+        DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(DictDO::getDelFlag, dataObject.getDelFlag())
+                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeAll();
         return count;
     }
 
     @Override
-    public int delete(Dict entity) {
-        int count = mapper.deleteById(entity.getId());
+    public int delete(String id) {
+        int count = mapper.deleteById(id);
         cacheSupport.removeAll();
         return count;
     }
 
     @Override
     public List<String> findTypeList() {
-        return mapper.findTypeList();
+        QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
+        wrapper.select("type").groupBy("type").orderByAsc("type");
+        return mapper.selectObjs(wrapper).stream().map(String::valueOf).collect(Collectors.toList());
     }
 
     @Override
@@ -125,16 +158,25 @@ public class DictDaoImpl implements DictDao {
         return cacheSupport.currentVersion();
     }
 
-    private QueryWrapper<DictDO> buildQueryWrapper(DictDO query) {
+    private QueryWrapper<DictDO> buildQueryWrapper(String type, String label, String remarks) {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag", DictDO.DEL_FLAG_NORMAL);
-        if (query != null && StringUtils.isNotBlank(query.getQueryType())) {
-            wrapper.eq("type", query.getQueryType());
+        if (StringUtils.isNotBlank(type)) {
+            wrapper.eq("type", type);
         }
-        if (query != null && StringUtils.isNotBlank(query.getQueryRemarks())) {
-            wrapper.like("remarks", query.getQueryRemarks());
+        if (StringUtils.isNotBlank(label)) {
+            wrapper.like("label", label);
+        }
+        if (StringUtils.isNotBlank(remarks)) {
+            wrapper.like("remarks", remarks);
         }
         wrapper.orderByAsc("type", "priority", "create_date");
+        return wrapper;
+    }
+
+    private LambdaUpdateWrapper<DictDO> buildIdUpdateWrapper(DictDO dataObject) {
+        LambdaUpdateWrapper<DictDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(DictDO::getId, dataObject.getId());
         return wrapper;
     }
 }

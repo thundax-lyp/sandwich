@@ -1,13 +1,31 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.List;
 
 /** @author wdit */
-public interface UploadFileDao extends CrudDao<UploadFile> {
+public interface UploadFileDao {
 
-    UploadFile getContent(UploadFile uploadFile);
+    UploadFile get(String id);
 
-    List<UploadFile> findByFileIds(String[] fileId);
+    List<UploadFile> getMany(List<String> idList);
+
+    List<UploadFile> findList();
+
+    Page<UploadFile> findPage(int pageNo, int pageSize);
+
+    int insert(UploadFile uploadFile);
+
+    int update(UploadFile uploadFile);
+
+    int updatePriority(UploadFile uploadFile);
+
+    int updateDelFlag(UploadFile uploadFile);
+
+    int delete(String id);
+
+    UploadFile getContent(String id);
+
+    List<UploadFile> findByFileIds(List<String> fileIds);
 }

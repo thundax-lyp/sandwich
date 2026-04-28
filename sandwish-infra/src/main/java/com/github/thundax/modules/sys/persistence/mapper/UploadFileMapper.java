@@ -1,33 +1,8 @@
 package com.github.thundax.modules.sys.persistence.mapper;
 
-import com.github.thundax.common.persistence.annotation.MyBatisDao;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
-import java.util.List;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Mapper;
 
-/** 上传文件 MyBatis Mapper。 */
-@MyBatisDao
-public interface UploadFileMapper {
-
-    UploadFileDO get(UploadFileDO uploadFile);
-
-    List<UploadFileDO> getMany(@Param("idList") List<String> idList);
-
-    List<UploadFileDO> findList(UploadFileDO uploadFile);
-
-    int insert(UploadFileDO uploadFile);
-
-    int update(UploadFileDO uploadFile);
-
-    int updatePriority(UploadFileDO uploadFile);
-
-    int updateStatus(UploadFileDO uploadFile);
-
-    int updateDelFlag(UploadFileDO uploadFile);
-
-    int delete(UploadFileDO uploadFile);
-
-    UploadFileDO getContent(UploadFileDO uploadFile);
-
-    List<UploadFileDO> findByFileIds(@Param("fileId") String[] fileId);
-}
+@Mapper
+public interface UploadFileMapper extends BaseMapper<UploadFileDO> {}

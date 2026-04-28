@@ -1,6 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.persistence.assembler.UploadFilePersistenceAssembler;
@@ -9,7 +11,6 @@ import com.github.thundax.modules.sys.persistence.mapper.UploadFileMapper;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
-/** 上传文件 DAO 实现。 */
 @Repository
 public class UploadFileDaoImpl implements UploadFileDao {
 
@@ -20,29 +21,30 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public UploadFile get(UploadFile entity) {
-        return UploadFilePersistenceAssembler.toEntity(
-                mapper.get(UploadFilePersistenceAssembler.toDataObject(entity)));
+    public UploadFile get(String id) {
+        return UploadFilePersistenceAssembler.toEntity(mapper.selectById(id));
     }
 
     @Override
     public List<UploadFile> getMany(List<String> idList) {
-        return UploadFilePersistenceAssembler.toEntityList(mapper.getMany(idList));
+        return UploadFilePersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<UploadFile> findList(UploadFile entity) {
-        List<UploadFileDO> dataObjects =
-                mapper.findList(UploadFilePersistenceAssembler.toDataObject(entity));
-        List<UploadFile> entities = UploadFilePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<UploadFile> findList() {
+        return UploadFilePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper()));
+    }
+
+    @Override
+    public Page<UploadFile> findPage(int pageNo, int pageSize) {
+        Page<UploadFileDO> dataObjectPage =
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper());
+        Page<UploadFile> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(
+                UploadFilePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
@@ -52,15 +54,18 @@ public class UploadFileDaoImpl implements UploadFileDao {
 
     @Override
     public int update(UploadFile entity) {
-        return mapper.update(UploadFilePersistenceAssembler.toDataObject(entity));
+        UploadFileDO dataObject = UploadFilePersistenceAssembler.toDataObject(entity);
+        LambdaUpdateWrapper<UploadFileDO> wrapper = buildIdUpdateWrapper(dataObject);
+        wrapper.set(UploadFileDO::getName, dataObject.getName())
+                .set(UploadFileDO::getExtendName, dataObject.getExtendName())
+                .set(UploadFileDO::getMimeType, dataObject.getMimeType())
+                .set(UploadFileDO::getSize, dataObject.getSize())
+                .set(UploadFileDO::getPath, dataObject.getPath());
+        return mapper.update(null, wrapper);
     }
 
     @Override
     public int updatePriority(UploadFile entity) {
-        return 0;
-    }
-
-    public int updateStatus(UploadFile entity) {
         return 0;
     }
 
@@ -70,18 +75,29 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public int delete(UploadFile entity) {
-        return mapper.delete(UploadFilePersistenceAssembler.toDataObject(entity));
+    public int delete(String id) {
+        return mapper.deleteById(id);
     }
 
     @Override
-    public UploadFile getContent(UploadFile uploadFile) {
-        return UploadFilePersistenceAssembler.toEntity(
-                mapper.getContent(UploadFilePersistenceAssembler.toDataObject(uploadFile)));
+    public UploadFile getContent(String id) {
+        return get(id);
     }
 
     @Override
-    public List<UploadFile> findByFileIds(String[] fileId) {
-        return UploadFilePersistenceAssembler.toEntityList(mapper.findByFileIds(fileId));
+    public List<UploadFile> findByFileIds(List<String> fileIds) {
+        return UploadFilePersistenceAssembler.toEntityList(mapper.selectBatchIds(fileIds));
+    }
+
+    private LambdaQueryWrapper<UploadFileDO> buildListWrapper() {
+        LambdaQueryWrapper<UploadFileDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByAsc(UploadFileDO::getCreateDate);
+        return wrapper;
+    }
+
+    private LambdaUpdateWrapper<UploadFileDO> buildIdUpdateWrapper(UploadFileDO dataObject) {
+        LambdaUpdateWrapper<UploadFileDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(UploadFileDO::getId, dataObject.getId());
+        return wrapper;
     }
 }

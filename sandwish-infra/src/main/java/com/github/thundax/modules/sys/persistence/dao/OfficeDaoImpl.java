@@ -81,7 +81,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public int insert(Office entity) {
+    public String insert(Office entity) {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
         Integer newPosition = allocateInsertPosition(dataObject);
         entity.setParentId(dataObject.getParentId());
@@ -89,9 +89,9 @@ public class OfficeDaoImpl implements OfficeDao {
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
-        int count = mapper.insert(dataObject);
+        mapper.insert(dataObject);
         cacheSupport.removeAll();
-        return count;
+        return dataObject.getId();
     }
 
     @Override

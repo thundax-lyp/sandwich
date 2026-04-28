@@ -90,10 +90,11 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public int insert(Role entity) {
-        int count = mapper.insert(RolePersistenceAssembler.toDataObject(entity));
-        cacheSupport.removeById(entity.getId());
-        return count;
+    public String insert(Role entity) {
+        RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        cacheSupport.removeById(dataObject.getId());
+        return dataObject.getId();
     }
 
     @Override

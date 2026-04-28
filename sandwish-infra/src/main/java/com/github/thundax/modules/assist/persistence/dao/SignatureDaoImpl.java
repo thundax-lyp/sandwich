@@ -1,7 +1,6 @@
 package com.github.thundax.modules.assist.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
@@ -52,14 +51,17 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     @Override
-    public int insert(Signature entity) {
-        return mapper.insert(SignaturePersistenceAssembler.toDataObject(entity));
+    public String insert(Signature entity) {
+        mapper.insert(SignaturePersistenceAssembler.toDataObject(entity));
+        return entity.getBusinessId();
     }
 
     @Override
     public int update(Signature entity) {
         SignatureDO dataObject = SignaturePersistenceAssembler.toDataObject(entity);
-        return mapper.update(buildUpdateDataObject(dataObject), buildIdUpdateWrapper(dataObject.getId()));
+        return mapper.update(
+                buildUpdateDataObject(dataObject),
+                buildBusinessKeyWrapper(dataObject.getBusinessType(), dataObject.getBusinessId()));
     }
 
     @Override
@@ -79,12 +81,6 @@ public class SignatureDaoImpl implements SignatureDao {
         LambdaQueryWrapper<SignatureDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SignatureDO::getBusinessType, businessType);
         wrapper.eq(SignatureDO::getBusinessId, businessId);
-        return wrapper;
-    }
-
-    private LambdaUpdateWrapper<SignatureDO> buildIdUpdateWrapper(String id) {
-        LambdaUpdateWrapper<SignatureDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(SignatureDO::getId, id);
         return wrapper;
     }
 

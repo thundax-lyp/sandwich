@@ -14,7 +14,7 @@ public interface DictDao {
 
     Page<Dict> findPage(String type, String label, String remarks, int pageNo, int pageSize);
 
-    int insert(Dict dict);
+    String insert(Dict dict);
 
     int update(Dict dict);
 

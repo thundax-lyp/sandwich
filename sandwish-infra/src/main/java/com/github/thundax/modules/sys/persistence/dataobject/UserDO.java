@@ -22,7 +22,7 @@ public class UserDO {
     @TableField(exist = false)
     public static final String DEL_FLAG_NORMAL = "0";
 
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
     @TableField("office_id")

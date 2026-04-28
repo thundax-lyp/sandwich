@@ -15,7 +15,7 @@ public interface OfficeDao {
 
     Page<Office> findPage(String parentId, String name, String remarks, int pageNo, int pageSize);
 
-    int insert(Office office);
+    String insert(Office office);
 
     int update(Office office);
 

@@ -73,7 +73,7 @@ public class LogServiceImpl implements LogService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Log log) {
         log.preInsert();
-        dao.insert(log);
+        log.setId(dao.insert(log));
 
         if (log.isSignable()) {
             signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
@@ -112,7 +112,11 @@ public class LogServiceImpl implements LogService {
             int toIndex = Math.min(fromIndex + pageSize, list.size());
             List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
             subList.forEach(Log::preInsert);
-            count += dao.insertList(subList);
+            List<String> idList = dao.insertList(subList);
+            for (int i = 0; i < idList.size(); i++) {
+                subList.get(i).setId(idList.get(i));
+            }
+            count += idList.size();
         }
 
         return count;

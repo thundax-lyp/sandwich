@@ -24,7 +24,7 @@ public interface StorageDao {
             int pageNo,
             int pageSize);
 
-    int insert(Storage entity);
+    String insert(Storage entity);
 
     int update(Storage entity);
 

@@ -170,9 +170,9 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public int insert(Member entity) {
+        public String insert(Member entity) {
             this.inserted = entity;
-            return 1;
+            return "generated-member-id";
         }
 
         @Override

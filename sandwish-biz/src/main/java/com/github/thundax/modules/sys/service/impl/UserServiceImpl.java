@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void add(User user) {
         user.preInsert();
-        dao.insert(user);
+        user.setId(dao.insert(user));
         afterWrite(user, true);
     }
 

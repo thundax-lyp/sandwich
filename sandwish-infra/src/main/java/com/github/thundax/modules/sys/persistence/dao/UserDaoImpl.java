@@ -99,10 +99,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int insert(User entity) {
-        int count = mapper.insert(UserPersistenceAssembler.toDataObject(entity));
-        removeUserCaches(entity.getId());
-        return count;
+    public String insert(User entity) {
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        removeUserCaches(dataObject.getId());
+        return dataObject.getId();
     }
 
     @Override

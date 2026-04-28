@@ -14,7 +14,7 @@ public interface UploadFileDao {
 
     Page<UploadFile> findPage(int pageNo, int pageSize);
 
-    int insert(UploadFile uploadFile);
+    String insert(UploadFile uploadFile);
 
     int update(UploadFile uploadFile);
 

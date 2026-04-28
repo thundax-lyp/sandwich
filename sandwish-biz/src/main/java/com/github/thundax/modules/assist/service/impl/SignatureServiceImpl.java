@@ -51,7 +51,7 @@ public class SignatureServiceImpl implements SignatureService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Signature entity) {
         entity.preInsert();
-        dao.insert(entity);
+        entity.setId(dao.insert(entity));
     }
 
     @Override

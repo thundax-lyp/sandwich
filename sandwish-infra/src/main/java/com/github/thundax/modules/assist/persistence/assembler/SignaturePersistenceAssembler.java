@@ -33,7 +33,7 @@ public final class SignaturePersistenceAssembler {
             return null;
         }
         Signature entity = new Signature();
-        entity.setId(dataObject.getId());
+        entity.setId(dataObject.getId() == null ? dataObject.getBusinessId() : dataObject.getId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setSignature(dataObject.getSignature());

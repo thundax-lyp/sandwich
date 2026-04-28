@@ -33,7 +33,7 @@ public interface LogDao {
             int pageNo,
             int pageSize);
 
-    int insert(Log log);
+    String insert(Log log);
 
     int update(Log log);
 
@@ -43,9 +43,9 @@ public interface LogDao {
      * 写入
      *
      * @param list 列表
-     * @return 影响记录数
+     * @return 写入后的主键列表
      */
-    int insertList(List<Log> list);
+    List<String> insertList(List<Log> list);
 
     /**
      * 批量删除

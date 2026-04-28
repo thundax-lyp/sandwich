@@ -175,9 +175,9 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int insert(Menu menu) {
+        public String insert(Menu menu) {
             this.inserted = menu;
-            return 1;
+            return "generated-menu-id";
         }
 
         @Override

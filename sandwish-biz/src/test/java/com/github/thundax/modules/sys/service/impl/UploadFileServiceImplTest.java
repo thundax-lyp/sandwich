@@ -111,9 +111,9 @@ public class UploadFileServiceImplTest {
         }
 
         @Override
-        public int insert(UploadFile uploadFile) {
+        public String insert(UploadFile uploadFile) {
             this.inserted = uploadFile;
-            return 1;
+            return "generated-upload-file-id";
         }
 
         @Override

@@ -107,7 +107,7 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Menu menu) {
         menu.preInsert();
-        dao.insert(menu);
+        menu.setId(dao.insert(menu));
         afterWrite(menu);
     }
 

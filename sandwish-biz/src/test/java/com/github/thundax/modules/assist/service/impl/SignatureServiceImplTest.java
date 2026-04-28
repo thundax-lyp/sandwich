@@ -140,9 +140,9 @@ public class SignatureServiceImplTest {
         }
 
         @Override
-        public int insert(Signature entity) {
+        public String insert(Signature entity) {
             this.insertedEntity = entity;
-            return 1;
+            return entity.getBusinessId();
         }
 
         @Override

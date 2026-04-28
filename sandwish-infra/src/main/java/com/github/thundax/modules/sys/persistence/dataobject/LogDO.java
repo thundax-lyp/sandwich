@@ -18,7 +18,7 @@ import lombok.Setter;
 @TableName("sys_log")
 public class LogDO {
 
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
     @TableField("user_id")

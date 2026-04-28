@@ -128,9 +128,9 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int insert(Role role) {
+        public String insert(Role role) {
             this.inserted = role;
-            return 1;
+            return "generated-role-id";
         }
 
         @Override

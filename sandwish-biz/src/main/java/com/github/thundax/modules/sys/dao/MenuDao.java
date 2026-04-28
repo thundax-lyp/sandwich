@@ -15,7 +15,7 @@ public interface MenuDao {
 
     Page<Menu> findPage(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
 
-    int insert(Menu menu);
+    String insert(Menu menu);
 
     int update(Menu menu);
 

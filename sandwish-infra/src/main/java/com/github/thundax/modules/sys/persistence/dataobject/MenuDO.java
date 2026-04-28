@@ -21,7 +21,7 @@ public class MenuDO {
     public static final String DEL_FLAG_NORMAL = "0";
     public static final String ROOT_ID = "ROOT";
 
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
     @TableField("parent_id")

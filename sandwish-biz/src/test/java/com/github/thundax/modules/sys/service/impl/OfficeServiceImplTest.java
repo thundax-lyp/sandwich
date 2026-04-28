@@ -152,9 +152,9 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public int insert(Office office) {
+        public String insert(Office office) {
             this.inserted = office;
-            return 1;
+            return "generated-office-id";
         }
 
         @Override

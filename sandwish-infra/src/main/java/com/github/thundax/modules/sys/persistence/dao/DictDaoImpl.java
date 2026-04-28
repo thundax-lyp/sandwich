@@ -78,10 +78,11 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public int insert(Dict entity) {
-        int count = mapper.insert(DictPersistenceAssembler.toDataObject(entity));
+    public String insert(Dict entity) {
+        DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
         cacheSupport.removeAll();
-        return count;
+        return dataObject.getId();
     }
 
     @Override

@@ -222,9 +222,9 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public int insert(Log log) {
+        public String insert(Log log) {
             this.inserted = log;
-            return 1;
+            return "generated-log-id";
         }
 
         @Override
@@ -238,14 +238,18 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public int insertList(List<Log> list) {
+        public List<String> insertList(List<Log> list) {
             this.insertListCalls++;
             if (insertListCalls == 1) {
                 firstBatchSize = list.size();
             } else {
                 secondBatchSize = list.size();
             }
-            return list.size();
+            List<String> idList = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                idList.add("generated-log-id-" + insertListCalls + "-" + i);
+            }
+            return idList;
         }
 
         @Override

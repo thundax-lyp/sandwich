@@ -147,9 +147,9 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int insert(Storage entity) {
+        public String insert(Storage entity) {
             this.inserted = entity;
-            return 1;
+            return "generated-storage-id";
         }
 
         @Override

@@ -110,7 +110,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Role role) {
         role.preInsert();
-        dao.insert(role);
+        role.setId(dao.insert(role));
         afterWrite(role);
     }
 

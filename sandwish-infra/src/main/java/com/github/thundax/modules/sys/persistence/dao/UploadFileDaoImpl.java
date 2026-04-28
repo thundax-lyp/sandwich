@@ -45,8 +45,10 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public int insert(UploadFile entity) {
-        return mapper.insert(UploadFilePersistenceAssembler.toDataObject(entity));
+    public String insert(UploadFile entity) {
+        UploadFileDO dataObject = UploadFilePersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        return dataObject.getId();
     }
 
     @Override

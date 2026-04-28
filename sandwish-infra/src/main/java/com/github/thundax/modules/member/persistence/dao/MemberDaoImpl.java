@@ -89,8 +89,10 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public int insert(Member entity) {
-        return mapper.insert(MemberPersistenceAssembler.toDataObject(entity));
+    public String insert(Member entity) {
+        MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        return dataObject.getId();
     }
 
     @Override

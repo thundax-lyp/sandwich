@@ -14,7 +14,7 @@ public interface RoleDao {
 
     Page<Role> findPage(String enableFlag, int pageNo, int pageSize);
 
-    int insert(Role role);
+    String insert(Role role);
 
     int update(Role role);
 

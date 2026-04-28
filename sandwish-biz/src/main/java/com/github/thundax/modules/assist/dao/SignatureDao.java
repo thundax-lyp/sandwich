@@ -53,9 +53,9 @@ public interface SignatureDao {
      * 插入签名。
      *
      * @param entity 签名数据
-     * @return 变更数量
+     * @return 签名标识
      */
-    int insert(Signature entity);
+    String insert(Signature entity);
 
     /**
      * 更新签名。

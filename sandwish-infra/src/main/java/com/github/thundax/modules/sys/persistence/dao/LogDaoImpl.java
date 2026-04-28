@@ -8,6 +8,7 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import com.github.thundax.modules.sys.persistence.mapper.LogMapper;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -69,8 +70,10 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int insert(Log entity) {
-        return mapper.insert(LogPersistenceAssembler.toDataObject(entity));
+    public String insert(Log entity) {
+        LogDO dataObject = LogPersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        return dataObject.getId();
     }
 
     @Override
@@ -84,12 +87,13 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int insertList(List<Log> list) {
-        int count = 0;
+    public List<String> insertList(List<Log> list) {
+        List<String> idList = new ArrayList<>();
         for (LogDO dataObject : LogPersistenceAssembler.toDataObjectList(list)) {
-            count += mapper.insert(dataObject);
+            mapper.insert(dataObject);
+            idList.add(dataObject.getId());
         }
-        return count;
+        return idList;
     }
 
     @Override

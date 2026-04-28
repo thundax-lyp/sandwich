@@ -85,7 +85,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public int insert(Menu entity) {
+    public String insert(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         Integer newPosition = allocateInsertPosition(dataObject);
         entity.setParentId(dataObject.getParentId());
@@ -93,9 +93,9 @@ public class MenuDaoImpl implements MenuDao {
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
-        int count = mapper.insert(dataObject);
+        mapper.insert(dataObject);
         cacheSupport.removeAll();
-        return count;
+        return dataObject.getId();
     }
 
     @Override

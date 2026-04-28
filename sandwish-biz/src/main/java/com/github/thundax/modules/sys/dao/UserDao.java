@@ -21,7 +21,7 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    int insert(User user);
+    String insert(User user);
 
     int update(User user);
 

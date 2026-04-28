@@ -72,7 +72,7 @@ public class StorageServiceImpl implements StorageService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Storage storage) {
         storage.preInsert();
-        dao.insert(storage);
+        storage.setId(dao.insert(storage));
     }
 
     @Override

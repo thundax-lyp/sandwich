@@ -2,7 +2,6 @@ package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.thundax.common.utils.IdGen;
 import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -39,9 +38,6 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
     /** 插入之前执行方法，需要手动调用 */
     @Override
     public void preInsert() {
-        if (StringUtils.isBlank(this.getId())) {
-            this.setId(IdGen.uuid());
-        }
         this.createDate = new Date();
         this.updateDate = this.createDate;
     }

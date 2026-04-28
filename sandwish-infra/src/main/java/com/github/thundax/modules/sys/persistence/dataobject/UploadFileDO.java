@@ -18,7 +18,7 @@ import lombok.Setter;
 @TableName("sys_upload_file")
 public class UploadFileDO {
 
-    @TableId(type = IdType.INPUT)
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
     private String name;

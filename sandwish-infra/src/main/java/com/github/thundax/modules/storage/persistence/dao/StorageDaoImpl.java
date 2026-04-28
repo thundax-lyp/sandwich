@@ -96,10 +96,11 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int insert(Storage entity) {
-        int count = mapper.insert(StoragePersistenceAssembler.toDataObject(entity));
-        cacheSupport.removeById(entity.getId());
-        return count;
+    public String insert(Storage entity) {
+        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        mapper.insert(dataObject);
+        cacheSupport.removeById(dataObject.getId());
+        return dataObject.getId();
     }
 
     @Override

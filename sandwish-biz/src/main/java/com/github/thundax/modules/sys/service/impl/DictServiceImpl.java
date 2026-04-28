@@ -115,7 +115,7 @@ public class DictServiceImpl implements DictService {
     @Transactional(rollbackFor = Exception.class)
     public void add(Dict dict) {
         dict.preInsert();
-        dao.insert(dict);
+        dict.setId(dao.insert(dict));
     }
 
     @Override

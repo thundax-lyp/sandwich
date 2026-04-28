@@ -1,12 +1,26 @@
 package com.github.thundax.modules.storage.service;
 
-import com.github.thundax.common.service.CrudService;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
 
 /** @author wdit */
-public interface StorageService extends CrudService<Storage> {
+public interface StorageService {
+
+    Storage get(String id);
+
+    List<Storage> getMany(List<String> ids);
+
+    List<Storage> findList(Storage storage);
+
+    Page<Storage> findPage(Storage storage, Page<Storage> page);
+
+    void save(Storage storage);
+
+    int delete(Storage storage);
+
+    int delete(List<Storage> list);
 
     /**
      * 获取MIME列表

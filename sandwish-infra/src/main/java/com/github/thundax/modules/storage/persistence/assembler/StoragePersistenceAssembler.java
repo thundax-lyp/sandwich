@@ -30,7 +30,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -126,18 +125,4 @@ public final class StoragePersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Storage.Query query, StorageDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryMimeType(query.getMimeType());
-        dataObject.setQueryBusinessId(query.getBusinessId());
-        dataObject.setQueryBusinessType(query.getBusinessType());
-        dataObject.setQueryOwnerId(query.getOwnerId());
-        dataObject.setQueryOwnerType(query.getOwnerType());
-        dataObject.setQueryEnableFlag(query.getEnableFlag());
-        dataObject.setQueryPublicFlag(query.getPublicFlag());
-        dataObject.setQueryName(query.getName());
-        dataObject.setQueryRemarks(query.getRemarks());
-    }
 }

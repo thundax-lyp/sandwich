@@ -1,15 +1,22 @@
 package com.github.thundax.modules.storage.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
+import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.mapper.StorageBusinessMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 /** 存储文件 DAO 实现。 */
@@ -17,23 +24,26 @@ import org.springframework.stereotype.Repository;
 public class StorageDaoImpl implements StorageDao {
 
     private final StorageMapper mapper;
+    private final StorageBusinessMapper businessMapper;
     private final StorageCacheSupport cacheSupport;
 
-    public StorageDaoImpl(StorageMapper mapper, StorageCacheSupport cacheSupport) {
+    public StorageDaoImpl(
+            StorageMapper mapper,
+            StorageBusinessMapper businessMapper,
+            StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
+        this.businessMapper = businessMapper;
         this.cacheSupport = cacheSupport;
     }
 
     @Override
-    public Storage get(Storage entity) {
-        Storage storage = cacheSupport.getById(entity.getId());
+    public Storage get(String id) {
+        Storage storage = cacheSupport.getById(id);
         if (storage != null) {
             return storage;
         }
 
-        storage =
-                StoragePersistenceAssembler.toEntity(
-                        mapper.get(StoragePersistenceAssembler.toDataObject(entity)));
+        storage = StoragePersistenceAssembler.toEntity(mapper.selectById(id));
         cacheSupport.putById(storage);
         return storage;
     }
@@ -53,7 +63,8 @@ public class StorageDaoImpl implements StorageDao {
 
         if (!uncachedIdList.isEmpty()) {
             List<Storage> uncachedStorageList =
-                    StoragePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+                    StoragePersistenceAssembler.toEntityList(
+                            mapper.selectBatchIds(uncachedIdList));
             for (Storage storage : uncachedStorageList) {
                 cacheSupport.putById(storage);
                 storageList.add(storage);
@@ -63,18 +74,36 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Storage> findList(Storage entity) {
-        List<StorageDO> dataObjects =
-                mapper.findList(StoragePersistenceAssembler.toDataObject(entity));
-        List<Storage> entities = StoragePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<Storage> findList(
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String name,
+            String remarks) {
+        return StoragePersistenceAssembler.toEntityList(
+                mapper.selectList(
+                        buildListWrapper(mimeType, ownerId, ownerType, enableFlag, name, remarks)));
+    }
+
+    @Override
+    public Page<Storage> findPage(
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String name,
+            String remarks,
+            Page<Storage> page) {
+        IPage<StorageDO> dataObjectPage =
+                mapper.selectPage(
+                        StoragePageFactory.create(page.getPageNo(), page.getPageSize()),
+                        buildListWrapper(mimeType, ownerId, ownerType, enableFlag, name, remarks));
+        page.setPageNo((int) dataObjectPage.getCurrent());
+        page.setPageSize((int) dataObjectPage.getSize());
+        page.setCount(dataObjectPage.getTotal());
+        page.setList(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return page;
     }
 
     @Override
@@ -86,76 +115,159 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public int update(Storage entity) {
-        int count = mapper.update(StoragePersistenceAssembler.toDataObject(entity));
+        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(StorageDO::getName, dataObject.getName())
+                                .set(StorageDO::getExtendName, dataObject.getExtendName())
+                                .set(StorageDO::getMimeType, dataObject.getMimeType())
+                                .set(StorageDO::getOwnerId, dataObject.getOwnerId())
+                                .set(StorageDO::getOwnerType, dataObject.getOwnerType())
+                                .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(StorageDO::getPriority, dataObject.getPriority())
+                                .set(StorageDO::getRemarks, dataObject.getRemarks())
+                                .set(StorageDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(StorageDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
 
     @Override
-    public int updatePriority(Storage entity) {
-        cacheSupport.removeById(entity.getId());
-        return 0;
-    }
-
-    public int updateStatus(Storage entity) {
-        return 0;
-    }
-
-    @Override
-    public int updateDelFlag(Storage entity) {
-        cacheSupport.removeById(entity.getId());
-        return 0;
-    }
-
-    @Override
-    public int delete(Storage entity) {
-        int count = mapper.delete(StoragePersistenceAssembler.toDataObject(entity));
-        cacheSupport.removeById(entity.getId());
+    public int delete(String id) {
+        int count = mapper.deleteById(id);
+        cacheSupport.removeById(id);
         return count;
     }
 
     @Override
     public List<String> findMimeTypeList() {
-        return mapper.findMimeTypeList();
+        return toStringList(
+                mapper.selectObjs(
+                        new QueryWrapper<StorageDO>()
+                                .select("mime_type")
+                                .groupBy("mime_type")
+                                .orderByAsc("mime_type")));
     }
 
     @Override
     public List<String> findBusinessTypeList() {
-        return mapper.findBusinessTypeList();
+        return toStringList(
+                businessMapper.selectObjs(
+                        new QueryWrapper<StorageBusinessDO>()
+                                .select("business_type")
+                                .groupBy("business_type")
+                                .orderByAsc("business_type")));
     }
 
     @Override
     public int updateEnableFlag(Storage storage) {
-        int count = mapper.updateEnableFlag(StoragePersistenceAssembler.toDataObject(storage));
+        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
         cacheSupport.removeById(storage.getId());
         return count;
     }
 
     @Override
     public int updatePublicFlag(Storage storage) {
-        int count = mapper.updatePublicFlag(StoragePersistenceAssembler.toDataObject(storage));
+        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(StorageDO::getPublicFlag, dataObject.getPublicFlag())
+                                .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
         cacheSupport.removeById(storage.getId());
         return count;
     }
 
     @Override
     public List<StorageBusiness> findBusiness(Storage entity) {
+        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StorageBusinessDO::getId, entity.getId());
         return StoragePersistenceAssembler.toBusinessEntityList(
-                mapper.findBusiness(StoragePersistenceAssembler.toDataObject(entity)));
+                businessMapper.selectList(wrapper));
     }
 
     @Override
     public void insertBusiness(List<StorageBusiness> list) {
-        mapper.insertBusiness(StoragePersistenceAssembler.toBusinessDataObjectList(list));
+        List<StorageBusinessDO> dataObjects =
+                StoragePersistenceAssembler.toBusinessDataObjectList(list);
+        if (dataObjects == null) {
+            return;
+        }
+        for (StorageBusinessDO dataObject : dataObjects) {
+            businessMapper.insert(dataObject);
+        }
     }
 
     @Override
-    public void deleteBusiness(Storage entity) {
-        mapper.deleteBusiness(StoragePersistenceAssembler.toDataObject(entity));
+    public void deleteBusiness(String id) {
+        businessMapper.deleteById(id);
     }
 
     @Override
     public int deleteBusinessByBusiness(String businessType, String businessId) {
-        return mapper.deleteBusinessByBusiness(businessType, businessId);
+        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StorageBusinessDO::getBusinessType, businessType);
+        wrapper.eq(StorageBusinessDO::getBusinessId, businessId);
+        return businessMapper.delete(wrapper);
+    }
+
+    private LambdaUpdateWrapper<StorageDO> buildIdUpdateWrapper(StorageDO dataObject) {
+        LambdaUpdateWrapper<StorageDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(StorageDO::getId, dataObject.getId());
+        return wrapper;
+    }
+
+    private LambdaQueryWrapper<StorageDO> buildListWrapper(
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String name,
+            String remarks) {
+        LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StorageDO::getDelFlag, StorageDO.DEL_FLAG_NORMAL);
+        if (StringUtils.isNotBlank(mimeType)) {
+            wrapper.eq(StorageDO::getMimeType, mimeType);
+        }
+        if (StringUtils.isNotBlank(ownerId)) {
+            wrapper.eq(StorageDO::getOwnerId, ownerId);
+        }
+        if (StringUtils.isNotBlank(ownerType)) {
+            wrapper.eq(StorageDO::getOwnerType, ownerType);
+        }
+        if (StringUtils.isNotBlank(enableFlag)) {
+            wrapper.eq(StorageDO::getEnableFlag, enableFlag);
+        }
+        if (StringUtils.isNotBlank(name)) {
+            wrapper.like(StorageDO::getName, name);
+        }
+        if (StringUtils.isNotBlank(remarks)) {
+            wrapper.like(StorageDO::getRemarks, remarks);
+        }
+        wrapper.orderByDesc(StorageDO::getCreateDate);
+        wrapper.orderByAsc(StorageDO::getPriority);
+        return wrapper;
+    }
+
+    private List<String> toStringList(List<Object> objects) {
+        List<String> values = new ArrayList<>();
+        if (objects == null) {
+            return values;
+        }
+        for (Object object : objects) {
+            if (object != null) {
+                values.add(String.valueOf(object));
+            }
+        }
+        return values;
     }
 }

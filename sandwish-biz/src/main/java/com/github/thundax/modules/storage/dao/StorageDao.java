@@ -1,13 +1,39 @@
 package com.github.thundax.modules.storage.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
 /** @author wdit */
-public interface StorageDao extends CrudDao<Storage> {
+public interface StorageDao {
+
+    Storage get(String id);
+
+    List<Storage> getMany(List<String> idList);
+
+    List<Storage> findList(
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String name,
+            String remarks);
+
+    Page<Storage> findPage(
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String name,
+            String remarks,
+            Page<Storage> page);
+
+    int insert(Storage entity);
+
+    int update(Storage entity);
+
+    int delete(String id);
 
     /**
      * 获取MIME列表
@@ -52,14 +78,14 @@ public interface StorageDao extends CrudDao<Storage> {
      *
      * @param list list
      */
-    void insertBusiness(@Param("list") List<StorageBusiness> list);
+    void insertBusiness(List<StorageBusiness> list);
 
     /**
      * 按业务删除
      *
-     * @param entity entity
+     * @param id 文件 id
      */
-    void deleteBusiness(Storage entity);
+    void deleteBusiness(String id);
 
     /**
      * 按业务删除
@@ -68,6 +94,5 @@ public interface StorageDao extends CrudDao<Storage> {
      * @param businessId 业务id
      * @return 影响记录数
      */
-    int deleteBusinessByBusiness(
-            @Param("businessType") String businessType, @Param("businessId") String businessId);
+    int deleteBusinessByBusiness(String businessType, String businessId);
 }

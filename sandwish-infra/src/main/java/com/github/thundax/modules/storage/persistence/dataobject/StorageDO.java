@@ -1,5 +1,8 @@
 package com.github.thundax.modules.storage.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -15,35 +18,55 @@ import lombok.Setter;
 @TableName("assist_storage")
 public class StorageDO {
 
+    @TableField(exist = false)
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
     private String name;
+
+    @TableField("extend_name")
     private String extendName;
+
+    @TableField("mime_type")
     private String mimeType;
+
+    @TableField(exist = false)
     private String businessId;
+
+    @TableField(exist = false)
     private String businessType;
+
+    @TableField(exist = false)
     private String businessParams;
+
+    @TableField("owner_id")
     private String ownerId;
+
+    @TableField("owner_type")
     private String ownerType;
+
+    @TableField("enable_flag")
     private String enableFlag;
+
+    @TableField("public_flag")
     private String publicFlag;
+
     private Integer priority;
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryMimeType;
-    private String queryBusinessId;
-    private String queryBusinessType;
-    private String queryOwnerId;
-    private String queryOwnerType;
-    private String queryEnableFlag;
-    private String queryPublicFlag;
-    private String queryName;
-    private String queryRemarks;
 
     public StorageDO(String id) {
         this.id = id;
@@ -183,77 +206,5 @@ public class StorageDO {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
-    }
-
-    public String getQueryMimeType() {
-        return queryMimeType;
-    }
-
-    public void setQueryMimeType(String queryMimeType) {
-        this.queryMimeType = queryMimeType;
-    }
-
-    public String getQueryBusinessId() {
-        return queryBusinessId;
-    }
-
-    public void setQueryBusinessId(String queryBusinessId) {
-        this.queryBusinessId = queryBusinessId;
-    }
-
-    public String getQueryBusinessType() {
-        return queryBusinessType;
-    }
-
-    public void setQueryBusinessType(String queryBusinessType) {
-        this.queryBusinessType = queryBusinessType;
-    }
-
-    public String getQueryOwnerId() {
-        return queryOwnerId;
-    }
-
-    public void setQueryOwnerId(String queryOwnerId) {
-        this.queryOwnerId = queryOwnerId;
-    }
-
-    public String getQueryOwnerType() {
-        return queryOwnerType;
-    }
-
-    public void setQueryOwnerType(String queryOwnerType) {
-        this.queryOwnerType = queryOwnerType;
-    }
-
-    public String getQueryEnableFlag() {
-        return queryEnableFlag;
-    }
-
-    public void setQueryEnableFlag(String queryEnableFlag) {
-        this.queryEnableFlag = queryEnableFlag;
-    }
-
-    public String getQueryPublicFlag() {
-        return queryPublicFlag;
-    }
-
-    public void setQueryPublicFlag(String queryPublicFlag) {
-        this.queryPublicFlag = queryPublicFlag;
-    }
-
-    public String getQueryName() {
-        return queryName;
-    }
-
-    public void setQueryName(String queryName) {
-        this.queryName = queryName;
-    }
-
-    public String getQueryRemarks() {
-        return queryRemarks;
-    }
-
-    public void setQueryRemarks(String queryRemarks) {
-        this.queryRemarks = queryRemarks;
     }
 }

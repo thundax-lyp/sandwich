@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.entity.base;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.Role;
 
-/** @author wdit */
 public abstract class BaseRole extends AdminDataEntity<Role> {
 
     private static final long serialVersionUID = 1L;

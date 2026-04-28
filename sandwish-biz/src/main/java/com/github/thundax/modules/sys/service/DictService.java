@@ -4,7 +4,6 @@ import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.List;
 
-/** @author wdit */
 public interface DictService extends CrudService<Dict> {
 
     /**

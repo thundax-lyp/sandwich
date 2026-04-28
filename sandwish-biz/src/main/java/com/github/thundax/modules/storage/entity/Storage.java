@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.storage.entity.base.BaseStorage;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Storage extends BaseStorage {
@@ -40,8 +39,7 @@ public class Storage extends BaseStorage {
 
     @Override
     public void setEnableFlag(String enableFlag) {
-        super.setEnableFlag(
-                StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
+        super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
     }
 
     @JsonIgnore
@@ -61,9 +59,7 @@ public class Storage extends BaseStorage {
 
     @JsonIgnore
     public String getPathName() {
-        return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate())
-                + MetaFile.SEPARATOR
-                + this.getFileName();
+        return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate()) + MetaFile.SEPARATOR + this.getFileName();
     }
 
     private Query query;

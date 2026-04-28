@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -50,11 +50,8 @@ public class HtmlResourceUtils {
             if (!isContextPath(resourceUrl, request.getContextPath())) {
                 continue;
             }
-            html =
-                    StringUtils.replace(
-                            html,
-                            resourceUrl,
-                            StringUtils.replace(resourceUrl, request.getContextPath(), ""));
+            html = StringUtils.replace(
+                    html, resourceUrl, StringUtils.replace(resourceUrl, request.getContextPath(), ""));
         }
 
         return html;

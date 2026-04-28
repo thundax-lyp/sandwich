@@ -17,8 +17,7 @@ public class KeypairServiceImpl implements KeypairService {
     private final KeypairPrivateKeyDao keypairPrivateKeyDao;
     private final AuthProperties properties;
 
-    public KeypairServiceImpl(
-            KeypairPrivateKeyDao keypairPrivateKeyDao, AuthProperties properties) {
+    public KeypairServiceImpl(KeypairPrivateKeyDao keypairPrivateKeyDao, AuthProperties properties) {
         this.keypairPrivateKeyDao = keypairPrivateKeyDao;
         this.properties = properties;
     }
@@ -27,9 +26,7 @@ public class KeypairServiceImpl implements KeypairService {
     public String createPublicKey(String token) {
         Sm2.StringKeyPair keyPair = Sm2.generateKeyPair();
         keypairPrivateKeyDao.save(
-                token,
-                keyPair.getPrivateKey(),
-                properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
+                token, keyPair.getPrivateKey(), properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         return keyPair.getPublicKey();
     }
 

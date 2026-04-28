@@ -3,7 +3,6 @@ package com.github.thundax.modules.storage.entity.base;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.storage.entity.Storage;
 
-/** @author wdit */
 public abstract class BaseStorage extends DataEntity<Storage> {
 
     private static final long serialVersionUID = 1L;

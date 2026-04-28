@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Arrays;
@@ -167,8 +166,7 @@ public class MemberServiceImplTest {
                 String mobile,
                 int pageNo,
                 int pageSize) {
-            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                    pageNo, pageSize);
+            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
         }
 
         @Override

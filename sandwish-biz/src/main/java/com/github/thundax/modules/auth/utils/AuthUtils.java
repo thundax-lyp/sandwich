@@ -1,9 +1,9 @@
 package com.github.thundax.modules.auth.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.utils.IPUtils;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -41,7 +41,6 @@ public class AuthUtils {
     public static boolean validateCheckCode(String checkCode) {
         String currentCheckCode = currentCheckCode();
 
-        return StringUtils.isBlank(currentCheckCode)
-                || StringUtils.equals(checkCode, currentCheckCode);
+        return StringUtils.isBlank(currentCheckCode) || StringUtils.equals(checkCode, currentCheckCode);
     }
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseMenu;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.google.common.collect.Maps;
@@ -15,8 +14,8 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Menu extends BaseMenu implements Comparable<Menu> {

@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import org.springframework.lang.NonNull;
 
-/** @author wdit */
 public class UserAccessHolder {
 
     private static final PooledThreadLocal<String> USER_ID_HOLDER = new PooledThreadLocal<>();

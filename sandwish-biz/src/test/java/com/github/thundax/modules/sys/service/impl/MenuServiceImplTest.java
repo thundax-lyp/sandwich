@@ -10,7 +10,6 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 
@@ -171,8 +170,7 @@ public class MenuServiceImplTest {
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Menu> dataPage =
-                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                            pageNo, pageSize);
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
             dataPage.setTotal(1);
             return dataPage;
         }
@@ -206,8 +204,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(
-                String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
+        public void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
 
         @Override
         public boolean isChildOf(String childId, String parentId) {

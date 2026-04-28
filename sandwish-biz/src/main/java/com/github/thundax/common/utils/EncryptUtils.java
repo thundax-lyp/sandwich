@@ -17,9 +17,7 @@ public class EncryptUtils {
         }
         try {
             String encryptedValue = SM4Util.encryptEcb(NativePropertyPlaceConfigurer.SALT, value);
-            return encryptedValue == null
-                    ? value
-                    : NativePropertyPlaceConfigurer.PREFIX + encryptedValue;
+            return encryptedValue == null ? value : NativePropertyPlaceConfigurer.PREFIX + encryptedValue;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,11 +35,9 @@ public class EncryptUtils {
             return value;
         }
         try {
-            String decryptValue =
-                    SM4Util.decryptEcb(
-                            NativePropertyPlaceConfigurer.SALT,
-                            StringUtils.substring(
-                                    value, NativePropertyPlaceConfigurer.PREFIX.length()));
+            String decryptValue = SM4Util.decryptEcb(
+                    NativePropertyPlaceConfigurer.SALT,
+                    StringUtils.substring(value, NativePropertyPlaceConfigurer.PREFIX.length()));
             return decryptValue == null ? value : decryptValue;
         } catch (Exception e) {
             e.printStackTrace();

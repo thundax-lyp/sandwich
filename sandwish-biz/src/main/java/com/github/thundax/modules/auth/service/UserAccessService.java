@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.service;
 
-/** @author wdit */
 public interface UserAccessService {
 
     /**

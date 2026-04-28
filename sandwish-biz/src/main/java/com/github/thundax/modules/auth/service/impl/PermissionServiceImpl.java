@@ -7,7 +7,6 @@ import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
 
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
@@ -19,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -97,19 +97,17 @@ public class PermissionServiceImpl implements PermissionService {
         Set<String> permissions = new HashSet<>();
         List<Menu> menuList = UserServiceHolder.findMenuList(user);
         if (menuList != null && !menuList.isEmpty()) {
-            menuList.forEach(
-                    menu -> {
-                    if (StringUtils.isNotBlank(menu.getPerms())) {
-                        for (String permission :
-                                StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
-                            if (!PERM_USER.equals(permission)
-                                    && !PERM_SUPER.equals(permission)
-                                    && !PERM_ADMIN.equals(permission)) {
-                                permissions.add(permission);
-                            }
+            menuList.forEach(menu -> {
+                if (StringUtils.isNotBlank(menu.getPerms())) {
+                    for (String permission : StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
+                        if (!PERM_USER.equals(permission)
+                                && !PERM_SUPER.equals(permission)
+                                && !PERM_ADMIN.equals(permission)) {
+                            permissions.add(permission);
                         }
                     }
-                    });
+                }
+            });
         }
 
         permissions.add(PERM_USER);

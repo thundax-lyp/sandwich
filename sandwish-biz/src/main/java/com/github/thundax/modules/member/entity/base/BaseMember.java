@@ -4,7 +4,6 @@ import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Date;
 
-/** @author wdit */
 public class BaseMember extends AdminDataEntity<Member> {
 
     private String loginName;

@@ -196,15 +196,7 @@ public class LogServiceImplTest {
                 String requestUri,
                 Date beginDate,
                 Date endDate) {
-            recordFilters(
-                    type,
-                    remoteAddr,
-                    userLoginName,
-                    userName,
-                    title,
-                    requestUri,
-                    beginDate,
-                    endDate);
+            recordFilters(type, remoteAddr, userLoginName, userName, title, requestUri, beginDate, endDate);
             return null;
         }
 
@@ -220,20 +212,11 @@ public class LogServiceImplTest {
                 Date endDate,
                 int pageNo,
                 int pageSize) {
-            recordFilters(
-                    type,
-                    remoteAddr,
-                    userLoginName,
-                    userName,
-                    title,
-                    requestUri,
-                    beginDate,
-                    endDate);
+            recordFilters(type, remoteAddr, userLoginName, userName, title, requestUri, beginDate, endDate);
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Log> dataPage =
-                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                            pageNo, pageSize);
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
             dataPage.setTotal(1);
             return dataPage;
         }
@@ -262,12 +245,7 @@ public class LogServiceImplTest {
 
         @Override
         public int batchDelete(
-                String type,
-                String remoteAddr,
-                String title,
-                String requestUri,
-                Date beginDate,
-                Date endDate) {
+                String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate) {
             recordFilters(type, remoteAddr, null, null, title, requestUri, beginDate, endDate);
             return 1;
         }

@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 import java.util.List;
 
-/** @author wdit */
 public interface LogDao {
 
     Log get(String id);
@@ -52,11 +51,5 @@ public interface LogDao {
      * @param log 查询条件
      * @return 影响记录数
      */
-    int batchDelete(
-            String type,
-            String remoteAddr,
-            String title,
-            String requestUri,
-            Date beginDate,
-            Date endDate);
+    int batchDelete(String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate);
 }

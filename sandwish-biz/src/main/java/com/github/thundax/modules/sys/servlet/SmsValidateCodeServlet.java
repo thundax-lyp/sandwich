@@ -45,26 +45,20 @@ public class SmsValidateCodeServlet extends HttpServlet {
     }
 
     public static boolean validate(HttpServletRequest request) {
-        return validate(
-                request,
-                request.getParameter(SMS_VALIDATE_MOBILE),
-                request.getParameter(SMS_VALIDATE_CODE));
+        return validate(request, request.getParameter(SMS_VALIDATE_MOBILE), request.getParameter(SMS_VALIDATE_CODE));
     }
 
-    public static boolean validate(
-            HttpServletRequest request, String validateMobile, String validateCode) {
+    public static boolean validate(HttpServletRequest request, String validateMobile, String validateCode) {
         if (StringUtils.isEmpty(validateCode)) {
             return false;
         }
 
-        if (StringUtils.isNotBlank(whiteCaptcha)
-                && StringUtils.equals(whiteCaptcha, validateCode)) {
+        if (StringUtils.isNotBlank(whiteCaptcha) && StringUtils.equals(whiteCaptcha, validateCode)) {
             return true;
         }
 
         String mobile = (String) request.getSession().getAttribute(SMS_VALIDATE_MOBILE);
-        if (!StringUtils.isEmpty(validateMobile)
-                && !StringUtils.equalsIgnoreCase(validateMobile, mobile)) {
+        if (!StringUtils.isEmpty(validateMobile) && !StringUtils.equalsIgnoreCase(validateMobile, mobile)) {
             return false;
         }
 
@@ -83,13 +77,11 @@ public class SmsValidateCodeServlet extends HttpServlet {
         String validateCode = request.getParameter(SMS_VALIDATE_CODE);
 
         response.setContentType("text/html");
-        response.getOutputStream()
-                .print(validate(request, validateMobile, validateCode) ? "true" : "false");
+        response.getOutputStream().print(validate(request, validateMobile, validateCode) ? "true" : "false");
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!ValidateCodeServlet.validate(request)) {
             sendResult(response, false, "验证码错误");
             return;
@@ -113,8 +105,7 @@ public class SmsValidateCodeServlet extends HttpServlet {
         sendResult(response, true, "验证码已发送");
     }
 
-    private void sendResult(HttpServletResponse response, boolean result, String message)
-            throws IOException {
+    private void sendResult(HttpServletResponse response, boolean result, String message) throws IOException {
         Map<String, Object> map = new HashMap<>();
         map.put("result", result);
         map.put("message", message);
@@ -145,5 +136,4 @@ public class SmsValidateCodeServlet extends HttpServlet {
         }
         return s.toString();
     }
-
 }

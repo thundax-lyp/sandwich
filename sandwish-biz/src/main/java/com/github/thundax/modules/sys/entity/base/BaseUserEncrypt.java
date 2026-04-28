@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.entity.base;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 
-/** @author thundax */
 public abstract class BaseUserEncrypt extends AdminDataEntity<UserEncrypt> {
 
     private static final long serialVersionUID = 1L;

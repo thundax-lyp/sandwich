@@ -5,7 +5,6 @@ import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
 
-/** @author wdit */
 public interface StorageDao {
 
     Storage get(String id);
@@ -13,12 +12,7 @@ public interface StorageDao {
     List<Storage> getMany(List<String> idList);
 
     List<Storage> findList(
-            String mimeType,
-            String ownerId,
-            String ownerType,
-            String enableFlag,
-            String name,
-            String remarks);
+            String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks);
 
     Page<Storage> findPage(
             String mimeType,

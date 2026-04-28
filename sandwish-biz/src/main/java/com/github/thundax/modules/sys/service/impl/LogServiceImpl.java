@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class LogServiceImpl implements LogService {
@@ -52,18 +51,17 @@ public class LogServiceImpl implements LogService {
     public Page<Log> findPage(Log log, Page<Log> page) {
         Page<Log> normalizedPage = normalizePage(page);
         Log.Query query = log == null ? null : log.getQuery();
-        IPage<Log> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getType(),
-                        query == null ? null : query.getRemoteAddr(),
-                        query == null ? null : query.getUserLoginName(),
-                        query == null ? null : query.getUserName(),
-                        query == null ? null : query.getTitle(),
-                        query == null ? null : query.getRequestUri(),
-                        query == null ? null : query.getBeginDate(),
-                        query == null ? null : query.getEndDate(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Log> dataPage = dao.findPage(
+                query == null ? null : query.getType(),
+                query == null ? null : query.getRemoteAddr(),
+                query == null ? null : query.getUserLoginName(),
+                query == null ? null : query.getUserName(),
+                query == null ? null : query.getTitle(),
+                query == null ? null : query.getRequestUri(),
+                query == null ? null : query.getBeginDate(),
+                query == null ? null : query.getEndDate(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

@@ -1,14 +1,13 @@
 package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class AsyncTaskServiceImpl implements AsyncTaskService {
 

@@ -4,7 +4,6 @@ import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 
-/** @author wdit */
 public abstract class BaseLog extends AdminDataEntity<Log> {
 
     private static final long serialVersionUID = 1L;

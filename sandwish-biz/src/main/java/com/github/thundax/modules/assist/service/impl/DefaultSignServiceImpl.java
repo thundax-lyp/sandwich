@@ -1,9 +1,9 @@
 package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.codec.Sm3Utils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
 
     @Override
     public Boolean sign(String businessType, String businessId, String body) {
-        if (StringUtils.isBlank(businessType)
-                || StringUtils.isBlank(businessId)
-                || StringUtils.isBlank(body)) {
+        if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId) || StringUtils.isBlank(body)) {
             return null;
         }
 
@@ -40,9 +38,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
 
     @Override
     public Boolean verifySign(String businessType, String businessId, String body) {
-        if (StringUtils.isBlank(businessType)
-                || StringUtils.isBlank(businessId)
-                || StringUtils.isBlank(body)) {
+        if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId) || StringUtils.isBlank(body)) {
             return null;
         }
 
@@ -50,8 +46,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         if (signature == null) {
             return null;
         }
-        Boolean isSuccess =
-                StringUtils.equalsIgnoreCase(createSignature(body), signature.getSignature());
+        Boolean isSuccess = StringUtils.equalsIgnoreCase(createSignature(body), signature.getSignature());
         if (isSuccess) {
             signature.setIsVerifySign("1");
         } else {

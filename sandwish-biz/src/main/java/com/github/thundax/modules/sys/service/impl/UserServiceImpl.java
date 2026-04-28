@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
@@ -26,8 +25,7 @@ public class UserServiceImpl implements UserService {
     private final SignService signService;
     private final UserEncryptService userEncryptService;
 
-    public UserServiceImpl(
-            UserDao dao, SignService signService, UserEncryptService userEncryptService) {
+    public UserServiceImpl(UserDao dao, SignService signService, UserEncryptService userEncryptService) {
         this.dao = dao;
         this.signService = signService;
         this.userEncryptService = userEncryptService;
@@ -82,15 +80,14 @@ public class UserServiceImpl implements UserService {
     public Page<User> findPage(User user, Page<User> page) {
         Page<User> normalizedPage = normalizePage(page);
         User.Query query = user == null ? null : user.getQuery();
-        IPage<User> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getOfficeId(),
-                        query == null ? null : query.getLoginName(),
-                        query == null ? null : query.getName(),
-                        query == null ? null : query.getEnableFlag(),
-                        query == null ? null : query.getSuperFlag(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<User> dataPage = dao.findPage(
+                query == null ? null : query.getOfficeId(),
+                query == null ? null : query.getLoginName(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getSuperFlag(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.entity.base;
 import com.github.thundax.common.persistence.AdminTreeEntity;
 import com.github.thundax.modules.sys.entity.Menu;
 
-/** @author wdit */
 public abstract class BaseMenu extends AdminTreeEntity<Menu> {
 
     private String parentId;

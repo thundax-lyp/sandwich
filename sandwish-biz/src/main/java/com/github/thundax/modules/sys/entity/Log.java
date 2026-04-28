@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseLog;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Log extends BaseLog {
@@ -82,18 +81,11 @@ public class Log extends BaseLog {
                 if (param.getValue() != null && param.getValue().length > 0) {
                     paramValue = param.getValue()[0];
                 }
-                String safeParamValue =
-                        StringUtils.endsWithIgnoreCase(param.getKey(), "password")
-                                ? ""
-                                : paramValue;
-                params.append(
-                        safeParamValue.length() > 100
-                                ? safeParamValue.substring(0, 100)
-                                : safeParamValue);
+                String safeParamValue = StringUtils.endsWithIgnoreCase(param.getKey(), "password") ? "" : paramValue;
+                params.append(safeParamValue.length() > 100 ? safeParamValue.substring(0, 100) : safeParamValue);
             }
             String requestParams = params.toString();
-            this.setRequestParams(
-                    requestParams.length() > 300 ? requestParams.substring(0, 300) : requestParams);
+            this.setRequestParams(requestParams.length() > 300 ? requestParams.substring(0, 300) : requestParams);
         }
     }
 

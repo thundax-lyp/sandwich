@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-/** @author wdit */
 public class WaveBuilder {
 
     private static final int WAVE_FILE_HEADER_SIZE = 44;

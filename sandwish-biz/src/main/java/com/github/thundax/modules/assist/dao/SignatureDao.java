@@ -37,11 +37,7 @@ public interface SignatureDao {
      * @param isVerifySign 验签状态
      * @return 签名列表
      */
-    List<Signature> findList(
-            String businessType,
-            String businessId,
-            List<String> businessIdList,
-            String isVerifySign);
+    List<Signature> findList(String businessType, String businessId, List<String> businessIdList, String isVerifySign);
 
     /**
      * 按业务分类分页查询签名。

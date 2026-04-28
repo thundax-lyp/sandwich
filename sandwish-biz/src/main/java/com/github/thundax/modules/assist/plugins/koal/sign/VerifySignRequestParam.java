@@ -30,17 +30,12 @@ public class VerifySignRequestParam implements Serializable {
         this(b64OriginData, b64SignedData, "", "", "");
     }
 
-    public VerifySignRequestParam(
-            String b64OriginData, String b64SignedData, String certAlias, String serviceName) {
+    public VerifySignRequestParam(String b64OriginData, String b64SignedData, String certAlias, String serviceName) {
         this(b64OriginData, b64SignedData, "", certAlias, serviceName);
     }
 
     public VerifySignRequestParam(
-            String b64OriginData,
-            String b64SignedData,
-            String b64Cert,
-            String certAlias,
-            String serviceName) {
+            String b64OriginData, String b64SignedData, String b64Cert, String certAlias, String serviceName) {
         this.b64OriginData = b64OriginData;
         this.b64SignedData = b64SignedData;
         this.b64Cert = b64Cert;

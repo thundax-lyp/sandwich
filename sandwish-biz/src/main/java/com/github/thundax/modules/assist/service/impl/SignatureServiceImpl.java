@@ -39,8 +39,7 @@ public class SignatureServiceImpl implements SignatureService {
     public Page<Signature> findPage(String businessType, Page<Signature> page) {
         Page<Signature> normalizedPage = normalizePage(page);
         IPage<Signature> dataPage =
-                dao.findPage(
-                        businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
+                dao.findPage(businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

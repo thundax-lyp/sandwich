@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.service.LogService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 @Lazy(value = false)
 public class LogServiceHolder {

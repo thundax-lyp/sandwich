@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
@@ -57,19 +56,18 @@ public class MemberServiceImpl implements MemberService {
     public Page<Member> findPage(Member member, Page<Member> page) {
         Page<Member> normalizedPage = normalizePage(page);
         Member.Query query = member == null ? null : member.getQuery();
-        IPage<Member> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getEnableFlag(),
-                        query == null ? null : query.getEmail(),
-                        query == null ? null : query.getName(),
-                        query == null ? null : query.getRemarks(),
-                        query == null ? null : query.getBeginRegisterDate(),
-                        query == null ? null : query.getEndRegisterDate(),
-                        query == null ? null : query.getBeginLoginDate(),
-                        query == null ? null : query.getEndLoginDate(),
-                        query == null ? null : query.getMobile(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Member> dataPage = dao.findPage(
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getEmail(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getRemarks(),
+                query == null ? null : query.getBeginRegisterDate(),
+                query == null ? null : query.getEndRegisterDate(),
+                query == null ? null : query.getBeginLoginDate(),
+                query == null ? null : query.getEndLoginDate(),
+                query == null ? null : query.getMobile(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

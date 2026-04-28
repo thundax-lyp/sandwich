@@ -121,12 +121,7 @@ public class StorageServiceImplTest {
 
         @Override
         public List<Storage> findList(
-                String mimeType,
-                String ownerId,
-                String ownerType,
-                String enableFlag,
-                String name,
-                String remarks) {
+                String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks) {
             return null;
         }
 
@@ -148,8 +143,7 @@ public class StorageServiceImplTest {
             this.remarks = remarks;
             this.pageNo = pageNo;
             this.pageSize = pageSize;
-            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                    pageNo, pageSize);
+            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
         }
 
         @Override

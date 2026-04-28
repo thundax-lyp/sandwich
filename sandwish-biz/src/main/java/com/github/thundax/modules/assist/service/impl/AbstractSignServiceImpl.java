@@ -1,9 +1,9 @@
 package com.github.thundax.modules.assist.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

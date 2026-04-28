@@ -5,7 +5,6 @@ import com.github.thundax.modules.member.entity.Member;
 import java.util.Date;
 import java.util.List;
 
-/** @author wdit */
 public interface MemberDao {
 
     Member get(String id);

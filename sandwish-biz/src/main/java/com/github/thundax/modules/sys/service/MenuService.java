@@ -4,7 +4,6 @@ import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
 import java.util.List;
 
-/** @author wdit */
 public interface MenuService extends TreeService<Menu> {
 
     /**

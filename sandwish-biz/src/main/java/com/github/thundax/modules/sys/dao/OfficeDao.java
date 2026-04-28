@@ -5,7 +5,6 @@ import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Office;
 import java.util.List;
 
-/** @author wdit */
 public interface OfficeDao {
 
     Office get(String id);

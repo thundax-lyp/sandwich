@@ -1,14 +1,13 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import com.google.common.collect.Maps;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signable {
 
     protected String createUserId;

@@ -3,14 +3,13 @@ package com.github.thundax.modules.member.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.config.Global;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.member.entity.base.BaseMember;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
-/** @author wdit */
 public class Member extends BaseMember {
 
     public static final String BEAN_NAME = "Member";
@@ -28,8 +27,7 @@ public class Member extends BaseMember {
 
     @Override
     public void setEnableFlag(String enableFlag) {
-        super.setEnableFlag(
-                StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
+        super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
     }
 
     public boolean isEnable() {
@@ -133,8 +131,7 @@ public class Member extends BaseMember {
 
         public void setEndRegisterDate(Date endRegisterDate) {
             if (endRegisterDate != null) {
-                endRegisterDate =
-                        DateUtils.addSeconds(DateUtils.ceiling(endRegisterDate, Calendar.DATE), -1);
+                endRegisterDate = DateUtils.addSeconds(DateUtils.ceiling(endRegisterDate, Calendar.DATE), -1);
             }
             this.endRegisterDate = endRegisterDate;
         }
@@ -158,8 +155,7 @@ public class Member extends BaseMember {
 
         public void setEndLoginDate(Date endLoginDate) {
             if (endLoginDate != null) {
-                endLoginDate =
-                        DateUtils.addSeconds(DateUtils.ceiling(endLoginDate, Calendar.DATE), -1);
+                endLoginDate = DateUtils.addSeconds(DateUtils.ceiling(endLoginDate, Calendar.DATE), -1);
             }
             this.endLoginDate = endLoginDate;
         }

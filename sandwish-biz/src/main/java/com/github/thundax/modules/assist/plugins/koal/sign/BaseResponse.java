@@ -2,8 +2,8 @@ package com.github.thundax.modules.assist.plugins.koal.sign;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 签名验签响应基类
@@ -28,7 +28,6 @@ public class BaseResponse implements Serializable {
     }
 
     public static boolean isSuccess(BaseResponse response) {
-        return response != null
-                && StringUtils.equalsIgnoreCase(response.getErrorCode(), SUCCESS_CODE);
+        return response != null && StringUtils.equalsIgnoreCase(response.getErrorCode(), SUCCESS_CODE);
     }
 }

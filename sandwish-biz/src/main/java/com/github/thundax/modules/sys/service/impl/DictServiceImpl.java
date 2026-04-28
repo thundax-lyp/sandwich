@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.persistence.Page;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
@@ -10,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class DictServiceImpl implements DictService {
@@ -93,13 +92,12 @@ public class DictServiceImpl implements DictService {
     public Page<Dict> findPage(Dict dict, Page<Dict> page) {
         Page<Dict> normalizedPage = normalizePage(page);
         Dict.Query query = dict == null ? null : dict.getQuery();
-        IPage<Dict> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getType(),
-                        query == null ? null : query.getLabel(),
-                        query == null ? null : query.getRemarks(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Dict> dataPage = dao.findPage(
+                query == null ? null : query.getType(),
+                query == null ? null : query.getLabel(),
+                query == null ? null : query.getRemarks(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

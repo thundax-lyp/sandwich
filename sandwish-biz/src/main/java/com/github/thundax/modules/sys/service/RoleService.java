@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.List;
 
-/** @author wdit */
 public interface RoleService extends CrudService<Role> {
 
     /**

@@ -5,7 +5,6 @@ import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
 
-/** @author wdit */
 public interface StorageService {
 
     Storage get(String id);

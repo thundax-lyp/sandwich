@@ -3,14 +3,13 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseOffice;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Office extends BaseOffice {

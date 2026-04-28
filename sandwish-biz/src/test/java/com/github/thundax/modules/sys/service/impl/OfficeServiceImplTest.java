@@ -147,8 +147,7 @@ public class OfficeServiceImplTest {
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Office> dataPage =
-                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                            pageNo, pageSize);
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
             dataPage.setTotal(1);
             return dataPage;
         }
@@ -183,8 +182,7 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(
-                String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
+        public void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
 
         @Override
         public boolean isChildOf(String childId, String parentId) {

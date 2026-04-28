@@ -1,6 +1,5 @@
 package com.github.thundax.common;
 
-/** @author wdit */
 public class Constants {
 
     public static final String CACHE_PREFIX = "_INTERACTION_";

@@ -105,8 +105,7 @@ public class UploadFileServiceImplTest {
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<UploadFile> dataPage =
-                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                            pageNo, pageSize);
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
             dataPage.setTotal(1);
             return dataPage;
         }

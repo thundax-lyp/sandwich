@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class RoleServiceImpl implements RoleService {
@@ -30,11 +29,9 @@ public class RoleServiceImpl implements RoleService {
     private final SignService signService;
 
     /** roleId -> userIdList */
-    private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler =
-            new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler = new PooledThreadLocal<>();
     /** roleId -> menuIdList */
-    private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler =
-            new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
     public RoleServiceImpl(RoleDao dao, SignService signService) {
         this.dao = dao;
@@ -85,11 +82,8 @@ public class RoleServiceImpl implements RoleService {
     public Page<Role> findPage(Role role, Page<Role> page) {
         Page<Role> normalizedPage = normalizePage(page);
         Role.Query query = role == null ? null : role.getQuery();
-        IPage<Role> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getEnableFlag(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Role> dataPage = dao.findPage(
+                query == null ? null : query.getEnableFlag(), normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -138,8 +132,7 @@ public class RoleServiceImpl implements RoleService {
         dao.deleteRoleUser(role.getId());
 
         if (userList != null && !userList.isEmpty()) {
-            dao.insertRoleUser(
-                    role.getId(), userList.stream().map(User::getId).collect(Collectors.toList()));
+            dao.insertRoleUser(role.getId(), userList.stream().map(User::getId).collect(Collectors.toList()));
         }
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
@@ -180,26 +173,18 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<User> findRoleUser(Role role) {
-        List<String> userIdList =
-                idUserIdsMapHandler
-                        .computeIfAbsent(HashMap::new)
-                        .computeIfAbsent(
-                                role.getId(),
-                                roleId ->
-                                        dao.findRoleUser(role.getId()));
+        List<String> userIdList = idUserIdsMapHandler
+                .computeIfAbsent(HashMap::new)
+                .computeIfAbsent(role.getId(), roleId -> dao.findRoleUser(role.getId()));
 
         return userIdList.stream().map(userId -> new User(userId)).collect(Collectors.toList());
     }
 
     @Override
     public List<Menu> findRoleMenu(Role role) {
-        List<String> menuIdList =
-                idMenuIdsMapHandler
-                        .computeIfAbsent(HashMap::new)
-                        .computeIfAbsent(
-                                String.valueOf(role.getId()),
-                                roleId ->
-                                        dao.findRoleMenu(role.getId()));
+        List<String> menuIdList = idMenuIdsMapHandler
+                .computeIfAbsent(HashMap::new)
+                .computeIfAbsent(String.valueOf(role.getId()), roleId -> dao.findRoleMenu(role.getId()));
 
         return menuIdList.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
     }

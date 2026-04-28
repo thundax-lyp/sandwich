@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class UploadFileServiceImpl implements UploadFileService {
@@ -66,8 +65,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     public Page<UploadFile> findPage(UploadFile entity, Page<UploadFile> page) {
         Page<UploadFile> normalizedPage = normalizePage(page);
-        IPage<UploadFile> dataPage =
-                dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<UploadFile> dataPage = dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

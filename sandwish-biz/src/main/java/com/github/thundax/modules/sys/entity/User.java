@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.base.BaseUser;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
@@ -18,9 +17,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseUser {
@@ -81,10 +80,9 @@ public class User extends BaseUser {
             if (this.getIsNewRecord()) {
                 this.roleIdList = new ArrayList<>();
             } else {
-                this.roleIdList =
-                        UserServiceHolder.getService().findUserRole(this).stream()
-                                .map(role -> role.getId())
-                                .collect(Collectors.toList());
+                this.roleIdList = UserServiceHolder.getService().findUserRole(this).stream()
+                        .map(role -> role.getId())
+                        .collect(Collectors.toList());
             }
         }
         return this.roleIdList;
@@ -103,18 +101,14 @@ public class User extends BaseUser {
     }
 
     public void setRoleList(List<Role> roleList) {
-        this.roleIdList =
-                roleList == null
-                        ? new ArrayList<>()
-                        : roleList.stream()
-                                .map(role -> role.getId())
-                                .collect(Collectors.toList());
+        this.roleIdList = roleList == null
+                ? new ArrayList<>()
+                : roleList.stream().map(role -> role.getId()).collect(Collectors.toList());
     }
 
     @JsonIgnore
     public boolean hasRole(@NotNull Role target) {
-        return getRoleIdList().stream()
-                .anyMatch(roleId -> StringUtils.equals(roleId, target.getId()));
+        return getRoleIdList().stream().anyMatch(roleId -> StringUtils.equals(roleId, target.getId()));
     }
 
     @JsonIgnore

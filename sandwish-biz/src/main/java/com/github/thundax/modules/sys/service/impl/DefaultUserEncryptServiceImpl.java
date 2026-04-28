@@ -17,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DefaultUserEncryptServiceImpl implements UserEncryptService {
 
-    public DefaultUserEncryptServiceImpl(UserEncryptDao dao) {
-    }
+    public DefaultUserEncryptServiceImpl(UserEncryptDao dao) {}
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

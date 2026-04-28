@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class StorageServiceImpl implements StorageService {
@@ -53,16 +52,15 @@ public class StorageServiceImpl implements StorageService {
     public Page<Storage> findPage(Storage storage, Page<Storage> page) {
         Page<Storage> normalizedPage = normalizePage(page);
         Storage.Query query = storage == null ? null : storage.getQuery();
-        IPage<Storage> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getMimeType(),
-                        query == null ? null : query.getOwnerId(),
-                        query == null ? null : query.getOwnerType(),
-                        query == null ? null : query.getEnableFlag(),
-                        query == null ? null : query.getName(),
-                        query == null ? null : query.getRemarks(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Storage> dataPage = dao.findPage(
+                query == null ? null : query.getMimeType(),
+                query == null ? null : query.getOwnerId(),
+                query == null ? null : query.getOwnerType(),
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getRemarks(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

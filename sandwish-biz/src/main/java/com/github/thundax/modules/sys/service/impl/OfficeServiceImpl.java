@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class OfficeServiceImpl implements OfficeService {
@@ -70,13 +69,12 @@ public class OfficeServiceImpl implements OfficeService {
     public Page<Office> findPage(Office office, Page<Office> page) {
         Page<Office> normalizedPage = normalizePage(page);
         Office.Query query = office == null ? null : office.getQuery();
-        IPage<Office> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getParentId(),
-                        query == null ? null : query.getName(),
-                        query == null ? null : query.getRemarks(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Office> dataPage = dao.findPage(
+                query == null ? null : query.getParentId(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getRemarks(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

@@ -10,8 +10,7 @@ public interface UserDao {
 
     List<User> getMany(List<String> idList);
 
-    List<User> findList(
-            String officeId, String loginName, String name, String enableFlag, String superFlag);
+    List<User> findList(String officeId, String loginName, String name, String enableFlag, String superFlag);
 
     Page<User> findPage(
             String officeId,

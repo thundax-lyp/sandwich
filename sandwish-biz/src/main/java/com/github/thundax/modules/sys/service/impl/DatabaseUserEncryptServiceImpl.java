@@ -5,20 +5,20 @@ import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 用户重要信息加密数据库加密服务 数据库列加密
@@ -34,8 +34,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     /** 加密保存队列名称 * */
     public static final String QUEUE_ENCRYPT_SAVE = QUEUE_PREFIX + "encrypt.db.save";
 
-    public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS =
-            QUEUE_PREFIX + "encrypt.db.update.login.pass";
+    public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS = QUEUE_PREFIX + "encrypt.db.update.login.pass";
     public static final String QUEUE_ENCRYPT_QUERY = QUEUE_PREFIX + "encrypt.db.query";
     private final UserEncryptDao dao;
     protected final AmqpTemplate amqpTemplate;
@@ -167,8 +166,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     public Page<UserEncrypt> findPage(UserEncrypt entity, Page<UserEncrypt> page) {
         Page<UserEncrypt> normalizedPage = normalizePage(page);
-        IPage<UserEncrypt> dataPage =
-                dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<UserEncrypt> dataPage = dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -230,8 +228,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         }
     }
 
-    private int batchOperate(
-            Collection<UserEncrypt> collection, Function<UserEncrypt, Integer> operator) {
+    private int batchOperate(Collection<UserEncrypt> collection, Function<UserEncrypt, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
             for (UserEncrypt userEncrypt : collection) {

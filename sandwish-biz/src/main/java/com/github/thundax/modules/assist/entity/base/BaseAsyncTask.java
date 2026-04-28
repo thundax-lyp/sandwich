@@ -3,7 +3,6 @@ package com.github.thundax.modules.assist.entity.base;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
-/** @author wdit */
 public class BaseAsyncTask extends AdminDataEntity<AsyncTask> {
 
     private String title;

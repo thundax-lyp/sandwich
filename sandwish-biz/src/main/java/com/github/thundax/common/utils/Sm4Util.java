@@ -49,8 +49,7 @@ public class Sm4Util {
      * @explain
      */
     public static byte[] generateKey(int keySize) throws Exception {
-        KeyGenerator kg =
-                KeyGenerator.getInstance(ALGORITHM_NAME, BouncyCastleProvider.PROVIDER_NAME);
+        KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM_NAME, BouncyCastleProvider.PROVIDER_NAME);
         kg.init(keySize, new SecureRandom());
         return kg.generateKey().getEncoded();
     }
@@ -65,8 +64,7 @@ public class Sm4Util {
      * @throws Exception
      * @explain ECB模式（电子密码本模式：Electronic codebook）
      */
-    private static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key)
-            throws Exception {
+    private static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key) throws Exception {
         Cipher cipher = Cipher.getInstance(algorithmName, BouncyCastleProvider.PROVIDER_NAME);
         Key sm4Key = new SecretKeySpec(key, ALGORITHM_NAME);
         cipher.init(mode, sm4Key);

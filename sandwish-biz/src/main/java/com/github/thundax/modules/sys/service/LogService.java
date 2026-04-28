@@ -4,7 +4,6 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.List;
 
-/** @author wdit */
 public interface LogService {
 
     Log get(String id);

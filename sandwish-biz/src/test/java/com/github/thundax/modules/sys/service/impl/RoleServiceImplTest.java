@@ -122,8 +122,7 @@ public class RoleServiceImplTest {
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Role> dataPage =
-                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-                            pageNo, pageSize);
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
             dataPage.setTotal(1);
             return dataPage;
         }

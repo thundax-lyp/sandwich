@@ -1,13 +1,12 @@
 package com.github.thundax.modules.assist.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.entity.base.BaseAsyncTask;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-/** @author wdit */
 public class AsyncTask extends BaseAsyncTask {
 
     public static final int DEFAULT_EXPIRED_SECONDS = 1800;

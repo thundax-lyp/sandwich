@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.Role;
 import java.util.List;
 
-/** @author wdit */
 public interface RoleDao {
 
     Role get(String id);

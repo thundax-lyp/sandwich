@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.storage.entity.base.BaseStorageBusiness;
 import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StorageBusiness extends BaseStorageBusiness {

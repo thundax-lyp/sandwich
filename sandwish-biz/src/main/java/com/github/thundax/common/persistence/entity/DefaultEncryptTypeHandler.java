@@ -1,11 +1,11 @@
 package com.github.thundax.common.persistence.entity;
 
 import com.github.thundax.common.utils.EncryptUtils;
-import org.apache.commons.lang3.StringUtils;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -21,8 +21,7 @@ import org.apache.ibatis.type.MappedTypes;
 public class DefaultEncryptTypeHandler extends BaseTypeHandler<String> {
 
     @Override
-    public void setNonNullParameter(
-            PreparedStatement preparedStatement, int i, String s, JdbcType jdbcType)
+    public void setNonNullParameter(PreparedStatement preparedStatement, int i, String s, JdbcType jdbcType)
             throws SQLException {
         preparedStatement.setString(i, encrypt(s));
     }
@@ -38,8 +37,7 @@ public class DefaultEncryptTypeHandler extends BaseTypeHandler<String> {
     }
 
     @Override
-    public String getNullableResult(CallableStatement callableStatement, int i)
-            throws SQLException {
+    public String getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
         return decrypt(callableStatement.getString(i));
     }
 

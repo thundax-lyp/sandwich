@@ -5,7 +5,6 @@ import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
 import java.util.List;
 
-/** @author wdit */
 public interface MenuDao {
 
     Menu get(String id);
@@ -14,8 +13,7 @@ public interface MenuDao {
 
     List<Menu> findList(String parentId, String displayFlag, Integer maxRank);
 
-    Page<Menu> findPage(
-            String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
+    Page<Menu> findPage(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
 
     int insert(Menu menu);
 

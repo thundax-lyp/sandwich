@@ -1,6 +1,5 @@
 package com.github.thundax.modules.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author wdit */
 public class AvatarUtils {
 
     private static final String AVATAR_PATH = "user";
@@ -64,10 +63,9 @@ public class AvatarUtils {
 
         if (originWidth > MAX_AVATAR_WIDTH || originHeight > MAX_AVATAR_HEIGHT) {
             // 缩放图片
-            double scale =
-                    Math.min(
-                            (double) MAX_AVATAR_WIDTH / (double) originWidth,
-                            (double) MAX_AVATAR_HEIGHT / (double) originHeight);
+            double scale = Math.min(
+                    (double) MAX_AVATAR_WIDTH / (double) originWidth,
+                    (double) MAX_AVATAR_HEIGHT / (double) originHeight);
             builder = Thumbnails.of(image);
             builder.scale(scale);
         } else {

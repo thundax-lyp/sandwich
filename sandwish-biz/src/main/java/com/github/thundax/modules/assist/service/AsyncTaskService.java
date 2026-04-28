@@ -2,7 +2,6 @@ package com.github.thundax.modules.assist.service;
 
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
-/** @author wdit */
 public interface AsyncTaskService {
 
     /**

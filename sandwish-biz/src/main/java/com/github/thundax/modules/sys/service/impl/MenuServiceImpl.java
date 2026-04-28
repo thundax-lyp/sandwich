@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.SpringContextHolder;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -11,11 +10,11 @@ import com.github.thundax.modules.sys.service.MenuService;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** @author wdit */
 @Service
 @Transactional(readOnly = true)
 public class MenuServiceImpl implements MenuService {
@@ -76,13 +75,12 @@ public class MenuServiceImpl implements MenuService {
     public Page<Menu> findPage(Menu menu, Page<Menu> page) {
         Page<Menu> normalizedPage = normalizePage(page);
         Menu.Query query = menu == null ? null : menu.getQuery();
-        IPage<Menu> dataPage =
-                dao.findPage(
-                        query == null ? null : query.getParentId(),
-                        query == null ? null : query.getDisplayFlag(),
-                        query == null ? null : query.getMaxRank(),
-                        normalizedPage.getPageNo(),
-                        normalizedPage.getPageSize());
+        IPage<Menu> dataPage = dao.findPage(
+                query == null ? null : query.getParentId(),
+                query == null ? null : query.getDisplayFlag(),
+                query == null ? null : query.getMaxRank(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

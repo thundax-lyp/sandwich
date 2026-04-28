@@ -104,10 +104,7 @@ public class SignatureServiceImplTest {
 
         @Override
         public List<Signature> findList(
-                String businessType,
-                String businessId,
-                List<String> businessIdList,
-                String isVerifySign) {
+                String businessType, String businessId, List<String> businessIdList, String isVerifySign) {
             return null;
         }
 

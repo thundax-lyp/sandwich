@@ -1,6 +1,6 @@
 package com.github.thundax.modules.member.service;
 
-import com.github.thundax.common.service.CrudService;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.List;
 
@@ -9,7 +9,25 @@ import java.util.List;
  *
  * @author wdit
  */
-public interface MemberService extends CrudService<Member> {
+public interface MemberService {
+
+    Member get(String id);
+
+    List<Member> getMany(List<String> ids);
+
+    List<Member> findList(Member member);
+
+    Page<Member> findPage(Member member, Page<Member> page);
+
+    void save(Member member);
+
+    int delete(Member member);
+
+    int delete(List<Member> list);
+
+    int updatePriority(Member member);
+
+    int updatePriority(List<Member> list);
 
     /**
      * 根据 loginName 获取

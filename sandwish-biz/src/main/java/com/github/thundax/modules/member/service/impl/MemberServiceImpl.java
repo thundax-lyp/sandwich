@@ -1,33 +1,95 @@
 package com.github.thundax.modules.member.service.impl;
 
-import com.github.thundax.common.service.impl.CrudServiceImpl;
-import org.apache.commons.lang3.StringUtils;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.StringUtils;
 
 /** @author wdit */
 @Service
 @Transactional(readOnly = true)
-public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implements MemberService {
+public class MemberServiceImpl implements MemberService {
+
+    private final MemberDao dao;
 
     @Autowired
     public MemberServiceImpl(MemberDao dao) {
-        super(dao);
+        this.dao = dao;
+    }
+
+    @Override
+    public Member get(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        return dao.get(id);
+    }
+
+    @Override
+    public List<Member> getMany(List<String> ids) {
+        return dao.getMany(ids);
+    }
+
+    @Override
+    public List<Member> findList(Member member) {
+        Member.Query query = member == null ? null : member.getQuery();
+        return dao.findList(
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getEmail(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getRemarks(),
+                query == null ? null : query.getBeginRegisterDate(),
+                query == null ? null : query.getEndRegisterDate(),
+                query == null ? null : query.getBeginLoginDate(),
+                query == null ? null : query.getEndLoginDate(),
+                query == null ? null : query.getMobile());
+    }
+
+    @Override
+    public Page<Member> findPage(Member member, Page<Member> page) {
+        Member.Query query = member == null ? null : member.getQuery();
+        return dao.findPage(
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getEmail(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getRemarks(),
+                query == null ? null : query.getBeginRegisterDate(),
+                query == null ? null : query.getEndRegisterDate(),
+                query == null ? null : query.getBeginLoginDate(),
+                query == null ? null : query.getEndLoginDate(),
+                query == null ? null : query.getMobile(),
+                page);
     }
 
     @Override
     public Member getByLoginName(String loginName) {
-        return findOne(() -> dao.findByLoginName(loginName));
+        List<Member> members = dao.findByLoginName(loginName);
+        return members == null || members.isEmpty() ? null : members.get(0);
     }
 
     @Override
     public Member getByEmail(String email) {
-        return findOne(() -> dao.findByEmail(email));
+        List<Member> members = dao.findByEmail(email);
+        return members == null || members.isEmpty() ? null : members.get(0);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void save(Member member) {
+        if (member.getIsNewRecord()) {
+            member.preInsert();
+            dao.insert(member);
+        } else {
+            member.preUpdate();
+            dao.update(member);
+        }
     }
 
     @Override
@@ -56,8 +118,37 @@ public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implem
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public int updatePriority(Member member) {
+        member.preUpdate();
+        return dao.updatePriority(member);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updatePriority(List<Member> list) {
+        return batchOperate(list, this::updatePriority);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(Member member) {
+        if (member == null) {
+            return 0;
+        }
+        return dao.delete(member.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(List<Member> list) {
+        return batchOperate(list, this::delete);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Member getByZjhm(Member member) {
-        return dao.getByZjhm(member);
+        Member.Query query = member == null ? null : member.getQuery();
+        return dao.getByZjhm(query == null ? null : query.getZjhm());
     }
 
     @Override
@@ -65,9 +156,7 @@ public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implem
         if (StringUtils.isEmpty(ywtbUserId)) {
             return null;
         }
-        Member member = new Member();
-        member.setYwtbId(ywtbUserId);
-        return dao.getByYwtbId(member);
+        return dao.getByYwtbId(ywtbUserId);
     }
 
     @Override
@@ -75,5 +164,15 @@ public class MemberServiceImpl extends CrudServiceImpl<MemberDao, Member> implem
     public void updatePassword(Member member) {
         member.preUpdate();
         dao.updateLoginPass(member);
+    }
+
+    private int batchOperate(Collection<Member> collection, Function<Member, Integer> operator) {
+        int count = 0;
+        if (collection != null && !collection.isEmpty()) {
+            for (Member entity : collection) {
+                count += operator.apply(entity);
+            }
+        }
+        return count;
     }
 }

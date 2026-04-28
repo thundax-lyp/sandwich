@@ -39,7 +39,6 @@ public final class MemberPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -86,20 +85,4 @@ public final class MemberPersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Member.Query query, MemberDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryEnableFlag(query.getEnableFlag());
-        dataObject.setQueryEmail(query.getEmail());
-        dataObject.setQueryName(query.getName());
-        dataObject.setQueryRemarks(query.getRemarks());
-        dataObject.setQueryBeginRegisterDate(query.getBeginRegisterDate());
-        dataObject.setQueryEndRegisterDate(query.getEndRegisterDate());
-        dataObject.setQueryBeginLoginDate(query.getBeginLoginDate());
-        dataObject.setQueryEndLoginDate(query.getEndLoginDate());
-        dataObject.setQueryYwtbId(query.getYwtbId());
-        dataObject.setQueryZjhm(query.getZjhm());
-        dataObject.setQueryMobile(query.getMobile());
-    }
 }

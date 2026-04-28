@@ -1,11 +1,47 @@
 package com.github.thundax.modules.member.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.entity.Member;
+import java.util.Date;
 import java.util.List;
 
 /** @author wdit */
-public interface MemberDao extends CrudDao<Member> {
+public interface MemberDao {
+
+    Member get(String id);
+
+    List<Member> getMany(List<String> idList);
+
+    List<Member> findList(
+            String enableFlag,
+            String email,
+            String name,
+            String remarks,
+            Date beginRegisterDate,
+            Date endRegisterDate,
+            Date beginLoginDate,
+            Date endLoginDate,
+            String mobile);
+
+    Page<Member> findPage(
+            String enableFlag,
+            String email,
+            String name,
+            String remarks,
+            Date beginRegisterDate,
+            Date endRegisterDate,
+            Date beginLoginDate,
+            Date endLoginDate,
+            String mobile,
+            Page<Member> page);
+
+    int insert(Member entity);
+
+    int update(Member entity);
+
+    int updatePriority(Member entity);
+
+    int delete(String id);
 
     /**
      * 根据 loginName 获取
@@ -53,8 +89,8 @@ public interface MemberDao extends CrudDao<Member> {
     int updateEnableFlag(Member member);
 
     /** 根据证件号码查询 */
-    Member getByZjhm(Member member);
+    Member getByZjhm(String zjhm);
 
     /** 根据一网通办的id查询 */
-    Member getByYwtbId(Member member);
+    Member getByYwtbId(String ywtbId);
 }

@@ -1,6 +1,10 @@
 package com.github.thundax.modules.member.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,47 +16,76 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("tb_member")
+@TableName(value = "tb_member", autoResultMap = true)
 public class MemberDO {
 
+    @TableField(exist = false)
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
+    @TableField("login_name")
     private String loginName;
+
+    @TableField("login_pass")
     private String loginPass;
+
+    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String email;
+
     private String name;
     private String gender;
+
+    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String mobile;
+
+    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String address;
+
     private String zipcode;
+
+    @TableField("enable_flag")
     private String enableFlag;
+
+    @TableField("register_ip")
     private String registerIp;
+
+    @TableField("register_date")
     private Date registerDate;
+
+    @TableField("last_login_ip")
     private String lastLoginIp;
+
+    @TableField("last_login_date")
     private Date lastLoginDate;
+
+    @TableField("ywtb_id")
     private String ywtbId;
+
+    @TableField("login_count")
     private int loginCount;
+
     private Integer priority;
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("create_by")
     private String createUserId;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("update_by")
     private String updateUserId;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryEnableFlag;
-    private String queryEmail;
-    private String queryName;
-    private String queryRemarks;
-    private Date queryBeginRegisterDate;
-    private Date queryEndRegisterDate;
-    private Date queryBeginLoginDate;
-    private Date queryEndLoginDate;
-    private String queryYwtbId;
-    private String queryZjhm;
-    private String queryMobile;
 
     public MemberDO(String id) {
         this.id = id;
@@ -248,93 +281,5 @@ public class MemberDO {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
-    }
-
-    public String getQueryEnableFlag() {
-        return queryEnableFlag;
-    }
-
-    public void setQueryEnableFlag(String queryEnableFlag) {
-        this.queryEnableFlag = queryEnableFlag;
-    }
-
-    public String getQueryEmail() {
-        return queryEmail;
-    }
-
-    public void setQueryEmail(String queryEmail) {
-        this.queryEmail = queryEmail;
-    }
-
-    public String getQueryName() {
-        return queryName;
-    }
-
-    public void setQueryName(String queryName) {
-        this.queryName = queryName;
-    }
-
-    public String getQueryRemarks() {
-        return queryRemarks;
-    }
-
-    public void setQueryRemarks(String queryRemarks) {
-        this.queryRemarks = queryRemarks;
-    }
-
-    public Date getQueryBeginRegisterDate() {
-        return queryBeginRegisterDate;
-    }
-
-    public void setQueryBeginRegisterDate(Date queryBeginRegisterDate) {
-        this.queryBeginRegisterDate = queryBeginRegisterDate;
-    }
-
-    public Date getQueryEndRegisterDate() {
-        return queryEndRegisterDate;
-    }
-
-    public void setQueryEndRegisterDate(Date queryEndRegisterDate) {
-        this.queryEndRegisterDate = queryEndRegisterDate;
-    }
-
-    public Date getQueryBeginLoginDate() {
-        return queryBeginLoginDate;
-    }
-
-    public void setQueryBeginLoginDate(Date queryBeginLoginDate) {
-        this.queryBeginLoginDate = queryBeginLoginDate;
-    }
-
-    public Date getQueryEndLoginDate() {
-        return queryEndLoginDate;
-    }
-
-    public void setQueryEndLoginDate(Date queryEndLoginDate) {
-        this.queryEndLoginDate = queryEndLoginDate;
-    }
-
-    public String getQueryYwtbId() {
-        return queryYwtbId;
-    }
-
-    public void setQueryYwtbId(String queryYwtbId) {
-        this.queryYwtbId = queryYwtbId;
-    }
-
-    public String getQueryZjhm() {
-        return queryZjhm;
-    }
-
-    public void setQueryZjhm(String queryZjhm) {
-        this.queryZjhm = queryZjhm;
-    }
-
-    public String getQueryMobile() {
-        return queryMobile;
-    }
-
-    public void setQueryMobile(String queryMobile) {
-        this.queryMobile = queryMobile;
     }
 }

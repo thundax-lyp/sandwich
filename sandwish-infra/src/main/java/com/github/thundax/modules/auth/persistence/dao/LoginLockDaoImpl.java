@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-/** 登录失败锁定 Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 public class LoginLockDaoImpl implements LoginLockDao {

@@ -47,7 +47,7 @@
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
         <checkstyle.version>8.33</checkstyle.version>
         <spotless-maven-plugin.version>2.22.8</spotless-maven-plugin.version>
-        <google-java-format.version>1.7</google-java-format.version>
+        <palantir-java-format.version>1.1.0</palantir-java-format.version>
 
         <!-- framework version setting -->
         <mybatis.version>3.5.5</mybatis.version>
@@ -344,10 +344,9 @@
                             <include>src/main/java/**/*.java</include>
                             <include>src/test/java/**/*.java</include>
                         </includes>
-                        <googleJavaFormat>
-                            <version>${google-java-format.version}</version>
-                            <style>AOSP</style>
-                        </googleJavaFormat>
+                        <palantirJavaFormat>
+                            <version>${palantir-java-format.version}</version>
+                        </palantirJavaFormat>
                         <removeUnusedImports/>
                         <trimTrailingWhitespace/>
                         <endWithNewline/>

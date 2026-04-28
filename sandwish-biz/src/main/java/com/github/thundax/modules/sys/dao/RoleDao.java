@@ -1,14 +1,29 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.modules.sys.entity.Menu;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.Role;
-import com.github.thundax.modules.sys.entity.User;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
 
 /** @author wdit */
-public interface RoleDao extends CrudDao<Role> {
+public interface RoleDao {
+
+    Role get(String id);
+
+    List<Role> getMany(List<String> idList);
+
+    List<Role> findList(String enableFlag);
+
+    Page<Role> findPage(String enableFlag, int pageNo, int pageSize);
+
+    int insert(Role role);
+
+    int update(Role role);
+
+    int updatePriority(Role role);
+
+    int updateDelFlag(Role role);
+
+    int delete(String id);
 
     /**
      * 启用/禁用
@@ -18,48 +33,15 @@ public interface RoleDao extends CrudDao<Role> {
      */
     int updateEnableFlag(Role role);
 
-    /**
-     * 获取菜单列表
-     *
-     * @param role 权限
-     * @return 菜单列表
-     */
-    List<Menu> findRoleMenu(Role role);
+    List<String> findRoleMenu(String roleId);
 
-    /**
-     * 删除菜单列表
-     *
-     * @param role 权限
-     */
-    void deleteRoleMenu(Role role);
+    void deleteRoleMenu(String roleId);
 
-    /**
-     * 写入菜单列表
-     *
-     * @param role 权限
-     */
-    void insertRoleMenu(Role role);
+    void insertRoleMenu(String roleId, List<String> menuIdList);
 
-    /**
-     * 获取用户列表
-     *
-     * @param role 权限
-     * @return 用户列表
-     */
-    List<User> findRoleUser(Role role);
+    List<String> findRoleUser(String roleId);
 
-    /**
-     * 删除用户列表
-     *
-     * @param role 权限
-     */
-    void deleteRoleUser(Role role);
+    void deleteRoleUser(String roleId);
 
-    /**
-     * 写入用户列表
-     *
-     * @param role 权限
-     * @param userList 用户列表
-     */
-    void insertRoleUser(@Param("role") Role role, @Param("userList") List<User> userList);
+    void insertRoleUser(String roleId, List<String> userIdList);
 }

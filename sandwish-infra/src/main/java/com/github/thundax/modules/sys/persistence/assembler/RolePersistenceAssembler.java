@@ -28,15 +28,6 @@ public final class RolePersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
-        return dataObject;
-    }
-
-    public static RoleDO toDataObjectWithMenus(Role entity) {
-        RoleDO dataObject = toDataObject(entity);
-        if (dataObject != null) {
-            dataObject.setMenuIdList(entity.getMenuIdList());
-        }
         return dataObject;
     }
 
@@ -50,7 +41,6 @@ public final class RolePersistenceAssembler {
         entity.setName(dataObject.getName());
         entity.setAdminFlag(dataObject.getAdminFlag());
         entity.setEnableFlag(dataObject.getEnableFlag());
-        entity.setMenuIdList(dataObject.getMenuIdList());
         entity.setPriority(dataObject.getPriority());
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -94,10 +84,4 @@ public final class RolePersistenceAssembler {
         return userIds;
     }
 
-    private static void copyQuery(Role.Query query, RoleDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryEnableFlag(query.getEnableFlag());
-    }
 }

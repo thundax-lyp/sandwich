@@ -1,8 +1,8 @@
 package com.github.thundax.modules.sys.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
+import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface RoleMapper extends BaseMapper<RoleDO> {}
+public interface UserRoleMapper extends BaseMapper<UserRoleDO> {}

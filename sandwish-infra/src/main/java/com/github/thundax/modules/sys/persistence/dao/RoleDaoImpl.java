@@ -1,45 +1,54 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.RoleDao;
-import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
-import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.assembler.RolePersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
+import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
+import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
+import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
 import com.github.thundax.modules.sys.persistence.mapper.RoleMapper;
+import com.github.thundax.modules.sys.persistence.mapper.UserRoleMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 角色 DAO 实现。 */
 @Repository
 public class RoleDaoImpl implements RoleDao {
 
     private final RoleMapper mapper;
+    private final MenuRoleMapper menuRoleMapper;
+    private final UserRoleMapper userRoleMapper;
     private final RoleCacheSupport cacheSupport;
     private final UserCacheSupport userCacheSupport;
 
     public RoleDaoImpl(
-            RoleMapper mapper, RoleCacheSupport cacheSupport, UserCacheSupport userCacheSupport) {
+            RoleMapper mapper,
+            MenuRoleMapper menuRoleMapper,
+            UserRoleMapper userRoleMapper,
+            RoleCacheSupport cacheSupport,
+            UserCacheSupport userCacheSupport) {
         this.mapper = mapper;
+        this.menuRoleMapper = menuRoleMapper;
+        this.userRoleMapper = userRoleMapper;
         this.cacheSupport = cacheSupport;
         this.userCacheSupport = userCacheSupport;
     }
 
     @Override
-    public Role get(Role entity) {
-        Role role = cacheSupport.getById(entity.getId());
+    public Role get(String id) {
+        Role role = cacheSupport.getById(id);
         if (role != null) {
             return role;
         }
-
-        role =
-                RolePersistenceAssembler.toEntity(
-                        mapper.get(RolePersistenceAssembler.toDataObject(entity)));
+        role = RolePersistenceAssembler.toEntity(mapper.selectById(id));
         cacheSupport.putById(role);
         return role;
     }
@@ -56,10 +65,9 @@ public class RoleDaoImpl implements RoleDao {
                 roleList.add(role);
             }
         }
-
         if (!uncachedIdList.isEmpty()) {
             List<Role> uncachedRoleList =
-                    RolePersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+                    RolePersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (Role role : uncachedRoleList) {
                 cacheSupport.putById(role);
                 roleList.add(role);
@@ -69,17 +77,19 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Role> findList(Role entity) {
-        List<RoleDO> dataObjects = mapper.findList(RolePersistenceAssembler.toDataObject(entity));
-        List<Role> entities = RolePersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<Role> findList(String enableFlag) {
+        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(enableFlag)));
+    }
+
+    @Override
+    public Page<Role> findPage(String enableFlag, int pageNo, int pageSize) {
+        Page<RoleDO> dataObjectPage =
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(enableFlag));
+        Page<Role> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(RolePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
@@ -91,93 +101,151 @@ public class RoleDaoImpl implements RoleDao {
 
     @Override
     public int update(Role entity) {
-        int count = mapper.update(RolePersistenceAssembler.toDataObject(entity));
+        RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(RoleDO::getName, dataObject.getName())
+                                .set(RoleDO::getAdminFlag, dataObject.getAdminFlag())
+                                .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(RoleDO::getPriority, dataObject.getPriority())
+                                .set(RoleDO::getRemarks, dataObject.getRemarks())
+                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
 
     @Override
     public int updatePriority(Role entity) {
-        int count = mapper.updatePriority(RolePersistenceAssembler.toDataObject(entity));
+        RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(RoleDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeById(entity.getId());
         return count;
-    }
-
-    public int updateStatus(Role entity) {
-        return mapper.updateStatus(RolePersistenceAssembler.toDataObject(entity));
     }
 
     @Override
     public int updateDelFlag(Role entity) {
-        int count = mapper.updateDelFlag(RolePersistenceAssembler.toDataObject(entity));
+        RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(RoleDO::getDelFlag, dataObject.getDelFlag())
+                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
 
     @Override
-    public int delete(Role entity) {
-        int count = mapper.delete(RolePersistenceAssembler.toDataObject(entity));
-        removeRoleCaches(entity);
+    public int delete(String id) {
+        int count = mapper.deleteById(id);
+        removeRoleCaches(id);
         return count;
     }
 
     @Override
     public int updateEnableFlag(Role role) {
-        int count = mapper.updateEnableFlag(RolePersistenceAssembler.toDataObject(role));
+        RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(role.getId());
         return count;
     }
 
     @Override
-    public List<Menu> findRoleMenu(Role role) {
-        List<String> menuIds = cacheSupport.getRoleMenuIds(role.getId());
+    public List<String> findRoleMenu(String roleId) {
+        List<String> menuIds = cacheSupport.getRoleMenuIds(roleId);
         if (menuIds == null) {
-            menuIds = mapper.findRoleMenu(RolePersistenceAssembler.toDataObject(role));
-            cacheSupport.putRoleMenuIds(role.getId(), menuIds);
+            LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(MenuRoleDO::getRoleId, roleId);
+            menuIds =
+                    menuRoleMapper.selectList(wrapper).stream()
+                            .map(MenuRoleDO::getMenuId)
+                            .collect(Collectors.toList());
+            cacheSupport.putRoleMenuIds(roleId, menuIds);
         }
-        return menuIds.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
+        return menuIds;
     }
 
     @Override
-    public void deleteRoleMenu(Role role) {
-        mapper.deleteRoleMenu(RolePersistenceAssembler.toDataObject(role));
-        removeRoleCaches(role);
+    public void deleteRoleMenu(String roleId) {
+        LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MenuRoleDO::getRoleId, roleId);
+        menuRoleMapper.delete(wrapper);
+        removeRoleCaches(roleId);
     }
 
     @Override
-    public void insertRoleMenu(Role role) {
-        mapper.insertRoleMenu(RolePersistenceAssembler.toDataObjectWithMenus(role));
-        removeRoleCaches(role);
+    public void insertRoleMenu(String roleId, List<String> menuIdList) {
+        for (String menuId : menuIdList) {
+            menuRoleMapper.insert(new MenuRoleDO(roleId, menuId));
+        }
+        removeRoleCaches(roleId);
     }
 
     @Override
-    public List<User> findRoleUser(Role role) {
-        List<String> userIds = cacheSupport.getRoleUserIds(role.getId());
+    public List<String> findRoleUser(String roleId) {
+        List<String> userIds = cacheSupport.getRoleUserIds(roleId);
         if (userIds == null) {
-            userIds = mapper.findRoleUser(RolePersistenceAssembler.toDataObject(role));
-            cacheSupport.putRoleUserIds(role.getId(), userIds);
+            LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(UserRoleDO::getRoleId, roleId);
+            userIds =
+                    userRoleMapper.selectList(wrapper).stream()
+                            .map(UserRoleDO::getUserId)
+                            .collect(Collectors.toList());
+            cacheSupport.putRoleUserIds(roleId, userIds);
         }
-        return userIds.stream().map(userId -> new User(userId)).collect(Collectors.toList());
+        return userIds;
     }
 
     @Override
-    public void deleteRoleUser(Role role) {
-        mapper.deleteRoleUser(RolePersistenceAssembler.toDataObject(role));
-        removeRoleCaches(role);
+    public void deleteRoleUser(String roleId) {
+        LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserRoleDO::getRoleId, roleId);
+        userRoleMapper.delete(wrapper);
+        removeRoleCaches(roleId);
     }
 
     @Override
-    public void insertRoleUser(Role role, List<User> userList) {
-        mapper.insertRoleUser(
-                RolePersistenceAssembler.toDataObject(role),
-                RolePersistenceAssembler.toUserIdList(userList));
-        removeRoleCaches(role);
+    public void insertRoleUser(String roleId, List<String> userIdList) {
+        for (String userId : userIdList) {
+            userRoleMapper.insert(new UserRoleDO(userId, roleId));
+        }
+        removeRoleCaches(roleId);
     }
 
-    private void removeRoleCaches(Role role) {
-        cacheSupport.removeById(role.getId());
-        cacheSupport.removeRoleUserIds(role.getId());
-        cacheSupport.removeRoleMenuIds(role.getId());
+    private LambdaUpdateWrapper<RoleDO> buildIdUpdateWrapper(RoleDO dataObject) {
+        LambdaUpdateWrapper<RoleDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(RoleDO::getId, dataObject.getId());
+        return wrapper;
+    }
+
+    private LambdaQueryWrapper<RoleDO> buildListWrapper(String enableFlag) {
+        LambdaQueryWrapper<RoleDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleDO::getDelFlag, RoleDO.DEL_FLAG_NORMAL);
+        if (StringUtils.isNotBlank(enableFlag)) {
+            wrapper.eq(RoleDO::getEnableFlag, enableFlag);
+        }
+        wrapper.orderByAsc(RoleDO::getPriority, RoleDO::getCreateDate);
+        return wrapper;
+    }
+
+    private void removeRoleCaches(String roleId) {
+        cacheSupport.removeById(roleId);
+        cacheSupport.removeRoleUserIds(roleId);
+        cacheSupport.removeRoleMenuIds(roleId);
         userCacheSupport.removeAll();
     }
 }

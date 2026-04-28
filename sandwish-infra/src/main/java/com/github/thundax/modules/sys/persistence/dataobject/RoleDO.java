@@ -1,9 +1,10 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,20 +20,38 @@ public class RoleDO {
 
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
+
     private String name;
+
+    @TableField("admin_flag")
     private String adminFlag;
+
+    @TableField("enable_flag")
     private String enableFlag;
-    private List<String> menuIdList;
+
     private Integer priority;
+
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("create_by")
     private String createUserId;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("update_by")
     private String updateUserId;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryEnableFlag;
 
     public RoleDO(String id) {
         this.id = id;
@@ -76,17 +95,6 @@ public class RoleDO {
 
     public void setEnableFlag(String enableFlag) {
         this.enableFlag = enableFlag;
-    }
-
-    public List<String> getMenuIdList() {
-        if (menuIdList == null) {
-            menuIdList = new ArrayList<>();
-        }
-        return menuIdList;
-    }
-
-    public void setMenuIdList(List<String> menuIdList) {
-        this.menuIdList = menuIdList;
     }
 
     public Integer getPriority() {
@@ -145,11 +153,4 @@ public class RoleDO {
         this.delFlag = delFlag;
     }
 
-    public String getQueryEnableFlag() {
-        return queryEnableFlag;
-    }
-
-    public void setQueryEnableFlag(String queryEnableFlag) {
-        this.queryEnableFlag = queryEnableFlag;
-    }
 }

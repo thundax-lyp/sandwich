@@ -19,14 +19,6 @@
 
 ### 第一批：有达梦 XML 的 entity
 
-1. 迁移 `User` 持久化链路
-    - 以 `UserMapper.xml` 达梦实现为行为基准。
-    - 迁出旧 CRUD 基类，展开查询 DAO 参数。
-    - 仅 `insert` / `update` 使用 `User` 实体参数。
-    - Mapper 保持最小 `BaseMapper<UserDO>` 定义，业务在 `DaoImpl` 中实现。
-    - 用 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现替代 XML。
-    - 消除当前链路 PageHelper 依赖，删除对应 XML，补齐最小验证。
-
 ### 第二批：无达梦 XML 但需清理旧持久化形态的对象
 
 1. 迁移 `Dict` 持久化链路

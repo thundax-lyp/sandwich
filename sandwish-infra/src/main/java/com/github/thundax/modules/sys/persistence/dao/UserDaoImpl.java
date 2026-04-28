@@ -1,44 +1,55 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.UserDao;
-import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
+import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserMapper;
+import com.github.thundax.modules.sys.persistence.mapper.UserRoleMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 用户 DAO 实现。 */
 @Repository
 public class UserDaoImpl implements UserDao {
 
+    private static final String OFFICE_TREE_FILTER_SQL =
+            "office_id IN (SELECT o.id FROM sys_office query_office "
+                    + "JOIN sys_office o ON o.lft BETWEEN query_office.lft AND query_office.rgt "
+                    + "WHERE query_office.id = {0})";
+
     private final UserMapper mapper;
+    private final UserRoleMapper userRoleMapper;
     private final UserCacheSupport cacheSupport;
     private final RoleCacheSupport roleCacheSupport;
 
     public UserDaoImpl(
-            UserMapper mapper, UserCacheSupport cacheSupport, RoleCacheSupport roleCacheSupport) {
+            UserMapper mapper,
+            UserRoleMapper userRoleMapper,
+            UserCacheSupport cacheSupport,
+            RoleCacheSupport roleCacheSupport) {
         this.mapper = mapper;
+        this.userRoleMapper = userRoleMapper;
         this.cacheSupport = cacheSupport;
         this.roleCacheSupport = roleCacheSupport;
     }
 
     @Override
-    public User get(User entity) {
-        User user = cacheSupport.getById(entity.getId());
+    public User get(String id) {
+        User user = cacheSupport.getById(id);
         if (user != null) {
             return user;
         }
-
-        user =
-                UserPersistenceAssembler.toEntity(
-                        mapper.get(UserPersistenceAssembler.toDataObject(entity)));
+        user = UserPersistenceAssembler.toEntity(mapper.selectById(id));
         cacheSupport.putById(user);
         return user;
     }
@@ -55,10 +66,9 @@ public class UserDaoImpl implements UserDao {
                 userList.add(user);
             }
         }
-
         if (!uncachedIdList.isEmpty()) {
             List<User> uncachedUserList =
-                    UserPersistenceAssembler.toEntityList(mapper.getMany(uncachedIdList));
+                    UserPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (User user : uncachedUserList) {
                 cacheSupport.putById(user);
                 userList.add(user);
@@ -68,121 +78,210 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<User> findList(User entity) {
-        List<UserDO> dataObjects = mapper.findList(UserPersistenceAssembler.toDataObject(entity));
-        List<User> entities = UserPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<User> findList(
+            String officeId, String loginName, String name, String enableFlag, String superFlag) {
+        return UserPersistenceAssembler.toEntityList(
+                mapper.selectList(buildListWrapper(officeId, loginName, name, enableFlag, superFlag)));
+    }
+
+    @Override
+    public Page<User> findPage(
+            String officeId,
+            String loginName,
+            String name,
+            String enableFlag,
+            String superFlag,
+            int pageNo,
+            int pageSize) {
+        Page<UserDO> dataObjectPage =
+                mapper.selectPage(
+                        new Page<>(pageNo, pageSize),
+                        buildListWrapper(officeId, loginName, name, enableFlag, superFlag));
+        Page<User> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(UserPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
     public int insert(User entity) {
         int count = mapper.insert(UserPersistenceAssembler.toDataObject(entity));
-        removeUserCaches(entity);
+        removeUserCaches(entity.getId());
         return count;
     }
 
     @Override
     public int update(User entity) {
-        int count = mapper.update(UserPersistenceAssembler.toDataObject(entity));
-        removeUserCaches(entity);
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(UserDO::getName, dataObject.getName())
+                                .set(UserDO::getOfficeId, dataObject.getOfficeId())
+                                .set(UserDO::getLoginName, dataObject.getLoginName())
+                                .set(UserDO::getEmail, dataObject.getEmail())
+                                .set(UserDO::getMobile, dataObject.getMobile())
+                                .set(UserDO::getTel, dataObject.getTel())
+                                .set(UserDO::getRanks, dataObject.getRanks())
+                                .set(UserDO::getAdminFlag, dataObject.getAdminFlag())
+                                .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(UserDO::getPriority, dataObject.getPriority())
+                                .set(UserDO::getRemarks, dataObject.getRemarks())
+                                .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId())
+                                .set(UserDO::getDelFlag, dataObject.getDelFlag())
+                                .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
+        removeUserCaches(entity.getId());
         return count;
     }
 
     @Override
     public int updatePriority(User entity) {
-        int count = mapper.updatePriority(UserPersistenceAssembler.toDataObject(entity));
-        removeUserCaches(entity);
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(UserDO::getPriority, dataObject.getPriority()));
+        removeUserCaches(entity.getId());
         return count;
-    }
-
-    public int updateStatus(User entity) {
-        return 0;
     }
 
     @Override
     public int updateDelFlag(User entity) {
-        removeUserCaches(entity);
+        removeUserCaches(entity.getId());
         return 0;
     }
 
     @Override
-    public int delete(User entity) {
-        int count = mapper.delete(UserPersistenceAssembler.toDataObject(entity));
-        removeUserCaches(entity);
+    public int delete(String id) {
+        int count = mapper.deleteById(id);
+        removeUserCaches(id);
         roleCacheSupport.removeAll();
         return count;
     }
 
     @Override
     public User getByLoginName(String loginName) {
-        User user = UserPersistenceAssembler.toEntity(mapper.getByLoginName(loginName));
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDO::getLoginName, loginName);
+        User user = UserPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
         cacheSupport.putById(user);
         return user;
     }
 
     @Override
     public User getBySsoLoginName(String ssoLoginName) {
-        User user = UserPersistenceAssembler.toEntity(mapper.getBySsoLoginName(ssoLoginName));
+        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserDO::getSsoLoginName, ssoLoginName);
+        User user = UserPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
         cacheSupport.putById(user);
         return user;
     }
 
     @Override
     public void updateLoginInfo(User user) {
-        mapper.updateLoginInfo(UserPersistenceAssembler.toDataObject(user));
-        removeUserCaches(user);
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
+        mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserDO::getLastLoginDate, dataObject.getLastLoginDate())
+                        .set(UserDO::getLastLoginIp, dataObject.getLastLoginIp())
+                        .set(UserDO::getLoginCount, dataObject.getLoginCount()));
+        removeUserCaches(user.getId());
     }
 
     @Override
     public int updateEnableFlag(User user) {
-        int count = mapper.updateEnableFlag(UserPersistenceAssembler.toDataObject(user));
-        removeUserCaches(user);
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
+        int count =
+                mapper.update(
+                        null,
+                        buildIdUpdateWrapper(dataObject)
+                                .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
+                                .set(UserDO::getLoginCount, 0)
+                                .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
+                                .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        removeUserCaches(user.getId());
         return count;
     }
 
     @Override
     public void updateLoginPass(User user) {
-        mapper.updateLoginPass(UserPersistenceAssembler.toDataObject(user));
-        removeUserCaches(user);
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
+        mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserDO::getLoginPass, dataObject.getLoginPass())
+                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        removeUserCaches(user.getId());
     }
 
     @Override
-    public List<Role> findUserRole(User user) {
-        List<String> roleIds = cacheSupport.getUserRoleIds(user.getId());
+    public List<String> findUserRole(String userId) {
+        List<String> roleIds = cacheSupport.getUserRoleIds(userId);
         if (roleIds == null) {
+            LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(UserRoleDO::getUserId, userId);
             roleIds =
-                    UserPersistenceAssembler.toRoleList(
-                                    mapper.findUserRole(
-                                            UserPersistenceAssembler.toDataObject(user)))
-                            .stream()
-                            .map(role -> role.getId())
+                    userRoleMapper.selectList(wrapper).stream()
+                            .map(UserRoleDO::getRoleId)
                             .collect(Collectors.toList());
-            cacheSupport.putUserRoleIds(user.getId(), roleIds);
+            cacheSupport.putUserRoleIds(userId, roleIds);
         }
-        return roleIds.stream().map(roleId -> new Role(roleId)).collect(Collectors.toList());
+        return roleIds;
     }
 
     @Override
-    public void deleteUserRole(User user) {
-        mapper.deleteUserRole(UserPersistenceAssembler.toDataObject(user));
-        removeUserCaches(user);
+    public void deleteUserRole(String userId) {
+        LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserRoleDO::getUserId, userId);
+        userRoleMapper.delete(wrapper);
+        removeUserCaches(userId);
     }
 
     @Override
-    public void insertUserRole(User user) {
-        mapper.insertUserRole(UserPersistenceAssembler.toDataObjectWithRoles(user));
-        removeUserCaches(user);
+    public void insertUserRole(String userId, List<String> roleIdList) {
+        for (String roleId : roleIdList) {
+            userRoleMapper.insert(new UserRoleDO(userId, roleId));
+        }
+        removeUserCaches(userId);
     }
 
-    private void removeUserCaches(User user) {
-        cacheSupport.removeById(user.getId());
-        cacheSupport.removeUserRoleIds(user.getId());
+    private LambdaUpdateWrapper<UserDO> buildIdUpdateWrapper(UserDO dataObject) {
+        LambdaUpdateWrapper<UserDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(UserDO::getId, dataObject.getId());
+        return wrapper;
+    }
+
+    private QueryWrapper<UserDO> buildListWrapper(
+            String officeId, String loginName, String name, String enableFlag, String superFlag) {
+        QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
+        wrapper.eq("del_flag", UserDO.DEL_FLAG_NORMAL);
+        if (StringUtils.isNotBlank(officeId)) {
+            wrapper.apply(OFFICE_TREE_FILTER_SQL, officeId);
+        }
+        if (StringUtils.isNotBlank(loginName)) {
+            wrapper.like("login_name", loginName);
+        }
+        if (StringUtils.isNotBlank(name)) {
+            wrapper.like("name", name);
+        }
+        if (StringUtils.isNotBlank(enableFlag)) {
+            wrapper.eq("enable_flag", enableFlag);
+        }
+        if (StringUtils.isNotBlank(superFlag)) {
+            wrapper.eq("super_flag", superFlag);
+        }
+        wrapper.orderByAsc("priority", "create_date");
+        return wrapper;
+    }
+
+    private void removeUserCaches(String userId) {
+        cacheSupport.removeById(userId);
+        cacheSupport.removeUserRoleIds(userId);
     }
 }

@@ -1,16 +1,36 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
-import com.github.thundax.modules.sys.entity.Role;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.List;
 
-/**
- * 用户DAO接口
- *
- * @author wdit
- */
-public interface UserDao extends CrudDao<User> {
+public interface UserDao {
+
+    User get(String id);
+
+    List<User> getMany(List<String> idList);
+
+    List<User> findList(
+            String officeId, String loginName, String name, String enableFlag, String superFlag);
+
+    Page<User> findPage(
+            String officeId,
+            String loginName,
+            String name,
+            String enableFlag,
+            String superFlag,
+            int pageNo,
+            int pageSize);
+
+    int insert(User user);
+
+    int update(User user);
+
+    int updatePriority(User user);
+
+    int updateDelFlag(User user);
+
+    int delete(String id);
 
     /**
      * 根据loginName获取
@@ -56,19 +76,19 @@ public interface UserDao extends CrudDao<User> {
      * @param user 用户
      * @return 权限列表
      */
-    List<Role> findUserRole(User user);
+    List<String> findUserRole(String userId);
 
     /**
      * 删除用户权限列表
      *
      * @param user 用户
      */
-    void deleteUserRole(User user);
+    void deleteUserRole(String userId);
 
     /**
      * 写入用户权限列表
      *
      * @param user 用户
      */
-    void insertUserRole(User user);
+    void insertUserRole(String userId, List<String> roleIdList);
 }

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.service.impl.CrudServiceImpl;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
@@ -8,23 +9,99 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /** @author wdit */
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements UserService {
+public class UserServiceImpl implements UserService {
 
+    private final UserDao dao;
     private final SignService signService;
     private final UserEncryptService userEncryptService;
 
     public UserServiceImpl(
             UserDao dao, SignService signService, UserEncryptService userEncryptService) {
-        super(dao);
+        this.dao = dao;
         this.signService = signService;
         this.userEncryptService = userEncryptService;
+    }
+
+    @Override
+    public Class<User> getElementType() {
+        return User.class;
+    }
+
+    @Override
+    public User newEntity(String id) {
+        return new User(id);
+    }
+
+    @Override
+    public User get(User entity) {
+        return entity == null ? null : get(entity.getId());
+    }
+
+    @Override
+    public User get(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        return dao.get(id);
+    }
+
+    @Override
+    public List<User> getMany(List<String> ids) {
+        return dao.getMany(ids);
+    }
+
+    @Override
+    public List<User> findList(User user) {
+        User.Query query = user == null ? null : user.getQuery();
+        return dao.findList(
+                query == null ? null : query.getOfficeId(),
+                query == null ? null : query.getLoginName(),
+                query == null ? null : query.getName(),
+                query == null ? null : query.getEnableFlag(),
+                query == null ? null : query.getSuperFlag());
+    }
+
+    @Override
+    public User findOne(User user) {
+        List<User> users = findList(user);
+        return users == null || users.isEmpty() ? null : users.get(0);
+    }
+
+    @Override
+    public Page<User> findPage(User user, Page<User> page) {
+        Page<User> normalizedPage = normalizePage(page);
+        User.Query query = user == null ? null : user.getQuery();
+        IPage<User> dataPage =
+                dao.findPage(
+                        query == null ? null : query.getOfficeId(),
+                        query == null ? null : query.getLoginName(),
+                        query == null ? null : query.getName(),
+                        query == null ? null : query.getEnableFlag(),
+                        query == null ? null : query.getSuperFlag(),
+                        normalizedPage.getPageNo(),
+                        normalizedPage.getPageSize());
+        normalizedPage.setPageNo((int) dataPage.getCurrent());
+        normalizedPage.setPageSize((int) dataPage.getSize());
+        normalizedPage.setCount(dataPage.getTotal());
+        normalizedPage.setList(dataPage.getRecords());
+        return normalizedPage;
+    }
+
+    @Override
+    public long count(User user) {
+        List<User> users = findList(user);
+        return users == null ? 0 : users.size();
     }
 
     @Override
@@ -56,9 +133,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
             dao.update(user);
         }
 
-        dao.deleteUserRole(user);
+        dao.deleteUserRole(user.getId());
         if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
-            dao.insertUserRole(user);
+            dao.insertUserRole(user.getId(), user.getRoleIdList());
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
@@ -113,9 +190,9 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(User user) {
-        dao.deleteUserRole(user);
+        dao.deleteUserRole(user.getId());
 
-        int result = dao.delete(user);
+        int result = dao.delete(user.getId());
 
         signService.deleteSign(user.getSignName(), user.getSignId());
 
@@ -124,6 +201,59 @@ public class UserServiceImpl extends CrudServiceImpl<UserDao, User> implements U
 
     @Override
     public List<Role> findUserRole(User user) {
-        return dao.findUserRole(user);
+        return dao.findUserRole(user.getId()).stream().map(Role::new).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(List<User> list) {
+        return batchOperate(list, this::delete);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updatePriority(User user) {
+        user.preUpdate();
+        return dao.updatePriority(user);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updatePriority(List<User> list) {
+        return batchOperate(list, this::updatePriority);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateDelFlag(User user) {
+        user.preUpdate();
+        return dao.updateDelFlag(user);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateDelFlag(List<User> list) {
+        return batchOperate(list, this::updateDelFlag);
+    }
+
+    private int batchOperate(Collection<User> collection, Function<User, Integer> operator) {
+        int count = 0;
+        if (collection != null && !collection.isEmpty()) {
+            for (User user : collection) {
+                count += operator.apply(user);
+            }
+        }
+        return count;
+    }
+
+    private Page<User> normalizePage(Page<User> page) {
+        Page<User> normalizedPage = page == null ? new Page<>() : page;
+        if (normalizedPage.getPageNo() < Page.FIRST_PAGE_INDEX) {
+            normalizedPage.setPageNo(Page.FIRST_PAGE_INDEX);
+        }
+        if (normalizedPage.getPageSize() <= 0) {
+            normalizedPage.setPageSize(Page.DEFAULT_PAGE_SIZE);
+        }
+        return normalizedPage;
     }
 }

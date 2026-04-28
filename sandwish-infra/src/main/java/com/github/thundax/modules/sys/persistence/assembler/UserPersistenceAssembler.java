@@ -42,15 +42,6 @@ public final class UserPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
-        return dataObject;
-    }
-
-    public static UserDO toDataObjectWithRoles(User entity) {
-        UserDO dataObject = toDataObject(entity);
-        if (dataObject != null) {
-            dataObject.setRoleIdList(entity.getRoleIdList());
-        }
         return dataObject;
     }
 
@@ -110,15 +101,4 @@ public final class UserPersistenceAssembler {
         return roles;
     }
 
-    private static void copyQuery(User.Query query, UserDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryOfficeId(query.getOfficeId());
-        dataObject.setQueryLoginName(query.getLoginName());
-        dataObject.setQueryName(query.getName());
-        dataObject.setQueryEnableFlag(query.getEnableFlag());
-        dataObject.setQuerySuperFlag(query.getSuperFlag());
-        dataObject.setQueryOrderBy(query.getOrderBy());
-    }
 }

@@ -1,9 +1,11 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.ArrayList;
+import com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler;
 import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,45 +16,81 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("sys_user")
+@TableName(value = "sys_user", autoResultMap = true)
 public class UserDO {
 
+    @TableField(exist = false)
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
+    @TableField("office_id")
     private String officeId;
+
+    @TableField("login_name")
     private String loginName;
+
+    @TableField("login_pass")
     private String loginPass;
+
+    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String email;
+
+    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String mobile;
+
     private String tel;
     private String name;
     private Integer ranks;
+
+    @TableField("register_date")
     private Date registerDate;
+
+    @TableField("register_ip")
     private String registerIp;
+
+    @TableField("last_login_date")
     private Date lastLoginDate;
+
+    @TableField("last_login_ip")
     private String lastLoginIp;
+
+    @TableField("login_count")
     private Integer loginCount;
+
+    @TableField("super_flag")
     private String superFlag;
+
+    @TableField("admin_flag")
     private String adminFlag;
+
+    @TableField("enable_flag")
     private String enableFlag;
+
+    @TableField("sso_login_name")
     private String ssoLoginName;
-    private List<String> roleIdList;
+
     private Integer priority;
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("create_by")
     private String createUserId;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("update_by")
     private String updateUserId;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryOfficeId;
-    private String queryLoginName;
-    private String queryName;
-    private String queryEnableFlag;
-    private String querySuperFlag;
-    private String queryOrderBy;
 
     public UserDO(String id) {
         this.id = id;
@@ -210,17 +248,6 @@ public class UserDO {
         this.ssoLoginName = ssoLoginName;
     }
 
-    public List<String> getRoleIdList() {
-        if (roleIdList == null) {
-            roleIdList = new ArrayList<>();
-        }
-        return roleIdList;
-    }
-
-    public void setRoleIdList(List<String> roleIdList) {
-        this.roleIdList = roleIdList;
-    }
-
     public Integer getPriority() {
         return priority;
     }
@@ -277,51 +304,4 @@ public class UserDO {
         this.delFlag = delFlag;
     }
 
-    public String getQueryOfficeId() {
-        return queryOfficeId;
-    }
-
-    public void setQueryOfficeId(String queryOfficeId) {
-        this.queryOfficeId = queryOfficeId;
-    }
-
-    public String getQueryLoginName() {
-        return queryLoginName;
-    }
-
-    public void setQueryLoginName(String queryLoginName) {
-        this.queryLoginName = queryLoginName;
-    }
-
-    public String getQueryName() {
-        return queryName;
-    }
-
-    public void setQueryName(String queryName) {
-        this.queryName = queryName;
-    }
-
-    public String getQueryEnableFlag() {
-        return queryEnableFlag;
-    }
-
-    public void setQueryEnableFlag(String queryEnableFlag) {
-        this.queryEnableFlag = queryEnableFlag;
-    }
-
-    public String getQuerySuperFlag() {
-        return querySuperFlag;
-    }
-
-    public void setQuerySuperFlag(String querySuperFlag) {
-        this.querySuperFlag = querySuperFlag;
-    }
-
-    public String getQueryOrderBy() {
-        return queryOrderBy;
-    }
-
-    public void setQueryOrderBy(String queryOrderBy) {
-        this.queryOrderBy = queryOrderBy;
-    }
 }

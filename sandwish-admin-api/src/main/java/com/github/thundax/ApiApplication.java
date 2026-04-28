@@ -2,7 +2,9 @@ package com.github.thundax;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.persistence.annotation.MyBatisDao;
+import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.annotation.MapperScans;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -13,9 +15,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /** @author wdit */
 @SpringBootApplication
-@MapperScan(
-        basePackages = {"com.github.thundax.modules"},
-        annotationClass = MyBatisDao.class)
+@MapperScans({
+    @MapperScan(
+            basePackages = {"com.github.thundax.modules"},
+            annotationClass = MyBatisDao.class),
+    @MapperScan(
+            basePackages = {"com.github.thundax.modules"},
+            annotationClass = Mapper.class)
+})
 @EnableConfigurationProperties(value = {VltavaProperties.class})
 @EnableAsync
 @EnableScheduling

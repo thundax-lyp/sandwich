@@ -46,7 +46,7 @@
 - `Mapper` 继承 `BaseMapper<DO>`，只在 `sandwish-infra` 内使用。
 - `QueryWrapper`、`LambdaQueryWrapper`、`Page`、`IPage` 不泄漏到 `sandwish-biz`。
 - `sandwish-common-mybatis` 只保留 MyBatis-Plus 基础配置、扫描标记、数据库方言和必要公共基础设施。
-- Mapper interface 保持最小定义，不承载业务方法。
+- Mapper interface 使用标准 `@Mapper`，保持最小定义，不承载业务方法。
 
 ## 4. Behavior Source
 
@@ -138,12 +138,15 @@ Mapper interface 固定保持最小定义。
 标准形态：
 
 ```java
+@Mapper
 public interface PostMapper extends BaseMapper<PostDO> {}
 ```
 
 固定规则：
 
 - Mapper interface 只继承 `BaseMapper<DO>`。
+- Mapper interface 使用 `org.apache.ibatis.annotations.Mapper`。
+- Mapper interface 不使用 `MyBatisDao`。
 - Mapper interface 不声明业务查询方法。
 - Mapper interface 不声明分页方法。
 - Mapper interface 不声明批量业务方法。
@@ -168,7 +171,7 @@ public interface PostMapper extends BaseMapper<PostDO> {}
 6. 将查询类 `Dao` 方法参数展开。
 7. 只保留 `insert(Entity entity)`、`update(Entity entity)` 使用实体参数。
 8. 调整 `ServiceImpl`，移除旧 `CrudServiceImpl` 继承，显式组合 `Dao`。
-9. 让 `Mapper` 保持 `public interface XxxMapper extends BaseMapper<XxxDO> {}` 最小定义。
+9. 让 `Mapper` 保持 `@Mapper public interface XxxMapper extends BaseMapper<XxxDO> {}` 最小定义。
 10. 用 `BaseMapper` 承接标准 CRUD。
 11. 用 `LambdaQueryWrapper` 承接单表条件查询。
 12. 用 MyBatis-Plus `Page` 承接分页查询。
@@ -243,6 +246,7 @@ rg "@Select|@Update|@Insert|@Delete|Provider" sandwish-infra/src/main/java/com/g
 - 展开查询 DAO 参数。
 - 只允许 insert / update 使用 `domain.Entity`。
 - Mapper 保持最小 `BaseMapper<DO>` 定义。
+- Mapper 使用标准 `@Mapper`。
 - 迁移 XML 到 `DaoImpl` 中的 MyBatis-Plus / Java 持久化实现。
 - 消除当前 entity 的 PageHelper 依赖。
 - 删除当前 entity 对应 XML。

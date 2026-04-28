@@ -8,7 +8,6 @@ import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
-/** 短信验证码发送限流状态 JetCache DAO 实现。 */
 @Repository
 public class SmsValidateCodeDaoImpl implements SmsValidateCodeDao {
 

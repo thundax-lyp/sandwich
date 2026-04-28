@@ -19,13 +19,6 @@
 
 ### 第一批：有达梦 XML 的 entity
 
-### 第二批：无达梦 XML 但需清理旧持久化形态的对象
-
-1. 迁移 `SmsValidateCode` 持久化链路
-   - 清理旧 CRUD 基类和 PageHelper 依赖。
-   - 展开查询 DAO 参数。
-   - 保持 MyBatis-Plus 只在 `sandwish-infra` 内使用。
-
 ### 第三批：公共收口
 
 1. 删除 PageHelper 依赖和公共支撑类。

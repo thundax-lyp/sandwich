@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-/** login form Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 @EnableConfigurationProperties(AuthProperties.class)

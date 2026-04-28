@@ -14,12 +14,12 @@ public final class AsyncTaskPersistenceAssembler {
         }
         AsyncTaskDO dataObject = new AsyncTaskDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setTitle(entity.getTitle());
         dataObject.setStatus(entity.getStatus());
         dataObject.setMessage(entity.getMessage());
         dataObject.setData(entity.getData());
-        dataObject.setPrivate(entity.getPrivate());
+        dataObject.setIsPrivate(entity.getPrivate());
         dataObject.setExpiredSeconds(entity.getExpiredSeconds());
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
@@ -37,12 +37,12 @@ public final class AsyncTaskPersistenceAssembler {
         }
         AsyncTask entity = new AsyncTask();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setTitle(dataObject.getTitle());
         entity.setStatus(dataObject.getStatus());
         entity.setMessage(dataObject.getMessage());
         entity.setData(dataObject.getData());
-        entity.setPrivate(dataObject.getPrivate());
+        entity.setPrivate(dataObject.getIsPrivate());
         entity.setExpiredSeconds(dataObject.getExpiredSeconds());
         entity.setPriority(dataObject.getPriority());
         entity.setRemarks(dataObject.getRemarks());

@@ -16,7 +16,7 @@ public final class MemberPersistenceAssembler {
         }
         MemberDO dataObject = new MemberDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setLoginName(entity.getLoginName());
         dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());
@@ -48,7 +48,7 @@ public final class MemberPersistenceAssembler {
         }
         Member entity = new Member();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setLoginName(dataObject.getLoginName());
         entity.setLoginPass(dataObject.getLoginPass());
         entity.setEmail(dataObject.getEmail());

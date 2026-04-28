@@ -16,7 +16,7 @@ public final class SignaturePersistenceAssembler {
         }
         SignatureDO dataObject = new SignatureDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setSignature(entity.getSignature());
@@ -35,7 +35,7 @@ public final class SignaturePersistenceAssembler {
         }
         Signature entity = new Signature();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setSignature(dataObject.getSignature());

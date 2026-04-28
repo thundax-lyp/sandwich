@@ -18,7 +18,7 @@ public final class StoragePersistenceAssembler {
         }
         StorageDO dataObject = new StorageDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -39,7 +39,7 @@ public final class StoragePersistenceAssembler {
         }
         Storage entity = new Storage();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());
@@ -71,7 +71,7 @@ public final class StoragePersistenceAssembler {
         }
         StorageBusinessDO dataObject = new StorageBusinessDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
@@ -90,7 +90,7 @@ public final class StoragePersistenceAssembler {
         }
         StorageBusiness entity = new StorageBusiness();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessParams(dataObject.getBusinessParams());

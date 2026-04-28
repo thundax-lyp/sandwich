@@ -16,7 +16,7 @@ public final class DictPersistenceAssembler {
         }
         DictDO dataObject = new DictDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setType(entity.getType());
         dataObject.setLabel(entity.getLabel());
         dataObject.setValue(entity.getValue());
@@ -36,7 +36,7 @@ public final class DictPersistenceAssembler {
         }
         Dict entity = new Dict();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setType(dataObject.getType());
         entity.setLabel(dataObject.getLabel());
         entity.setValue(dataObject.getValue());

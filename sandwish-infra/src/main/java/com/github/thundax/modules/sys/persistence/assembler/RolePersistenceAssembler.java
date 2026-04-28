@@ -17,7 +17,7 @@ public final class RolePersistenceAssembler {
         }
         RoleDO dataObject = new RoleDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setName(entity.getName());
         dataObject.setAdminFlag(entity.getAdminFlag());
         dataObject.setEnableFlag(entity.getEnableFlag());
@@ -37,7 +37,7 @@ public final class RolePersistenceAssembler {
         }
         Role entity = new Role();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setName(dataObject.getName());
         entity.setAdminFlag(dataObject.getAdminFlag());
         entity.setEnableFlag(dataObject.getEnableFlag());

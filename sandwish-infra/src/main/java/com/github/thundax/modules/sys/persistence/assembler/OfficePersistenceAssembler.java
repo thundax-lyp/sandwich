@@ -16,7 +16,7 @@ public final class OfficePersistenceAssembler {
         }
         OfficeDO dataObject = new OfficeDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
@@ -36,7 +36,7 @@ public final class OfficePersistenceAssembler {
         }
         Office entity = new Office();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());

@@ -16,7 +16,7 @@ public final class MenuPersistenceAssembler {
         }
         MenuDO dataObject = new MenuDO();
         dataObject.setId(entity.getId());
-        dataObject.setIsNewRecord(entity.getIsNewRecord());
+        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
@@ -41,7 +41,7 @@ public final class MenuPersistenceAssembler {
         }
         Menu entity = new Menu();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.getIsNewRecord());
+        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());

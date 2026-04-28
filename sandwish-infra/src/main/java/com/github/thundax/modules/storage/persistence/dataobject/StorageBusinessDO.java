@@ -50,8 +50,4 @@ public class StorageBusinessDO {
 
     @TableField(exist = false)
     private String delFlag;
-
-    public StorageBusinessDO(String id) {
-        this.id = id;
-    }
 }

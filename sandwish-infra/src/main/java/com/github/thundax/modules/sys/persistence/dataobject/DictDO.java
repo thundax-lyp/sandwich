@@ -52,8 +52,4 @@ public class DictDO {
 
     @TableField(exist = false)
     private String queryLabel;
-
-    public DictDO(String id) {
-        this.id = id;
-    }
 }

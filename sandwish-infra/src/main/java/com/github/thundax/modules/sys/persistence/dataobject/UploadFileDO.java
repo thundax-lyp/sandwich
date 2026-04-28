@@ -59,8 +59,4 @@ public class UploadFileDO {
 
     @TableField(exist = false)
     private String delFlag;
-
-    public UploadFileDO(String id) {
-        this.id = id;
-    }
 }

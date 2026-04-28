@@ -69,10 +69,6 @@ public class MenuDO {
     @TableField("del_flag")
     private String delFlag;
 
-    public MenuDO(String id) {
-        this.id = id;
-    }
-
     public Integer treeSpan() {
         return this.rgt - this.lft + 1;
     }

@@ -52,8 +52,4 @@ public class RoleDO {
 
     @TableField("del_flag")
     private String delFlag;
-
-    public RoleDO(String id) {
-        this.id = id;
-    }
 }

@@ -38,8 +38,4 @@ public class SignatureDO {
 
     @TableField(exist = false)
     private String delFlag;
-
-    public SignatureDO(String id) {
-        this.id = id;
-    }
 }

@@ -67,8 +67,4 @@ public class StorageDO {
 
     @TableField("del_flag")
     private String delFlag;
-
-    public StorageDO(String id) {
-        this.id = id;
-    }
 }

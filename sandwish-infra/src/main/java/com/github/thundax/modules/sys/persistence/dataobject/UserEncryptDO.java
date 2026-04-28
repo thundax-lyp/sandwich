@@ -53,8 +53,4 @@ public class UserEncryptDO {
 
     @TableField(exist = false)
     private String delFlag;
-
-    public UserEncryptDO(String id) {
-        this.id = id;
-    }
 }

@@ -56,8 +56,4 @@ public class OfficeDO {
 
     @TableField("del_flag")
     private String delFlag;
-
-    public OfficeDO(String id) {
-        this.id = id;
-    }
 }

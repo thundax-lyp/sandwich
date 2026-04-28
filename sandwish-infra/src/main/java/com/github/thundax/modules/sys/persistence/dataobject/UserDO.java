@@ -91,8 +91,4 @@ public class UserDO {
 
     @TableField("del_flag")
     private String delFlag;
-
-    public UserDO(String id) {
-        this.id = id;
-    }
 }

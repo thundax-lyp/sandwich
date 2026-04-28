@@ -86,8 +86,4 @@ public class MemberDO {
 
     @TableField("del_flag")
     private String delFlag;
-
-    public MemberDO(String id) {
-        this.id = id;
-    }
 }

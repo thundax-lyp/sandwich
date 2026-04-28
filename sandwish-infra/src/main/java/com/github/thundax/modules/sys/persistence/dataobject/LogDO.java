@@ -68,8 +68,4 @@ public class LogDO {
 
     @TableField(exist = false)
     private String delFlag;
-
-    public LogDO(String id) {
-        this.id = id;
-    }
 }

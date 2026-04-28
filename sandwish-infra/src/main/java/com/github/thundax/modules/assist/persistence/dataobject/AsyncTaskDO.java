@@ -27,8 +27,4 @@ public class AsyncTaskDO {
     private Date updateDate;
     private String updateUserId;
     private String delFlag;
-
-    public AsyncTaskDO(String id) {
-        this.id = id;
-    }
 }

@@ -42,17 +42,8 @@ public class LogDaoImpl implements LogDao {
             String requestUri,
             Date beginDate,
             Date endDate) {
-        return LogPersistenceAssembler.toEntityList(
-                mapper.selectList(
-                        buildListWrapper(
-                                type,
-                                remoteAddr,
-                                userLoginName,
-                                userName,
-                                title,
-                                requestUri,
-                                beginDate,
-                                endDate)));
+        return LogPersistenceAssembler.toEntityList(mapper.selectList(
+                buildListWrapper(type, remoteAddr, userLoginName, userName, title, requestUri, beginDate, endDate)));
     }
 
     @Override
@@ -68,18 +59,9 @@ public class LogDaoImpl implements LogDao {
             int pageNo,
             int pageSize) {
         Page<LogDO> page = new Page<>(pageNo, pageSize);
-        IPage<LogDO> dataObjectPage =
-                mapper.selectPage(
-                        page,
-                        buildListWrapper(
-                        type,
-                        remoteAddr,
-                        userLoginName,
-                        userName,
-                        title,
-                        requestUri,
-                        beginDate,
-                        endDate));
+        IPage<LogDO> dataObjectPage = mapper.selectPage(
+                page,
+                buildListWrapper(type, remoteAddr, userLoginName, userName, title, requestUri, beginDate, endDate));
         Page<Log> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(LogPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -107,14 +89,8 @@ public class LogDaoImpl implements LogDao {
 
     @Override
     public int batchDelete(
-            String type,
-            String remoteAddr,
-            String title,
-            String requestUri,
-            Date beginDate,
-            Date endDate) {
-        return mapper.delete(
-                buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate));
+            String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate) {
+        return mapper.delete(buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate));
     }
 
     private QueryWrapper<LogDO> buildListWrapper(
@@ -126,29 +102,20 @@ public class LogDaoImpl implements LogDao {
             String requestUri,
             Date beginDate,
             Date endDate) {
-        QueryWrapper<LogDO> wrapper =
-                buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate);
+        QueryWrapper<LogDO> wrapper = buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate);
         if (StringUtils.isNotBlank(userLoginName)) {
             wrapper.apply(
-                    "user_id IN (SELECT id FROM sys_user WHERE login_name LIKE CONCAT('%', {0}, '%'))",
-                    userLoginName);
+                    "user_id IN (SELECT id FROM sys_user WHERE login_name LIKE CONCAT('%', {0}, '%'))", userLoginName);
         }
         if (StringUtils.isNotBlank(userName)) {
-            wrapper.apply(
-                    "user_id IN (SELECT id FROM sys_user WHERE name LIKE CONCAT('%', {0}, '%'))",
-                    userName);
+            wrapper.apply("user_id IN (SELECT id FROM sys_user WHERE name LIKE CONCAT('%', {0}, '%'))", userName);
         }
         wrapper.orderByDesc("log_date");
         return wrapper;
     }
 
     private QueryWrapper<LogDO> buildBatchDeleteWrapper(
-            String type,
-            String remoteAddr,
-            String title,
-            String requestUri,
-            Date beginDate,
-            Date endDate) {
+            String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate) {
         QueryWrapper<LogDO> wrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(type)) {
             wrapper.eq("type", type);

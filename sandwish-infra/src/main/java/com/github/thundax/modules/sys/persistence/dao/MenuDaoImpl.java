@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssembler;
@@ -18,6 +17,7 @@ import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
 import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,8 +27,7 @@ public class MenuDaoImpl implements MenuDao {
     private final MenuRoleMapper menuRoleMapper;
     private final MenuCacheSupport cacheSupport;
 
-    public MenuDaoImpl(
-            MenuMapper mapper, MenuRoleMapper menuRoleMapper, MenuCacheSupport cacheSupport) {
+    public MenuDaoImpl(MenuMapper mapper, MenuRoleMapper menuRoleMapper, MenuCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.menuRoleMapper = menuRoleMapper;
         this.cacheSupport = cacheSupport;
@@ -60,8 +59,7 @@ public class MenuDaoImpl implements MenuDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Menu> uncachedMenuList =
-                    MenuPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            List<Menu> uncachedMenuList = MenuPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (Menu menu : uncachedMenuList) {
                 cacheSupport.putById(menu);
                 menuList.add(menu);
@@ -77,14 +75,10 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public Page<Menu> findPage(
-            String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+    public Page<Menu> findPage(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
         IPage<MenuDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize),
-                        buildListWrapper(parentId, displayFlag, maxRank));
-        Page<Menu> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, displayFlag, maxRank));
+        Page<Menu> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(MenuPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
@@ -110,26 +104,24 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null
-                && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(MenuDO::getParentId, dataObject.getParentId())
-                                .set(MenuDO::getName, dataObject.getName())
-                                .set(MenuDO::getPerms, dataObject.getPerms())
-                                .set(MenuDO::getRanks, dataObject.getRanks())
-                                .set(MenuDO::getUrl, dataObject.getUrl())
-                                .set(MenuDO::getTarget, dataObject.getTarget())
-                                .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
-                                .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
-                                .set(MenuDO::getRemarks, dataObject.getRemarks())
-                                .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId())
-                                .set(MenuDO::getDelFlag, dataObject.getDelFlag()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(MenuDO::getParentId, dataObject.getParentId())
+                        .set(MenuDO::getName, dataObject.getName())
+                        .set(MenuDO::getPerms, dataObject.getPerms())
+                        .set(MenuDO::getRanks, dataObject.getRanks())
+                        .set(MenuDO::getUrl, dataObject.getUrl())
+                        .set(MenuDO::getTarget, dataObject.getTarget())
+                        .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
+                        .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
+                        .set(MenuDO::getRemarks, dataObject.getRemarks())
+                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(MenuDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeAll();
         return count;
     }
@@ -137,13 +129,12 @@ public class MenuDaoImpl implements MenuDao {
     @Override
     public int updatePriority(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(MenuDO::getPriority, dataObject.getPriority())
-                                .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(MenuDO::getPriority, dataObject.getPriority())
+                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -151,13 +142,12 @@ public class MenuDaoImpl implements MenuDao {
     @Override
     public int updateDelFlag(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(MenuDO::getDelFlag, dataObject.getDelFlag())
-                                .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(MenuDO::getDelFlag, dataObject.getDelFlag())
+                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -217,22 +207,18 @@ public class MenuDaoImpl implements MenuDao {
     public boolean isChildOf(String childId, String parentId) {
         MenuDO child = getTreeNode(childId);
         MenuDO parent = getTreeNode(parentId);
-        return child != null
-                && parent != null
-                && child.getLft() > parent.getLft()
-                && child.getRgt() < parent.getRgt();
+        return child != null && parent != null && child.getLft() > parent.getLft() && child.getRgt() < parent.getRgt();
     }
 
     @Override
     public int updateDisplayFlag(Menu menu) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
-                                .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
+                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(menu.getId());
         return count;
     }
@@ -246,8 +232,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private Integer allocateInsertPosition(MenuDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId())
-                && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
             MenuDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -297,8 +282,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     private void updateParent(MenuDO node) {
-        mapper.update(
-                null, buildIdUpdateWrapper(node).set(MenuDO::getParentId, node.getParentId()));
+        mapper.update(null, buildIdUpdateWrapper(node).set(MenuDO::getParentId, node.getParentId()));
     }
 
     private void moveTreeRgts(Integer from, Integer offset) {
@@ -327,8 +311,7 @@ public class MenuDaoImpl implements MenuDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<MenuDO> buildListWrapper(
-            String parentId, String displayFlag, Integer maxRank) {
+    private LambdaQueryWrapper<MenuDO> buildListWrapper(String parentId, String displayFlag, Integer maxRank) {
         LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MenuDO::getDelFlag, MenuDO.DEL_FLAG_NORMAL);
         if (parentId != null) {

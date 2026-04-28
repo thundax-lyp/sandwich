@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssembler;
@@ -13,6 +12,7 @@ import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 /** 字典 DAO 实现。 */
@@ -53,8 +53,7 @@ public class DictDaoImpl implements DictDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Dict> uncachedDictList =
-                    DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            List<Dict> uncachedDictList = DictPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (Dict dict : uncachedDictList) {
                 cacheSupport.putById(dict);
                 dictList.add(dict);
@@ -65,17 +64,14 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public List<Dict> findList(String type, String label, String remarks) {
-        return DictPersistenceAssembler.toEntityList(
-                mapper.selectList(buildQueryWrapper(type, label, remarks)));
+        return DictPersistenceAssembler.toEntityList(mapper.selectList(buildQueryWrapper(type, label, remarks)));
     }
 
     @Override
-    public Page<Dict> findPage(
-            String type, String label, String remarks, int pageNo, int pageSize) {
+    public Page<Dict> findPage(String type, String label, String remarks, int pageNo, int pageSize) {
         Page<DictDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildQueryWrapper(type, label, remarks));
-        Page<Dict> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<Dict> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(DictPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
@@ -91,18 +87,17 @@ public class DictDaoImpl implements DictDao {
     @Override
     public int update(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(DictDO::getValue, dataObject.getValue())
-                                .set(DictDO::getLabel, dataObject.getLabel())
-                                .set(DictDO::getType, dataObject.getType())
-                                .set(DictDO::getPriority, dataObject.getPriority())
-                                .set(DictDO::getRemarks, dataObject.getRemarks())
-                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId())
-                                .set(DictDO::getDelFlag, dataObject.getDelFlag()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(DictDO::getValue, dataObject.getValue())
+                        .set(DictDO::getLabel, dataObject.getLabel())
+                        .set(DictDO::getType, dataObject.getType())
+                        .set(DictDO::getPriority, dataObject.getPriority())
+                        .set(DictDO::getRemarks, dataObject.getRemarks())
+                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(DictDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeAll();
         return count;
     }
@@ -110,13 +105,12 @@ public class DictDaoImpl implements DictDao {
     @Override
     public int updatePriority(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(DictDO::getPriority, dataObject.getPriority())
-                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(DictDO::getPriority, dataObject.getPriority())
+                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeAll();
         return count;
     }
@@ -128,13 +122,12 @@ public class DictDaoImpl implements DictDao {
     @Override
     public int updateDelFlag(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(DictDO::getDelFlag, dataObject.getDelFlag())
-                                .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(DictDO::getDelFlag, dataObject.getDelFlag())
+                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeAll();
         return count;
     }

@@ -37,13 +37,10 @@ public class UploadFileDaoImpl implements UploadFileDao {
 
     @Override
     public Page<UploadFile> findPage(int pageNo, int pageSize) {
-        Page<UploadFileDO> dataObjectPage =
-                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper());
-        Page<UploadFile> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<UploadFileDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper());
+        Page<UploadFile> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(
-                UploadFilePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(UploadFilePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 

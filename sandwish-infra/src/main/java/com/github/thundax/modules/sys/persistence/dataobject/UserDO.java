@@ -303,5 +303,4 @@ public class UserDO {
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
     }
-
 }

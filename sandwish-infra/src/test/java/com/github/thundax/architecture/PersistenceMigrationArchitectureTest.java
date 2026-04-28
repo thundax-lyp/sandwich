@@ -14,13 +14,8 @@ import org.junit.Test;
 
 public class PersistenceMigrationArchitectureTest {
 
-    private static final List<String> MODULES =
-            Arrays.asList(
-                    "sandwish-common",
-                    "sandwish-biz",
-                    "sandwish-infra",
-                    "sandwish-admin-api",
-                    "sandwish-front-api");
+    private static final List<String> MODULES = Arrays.asList(
+            "sandwish-common", "sandwish-biz", "sandwish-infra", "sandwish-admin-api", "sandwish-front-api");
 
     @Test
     public void shouldNotKeepMapperXmlInMainSources() throws IOException {
@@ -33,10 +28,8 @@ public class PersistenceMigrationArchitectureTest {
             try (Stream<Path> paths = Files.walk(main)) {
                 assertFalse(
                         "Mapper XML must not exist in main sources",
-                        paths.anyMatch(
-                                path ->
-                                        path.toString().contains("/mapper/mapping/")
-                                                && path.toString().endsWith(".xml")));
+                        paths.anyMatch(path -> path.toString().contains("/mapper/mapping/")
+                                && path.toString().endsWith(".xml")));
             }
         }
     }

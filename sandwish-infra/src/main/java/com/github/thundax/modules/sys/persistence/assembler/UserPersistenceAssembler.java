@@ -100,5 +100,4 @@ public final class UserPersistenceAssembler {
         }
         return roles;
     }
-
 }

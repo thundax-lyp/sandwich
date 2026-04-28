@@ -75,7 +75,8 @@ public class LoginFormDaoImpl implements LoginFormDao {
     @Override
     public void save(LoginForm form) {
         Assert.isTrue(
-                form.getRefreshTokenList() != null && !form.getRefreshTokenList().isEmpty(),
+                form.getRefreshTokenList() != null
+                        && !form.getRefreshTokenList().isEmpty(),
                 "refreshTokenList can not be null");
 
         Set<String> removeTokens = new HashSet<>();
@@ -101,11 +102,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
                 if (cache.get(refreshKey) == null) {
                     form.getRefreshTokenList().remove(idx);
                 } else if (idx == 1) {
-                    cache.put(
-                            refreshKey,
-                            form.getLoginToken(),
-                            REFRESH_REMAIN_SECONDS,
-                            TimeUnit.SECONDS);
+                    cache.put(refreshKey, form.getLoginToken(), REFRESH_REMAIN_SECONDS, TimeUnit.SECONDS);
                     rememberRefreshKey(refreshKey);
                 } else {
                     cache.put(refreshKey, form.getLoginToken());
@@ -134,14 +131,13 @@ public class LoginFormDaoImpl implements LoginFormDao {
         LoginForm form = getByToken(loginToken);
         if (form != null) {
             cache.remove(TOKEN_PREFIX + loginToken);
-            if (form.getRefreshTokenList() != null && !form.getRefreshTokenList().isEmpty()) {
-                form.getRefreshTokenList()
-                        .forEach(
-                                refreshToken -> {
-                                    String refreshKey = REFRESH_TOKEN_PREFIX + refreshToken;
-                                    cache.remove(refreshKey);
-                                    forgetRefreshKey(refreshKey);
-                                });
+            if (form.getRefreshTokenList() != null
+                    && !form.getRefreshTokenList().isEmpty()) {
+                form.getRefreshTokenList().forEach(refreshToken -> {
+                    String refreshKey = REFRESH_TOKEN_PREFIX + refreshToken;
+                    cache.remove(refreshKey);
+                    forgetRefreshKey(refreshKey);
+                });
             }
         }
     }

@@ -172,5 +172,4 @@ public class OfficeDO {
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
     }
-
 }

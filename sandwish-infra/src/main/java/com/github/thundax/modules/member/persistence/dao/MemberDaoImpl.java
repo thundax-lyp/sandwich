@@ -45,18 +45,16 @@ public class MemberDaoImpl implements MemberDao {
             Date beginLoginDate,
             Date endLoginDate,
             String mobile) {
-        return MemberPersistenceAssembler.toEntityList(
-                mapper.selectList(
-                        buildListWrapper(
-                                enableFlag,
-                                email,
-                                name,
-                                remarks,
-                                beginRegisterDate,
-                                endRegisterDate,
-                                beginLoginDate,
-                                endLoginDate,
-                                mobile)));
+        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(
+                enableFlag,
+                email,
+                name,
+                remarks,
+                beginRegisterDate,
+                endRegisterDate,
+                beginLoginDate,
+                endLoginDate,
+                mobile)));
     }
 
     @Override
@@ -72,24 +70,21 @@ public class MemberDaoImpl implements MemberDao {
             String mobile,
             int pageNo,
             int pageSize) {
-        Page<MemberDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize),
-                        buildListWrapper(
-                                enableFlag,
-                                email,
-                                name,
-                                remarks,
-                                beginRegisterDate,
-                                endRegisterDate,
-                                beginLoginDate,
-                                endLoginDate,
-                                mobile));
-        Page<Member> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<MemberDO> dataObjectPage = mapper.selectPage(
+                new Page<>(pageNo, pageSize),
+                buildListWrapper(
+                        enableFlag,
+                        email,
+                        name,
+                        remarks,
+                        beginRegisterDate,
+                        endRegisterDate,
+                        beginLoginDate,
+                        endLoginDate,
+                        mobile));
+        Page<Member> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(
-                MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
@@ -173,10 +168,7 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public void updateLoginPass(Member member) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
-        mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MemberDO::getLoginPass, dataObject.getLoginPass()));
+        mapper.update(null, buildIdUpdateWrapper(dataObject).set(MemberDO::getLoginPass, dataObject.getLoginPass()));
     }
 
     @Override

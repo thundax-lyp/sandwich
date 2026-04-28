@@ -124,5 +124,4 @@ public final class StoragePersistenceAssembler {
         }
         return entities;
     }
-
 }

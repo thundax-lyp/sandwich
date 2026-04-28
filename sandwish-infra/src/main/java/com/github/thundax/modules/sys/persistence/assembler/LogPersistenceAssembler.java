@@ -83,5 +83,4 @@ public final class LogPersistenceAssembler {
         }
         return dataObjects;
     }
-
 }

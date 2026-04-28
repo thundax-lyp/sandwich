@@ -22,10 +22,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDaoImpl implements UserDao {
 
-    private static final String OFFICE_TREE_FILTER_SQL =
-            "office_id IN (SELECT o.id FROM sys_office query_office "
-                    + "JOIN sys_office o ON o.lft BETWEEN query_office.lft AND query_office.rgt "
-                    + "WHERE query_office.id = {0})";
+    private static final String OFFICE_TREE_FILTER_SQL = "office_id IN (SELECT o.id FROM sys_office query_office "
+            + "JOIN sys_office o ON o.lft BETWEEN query_office.lft AND query_office.rgt "
+            + "WHERE query_office.id = {0})";
 
     private final UserMapper mapper;
     private final UserRoleMapper userRoleMapper;
@@ -67,8 +66,7 @@ public class UserDaoImpl implements UserDao {
             }
         }
         if (!uncachedIdList.isEmpty()) {
-            List<User> uncachedUserList =
-                    UserPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            List<User> uncachedUserList = UserPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (User user : uncachedUserList) {
                 cacheSupport.putById(user);
                 userList.add(user);
@@ -78,8 +76,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findList(
-            String officeId, String loginName, String name, String enableFlag, String superFlag) {
+    public List<User> findList(String officeId, String loginName, String name, String enableFlag, String superFlag) {
         return UserPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(officeId, loginName, name, enableFlag, superFlag)));
     }
@@ -93,12 +90,9 @@ public class UserDaoImpl implements UserDao {
             String superFlag,
             int pageNo,
             int pageSize) {
-        Page<UserDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize),
-                        buildListWrapper(officeId, loginName, name, enableFlag, superFlag));
-        Page<User> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<UserDO> dataObjectPage = mapper.selectPage(
+                new Page<>(pageNo, pageSize), buildListWrapper(officeId, loginName, name, enableFlag, superFlag));
+        Page<User> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(UserPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
@@ -114,25 +108,24 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int update(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(UserDO::getName, dataObject.getName())
-                                .set(UserDO::getOfficeId, dataObject.getOfficeId())
-                                .set(UserDO::getLoginName, dataObject.getLoginName())
-                                .set(UserDO::getEmail, dataObject.getEmail())
-                                .set(UserDO::getMobile, dataObject.getMobile())
-                                .set(UserDO::getTel, dataObject.getTel())
-                                .set(UserDO::getRanks, dataObject.getRanks())
-                                .set(UserDO::getAdminFlag, dataObject.getAdminFlag())
-                                .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
-                                .set(UserDO::getPriority, dataObject.getPriority())
-                                .set(UserDO::getRemarks, dataObject.getRemarks())
-                                .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId())
-                                .set(UserDO::getDelFlag, dataObject.getDelFlag())
-                                .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserDO::getName, dataObject.getName())
+                        .set(UserDO::getOfficeId, dataObject.getOfficeId())
+                        .set(UserDO::getLoginName, dataObject.getLoginName())
+                        .set(UserDO::getEmail, dataObject.getEmail())
+                        .set(UserDO::getMobile, dataObject.getMobile())
+                        .set(UserDO::getTel, dataObject.getTel())
+                        .set(UserDO::getRanks, dataObject.getRanks())
+                        .set(UserDO::getAdminFlag, dataObject.getAdminFlag())
+                        .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(UserDO::getPriority, dataObject.getPriority())
+                        .set(UserDO::getRemarks, dataObject.getRemarks())
+                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(UserDO::getDelFlag, dataObject.getDelFlag())
+                        .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
         removeUserCaches(entity.getId());
         return count;
     }
@@ -140,11 +133,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int updatePriority(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(UserDO::getPriority, dataObject.getPriority()));
+        int count = mapper.update(
+                null, buildIdUpdateWrapper(dataObject).set(UserDO::getPriority, dataObject.getPriority()));
         removeUserCaches(entity.getId());
         return count;
     }
@@ -196,14 +186,13 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int updateEnableFlag(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
-                                .set(UserDO::getLoginCount, 0)
-                                .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(UserDO::getLoginCount, 0)
+                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
         removeUserCaches(user.getId());
         return count;
     }
@@ -226,10 +215,9 @@ public class UserDaoImpl implements UserDao {
         if (roleIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRoleDO::getUserId, userId);
-            roleIds =
-                    userRoleMapper.selectList(wrapper).stream()
-                            .map(UserRoleDO::getRoleId)
-                            .collect(Collectors.toList());
+            roleIds = userRoleMapper.selectList(wrapper).stream()
+                    .map(UserRoleDO::getRoleId)
+                    .collect(Collectors.toList());
             cacheSupport.putUserRoleIds(userId, roleIds);
         }
         return roleIds;

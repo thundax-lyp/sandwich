@@ -36,37 +36,27 @@ public class SignatureDaoImpl implements SignatureDao {
 
     @Override
     public List<Signature> findList(
-            String businessType,
-            String businessId,
-            List<String> businessIdList,
-            String isVerifySign) {
+            String businessType, String businessId, List<String> businessIdList, String isVerifySign) {
         return SignaturePersistenceAssembler.toEntityList(
-                mapper.selectList(
-                        buildListWrapper(businessType, businessId, businessIdList, isVerifySign)));
+                mapper.selectList(buildListWrapper(businessType, businessId, businessIdList, isVerifySign)));
     }
 
     @Override
     public Page<Signature> findPage(String businessType, int pageNo, int pageSize) {
         Page<SignatureDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize),
-                        buildListWrapper(businessType, null, null, null));
-        Page<Signature> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(businessType, null, null, null));
+        Page<Signature> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(
-                SignaturePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(SignaturePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
     @Override
     public int upsert(Signature entity) {
         SignatureDO dataObject = SignaturePersistenceAssembler.toDataObject(entity);
-        int updated =
-                mapper.update(
-                        buildUpdateDataObject(dataObject),
-                        buildBusinessKeyUpdateWrapper(
-                                dataObject.getBusinessType(), dataObject.getBusinessId()));
+        int updated = mapper.update(
+                buildUpdateDataObject(dataObject),
+                buildBusinessKeyUpdateWrapper(dataObject.getBusinessType(), dataObject.getBusinessId()));
         if (updated > 0) {
             return updated;
         }
@@ -86,16 +76,14 @@ public class SignatureDaoImpl implements SignatureDao {
         return update;
     }
 
-    private LambdaQueryWrapper<SignatureDO> buildBusinessKeyWrapper(
-            String businessType, String businessId) {
+    private LambdaQueryWrapper<SignatureDO> buildBusinessKeyWrapper(String businessType, String businessId) {
         LambdaQueryWrapper<SignatureDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SignatureDO::getBusinessType, businessType);
         wrapper.eq(SignatureDO::getBusinessId, businessId);
         return wrapper;
     }
 
-    private LambdaUpdateWrapper<SignatureDO> buildBusinessKeyUpdateWrapper(
-            String businessType, String businessId) {
+    private LambdaUpdateWrapper<SignatureDO> buildBusinessKeyUpdateWrapper(String businessType, String businessId) {
         LambdaUpdateWrapper<SignatureDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(SignatureDO::getBusinessType, businessType);
         wrapper.eq(SignatureDO::getBusinessId, businessId);
@@ -103,10 +91,7 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     private LambdaQueryWrapper<SignatureDO> buildListWrapper(
-            String businessType,
-            String businessId,
-            List<String> businessIdList,
-            String isVerifySign) {
+            String businessType, String businessId, List<String> businessIdList, String isVerifySign) {
         LambdaQueryWrapper<SignatureDO> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isNotBlank(businessType)) {
             wrapper.eq(SignatureDO::getBusinessType, businessType);

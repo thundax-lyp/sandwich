@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.persistence.assembler.OfficePersistenceAssembler;
@@ -16,6 +15,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
 import com.github.thundax.modules.sys.persistence.mapper.OfficeMapper;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -67,21 +67,16 @@ public class OfficeDaoImpl implements OfficeDao {
 
     @Override
     public List<Office> findList(String parentId, String name, String remarks) {
-        return OfficePersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(parentId, name, remarks)));
+        return OfficePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(parentId, name, remarks)));
     }
 
     @Override
-    public Page<Office> findPage(
-            String parentId, String name, String remarks, int pageNo, int pageSize) {
+    public Page<Office> findPage(String parentId, String name, String remarks, int pageNo, int pageSize) {
         IPage<OfficeDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize), buildListWrapper(parentId, name, remarks));
-        Page<Office> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, name, remarks));
+        Page<Office> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(
-                OfficePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(OfficePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
@@ -105,21 +100,19 @@ public class OfficeDaoImpl implements OfficeDao {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null
-                && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(OfficeDO::getParentId, dataObject.getParentId())
-                                .set(OfficeDO::getName, dataObject.getName())
-                                .set(OfficeDO::getShortName, dataObject.getShortName())
-                                .set(OfficeDO::getPriority, dataObject.getPriority())
-                                .set(OfficeDO::getRemarks, dataObject.getRemarks())
-                                .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(OfficeDO::getParentId, dataObject.getParentId())
+                        .set(OfficeDO::getName, dataObject.getName())
+                        .set(OfficeDO::getShortName, dataObject.getShortName())
+                        .set(OfficeDO::getPriority, dataObject.getPriority())
+                        .set(OfficeDO::getRemarks, dataObject.getRemarks())
+                        .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeAll();
         return count;
     }
@@ -127,11 +120,8 @@ public class OfficeDaoImpl implements OfficeDao {
     @Override
     public int updatePriority(Office entity) {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(OfficeDO::getPriority, dataObject.getPriority()));
+        int count = mapper.update(
+                null, buildIdUpdateWrapper(dataObject).set(OfficeDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -139,13 +129,12 @@ public class OfficeDaoImpl implements OfficeDao {
     @Override
     public int updateDelFlag(Office entity) {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(OfficeDO::getDelFlag, dataObject.getDelFlag())
-                                .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(OfficeDO::getDelFlag, dataObject.getDelFlag())
+                        .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -205,16 +194,12 @@ public class OfficeDaoImpl implements OfficeDao {
     public boolean isChildOf(String childId, String parentId) {
         OfficeDO child = getTreeNode(childId);
         OfficeDO parent = getTreeNode(parentId);
-        return child != null
-                && parent != null
-                && child.getLft() > parent.getLft()
-                && child.getRgt() < parent.getRgt();
+        return child != null && parent != null && child.getLft() > parent.getLft() && child.getRgt() < parent.getRgt();
     }
 
     private Integer allocateInsertPosition(OfficeDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId())
-                && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
             OfficeDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -264,8 +249,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     private void updateParent(OfficeDO node) {
-        mapper.update(
-                null, buildIdUpdateWrapper(node).set(OfficeDO::getParentId, node.getParentId()));
+        mapper.update(null, buildIdUpdateWrapper(node).set(OfficeDO::getParentId, node.getParentId()));
     }
 
     private void moveTreeRgts(Integer from, Integer offset) {
@@ -294,8 +278,7 @@ public class OfficeDaoImpl implements OfficeDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<OfficeDO> buildListWrapper(
-            String parentId, String name, String remarks) {
+    private LambdaQueryWrapper<OfficeDO> buildListWrapper(String parentId, String name, String remarks) {
         LambdaQueryWrapper<OfficeDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OfficeDO::getDelFlag, OfficeDO.DEL_FLAG_NORMAL);
         if (StringUtils.isNotBlank(parentId)) {
@@ -306,11 +289,7 @@ public class OfficeDaoImpl implements OfficeDao {
             }
         }
         if (StringUtils.isNotBlank(name)) {
-            wrapper.and(
-                    nested ->
-                            nested.like(OfficeDO::getName, name)
-                                    .or()
-                                    .like(OfficeDO::getShortName, name));
+            wrapper.and(nested -> nested.like(OfficeDO::getName, name).or().like(OfficeDO::getShortName, name));
         }
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like(OfficeDO::getRemarks, remarks);

@@ -39,11 +39,9 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     public Page<UserEncrypt> findPage(int pageNo, int pageSize) {
         Page<UserEncryptDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), new LambdaQueryWrapper<>());
-        Page<UserEncrypt> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<UserEncrypt> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(
-                UserEncryptPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(UserEncryptPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 

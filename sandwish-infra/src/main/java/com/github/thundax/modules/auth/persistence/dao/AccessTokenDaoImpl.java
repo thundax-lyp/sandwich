@@ -76,11 +76,7 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         AccessTokenDO accessTokenDO = AuthPersistenceAssembler.toDataObject(accessToken);
         String tokenKey = TOKEN_PREFIX + accessToken.getToken();
         cache.put(tokenKey, accessToken.getUserId(), expiredSeconds, TimeUnit.SECONDS);
-        cache.put(
-                USER_ID_PREFIX + accessToken.getUserId(),
-                accessTokenDO,
-                expiredSeconds,
-                TimeUnit.SECONDS);
+        cache.put(USER_ID_PREFIX + accessToken.getUserId(), accessTokenDO, expiredSeconds, TimeUnit.SECONDS);
         rememberTokenKey(tokenKey);
     }
 
@@ -95,11 +91,7 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         }
         AccessTokenDO accessTokenDO = (AccessTokenDO) cache.get(USER_ID_PREFIX + accessToken.getUserId());
         if (accessTokenDO != null) {
-            cache.put(
-                    USER_ID_PREFIX + accessToken.getUserId(),
-                    accessTokenDO,
-                    expiredSeconds,
-                    TimeUnit.SECONDS);
+            cache.put(USER_ID_PREFIX + accessToken.getUserId(), accessTokenDO, expiredSeconds, TimeUnit.SECONDS);
         }
     }
 

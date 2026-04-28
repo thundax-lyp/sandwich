@@ -66,8 +66,7 @@ public class RoleDaoImpl implements RoleDao {
             }
         }
         if (!uncachedIdList.isEmpty()) {
-            List<Role> uncachedRoleList =
-                    RolePersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            List<Role> uncachedRoleList = RolePersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
             for (Role role : uncachedRoleList) {
                 cacheSupport.putById(role);
                 roleList.add(role);
@@ -83,10 +82,8 @@ public class RoleDaoImpl implements RoleDao {
 
     @Override
     public Page<Role> findPage(String enableFlag, int pageNo, int pageSize) {
-        Page<RoleDO> dataObjectPage =
-                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(enableFlag));
-        Page<Role> entityPage =
-                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<RoleDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(enableFlag));
+        Page<Role> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(RolePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
@@ -102,17 +99,16 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int update(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(RoleDO::getName, dataObject.getName())
-                                .set(RoleDO::getAdminFlag, dataObject.getAdminFlag())
-                                .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
-                                .set(RoleDO::getPriority, dataObject.getPriority())
-                                .set(RoleDO::getRemarks, dataObject.getRemarks())
-                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(RoleDO::getName, dataObject.getName())
+                        .set(RoleDO::getAdminFlag, dataObject.getAdminFlag())
+                        .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(RoleDO::getPriority, dataObject.getPriority())
+                        .set(RoleDO::getRemarks, dataObject.getRemarks())
+                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -120,11 +116,8 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int updatePriority(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(RoleDO::getPriority, dataObject.getPriority()));
+        int count = mapper.update(
+                null, buildIdUpdateWrapper(dataObject).set(RoleDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -132,13 +125,12 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int updateDelFlag(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(RoleDO::getDelFlag, dataObject.getDelFlag())
-                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(RoleDO::getDelFlag, dataObject.getDelFlag())
+                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -153,13 +145,12 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int updateEnableFlag(Role role) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
-        int count =
-                mapper.update(
-                        null,
-                        buildIdUpdateWrapper(dataObject)
-                                .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
-                                .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                                .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+        int count = mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
         cacheSupport.removeById(role.getId());
         return count;
     }
@@ -170,10 +161,9 @@ public class RoleDaoImpl implements RoleDao {
         if (menuIds == null) {
             LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(MenuRoleDO::getRoleId, roleId);
-            menuIds =
-                    menuRoleMapper.selectList(wrapper).stream()
-                            .map(MenuRoleDO::getMenuId)
-                            .collect(Collectors.toList());
+            menuIds = menuRoleMapper.selectList(wrapper).stream()
+                    .map(MenuRoleDO::getMenuId)
+                    .collect(Collectors.toList());
             cacheSupport.putRoleMenuIds(roleId, menuIds);
         }
         return menuIds;
@@ -201,10 +191,9 @@ public class RoleDaoImpl implements RoleDao {
         if (userIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRoleDO::getRoleId, roleId);
-            userIds =
-                    userRoleMapper.selectList(wrapper).stream()
-                            .map(UserRoleDO::getUserId)
-                            .collect(Collectors.toList());
+            userIds = userRoleMapper.selectList(wrapper).stream()
+                    .map(UserRoleDO::getUserId)
+                    .collect(Collectors.toList());
             cacheSupport.putRoleUserIds(roleId, userIds);
         }
         return userIds;

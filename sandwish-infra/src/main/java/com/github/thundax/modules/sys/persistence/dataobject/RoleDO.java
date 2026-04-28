@@ -152,5 +152,4 @@ public class RoleDO {
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
     }
-
 }

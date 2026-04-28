@@ -1,9 +1,10 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.service.impl.CrudServiceImpl;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class DefaultUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDao, UserEncrypt>
-        implements UserEncryptService {
+public class DefaultUserEncryptServiceImpl implements UserEncryptService {
 
     public DefaultUserEncryptServiceImpl(UserEncryptDao dao) {
-        super(dao);
     }
 
     /**
@@ -54,5 +53,65 @@ public class DefaultUserEncryptServiceImpl extends CrudServiceImpl<UserEncryptDa
     @Override
     public UserEncrypt findOne(UserEncrypt query) {
         return null;
+    }
+
+    @Override
+    public Class<UserEncrypt> getElementType() {
+        return UserEncrypt.class;
+    }
+
+    @Override
+    public UserEncrypt newEntity(String id) {
+        return new UserEncrypt(id);
+    }
+
+    @Override
+    public List<UserEncrypt> getMany(List<String> ids) {
+        return null;
+    }
+
+    @Override
+    public List<UserEncrypt> findList(UserEncrypt entity) {
+        return null;
+    }
+
+    @Override
+    public Page<UserEncrypt> findPage(UserEncrypt entity, Page<UserEncrypt> page) {
+        return page;
+    }
+
+    @Override
+    public long count(UserEncrypt entity) {
+        return 0;
+    }
+
+    @Override
+    public int delete(UserEncrypt entity) {
+        return 0;
+    }
+
+    @Override
+    public int delete(List<UserEncrypt> list) {
+        return 0;
+    }
+
+    @Override
+    public int updatePriority(UserEncrypt entity) {
+        return 0;
+    }
+
+    @Override
+    public int updatePriority(List<UserEncrypt> list) {
+        return 0;
+    }
+
+    @Override
+    public int updateDelFlag(UserEncrypt entity) {
+        return 0;
+    }
+
+    @Override
+    public int updateDelFlag(List<UserEncrypt> list) {
+        return 0;
     }
 }

@@ -1,6 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
-import com.github.pagehelper.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.persistence.assembler.UserEncryptPersistenceAssembler;
@@ -9,7 +11,6 @@ import com.github.thundax.modules.sys.persistence.mapper.UserEncryptMapper;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
-/** 用户加密信息 DAO 实现。 */
 @Repository
 public class UserEncryptDaoImpl implements UserEncryptDao {
 
@@ -20,29 +21,30 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public UserEncrypt get(UserEncrypt entity) {
-        return UserEncryptPersistenceAssembler.toEntity(
-                mapper.get(UserEncryptPersistenceAssembler.toDataObject(entity)));
+    public UserEncrypt get(String id) {
+        return UserEncryptPersistenceAssembler.toEntity(mapper.selectById(id));
     }
 
     @Override
     public List<UserEncrypt> getMany(List<String> idList) {
-        return UserEncryptPersistenceAssembler.toEntityList(mapper.getMany(idList));
+        return UserEncryptPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<UserEncrypt> findList(UserEncrypt entity) {
-        List<UserEncryptDO> dataObjects =
-                mapper.findList(UserEncryptPersistenceAssembler.toDataObject(entity));
-        List<UserEncrypt> entities = UserEncryptPersistenceAssembler.toEntityList(dataObjects);
-        if (dataObjects instanceof Page) {
-            List rawPage = (List) dataObjects;
-            rawPage.clear();
-            rawPage.addAll(entities);
-            return rawPage;
-        }
-        return entities;
+    public List<UserEncrypt> findList() {
+        return UserEncryptPersistenceAssembler.toEntityList(mapper.selectList(new LambdaQueryWrapper<>()));
+    }
+
+    @Override
+    public Page<UserEncrypt> findPage(int pageNo, int pageSize) {
+        Page<UserEncryptDO> dataObjectPage =
+                mapper.selectPage(new Page<>(pageNo, pageSize), new LambdaQueryWrapper<>());
+        Page<UserEncrypt> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(
+                UserEncryptPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
@@ -52,15 +54,19 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
 
     @Override
     public int update(UserEncrypt entity) {
-        return mapper.update(UserEncryptPersistenceAssembler.toDataObject(entity));
+        UserEncryptDO dataObject = UserEncryptPersistenceAssembler.toDataObject(entity);
+        return mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserEncryptDO::getEmail, dataObject.getEmail())
+                        .set(UserEncryptDO::getMobile, dataObject.getMobile())
+                        .set(UserEncryptDO::getTel, dataObject.getTel())
+                        .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(UserEncryptDO::getUpdateUserId, dataObject.getUpdateUserId()));
     }
 
     @Override
     public int updatePriority(UserEncrypt entity) {
-        return 0;
-    }
-
-    public int updateStatus(UserEncrypt entity) {
         return 0;
     }
 
@@ -70,12 +76,24 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public int delete(UserEncrypt entity) {
-        return mapper.delete(UserEncryptPersistenceAssembler.toDataObject(entity));
+    public int delete(String id) {
+        return mapper.deleteById(id);
     }
 
     @Override
     public void updateLoginPass(UserEncrypt userEncrypt) {
-        mapper.updateLoginPass(UserEncryptPersistenceAssembler.toDataObject(userEncrypt));
+        UserEncryptDO dataObject = UserEncryptPersistenceAssembler.toDataObject(userEncrypt);
+        mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(UserEncryptDO::getLoginPass, dataObject.getLoginPass())
+                        .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(UserEncryptDO::getUpdateUserId, dataObject.getUpdateUserId()));
+    }
+
+    private LambdaUpdateWrapper<UserEncryptDO> buildIdUpdateWrapper(UserEncryptDO dataObject) {
+        LambdaUpdateWrapper<UserEncryptDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(UserEncryptDO::getId, dataObject.getId());
+        return wrapper;
     }
 }

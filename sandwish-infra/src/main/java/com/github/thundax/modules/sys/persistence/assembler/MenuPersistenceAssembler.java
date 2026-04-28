@@ -27,9 +27,9 @@ public final class MenuPersistenceAssembler {
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateUserId(entity.getCreateUserId());
+        dataObject.setCreateBy(entity.getCreateUserId());
         dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateUserId(entity.getUpdateUserId());
+        dataObject.setUpdateBy(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
@@ -51,9 +51,9 @@ public final class MenuPersistenceAssembler {
         entity.setPriority(dataObject.getPriority());
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateUserId());
+        entity.setCreateUserId(dataObject.getCreateBy());
         entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateUserId());
+        entity.setUpdateUserId(dataObject.getUpdateBy());
         entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }

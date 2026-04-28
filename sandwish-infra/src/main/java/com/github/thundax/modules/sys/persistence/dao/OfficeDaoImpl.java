@@ -112,7 +112,7 @@ public class OfficeDaoImpl implements OfficeDao {
                         .set(OfficeDO::getPriority, dataObject.getPriority())
                         .set(OfficeDO::getRemarks, dataObject.getRemarks())
                         .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(OfficeDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeAll();
         return count;
     }
@@ -134,7 +134,7 @@ public class OfficeDaoImpl implements OfficeDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(OfficeDO::getDelFlag, dataObject.getDelFlag())
                         .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OfficeDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(OfficeDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(entity.getId());
         return count;
     }

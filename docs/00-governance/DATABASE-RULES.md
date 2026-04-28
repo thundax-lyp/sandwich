@@ -54,6 +54,7 @@
 - Java 8 项目默认沿用现有日期时间类型
 - 不为追随外部规则强制迁移为 `Instant`
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
+- `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
 
 ## Primary Key Rules
 

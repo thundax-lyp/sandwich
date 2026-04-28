@@ -67,6 +67,23 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         assertTableId(storageBusinessDO, "storageId", "file_id", IdType.INPUT);
     }
 
+    @Test
+    public void shouldUseDatabaseAuditFieldNamesForDataObjects() {
+        JavaClasses classes = importPackages(BASE_PACKAGE);
+
+        for (JavaClass javaClass : classes) {
+            if (!isDataObjectClass(javaClass)) {
+                continue;
+            }
+            assertFalse(javaClass.getFullName() + " must not declare createUserId field", javaClass
+                    .tryGetField("createUserId")
+                    .isPresent());
+            assertFalse(javaClass.getFullName() + " must not declare updateUserId field", javaClass
+                    .tryGetField("updateUserId")
+                    .isPresent());
+        }
+    }
+
     private JavaClass classByName(JavaClasses classes, String className) {
         for (JavaClass javaClass : classes) {
             if (javaClass.getFullName().equals(className)) {
@@ -85,5 +102,11 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         TableId tableId = field.getAnnotationOfType(TableId.class);
         assertEquals(javaClass.getFullName() + "." + fieldName + " TableId value", columnName, tableId.value());
         assertEquals(javaClass.getFullName() + "." + fieldName + " TableId type", idType, tableId.type());
+    }
+
+    private boolean isDataObjectClass(JavaClass javaClass) {
+        return javaClass.getPackageName().startsWith(BASE_PACKAGE + ".")
+                && javaClass.getPackageName().contains(".persistence.dataobject")
+                && (javaClass.getSimpleName().endsWith("DO") || javaClass.getSimpleName().endsWith("DataObject"));
     }
 }

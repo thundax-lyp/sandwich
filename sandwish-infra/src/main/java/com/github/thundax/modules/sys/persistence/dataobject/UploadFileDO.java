@@ -46,13 +46,13 @@ public class UploadFileDO {
     private Date createDate;
 
     @TableField(exist = false)
-    private String createUserId;
+    private String createBy;
 
     @TableField(exist = false)
     private Date updateDate;
 
     @TableField(exist = false)
-    private String updateUserId;
+    private String updateBy;
 
     @TableField(exist = false)
     private String delFlag;

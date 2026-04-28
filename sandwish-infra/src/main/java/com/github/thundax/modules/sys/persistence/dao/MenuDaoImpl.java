@@ -120,7 +120,7 @@ public class MenuDaoImpl implements MenuDao {
                         .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
                         .set(MenuDO::getRemarks, dataObject.getRemarks())
                         .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy())
                         .set(MenuDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeAll();
         return count;
@@ -134,7 +134,7 @@ public class MenuDaoImpl implements MenuDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(MenuDO::getPriority, dataObject.getPriority())
                         .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -147,7 +147,7 @@ public class MenuDaoImpl implements MenuDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(MenuDO::getDelFlag, dataObject.getDelFlag())
                         .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -218,7 +218,7 @@ public class MenuDaoImpl implements MenuDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
                         .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(menu.getId());
         return count;
     }

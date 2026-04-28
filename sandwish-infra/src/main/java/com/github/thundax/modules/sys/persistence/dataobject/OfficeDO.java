@@ -43,13 +43,13 @@ public class OfficeDO {
     private Date createDate;
 
     @TableField("create_by")
-    private String createUserId;
+    private String createBy;
 
     @TableField("update_date")
     private Date updateDate;
 
     @TableField("update_by")
-    private String updateUserId;
+    private String updateBy;
 
     @TableField("del_flag")
     private String delFlag;

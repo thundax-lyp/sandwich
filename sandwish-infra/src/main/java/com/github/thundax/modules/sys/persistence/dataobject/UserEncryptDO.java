@@ -40,13 +40,13 @@ public class UserEncryptDO {
     private Date createDate;
 
     @TableField("create_by")
-    private String createUserId;
+    private String createBy;
 
     @TableField("update_date")
     private Date updateDate;
 
     @TableField("update_by")
-    private String updateUserId;
+    private String updateBy;
 
     @TableField(exist = false)
     private String delFlag;

@@ -21,8 +21,8 @@ public class AsyncTaskDO {
     private Integer priority;
     private String remarks;
     private Date createDate;
-    private String createUserId;
+    private String createBy;
     private Date updateDate;
-    private String updateUserId;
+    private String updateBy;
     private String delFlag;
 }

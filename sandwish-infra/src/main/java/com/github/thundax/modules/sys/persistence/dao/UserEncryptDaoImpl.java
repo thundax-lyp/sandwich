@@ -60,7 +60,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
                         .set(UserEncryptDO::getMobile, dataObject.getMobile())
                         .set(UserEncryptDO::getTel, dataObject.getTel())
                         .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserEncryptDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(UserEncryptDO::getUpdateBy, dataObject.getUpdateBy()));
     }
 
     @Override
@@ -86,7 +86,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(UserEncryptDO::getLoginPass, dataObject.getLoginPass())
                         .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserEncryptDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(UserEncryptDO::getUpdateBy, dataObject.getUpdateBy()));
     }
 
     private LambdaUpdateWrapper<UserEncryptDO> buildIdUpdateWrapper(UserEncryptDO dataObject) {

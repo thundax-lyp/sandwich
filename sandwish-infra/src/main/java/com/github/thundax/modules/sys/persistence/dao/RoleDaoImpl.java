@@ -109,7 +109,7 @@ public class RoleDaoImpl implements RoleDao {
                         .set(RoleDO::getPriority, dataObject.getPriority())
                         .set(RoleDO::getRemarks, dataObject.getRemarks())
                         .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -131,7 +131,7 @@ public class RoleDaoImpl implements RoleDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(RoleDO::getDelFlag, dataObject.getDelFlag())
                         .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -151,7 +151,7 @@ public class RoleDaoImpl implements RoleDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeById(role.getId());
         return count;
     }

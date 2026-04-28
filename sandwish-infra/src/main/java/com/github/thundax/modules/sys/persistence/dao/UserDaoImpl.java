@@ -124,7 +124,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks())
                         .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy())
                         .set(UserDO::getDelFlag, dataObject.getDelFlag())
                         .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
         removeUserCaches(entity.getId());
@@ -193,7 +193,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(UserDO::getLoginCount, 0)
                         .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy()));
         removeUserCaches(user.getId());
         return count;
     }
@@ -206,7 +206,7 @@ public class UserDaoImpl implements UserDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(UserDO::getLoginPass, dataObject.getLoginPass())
                         .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy()));
         removeUserCaches(user.getId());
     }
 

@@ -32,12 +32,12 @@ public class DictDO {
     private Date createDate;
 
     @TableField("create_by")
-    private String createUserId;
+    private String createBy;
 
     private Date updateDate;
 
     @TableField("update_by")
-    private String updateUserId;
+    private String updateBy;
 
     private String delFlag;
 }

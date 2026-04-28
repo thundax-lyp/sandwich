@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 字典 DAO 实现。 */
+
 @Repository
 public class DictDaoImpl implements DictDao {
 
@@ -97,7 +97,7 @@ public class DictDaoImpl implements DictDao {
                         .set(DictDO::getPriority, dataObject.getPriority())
                         .set(DictDO::getRemarks, dataObject.getRemarks())
                         .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId())
+                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy())
                         .set(DictDO::getDelFlag, dataObject.getDelFlag()));
         cacheSupport.removeAll();
         return count;
@@ -111,7 +111,7 @@ public class DictDaoImpl implements DictDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(DictDO::getPriority, dataObject.getPriority())
                         .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeAll();
         return count;
     }
@@ -128,7 +128,7 @@ public class DictDaoImpl implements DictDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(DictDO::getDelFlag, dataObject.getDelFlag())
                         .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateUserId, dataObject.getUpdateUserId()));
+                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeAll();
         return count;
     }

@@ -8,7 +8,6 @@ import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
-/** 公私钥私钥临时存储 Redis DAO 实现。 */
 @Repository
 public class KeypairPrivateKeyDaoImpl implements KeypairPrivateKeyDao {
 

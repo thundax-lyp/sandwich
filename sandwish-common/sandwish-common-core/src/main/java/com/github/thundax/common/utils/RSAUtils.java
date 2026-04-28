@@ -51,8 +51,7 @@ public class RSAUtils {
             String privateKeyExponent = privateKey.getPrivateExponent().toString(16);
             String publicKeyExponent = publicKey.getPublicExponent().toString(16);
 
-            return new ReadableKeyPair(
-                    publicKeyText, modulus, publicKeyExponent, privateKeyExponent);
+            return new ReadableKeyPair(publicKeyText, modulus, publicKeyExponent, privateKeyExponent);
         } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -64,9 +63,7 @@ public class RSAUtils {
      * @param encryptBase64Text base64编码后的加密数据
      */
     public static String decryptBase64(String encryptBase64Text, ReadableKeyPair keyPair) {
-        if (StringUtils.isBlank(encryptBase64Text)
-                || keyPair == null
-                || keyPair.getModulus() == null) {
+        if (StringUtils.isBlank(encryptBase64Text) || keyPair == null || keyPair.getModulus() == null) {
             return StringUtils.EMPTY;
         }
         try {
@@ -99,11 +96,7 @@ public class RSAUtils {
 
         private String publicKeyExponent;
 
-        public ReadableKeyPair(
-                String publicKey,
-                String modulus,
-                String publicKeyExponent,
-                String privateKeyExponent) {
+        public ReadableKeyPair(String publicKey, String modulus, String publicKeyExponent, String privateKeyExponent) {
             this.setPublicKey(publicKey);
             this.setModulus(modulus);
             this.setPublicKeyExponent(publicKeyExponent);

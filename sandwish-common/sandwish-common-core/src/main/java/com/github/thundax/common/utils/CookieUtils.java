@@ -31,8 +31,7 @@ public class CookieUtils {
      * @param value 值
      * @param maxAge 生存时间（单位秒）
      */
-    public static void setCookie(
-            HttpServletResponse response, String name, String value, int maxAge) {
+    public static void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
         setCookie(response, name, value, "/", maxAge);
     }
 
@@ -43,8 +42,7 @@ public class CookieUtils {
      * @param value 值
      * @param maxAge 生存时间（单位秒）
      */
-    public static void setCookie(
-            HttpServletResponse response, String name, String value, String path, int maxAge) {
+    public static void setCookie(HttpServletResponse response, String name, String value, String path, int maxAge) {
         Cookie cookie = new Cookie(name, null);
         cookie.setPath(path);
         cookie.setMaxAge(maxAge);
@@ -76,10 +74,7 @@ public class CookieUtils {
      * @return 值
      */
     public static String getCookie(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            String name,
-            boolean isRemove) {
+            HttpServletRequest request, HttpServletResponse response, String name, boolean isRemove) {
         String value = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

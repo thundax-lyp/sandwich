@@ -1,6 +1,5 @@
 package com.github.thundax.common.config;
 
-/** @author thundax */
 public class Global {
 
     /** 显示/隐藏 */

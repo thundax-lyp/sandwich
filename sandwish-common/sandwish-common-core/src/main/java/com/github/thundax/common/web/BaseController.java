@@ -1,17 +1,16 @@
 package com.github.thundax.common.web;
 
-import org.apache.commons.lang3.StringUtils;
 import java.beans.PropertyEditorSupport;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.sql.Timestamp;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 
-/** @author thundax */
 public abstract class BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -28,33 +27,29 @@ public abstract class BaseController {
     protected void initBinder(WebDataBinder binder) {
 
         // Date 类型转换
-        binder.registerCustomEditor(
-                Date.class,
-                new PropertyEditorSupport() {
+        binder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
 
-                    @Override
-                    public void setAsText(String text) throws IllegalArgumentException {
-                        text = text.trim();
-                        if (StringUtils.isBlank(text)) {
-                            setValue(null);
-                        } else {
-                            Date value = parseDate(text);
-                            if (value == null) {
-                                setValue(null);
-                            } else {
-                                setValue(new Timestamp(value.getTime()));
-                            }
-                        }
+            @Override
+            public void setAsText(String text) throws IllegalArgumentException {
+                text = text.trim();
+                if (StringUtils.isBlank(text)) {
+                    setValue(null);
+                } else {
+                    Date value = parseDate(text);
+                    if (value == null) {
+                        setValue(null);
+                    } else {
+                        setValue(new Timestamp(value.getTime()));
                     }
+                }
+            }
 
-                    @Override
-                    public String getAsText() {
-                        Date value = (Date) getValue();
-                        return (value != null
-                                ? new SimpleDateFormat(DATE_TIME_PATTERN).format(value)
-                                : "");
-                    }
-                });
+            @Override
+            public String getAsText() {
+                Date value = (Date) getValue();
+                return (value != null ? new SimpleDateFormat(DATE_TIME_PATTERN).format(value) : "");
+            }
+        });
     }
 
     private static Date parseDate(String text) {

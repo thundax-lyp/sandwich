@@ -8,7 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-/** @author thundax */
 public class PooledThreadLocalFilter implements Filter {
 
     @Override

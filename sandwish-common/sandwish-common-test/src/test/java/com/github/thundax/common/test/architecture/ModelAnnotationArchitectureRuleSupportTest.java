@@ -5,8 +5,7 @@ import org.junit.Test;
 
 public class ModelAnnotationArchitectureRuleSupportTest extends AbstractArchitectureTest {
 
-    private static final String FIXTURE_PACKAGE =
-            "com.github.thundax.common.test.architecture.fixture";
+    private static final String FIXTURE_PACKAGE = "com.github.thundax.common.test.architecture.fixture";
 
     @Test
     public void shouldPassWhenRequestClassAnnotationsMatchRequiredSet() {
@@ -85,8 +84,7 @@ public class ModelAnnotationArchitectureRuleSupportTest extends AbstractArchitec
         JavaClasses classes = importPackages(FIXTURE_PACKAGE + ".persistence.dataobject.redis");
 
         ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(
-                        FIXTURE_PACKAGE,
-                        FIXTURE_PACKAGE + ".persistence.dataobject.redis.RedisOnlyFixtureDO")
+                        FIXTURE_PACKAGE, FIXTURE_PACKAGE + ".persistence.dataobject.redis.RedisOnlyFixtureDO")
                 .check(classes);
     }
 }

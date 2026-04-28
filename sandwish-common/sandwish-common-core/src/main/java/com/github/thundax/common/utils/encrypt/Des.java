@@ -15,7 +15,6 @@ import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-/** @author thundax */
 public class Des {
 
     private static final String ALGORITHM_DES = "DES";

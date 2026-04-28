@@ -10,11 +10,8 @@ public class PermissionAuthoritiesTest {
 
     @Test
     public void shouldConvertSpringAuthoritiesToPermissions() {
-        Set<String> permissions =
-                PermissionAuthorities.toPermissions(
-                        Arrays.asList(
-                                new SimpleGrantedAuthority("user"),
-                                new SimpleGrantedAuthority("sys:role")));
+        Set<String> permissions = PermissionAuthorities.toPermissions(
+                Arrays.asList(new SimpleGrantedAuthority("user"), new SimpleGrantedAuthority("sys:role")));
 
         Assert.assertTrue(permissions.contains("user"));
         Assert.assertTrue(permissions.contains("sys:role"));

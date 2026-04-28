@@ -9,7 +9,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.stereotype.Service;
 
-/** @author thundax */
 @Service
 @Lazy(false)
 public class I18nMessages {
@@ -30,8 +29,7 @@ public class I18nMessages {
 
     public static String getMessage(String code, Object... args) {
         try {
-            return getDefaultMessageSource()
-                    .getMessage(code, args, LocaleContextHolder.getLocale());
+            return getDefaultMessageSource().getMessage(code, args, LocaleContextHolder.getLocale());
 
         } catch (NoSuchMessageException e) {
             throw new IllegalArgumentException("undefined message:" + code);

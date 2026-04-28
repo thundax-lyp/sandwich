@@ -1,6 +1,5 @@
 package com.github.thundax.common.utils.encrypt;
 
-import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 
-/** @author thundax */
 public class Md5 {
 
     private static final String ALGORITHM_MD5 = "MD5";

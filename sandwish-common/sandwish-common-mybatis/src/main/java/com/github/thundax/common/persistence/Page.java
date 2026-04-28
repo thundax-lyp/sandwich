@@ -85,8 +85,7 @@ public class Page<T> {
                 this.setPageNo(Integer.parseInt(pageNo));
             }
         } else {
-            CookieUtils.setCookie(
-                    response, cookiePrefix + "pageNo", String.valueOf(Page.FIRST_PAGE_INDEX));
+            CookieUtils.setCookie(response, cookiePrefix + "pageNo", String.valueOf(Page.FIRST_PAGE_INDEX));
         }
 
         // 设置页面大小参数（传递reload参数，来记住页码大小）
@@ -195,54 +194,45 @@ public class Page<T> {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<ul class=\"pagination\">");
-        sb.append(
-                "<li><a href=\"javascript:void(0)\" aria-label=\"Previous\"\n"
-                        + "onclick=\"javascript:page(1);\">首页</a></li>");
+        sb.append("<li><a href=\"javascript:void(0)\" aria-label=\"Previous\"\n"
+                + "onclick=\"javascript:page(1);\">首页</a></li>");
         if (pageNo > 1) {
-            sb.append(
-                    " <li><a href=\"javascript:void(0)\" aria-label=\"Previous\"\n"
-                            + "                               onclick=\"javascript:page("
-                            + (pageNo - 1)
-                            + ");\"><span\n"
-                            + "                                aria-hidden=\"true\">&laquo;</span></a></li>");
+            sb.append(" <li><a href=\"javascript:void(0)\" aria-label=\"Previous\"\n"
+                    + "                               onclick=\"javascript:page("
+                    + (pageNo - 1)
+                    + ");\"><span\n"
+                    + "                                aria-hidden=\"true\">&laquo;</span></a></li>");
         }
-        int begin =
-                (pageNo + 9) < getTotalPage()
-                        ? pageNo
-                        : ((getTotalPage() - 9) > 0 ? (getTotalPage() - 9) : 1);
+        int begin = (pageNo + 9) < getTotalPage() ? pageNo : ((getTotalPage() - 9) > 0 ? (getTotalPage() - 9) : 1);
         int end = (pageNo + 9) < getTotalPage() ? (pageNo + 9) : getTotalPage();
         for (int i = begin; i <= end; i++) {
             if (i == pageNo) {
-                sb.append(
-                        "<li class=\"active\"><a href=\"javascript:void(0)\" onclick=\"javascript:page("
-                                + i
-                                + ");\">"
-                                + i
-                                + "</a></li>");
+                sb.append("<li class=\"active\"><a href=\"javascript:void(0)\" onclick=\"javascript:page("
+                        + i
+                        + ");\">"
+                        + i
+                        + "</a></li>");
             } else {
-                sb.append(
-                        "<li><a href=\"javascript:void(0)\" onclick=\"javascript:page("
-                                + i
-                                + ");\">"
-                                + i
-                                + "</a></li>");
+                sb.append("<li><a href=\"javascript:void(0)\" onclick=\"javascript:page("
+                        + i
+                        + ");\">"
+                        + i
+                        + "</a></li>");
             }
         }
 
         if (pageNo < getTotalPage()) {
-            sb.append(
-                    "<li><a href=\"javascript:void(0)\" aria-label=\"Next\"\n"
-                            + "onclick=\"javascript:page("
-                            + (pageNo + 1)
-                            + ");\"><span\n"
-                            + "aria-hidden=\"true\">&raquo;</span></a></li>");
+            sb.append("<li><a href=\"javascript:void(0)\" aria-label=\"Next\"\n"
+                    + "onclick=\"javascript:page("
+                    + (pageNo + 1)
+                    + ");\"><span\n"
+                    + "aria-hidden=\"true\">&raquo;</span></a></li>");
         }
 
-        sb.append(
-                "<li><a href=\"javascript:void(0)\" aria-label=\"Next\"\n"
-                        + "onclick=\"javascript:page("
-                        + getTotalPage()
-                        + ");\">尾页</a></li>");
+        sb.append("<li><a href=\"javascript:void(0)\" aria-label=\"Next\"\n"
+                + "onclick=\"javascript:page("
+                + getTotalPage()
+                + ");\">尾页</a></li>");
 
         return sb.toString();
     }

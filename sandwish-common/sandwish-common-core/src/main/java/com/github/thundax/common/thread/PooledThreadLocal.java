@@ -9,8 +9,7 @@ import java.util.function.Supplier;
  */
 public class PooledThreadLocal<T> {
 
-    private static final ThreadLocal<PolledThreadLocalMap> THREAD_LOCAL_HOLDER =
-            new ThreadLocal<>();
+    private static final ThreadLocal<PolledThreadLocalMap> THREAD_LOCAL_HOLDER = new ThreadLocal<>();
 
     public void set(T value) {
         PolledThreadLocalMap map = THREAD_LOCAL_HOLDER.get();

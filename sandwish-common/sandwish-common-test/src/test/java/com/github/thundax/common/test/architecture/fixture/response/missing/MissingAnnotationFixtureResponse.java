@@ -7,9 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(
-        value = "MissingAnnotationFixtureResponse",
-        description = "missing annotation fixture response")
+@ApiModel(value = "MissingAnnotationFixtureResponse", description = "missing annotation fixture response")
 public class MissingAnnotationFixtureResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;

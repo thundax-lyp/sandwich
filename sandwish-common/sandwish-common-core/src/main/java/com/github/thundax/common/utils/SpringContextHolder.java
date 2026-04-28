@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-/** @author thundax */
 public class SpringContextHolder {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);

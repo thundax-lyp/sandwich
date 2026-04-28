@@ -1,7 +1,7 @@
 package com.github.thundax.common.jasypt;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Des;
+import org.apache.commons.lang3.StringUtils;
 import org.jasypt.encryption.StringEncryptor;
 
 /**

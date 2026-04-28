@@ -3,7 +3,6 @@ package com.github.thundax.common.utils.encrypt;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -13,6 +12,7 @@ import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.InvalidCipherTextException;
@@ -46,18 +46,13 @@ public class Sm2 {
     private static final String ENCRYPTED_PREFIX = "04";
 
     private static final X9ECParameters X9EC_PARAMETERS = GMNamedCurves.getByName(SM2_CURVE_NAME);
-    private static final ECDomainParameters DOMAIN_PARAMETERS =
-            new ECDomainParameters(
-                    X9EC_PARAMETERS.getCurve(),
-                    X9EC_PARAMETERS.getG(),
-                    X9EC_PARAMETERS.getN(),
-                    X9EC_PARAMETERS.getH());
+    private static final ECDomainParameters DOMAIN_PARAMETERS = new ECDomainParameters(
+            X9EC_PARAMETERS.getCurve(), X9EC_PARAMETERS.getG(), X9EC_PARAMETERS.getN(), X9EC_PARAMETERS.getH());
 
     public static StringKeyPair generateKeyPair() {
         try {
             SecureRandom random = new SecureRandom();
-            KeyPairGenerator generator =
-                    KeyPairGenerator.getInstance(ALGORITHM, new BouncyCastleProvider());
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM, new BouncyCastleProvider());
             generator.initialize(new ECGenParameterSpec(SM2_CURVE_NAME), random);
 
             return new StringKeyPair(generator.generateKeyPair());
@@ -74,10 +69,8 @@ public class Sm2 {
         }
 
         try {
-            ECPoint point =
-                    DOMAIN_PARAMETERS.getCurve().decodePoint(Hex.decodeHex(publicKeyString));
-            ECPublicKeyParameters publicKeyParameters =
-                    new ECPublicKeyParameters(point, DOMAIN_PARAMETERS);
+            ECPoint point = DOMAIN_PARAMETERS.getCurve().decodePoint(Hex.decodeHex(publicKeyString));
+            ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(point, DOMAIN_PARAMETERS);
 
             byte[] buffer = plainText.getBytes(StandardCharsets.UTF_8);
 
@@ -103,10 +96,8 @@ public class Sm2 {
         }
 
         try {
-            ECPrivateKeyParameters privateKeyParameters =
-                    new ECPrivateKeyParameters(
-                            BigIntegers.fromUnsignedByteArray(Hex.decodeHex(privateKeyString)),
-                            DOMAIN_PARAMETERS);
+            ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(
+                    BigIntegers.fromUnsignedByteArray(Hex.decodeHex(privateKeyString)), DOMAIN_PARAMETERS);
 
             byte[] encryptedBuffer = Hex.decodeHex(encryptedText);
 
@@ -132,13 +123,11 @@ public class Sm2 {
         public StringKeyPair() {}
 
         public StringKeyPair(KeyPair keyPair) {
-            this.publicKey =
-                    Hex.encodeHexString(
-                            ((BCECPublicKey) keyPair.getPublic()).getQ().getEncoded(false));
+            this.publicKey = Hex.encodeHexString(
+                    ((BCECPublicKey) keyPair.getPublic()).getQ().getEncoded(false));
 
-            this.privateKey =
-                    Hex.encodeHexString(
-                            ((BCECPrivateKey) keyPair.getPrivate()).getD().toByteArray());
+            this.privateKey = Hex.encodeHexString(
+                    ((BCECPrivateKey) keyPair.getPrivate()).getD().toByteArray());
         }
 
         public String getPublicKey() {

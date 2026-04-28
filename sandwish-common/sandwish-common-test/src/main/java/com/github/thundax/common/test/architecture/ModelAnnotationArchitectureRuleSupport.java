@@ -21,39 +21,30 @@ import java.util.Set;
 
 public final class ModelAnnotationArchitectureRuleSupport {
 
-    public static final String NAME_REQUEST_REQUIRED_ANNOTATIONS =
-            "MODEL_REQUEST_REQUIRED_ANNOTATIONS";
-    public static final String NAME_RESPONSE_REQUIRED_ANNOTATIONS =
-            "MODEL_RESPONSE_REQUIRED_ANNOTATIONS";
-    public static final String NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS =
-            "MODEL_DATA_OBJECT_REQUIRED_ANNOTATIONS";
+    public static final String NAME_REQUEST_REQUIRED_ANNOTATIONS = "MODEL_REQUEST_REQUIRED_ANNOTATIONS";
+    public static final String NAME_RESPONSE_REQUIRED_ANNOTATIONS = "MODEL_RESPONSE_REQUIRED_ANNOTATIONS";
+    public static final String NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS = "MODEL_DATA_OBJECT_REQUIRED_ANNOTATIONS";
 
-    private static final Set<String> REQUEST_REQUIRED_ANNOTATIONS =
-            new LinkedHashSet<String>(
-                    Arrays.asList(
-                            "lombok.Getter",
-                            "lombok.Setter",
-                            "io.swagger.annotations.ApiModel",
-                            "com.fasterxml.jackson.annotation.JsonInclude",
-                            "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
+    private static final Set<String> REQUEST_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
+            "lombok.Getter",
+            "lombok.Setter",
+            "io.swagger.annotations.ApiModel",
+            "com.fasterxml.jackson.annotation.JsonInclude",
+            "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
 
-    private static final Set<String> RESPONSE_REQUIRED_ANNOTATIONS =
-            new LinkedHashSet<String>(
-                    Arrays.asList(
-                            "lombok.Getter",
-                            "lombok.Setter",
-                            "io.swagger.annotations.ApiModel",
-                            "com.fasterxml.jackson.annotation.JsonInclude",
-                            "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
+    private static final Set<String> RESPONSE_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
+            "lombok.Getter",
+            "lombok.Setter",
+            "io.swagger.annotations.ApiModel",
+            "com.fasterxml.jackson.annotation.JsonInclude",
+            "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));
 
-    private static final Set<String> DATA_OBJECT_REQUIRED_ANNOTATIONS =
-            new LinkedHashSet<String>(
-                    Arrays.asList(
-                            "lombok.Getter",
-                            "lombok.Setter",
-                            "lombok.NoArgsConstructor",
-                            "lombok.AllArgsConstructor",
-                            "com.baomidou.mybatisplus.annotation.TableName"));
+    private static final Set<String> DATA_OBJECT_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
+            "lombok.Getter",
+            "lombok.Setter",
+            "lombok.NoArgsConstructor",
+            "lombok.AllArgsConstructor",
+            "com.baomidou.mybatisplus.annotation.TableName"));
 
     private static final String SOURCE_ROOTS_PROPERTY = "sandwish.architecture.sourceRoots";
 
@@ -61,11 +52,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
 
     public static ArchRule requestClassAnnotationsRequired(String basePackage) {
         return modelClassAnnotationsRequired(
-                basePackage,
-                ".request",
-                "Request",
-                REQUEST_REQUIRED_ANNOTATIONS,
-                NAME_REQUEST_REQUIRED_ANNOTATIONS);
+                basePackage, ".request", "Request", REQUEST_REQUIRED_ANNOTATIONS, NAME_REQUEST_REQUIRED_ANNOTATIONS);
     }
 
     public static ArchRule responseClassAnnotationsRequired(String basePackage) {
@@ -77,44 +64,35 @@ public final class ModelAnnotationArchitectureRuleSupport {
                 NAME_RESPONSE_REQUIRED_ANNOTATIONS);
     }
 
-    public static ArchRule dataObjectClassAnnotationsRequired(
-            String basePackage, String... excludedClassNames) {
+    public static ArchRule dataObjectClassAnnotationsRequired(String basePackage, String... excludedClassNames) {
         return ArchRuleDefinition.classes()
-                .should(
-                        new ArchCondition<JavaClass>(
-                                "declare required data object class annotations only") {
-                            @Override
-                            public void check(JavaClass item, ConditionEvents events) {
-                                if (!isDataObjectClassUnder(item, basePackage)
-                                        || Arrays.asList(excludedClassNames)
-                                                .contains(item.getFullName())) {
-                                    return;
-                                }
-                                Set<String> actualAnnotations = annotationTypeNames(item);
-                                Set<String> missingAnnotations =
-                                        missingAnnotations(
-                                                actualAnnotations,
-                                                DATA_OBJECT_REQUIRED_ANNOTATIONS);
-                                Set<String> extraAnnotations =
-                                        missingAnnotations(
-                                                DATA_OBJECT_REQUIRED_ANNOTATIONS,
-                                                actualAnnotations);
+                .should(new ArchCondition<JavaClass>("declare required data object class annotations only") {
+                    @Override
+                    public void check(JavaClass item, ConditionEvents events) {
+                        if (!isDataObjectClassUnder(item, basePackage)
+                                || Arrays.asList(excludedClassNames).contains(item.getFullName())) {
+                            return;
+                        }
+                        Set<String> actualAnnotations = annotationTypeNames(item);
+                        Set<String> missingAnnotations =
+                                missingAnnotations(actualAnnotations, DATA_OBJECT_REQUIRED_ANNOTATIONS);
+                        Set<String> extraAnnotations =
+                                missingAnnotations(DATA_OBJECT_REQUIRED_ANNOTATIONS, actualAnnotations);
 
-                                if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
-                                    events.add(
-                                            SimpleConditionEvent.violated(
-                                                    item,
-                                                    "["
-                                                            + NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS
-                                                            + "] "
-                                                            + item.getFullName()
-                                                            + " violates data object class annotations: missing="
-                                                            + missingAnnotations
-                                                            + ", extra="
-                                                            + extraAnnotations));
-                                }
-                            }
-                        })
+                        if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
+                            events.add(SimpleConditionEvent.violated(
+                                    item,
+                                    "["
+                                            + NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS
+                                            + "] "
+                                            + item.getFullName()
+                                            + " violates data object class annotations: missing="
+                                            + missingAnnotations
+                                            + ", extra="
+                                            + extraAnnotations));
+                        }
+                    }
+                })
                 .allowEmptyShould(true)
                 .because("RULE " + NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS);
     }
@@ -126,36 +104,30 @@ public final class ModelAnnotationArchitectureRuleSupport {
             final Set<String> requiredAnnotations,
             final String ruleName) {
         return ArchRuleDefinition.classes()
-                .should(
-                        new ArchCondition<JavaClass>(
-                                "declare required model class annotations only") {
-                            @Override
-                            public void check(JavaClass item, ConditionEvents events) {
-                                if (!isModelClassUnder(
-                                        item, basePackage, packageSegment, simpleNameSuffix)) {
-                                    return;
-                                }
-                                Set<String> actualAnnotations = annotationTypeNames(item);
-                                Set<String> missingAnnotations =
-                                        missingAnnotations(actualAnnotations, requiredAnnotations);
-                                Set<String> extraAnnotations =
-                                        missingAnnotations(requiredAnnotations, actualAnnotations);
+                .should(new ArchCondition<JavaClass>("declare required model class annotations only") {
+                    @Override
+                    public void check(JavaClass item, ConditionEvents events) {
+                        if (!isModelClassUnder(item, basePackage, packageSegment, simpleNameSuffix)) {
+                            return;
+                        }
+                        Set<String> actualAnnotations = annotationTypeNames(item);
+                        Set<String> missingAnnotations = missingAnnotations(actualAnnotations, requiredAnnotations);
+                        Set<String> extraAnnotations = missingAnnotations(requiredAnnotations, actualAnnotations);
 
-                                if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
-                                    events.add(
-                                            SimpleConditionEvent.violated(
-                                                    item,
-                                                    "["
-                                                            + ruleName
-                                                            + "] "
-                                                            + item.getFullName()
-                                                            + " violates model class annotations: missing="
-                                                            + missingAnnotations
-                                                            + ", extra="
-                                                            + extraAnnotations));
-                                }
-                            }
-                        })
+                        if (!missingAnnotations.isEmpty() || !extraAnnotations.isEmpty()) {
+                            events.add(SimpleConditionEvent.violated(
+                                    item,
+                                    "["
+                                            + ruleName
+                                            + "] "
+                                            + item.getFullName()
+                                            + " violates model class annotations: missing="
+                                            + missingAnnotations
+                                            + ", extra="
+                                            + extraAnnotations));
+                        }
+                    }
+                })
                 .allowEmptyShould(true)
                 .because("RULE " + ruleName);
     }
@@ -170,8 +142,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
     private static boolean isDataObjectClassUnder(JavaClass item, String basePackage) {
         return item.getPackageName().startsWith(basePackage + ".")
                 && item.getPackageName().contains(".persistence.dataobject")
-                && (item.getSimpleName().endsWith("DO")
-                        || item.getSimpleName().endsWith("DataObject"));
+                && (item.getSimpleName().endsWith("DO") || item.getSimpleName().endsWith("DataObject"));
     }
 
     private static Set<String> annotationTypeNames(JavaClass item) {
@@ -183,8 +154,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
         return annotationTypeNames;
     }
 
-    private static Set<String> missingAnnotations(
-            Set<String> actualAnnotations, Set<String> expectedAnnotations) {
+    private static Set<String> missingAnnotations(Set<String> actualAnnotations, Set<String> expectedAnnotations) {
         Set<String> missingAnnotations = new LinkedHashSet<String>(expectedAnnotations);
         missingAnnotations.removeAll(actualAnnotations);
         return missingAnnotations;
@@ -215,8 +185,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
     }
 
     private static List<String> sourceRoots() {
-        String configuredSourceRoots =
-                System.getProperty(SOURCE_ROOTS_PROPERTY, "src/main/java,src/test/java");
+        String configuredSourceRoots = System.getProperty(SOURCE_ROOTS_PROPERTY, "src/main/java,src/test/java");
         return Arrays.asList(configuredSourceRoots.split(","));
     }
 
@@ -231,8 +200,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
                 break;
             }
             if (trimmedLine.startsWith("@")) {
-                annotationTypeNames.add(
-                        resolveAnnotationName(item, imports, annotationSimpleName(trimmedLine)));
+                annotationTypeNames.add(resolveAnnotationName(item, imports, annotationSimpleName(trimmedLine)));
             }
         }
         return annotationTypeNames;
@@ -245,8 +213,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
             if (!trimmedLine.startsWith("import ") || trimmedLine.startsWith("import static ")) {
                 continue;
             }
-            String importedClass =
-                    trimmedLine.substring("import ".length(), trimmedLine.length() - 1);
+            String importedClass = trimmedLine.substring("import ".length(), trimmedLine.length() - 1);
             imports.put(importedClass.substring(importedClass.lastIndexOf('.') + 1), importedClass);
         }
         return imports;
@@ -264,8 +231,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
         return line.substring(1, endIndex);
     }
 
-    private static String resolveAnnotationName(
-            JavaClass item, Map<String, String> imports, String annotationName) {
+    private static String resolveAnnotationName(JavaClass item, Map<String, String> imports, String annotationName) {
         if (annotationName.contains(".")) {
             return annotationName;
         }

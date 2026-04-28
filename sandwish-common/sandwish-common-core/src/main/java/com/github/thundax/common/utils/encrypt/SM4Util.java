@@ -62,10 +62,7 @@ public class SM4Util {
      */
     private static byte[] encryptEcbPadding(byte[] key, byte[] data) throws Exception {
         Cipher cipher =
-                generateEcbCipher(
-                        ALGORITHM_NAME_ECB_PADDING,
-                        Cipher.ENCRYPT_MODE,
-                        key); // 声称Ecb暗号,通过第二个参数判断加密还是解密
+                generateEcbCipher(ALGORITHM_NAME_ECB_PADDING, Cipher.ENCRYPT_MODE, key); // 声称Ecb暗号,通过第二个参数判断加密还是解密
         return cipher.doFinal(data);
     }
 
@@ -110,10 +107,7 @@ public class SM4Util {
      */
     private static byte[] decryptEcbPadding(byte[] key, byte[] cipherText) throws Exception {
         Cipher cipher =
-                generateEcbCipher(
-                        ALGORITHM_NAME_ECB_PADDING,
-                        Cipher.DECRYPT_MODE,
-                        key); // 生成Ecb暗号,通过第二个参数判断加密还是解密
+                generateEcbCipher(ALGORITHM_NAME_ECB_PADDING, Cipher.DECRYPT_MODE, key); // 生成Ecb暗号,通过第二个参数判断加密还是解密
         return cipher.doFinal(cipherText);
     }
 
@@ -153,8 +147,7 @@ public class SM4Util {
      * @return
      * @throws Exception
      */
-    private static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key)
-            throws Exception {
+    private static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key) throws Exception {
         Cipher cipher = Cipher.getInstance(algorithmName, BouncyCastleProvider.PROVIDER_NAME);
         Key sm4Key = new SecretKeySpec(key, ALGORITHM_NAME);
         cipher.init(mode, sm4Key);
@@ -171,8 +164,7 @@ public class SM4Util {
      * @return 是否为同一数据
      * @throws Exception
      */
-    public static boolean verifyEcb(String key, String cipherText, String paramStr)
-            throws Exception {
+    public static boolean verifyEcb(String key, String cipherText, String paramStr) throws Exception {
         // 生成16进制密钥
         String hexKey = generateKey(key);
         // 用于接收校验结果

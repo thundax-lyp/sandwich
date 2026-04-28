@@ -153,7 +153,7 @@ public class StorageUtils {
             }
         }
 
-        StorageServiceHolder.getService().save(storage);
+        StorageServiceHolder.getService().add(storage);
     }
 
     @NonNull

@@ -52,7 +52,7 @@ public class RoleServiceImplTest {
         role.setMenuIdList(Arrays.asList("m1", "m2"));
         RoleServiceImpl service = new RoleServiceImpl(dao, signService);
 
-        service.save(role);
+        service.add(role);
 
         assertNotNull(role.getId());
         assertSame(role, dao.inserted);

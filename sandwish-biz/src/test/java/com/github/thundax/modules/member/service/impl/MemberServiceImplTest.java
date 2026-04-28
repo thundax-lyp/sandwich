@@ -68,7 +68,7 @@ public class MemberServiceImplTest {
         Member member = new Member();
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
-        service.save(member);
+        service.add(member);
 
         assertNotNull(member.getId());
         assertNotNull(member.getCreateDate());

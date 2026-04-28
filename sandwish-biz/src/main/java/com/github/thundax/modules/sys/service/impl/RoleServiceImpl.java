@@ -108,15 +108,21 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Role role) {
-        if (role.getIsNewRecord()) {
-            role.preInsert();
-            dao.insert(role);
-        } else {
-            role.preUpdate();
-            dao.update(role);
-        }
+    public void add(Role role) {
+        role.preInsert();
+        dao.insert(role);
+        afterWrite(role);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Role role) {
+        role.preUpdate();
+        dao.update(role);
+        afterWrite(role);
+    }
+
+    private void afterWrite(Role role) {
         dao.deleteRoleMenu(role.getId());
         if (role.getMenuIdList() != null && !role.getMenuIdList().isEmpty()) {
             dao.insertRoleMenu(role.getId(), role.getMenuIdList());

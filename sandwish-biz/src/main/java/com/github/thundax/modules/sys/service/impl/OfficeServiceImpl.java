@@ -89,14 +89,16 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Office entity) {
-        if (entity.getIsNewRecord()) {
-            entity.preInsert();
-            dao.insert(entity);
-        } else {
-            entity.preUpdate();
-            dao.update(entity);
-        }
+    public void add(Office entity) {
+        entity.preInsert();
+        dao.insert(entity);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Office entity) {
+        entity.preUpdate();
+        dao.update(entity);
     }
 
     @Override

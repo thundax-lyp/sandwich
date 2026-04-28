@@ -13,11 +13,18 @@ public interface AsyncTaskService {
     AsyncTask get(String id);
 
     /**
-     * 保存
+     * 新增
      *
      * @param asyncTask asyncTask
      */
-    void save(AsyncTask asyncTask);
+    void add(AsyncTask asyncTask);
+
+    /**
+     * 更新
+     *
+     * @param asyncTask asyncTask
+     */
+    void update(AsyncTask asyncTask);
 
     /**
      * 删除

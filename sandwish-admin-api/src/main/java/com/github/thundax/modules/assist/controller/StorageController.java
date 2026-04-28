@@ -156,7 +156,7 @@ public class StorageController extends BaseAdminController {
                     //                    localFile.getParentFile().mkdirs();
 
                     //                    file.transferTo(localFile);
-                    storageService.save(storage);
+                    storageService.add(storage);
 
                     response = storageInterfaceAssembler.toUploadResponse(storage);
 

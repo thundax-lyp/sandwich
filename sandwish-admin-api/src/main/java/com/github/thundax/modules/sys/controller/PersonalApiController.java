@@ -79,7 +79,7 @@ public class PersonalApiController extends BaseApiController implements Personal
         User currentUser = UserAccessHolder.currentUser();
 
         personalInterfaceAssembler.toEntity(currentUser, request);
-        userService.save(currentUser);
+        userService.update(currentUser);
 
         return personalInterfaceAssembler.toInfoResponse(currentUser);
     }

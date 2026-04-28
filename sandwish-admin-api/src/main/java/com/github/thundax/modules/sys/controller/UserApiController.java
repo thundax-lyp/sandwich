@@ -155,7 +155,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
-        userService.save(entity);
+        userService.add(entity);
 
         return userInterfaceAssembler.toResponse(entity);
     }
@@ -199,7 +199,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         User entity = userInterfaceAssembler.toEntity(bean, request);
 
-        userService.save(entity);
+        userService.update(entity);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
             entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));

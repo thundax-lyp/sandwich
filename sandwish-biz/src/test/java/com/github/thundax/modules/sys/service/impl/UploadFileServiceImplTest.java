@@ -43,7 +43,7 @@ public class UploadFileServiceImplTest {
         UploadFile file = new UploadFile();
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        service.save(file);
+        service.add(file);
 
         assertNotNull(file.getId());
         assertNotNull(file.getCreateDate());

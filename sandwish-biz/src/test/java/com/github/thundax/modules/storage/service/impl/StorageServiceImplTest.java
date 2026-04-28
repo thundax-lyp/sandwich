@@ -59,7 +59,7 @@ public class StorageServiceImplTest {
         Storage storage = new Storage();
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
-        service.save(storage);
+        service.add(storage);
 
         assertNotNull(storage.getId());
         assertNotNull(storage.getCreateDate());

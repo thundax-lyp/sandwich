@@ -76,7 +76,7 @@ public class MenuServiceImplTest {
         Menu menu = new Menu();
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
-        service.save(menu);
+        service.add(menu);
 
         assertNotNull(menu.getId());
         assertNotNull(menu.getCreateDate());
@@ -93,7 +93,7 @@ public class MenuServiceImplTest {
         menu.setIsNewRecord(false);
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
-        service.save(menu);
+        service.update(menu);
 
         assertNotNull(menu.getUpdateDate());
         assertSame(menu, dao.updated);

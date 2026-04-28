@@ -19,7 +19,9 @@ public interface MemberService {
 
     Page<Member> findPage(Member member, Page<Member> page);
 
-    void save(Member member);
+    void add(Member member);
+
+    void update(Member member);
 
     int delete(Member member);
 

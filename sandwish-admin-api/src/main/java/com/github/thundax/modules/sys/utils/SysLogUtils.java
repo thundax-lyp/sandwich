@@ -68,7 +68,7 @@ public class SysLogUtils {
         try {
             Log log = JsonUtils.fromJson(paramString, Log.class);
             if (log != null) {
-                LogServiceHolder.getService().save(log);
+                LogServiceHolder.getService().add(log);
 
                 try {
                     String filename = LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;

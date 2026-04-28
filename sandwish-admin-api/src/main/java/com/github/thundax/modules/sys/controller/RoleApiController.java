@@ -112,7 +112,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
             entity.setIsNewRecord(true);
         }
 
-        roleService.save(entity);
+        roleService.add(entity);
 
         return roleInterfaceAssembler.toResponse(entity);
     }
@@ -130,7 +130,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         Role entity = roleInterfaceAssembler.toEntity(bean, request);
 
-        roleService.save(entity);
+        roleService.update(entity);
 
         return roleInterfaceAssembler.toResponse(entity);
     }

@@ -97,14 +97,12 @@ public class KoalSignServiceImpl extends AbstractSignServiceImpl {
             } else {
                 signature.setIsVerifySign("2");
             }
-            signature.preUpdate();
-            signatureService.save(signature);
+            signatureService.update(signature);
             return isSuccess;
 
         } catch (RestClientException e) {
             signature.setIsVerifySign("2");
-            signature.preUpdate();
-            signatureService.save(signature);
+            signatureService.update(signature);
             logger.error("验签异常：{}", e.getMessage());
             return false;
         }
@@ -138,7 +136,13 @@ public class KoalSignServiceImpl extends AbstractSignServiceImpl {
             signature.setBusinessId(signaturePre.getBusinessId());
             signature.setIsVerifySign(signaturePre.getIsVerifySign());
             signature.setSignature(response.getB64SignedData());
-            signatureService.save(signature);
+            Signature existing = signatureService.find(signature.getBusinessType(), signature.getBusinessId());
+            if (existing == null) {
+                signatureService.add(signature);
+            } else {
+                signature.setId(existing.getId());
+                signatureService.update(signature);
+            }
 
         } catch (RestClientException e) {
             logger.error("签名对象：{}，签名异常：{}", signEntity, e.getMessage());

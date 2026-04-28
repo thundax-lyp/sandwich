@@ -70,14 +70,16 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Storage storage) {
-        if (storage.getIsNewRecord()) {
-            storage.preInsert();
-            dao.insert(storage);
-        } else {
-            storage.preUpdate();
-            dao.update(storage);
-        }
+    public void add(Storage storage) {
+        storage.preInsert();
+        dao.insert(storage);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Storage storage) {
+        storage.preUpdate();
+        dao.update(storage);
     }
 
     @Override

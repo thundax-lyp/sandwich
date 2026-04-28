@@ -105,15 +105,21 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Menu menu) {
-        if (menu.getIsNewRecord()) {
-            menu.preInsert();
-            dao.insert(menu);
-        } else {
-            menu.preUpdate();
-            dao.update(menu);
-        }
+    public void add(Menu menu) {
+        menu.preInsert();
+        dao.insert(menu);
+        afterWrite(menu);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Menu menu) {
+        menu.preUpdate();
+        dao.update(menu);
+        afterWrite(menu);
+    }
+
+    private void afterWrite(Menu menu) {
         signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
         notifyCacheChanged();
     }

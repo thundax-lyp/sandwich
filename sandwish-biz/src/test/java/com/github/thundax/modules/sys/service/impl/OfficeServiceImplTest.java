@@ -62,7 +62,7 @@ public class OfficeServiceImplTest {
         Office office = new Office();
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.save(office);
+        service.add(office);
 
         assertNotNull(office.getId());
         assertNotNull(office.getCreateDate());
@@ -76,7 +76,7 @@ public class OfficeServiceImplTest {
         office.setIsNewRecord(false);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.save(office);
+        service.update(office);
 
         assertNotNull(office.getUpdateDate());
         assertSame(office, dao.updated);

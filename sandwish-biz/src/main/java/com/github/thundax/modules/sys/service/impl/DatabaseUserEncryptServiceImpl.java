@@ -32,7 +32,8 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /** 加密保存队列名称 * */
-    public static final String QUEUE_ENCRYPT_SAVE = QUEUE_PREFIX + "encrypt.db.save";
+    public static final String QUEUE_ENCRYPT_ADD = QUEUE_PREFIX + "encrypt.db.add";
+    public static final String QUEUE_ENCRYPT_UPDATE = QUEUE_PREFIX + "encrypt.db.update";
 
     public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS = QUEUE_PREFIX + "encrypt.db.update.login.pass";
     public static final String QUEUE_ENCRYPT_QUERY = QUEUE_PREFIX + "encrypt.db.query";
@@ -67,9 +68,16 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public void save(UserEncrypt entity) {
+    public void add(UserEncrypt entity) {
         if (entity != null) {
-            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_SAVE, JsonUtils.toJson(entity));
+            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_ADD, JsonUtils.toJson(entity));
+        }
+    }
+
+    @Override
+    public void update(UserEncrypt entity) {
+        if (entity != null) {
+            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_UPDATE, JsonUtils.toJson(entity));
         }
     }
 
@@ -89,8 +97,8 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         return null;
     }
 
-    @RabbitListener(queues = QUEUE_ENCRYPT_SAVE, concurrency = "1")
-    public void enctyptSave(String encryptEntity) {
+    @RabbitListener(queues = QUEUE_ENCRYPT_ADD, concurrency = "1")
+    public void encryptAdd(String encryptEntity) {
         if (StringUtils.isBlank(encryptEntity)) {
             logger.warn("加密内容为空");
             return;
@@ -101,7 +109,26 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
             if (userEncryptPre == null) {
                 return;
             }
-            saveDirect(userEncryptPre);
+            addDirect(userEncryptPre);
+
+        } catch (RestClientException e) {
+            logger.error("加密对象：{}，加密异常：{}", encryptEntity, e.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = QUEUE_ENCRYPT_UPDATE, concurrency = "1")
+    public void encryptUpdate(String encryptEntity) {
+        if (StringUtils.isBlank(encryptEntity)) {
+            logger.warn("加密内容为空");
+            return;
+        }
+
+        try {
+            UserEncrypt userEncryptPre = JsonUtils.fromJson(encryptEntity, UserEncrypt.class);
+            if (userEncryptPre == null) {
+                return;
+            }
+            updateDirect(userEncryptPre);
 
         } catch (RestClientException e) {
             logger.error("加密对象：{}，加密异常：{}", encryptEntity, e.getMessage());
@@ -218,14 +245,14 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         return batchOperate(list, this::updateDelFlag);
     }
 
-    private void saveDirect(UserEncrypt entity) {
-        if (entity.getIsNewRecord()) {
-            entity.preInsert();
-            dao.insert(entity);
-        } else {
-            entity.preUpdate();
-            dao.update(entity);
-        }
+    private void addDirect(UserEncrypt entity) {
+        entity.preInsert();
+        dao.insert(entity);
+    }
+
+    private void updateDirect(UserEncrypt entity) {
+        entity.preUpdate();
+        dao.update(entity);
     }
 
     private int batchOperate(Collection<UserEncrypt> collection, Function<UserEncrypt, Integer> operator) {

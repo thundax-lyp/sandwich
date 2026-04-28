@@ -89,14 +89,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Member member) {
-        if (member.getIsNewRecord()) {
-            member.preInsert();
-            dao.insert(member);
-        } else {
-            member.preUpdate();
-            dao.update(member);
-        }
+    public void add(Member member) {
+        member.preInsert();
+        dao.insert(member);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Member member) {
+        member.preUpdate();
+        dao.update(member);
     }
 
     @Override

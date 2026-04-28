@@ -71,13 +71,20 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Log log) {
+    public void add(Log log) {
         log.preInsert();
         dao.insert(log);
 
         if (log.isSignable()) {
             signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Log log) {
+        log.preUpdate();
+        dao.update(log);
     }
 
     @Override

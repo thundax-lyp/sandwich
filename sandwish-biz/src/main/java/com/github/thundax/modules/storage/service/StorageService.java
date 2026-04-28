@@ -15,7 +15,9 @@ public interface StorageService {
 
     Page<Storage> findPage(Storage storage, Page<Storage> page);
 
-    void save(Storage storage);
+    void add(Storage storage);
+
+    void update(Storage storage);
 
     int delete(Storage storage);
 

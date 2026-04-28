@@ -93,7 +93,7 @@ public class LogServiceImplTest {
         log.setType(Log.TYPE_EXCEPTION);
         LogServiceImpl service = new LogServiceImpl(dao, signService);
 
-        service.save(log);
+        service.add(log);
 
         assertNotNull(log.getId());
         assertNotNull(log.getCreateDate());
@@ -224,6 +224,11 @@ public class LogServiceImplTest {
         @Override
         public int insert(Log log) {
             this.inserted = log;
+            return 1;
+        }
+
+        @Override
+        public int update(Log log) {
             return 1;
         }
 

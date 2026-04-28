@@ -30,12 +30,17 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     /**
-     * 保存
+     * 新增
      *
      * @param entity 对象
      */
     @Override
-    public void save(UserEncrypt entity) {
+    public void add(UserEncrypt entity) {
+        // 默认不做任何处理
+    }
+
+    @Override
+    public void update(UserEncrypt entity) {
         // 默认不做任何处理
     }
 

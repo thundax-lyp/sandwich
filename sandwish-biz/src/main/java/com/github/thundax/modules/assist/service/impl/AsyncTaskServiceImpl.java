@@ -23,15 +23,17 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     }
 
     @Override
-    public void save(AsyncTask asyncTask) {
-        if (StringUtils.isEmpty(asyncTask.getId())) {
+    public void add(AsyncTask asyncTask) {
+        if (StringUtils.isBlank(asyncTask.getId())) {
             asyncTask.setId(IdGen.uuid());
-            asyncTask.setCreateDate(new Date());
-            asyncTask.setUpdateDate(new Date());
-            asyncTaskDao.insert(asyncTask);
-            return;
         }
+        asyncTask.setCreateDate(new Date());
+        asyncTask.setUpdateDate(new Date());
+        asyncTaskDao.insert(asyncTask);
+    }
 
+    @Override
+    public void update(AsyncTask asyncTask) {
         asyncTask.setUpdateDate(new Date());
         asyncTaskDao.update(asyncTask);
     }

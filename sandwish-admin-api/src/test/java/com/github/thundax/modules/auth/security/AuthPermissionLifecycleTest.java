@@ -214,7 +214,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void save(User entity) {}
+        public void add(User entity) {}
+
+        @Override
+        public void update(User entity) {}
 
         @Override
         public int delete(User entity) {
@@ -334,7 +337,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void save(Menu entity) {}
+        public void add(Menu entity) {}
+
+        @Override
+        public void update(Menu entity) {}
 
         @Override
         public int delete(Menu entity) {

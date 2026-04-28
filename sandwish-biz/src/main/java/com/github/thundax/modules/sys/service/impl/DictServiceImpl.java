@@ -113,14 +113,16 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Dict dict) {
-        if (dict.getIsNewRecord()) {
-            dict.preInsert();
-            dao.insert(dict);
-        } else {
-            dict.preUpdate();
-            dao.update(dict);
-        }
+    public void add(Dict dict) {
+        dict.preInsert();
+        dao.insert(dict);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Dict dict) {
+        dict.preUpdate();
+        dao.update(dict);
     }
 
     @Override

@@ -49,16 +49,14 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Signature entity) {
-        Signature existing = find(entity.getBusinessType(), entity.getBusinessId());
-        if (entity.getIsNewRecord() && existing == null) {
-            entity.preInsert();
-            dao.insert(entity);
-            return;
-        }
-        if (StringUtils.isBlank(entity.getId()) && existing != null) {
-            entity.setId(existing.getId());
-        }
+    public void add(Signature entity) {
+        entity.preInsert();
+        dao.insert(entity);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(Signature entity) {
         entity.preUpdate();
         dao.update(entity);
     }

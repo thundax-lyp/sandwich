@@ -82,11 +82,18 @@ public interface CrudService<T> extends BaseService {
     long count(T entity);
 
     /**
-     * 保存，新增或更新
+     * 新增
      *
      * @param entity 对象
      */
-    void save(T entity);
+    void add(T entity);
+
+    /**
+     * 更新
+     *
+     * @param entity 对象
+     */
+    void update(T entity);
 
     /**
      * 删除

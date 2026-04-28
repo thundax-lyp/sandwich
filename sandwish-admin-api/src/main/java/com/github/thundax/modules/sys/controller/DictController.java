@@ -55,7 +55,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
     @Override
     public DictResponse add(@RequestBody DictSaveRequest request) throws ApiException {
         Dict dict = dictInterfaceAssembler.toEntity(new Dict(), request);
-        dictService.save(dict);
+        dictService.add(dict);
         return dictInterfaceAssembler.toResponse(dict);
     }
 
@@ -66,7 +66,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
             throw new ApiException("id not exist");
         }
         Dict entity = dictInterfaceAssembler.toEntity(dict, request);
-        dictService.save(entity);
+        dictService.update(entity);
         return dictInterfaceAssembler.toResponse(entity);
     }
 

@@ -31,7 +31,13 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         signature.setBusinessId(businessId);
         signature.setSignature(createSignature(body));
         signature.setIsVerifySign("0");
-        signatureService.save(signature);
+        Signature existing = signatureService.find(businessType, businessId);
+        if (existing == null) {
+            signatureService.add(signature);
+        } else {
+            signature.setId(existing.getId());
+            signatureService.update(signature);
+        }
 
         return true;
     }
@@ -52,8 +58,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         } else {
             signature.setIsVerifySign("2");
         }
-        signature.preUpdate();
-        signatureService.save(signature);
+        signatureService.update(signature);
         return isSuccess;
     }
 

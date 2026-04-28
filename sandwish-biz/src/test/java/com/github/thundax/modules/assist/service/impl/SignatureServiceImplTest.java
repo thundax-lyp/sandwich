@@ -55,7 +55,7 @@ public class SignatureServiceImplTest {
         Signature signature = new Signature(null, "Menu", "m1");
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
-        service.save(signature);
+        service.add(signature);
 
         assertNotNull(signature.getId());
         assertNotNull(signature.getCreateDate());
@@ -65,13 +65,12 @@ public class SignatureServiceImplTest {
     }
 
     @Test
-    public void shouldUpdateExistingBusinessKeyWhenSavingNewEntity() {
+    public void shouldPrepareEntityBeforeUpdate() {
         RecordingSignatureDao dao = new RecordingSignatureDao();
-        dao.findResult = new Signature("s1", "Menu", "m1");
-        Signature signature = new Signature(null, "Menu", "m1");
+        Signature signature = new Signature("s1", "Menu", "m1");
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
-        service.save(signature);
+        service.update(signature);
 
         assertEquals("s1", signature.getId());
         assertNotNull(signature.getUpdateDate());

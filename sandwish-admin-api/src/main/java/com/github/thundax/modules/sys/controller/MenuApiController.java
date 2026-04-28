@@ -93,7 +93,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
             }
         }
 
-        menuService.save(entity);
+        menuService.add(entity);
 
         return menuInterfaceAssembler.toResponse(entity);
     }
@@ -117,7 +117,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
         Menu entity = menuInterfaceAssembler.toEntity(bean, request);
 
-        menuService.save(entity);
+        menuService.update(entity);
 
         return menuInterfaceAssembler.toResponse(entity);
     }

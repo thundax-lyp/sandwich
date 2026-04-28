@@ -121,15 +121,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(User user) {
-        if (user.getIsNewRecord()) {
-            user.preInsert();
-            dao.insert(user);
-        } else {
-            user.preUpdate();
-            dao.update(user);
-        }
+    public void add(User user) {
+        user.preInsert();
+        dao.insert(user);
+        afterWrite(user, true);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(User user) {
+        user.preUpdate();
+        dao.update(user);
+        afterWrite(user, false);
+    }
+
+    private void afterWrite(User user, boolean added) {
         dao.deleteUserRole(user.getId());
         if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
             dao.insertUserRole(user.getId(), user.getRoleIdList());
@@ -142,7 +148,11 @@ public class UserServiceImpl implements UserService {
         userEncrypt.setEmail(user.getEmail());
         userEncrypt.setMobile(user.getMobile());
         userEncrypt.setTel(user.getTel());
-        userEncryptService.save(userEncrypt);
+        if (added) {
+            userEncryptService.add(userEncrypt);
+        } else {
+            userEncryptService.update(userEncrypt);
+        }
     }
 
     @Override

@@ -12,7 +12,9 @@ public interface LogService {
 
     Page<Log> findPage(Log log, Page<Log> page);
 
-    void save(Log log);
+    void add(Log log);
+
+    void update(Log log);
 
     int delete(Log log);
 

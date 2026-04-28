@@ -90,7 +90,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
             }
         }
 
-        officeService.save(entity);
+        officeService.add(entity);
 
         return officeInterfaceAssembler.toResponse(entity);
     }
@@ -114,7 +114,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
         Office entity = officeInterfaceAssembler.toEntity(bean, request);
 
-        officeService.save(entity);
+        officeService.update(entity);
 
         return officeInterfaceAssembler.toResponse(entity);
     }

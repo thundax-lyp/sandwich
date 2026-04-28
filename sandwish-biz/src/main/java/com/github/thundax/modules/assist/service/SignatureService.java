@@ -30,11 +30,18 @@ public interface SignatureService {
     Page<Signature> findPage(String businessType, Page<Signature> page);
 
     /**
-     * 保存签名结果。
+     * 新增签名结果。
      *
      * @param entity 签名结果
      */
-    void save(Signature entity);
+    void add(Signature entity);
+
+    /**
+     * 更新签名结果。
+     *
+     * @param entity 签名结果
+     */
+    void update(Signature entity);
 
     /**
      * 删除签名结果。

@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
-/** 后台权限会话 Redis DAO 实现。 */
 @Repository
 @Profile("!test")
 public class PermissionDaoImpl implements PermissionDao {

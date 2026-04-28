@@ -52,15 +52,14 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     @Override
-    public int upsert(Signature entity) {
+    public int insert(Signature entity) {
+        return mapper.insert(SignaturePersistenceAssembler.toDataObject(entity));
+    }
+
+    @Override
+    public int update(Signature entity) {
         SignatureDO dataObject = SignaturePersistenceAssembler.toDataObject(entity);
-        int updated = mapper.update(
-                buildUpdateDataObject(dataObject),
-                buildBusinessKeyUpdateWrapper(dataObject.getBusinessType(), dataObject.getBusinessId()));
-        if (updated > 0) {
-            return updated;
-        }
-        return mapper.insert(dataObject);
+        return mapper.update(buildUpdateDataObject(dataObject), buildIdUpdateWrapper(dataObject.getId()));
     }
 
     @Override
@@ -83,10 +82,9 @@ public class SignatureDaoImpl implements SignatureDao {
         return wrapper;
     }
 
-    private LambdaUpdateWrapper<SignatureDO> buildBusinessKeyUpdateWrapper(String businessType, String businessId) {
+    private LambdaUpdateWrapper<SignatureDO> buildIdUpdateWrapper(String id) {
         LambdaUpdateWrapper<SignatureDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(SignatureDO::getBusinessType, businessType);
-        wrapper.eq(SignatureDO::getBusinessId, businessId);
+        wrapper.eq(SignatureDO::getId, id);
         return wrapper;
     }
 

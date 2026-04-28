@@ -67,7 +67,7 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
     }
 
     @Override
-    public void save(AccessToken accessToken) {
+    public void insert(AccessToken accessToken) {
         Assert.notNull(accessToken.getToken(), "token can not be null");
         Assert.notNull(accessToken.getUserId(), "userId can not be null");
 

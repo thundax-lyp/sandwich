@@ -34,7 +34,7 @@ public class PermissionDaoImpl implements PermissionDao {
     }
 
     @Override
-    public void save(PermissionSession session, int expiredSeconds) {
+    public void insert(PermissionSession session, int expiredSeconds) {
         Assert.hasText(session.getToken(), "token can not be empty");
         String key = TOKEN_PREFIX + session.getToken();
         cache.put(key, session, expiredSeconds, TimeUnit.SECONDS);

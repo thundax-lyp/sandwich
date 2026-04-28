@@ -6,7 +6,7 @@ public interface PermissionDao {
 
     PermissionSession getByToken(String token);
 
-    void save(PermissionSession session, int expiredSeconds);
+    void insert(PermissionSession session, int expiredSeconds);
 
     void touch(String token, int expiredSeconds);
 

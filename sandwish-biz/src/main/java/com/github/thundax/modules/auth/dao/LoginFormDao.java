@@ -10,7 +10,7 @@ public interface LoginFormDao {
 
     LoginForm getByRefreshToken(String refreshToken);
 
-    void save(LoginForm form);
+    void insert(LoginForm form);
 
     void deleteByToken(String loginToken);
 

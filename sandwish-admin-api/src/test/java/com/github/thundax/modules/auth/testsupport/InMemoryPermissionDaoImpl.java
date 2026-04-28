@@ -22,7 +22,7 @@ public class InMemoryPermissionDaoImpl implements PermissionDao {
     }
 
     @Override
-    public void save(PermissionSession session, int expiredSeconds) {
+    public void insert(PermissionSession session, int expiredSeconds) {
         sessions.put(session.getToken(), session);
         this.expiredSeconds.put(session.getToken(), expiredSeconds);
     }

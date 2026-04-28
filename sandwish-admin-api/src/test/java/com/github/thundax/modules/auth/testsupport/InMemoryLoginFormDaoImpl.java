@@ -31,7 +31,7 @@ public class InMemoryLoginFormDaoImpl implements LoginFormDao {
     }
 
     @Override
-    public void save(LoginForm form) {
+    public void insert(LoginForm form) {
         forms.put(form.getLoginToken(), form);
         for (String refreshToken : form.getRefreshTokenList()) {
             refreshTokens.put(refreshToken, form.getLoginToken());

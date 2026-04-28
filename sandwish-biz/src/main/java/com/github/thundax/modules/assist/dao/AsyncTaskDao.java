@@ -7,7 +7,9 @@ public interface AsyncTaskDao {
 
     AsyncTask get(String id);
 
-    void save(AsyncTask asyncTask);
+    void insert(AsyncTask asyncTask);
+
+    void update(AsyncTask asyncTask);
 
     void delete(AsyncTask asyncTask);
 }

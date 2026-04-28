@@ -15,7 +15,7 @@ public class KeypairPrivateKeyDaoImpl implements KeypairPrivateKeyDao {
     private Cache<String, String> cache;
 
     @Override
-    public void save(String token, String privateKey, int expiredSeconds) {
+    public void insert(String token, String privateKey, int expiredSeconds) {
         cache.put(token, privateKey, expiredSeconds, TimeUnit.SECONDS);
     }
 

@@ -31,7 +31,7 @@ public class InMemoryAccessTokenDaoImpl implements AccessTokenDao {
     }
 
     @Override
-    public void save(AccessToken accessToken) {
+    public void insert(AccessToken accessToken) {
         tokenUserIds.put(accessToken.getToken(), accessToken.getUserId());
         userTokens.put(accessToken.getUserId(), accessToken);
     }

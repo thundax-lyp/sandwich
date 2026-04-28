@@ -50,12 +50,20 @@ public interface SignatureDao {
     Page<Signature> findPage(String businessType, int pageNo, int pageSize);
 
     /**
-     * 插入或更新
+     * 插入签名。
      *
      * @param entity 签名数据
      * @return 变更数量
      */
-    int upsert(Signature entity);
+    int insert(Signature entity);
+
+    /**
+     * 更新签名。
+     *
+     * @param entity 签名数据
+     * @return 变更数量
+     */
+    int update(Signature entity);
 
     /**
      * 删除签名。

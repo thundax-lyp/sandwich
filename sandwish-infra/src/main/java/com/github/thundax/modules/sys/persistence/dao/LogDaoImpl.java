@@ -74,6 +74,11 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
+    public int update(Log entity) {
+        return mapper.updateById(LogPersistenceAssembler.toDataObject(entity));
+    }
+
+    @Override
     public int delete(String id) {
         return mapper.deleteById(id);
     }

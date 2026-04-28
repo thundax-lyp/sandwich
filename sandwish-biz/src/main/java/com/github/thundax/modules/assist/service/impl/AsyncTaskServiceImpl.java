@@ -27,11 +27,13 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
         if (StringUtils.isEmpty(asyncTask.getId())) {
             asyncTask.setId(IdGen.uuid());
             asyncTask.setCreateDate(new Date());
+            asyncTask.setUpdateDate(new Date());
+            asyncTaskDao.insert(asyncTask);
+            return;
         }
 
         asyncTask.setUpdateDate(new Date());
-
-        asyncTaskDao.save(asyncTask);
+        asyncTaskDao.update(asyncTask);
     }
 
     @Override

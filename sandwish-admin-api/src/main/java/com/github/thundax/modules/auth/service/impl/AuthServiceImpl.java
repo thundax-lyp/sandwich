@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
             form.setPrivateKey(keyPair.getPrivateKey());
         }
 
-        loginFormDao.save(form);
+        loginFormDao.insert(form);
 
         return form;
     }
@@ -115,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
         form.setExpiredSeconds(properties.getLoginExpiredSeconds());
         form.setCheckCode(AuthUtils.currentCheckCode());
 
-        loginFormDao.save(form);
+        loginFormDao.insert(form);
 
         return form;
     }
@@ -221,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
         accessToken.setUserId(userId);
         accessToken.setCheckCode(AuthUtils.currentCheckCode());
 
-        accessTokenDao.save(accessToken);
+        accessTokenDao.insert(accessToken);
         permissionService.createSession(token, userId);
 
         return accessToken;

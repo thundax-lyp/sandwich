@@ -25,7 +25,7 @@ public class KeypairServiceImpl implements KeypairService {
     @Override
     public String createPublicKey(String token) {
         Sm2.StringKeyPair keyPair = Sm2.generateKeyPair();
-        keypairPrivateKeyDao.save(
+        keypairPrivateKeyDao.insert(
                 token, keyPair.getPrivateKey(), properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         return keyPair.getPublicKey();
     }

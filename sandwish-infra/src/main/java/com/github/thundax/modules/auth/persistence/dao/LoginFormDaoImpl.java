@@ -73,7 +73,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
     }
 
     @Override
-    public void save(LoginForm form) {
+    public void insert(LoginForm form) {
         Assert.isTrue(
                 form.getRefreshTokenList() != null
                         && !form.getRefreshTokenList().isEmpty(),

@@ -26,12 +26,13 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     }
 
     @Override
-    public void save(AsyncTask asyncTask) {
-        cache.put(
-                cacheKey(asyncTask.getId()),
-                AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
-                asyncTask.getExpiredSeconds(),
-                TimeUnit.SECONDS);
+    public void insert(AsyncTask asyncTask) {
+        put(asyncTask);
+    }
+
+    @Override
+    public void update(AsyncTask asyncTask) {
+        put(asyncTask);
     }
 
     @Override
@@ -41,5 +42,13 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private String cacheKey(String id) {
         return CACHE_SECTION + id;
+    }
+
+    private void put(AsyncTask asyncTask) {
+        cache.put(
+                cacheKey(asyncTask.getId()),
+                AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
+                asyncTask.getExpiredSeconds(),
+                TimeUnit.SECONDS);
     }
 }

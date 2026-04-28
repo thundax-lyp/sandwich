@@ -35,6 +35,8 @@ public interface LogDao {
 
     int insert(Log log);
 
+    int update(Log log);
+
     int delete(String id);
 
     /**

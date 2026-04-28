@@ -51,7 +51,7 @@ public class PermissionServiceImpl implements PermissionService {
         session.setVersion(UUID.randomUUID().toString());
         session.setTimestamp(System.currentTimeMillis());
 
-        permissionDao.save(session, expiredSeconds());
+        permissionDao.insert(session, expiredSeconds());
 
         return session;
     }

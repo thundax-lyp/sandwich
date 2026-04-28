@@ -60,7 +60,24 @@ public class SignatureServiceImplTest {
         assertNotNull(signature.getId());
         assertNotNull(signature.getCreateDate());
         assertNotNull(signature.getUpdateDate());
-        assertSame(signature, dao.savedEntity);
+        assertSame(signature, dao.insertedEntity);
+        assertEquals(null, dao.updatedEntity);
+    }
+
+    @Test
+    public void shouldUpdateExistingBusinessKeyWhenSavingNewEntity() {
+        RecordingSignatureDao dao = new RecordingSignatureDao();
+        dao.findResult = new Signature("s1", "Menu", "m1");
+        Signature signature = new Signature(null, "Menu", "m1");
+
+        SignatureServiceImpl service = new SignatureServiceImpl(dao);
+        service.save(signature);
+
+        assertEquals("s1", signature.getId());
+        assertNotNull(signature.getUpdateDate());
+        assertEquals(null, signature.getCreateDate());
+        assertSame(signature, dao.updatedEntity);
+        assertEquals(null, dao.insertedEntity);
     }
 
     @Test
@@ -86,7 +103,8 @@ public class SignatureServiceImplTest {
         private String pageBusinessType;
         private int pageNo;
         private int pageSize;
-        private Signature savedEntity;
+        private Signature insertedEntity;
+        private Signature updatedEntity;
         private List<String> deletedBusinessKeys = new java.util.ArrayList<>();
 
         @Override
@@ -123,8 +141,14 @@ public class SignatureServiceImplTest {
         }
 
         @Override
-        public int upsert(Signature entity) {
-            this.savedEntity = entity;
+        public int insert(Signature entity) {
+            this.insertedEntity = entity;
+            return 1;
+        }
+
+        @Override
+        public int update(Signature entity) {
+            this.updatedEntity = entity;
             return 1;
         }
 

@@ -10,7 +10,7 @@ public interface AccessTokenDao {
 
     AccessToken getByUserId(String userId);
 
-    void save(AccessToken accessToken);
+    void insert(AccessToken accessToken);
 
     void active(AccessToken accessToken);
 

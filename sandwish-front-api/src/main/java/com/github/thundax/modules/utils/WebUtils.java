@@ -3,7 +3,6 @@ package com.github.thundax.modules.utils;
 import com.github.thundax.autoconfigure.WebProperties;
 import com.github.thundax.common.utils.SpringContextHolder;
 
-/** @Auther: zhangrudong @Date: 2021/10/20 15:31 @Description: */
 public class WebUtils {
 
     private static WebProperties properties;

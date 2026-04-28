@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-/** @Auther: zhangrudong @Date: 2021/10/29 15:32 @Description: */
 public class SmsUtils {
     private static Logger logger = LoggerFactory.getLogger(SmsUtils.class);
 
@@ -42,10 +41,6 @@ public class SmsUtils {
         if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(message)) {
             return false;
         }
-        //        System.out.println(getProperties().getUsername());
-        //        System.out.println(getProperties().getPassword());
-        //        SmsContent smsContent = create(mobile, message);
-        //        logger.info("发送内容：{}",JsonUtils.toJson(smsContent));
         try {
             String result = post(getProperties().getUrl(), generateParams(mobile, message));
             logger.info("发送结果：{}", result);

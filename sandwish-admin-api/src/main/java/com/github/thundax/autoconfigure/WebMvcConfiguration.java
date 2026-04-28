@@ -39,18 +39,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         return bean;
     }
 
-    //    @Bean
-    //    public ServletRegistrationBean<StorageServlet>
-    // storageServletServletRegistrationBean(VltavaProperties properties) {
-    //        VltavaProperties.UploadProperties upload = properties.getUpload();
-    //
-    //        ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-    //        bean.setServlet(new StorageServlet(upload.getStoragePath()));
-    //        bean.addUrlMappings(upload.getServletPath() + "*");
-    //
-    //        return bean;
-    //    }
-
     @Bean
     public FilterRegistrationBean<ResponseWrapperFilter> responseWrapperFilter(VltavaProperties properties) {
         VltavaProperties.ResponseWrapperFilterProperties wrapperFilterProperties =

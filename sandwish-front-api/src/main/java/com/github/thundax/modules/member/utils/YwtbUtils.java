@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.utils;
 
 import com.github.thundax.common.utils.SpringContextHolder;
 
-/** @Auther: zhangrudong @Date: 2021/10/20 15:31 @Description: */
 public class YwtbUtils {
 
     private static YwtbProperties properties;

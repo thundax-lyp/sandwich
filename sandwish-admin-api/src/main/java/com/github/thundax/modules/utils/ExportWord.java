@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-/** @Auther: zhangrudong @Date: 2022/1/10 17:26 @Description: */
 public class ExportWord {
 
     private FreeMarkerConfigurer configurer;

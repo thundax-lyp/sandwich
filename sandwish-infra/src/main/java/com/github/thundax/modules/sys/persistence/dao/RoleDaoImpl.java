@@ -116,9 +116,7 @@ public class RoleDaoImpl implements RoleDao {
                         .set(RoleDO::getAdminFlag, dataObject.getAdminFlag())
                         .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(RoleDO::getPriority, dataObject.getPriority())
-                        .set(RoleDO::getRemarks, dataObject.getRemarks())
-                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(RoleDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -143,11 +141,7 @@ public class RoleDaoImpl implements RoleDao {
     public int updateEnableFlag(Role role) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
-                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(RoleDO::getEnableFlag, dataObject.getEnableFlag()));
         cacheSupport.removeById(role.getId());
         return count;
     }

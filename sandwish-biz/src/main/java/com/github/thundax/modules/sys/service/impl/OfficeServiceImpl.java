@@ -90,14 +90,12 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Office entity) {
-        entity.preInsert();
         entity.setId(dao.insert(entity));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Office entity) {
-        entity.preUpdate();
         dao.update(entity);
     }
 
@@ -123,7 +121,6 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Office office) {
-        office.preUpdate();
         return dao.updatePriority(office);
     }
 

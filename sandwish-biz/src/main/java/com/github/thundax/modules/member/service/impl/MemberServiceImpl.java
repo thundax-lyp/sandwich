@@ -90,14 +90,12 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Member member) {
-        member.preInsert();
         member.setId(dao.insert(member));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Member member) {
-        member.preUpdate();
         dao.update(member);
     }
 
@@ -128,7 +126,6 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Member member) {
-        member.preUpdate();
         return dao.updatePriority(member);
     }
 
@@ -171,7 +168,6 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(Member member) {
-        member.preUpdate();
         dao.updateLoginPass(member);
     }
 

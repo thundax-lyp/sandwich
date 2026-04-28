@@ -106,7 +106,6 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Menu menu) {
-        menu.preInsert();
         menu.setId(dao.insert(menu));
         afterWrite(menu);
     }
@@ -114,7 +113,6 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Menu menu) {
-        menu.preUpdate();
         dao.update(menu);
         afterWrite(menu);
     }
@@ -127,7 +125,6 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateDisplayFlag(Menu menu) {
-        menu.preUpdate();
         int result = dao.updateDisplayFlag(menu);
         signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
         notifyCacheChanged();
@@ -143,7 +140,6 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Menu menu) {
-        menu.preUpdate();
         return dao.updatePriority(menu);
     }
 

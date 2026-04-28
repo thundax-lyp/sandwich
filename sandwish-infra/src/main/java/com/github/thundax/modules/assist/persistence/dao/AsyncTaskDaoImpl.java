@@ -8,6 +8,8 @@ import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersistenceAssembler;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
+import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
@@ -26,11 +28,19 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     @Override
     public void insert(AsyncTask asyncTask) {
+        Date now = new Date();
+        String currentUserId = UserAccessHolder.currentUserId();
+        asyncTask.setCreateDate(now);
+        asyncTask.setCreateUserId(currentUserId);
+        asyncTask.setUpdateDate(now);
+        asyncTask.setUpdateUserId(currentUserId);
         put(asyncTask);
     }
 
     @Override
     public void update(AsyncTask asyncTask) {
+        asyncTask.setUpdateDate(new Date());
+        asyncTask.setUpdateUserId(UserAccessHolder.currentUserId());
         put(asyncTask);
     }
 

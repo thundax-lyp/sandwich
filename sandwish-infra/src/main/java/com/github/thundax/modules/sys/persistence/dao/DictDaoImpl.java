@@ -103,9 +103,7 @@ public class DictDaoImpl implements DictDao {
                         .set(DictDO::getLabel, dataObject.getLabel())
                         .set(DictDO::getType, dataObject.getType())
                         .set(DictDO::getPriority, dataObject.getPriority())
-                        .set(DictDO::getRemarks, dataObject.getRemarks())
-                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(DictDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
         return count;
     }
@@ -114,11 +112,7 @@ public class DictDaoImpl implements DictDao {
     public int updatePriority(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(DictDO::getPriority, dataObject.getPriority())
-                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(DictDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeAll();
         return count;
     }

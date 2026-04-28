@@ -127,9 +127,7 @@ public class MenuDaoImpl implements MenuDao {
                         .set(MenuDO::getTarget, dataObject.getTarget())
                         .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
                         .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
-                        .set(MenuDO::getRemarks, dataObject.getRemarks())
-                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(MenuDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
         return count;
     }
@@ -138,11 +136,7 @@ public class MenuDaoImpl implements MenuDao {
     public int updatePriority(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MenuDO::getPriority, dataObject.getPriority())
-                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(MenuDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -209,11 +203,7 @@ public class MenuDaoImpl implements MenuDao {
     public int updateDisplayFlag(Menu menu) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
-                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag()));
         cacheSupport.removeById(menu.getId());
         return count;
     }

@@ -62,6 +62,19 @@ public class PersistenceMigrationArchitectureTest {
         }
     }
 
+    @Test
+    public void shouldNotFillAuditFieldsInServiceLayer() throws IOException {
+        Path root = repositoryRoot();
+        Path bizMain = root.resolve("sandwish-biz").resolve("src/main/java");
+        try (Stream<Path> paths = Files.walk(bizMain)) {
+            assertFalse(
+                    "Service layer must not call preInsert/preUpdate to fill persistence audit fields",
+                    paths.filter(Files::isRegularFile)
+                            .filter(path -> path.toString().endsWith("ServiceImpl.java"))
+                            .anyMatch(this::containsEntityPreWriteHook));
+        }
+    }
+
     private boolean isProjectSource(Path path) {
         String value = path.toString();
         return value.endsWith(".java") || value.endsWith(".xml") || value.endsWith("pom.xml");
@@ -76,6 +89,15 @@ public class PersistenceMigrationArchitectureTest {
                     || content.contains("CrudDao")
                     || content.contains("CrudServiceImpl")
                     || content.contains("MyBatisDao");
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private boolean containsEntityPreWriteHook(Path path) {
+        try {
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return content.contains(".preInsert()") || content.contains(".preUpdate()");
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -58,8 +58,8 @@ public class SignatureServiceImplTest {
         service.add(signature);
 
         assertNotNull(signature.getId());
-        assertNotNull(signature.getCreateDate());
-        assertNotNull(signature.getUpdateDate());
+        assertEquals(null, signature.getCreateDate());
+        assertEquals(null, signature.getUpdateDate());
         assertSame(signature, dao.insertedEntity);
         assertEquals(null, dao.updatedEntity);
     }
@@ -73,7 +73,7 @@ public class SignatureServiceImplTest {
         service.update(signature);
 
         assertEquals("s1", signature.getId());
-        assertNotNull(signature.getUpdateDate());
+        assertEquals(null, signature.getUpdateDate());
         assertEquals(null, signature.getCreateDate());
         assertSame(signature, dao.updatedEntity);
         assertEquals(null, dao.insertedEntity);

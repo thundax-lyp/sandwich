@@ -114,14 +114,12 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Dict dict) {
-        dict.preInsert();
         dict.setId(dao.insert(dict));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Dict dict) {
-        dict.preUpdate();
         dao.update(dict);
     }
 
@@ -140,7 +138,6 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Dict dict) {
-        dict.preUpdate();
         return dao.updatePriority(dict);
     }
 

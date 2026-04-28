@@ -82,14 +82,12 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(UploadFile entity) {
-        entity.preInsert();
         entity.setId(dao.insert(entity));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(UploadFile entity) {
-        entity.preUpdate();
         dao.update(entity);
     }
 
@@ -108,7 +106,6 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(UploadFile entity) {
-        entity.preUpdate();
         return dao.updatePriority(entity);
     }
 

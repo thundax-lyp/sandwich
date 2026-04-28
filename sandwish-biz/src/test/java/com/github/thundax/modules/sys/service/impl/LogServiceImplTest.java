@@ -96,7 +96,7 @@ public class LogServiceImplTest {
         service.add(log);
 
         assertNotNull(log.getId());
-        assertNotNull(log.getCreateDate());
+        assertEquals(null, log.getCreateDate());
         assertSame(log, dao.inserted);
         assertEquals(Log.BEAN_NAME, signService.businessType);
         assertEquals(log.getSignId(), signService.businessId);

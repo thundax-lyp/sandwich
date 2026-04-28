@@ -62,8 +62,8 @@ public class StorageServiceImplTest {
         service.add(storage);
 
         assertNotNull(storage.getId());
-        assertNotNull(storage.getCreateDate());
-        assertNotNull(storage.getUpdateDate());
+        assertEquals(null, storage.getCreateDate());
+        assertEquals(null, storage.getUpdateDate());
         assertSame(storage, dao.inserted);
     }
 

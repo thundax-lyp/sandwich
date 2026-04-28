@@ -122,7 +122,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(User user) {
-        user.preInsert();
         user.setId(dao.insert(user));
         afterWrite(user, true);
     }
@@ -130,7 +129,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(User user) {
-        user.preUpdate();
         dao.update(user);
         afterWrite(user, false);
     }
@@ -143,8 +141,6 @@ public class UserServiceImpl implements UserService {
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
         userEncrypt.setId(user.getId());
-        userEncrypt.setCreateUserId(user.getCreateUserId());
-        userEncrypt.setUpdateUserId(user.getUpdateUserId());
         userEncrypt.setEmail(user.getEmail());
         userEncrypt.setMobile(user.getMobile());
         userEncrypt.setTel(user.getTel());
@@ -158,13 +154,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(User user) {
-        user.preUpdate();
         dao.updateLoginPass(user);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
         userEncrypt.setId(user.getId());
-        userEncrypt.setCreateUserId(user.getCreateUserId());
-        userEncrypt.setUpdateUserId(user.getUpdateUserId());
         userEncrypt.setLoginPass(user.getLoginPass());
         userEncryptService.updateLoginPass(userEncrypt);
     }
@@ -179,8 +172,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateEnableFlag(User user) {
-        user.preUpdate();
-
         int result = dao.updateEnableFlag(user);
 
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
@@ -220,7 +211,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(User user) {
-        user.preUpdate();
         return dao.updatePriority(user);
     }
 

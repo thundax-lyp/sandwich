@@ -131,8 +131,6 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks())
-                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy())
                         .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
         removeUserCaches(entity.getId());
         return count;
@@ -192,9 +190,7 @@ public class UserDaoImpl implements UserDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
-                        .set(UserDO::getLoginCount, 0)
-                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(UserDO::getLoginCount, 0));
         removeUserCaches(user.getId());
         return count;
     }
@@ -202,12 +198,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void updateLoginPass(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
-        mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(UserDO::getLoginPass, dataObject.getLoginPass())
-                        .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserDO::getUpdateBy, dataObject.getUpdateBy()));
+        mapper.update(null, buildIdUpdateWrapper(dataObject).set(UserDO::getLoginPass, dataObject.getLoginPass()));
         removeUserCaches(user.getId());
     }
 

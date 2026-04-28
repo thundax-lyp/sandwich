@@ -108,7 +108,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Role role) {
-        role.preInsert();
         role.setId(dao.insert(role));
         afterWrite(role);
     }
@@ -116,7 +115,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Role role) {
-        role.preUpdate();
         dao.update(role);
         afterWrite(role);
     }
@@ -147,8 +145,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateEnableFlag(Role role) {
-        role.preUpdate();
-
         int result = dao.updateEnableFlag(role);
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
@@ -217,7 +213,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Role role) {
-        role.preUpdate();
         return dao.updatePriority(role);
     }
 

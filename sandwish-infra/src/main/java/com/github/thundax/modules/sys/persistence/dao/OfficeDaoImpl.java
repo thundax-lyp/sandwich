@@ -119,9 +119,7 @@ public class OfficeDaoImpl implements OfficeDao {
                         .set(OfficeDO::getName, dataObject.getName())
                         .set(OfficeDO::getShortName, dataObject.getShortName())
                         .set(OfficeDO::getPriority, dataObject.getPriority())
-                        .set(OfficeDO::getRemarks, dataObject.getRemarks())
-                        .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OfficeDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(OfficeDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
         return count;
     }

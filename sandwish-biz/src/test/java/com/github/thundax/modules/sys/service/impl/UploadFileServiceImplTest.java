@@ -46,7 +46,7 @@ public class UploadFileServiceImplTest {
         service.add(file);
 
         assertNotNull(file.getId());
-        assertNotNull(file.getCreateDate());
+        assertEquals(null, file.getCreateDate());
         assertSame(file, dao.inserted);
     }
 

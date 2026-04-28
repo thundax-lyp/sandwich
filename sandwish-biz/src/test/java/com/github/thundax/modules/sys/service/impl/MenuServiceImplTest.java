@@ -79,7 +79,7 @@ public class MenuServiceImplTest {
         service.add(menu);
 
         assertNotNull(menu.getId());
-        assertNotNull(menu.getCreateDate());
+        assertEquals(null, menu.getCreateDate());
         assertSame(menu, dao.inserted);
         assertEquals(Menu.BEAN_NAME, signService.businessType);
         assertEquals(menu.getSignId(), signService.businessId);
@@ -94,7 +94,7 @@ public class MenuServiceImplTest {
 
         service.update(menu);
 
-        assertNotNull(menu.getUpdateDate());
+        assertEquals(null, menu.getUpdateDate());
         assertSame(menu, dao.updated);
         assertEquals(Menu.BEAN_NAME, signService.businessType);
     }

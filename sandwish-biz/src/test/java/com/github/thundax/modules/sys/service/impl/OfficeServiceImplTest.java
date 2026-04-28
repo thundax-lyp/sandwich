@@ -65,7 +65,7 @@ public class OfficeServiceImplTest {
         service.add(office);
 
         assertNotNull(office.getId());
-        assertNotNull(office.getCreateDate());
+        assertEquals(null, office.getCreateDate());
         assertSame(office, dao.inserted);
     }
 
@@ -77,7 +77,7 @@ public class OfficeServiceImplTest {
 
         service.update(office);
 
-        assertNotNull(office.getUpdateDate());
+        assertEquals(null, office.getUpdateDate());
         assertSame(office, dao.updated);
     }
 

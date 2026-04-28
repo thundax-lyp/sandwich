@@ -146,7 +146,6 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
             if (userEncryptPre == null) {
                 return;
             }
-            userEncryptPre.preUpdate();
             dao.updateLoginPass(userEncryptPre);
 
         } catch (RestClientException e) {
@@ -221,7 +220,6 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(UserEncrypt entity) {
-        entity.preUpdate();
         return dao.updatePriority(entity);
     }
 
@@ -232,12 +230,10 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     private void addDirect(UserEncrypt entity) {
-        entity.preInsert();
         dao.insert(entity);
     }
 
     private void updateDirect(UserEncrypt entity) {
-        entity.preUpdate();
         dao.update(entity);
     }
 

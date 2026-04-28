@@ -55,6 +55,7 @@
 - 不为追随外部规则强制迁移为 `Instant`
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
 - `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
+- `createDate` / `createBy` / `updateDate` / `updateBy` 是持久化审计字段，由 infra 在 insert / update 时统一填充；`createBy` / `updateBy` 只透传当前请求的 `currentUserId`，Service 不预填审计字段。
 - `del_flag` 是数据库逻辑删除审计字段，默认值为 `0`；`Entity` 与 `DO/DataObject` 不声明 `delFlag`，DAO insert 时负责写入 `del_flag = '0'`，DAO list/page 查询固定追加 `del_flag = '0'` 条件。
 
 ## Primary Key Rules
@@ -87,6 +88,7 @@
 - 禁止新增 Mapper XML、注解 SQL 或 SQL Provider 作为业务持久化实现入口。
 - `PersistenceAssembler` 只负责 `Entity <-> DO/DataObject` 转换，不调用 Service、DAO 或 Mapper。
 - DAO implementation 负责调用 MyBatis Mapper 并通过 `PersistenceAssembler` 完成模型转换。
+- 数据库表审计字段填充固定使用 infra 统一持久化拦截能力，不在各个 DAO implementation 的业务写法中散落设置。
 - Service 不感知 `DO/DataObject`。
 - Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
 - `DO/DataObject` 只承载数据库字段、必要关系字段和持久化查询所需的显式字段。

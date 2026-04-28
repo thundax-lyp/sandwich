@@ -117,18 +117,14 @@ public class MemberDaoImpl implements MemberDao {
                         .set(MemberDO::getZipcode, dataObject.getZipcode())
                         .set(MemberDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(MemberDO::getPriority, dataObject.getPriority())
-                        .set(MemberDO::getRemarks, dataObject.getRemarks())
-                        .set(MemberDO::getUpdateDate, dataObject.getUpdateDate()));
+                        .set(MemberDO::getRemarks, dataObject.getRemarks()));
     }
 
     @Override
     public int updatePriority(Member entity) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         return mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MemberDO::getPriority, dataObject.getPriority())
-                        .set(MemberDO::getUpdateDate, dataObject.getUpdateDate()));
+                null, buildIdUpdateWrapper(dataObject).set(MemberDO::getPriority, dataObject.getPriority()));
     }
 
     @Override
@@ -171,8 +167,7 @@ public class MemberDaoImpl implements MemberDao {
                         .set(MemberDO::getGender, dataObject.getGender())
                         .set(MemberDO::getMobile, dataObject.getMobile())
                         .set(MemberDO::getAddress, dataObject.getAddress())
-                        .set(MemberDO::getZipcode, dataObject.getZipcode())
-                        .set(MemberDO::getUpdateDate, dataObject.getUpdateDate()));
+                        .set(MemberDO::getZipcode, dataObject.getZipcode()));
     }
 
     @Override
@@ -185,10 +180,7 @@ public class MemberDaoImpl implements MemberDao {
     public int updateEnableFlag(Member member) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
         return mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MemberDO::getEnableFlag, dataObject.getEnableFlag())
-                        .set(MemberDO::getUpdateDate, dataObject.getUpdateDate()));
+                null, buildIdUpdateWrapper(dataObject).set(MemberDO::getEnableFlag, dataObject.getEnableFlag()));
     }
 
     @Override

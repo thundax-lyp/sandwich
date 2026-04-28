@@ -4,7 +4,6 @@ import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +26,11 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
         if (StringUtils.isBlank(asyncTask.getId())) {
             asyncTask.setId(IdGen.uuid());
         }
-        asyncTask.setCreateDate(new Date());
-        asyncTask.setUpdateDate(new Date());
         asyncTaskDao.insert(asyncTask);
     }
 
     @Override
     public void update(AsyncTask asyncTask) {
-        asyncTask.setUpdateDate(new Date());
         asyncTaskDao.update(asyncTask);
     }
 

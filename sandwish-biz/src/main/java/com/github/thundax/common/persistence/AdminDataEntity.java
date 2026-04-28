@@ -3,7 +3,6 @@ package com.github.thundax.common.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 
 /**
  * 管理后台DataEntity
@@ -46,18 +45,11 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
     @Override
     public void preInsert() {
         super.preInsert();
-        if (this.createUserId == null) {
-            this.createUserId = UserAccessHolder.currentUserId();
-        }
-        this.updateUserId = this.createUserId;
     }
 
     @Override
     public void preUpdate() {
         super.preUpdate();
-        if (this.updateUserId == null) {
-            this.updateUserId = UserAccessHolder.currentUserId();
-        }
     }
 
     @Override

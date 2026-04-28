@@ -58,9 +58,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(UserEncryptDO::getEmail, dataObject.getEmail())
                         .set(UserEncryptDO::getMobile, dataObject.getMobile())
-                        .set(UserEncryptDO::getTel, dataObject.getTel())
-                        .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserEncryptDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(UserEncryptDO::getTel, dataObject.getTel()));
     }
 
     @Override
@@ -77,11 +75,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     public void updateLoginPass(UserEncrypt userEncrypt) {
         UserEncryptDO dataObject = UserEncryptPersistenceAssembler.toDataObject(userEncrypt);
         mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(UserEncryptDO::getLoginPass, dataObject.getLoginPass())
-                        .set(UserEncryptDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(UserEncryptDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(UserEncryptDO::getLoginPass, dataObject.getLoginPass()));
     }
 
     private LambdaUpdateWrapper<UserEncryptDO> buildIdUpdateWrapper(UserEncryptDO dataObject) {

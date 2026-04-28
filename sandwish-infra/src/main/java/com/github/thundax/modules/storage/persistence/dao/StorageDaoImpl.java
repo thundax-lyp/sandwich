@@ -124,8 +124,7 @@ public class StorageDaoImpl implements StorageDao {
                         .set(StorageDO::getOwnerType, dataObject.getOwnerType())
                         .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(StorageDO::getPriority, dataObject.getPriority())
-                        .set(StorageDO::getRemarks, dataObject.getRemarks())
-                        .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
+                        .set(StorageDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -157,10 +156,7 @@ public class StorageDaoImpl implements StorageDao {
     public int updateEnableFlag(Storage storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
-                        .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
+                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getEnableFlag, dataObject.getEnableFlag()));
         cacheSupport.removeById(storage.getId());
         return count;
     }
@@ -169,10 +165,7 @@ public class StorageDaoImpl implements StorageDao {
     public int updatePublicFlag(Storage storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(StorageDO::getPublicFlag, dataObject.getPublicFlag())
-                        .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
+                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));
         cacheSupport.removeById(storage.getId());
         return count;
     }

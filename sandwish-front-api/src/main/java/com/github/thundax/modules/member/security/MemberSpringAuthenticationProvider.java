@@ -15,7 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-/** 前台会员 Spring Security 认证 provider。 */
+
 @Component
 public class MemberSpringAuthenticationProvider implements AuthenticationProvider {
 

@@ -28,7 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** 使用 access token 恢复后台认证上下文。 */
+
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String HEADER_TOKEN = Constants.HEADER_TOKEN;

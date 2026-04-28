@@ -16,7 +16,7 @@ public class BaseResponse implements Serializable {
 
     public static final String SUCCESS_CODE = "0";
 
-    /** 消息编码 * */
+
     private String errorCode;
 
     public String getErrorCode() {

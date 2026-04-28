@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class ProcessTimeFilter implements Filter {
 
     protected static final Logger log = LoggerFactory.getLogger(ProcessTimeFilter.class);
-    /** 请求执行开始时间 */
+
     public static final String START_TIME = "_start_time";
 
     @Override

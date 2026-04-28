@@ -6,7 +6,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 用户业务模型与持久化对象转换器。 */
+
 public final class UserPersistenceAssembler {
 
     private UserPersistenceAssembler() {}

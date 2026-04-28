@@ -6,7 +6,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 角色业务模型与持久化对象转换器。 */
+
 public final class RolePersistenceAssembler {
 
     private RolePersistenceAssembler() {}

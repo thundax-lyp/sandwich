@@ -5,7 +5,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 上传文件业务模型与持久化对象转换器。 */
+
 public final class UploadFilePersistenceAssembler {
 
     private UploadFilePersistenceAssembler() {}

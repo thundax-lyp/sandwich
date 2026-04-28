@@ -11,7 +11,7 @@ public class AsyncTask extends BaseAsyncTask {
 
     public static final int DEFAULT_EXPIRED_SECONDS = 1800;
 
-    /** 开始，激活，挂起，结束 */
+
     public static final String STATUS_IDLE = "idle";
 
     public static final String STATUS_ACTIVE = "active";

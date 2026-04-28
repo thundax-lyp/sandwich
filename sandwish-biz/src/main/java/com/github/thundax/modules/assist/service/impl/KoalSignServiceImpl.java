@@ -28,23 +28,23 @@ public class KoalSignServiceImpl extends AbstractSignServiceImpl {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected final AmqpTemplate amqpTemplate;
-    /** 签名队列名称 * */
+
     public static final String QUEUE_SIGN = QUEUE_PREFIX + "sign.koal";
-    /** 默认证书别名 * */
+
     public static final String DEFAULT_CERT_ALIAS = "SM2";
-    /** 默认服务名称 * */
+
     public static final String DEFAULT_SERVICE_NAME = "default";
-    /** 签名uri * */
+
     private static final String URL_SIGN = "/bss/signData";
 
     private static final String URL_SIGN_NEW = "/bss/signMessageDetach";
-    /** 验签uri * */
+
     private static final String URL_VERIFY_SIGN = "/bss/verifySignedData";
 
     private static final String URL_VERIFY_SIGN_NEW = "/bss/verifySignedMessageDetach";
-    /** 接口地址前缀 * */
+
     private final String serviceUrl;
-    /** 证书别名 * */
+
     private final String certAlias;
 
     private final RestTemplate restTemplate = new RestTemplate();

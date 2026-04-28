@@ -38,7 +38,7 @@ public class Sm2 {
 
     private static final Logger logger = LoggerFactory.getLogger(Sm2.class);
 
-    /** SM2默认曲线 */
+
     private static final String SM2_CURVE_NAME = "sm2p256v1";
 
     private static final String ALGORITHM = "EC";

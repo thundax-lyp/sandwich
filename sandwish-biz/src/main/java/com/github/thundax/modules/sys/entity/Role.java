@@ -83,7 +83,7 @@ public class Role extends BaseRole {
         return RoleServiceHolder.getService().findRoleUser(this);
     }
 
-    /** 获取全部权限字符串 */
+
     @JsonIgnore
     public Set<String> getPerms() {
         Set<String> allPerms = new HashSet<>();

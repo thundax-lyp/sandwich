@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 用户持久化对象。 */
+
 @Getter
 @Setter
 @NoArgsConstructor

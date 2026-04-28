@@ -12,9 +12,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SignResponseParam extends BaseResponse {
 
-    /** B64 签名结果 * */
+
     private String b64SignedData;
-    /** B64 签名证书 * */
+
     private String b64Cert;
 
     public SignResponseParam() {}

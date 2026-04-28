@@ -38,7 +38,7 @@ public class WaveValidateCodeServlet extends HttpServlet {
         sendWave(request, response);
     }
 
-    /** 发送语音流，这里需要对range=xxxx做处理 */
+
     private void sendWave(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Integer[] range = getRange(request);
 
@@ -85,7 +85,7 @@ public class WaveValidateCodeServlet extends HttpServlet {
         }
     }
 
-    /** 获取Range范围 */
+
     private static Integer[] getRange(HttpServletRequest request) {
         Integer[] range = new Integer[2];
         String rangeText = request.getHeader("range");

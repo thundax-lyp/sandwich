@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import java.io.Serializable;
 import java.util.Set;
 
-/** 后台权限会话。 */
+
 public class PermissionSession implements Serializable {
 
     private String token;

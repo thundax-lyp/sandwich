@@ -13,7 +13,7 @@ public class ExportWord {
 
     private FreeMarkerConfigurer configurer;
 
-    /** 构造函数 配置模板路径 */
+
     public ExportWord() throws Exception {
         configurer = new FreeMarkerConfigurer();
 

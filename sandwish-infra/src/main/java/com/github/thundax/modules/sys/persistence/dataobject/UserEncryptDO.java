@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 用户加密信息持久化对象。 */
+
 @Getter
 @Setter
 @NoArgsConstructor

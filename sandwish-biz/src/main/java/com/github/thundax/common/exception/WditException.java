@@ -1,6 +1,6 @@
 package com.github.thundax.common.exception;
 
-/** 自定义异常 */
+
 public class WditException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 

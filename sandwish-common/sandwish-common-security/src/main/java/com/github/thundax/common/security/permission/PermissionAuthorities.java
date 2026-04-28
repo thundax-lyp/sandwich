@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 
-/** 转换 Spring Security 权限对象。 */
+
 public final class PermissionAuthorities {
 
     private PermissionAuthorities() {}

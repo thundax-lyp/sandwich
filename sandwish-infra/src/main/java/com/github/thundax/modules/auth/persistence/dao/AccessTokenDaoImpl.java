@@ -24,10 +24,10 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "AUTH_ONLINE_";
 
-    /** TOKEN_PREFIX + token : userId */
+
     private static final String TOKEN_PREFIX = CACHE_SECTION + "TOKEN_";
 
-    /** USER_ID_PREFIX + userId : AccessToken */
+
     private static final String USER_ID_PREFIX = CACHE_SECTION + "UID_";
 
     private static final String TOKEN_INDEX_KEY = "tokens";

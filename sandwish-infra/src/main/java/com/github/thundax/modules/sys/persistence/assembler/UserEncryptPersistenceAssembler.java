@@ -5,7 +5,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 用户加密信息业务模型与持久化对象转换器。 */
+
 public final class UserEncryptPersistenceAssembler {
 
     private UserEncryptPersistenceAssembler() {}

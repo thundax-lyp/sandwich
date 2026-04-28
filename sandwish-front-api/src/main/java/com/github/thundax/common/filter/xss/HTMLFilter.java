@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public final class HTMLFilter {
 
-    /** regex flag union representing /si modifiers in php * */
+
     private static final int REGEX_FLAGS_SI = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
 
     private static final Pattern P_COMMENTS = Pattern.compile("<!--(.*?)-->", Pattern.DOTALL);
@@ -71,26 +71,26 @@ public final class HTMLFilter {
     private static final ConcurrentMap<String, Pattern> P_REMOVE_PAIR_BLANKS = new ConcurrentHashMap<String, Pattern>();
     private static final ConcurrentMap<String, Pattern> P_REMOVE_SELF_BLANKS = new ConcurrentHashMap<String, Pattern>();
 
-    /** set of allowed html elements, along with allowed attributes for each element */
+
     private final Map<String, List<String>> vAllowed;
-    /** counts of open tags for each (allowable) html element * */
+
     private final Map<String, Integer> vTagCounts = new HashMap<String, Integer>();
 
-    /** html elements which must always be self-closing (e.g. "<img />") * */
+
     private final String[] vSelfClosingTags;
-    /** html elements which must always have separate opening and closing tags (e.g. "<b></b>") */
+
     private final String[] vNeedClosingTags;
-    /** set of disallowed html elements * */
+
     private final String[] vDisallowed;
-    /** attributes which should be checked for valid protocols * */
+
     private final String[] vProtocolAtts;
-    /** allowed protocols * */
+
     private final String[] vAllowedProtocols;
-    /** tags which should be removed if they contain no content (e.g. "<b></b>" or "<b />") */
+
     private final String[] vRemoveBlanks;
-    /** entities allowed within html markup * */
+
     private final String[] vAllowedEntities;
-    /** flag determining whether comments are allowed in input String. */
+
     private final boolean stripComment;
 
     private final boolean encodeQuotes;
@@ -102,7 +102,7 @@ public final class HTMLFilter {
      */
     private final boolean alwaysMakeTags;
 
-    /** Default constructor. */
+
     public HTMLFilter() {
         vAllowed = new HashMap<>();
 

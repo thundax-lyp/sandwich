@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/** 前台 Spring Security 配置。 */
+
 @Configuration
 public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 

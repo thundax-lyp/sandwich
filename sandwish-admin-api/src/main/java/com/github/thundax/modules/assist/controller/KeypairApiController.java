@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-/** 公私钥接口入口。 */
+
 @RestController
 public class KeypairApiController extends BaseApiController implements KeypairServiceApi {
 

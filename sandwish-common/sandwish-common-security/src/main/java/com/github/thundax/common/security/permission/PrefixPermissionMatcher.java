@@ -2,7 +2,7 @@ package com.github.thundax.common.security.permission;
 
 import java.util.Collection;
 
-/** 使用冒号分段前缀规则匹配权限。 */
+
 public class PrefixPermissionMatcher implements PermissionMatcher {
 
     private static final String PERMISSION_SEPARATOR = ":";

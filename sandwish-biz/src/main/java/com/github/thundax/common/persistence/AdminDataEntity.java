@@ -43,7 +43,7 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
         this.updateUserId = updateUserId;
     }
 
-    /** 插入之前执行方法，需要手动调用 */
+
     @Override
     public void preInsert() {
         super.preInsert();
@@ -53,7 +53,7 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
         this.updateUserId = this.createUserId;
     }
 
-    /** 更新之前执行方法，需要手动调用 */
+
     @Override
     public void preUpdate() {
         super.preUpdate();

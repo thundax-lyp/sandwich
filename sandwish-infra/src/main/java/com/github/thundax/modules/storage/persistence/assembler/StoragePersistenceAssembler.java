@@ -7,7 +7,7 @@ import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 存储业务模型与持久化对象转换器。 */
+
 public final class StoragePersistenceAssembler {
 
     private StoragePersistenceAssembler() {}

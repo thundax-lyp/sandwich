@@ -25,9 +25,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "AUTH_LOGIN_";
 
-    /** TOKEN_PREFIX + token : LoginForm */
+
     private static final String TOKEN_PREFIX = CACHE_SECTION + "TOKEN_";
-    /** REFRESH_TOKEN_PREFIX + refreshToken : loginToken */
+
     private static final String REFRESH_TOKEN_PREFIX = CACHE_SECTION + "REFRESH_";
 
     private static final String REFRESH_INDEX_KEY = "refreshTokens";

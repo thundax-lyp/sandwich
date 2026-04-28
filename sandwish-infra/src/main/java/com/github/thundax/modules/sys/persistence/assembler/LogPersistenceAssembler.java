@@ -5,7 +5,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 日志业务模型与持久化对象转换器。 */
+
 public final class LogPersistenceAssembler {
 
     private LogPersistenceAssembler() {}

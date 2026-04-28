@@ -7,13 +7,13 @@ package com.github.thundax.common.service;
 public interface TreeService<T> extends CrudService<T> {
 
     enum MoveTreeNodeType {
-        /** 移动到节点前 */
+
         BEFORE,
-        /** 移动到节点后 */
+
         AFTER,
-        /** 移动为子节点 */
+
         INSIDE,
-        /** 移动为子节点，并到最后 */
+
         INSIDE_LAST
     }
 

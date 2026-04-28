@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
-/** @Auther: zhangrudong @Date: 2021/12/29 15:27 @Description: */
+
 public class SM4Util {
 
     static {

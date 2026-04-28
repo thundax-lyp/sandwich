@@ -84,9 +84,9 @@ public interface MemberService {
      */
     int updateEnableFlag(List<Member> list);
 
-    /** 根据证件号码查询 */
+
     Member getByZjhm(Member member);
 
-    /** 根据一网通办的id查询 */
+
     Member getByYwtbId(String ywtbUserId);
 }

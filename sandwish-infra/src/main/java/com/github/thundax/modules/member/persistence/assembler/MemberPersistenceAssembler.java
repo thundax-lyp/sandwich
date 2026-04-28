@@ -5,7 +5,7 @@ import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 会员业务模型与持久化对象转换器。 */
+
 public final class MemberPersistenceAssembler {
 
     private MemberPersistenceAssembler() {}

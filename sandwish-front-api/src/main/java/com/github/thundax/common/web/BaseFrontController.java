@@ -98,7 +98,7 @@ public class BaseFrontController extends BaseController {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, message);
     }
 
-    /** 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中 */
+
     protected static Integer readReloadInteger(
             String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadInteger(paramName, paramName, request, response);

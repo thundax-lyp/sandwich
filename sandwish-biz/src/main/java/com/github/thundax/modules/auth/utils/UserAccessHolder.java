@@ -10,7 +10,7 @@ public class UserAccessHolder {
     private static final PooledThreadLocal<String> USER_ID_HOLDER = new PooledThreadLocal<>();
     private static final PooledThreadLocal<String> TOKEN_HOLDER = new PooledThreadLocal<>();
 
-    /** 获取当前用户 */
+
     @NonNull
     public static User currentUser() {
         User user = UserServiceHolder.get(currentUserId());

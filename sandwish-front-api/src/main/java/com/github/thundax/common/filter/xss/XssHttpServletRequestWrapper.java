@@ -183,7 +183,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         return paramStr;
     }
 
-    /** <b> #获取最原始的request </b> */
+
     public HttpServletRequest getOrgRequest() {
         return orgRequest;
     }

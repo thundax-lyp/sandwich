@@ -107,7 +107,7 @@ public class VltavaProperties {
         this.accessTokenFilter = accessTokenFilter;
     }
 
-    /** 产品名/版本 */
+
     public static class ProductProperties {
 
         private String name;
@@ -148,7 +148,7 @@ public class VltavaProperties {
         }
     }
 
-    /** 上传文件/图片设置 */
+
     public static class UploadProperties {
         // 本地存储目录
         private String servletPath;
@@ -253,7 +253,7 @@ public class VltavaProperties {
         }
     }
 
-    /** 日志 */
+
     public static class LogProperties {
         // 本地存储目录
         private String storagePath;

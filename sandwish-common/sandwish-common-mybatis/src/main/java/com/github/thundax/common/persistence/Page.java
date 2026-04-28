@@ -105,7 +105,7 @@ public class Page<T> {
         }
     }
 
-    /** 初始化参数 */
+
     public void initialize() {
         if (this.pageNo < FIRST_PAGE_INDEX) {
             this.pageNo = FIRST_PAGE_INDEX;
@@ -145,7 +145,7 @@ public class Page<T> {
         this.count = count;
     }
 
-    /** 获取页面总数 */
+
     @JsonIgnore
     public int getTotalPage() {
         if (pageSize > 0) {
@@ -173,18 +173,18 @@ public class Page<T> {
         return this.pageNo >= this.getTotalPage();
     }
 
-    /** 是否进行总数统计 */
+
     @JsonIgnore
     public boolean isNotCount() {
         return this.count == -1;
     }
 
-    /** 获取 Hibernate FirstResult */
+
     public int getFirstResult() {
         return (getPageNo() - 1) * getPageSize();
     }
 
-    /** 获取 Hibernate MaxResults */
+
     public int getMaxResults() {
         return getPageSize();
     }

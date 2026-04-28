@@ -35,14 +35,14 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
         this.setPriority(0);
     }
 
-    /** 插入之前执行方法，需要手动调用 */
+
     @Override
     public void preInsert() {
         this.createDate = new Date();
         this.updateDate = this.createDate;
     }
 
-    /** 更新之前执行方法，需要手动调用 */
+
     @Override
     public void preUpdate() {
         this.updateDate = new Date();

@@ -13,15 +13,15 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VerifySignRequestParam implements Serializable {
 
-    /** B64 签名原文（必传） * */
+
     private String b64OriginData;
-    /** B64 签名结果（必传） * */
+
     private String b64SignedData;
-    /** B64 签名证书（非必传） * */
+
     private String b64Cert;
-    /** 证书别名（非必传） * */
+
     private String certAlias;
-    /** 服务名称（非必传） * */
+
     private String serviceName;
 
     public VerifySignRequestParam() {}

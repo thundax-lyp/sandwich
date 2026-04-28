@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-/** 字典缓存支撑。 */
+
 @Component
 public class DictCacheSupport {
 

@@ -77,7 +77,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return Global.SHOW.equals(this.getDisplayFlag());
     }
 
-    /** 获取指定显示参数 */
+
     public Object getDisplayParam(String paramName, Object defaultValue) {
         Map<String, Object> map = getDisplayParamMap();
         if (!map.containsKey(paramName)) {
@@ -86,7 +86,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return map.get(paramName);
     }
 
-    /** 获取指定显示参数集 */
+
     @JsonIgnore
     public Map<String, Object> getDisplayParamMap() {
         String displayParams = this.getDisplayParams();

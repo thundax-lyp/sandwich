@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 日志持久化对象。 */
+
 @Getter
 @Setter
 @NoArgsConstructor

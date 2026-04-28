@@ -19,7 +19,7 @@ public class Log extends BaseLog {
     private static final long serialVersionUID = 1L;
     public static final String BEAN_NAME = "Log";
 
-    /** 日志类型（1：接入日志；2：错误日志） */
+
     public static final String TYPE_ACCESS = "1";
 
     public static final String TYPE_EXCEPTION = "2";

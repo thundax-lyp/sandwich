@@ -9,7 +9,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-/** auth工具。 */
+
 public class AuthUtils {
 
     /**

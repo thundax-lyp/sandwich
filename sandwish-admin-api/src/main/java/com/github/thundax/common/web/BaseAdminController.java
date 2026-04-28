@@ -207,7 +207,7 @@ public class BaseAdminController extends BaseController {
         return dataList;
     }
 
-    /** 将requestParams装配到model */
+
     protected void setupParamsModel(HttpServletRequest request, Model model) {
         request.getParameterMap().forEach((name, values) -> {
             if (StringUtils.isNotBlank(name) && values != null) {
@@ -220,7 +220,7 @@ public class BaseAdminController extends BaseController {
         });
     }
 
-    /** 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中 */
+
     protected static Integer readReloadInteger(
             String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadInteger(paramName, paramName, request, response);

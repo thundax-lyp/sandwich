@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-/** login form实体。 */
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginForm implements Serializable {
@@ -17,24 +17,24 @@ public class LoginForm implements Serializable {
 
     private static final String NULL_CAPTCHA = "null";
 
-    /** * 登录令牌 ** */
+
     private String loginToken;
-    /** * 刷新令牌，最多5个，按时间倒序存放 ** */
+
     private List<String> refreshTokenList;
-    /** * 验证码 ** */
+
     private String captcha;
-    /** * 手机号码 ** */
+
     private String mobile;
-    /** * 短信验证码 ** */
+
     private String mobileValidateCode;
-    /** * 超时时间 ** */
+
     private Integer expiredSeconds;
-    /** * 校验码，由 AuthUtils.currentCheckCode 生成 ** */
+
     private String checkCode;
 
-    /** * 加密传输的公钥 ** */
+
     private String publicKey;
-    /** * 加密传输的私钥 ** */
+
     private String privateKey;
 
     public LoginForm() {

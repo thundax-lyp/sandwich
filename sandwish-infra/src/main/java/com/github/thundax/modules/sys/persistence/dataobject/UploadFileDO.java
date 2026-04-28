@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** 上传文件持久化对象。 */
+
 @Getter
 @Setter
 @NoArgsConstructor

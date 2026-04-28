@@ -28,7 +28,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
      */
     public abstract String getName();
 
-    /** 插入之前执行方法，需要手动调用 */
+
     @Override
     public void preInsert() {
         super.preInsert();
@@ -38,7 +38,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
         this.updateUserId = this.createUserId;
     }
 
-    /** 更新之前执行方法，需要手动调用 */
+
     @Override
     public void preUpdate() {
         super.preUpdate();

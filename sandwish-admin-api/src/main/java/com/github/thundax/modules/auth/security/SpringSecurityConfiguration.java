@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/** 后台 Spring Security 配置。 */
+
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {

@@ -11,7 +11,7 @@ public abstract class BaseEntity<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** 实体编号（唯一标识） */
+
     protected String id;
 
     public BaseEntity() {
@@ -23,7 +23,7 @@ public abstract class BaseEntity<T> implements Serializable {
         this.id = id;
     }
 
-    /** 初始化方法 */
+
     protected abstract void initialize();
 
     public String getId() {
@@ -34,10 +34,10 @@ public abstract class BaseEntity<T> implements Serializable {
         this.id = id;
     }
 
-    /** 插入之前执行方法，子类实现 */
+
     public abstract void preInsert();
 
-    /** 更新之前执行方法，子类实现 */
+
     public abstract void preUpdate();
 
     @Override
@@ -54,7 +54,7 @@ public abstract class BaseEntity<T> implements Serializable {
         return this.getId().equals(((BaseEntity<?>) obj).getId());
     }
 
-    /** 删除标记（0：正常；1：删除；） */
+
     public static final String DEL_FLAG_NORMAL = "0";
 
     public static final String DEL_FLAG_DELETE = "1";

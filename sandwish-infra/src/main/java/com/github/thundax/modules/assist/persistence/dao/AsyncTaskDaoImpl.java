@@ -11,7 +11,7 @@ import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
-/** 异步任务 Redis DAO 实现。 */
+
 @Repository
 public class AsyncTaskDaoImpl implements AsyncTaskDao {
 

@@ -92,7 +92,7 @@ public class SysLogUtils {
         }
     }
 
-    /** 删除过期任务 */
+
     @Scheduled(cron = "0 0 0/4 * * ?")
     void doTask() {
         Log query = new Log();

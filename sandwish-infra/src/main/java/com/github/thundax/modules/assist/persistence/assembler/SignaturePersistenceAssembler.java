@@ -5,7 +5,7 @@ import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 签名业务模型与持久化对象转换器。 */
+
 public final class SignaturePersistenceAssembler {
 
     private SignaturePersistenceAssembler() {}

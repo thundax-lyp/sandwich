@@ -31,7 +31,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /** 加密保存队列名称 * */
+
     public static final String QUEUE_ENCRYPT_ADD = QUEUE_PREFIX + "encrypt.db.add";
     public static final String QUEUE_ENCRYPT_UPDATE = QUEUE_PREFIX + "encrypt.db.update";
 

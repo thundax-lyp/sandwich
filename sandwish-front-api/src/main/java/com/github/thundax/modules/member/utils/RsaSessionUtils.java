@@ -9,7 +9,7 @@ public class RsaSessionUtils {
     private static final String CACHE_RSA_MODULUS = "rsa_modulus";
     private static final String CACHE_RSA_PRIVATE_EXPONENT = "rsa_private_exponent";
 
-    /** 注册RSA modules & privateKey */
+
     public static String updateRsaKey(HttpServletRequest request) {
         RSAUtils.ReadableKeyPair keyPair = RSAUtils.generateKeyPair();
 
@@ -26,7 +26,7 @@ public class RsaSessionUtils {
         return keyPair.getPublicKey();
     }
 
-    /** RSA解码 */
+
     public static String decryptRsaValue(HttpServletRequest request, String encryptedValue) {
         HttpSession session = request.getSession(true);
 

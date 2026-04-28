@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-/** 菜单缓存支撑。 */
+
 @Component
 public class MenuCacheSupport {
 

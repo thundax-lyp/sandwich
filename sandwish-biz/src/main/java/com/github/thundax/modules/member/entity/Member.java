@@ -72,10 +72,10 @@ public class Member extends BaseMember {
         private Date endRegisterDate;
         private Date beginLoginDate;
         private Date endLoginDate;
-        /** 一网通办id */
+
         private String ywtbId;
 
-        /** 证件号码 */
+
         private String zjhm;
 
         private String mobile;

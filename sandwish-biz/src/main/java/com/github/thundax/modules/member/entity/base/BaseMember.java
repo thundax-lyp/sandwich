@@ -22,9 +22,9 @@ public class BaseMember extends AdminDataEntity<Member> {
     private Date registerDate;
     private String lastLoginIp;
     private Date lastLoginDate;
-    /** *一网通办id */
+
     private String ywtbId;
-    /** 登录次数* */
+
     private int loginCount;
 
     public BaseMember() {

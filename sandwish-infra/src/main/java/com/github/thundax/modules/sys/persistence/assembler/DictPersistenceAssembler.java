@@ -5,7 +5,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 字典业务模型与持久化对象转换器。 */
+
 public final class DictPersistenceAssembler {
 
     private DictPersistenceAssembler() {}

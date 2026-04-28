@@ -28,9 +28,9 @@ public class RoleServiceImpl implements RoleService {
     private final RoleDao dao;
     private final SignService signService;
 
-    /** roleId -> userIdList */
+
     private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler = new PooledThreadLocal<>();
-    /** roleId -> menuIdList */
+
     private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
     public RoleServiceImpl(RoleDao dao, SignService signService) {
@@ -205,7 +205,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     public interface CacheChangedListener {
-        /** role cache changed listener */
+
         void onRoleCacheChanged();
     }
 

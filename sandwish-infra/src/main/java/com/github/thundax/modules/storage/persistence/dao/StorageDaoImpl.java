@@ -18,7 +18,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 存储文件 DAO 实现。 */
+
 @Repository
 public class StorageDaoImpl implements StorageDao {
 

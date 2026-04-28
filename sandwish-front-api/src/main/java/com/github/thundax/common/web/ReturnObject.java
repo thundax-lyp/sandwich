@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.http.HttpStatus;
 
-/** 返回数据 */
+
 public class ReturnObject extends HashMap<String, Object> {
     private static final long serialVersionUID = 1L;
 

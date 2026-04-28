@@ -7,7 +7,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** JetCache baseline configuration for Sandwich cache infrastructure. */
+
 @Configuration
 @EnableMethodCache(basePackages = "com.github.thundax")
 @EnableCreateCacheAnnotation

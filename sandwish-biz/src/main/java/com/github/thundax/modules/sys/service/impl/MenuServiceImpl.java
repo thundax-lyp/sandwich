@@ -211,7 +211,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     public interface CacheChangedListener {
-        /** cache changed event */
+
         void onMenuCacheChanged();
     }
 

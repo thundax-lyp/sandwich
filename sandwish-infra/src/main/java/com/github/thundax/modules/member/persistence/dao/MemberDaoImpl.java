@@ -14,7 +14,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
-/** 会员 DAO 实现。 */
+
 @Repository
 public class MemberDaoImpl implements MemberDao {
 

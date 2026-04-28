@@ -83,15 +83,15 @@ public class RSAUtils {
         }
     }
 
-    /** 存储生成好的public key（base64 encode），modulus,private key exponents */
+
     public static class ReadableKeyPair implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        /** Base64编码的公钥，用于发送给客户端的jsencrypt.js */
+
         private String publicKey;
-        /** public key modulus，用于存储在会话中，与privateKeyExponent一起用来还原key，以解密 */
+
         private String modulus;
-        /** private key exponent，用于存储在会话中，与modulus一起用来还原key，以解密 */
+
         private String privateKeyExponent;
 
         private String publicKeyExponent;
@@ -103,7 +103,7 @@ public class RSAUtils {
             this.setPrivateKeyExponent(privateKeyExponent);
         }
 
-        /** get/set publicKey */
+
         public String getPublicKey() {
             return this.publicKey;
         }
@@ -112,7 +112,7 @@ public class RSAUtils {
             this.publicKey = publicKey;
         }
 
-        /** get/set modulus */
+
         public String getModulus() {
             return this.modulus;
         }
@@ -121,7 +121,7 @@ public class RSAUtils {
             this.modulus = modulus;
         }
 
-        /** get/set privateKeyExponent */
+
         public String getPrivateKeyExponent() {
             return this.privateKeyExponent;
         }
@@ -130,7 +130,7 @@ public class RSAUtils {
             this.privateKeyExponent = privateKeyExponent;
         }
 
-        /** get/set publicKeyExponent */
+
         public String getPublicKeyExponent() {
             return this.publicKeyExponent;
         }

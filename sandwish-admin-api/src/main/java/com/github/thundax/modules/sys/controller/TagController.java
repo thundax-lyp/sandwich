@@ -22,7 +22,7 @@ public class TagController extends BaseAdminController {
         super(validator);
     }
 
-    /** 树结构选择标签（treeselect.tag） */
+
     @RequestMapping(value = "treeSelector")
     public String treeSelector(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);
@@ -30,7 +30,7 @@ public class TagController extends BaseAdminController {
         return "modules/sys/tagTreeselect";
     }
 
-    /** 图标选择标签（iconSelector.tag） */
+
     @RequestMapping(value = "iconSelector")
     public String iconSelector(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);
@@ -38,7 +38,7 @@ public class TagController extends BaseAdminController {
         return "modules/sys/tagIconSelector";
     }
 
-    /** 地理位置选择标签（locationSelector.tag） */
+
     @RequestMapping(value = "locationSelector")
     public String locationSelector(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);
@@ -50,7 +50,7 @@ public class TagController extends BaseAdminController {
         return "modules/sys/tagLocationSelector";
     }
 
-    /** 代码编辑器（codeditor.tag） */
+
     @RequestMapping(value = "codeditor")
     public String codeditor(HttpServletRequest request, Model model) {
         setupParamsModel(request, model);

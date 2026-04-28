@@ -23,19 +23,19 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class XssFilter implements Filter {
 
-    /** 例外urls */
+
     private List<String> urlExcludes = new ArrayList<>();
 
-    /** 例外标签 */
+
     private List<String> excludeTags = new ArrayList<>();
 
-    /** 需要过滤标签 */
+
     private List<String> includeTags = new ArrayList<>();
 
-    /** 开关 */
+
     public boolean enabled = false;
 
-    /** 编码 */
+
     private String encoding = "UTF-8";
 
     @Override

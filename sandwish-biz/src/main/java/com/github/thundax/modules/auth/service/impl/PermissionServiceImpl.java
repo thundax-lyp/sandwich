@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-/** 后台权限会话服务实现。 */
+
 @Service
 @EnableConfigurationProperties(AuthProperties.class)
 public class PermissionServiceImpl implements PermissionService {

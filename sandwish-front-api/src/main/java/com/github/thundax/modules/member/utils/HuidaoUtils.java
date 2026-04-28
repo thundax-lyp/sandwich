@@ -52,8 +52,7 @@ public class HuidaoUtils {
     public JSONObject getUserInfo(String accessToken) throws Exception {
         HttpClient httpclient = getHttpClient(properties.getBaseUrl().startsWith("https://"));
         HttpPost httpPost = new HttpPost(properties.getBaseUrl());
-        String content =
-                properties.getAppId() + properties.getApiId() + System.currentTimeMillis() / 1000;
+        String content = properties.getAppId() + properties.getApiId() + System.currentTimeMillis() / 1000;
         String signature = encrypt(content);
         httpPost.addHeader("appid", properties.getAppId());
         httpPost.addHeader("apiname", properties.getApiId());
@@ -75,11 +74,7 @@ public class HuidaoUtils {
             System.out.println(s);
             return JSONObject.fromObject(s);
         } else {
-            System.out.println(
-                    "getUserInfo失败"
-                            + statusLine.getStatusCode()
-                            + ","
-                            + statusLine.getReasonPhrase());
+            System.out.println("getUserInfo失败" + statusLine.getStatusCode() + "," + statusLine.getReasonPhrase());
             throw new RuntimeException(s);
         }
     }
@@ -87,21 +82,18 @@ public class HuidaoUtils {
     private SSLContext createIgnoreVerifySSL() {
         try {
             SSLContext sc = SSLContext.getInstance("SSL");
-            X509TrustManager trustManager =
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(
-                                X509Certificate[] x509Certificates, String paramString) {}
+            X509TrustManager trustManager = new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String paramString) {}
 
-                        @Override
-                        public void checkServerTrusted(
-                                X509Certificate[] x509Certificates, String paramString) {}
+                @Override
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String paramString) {}
 
-                        @Override
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
-                    };
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            };
             sc.init(null, new TrustManager[] {trustManager}, null);
             return sc;
         } catch (KeyManagementException e) {
@@ -114,11 +106,10 @@ public class HuidaoUtils {
     private HttpClient getHttpClient(boolean isHttps) {
         if (isHttps) {
             SSLContext sslContext = createIgnoreVerifySSL();
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register("http", PlainConnectionSocketFactory.INSTANCE)
-                            .register("https", new SSLConnectionSocketFactory(sslContext))
-                            .build();
+            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("http", PlainConnectionSocketFactory.INSTANCE)
+                    .register("https", new SSLConnectionSocketFactory(sslContext))
+                    .build();
             PoolingHttpClientConnectionManager connManager =
                     new PoolingHttpClientConnectionManager(socketFactoryRegistry);
             return HttpClients.custom().setConnectionManager(connManager).build();

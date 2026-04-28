@@ -10,7 +10,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Autowired private InterfaceInterceptor interfaceInterceptor;
+    @Autowired
+    private InterfaceInterceptor interfaceInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

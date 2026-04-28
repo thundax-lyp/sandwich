@@ -40,10 +40,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * @param includeTags 需要过滤的标签
      */
     public XssHttpServletRequestWrapper(
-            HttpServletRequest request,
-            String encoding,
-            List<String> excludeTags,
-            List<String> includeTags) {
+            HttpServletRequest request, String encoding, List<String> excludeTags, List<String> includeTags) {
         super(request);
         orgRequest = request;
         this.encoding = encoding;

@@ -46,15 +46,12 @@ public class ExportWord {
      * @param data
      * @throws Exception
      */
-    public void exportDoc(
-            HttpServletResponse response, String fileName, String tplName, Map<String, Object> data)
+    public void exportDoc(HttpServletResponse response, String fileName, String tplName, Map<String, Object> data)
             throws Exception {
         response.reset();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/msword");
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
         // 把本地文件发送给客户端
         Writer out = response.getWriter();
         Template template = getTemplate(tplName);

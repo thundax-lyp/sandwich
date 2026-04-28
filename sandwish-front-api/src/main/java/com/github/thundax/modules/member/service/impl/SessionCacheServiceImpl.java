@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class SessionCacheServiceImpl implements SessionCacheService {
 
@@ -21,18 +20,14 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     @CreateCache(name = Constants.CACHE_PREFIX + "front.session.", cacheType = CacheType.REMOTE)
     private Cache<String, Object> cache;
 
-    private final PooledThreadLocal<Map<String, Object>> localCacheHandler =
-            new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<String, Object>> localCacheHandler = new PooledThreadLocal<>();
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String sessionId, String key, Class<T> clazz) {
-        Object value =
-                localCacheHandler
-                        .computeIfAbsent(HashMap::new)
-                        .computeIfAbsent(
-                                createCacheKey(sessionId, key),
-                                cacheKey -> cache.get(createCacheKey(sessionId, key)));
+        Object value = localCacheHandler
+                .computeIfAbsent(HashMap::new)
+                .computeIfAbsent(createCacheKey(sessionId, key), cacheKey -> cache.get(createCacheKey(sessionId, key)));
 
         return (T) value;
     }
@@ -40,12 +35,9 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(String sessionId, String key, TypeReference<T> type) {
-        Object value =
-                localCacheHandler
-                        .computeIfAbsent(HashMap::new)
-                        .computeIfAbsent(
-                                createCacheKey(sessionId, key),
-                                cacheKey -> cache.get(createCacheKey(sessionId, key)));
+        Object value = localCacheHandler
+                .computeIfAbsent(HashMap::new)
+                .computeIfAbsent(createCacheKey(sessionId, key), cacheKey -> cache.get(createCacheKey(sessionId, key)));
 
         return (T) value;
     }

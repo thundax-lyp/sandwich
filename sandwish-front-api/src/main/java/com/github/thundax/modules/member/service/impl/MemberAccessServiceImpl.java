@@ -4,7 +4,6 @@ import com.github.thundax.modules.member.security.MemberSecurityContext;
 import com.github.thundax.modules.member.service.MemberAccessService;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class MemberAccessServiceImpl implements MemberAccessService {
 

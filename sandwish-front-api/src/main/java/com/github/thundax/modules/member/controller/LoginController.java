@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/** @author wdit */
 @Controller
 @RequestMapping(value = "/auth")
 public class LoginController extends BaseFrontController {
@@ -32,17 +31,14 @@ public class LoginController extends BaseFrontController {
     private final MemberLoginInterfaceAssembler memberLoginInterfaceAssembler;
 
     @Autowired
-    public LoginController(
-            YwtbProperties properties,
-            MemberLoginInterfaceAssembler memberLoginInterfaceAssembler) {
+    public LoginController(YwtbProperties properties, MemberLoginInterfaceAssembler memberLoginInterfaceAssembler) {
         this.properties = properties;
         this.memberLoginInterfaceAssembler = memberLoginInterfaceAssembler;
     }
 
     // 第三方登录页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。
     @RequestMapping(value = "login", method = RequestMethod.GET)
-    public String login(HttpServletRequest request, HttpServletResponse response, Model model)
-            throws Exception {
+    public String login(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
         // 如果已经登录，则跳转到管理首页
         if (principal != null) {
@@ -56,8 +52,7 @@ public class LoginController extends BaseFrontController {
         }
         logger.info("登录方法中的requestUrl: {}", requestUrl);
         String url =
-                properties.getThirdLoginUrl()
-                        + URLEncoder.encode(properties.getLoginBackUrl() + requestUrl, "UTF-8");
+                properties.getThirdLoginUrl() + URLEncoder.encode(properties.getLoginBackUrl() + requestUrl, "UTF-8");
         logger.info("登录方法中的url: {}", url);
         model.addAttribute("url", url);
         return "modules/member/login";
@@ -66,8 +61,7 @@ public class LoginController extends BaseFrontController {
     /** 登录失败，真正登录的POST请求由Filter完成 */
     // 第三方登录失败页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。
     @RequestMapping(value = "login", method = RequestMethod.POST)
-    public String loginFail(HttpServletRequest request, HttpServletResponse response, Model model)
-            throws Exception {
+    public String loginFail(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
 
         // 如果已经登录，则跳转到管理首页
@@ -77,8 +71,7 @@ public class LoginController extends BaseFrontController {
         SavedRequest savedRequest = new HttpSessionRequestCache().getRequest(request, response);
         String requestUrl = savedRequest != null ? savedRequest.getRedirectUrl() : successUrl;
         String url =
-                properties.getThirdLoginUrl()
-                        + URLEncoder.encode(properties.getLoginBackUrl() + requestUrl, "UTF-8");
+                properties.getThirdLoginUrl() + URLEncoder.encode(properties.getLoginBackUrl() + requestUrl, "UTF-8");
         model.addAttribute("url", url);
         return "modules/member/login";
     }
@@ -86,7 +79,6 @@ public class LoginController extends BaseFrontController {
     @RequestMapping("check-login")
     @ResponseBody
     public MemberLoginStatusResponse checkLogin() {
-        return memberLoginInterfaceAssembler.toLoginStatusResponse(
-                MemberSecurityContext.getPrincipal() != null);
+        return memberLoginInterfaceAssembler.toLoginStatusResponse(MemberSecurityContext.getPrincipal() != null);
     }
 }

@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.modules.auth.service.UserAccessService;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class UserAccessServiceImpl implements UserAccessService {
 

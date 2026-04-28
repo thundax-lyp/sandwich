@@ -6,7 +6,6 @@ import com.github.thundax.modules.member.service.SessionCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class SessionCacheServiceHolder {
 

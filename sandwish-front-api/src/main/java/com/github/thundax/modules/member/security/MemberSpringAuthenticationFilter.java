@@ -32,8 +32,7 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
         }
 
         UsernamePasswordAuthenticationToken authRequest =
-                new UsernamePasswordAuthenticationToken(
-                        username, decryptPassword(request, password));
+                new UsernamePasswordAuthenticationToken(username, decryptPassword(request, password));
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
         return getAuthenticationManager().authenticate(authRequest);
     }

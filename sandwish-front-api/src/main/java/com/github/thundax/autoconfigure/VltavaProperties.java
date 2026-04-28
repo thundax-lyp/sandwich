@@ -1,14 +1,13 @@
 package com.github.thundax.autoconfigure;
 
-import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
-/** @author wdit */
 @ConfigurationProperties(prefix = "vltava")
 public class VltavaProperties {
 

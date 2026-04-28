@@ -30,8 +30,7 @@ public class LogoutController {
     }
 
     @RequestMapping("logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response)
-            throws UnsupportedEncodingException {
+    public String logout(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
         try {
             SecurityContextHolder.clearContext();
             request.getSession().invalidate();

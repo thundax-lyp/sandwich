@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-/** @author wdit */
 public interface SessionCacheService {
 
     /**

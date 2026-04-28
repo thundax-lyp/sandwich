@@ -40,9 +40,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .logout()
                 .logoutUrl("/auth/logout")
                 .and()
-                .addFilterAt(
-                        memberSpringAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(memberSpringAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     private MemberSpringAuthenticationFilter memberSpringAuthenticationFilter() throws Exception {

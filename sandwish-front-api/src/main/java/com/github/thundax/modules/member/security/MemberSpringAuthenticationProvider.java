@@ -25,8 +25,7 @@ public class MemberSpringAuthenticationProvider implements AuthenticationProvide
     private final String defaultPassword;
 
     public MemberSpringAuthenticationProvider(
-            MemberService memberService,
-            @Value("${vltava.defalut-password:12312321321}") String defaultPassword) {
+            MemberService memberService, @Value("${vltava.defalut-password:12312321321}") String defaultPassword) {
         this.memberService = memberService;
         this.defaultPassword = defaultPassword;
     }

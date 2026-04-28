@@ -19,7 +19,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/** @author wdit */
 @Configuration
 @EnableWebMvc
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -36,9 +35,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ServletRegistrationBean<SmsValidateCodeServlet>
-            smsValidateCodeServletServletRegistrationBean(
-                    VltavaProperties properties, SmsValidateCodeDao smsValidateCodeDao) {
+    public ServletRegistrationBean<SmsValidateCodeServlet> smsValidateCodeServletServletRegistrationBean(
+            VltavaProperties properties, SmsValidateCodeDao smsValidateCodeDao) {
         SmsValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
 
         ServletRegistrationBean<SmsValidateCodeServlet> bean = new ServletRegistrationBean<>();
@@ -74,8 +72,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(
-            VltavaProperties properties) {
+    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(VltavaProperties properties) {
         FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());
@@ -95,7 +92,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
 
-        registry.addResourceHandler("/favicon.ico")
-                .addResourceLocations("classpath:/static/favicon.ico");
+        registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/favicon.ico");
     }
 }

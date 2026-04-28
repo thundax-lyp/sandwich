@@ -4,7 +4,6 @@ import com.github.thundax.common.utils.RSAUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-/** @author wdit */
 public class RsaSessionUtils {
 
     private static final String CACHE_RSA_MODULUS = "rsa_modulus";
@@ -17,10 +16,7 @@ public class RsaSessionUtils {
         HttpSession session = request.getSession(true);
 
         SessionCacheServiceHolder.put(
-                session.getId(),
-                CACHE_RSA_MODULUS,
-                keyPair.getModulus(),
-                session.getMaxInactiveInterval());
+                session.getId(), CACHE_RSA_MODULUS, keyPair.getModulus(), session.getMaxInactiveInterval());
         SessionCacheServiceHolder.put(
                 session.getId(),
                 CACHE_RSA_PRIVATE_EXPONENT,
@@ -34,14 +30,11 @@ public class RsaSessionUtils {
     public static String decryptRsaValue(HttpServletRequest request, String encryptedValue) {
         HttpSession session = request.getSession(true);
 
-        String modulus =
-                SessionCacheServiceHolder.get(session.getId(), CACHE_RSA_MODULUS, String.class);
+        String modulus = SessionCacheServiceHolder.get(session.getId(), CACHE_RSA_MODULUS, String.class);
         String privateExponent =
-                SessionCacheServiceHolder.get(
-                        session.getId(), CACHE_RSA_PRIVATE_EXPONENT, String.class);
+                SessionCacheServiceHolder.get(session.getId(), CACHE_RSA_PRIVATE_EXPONENT, String.class);
 
-        RSAUtils.ReadableKeyPair keyPair =
-                new RSAUtils.ReadableKeyPair(null, modulus, null, privateExponent);
+        RSAUtils.ReadableKeyPair keyPair = new RSAUtils.ReadableKeyPair(null, modulus, null, privateExponent);
         return RSAUtils.decryptBase64(encryptedValue, keyPair);
     }
 }

@@ -21,8 +21,7 @@ public class InterfaceInterceptor extends HandlerInterceptorAdapter {
     private String authCode;
 
     @Override
-    public boolean preHandle(
-            HttpServletRequest request, HttpServletResponse response, Object handler)
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
         ApiLogin annotation;
@@ -63,10 +62,7 @@ public class InterfaceInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public void afterCompletion(
-            HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse,
-            Object o,
-            Exception e)
+            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e)
             throws Exception {}
 
     private boolean validateDate(Long timestamp) {

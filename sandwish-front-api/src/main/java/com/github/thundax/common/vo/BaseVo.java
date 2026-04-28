@@ -9,7 +9,6 @@ import java.util.Date;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
-/** @author wdit */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseVo implements Serializable {

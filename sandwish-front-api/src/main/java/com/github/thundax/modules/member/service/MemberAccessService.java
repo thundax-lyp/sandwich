@@ -1,6 +1,5 @@
 package com.github.thundax.modules.member.service;
 
-/** @author wdit */
 public interface MemberAccessService {
 
     /**

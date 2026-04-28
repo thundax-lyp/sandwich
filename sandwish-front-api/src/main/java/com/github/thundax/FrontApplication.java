@@ -10,7 +10,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/** @author wdit */
 @SpringBootApplication
 @MapperScan(
         basePackages = {"com.github.thundax.modules"},

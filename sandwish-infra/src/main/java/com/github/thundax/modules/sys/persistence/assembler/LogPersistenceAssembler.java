@@ -16,7 +16,6 @@ public final class LogPersistenceAssembler {
         }
         LogDO dataObject = new LogDO();
         dataObject.setId(entity.getId());
-        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setUserId(entity.getUserId());
         dataObject.setType(entity.getType());
         dataObject.setLogDate(entity.getLogDate());
@@ -42,7 +41,6 @@ public final class LogPersistenceAssembler {
         }
         Log entity = new Log();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setUserId(dataObject.getUserId());
         entity.setType(dataObject.getType());
         entity.setLogDate(dataObject.getLogDate());

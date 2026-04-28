@@ -12,8 +12,6 @@ import lombok.Setter;
 public class AsyncTaskDO {
 
     private String id;
-    private boolean isNewRecord;
-
     private String title;
     private String status;
     private String message;

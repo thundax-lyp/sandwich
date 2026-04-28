@@ -21,9 +21,6 @@ public class StorageBusinessDO {
     @TableId(value = "file_id", type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("business_id")
     private String businessId;
 

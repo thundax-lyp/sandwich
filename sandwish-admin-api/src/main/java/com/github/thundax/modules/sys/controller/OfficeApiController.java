@@ -80,7 +80,6 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
             if (bean != null) {
                 throw new InsertBeanExistException(Office.BEAN_NAME, entity.getId());
             }
-            entity.setIsNewRecord(true);
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {

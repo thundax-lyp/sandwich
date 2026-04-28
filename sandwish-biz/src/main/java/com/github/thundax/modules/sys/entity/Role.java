@@ -50,7 +50,7 @@ public class Role extends BaseRole {
 
     public List<String> getMenuIdList() {
         if (this.menuIdList == null) {
-            if (this.getIsNewRecord()) {
+            if (StringUtils.isBlank(this.getId())) {
                 this.menuIdList = new ArrayList<>();
             } else {
                 this.menuIdList = RoleServiceHolder.getService().findRoleMenu(this).stream()

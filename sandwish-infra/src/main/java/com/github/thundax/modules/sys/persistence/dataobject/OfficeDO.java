@@ -23,9 +23,6 @@ public class OfficeDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("parent_id")
     private String parentId;
 

@@ -25,9 +25,6 @@ public class MemberDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("login_name")
     private String loginName;
 

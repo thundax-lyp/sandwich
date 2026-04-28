@@ -16,7 +16,6 @@ public final class UploadFilePersistenceAssembler {
         }
         UploadFileDO dataObject = new UploadFileDO();
         dataObject.setId(entity.getId());
-        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -39,7 +38,6 @@ public final class UploadFilePersistenceAssembler {
         }
         UploadFile entity = new UploadFile();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());

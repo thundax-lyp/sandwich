@@ -90,7 +90,6 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         RecordingSignService signService = new RecordingSignService();
         Menu menu = new Menu("menu-1");
-        menu.setIsNewRecord(false);
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
         service.update(menu);

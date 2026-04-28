@@ -21,9 +21,6 @@ public class UploadFileDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     private String name;
 
     @TableField("extend_name")

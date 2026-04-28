@@ -83,7 +83,6 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
             if (bean != null) {
                 throw new InsertBeanExistException(Menu.BEAN_NAME, entity.getId());
             }
-            entity.setIsNewRecord(true);
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {

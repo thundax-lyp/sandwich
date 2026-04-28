@@ -21,9 +21,6 @@ public class UserEncryptDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("login_pass")
     private String loginPass;
 

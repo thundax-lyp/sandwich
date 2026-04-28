@@ -20,8 +20,6 @@ public class SignatureDO {
     private String id;
 
     @TableField(exist = false)
-    private boolean isNewRecord;
-
     private String businessType;
     private String businessId;
     private String signature;

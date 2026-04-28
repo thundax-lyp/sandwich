@@ -25,9 +25,6 @@ public class UserDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("office_id")
     private String officeId;
 

@@ -147,7 +147,6 @@ public class UserApiController extends BaseApiController implements UserServiceA
             if (bean != null) {
                 throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
             }
-            entity.setIsNewRecord(true);
         }
 
         entity.setRegisterDate(new Date());

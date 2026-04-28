@@ -141,7 +141,6 @@ public class StorageController extends BaseAdminController {
                     }
 
                     Storage storage = new Storage();
-                    storage.setIsNewRecord(true);
                     storage.setId(IdGen.uuid());
 
                     storage.setName(FilenameUtils.getBaseName(originalFilename));

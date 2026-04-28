@@ -24,9 +24,6 @@ public class DictDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     private String type;
     private String label;
     private String value;

@@ -21,9 +21,6 @@ public class LogDO {
     @TableId(type = IdType.INPUT)
     private String id;
 
-    @TableField(exist = false)
-    private boolean isNewRecord;
-
     @TableField("user_id")
     private String userId;
 

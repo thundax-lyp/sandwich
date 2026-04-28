@@ -17,7 +17,6 @@ public final class UserPersistenceAssembler {
         }
         UserDO dataObject = new UserDO();
         dataObject.setId(entity.getId());
-        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setOfficeId(entity.getOfficeId());
         dataObject.setLoginName(entity.getLoginName());
         dataObject.setLoginPass(entity.getLoginPass());
@@ -51,7 +50,6 @@ public final class UserPersistenceAssembler {
         }
         User entity = new User();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setOfficeId(dataObject.getOfficeId());
         entity.setLoginName(dataObject.getLoginName());
         entity.setLoginPass(dataObject.getLoginPass());

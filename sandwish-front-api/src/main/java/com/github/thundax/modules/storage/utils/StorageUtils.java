@@ -73,7 +73,6 @@ public class StorageUtils {
 
             if (StringUtils.isBlank(storage.getId())) {
                 storage.setId(IdGen.uuid());
-                storage.setIsNewRecord(true);
                 storage.setCreateDate(new Date());
             }
 
@@ -106,7 +105,6 @@ public class StorageUtils {
 
             if (StringUtils.isBlank(storage.getId())) {
                 storage.setId(IdGen.uuid());
-                storage.setIsNewRecord(true);
                 storage.setCreateDate(new Date());
             }
 

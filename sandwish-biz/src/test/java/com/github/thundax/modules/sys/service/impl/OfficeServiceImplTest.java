@@ -73,7 +73,6 @@ public class OfficeServiceImplTest {
     public void shouldPrepareOfficeBeforeUpdate() {
         RecordingOfficeDao dao = new RecordingOfficeDao();
         Office office = new Office("office-1");
-        office.setIsNewRecord(false);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
         service.update(office);

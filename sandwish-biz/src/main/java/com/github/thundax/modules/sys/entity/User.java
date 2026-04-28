@@ -77,7 +77,7 @@ public class User extends BaseUser {
     @NotNull
     public List<String> getRoleIdList() {
         if (this.roleIdList == null) {
-            if (this.getIsNewRecord()) {
+            if (StringUtils.isBlank(this.getId())) {
                 this.roleIdList = new ArrayList<>();
             } else {
                 this.roleIdList = UserServiceHolder.getService().findUserRole(this).stream()

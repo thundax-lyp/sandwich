@@ -109,7 +109,6 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
             if (bean != null) {
                 throw new InsertBeanExistException(Role.BEAN_NAME, entity.getId());
             }
-            entity.setIsNewRecord(true);
         }
 
         roleService.add(entity);

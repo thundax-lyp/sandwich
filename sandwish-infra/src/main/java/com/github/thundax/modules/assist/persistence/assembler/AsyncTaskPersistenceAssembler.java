@@ -14,7 +14,6 @@ public final class AsyncTaskPersistenceAssembler {
         }
         AsyncTaskDO dataObject = new AsyncTaskDO();
         dataObject.setId(entity.getId());
-        dataObject.setNewRecord(entity.getIsNewRecord());
         dataObject.setTitle(entity.getTitle());
         dataObject.setStatus(entity.getStatus());
         dataObject.setMessage(entity.getMessage());
@@ -37,7 +36,6 @@ public final class AsyncTaskPersistenceAssembler {
         }
         AsyncTask entity = new AsyncTask();
         entity.setId(dataObject.getId());
-        entity.setIsNewRecord(dataObject.isNewRecord());
         entity.setTitle(dataObject.getTitle());
         entity.setStatus(dataObject.getStatus());
         entity.setMessage(dataObject.getMessage());

@@ -1,10 +1,13 @@
 package com.github.thundax.modules.assist.service.impl;
 
-import com.github.thundax.common.service.impl.CrudServiceImpl;
-import org.apache.commons.lang3.StringUtils;
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signature>
-        implements SignatureService {
+public class SignatureServiceImpl implements SignatureService {
+
+    private final SignatureDao dao;
 
     public SignatureServiceImpl(SignatureDao dao) {
-        super(dao);
+        this.dao = dao;
     }
 
     @Override
@@ -27,10 +31,12 @@ public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signatur
         if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId)) {
             return null;
         }
-        Signature query = new Signature();
-        query.setBusinessType(businessType);
-        query.setBusinessId(businessId);
-        return dao.get(query);
+        return dao.find(businessType, businessId);
+    }
+
+    @Override
+    public Page<Signature> findPage(String businessType, Page<Signature> page) {
+        return dao.findPage(businessType, page);
     }
 
     @Override
@@ -39,5 +45,30 @@ public class SignatureServiceImpl extends CrudServiceImpl<SignatureDao, Signatur
         entity.preInsert();
         entity.preUpdate();
         dao.insertOrUpdate(entity);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(Signature entity) {
+        if (entity == null) {
+            return 0;
+        }
+        return dao.delete(entity.getBusinessType(), entity.getBusinessId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(List<Signature> list) {
+        return batchOperate(list, this::delete);
+    }
+
+    private int batchOperate(Collection<Signature> collection, Function<Signature, Integer> operator) {
+        int count = 0;
+        if (collection != null && !collection.isEmpty()) {
+            for (Signature entity : collection) {
+                count += operator.apply(entity);
+            }
+        }
+        return count;
     }
 }

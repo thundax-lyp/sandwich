@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,22 +16,28 @@ import lombok.Setter;
 @TableName("tb_assist_signature")
 public class SignatureDO {
 
+    @TableField(exist = false)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
     private String businessType;
     private String businessId;
     private String signature;
     private String isVerifySign;
+
+    @TableField(exist = false)
     private Integer priority;
+
+    @TableField(exist = false)
     private String remarks;
+
     private Date createDate;
     private Date updateDate;
+
+    @TableField(exist = false)
     private String delFlag;
-    private String queryBusinessType;
-    private String queryBusinessId;
-    private String queryIsVerifySign;
-    private List<String> queryBusinessIdList;
 
     public SignatureDO(String id) {
         this.id = id;
@@ -123,37 +129,5 @@ public class SignatureDO {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
-    }
-
-    public String getQueryBusinessType() {
-        return queryBusinessType;
-    }
-
-    public void setQueryBusinessType(String queryBusinessType) {
-        this.queryBusinessType = queryBusinessType;
-    }
-
-    public String getQueryBusinessId() {
-        return queryBusinessId;
-    }
-
-    public void setQueryBusinessId(String queryBusinessId) {
-        this.queryBusinessId = queryBusinessId;
-    }
-
-    public String getQueryIsVerifySign() {
-        return queryIsVerifySign;
-    }
-
-    public void setQueryIsVerifySign(String queryIsVerifySign) {
-        this.queryIsVerifySign = queryIsVerifySign;
-    }
-
-    public List<String> getQueryBusinessIdList() {
-        return queryBusinessIdList;
-    }
-
-    public void setQueryBusinessIdList(List<String> queryBusinessIdList) {
-        this.queryBusinessIdList = queryBusinessIdList;
     }
 }

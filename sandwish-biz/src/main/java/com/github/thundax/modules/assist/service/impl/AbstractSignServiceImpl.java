@@ -30,10 +30,6 @@ public abstract class AbstractSignServiceImpl implements SignService {
             return;
         }
 
-        Signature query = new Signature();
-        query.setBusinessType(businessType);
-        query.setBusinessId(businessId);
-
-        signatureService.delete(query);
+        signatureService.delete(new Signature(null, businessType, businessId));
     }
 }

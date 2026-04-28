@@ -26,7 +26,6 @@ public final class SignaturePersistenceAssembler {
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -60,13 +59,4 @@ public final class SignaturePersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Signature.Query query, SignatureDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryBusinessType(query.getBusinessType());
-        dataObject.setQueryBusinessId(query.getBusinessId());
-        dataObject.setQueryIsVerifySign(query.getIsVerifySign());
-        dataObject.setQueryBusinessIdList(query.getBusinessIdList());
-    }
 }

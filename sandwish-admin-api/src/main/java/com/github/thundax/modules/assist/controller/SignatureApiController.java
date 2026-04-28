@@ -57,13 +57,8 @@ public class SignatureApiController extends BaseApiController implements Signatu
             throws ApiException {
         validate(request);
 
-        Signature query = new Signature();
-        Signature.Query queryCondition = new Signature.Query();
-        queryCondition.setBusinessType(request.getBusinessType());
-        query.setQuery(queryCondition);
-
         return entityPageToVo(
-                signatureService.findPage(query, readSignaturePage(request)),
+                signatureService.findPage(request.getBusinessType(), readSignaturePage(request)),
                 this::entityToResponse);
     }
 

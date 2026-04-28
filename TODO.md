@@ -21,8 +21,4 @@
 
 ### 第三批：公共收口
 
-1. 删除 PageHelper 依赖和公共支撑类。
-2. 删除或收窄旧 `CrudDao` / `CrudServiceImpl` 基类。
-3. 删除 Mapper XML 配置和空 mapping 目录。
-4. 增加禁止新增 XML、PageHelper、旧 CRUD 基类依赖的架构测试或静态检查。
-5. 同步长期数据库治理规则。
+1. 同步长期数据库治理规则。

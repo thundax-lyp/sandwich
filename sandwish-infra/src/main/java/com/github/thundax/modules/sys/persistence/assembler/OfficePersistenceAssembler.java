@@ -27,7 +27,6 @@ public final class OfficePersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -62,12 +61,4 @@ public final class OfficePersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Office.Query query, OfficeDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryParentId(query.getParentId());
-        dataObject.setQueryName(query.getName());
-        dataObject.setQueryRemarks(query.getRemarks());
-    }
 }

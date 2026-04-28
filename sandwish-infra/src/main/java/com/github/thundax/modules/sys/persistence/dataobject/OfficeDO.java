@@ -1,5 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -17,24 +20,42 @@ public class OfficeDO {
 
     public static final String DEL_FLAG_NORMAL = "0";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
 
+    @TableField("parent_id")
     private String parentId;
+
     private Integer lft;
+
     private Integer rgt;
+
     private String name;
+
+    @TableField("short_name")
     private String shortName;
+
     private Integer priority;
+
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("create_by")
     private String createUserId;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("update_by")
     private String updateUserId;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryParentId;
-    private String queryName;
-    private String queryRemarks;
 
     public OfficeDO(String id) {
         this.id = id;
@@ -152,27 +173,4 @@ public class OfficeDO {
         this.delFlag = delFlag;
     }
 
-    public String getQueryParentId() {
-        return queryParentId;
-    }
-
-    public void setQueryParentId(String queryParentId) {
-        this.queryParentId = queryParentId;
-    }
-
-    public String getQueryName() {
-        return queryName;
-    }
-
-    public void setQueryName(String queryName) {
-        this.queryName = queryName;
-    }
-
-    public String getQueryRemarks() {
-        return queryRemarks;
-    }
-
-    public void setQueryRemarks(String queryRemarks) {
-        this.queryRemarks = queryRemarks;
-    }
 }

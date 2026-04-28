@@ -1,11 +1,30 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Office;
+import java.util.List;
 
 /** @author wdit */
-public interface OfficeDao extends CrudDao<Office> {
+public interface OfficeDao {
+
+    Office get(String id);
+
+    List<Office> getMany(List<String> idList);
+
+    List<Office> findList(String parentId, String name, String remarks);
+
+    Page<Office> findPage(String parentId, String name, String remarks, int pageNo, int pageSize);
+
+    int insert(Office office);
+
+    int update(Office office);
+
+    int updatePriority(Office office);
+
+    int updateDelFlag(Office office);
+
+    int delete(String id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
 

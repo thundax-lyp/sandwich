@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
@@ -36,7 +37,15 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Override
     public Page<Signature> findPage(String businessType, Page<Signature> page) {
-        return dao.findPage(businessType, page);
+        Page<Signature> normalizedPage = normalizePage(page);
+        IPage<Signature> dataPage =
+                dao.findPage(
+                        businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        normalizedPage.setPageNo((int) dataPage.getCurrent());
+        normalizedPage.setPageSize((int) dataPage.getSize());
+        normalizedPage.setCount(dataPage.getTotal());
+        normalizedPage.setList(dataPage.getRecords());
+        return normalizedPage;
     }
 
     @Override
@@ -44,7 +53,7 @@ public class SignatureServiceImpl implements SignatureService {
     public void save(Signature entity) {
         entity.preInsert();
         entity.preUpdate();
-        dao.insertOrUpdate(entity);
+        dao.upsert(entity);
     }
 
     @Override
@@ -70,5 +79,11 @@ public class SignatureServiceImpl implements SignatureService {
             }
         }
         return count;
+    }
+
+    private Page<Signature> normalizePage(Page<Signature> page) {
+        Page<Signature> normalizedPage = page == null ? new Page<>() : page;
+        normalizedPage.initialize();
+        return normalizedPage;
     }
 }

@@ -45,7 +45,8 @@ public class SignatureServiceImplTest {
 
         assertSame(page, service.findPage("Log", page));
         assertEquals("Log", dao.pageBusinessType);
-        assertSame(page, dao.pageArgument);
+        assertEquals(page.getPageNo(), dao.pageNo);
+        assertEquals(page.getPageSize(), dao.pageSize);
     }
 
     @Test
@@ -83,7 +84,8 @@ public class SignatureServiceImplTest {
         private String businessId;
         private int findCalls;
         private String pageBusinessType;
-        private Page<Signature> pageArgument;
+        private int pageNo;
+        private int pageSize;
         private Signature savedEntity;
         private List<String> deletedBusinessKeys = new java.util.ArrayList<>();
 
@@ -110,14 +112,21 @@ public class SignatureServiceImplTest {
         }
 
         @Override
-        public Page<Signature> findPage(String businessType, Page<Signature> page) {
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Signature> findPage(
+                String businessType, int pageNo, int pageSize) {
             this.pageBusinessType = businessType;
-            this.pageArgument = page;
-            return pageResult;
+            this.pageNo = pageNo;
+            this.pageSize = pageSize;
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Signature> dataPage =
+                    new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                            pageResult.getPageNo(), pageResult.getPageSize());
+            dataPage.setTotal(pageResult.getCount());
+            dataPage.setRecords(pageResult.getList());
+            return dataPage;
         }
 
         @Override
-        public int insertOrUpdate(Signature entity) {
+        public int upsert(Signature entity) {
             this.savedEntity = entity;
             return 1;
         }

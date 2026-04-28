@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.dao;
 
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.assist.entity.Signature;
 import java.util.List;
 
@@ -47,10 +47,11 @@ public interface SignatureDao {
      * 按业务分类分页查询签名。
      *
      * @param businessType 业务分类
-     * @param page 分页对象
+     * @param pageNo 页码
+     * @param pageSize 分页大小
      * @return 分页结果
      */
-    Page<Signature> findPage(String businessType, Page<Signature> page);
+    Page<Signature> findPage(String businessType, int pageNo, int pageSize);
 
     /**
      * 插入或更新
@@ -58,7 +59,7 @@ public interface SignatureDao {
      * @param entity 签名数据
      * @return 变更数量
      */
-    int insertOrUpdate(Signature entity);
+    int upsert(Signature entity);
 
     /**
      * 删除签名。

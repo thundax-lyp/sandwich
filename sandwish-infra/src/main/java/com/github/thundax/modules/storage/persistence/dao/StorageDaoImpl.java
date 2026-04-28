@@ -3,8 +3,7 @@ package com.github.thundax.modules.storage.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -94,16 +93,18 @@ public class StorageDaoImpl implements StorageDao {
             String enableFlag,
             String name,
             String remarks,
-            Page<Storage> page) {
-        IPage<StorageDO> dataObjectPage =
+            int pageNo,
+            int pageSize) {
+        Page<StorageDO> dataObjectPage =
                 mapper.selectPage(
-                        StoragePageFactory.create(page.getPageNo(), page.getPageSize()),
+                        new Page<>(pageNo, pageSize),
                         buildListWrapper(mimeType, ownerId, ownerType, enableFlag, name, remarks));
-        page.setPageNo((int) dataObjectPage.getCurrent());
-        page.setPageSize((int) dataObjectPage.getSize());
-        page.setCount(dataObjectPage.getTotal());
-        page.setList(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
-        return page;
+        Page<Storage> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(
+                StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override

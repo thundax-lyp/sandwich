@@ -155,7 +155,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public Page<Member> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> findPage(
                 String enableFlag,
                 String email,
                 String name,
@@ -165,8 +165,10 @@ public class MemberServiceImplTest {
                 Date beginLoginDate,
                 Date endLoginDate,
                 String mobile,
-                Page<Member> page) {
-            return page;
+                int pageNo,
+                int pageSize) {
+            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                    pageNo, pageSize);
         }
 
         @Override

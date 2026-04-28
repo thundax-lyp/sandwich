@@ -49,7 +49,8 @@ public class StorageServiceImplTest {
         assertEquals("1", dao.enableFlag);
         assertEquals("avatar", dao.name);
         assertEquals("remark", dao.remarks);
-        assertSame(page, dao.page);
+        assertEquals(page.getPageNo(), dao.pageNo);
+        assertEquals(page.getPageSize(), dao.pageSize);
     }
 
     @Test
@@ -100,7 +101,8 @@ public class StorageServiceImplTest {
         private String enableFlag;
         private String name;
         private String remarks;
-        private Page<Storage> page;
+        private int pageNo;
+        private int pageSize;
         private Storage inserted;
         private List<String> deletedIds = new java.util.ArrayList<>();
         private List<StorageBusiness> businessList;
@@ -129,22 +131,25 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public Page<Storage> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Storage> findPage(
                 String mimeType,
                 String ownerId,
                 String ownerType,
                 String enableFlag,
                 String name,
                 String remarks,
-                Page<Storage> page) {
+                int pageNo,
+                int pageSize) {
             this.mimeType = mimeType;
             this.ownerId = ownerId;
             this.ownerType = ownerType;
             this.enableFlag = enableFlag;
             this.name = name;
             this.remarks = remarks;
-            this.page = page;
-            return page;
+            this.pageNo = pageNo;
+            this.pageSize = pageSize;
+            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
+                    pageNo, pageSize);
         }
 
         @Override

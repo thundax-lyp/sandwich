@@ -3,8 +3,7 @@ package com.github.thundax.modules.member.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
@@ -71,10 +70,11 @@ public class MemberDaoImpl implements MemberDao {
             Date beginLoginDate,
             Date endLoginDate,
             String mobile,
-            Page<Member> page) {
-        IPage<MemberDO> dataObjectPage =
+            int pageNo,
+            int pageSize) {
+        Page<MemberDO> dataObjectPage =
                 mapper.selectPage(
-                        MemberPageFactory.create(page.getPageNo(), page.getPageSize()),
+                        new Page<>(pageNo, pageSize),
                         buildListWrapper(
                                 enableFlag,
                                 email,
@@ -85,11 +85,12 @@ public class MemberDaoImpl implements MemberDao {
                                 beginLoginDate,
                                 endLoginDate,
                                 mobile));
-        page.setPageNo((int) dataObjectPage.getCurrent());
-        page.setPageSize((int) dataObjectPage.getSize());
-        page.setCount(dataObjectPage.getTotal());
-        page.setList(MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
-        return page;
+        Page<Member> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(
+                MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override

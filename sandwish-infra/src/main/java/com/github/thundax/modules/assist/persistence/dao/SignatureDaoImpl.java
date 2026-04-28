@@ -2,8 +2,7 @@ package com.github.thundax.modules.assist.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.persistence.assembler.SignaturePersistenceAssembler;
@@ -47,20 +46,21 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     @Override
-    public Page<Signature> findPage(String businessType, Page<Signature> page) {
-        IPage<SignatureDO> dataObjectPage =
+    public Page<Signature> findPage(String businessType, int pageNo, int pageSize) {
+        Page<SignatureDO> dataObjectPage =
                 mapper.selectPage(
-                        SignaturePageFactory.create(page.getPageNo(), page.getPageSize()),
+                        new Page<>(pageNo, pageSize),
                         buildListWrapper(businessType, null, null, null));
-        page.setPageNo((int) dataObjectPage.getCurrent());
-        page.setPageSize((int) dataObjectPage.getSize());
-        page.setCount(dataObjectPage.getTotal());
-        page.setList(SignaturePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
-        return page;
+        Page<Signature> entityPage =
+                new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        entityPage.setTotal(dataObjectPage.getTotal());
+        entityPage.setRecords(
+                SignaturePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        return entityPage;
     }
 
     @Override
-    public int insertOrUpdate(Signature entity) {
+    public int upsert(Signature entity) {
         SignatureDO dataObject = SignaturePersistenceAssembler.toDataObject(entity);
         int updated =
                 mapper.update(

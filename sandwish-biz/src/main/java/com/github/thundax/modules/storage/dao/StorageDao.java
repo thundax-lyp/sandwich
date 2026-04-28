@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.dao;
 
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
@@ -27,7 +27,8 @@ public interface StorageDao {
             String enableFlag,
             String name,
             String remarks,
-            Page<Storage> page);
+            int pageNo,
+            int pageSize);
 
     int insert(Storage entity);
 

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.storage.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -50,15 +51,23 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Page<Storage> findPage(Storage storage, Page<Storage> page) {
+        Page<Storage> normalizedPage = normalizePage(page);
         Storage.Query query = storage == null ? null : storage.getQuery();
-        return dao.findPage(
-                query == null ? null : query.getMimeType(),
-                query == null ? null : query.getOwnerId(),
-                query == null ? null : query.getOwnerType(),
-                query == null ? null : query.getEnableFlag(),
-                query == null ? null : query.getName(),
-                query == null ? null : query.getRemarks(),
-                page);
+        IPage<Storage> dataPage =
+                dao.findPage(
+                        query == null ? null : query.getMimeType(),
+                        query == null ? null : query.getOwnerId(),
+                        query == null ? null : query.getOwnerType(),
+                        query == null ? null : query.getEnableFlag(),
+                        query == null ? null : query.getName(),
+                        query == null ? null : query.getRemarks(),
+                        normalizedPage.getPageNo(),
+                        normalizedPage.getPageSize());
+        normalizedPage.setPageNo((int) dataPage.getCurrent());
+        normalizedPage.setPageSize((int) dataPage.getSize());
+        normalizedPage.setCount(dataPage.getTotal());
+        normalizedPage.setList(dataPage.getRecords());
+        return normalizedPage;
     }
 
     @Override
@@ -135,5 +144,11 @@ public class StorageServiceImpl implements StorageService {
             }
         }
         return count;
+    }
+
+    private Page<Storage> normalizePage(Page<Storage> page) {
+        Page<Storage> normalizedPage = page == null ? new Page<>() : page;
+        normalizedPage.initialize();
+        return normalizedPage;
     }
 }

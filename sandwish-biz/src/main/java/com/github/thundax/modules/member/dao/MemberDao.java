@@ -1,6 +1,6 @@
 package com.github.thundax.modules.member.dao;
 
-import com.github.thundax.common.persistence.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +33,8 @@ public interface MemberDao {
             Date beginLoginDate,
             Date endLoginDate,
             String mobile,
-            Page<Member> page);
+            int pageNo,
+            int pageSize);
 
     int insert(Member entity);
 

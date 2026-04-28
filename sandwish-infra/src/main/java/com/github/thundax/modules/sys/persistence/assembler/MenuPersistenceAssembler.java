@@ -32,7 +32,6 @@ public final class MenuPersistenceAssembler {
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateUserId(entity.getUpdateUserId());
         dataObject.setDelFlag(entity.getDelFlag());
-        copyQuery(entity.getQuery(), dataObject);
         return dataObject;
     }
 
@@ -72,12 +71,4 @@ public final class MenuPersistenceAssembler {
         return entities;
     }
 
-    private static void copyQuery(Menu.Query query, MenuDO dataObject) {
-        if (query == null) {
-            return;
-        }
-        dataObject.setQueryParentId(query.getParentId());
-        dataObject.setQueryDisplayFlag(query.getDisplayFlag());
-        dataObject.setQueryMaxRank(query.getMaxRank());
-    }
 }

@@ -1,11 +1,31 @@
 package com.github.thundax.modules.sys.dao;
 
-import com.github.thundax.common.persistence.CrudDao;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
+import java.util.List;
 
 /** @author wdit */
-public interface MenuDao extends CrudDao<Menu> {
+public interface MenuDao {
+
+    Menu get(String id);
+
+    List<Menu> getMany(List<String> idList);
+
+    List<Menu> findList(String parentId, String displayFlag, Integer maxRank);
+
+    Page<Menu> findPage(
+            String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
+
+    int insert(Menu menu);
+
+    int update(Menu menu);
+
+    int updatePriority(Menu menu);
+
+    int updateDelFlag(Menu menu);
+
+    int delete(String id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
 
@@ -24,5 +44,5 @@ public interface MenuDao extends CrudDao<Menu> {
      *
      * @param menu 菜单
      */
-    void deleteMenuRole(Menu menu);
+    void deleteMenuRole(String menuId);
 }

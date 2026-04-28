@@ -1,5 +1,8 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -18,28 +21,53 @@ public class MenuDO {
     public static final String DEL_FLAG_NORMAL = "0";
     public static final String ROOT_ID = "ROOT";
 
+    @TableId(type = IdType.INPUT)
     private String id;
+
+    @TableField(exist = false)
     private boolean isNewRecord;
+
+    @TableField("parent_id")
     private String parentId;
+
     private Integer lft;
+
     private Integer rgt;
+
     private String name;
+
     private String perms;
+
     private Integer ranks;
+
+    @TableField("display_flag")
     private String displayFlag;
+
+    @TableField("display_params")
     private String displayParams;
+
     private String url;
+
     private String target;
+
     private Integer priority;
+
     private String remarks;
+
+    @TableField("create_date")
     private Date createDate;
+
+    @TableField("create_by")
     private String createUserId;
+
+    @TableField("update_date")
     private Date updateDate;
+
+    @TableField("update_by")
     private String updateUserId;
+
+    @TableField("del_flag")
     private String delFlag;
-    private String queryParentId;
-    private String queryDisplayFlag;
-    private Integer queryMaxRank;
 
     public MenuDO(String id) {
         this.id = id;
@@ -195,30 +223,6 @@ public class MenuDO {
 
     public void setDelFlag(String delFlag) {
         this.delFlag = delFlag;
-    }
-
-    public String getQueryParentId() {
-        return queryParentId;
-    }
-
-    public void setQueryParentId(String queryParentId) {
-        this.queryParentId = queryParentId;
-    }
-
-    public String getQueryDisplayFlag() {
-        return queryDisplayFlag;
-    }
-
-    public void setQueryDisplayFlag(String queryDisplayFlag) {
-        this.queryDisplayFlag = queryDisplayFlag;
-    }
-
-    public Integer getQueryMaxRank() {
-        return queryMaxRank;
-    }
-
-    public void setQueryMaxRank(Integer queryMaxRank) {
-        this.queryMaxRank = queryMaxRank;
     }
 
     public Integer treeSpan() {

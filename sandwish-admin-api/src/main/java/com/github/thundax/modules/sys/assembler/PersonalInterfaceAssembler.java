@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -12,6 +11,7 @@ import com.github.thundax.modules.sys.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.response.PersonalPermsResponse;
 import com.github.thundax.modules.utils.AvatarUtils;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -80,9 +80,7 @@ public class PersonalInterfaceAssembler {
     }
 
     private String readAvatarUrl(User entity) {
-        if (entity == null
-                || StringUtils.isBlank(entity.getId())
-                || !AvatarUtils.existAvatar(entity.getId())) {
+        if (entity == null || StringUtils.isBlank(entity.getId()) || !AvatarUtils.existAvatar(entity.getId())) {
             return null;
         }
         return UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken());

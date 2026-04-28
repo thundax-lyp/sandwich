@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.aop;
 
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
@@ -17,13 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-/** @author wdit */
 public class SysLogMethodInterceptor implements MethodInterceptor {
 
     private static final String TITLE_SEPARATOR = "-";
@@ -44,14 +43,11 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
             category = annotation.category();
         }
 
-        if (StringUtils.isEmpty(value)
-                || ArrayUtils.isEmpty(modules)
-                || StringUtils.isEmpty(category)) {
+        if (StringUtils.isEmpty(value) || ArrayUtils.isEmpty(modules) || StringUtils.isEmpty(category)) {
             Class<?> clazz = methodInvocation.getClass();
             System.out.println(clazz);
 
-            SysLogger parentAnnotation =
-                    AnnotationUtils.findAnnotation(method.getDeclaringClass(), SysLogger.class);
+            SysLogger parentAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), SysLogger.class);
             Assert.notNull(parentAnnotation, "modules of annotation '@SysLogger' is empty");
 
             if (StringUtils.isEmpty(value)) {
@@ -100,8 +96,7 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
 
     private void writeLog(String[] modules, String value, String category, Object requestBody) {
         HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                        .getRequest();
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         List<String> titleParts = new ArrayList<>(Arrays.asList(modules));
         titleParts.add(value);

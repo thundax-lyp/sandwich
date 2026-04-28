@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 
-/** @author wdit */
 @ApiModel(value = "MoveTreeNodeQueryParam", description = "移动树节点参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -51,25 +50,16 @@ public class MoveTreeNodeQueryParam implements Serializable {
 
     @ApiModelProperty(
             name = "type",
-            value =
-                    "操作。"
-                            + TYPE_BEFORE
-                            + ": 节点前;"
-                            + TYPE_AFTER
-                            + ": 节点后;"
-                            + TYPE_INSIDE
-                            + ": 成为第一个子节点;"
-                            + TYPE_INSIDE_LAST
-                            + "成为最后一个子节点",
-            allowableValues =
-                    ""
-                            + TYPE_BEFORE
-                            + ","
-                            + TYPE_AFTER
-                            + ","
-                            + TYPE_INSIDE
-                            + ","
-                            + TYPE_INSIDE_LAST,
+            value = "操作。"
+                    + TYPE_BEFORE
+                    + ": 节点前;"
+                    + TYPE_AFTER
+                    + ": 节点后;"
+                    + TYPE_INSIDE
+                    + ": 成为第一个子节点;"
+                    + TYPE_INSIDE_LAST
+                    + "成为最后一个子节点",
+            allowableValues = "" + TYPE_BEFORE + "," + TYPE_AFTER + "," + TYPE_INSIDE + "," + TYPE_INSIDE_LAST,
             example = TYPE_AFTER)
     @JsonProperty("type")
     public String getType() {

@@ -9,7 +9,6 @@ import java.io.Serializable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-/** @author wdit */
 @ApiModel(value = "PageQueryParam", description = "分页查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

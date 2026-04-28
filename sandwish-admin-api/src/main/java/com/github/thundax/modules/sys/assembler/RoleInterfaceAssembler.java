@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.persistence.DataEntity;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
@@ -15,6 +14,7 @@ import com.github.thundax.modules.sys.response.RoleUserResponse;
 import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -112,8 +112,7 @@ public class RoleInterfaceAssembler {
 
         entity.setName(request.getName());
         entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(
-                Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
         entity.setMenuIdList(
                 request.getMenuList() == null
                         ? new ArrayList<>()
@@ -137,8 +136,7 @@ public class RoleInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(
-            T entity, RoleSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, RoleSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

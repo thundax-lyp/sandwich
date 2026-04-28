@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
@@ -24,12 +23,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class MenuApiController extends BaseApiController implements MenuServiceApi {
 
@@ -38,9 +37,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
     @Autowired
     public MenuApiController(
-            MenuService menuService,
-            Validator validator,
-            MenuInterfaceAssembler menuInterfaceAssembler) {
+            MenuService menuService, Validator validator, MenuInterfaceAssembler menuInterfaceAssembler) {
         super(validator);
         this.menuService = menuService;
         this.menuInterfaceAssembler = menuInterfaceAssembler;
@@ -127,18 +124,12 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list)
-            throws ApiException {
-        List<Menu> beanList =
-                validateList(
-                        list,
-                        vo -> menuService.get(vo.getId()),
-                        null,
-                        (bean, vo) ->
-                                bean.setDisplayFlag(
-                                        Boolean.TRUE.equals(vo.getDisplay())
-                                                ? Global.SHOW
-                                                : Global.HIDE));
+    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
+        List<Menu> beanList = validateList(
+                list,
+                vo -> menuService.get(vo.getId()),
+                null,
+                (bean, vo) -> bean.setDisplayFlag(Boolean.TRUE.equals(vo.getDisplay()) ? Global.SHOW : Global.HIDE));
 
         menuService.updateDisplayFlag(beanList);
 
@@ -160,13 +151,10 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
     public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.findList(new Menu());
 
-        Set<String> excludeIds =
-                excludeList == null
-                        ? new HashSet<>()
-                        : new HashSet<>(
-                                excludeList.stream()
-                                        .map(request -> request.getId())
-                                        .collect(Collectors.toList()));
+        Set<String> excludeIds = excludeList == null
+                ? new HashSet<>()
+                : new HashSet<>(
+                        excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(
@@ -211,8 +199,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         }
 
         if (toBean.equals(fromBean) || menuService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(
-                    Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(Menu.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
         menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

@@ -8,7 +8,6 @@ import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.utils.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.function.ThrowableBiConsumer;
 import com.github.thundax.common.utils.function.ThrowableBiPredicate;
 import com.github.thundax.common.utils.function.ThrowableFunction;
@@ -27,11 +26,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 
-/** @author wdit */
 public abstract class BaseApiController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -48,8 +47,7 @@ public abstract class BaseApiController extends BaseController {
 
     protected <T> void validate(T object, String... propertyNames) throws ApiException {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations =
-                    validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 throw new ApiException(constraintViolations.iterator().next().getMessage());
             }
@@ -74,8 +72,7 @@ public abstract class BaseApiController extends BaseController {
      * @throws ApiException API异常
      */
     @NonNull
-    protected static <E, V> List<E> validateList(
-            @NonNull List<V> sourceList, @NonNull ThrowableFunction<V, E> supplier)
+    protected static <E, V> List<E> validateList(@NonNull List<V> sourceList, @NonNull ThrowableFunction<V, E> supplier)
             throws ApiException {
         return validateList(sourceList, supplier, null, null);
     }
@@ -165,15 +162,10 @@ public abstract class BaseApiController extends BaseController {
      * @return 树形列表
      */
     protected static <T> List<T> removeTreeNode(
-            @NonNull List<T> nodeList,
-            @NonNull RemoveTreeNodeSupport<T> support,
-            @NonNull Set<String> excludeIds) {
+            @NonNull List<T> nodeList, @NonNull RemoveTreeNodeSupport<T> support, @NonNull Set<String> excludeIds) {
         // 创建id-data映射表，用于快速查询pid对应的数据
         Set<String> ids =
-                new HashSet<>(
-                        nodeList.stream()
-                                .map(node -> support.getId(node))
-                                .collect(Collectors.toList()));
+                new HashSet<>(nodeList.stream().map(node -> support.getId(node)).collect(Collectors.toList()));
 
         int size = 0;
         while (size != nodeList.size()) {

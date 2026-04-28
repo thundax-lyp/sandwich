@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author thundax */
 @Api(tags = "03-01.辅助-异步任务")
 @RequestMapping(value = "/api/assist/async-task")
 public interface AsyncTaskServiceApi {
@@ -34,6 +33,5 @@ public interface AsyncTaskServiceApi {
                 dataTypeClass = String.class),
     })
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    AsyncTaskResponse get(@RequestBody @ApiParam("异步任务标识请求") AsyncTaskIdRequest request)
-            throws ApiException;
+    AsyncTaskResponse get(@RequestBody @ApiParam("异步任务标识请求") AsyncTaskIdRequest request) throws ApiException;
 }

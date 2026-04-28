@@ -30,7 +30,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class SignatureApiController extends BaseApiController implements SignatureServiceApi {
 
@@ -53,8 +52,7 @@ public class SignatureApiController extends BaseApiController implements Signatu
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
-    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request)
-            throws ApiException {
+    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request) throws ApiException {
         validate(request);
 
         return entityPageToVo(
@@ -64,8 +62,7 @@ public class SignatureApiController extends BaseApiController implements Signatu
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
-    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request)
-            throws ApiException {
+    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request) throws ApiException {
         validate(request);
         Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
 
@@ -79,17 +76,14 @@ public class SignatureApiController extends BaseApiController implements Signatu
         }
 
         return signatureInterfaceAssembler.toVerifyResponse(
-                signService.verifySign(
-                        signable.getSignName(), signable.getSignId(), signable.getSignBody()));
+                signService.verifySign(signable.getSignName(), signable.getSignId(), signable.getSignBody()));
     }
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
         List<Signature> beanList =
-                validateList(
-                        list,
-                        vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
+                validateList(list, vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
 
         signatureService.delete(beanList);
 

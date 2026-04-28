@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.DictServiceApi;
@@ -17,6 +16,7 @@ import com.github.thundax.modules.sys.service.DictService;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,10 +26,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
     private final DictService dictService;
     private final DictInterfaceAssembler dictInterfaceAssembler;
 
-    public DictController(
-            Validator validator,
-            DictService dictService,
-            DictInterfaceAssembler dictInterfaceAssembler) {
+    public DictController(Validator validator, DictService dictService, DictInterfaceAssembler dictInterfaceAssembler) {
         super(validator);
         this.dictService = dictService;
         this.dictInterfaceAssembler = dictInterfaceAssembler;
@@ -52,8 +49,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         Page<Dict> page = readDictPage(request);
-        return entityPageToVo(
-                dictService.findPage(query, page), dictInterfaceAssembler::toResponse);
+        return entityPageToVo(dictService.findPage(query, page), dictInterfaceAssembler::toResponse);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.persistence.DataEntity;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Office;
@@ -14,6 +13,7 @@ import com.github.thundax.modules.sys.response.UserResponse;
 import com.github.thundax.modules.sys.response.UserRoleResponse;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -34,8 +34,7 @@ public class UserInterfaceAssembler {
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
-        response.setAvatar(
-                UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
+        response.setAvatar(UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
 
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
@@ -103,8 +102,7 @@ public class UserInterfaceAssembler {
         entity.setMobile(request.getMobile());
 
         entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(
-                Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
 
         entity.setRoleIdList(
                 request.getRoleList() == null
@@ -125,8 +123,7 @@ public class UserInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(
-            T entity, UserSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, UserSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author wdit */
 @Api(tags = "02-01.系统/个人")
 @SysLogger(module = {"系统", "个人"})
 @RequestMapping(value = "/api/sys/personal")
@@ -63,8 +62,7 @@ public interface PersonalServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    PersonalInfoResponse updateInfo(
-            @RequestBody @ApiParam("个人资料更新请求") PersonalInfoUpdateRequest request)
+    PersonalInfoResponse updateInfo(@RequestBody @ApiParam("个人资料更新请求") PersonalInfoUpdateRequest request)
             throws ApiException;
 
     /**
@@ -107,8 +105,7 @@ public interface PersonalServiceApi {
             value = "avatar/upload",
             method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    PersonalAvatarResponse uploadAvatar(
-            @ModelAttribute @ApiParam("个人头像上传请求") PersonalAvatarUploadRequest request)
+    PersonalAvatarResponse uploadAvatar(@ModelAttribute @ApiParam("个人头像上传请求") PersonalAvatarUploadRequest request)
             throws ApiException;
 
     /**
@@ -129,8 +126,7 @@ public interface PersonalServiceApi {
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
     PersonalAvatarResponse deleteAvatar(
-            @RequestBody(required = false) @ApiParam("个人头像删除请求")
-                    PersonalAvatarDeleteRequest request)
+            @RequestBody(required = false) @ApiParam("个人头像删除请求") PersonalAvatarDeleteRequest request)
             throws ApiException;
 
     /**

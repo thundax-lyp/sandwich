@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-/** @author wdit */
 @Api(tags = "02-05.系统-用户")
 @SysLogger(module = {"系统", "用户"})
 @RequestMapping(value = "/api/sys/user")
@@ -72,8 +71,7 @@ public interface UserServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<UserResponse> list(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request)
-            throws ApiException;
+    List<UserResponse> list(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request) throws ApiException;
 
     /**
      * 获取分页列表
@@ -92,8 +90,7 @@ public interface UserServiceApi {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<UserResponse> page(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request)
-            throws ApiException;
+    PageVo<UserResponse> page(@RequestBody @ApiParam("用户查询请求") UserQueryRequest request) throws ApiException;
 
     /**
      * 添加
@@ -131,8 +128,7 @@ public interface UserServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    UserResponse update(@RequestBody @ApiParam("用户保存请求") UserSaveRequest request)
-            throws ApiException;
+    UserResponse update(@RequestBody @ApiParam("用户保存请求") UserSaveRequest request) throws ApiException;
 
     /**
      * 上传头像
@@ -149,11 +145,7 @@ public interface UserServiceApi {
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
-        @ApiImplicitParam(
-                name = "id",
-                value = "用户ID",
-                required = true,
-                dataTypeClass = String.class),
+        @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataTypeClass = String.class),
     })
     @SysLogger("上传头像")
     @RequestMapping(
@@ -161,8 +153,7 @@ public interface UserServiceApi {
             method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     Boolean uploadAvatar(
-            @RequestParam(value = "id") String id,
-            @ApiParam(value = "头像文件", required = true) MultipartFile avatar)
+            @RequestParam(value = "id") String id, @ApiParam(value = "头像文件", required = true) MultipartFile avatar)
             throws ApiException;
 
     /**
@@ -182,8 +173,7 @@ public interface UserServiceApi {
     })
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
-    Boolean deleteAvatar(@RequestBody @ApiParam("用户头像请求") UserAvatarRequest request)
-            throws ApiException;
+    Boolean deleteAvatar(@RequestBody @ApiParam("用户头像请求") UserAvatarRequest request) throws ApiException;
 
     /**
      * 获取头像相对路径
@@ -220,8 +210,7 @@ public interface UserServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("用户状态请求列表") List<UserStatusRequest> list)
-            throws ApiException;
+    Boolean updateEnableFlag(@RequestBody @ApiParam("用户状态请求列表") List<UserStatusRequest> list) throws ApiException;
 
     /**
      * 删除

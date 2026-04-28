@@ -51,15 +51,14 @@ public class AuthPermissionLifecycleTest {
         authProperties.setLoginExpiredSeconds(60);
 
         permissionService = new PermissionServiceImpl(permissionDao, authProperties);
-        authService =
-                new AuthServiceImpl(
-                        authProperties,
-                        new LoginProperties(),
-                        new InMemoryLoginFormDaoImpl(),
-                        accessTokenDao,
-                        new InMemoryLoginLockDaoImpl(),
-                        new PlainPasswordService(),
-                        permissionService);
+        authService = new AuthServiceImpl(
+                authProperties,
+                new LoginProperties(),
+                new InMemoryLoginFormDaoImpl(),
+                accessTokenDao,
+                new InMemoryLoginLockDaoImpl(),
+                new PlainPasswordService(),
+                permissionService);
 
         new UserServiceHolder(new TestUserService());
         new MenuServiceHolder(new TestMenuService());
@@ -90,11 +89,8 @@ public class AuthPermissionLifecycleTest {
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1");
-        AccessTokenAuthenticationFilter filter =
-                new AccessTokenAuthenticationFilter(
-                        new VltavaProperties.AccessTokenFilterProperties(),
-                        authService,
-                        permissionService);
+        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
+                new VltavaProperties.AccessTokenFilterProperties(), authService, permissionService);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
@@ -112,11 +108,8 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldRejectRequestWithoutToken() throws Exception {
-        AccessTokenAuthenticationFilter filter =
-                new AccessTokenAuthenticationFilter(
-                        new VltavaProperties.AccessTokenFilterProperties(),
-                        authService,
-                        permissionService);
+        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
+                new VltavaProperties.AccessTokenFilterProperties(), authService, permissionService);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         MockHttpServletResponse response = new MockHttpServletResponse();

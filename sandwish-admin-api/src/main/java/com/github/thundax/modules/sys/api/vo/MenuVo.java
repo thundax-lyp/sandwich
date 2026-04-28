@@ -10,7 +10,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/** @author wdit */
 @ApiModel(value = "Menu", description = "菜单")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

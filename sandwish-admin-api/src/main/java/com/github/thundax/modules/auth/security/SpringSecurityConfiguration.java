@@ -22,9 +22,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final PermissionService permissionService;
 
     public SpringSecurityConfiguration(
-            VltavaProperties properties,
-            AuthService authService,
-            PermissionService permissionService) {
+            VltavaProperties properties, AuthService authService, PermissionService permissionService) {
         this.properties = properties;
         this.authService = authService;
         this.permissionService = permissionService;

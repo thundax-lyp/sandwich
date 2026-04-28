@@ -11,7 +11,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-/** @author wdit */
 @SpringBootApplication
 @MapperScan(
         basePackages = {"com.github.thundax.modules"},

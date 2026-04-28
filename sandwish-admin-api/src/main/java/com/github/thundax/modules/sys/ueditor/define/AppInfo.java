@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.ueditor.define;
 import java.util.HashMap;
 import java.util.Map;
 
-/** @author wdit */
 public final class AppInfo {
 
     public static final int SUCCESS = 0;
@@ -29,49 +28,48 @@ public final class AppInfo {
     public static final int ILLEGAL = 401;
 
     @SuppressWarnings("serial")
-    public static Map<Integer, String> info =
-            new HashMap<Integer, String>() {
-                {
-                    put(AppInfo.SUCCESS, "SUCCESS");
+    public static Map<Integer, String> info = new HashMap<Integer, String>() {
+        {
+            put(AppInfo.SUCCESS, "SUCCESS");
 
-                    // 无效的Action
-                    put(AppInfo.INVALID_ACTION, "无效的Action");
-                    // 配置文件初始化失败
-                    put(AppInfo.CONFIG_ERROR, "配置文件初始化失败");
-                    // 抓取远程图片失败
-                    put(AppInfo.REMOTE_FAIL, "抓取远程图片失败");
+            // 无效的Action
+            put(AppInfo.INVALID_ACTION, "无效的Action");
+            // 配置文件初始化失败
+            put(AppInfo.CONFIG_ERROR, "配置文件初始化失败");
+            // 抓取远程图片失败
+            put(AppInfo.REMOTE_FAIL, "抓取远程图片失败");
 
-                    // 被阻止的远程主机
-                    put(AppInfo.PREVENT_HOST, "被阻止的远程主机");
-                    // 远程连接出错
-                    put(AppInfo.CONNECTION_ERROR, "远程连接出错");
+            // 被阻止的远程主机
+            put(AppInfo.PREVENT_HOST, "被阻止的远程主机");
+            // 远程连接出错
+            put(AppInfo.CONNECTION_ERROR, "远程连接出错");
 
-                    // "文件大小超出限制"
-                    put(AppInfo.MAX_SIZE, "文件大小超出限制");
-                    // 权限不足， 多指写权限
-                    put(AppInfo.PERMISSION_DENIED, "权限不足");
-                    // 创建文件失败
-                    put(AppInfo.FAILED_CREATE_FILE, "创建文件失败");
-                    // IO错误
-                    put(AppInfo.IO_ERROR, "IO错误");
-                    // 上传表单不是multipart/form-data类型
-                    put(AppInfo.NOT_MULTIPART_CONTENT, "上传表单不是multipart/form-data类型");
-                    // 解析上传表单错误
-                    put(AppInfo.PARSE_REQUEST_ERROR, "解析上传表单错误");
-                    // 未找到上传数据
-                    put(AppInfo.NOTFOUND_UPLOAD_DATA, "未找到上传数据");
-                    // 不允许的文件类型
-                    put(AppInfo.NOT_ALLOW_FILE_TYPE, "不允许的文件类型");
+            // "文件大小超出限制"
+            put(AppInfo.MAX_SIZE, "文件大小超出限制");
+            // 权限不足， 多指写权限
+            put(AppInfo.PERMISSION_DENIED, "权限不足");
+            // 创建文件失败
+            put(AppInfo.FAILED_CREATE_FILE, "创建文件失败");
+            // IO错误
+            put(AppInfo.IO_ERROR, "IO错误");
+            // 上传表单不是multipart/form-data类型
+            put(AppInfo.NOT_MULTIPART_CONTENT, "上传表单不是multipart/form-data类型");
+            // 解析上传表单错误
+            put(AppInfo.PARSE_REQUEST_ERROR, "解析上传表单错误");
+            // 未找到上传数据
+            put(AppInfo.NOTFOUND_UPLOAD_DATA, "未找到上传数据");
+            // 不允许的文件类型
+            put(AppInfo.NOT_ALLOW_FILE_TYPE, "不允许的文件类型");
 
-                    // 指定路径不是目录
-                    put(AppInfo.NOT_DIRECTORY, "指定路径不是目录");
-                    // 指定路径并不存在
-                    put(AppInfo.NOT_EXIST, "指定路径并不存在");
+            // 指定路径不是目录
+            put(AppInfo.NOT_DIRECTORY, "指定路径不是目录");
+            // 指定路径并不存在
+            put(AppInfo.NOT_EXIST, "指定路径并不存在");
 
-                    // callback参数名不合法
-                    put(AppInfo.ILLEGAL, "Callback参数名不合法");
-                }
-            };
+            // callback参数名不合法
+            put(AppInfo.ILLEGAL, "Callback参数名不合法");
+        }
+    };
 
     public static String getStateInfo(int key) {
         return AppInfo.info.get(key);

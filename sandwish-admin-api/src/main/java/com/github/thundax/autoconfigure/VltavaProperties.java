@@ -1,15 +1,14 @@
 package com.github.thundax.autoconfigure;
 
-import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
-/** @author thundax */
 @ConfigurationProperties(prefix = "vltava")
 public class VltavaProperties {
 
@@ -92,9 +91,7 @@ public class VltavaProperties {
 
     @NotNull
     public ResponseWrapperFilterProperties getResponseWrapperFilter() {
-        return responseWrapperFilter != null
-                ? responseWrapperFilter
-                : new ResponseWrapperFilterProperties();
+        return responseWrapperFilter != null ? responseWrapperFilter : new ResponseWrapperFilterProperties();
     }
 
     public void setResponseWrapperFilter(ResponseWrapperFilterProperties responseWrapperFilter) {

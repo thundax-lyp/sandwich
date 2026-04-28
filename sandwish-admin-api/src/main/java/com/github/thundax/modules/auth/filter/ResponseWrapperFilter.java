@@ -26,15 +26,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class ResponseWrapperFilter extends OncePerRequestFilter {
 
     /** {"code": */
-    private static final byte[] WRAPPED_RESPONSE_PREFIX = {
-        '{', '\"', 'c', 'o', 'd', 'e', '\"', ':'
-    };
+    private static final byte[] WRAPPED_RESPONSE_PREFIX = {'{', '\"', 'c', 'o', 'd', 'e', '\"', ':'};
 
     /** {"code":0,"message":"success","data": */
     private static final byte[] RESPONSE_BODY_PREFIX = {
-        '{', '\"', 'c', 'o', 'd', 'e', '\"', ':', '0', ',', '\"', 'm', 'e', 's', 's', 'a', 'g', 'e',
-        '\"', ':', '\"', 's', 'u', 'c', 'c', 'e', 's', 's', '\"', ',', '\"', 'd', 'a', 't', 'a',
-        '\"', ':'
+        '{', '\"', 'c', 'o', 'd', 'e', '\"', ':', '0', ',', '\"', 'm', 'e', 's', 's', 'a', 'g', 'e', '\"', ':', '\"',
+        's', 'u', 'c', 'c', 'e', 's', 's', '\"', ',', '\"', 'd', 'a', 't', 'a', '\"', ':'
     };
 
     private static final byte[] RESPONSE_BODY_SUFFIX = {'}'};
@@ -48,7 +45,8 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        String requestUri = request.getRequestURI().substring(request.getContextPath().length());
+        String requestUri =
+                request.getRequestURI().substring(request.getContextPath().length());
 
         for (String excludePattern : excludePatternList) {
             if (pathMatcher.match(excludePattern, requestUri)) {
@@ -87,10 +85,7 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
             outputStream.write(responseBody);
 
         } else {
-            response.setContentLength(
-                    responseBody.length
-                            + RESPONSE_BODY_PREFIX.length
-                            + RESPONSE_BODY_SUFFIX.length);
+            response.setContentLength(responseBody.length + RESPONSE_BODY_PREFIX.length + RESPONSE_BODY_SUFFIX.length);
             outputStream.write(RESPONSE_BODY_PREFIX);
             outputStream.write(responseBody);
             outputStream.write(RESPONSE_BODY_SUFFIX);
@@ -128,21 +123,20 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
         @Override
         public ServletOutputStream getOutputStream() {
             if (servletOutputStream == null) {
-                servletOutputStream =
-                        new ServletOutputStream() {
-                            @Override
-                            public void write(int b) {
-                                byteArrayOutputStream.write(b);
-                            }
+                servletOutputStream = new ServletOutputStream() {
+                    @Override
+                    public void write(int b) {
+                        byteArrayOutputStream.write(b);
+                    }
 
-                            @Override
-                            public boolean isReady() {
-                                return false;
-                            }
+                    @Override
+                    public boolean isReady() {
+                        return false;
+                    }
 
-                            @Override
-                            public void setWriteListener(WriteListener listener) {}
-                        };
+                    @Override
+                    public void setWriteListener(WriteListener listener) {}
+                };
             }
             return servletOutputStream;
         }

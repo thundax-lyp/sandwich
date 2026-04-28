@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.api.CaptchaServiceApi;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
@@ -20,13 +19,13 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class CaptchaApiController extends BaseApiController implements CaptchaServiceApi {
 
@@ -43,9 +42,7 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
 
     @Autowired
     public CaptchaApiController(
-            Validator validator,
-            AuthService authService,
-            CaptchaInterfaceAssembler captchaInterfaceAssembler) {
+            Validator validator, AuthService authService, CaptchaInterfaceAssembler captchaInterfaceAssembler) {
         super(validator);
 
         this.authService = authService;
@@ -53,8 +50,7 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     @Override
-    public void captcha(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String loginToken = request.getParameter("loginToken");
         if (StringUtils.isBlank(loginToken)) {
             writeResponse(response, -1, "invalidate login token");
@@ -102,8 +98,7 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     }
 
     @Override
-    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request)
-            throws ApiException {
+    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException {
         if (StringUtils.isBlank(request.getLoginToken())) {
             throw new InvalidParameterException("loginToken");
         }
@@ -113,13 +108,11 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
         return captchaInterfaceAssembler.toRefreshResponse(true);
     }
 
-    private void writeResponse(HttpServletResponse response, int code, String message)
-            throws IOException {
+    private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {
         response.getWriter().print("{\"code\":" + code + ",\"message\":\"" + message + "\"}");
     }
 
-    private void writeImage(
-            HttpServletRequest request, HttpServletResponse response, String captcha)
+    private void writeImage(HttpServletRequest request, HttpServletResponse response, String captcha)
             throws IOException {
 
         response.setHeader("Pragma", "no-cache");
@@ -173,8 +166,7 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
         if (b > MAX_COLOR) {
             b = MAX_COLOR;
         }
-        return new Color(
-                f + random.nextInt(b - f), f + random.nextInt(b - f), f + random.nextInt(b - f));
+        return new Color(f + random.nextInt(b - f), f + random.nextInt(b - f), f + random.nextInt(b - f));
     }
 
     private void createBackground(Graphics graphics, int width, int height) {

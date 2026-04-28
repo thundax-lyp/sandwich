@@ -14,7 +14,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/** @author thundax */
 @Configuration
 @EnableWebMvc
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -53,8 +52,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     //    }
 
     @Bean
-    public FilterRegistrationBean<ResponseWrapperFilter> responseWrapperFilter(
-            VltavaProperties properties) {
+    public FilterRegistrationBean<ResponseWrapperFilter> responseWrapperFilter(VltavaProperties properties) {
         VltavaProperties.ResponseWrapperFilterProperties wrapperFilterProperties =
                 properties.getResponseWrapperFilter();
 
@@ -91,14 +89,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
 
-        registry.addResourceHandler("/favicon.ico")
-                .addResourceLocations("classpath:/static/favicon.ico");
+        registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/favicon.ico");
 
         registry.addResourceHandler("/testcase/**").addResourceLocations("classpath:/testcase/");
 
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }

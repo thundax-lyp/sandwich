@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Size;
 
-/** @author thundax */
 @ApiModel(value = "SignatureQueryParam", description = "辅助：签名查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

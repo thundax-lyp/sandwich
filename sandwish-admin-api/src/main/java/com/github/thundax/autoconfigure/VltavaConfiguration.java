@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-/** @author thundax */
 @Configuration
 @EnableConfigurationProperties({VltavaProperties.class, AuthProperties.class})
 public class VltavaConfiguration {
@@ -53,18 +52,17 @@ public class VltavaConfiguration {
     }
 
     public static void main(String[] argc) {
-        String[] plainStrings =
-                new String[] {
-                    "SYSTEM",
-                    "Kbs2020v8.com.cn",
-                    "uos2020@#test",
-                    "cms",
-                    "wdit2020@#rbmq",
-                    "666666",
-                    "shmhq",
-                    "b2f6753ce85d40d5b77954e350e40ec3",
-                    "031d74741d9c23c639f78bbeb81a5442"
-                };
+        String[] plainStrings = new String[] {
+            "SYSTEM",
+            "Kbs2020v8.com.cn",
+            "uos2020@#test",
+            "cms",
+            "wdit2020@#rbmq",
+            "666666",
+            "shmhq",
+            "b2f6753ce85d40d5b77954e350e40ec3",
+            "031d74741d9c23c639f78bbeb81a5442"
+        };
         StringEncryptor encryptor = new JasyptStringEncryptor();
 
         for (String plainString : plainStrings) {

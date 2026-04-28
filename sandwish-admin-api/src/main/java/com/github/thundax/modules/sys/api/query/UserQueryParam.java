@@ -76,36 +76,34 @@ public class UserQueryParam extends PageQueryParam {
 
     @ApiModelProperty(
             name = "orderBy",
-            value =
-                    "排序规则。\n"
-                            + ORDER_BY_NAME_ASC
-                            + ": 名称正序\n"
-                            + ORDER_BY_NAME_DESC
-                            + ": 名称倒序\n"
-                            + ORDER_BY_LOGIN_NAME_ASC
-                            + ": 登录名正序\n"
-                            + ORDER_BY_LOGIN_NAME_DESC
-                            + ": 登录名倒序\n"
-                            + ORDER_BY_ENABLE_ASC
-                            + ": 启用/禁用正序\n"
-                            + ORDER_BY_ENABLE_DESC
-                            + ": 启用/禁用倒序\n"
-                            + "",
-            allowableValues =
-                    ""
-                            + ORDER_BY_NAME_ASC
-                            + ","
-                            + ORDER_BY_NAME_DESC
-                            + ","
-                            + ORDER_BY_LOGIN_NAME_ASC
-                            + ","
-                            + ORDER_BY_LOGIN_NAME_DESC
-                            + ","
-                            + ORDER_BY_ENABLE_ASC
-                            + ","
-                            + ORDER_BY_ENABLE_DESC
-                            + ","
-                            + "",
+            value = "排序规则。\n"
+                    + ORDER_BY_NAME_ASC
+                    + ": 名称正序\n"
+                    + ORDER_BY_NAME_DESC
+                    + ": 名称倒序\n"
+                    + ORDER_BY_LOGIN_NAME_ASC
+                    + ": 登录名正序\n"
+                    + ORDER_BY_LOGIN_NAME_DESC
+                    + ": 登录名倒序\n"
+                    + ORDER_BY_ENABLE_ASC
+                    + ": 启用/禁用正序\n"
+                    + ORDER_BY_ENABLE_DESC
+                    + ": 启用/禁用倒序\n"
+                    + "",
+            allowableValues = ""
+                    + ORDER_BY_NAME_ASC
+                    + ","
+                    + ORDER_BY_NAME_DESC
+                    + ","
+                    + ORDER_BY_LOGIN_NAME_ASC
+                    + ","
+                    + ORDER_BY_LOGIN_NAME_DESC
+                    + ","
+                    + ORDER_BY_ENABLE_ASC
+                    + ","
+                    + ORDER_BY_ENABLE_DESC
+                    + ","
+                    + "",
             example = ORDER_BY_NAME_ASC)
     public String getOrderBy() {
         return orderBy;

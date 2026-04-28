@@ -4,7 +4,6 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
@@ -35,12 +34,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class PersonalApiController extends BaseApiController implements PersonalServiceApi {
 
@@ -74,8 +73,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     }
 
     @Override
-    public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request)
-            throws ApiException {
+    public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         validate(request);
 
         User currentUser = UserAccessHolder.currentUser();
@@ -87,8 +85,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     }
 
     @Override
-    public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request)
-            throws ApiException {
+    public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
         String privateKey = keypairService.getPrivateKey(request.getToken());
@@ -117,8 +114,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     }
 
     @Override
-    public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request)
-            throws ApiException {
+    public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request) throws ApiException {
         validate(request);
         User currentUser = UserAccessHolder.currentUser();
 
@@ -132,8 +128,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     }
 
     @Override
-    public PersonalAvatarResponse deleteAvatar(
-            @RequestBody(required = false) PersonalAvatarDeleteRequest request) {
+    public PersonalAvatarResponse deleteAvatar(@RequestBody(required = false) PersonalAvatarDeleteRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
         AvatarUtils.deleteAvatar(currentUser.getId());
@@ -152,17 +147,11 @@ public class PersonalApiController extends BaseApiController implements Personal
         for (int idx = 0; idx < menuList.size(); idx++) {
             Menu parent = menuList.get(idx);
 
-            List<Menu> childList =
-                    allMenuList == null
-                            ? new ArrayList<>()
-                            : allMenuList.stream()
-                                    .filter(
-                                            item ->
-                                                    item.isDisplay()
-                                                            && Objects.equals(
-                                                                    item.getParentId(),
-                                                                    parent.getId()))
-                                    .collect(Collectors.toList());
+            List<Menu> childList = allMenuList == null
+                    ? new ArrayList<>()
+                    : allMenuList.stream()
+                            .filter(item -> item.isDisplay() && Objects.equals(item.getParentId(), parent.getId()))
+                            .collect(Collectors.toList());
 
             menuList.addAll(idx + 1, childList);
         }

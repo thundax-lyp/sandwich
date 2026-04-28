@@ -6,7 +6,6 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.service.TreeService;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.OfficeServiceApi;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
@@ -22,12 +21,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class OfficeApiController extends BaseApiController implements OfficeServiceApi {
 
@@ -36,9 +35,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
     @Autowired
     public OfficeApiController(
-            OfficeService officeService,
-            Validator validator,
-            OfficeInterfaceAssembler officeInterfaceAssembler) {
+            OfficeService officeService, Validator validator, OfficeInterfaceAssembler officeInterfaceAssembler) {
         super(validator);
         this.officeService = officeService;
         this.officeInterfaceAssembler = officeInterfaceAssembler;
@@ -137,13 +134,10 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
     public List<OfficeResponse> tree(@RequestBody List<OfficeIdRequest> excludeList) {
         List<Office> beanList = officeService.findList(new Office());
 
-        Set<String> excludeIds =
-                excludeList == null
-                        ? new HashSet<>()
-                        : new HashSet<>(
-                                excludeList.stream()
-                                        .map(request -> request.getId())
-                                        .collect(Collectors.toList()));
+        Set<String> excludeIds = excludeList == null
+                ? new HashSet<>()
+                : new HashSet<>(
+                        excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         removeTreeNode(
@@ -188,8 +182,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         }
 
         if (toBean.equals(fromBean) || officeService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(
-                    Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(Office.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
         }
 
         officeService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

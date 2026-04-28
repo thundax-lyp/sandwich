@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.persistence.Page;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
@@ -46,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,7 +57,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-/** @author thundax */
 @RestController
 public class UserApiController extends BaseApiController implements UserServiceApi {
 
@@ -119,17 +118,14 @@ public class UserApiController extends BaseApiController implements UserServiceA
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
-        return entityPageToVo(
-                userService.findPage(query, page), userInterfaceAssembler::toResponse);
+        return entityPageToVo(userService.findPage(query, page), userInterfaceAssembler::toResponse);
     }
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password =
-                Sm2.decrypt(
-                        request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
+        String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validate(request);
         validateOffice(request.getOffice());
@@ -156,8 +152,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         entity.setRegisterDate(new Date());
         HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                        .getRequest();
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
         userService.save(entity);
@@ -170,10 +165,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password =
-                    Sm2.decrypt(
-                            request.getLoginPass(),
-                            keypairService.getPrivateKey(request.getToken()));
+            String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }
@@ -195,8 +187,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
         // 非超管用户无权限开启/关闭管理员
         if (!currentUser().isSuper()
-                && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO)
-                        .equals(bean.getAdminFlag())) {
+                && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO).equals(bean.getAdminFlag())) {
             throw new PermissionDeniedException();
         }
         // 无权限修改超管/等级高于自身的用户信息
@@ -220,8 +211,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar)
-            throws ApiException {
+    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
         return true;
     }
 
@@ -242,21 +232,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
     public Boolean updateEnableFlag(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = currentUser();
 
-        List<User> beanList =
-                validateList(
-                        list,
-                        vo -> userService.get(vo.getId()),
-                        (bean, vo) -> {
-                            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                                throw new PermissionDeniedException();
-                            }
-                            return true;
-                        },
-                        (bean, vo) ->
-                                bean.setEnableFlag(
-                                        Boolean.TRUE.equals(vo.getEnable())
-                                                ? Global.ENABLE
-                                                : Global.DISABLE));
+        List<User> beanList = validateList(
+                list,
+                vo -> userService.get(vo.getId()),
+                (bean, vo) -> {
+                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                        throw new PermissionDeniedException();
+                    }
+                    return true;
+                },
+                (bean, vo) -> bean.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE));
 
         userService.updateEnableFlag(beanList);
 
@@ -268,17 +253,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
     public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = currentUser();
 
-        List<User> beanList =
-                validateList(
-                        list,
-                        vo -> userService.get(vo.getId()),
-                        (bean, vo) -> {
-                            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                                throw new PermissionDeniedException();
-                            }
-                            return true;
-                        },
-                        null);
+        List<User> beanList = validateList(
+                list,
+                vo -> userService.get(vo.getId()),
+                (bean, vo) -> {
+                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                        throw new PermissionDeniedException();
+                    }
+                    return true;
+                },
+                null);
 
         userService.delete(beanList);
 
@@ -320,8 +304,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
-    public void avatarImage(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    public void avatarImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userId = request.getParameter("id");
         if (StringUtils.isBlank(userId)) {
             response.sendError(HttpStatus.NOT_FOUND.value());

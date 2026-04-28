@@ -7,7 +7,6 @@ import com.github.thundax.common.vo.BaseVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-/** @author wdit */
 @ApiModel(value = "Log", description = "日志")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

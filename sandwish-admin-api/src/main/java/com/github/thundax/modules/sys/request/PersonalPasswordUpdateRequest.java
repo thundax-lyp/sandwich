@@ -27,9 +27,7 @@ public class PersonalPasswordUpdateRequest implements Serializable {
     @ApiModelProperty(name = "password", value = "新密码")
     @JsonProperty("password")
     @NotEmpty(message = "\"新密码\"不能为空")
-    @Pattern(
-            regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN,
-            message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
+    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     private String password;
 
     @ApiModelProperty(name = "token", value = "令牌")

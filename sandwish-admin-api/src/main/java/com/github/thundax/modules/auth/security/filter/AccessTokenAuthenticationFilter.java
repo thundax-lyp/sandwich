@@ -53,7 +53,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String requestUri = request.getRequestURI().substring(request.getContextPath().length());
+        String requestUri =
+                request.getRequestURI().substring(request.getContextPath().length());
 
         for (String excludePattern : excludePatternList) {
             if (pathMatcher.match(excludePattern, requestUri)) {
@@ -65,8 +66,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = findToken(request);
         if (StringUtils.isBlank(token)) {
@@ -95,11 +95,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         authService.activeAccessToken(accessToken);
         SecurityContextHolder.getContext()
-                .setAuthentication(
-                        new UsernamePasswordAuthenticationToken(
-                                accessToken.getUserId(),
-                                token,
-                                toAuthorities(session.getPermissions())));
+                .setAuthentication(new UsernamePasswordAuthenticationToken(
+                        accessToken.getUserId(), token, toAuthorities(session.getPermissions())));
 
         filterChain.doFilter(request, response);
     }
@@ -126,8 +123,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void writeError(HttpServletResponse response) throws IOException {
-        String jsonString =
-                JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
+        String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
 
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

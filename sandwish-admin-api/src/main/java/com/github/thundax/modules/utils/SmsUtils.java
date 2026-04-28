@@ -1,11 +1,11 @@
 package com.github.thundax.modules.utils;
 
 import com.github.thundax.common.utils.SpringContextHolder;
-import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.net.ssl.SSLContext;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -95,8 +95,7 @@ public class SmsUtils {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<Object> httpEntity = new HttpEntity<>(params, httpHeaders);
-        ResponseEntity<String> response =
-                client.exchange(url, HttpMethod.POST, httpEntity, String.class);
+        ResponseEntity<String> response = client.exchange(url, HttpMethod.POST, httpEntity, String.class);
         if (HttpStatus.OK.value() == response.getStatusCodeValue()) {
             return response.getBody();
         }
@@ -109,14 +108,15 @@ public class SmsUtils {
         }
         try {
             TrustStrategy acceptingTrustStrategy = (chain, authType) -> true;
-            SSLContext sslContext =
-                    SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, acceptingTrustStrategy)
+                    .build();
             SSLConnectionSocketFactory sslsf =
                     new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
             HttpClientBuilder clientBuilder = HttpClients.custom();
-            CloseableHttpClient httpClient = clientBuilder.setSSLSocketFactory(sslsf).build();
-            HttpComponentsClientHttpRequestFactory requestFactory =
-                    new HttpComponentsClientHttpRequestFactory();
+            CloseableHttpClient httpClient =
+                    clientBuilder.setSSLSocketFactory(sslsf).build();
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             return new RestTemplate(requestFactory);
         } catch (Exception e) {

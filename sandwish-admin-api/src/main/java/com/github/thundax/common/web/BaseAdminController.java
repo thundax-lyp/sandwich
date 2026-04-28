@@ -2,7 +2,6 @@ package com.github.thundax.common.web;
 
 import com.github.thundax.common.exception.WebMvcException;
 import com.github.thundax.common.utils.CookieUtils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import java.text.ParseException;
@@ -20,16 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** @author thundax */
 public class BaseAdminController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -100,14 +99,13 @@ public class BaseAdminController extends BaseController {
         return true;
     }
 
-    protected <T> boolean validate(
-            RedirectAttributes redirectAttributes, T object, String... propertyNames) {
+    protected <T> boolean validate(RedirectAttributes redirectAttributes, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations =
-                    validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 addWarningMessage(
-                        redirectAttributes, constraintViolations.iterator().next().getMessage());
+                        redirectAttributes,
+                        constraintViolations.iterator().next().getMessage());
                 return false;
             }
         }
@@ -127,8 +125,7 @@ public class BaseAdminController extends BaseController {
 
     protected <T> boolean validate(Model model, T object, String... propertyNames) {
         for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations =
-                    validator.validateProperty(object, propertyName);
+            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
             if (constraintViolations.size() > 0) {
                 addWarningMessage(model, constraintViolations.iterator().next().getMessage());
                 return false;
@@ -155,13 +152,11 @@ public class BaseAdminController extends BaseController {
         }
     }
 
-    protected void addSuccessMessage(
-            @NotNull RedirectAttributes redirectAttributes, String message) {
+    protected void addSuccessMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MESSAGE_SUCCESS + ":" + message);
     }
 
-    protected void addWarningMessage(
-            @NotNull RedirectAttributes redirectAttributes, String message) {
+    protected void addWarningMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MESSAGE_WARN + ":" + message);
     }
 
@@ -179,11 +174,7 @@ public class BaseAdminController extends BaseController {
      * @return 排除的数据结构数目
      */
     protected List<Map<String, String>> removeTreeNode(
-            List<Map<String, String>> dataList,
-            String keyNameId,
-            String keyNamePid,
-            String rootId,
-            String extId) {
+            List<Map<String, String>> dataList, String keyNameId, String keyNamePid, String rootId, String extId) {
         // 创建id-data映射表，用于快速查询pid对应的数据
         Set<String> ids = new HashSet<>();
         for (Map<String, String> data : dataList) {
@@ -218,17 +209,15 @@ public class BaseAdminController extends BaseController {
 
     /** 将requestParams装配到model */
     protected void setupParamsModel(HttpServletRequest request, Model model) {
-        request.getParameterMap()
-                .forEach(
-                        (name, values) -> {
-                            if (StringUtils.isNotBlank(name) && values != null) {
-                                if (values.length == 1) {
-                                    model.addAttribute(name, values[0]);
-                                } else if (values.length > 1) {
-                                    model.addAttribute(name, values);
-                                }
-                            }
-                        });
+        request.getParameterMap().forEach((name, values) -> {
+            if (StringUtils.isNotBlank(name) && values != null) {
+                if (values.length == 1) {
+                    model.addAttribute(name, values[0]);
+                } else if (values.length > 1) {
+                    model.addAttribute(name, values);
+                }
+            }
+        });
     }
 
     /** 从request中读取整数，如果读取失败且设置了reload开关，则从cookie中获取，读取结果content保存在cookie中 */
@@ -238,10 +227,7 @@ public class BaseAdminController extends BaseController {
     }
 
     protected static Integer readReloadInteger(
-            String paramName,
-            String cookieName,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            String paramName, String cookieName, HttpServletRequest request, HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNumeric(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -257,16 +243,12 @@ public class BaseAdminController extends BaseController {
         return null;
     }
 
-    protected static Date readReloadDate(
-            String paramName, HttpServletRequest request, HttpServletResponse response) {
+    protected static Date readReloadDate(String paramName, HttpServletRequest request, HttpServletResponse response) {
         return readReloadDate(paramName, paramName, request, response);
     }
 
     protected static Date readReloadDate(
-            String paramName,
-            String cookieName,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            String paramName, String cookieName, HttpServletRequest request, HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (StringUtils.isNotEmpty(paramValue)) {
             CookieUtils.setCookie(response, cookieName, paramValue);
@@ -296,10 +278,7 @@ public class BaseAdminController extends BaseController {
     }
 
     protected static String readReloadString(
-            String paramName,
-            String cookieName,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            String paramName, String cookieName, HttpServletRequest request, HttpServletResponse response) {
         String paramValue = request.getParameter(paramName);
         if (paramValue != null) {
             CookieUtils.setCookie(response, cookieName, paramValue);

@@ -8,12 +8,10 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-/** @author wdit */
 @SuppressWarnings({"unchecked"})
 public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
 
-    private static final Class<? extends Annotation>[] ANNOTATION_CLASSES =
-            new Class[] {SysLogger.class};
+    private static final Class<? extends Annotation>[] ANNOTATION_CLASSES = new Class[] {SysLogger.class};
 
     public SysLogPointcutAdvisor() {
         setAdvice(new SysLogMethodInterceptor());

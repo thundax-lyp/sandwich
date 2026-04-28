@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.codec.Sm3Utils;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.auth.service.PasswordService;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * SM3加密
@@ -27,8 +27,7 @@ public class Sm3PasswordServiceImpl implements PasswordService {
 
     private String encrypt(String plainPassword, String salt) {
         String encryptedPassword =
-                Sm3Utils.sm3Hex(
-                        (salt + ARG_SEPARATOR + plainPassword).getBytes(StandardCharsets.UTF_8));
+                Sm3Utils.sm3Hex((salt + ARG_SEPARATOR + plainPassword).getBytes(StandardCharsets.UTF_8));
         return PREFIX + salt + ARG_SEPARATOR + encryptedPassword + SUFFIX;
     }
 
@@ -41,8 +40,7 @@ public class Sm3PasswordServiceImpl implements PasswordService {
         if (StringUtils.startsWithIgnoreCase(encryptedPassword, PREFIX)
                 && StringUtils.endsWithIgnoreCase(encryptedPassword, SUFFIX)) {
             String queryString =
-                    encryptedPassword.substring(
-                            PREFIX.length(), encryptedPassword.length() - SUFFIX.length());
+                    encryptedPassword.substring(PREFIX.length(), encryptedPassword.length() - SUFFIX.length());
             String[] args = StringUtils.split(queryString, ARG_SEPARATOR);
             if (args.length != ARG_SIZE) {
                 return false;
@@ -60,10 +58,8 @@ public class Sm3PasswordServiceImpl implements PasswordService {
 
         Sm3PasswordServiceImpl impl = new Sm3PasswordServiceImpl();
         System.out.println(impl.encrypt("Q1w2e3r$", "fdf7"));
-        System.out.println(
-                impl.validate(
-                        "Q1w2e3r$",
-                        "ENC(fdf7,030f84263f1a4eef98be3a7689f52385a2d1bf1fe83af14ecdcc66948b39af75)"));
+        System.out.println(impl.validate(
+                "Q1w2e3r$", "ENC(fdf7,030f84263f1a4eef98be3a7689f52385a2d1bf1fe83af14ecdcc66948b39af75)"));
 
         // "8f5928a2f8b4ead6f91374f1a009a4d620034e5681ac1404e8d5b60730de61eb";
     }

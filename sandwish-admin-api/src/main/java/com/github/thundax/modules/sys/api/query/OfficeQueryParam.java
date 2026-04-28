@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.Size;
 
-/** @author wdit */
 @ApiModel(value = "OfficeQueryParam", description = "组织机构查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

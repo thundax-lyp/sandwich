@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/** @author thundax */
 @ApiModel(value = "Signature", description = "辅助：数据签名")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

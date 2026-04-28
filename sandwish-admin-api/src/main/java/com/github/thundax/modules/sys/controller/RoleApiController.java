@@ -5,7 +5,6 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.RoleServiceApi;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
@@ -36,13 +35,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author thundax */
 @RestController
 public class RoleApiController extends BaseApiController implements RoleServiceApi {
 
@@ -139,16 +138,11 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updateEnableFlag(@RequestBody List<RoleStatusRequest> list) throws ApiException {
-        List<Role> beanList =
-                validateList(
-                        list,
-                        vo -> roleService.get(vo.getId()),
-                        null,
-                        (bean, vo) ->
-                                bean.setEnableFlag(
-                                        Boolean.TRUE.equals(vo.getEnable())
-                                                ? Global.ENABLE
-                                                : Global.DISABLE));
+        List<Role> beanList = validateList(
+                list,
+                vo -> roleService.get(vo.getId()),
+                null,
+                (bean, vo) -> bean.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE));
 
         roleService.updateEnableFlag(beanList);
 
@@ -158,12 +152,8 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updatePriority(@RequestBody List<RolePriorityRequest> list) throws ApiException {
-        List<Role> beanList =
-                validateList(
-                        list,
-                        vo -> roleService.get(vo.getId()),
-                        null,
-                        (bean, vo) -> bean.setPriority(vo.getPriority()));
+        List<Role> beanList = validateList(
+                list, vo -> roleService.get(vo.getId()), null, (bean, vo) -> bean.setPriority(vo.getPriority()));
 
         roleService.updatePriority(beanList);
 
@@ -193,21 +183,13 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
-        list.addAll(
-                officeService.findList(new Office()).stream()
-                        .map(
-                                office ->
-                                        roleInterfaceAssembler.toOfficeTreeNode(
-                                                OFFICE_ID_PREFIX + office.getId(), office))
-                        .collect(Collectors.toList()));
+        list.addAll(officeService.findList(new Office()).stream()
+                .map(office -> roleInterfaceAssembler.toOfficeTreeNode(OFFICE_ID_PREFIX + office.getId(), office))
+                .collect(Collectors.toList()));
 
-        list.addAll(
-                userService.findList(new User()).stream()
-                        .map(
-                                user ->
-                                        roleInterfaceAssembler.toUserTreeNode(
-                                                OFFICE_ID_PREFIX, user))
-                        .collect(Collectors.toList()));
+        list.addAll(userService.findList(new User()).stream()
+                .map(user -> roleInterfaceAssembler.toUserTreeNode(OFFICE_ID_PREFIX, user))
+                .collect(Collectors.toList()));
 
         return list;
     }
@@ -221,10 +203,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         }
 
         return roleService.findRoleUser(bean).stream()
-                .map(
-                        user ->
-                                roleInterfaceAssembler.toUserResponse(
-                                        UserServiceHolder.get(user.getId())))
+                .map(user -> roleInterfaceAssembler.toUserResponse(UserServiceHolder.get(user.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -238,9 +217,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         roleService.updateUserList(
                 roleBean,
-                request.getUsers().stream()
-                        .map(vo -> new User(vo.getId()))
-                        .collect(Collectors.toList()));
+                request.getUsers().stream().map(vo -> new User(vo.getId())).collect(Collectors.toList()));
 
         return true;
     }

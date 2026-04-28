@@ -4,7 +4,6 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
@@ -28,13 +27,13 @@ import com.github.thundax.modules.utils.IPUtils;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-/** @author thundax */
 @RestController
 public class AuthApiController extends BaseApiController implements AuthServiceApi {
 
@@ -67,17 +66,14 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
             throw new InvalidParameterException("refreshToken");
         }
 
-        return authInterfaceAssembler.toLoginFormResponse(
-                authService.refreshLoginForm(request.getRefreshToken()));
+        return authInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
     }
 
     @Override
-    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request)
-            throws ApiException {
+    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException {
         validate(request);
         HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                        .getRequest();
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         if (!authService.validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
             // 刷新验证码
             authService.createCaptcha(request.getLoginToken());
@@ -129,8 +125,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
         userService.updateLoginInfo(user);
 
-        return authInterfaceAssembler.toAccessTokenResponse(
-                authService.createAccessToken(user.getId()));
+        return authInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(user.getId()));
     }
 
     @Override
@@ -154,8 +149,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
     }
 
     /** 记录登录日志 */
-    private void writeLog(
-            HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
+    private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {
         Log log = new Log();
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());

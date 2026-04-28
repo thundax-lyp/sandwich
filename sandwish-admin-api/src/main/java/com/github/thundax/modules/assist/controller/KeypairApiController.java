@@ -3,7 +3,6 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.api.KeypairServiceApi;
 import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
@@ -14,6 +13,7 @@ import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import javax.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 

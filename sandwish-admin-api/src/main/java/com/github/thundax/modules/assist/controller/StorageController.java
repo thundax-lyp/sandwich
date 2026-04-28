@@ -4,7 +4,6 @@ import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.web.BaseAdminController;
 import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
@@ -28,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/** @author thundax */
 @Controller
 @RequestMapping(value = "/api/assist/storage")
 public class StorageController extends BaseAdminController {
@@ -129,16 +128,14 @@ public class StorageController extends BaseAdminController {
             return storageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
 
         } else {
-            Map<String, MultipartFile> fileMap =
-                    ((MultipartHttpServletRequest) request).getFileMap();
+            Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
             StorageUploadResponse response = new StorageUploadResponse();
             for (MultipartFile file : fileMap.values()) {
                 try {
                     String originalFilename = file.getOriginalFilename();
 
                     List<String> validExtNameList = properties.getAllowSuffix();
-                    String extendName =
-                            StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
+                    String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
                     if (!validExtNameList.contains(extendName)) {
                         return storageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
                     }
@@ -175,13 +172,10 @@ public class StorageController extends BaseAdminController {
     // 文件预览是静态资源支撑入口，保持 HttpServletResponse 流式输出边界。
     @RequestMapping(value = "file/{id}.{extendName}")
     public void preview(
-            @PathVariable("id") String id,
-            @PathVariable("extendName") String extendName,
-            HttpServletResponse response)
+            @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
         Storage storage = StorageServiceHolder.get(id);
-        if (storage == null
-                || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
+        if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
@@ -212,11 +206,8 @@ public class StorageController extends BaseAdminController {
             return "redirect:" + modulePath + "/list?reload";
         }
 
-        int count =
-                storageService.delete(
-                        new ArrayList<>(Arrays.asList(ids)).stream()
-                                .map(id -> new Storage(id))
-                                .collect(Collectors.toList()));
+        int count = storageService.delete(new ArrayList<>(Arrays.asList(ids))
+                .stream().map(id -> new Storage(id)).collect(Collectors.toList()));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
         return "redirect:" + modulePath + "/list?reload";
@@ -235,26 +226,20 @@ public class StorageController extends BaseAdminController {
         Storage query = new Storage();
         Storage.Query queryCondition = new Storage.Query();
 
-        queryCondition.setMimeType(
-                readReloadString("query.mimeType", "storage.query.mimeType", request, response));
+        queryCondition.setMimeType(readReloadString("query.mimeType", "storage.query.mimeType", request, response));
 
         queryCondition.setBusinessType(
-                readReloadString(
-                        "query.businessId", "storage.query.businessId", request, response));
+                readReloadString("query.businessId", "storage.query.businessId", request, response));
 
         queryCondition.setEnableFlag(
-                readReloadString(
-                        "query.enableFlag", "storage.query.enableFlag", request, response));
+                readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
 
         queryCondition.setPublicFlag(
-                readReloadString(
-                        "query.publicFlag", "storage.query.publicFlag", request, response));
+                readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
 
-        queryCondition.setName(
-                readReloadString("query.name", "storage.query.name", request, response));
+        queryCondition.setName(readReloadString("query.name", "storage.query.name", request, response));
 
-        queryCondition.setRemarks(
-                readReloadString("query.remarks", "storage.query.remarks", request, response));
+        queryCondition.setRemarks(readReloadString("query.remarks", "storage.query.remarks", request, response));
         query.setQuery(queryCondition);
 
         return query;

@@ -2,10 +2,10 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.persistence.DataEntity;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -56,8 +56,7 @@ public class MenuInterfaceAssembler {
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());
         entity.setRanks(request.getRanks());
-        entity.setDisplayFlag(
-                Boolean.TRUE.equals(request.getDisplay()) ? Global.SHOW : Global.HIDE);
+        entity.setDisplayFlag(Boolean.TRUE.equals(request.getDisplay()) ? Global.SHOW : Global.HIDE);
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
 
@@ -73,8 +72,7 @@ public class MenuInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(
-            T entity, MenuSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, MenuSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

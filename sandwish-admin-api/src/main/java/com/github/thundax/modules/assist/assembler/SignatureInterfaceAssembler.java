@@ -34,8 +34,7 @@ public class SignatureInterfaceAssembler {
         return response;
     }
 
-    private static SignatureResponse baseEntityToResponse(
-            SignatureResponse response, DataEntity entity) {
+    private static SignatureResponse baseEntityToResponse(SignatureResponse response, DataEntity entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());

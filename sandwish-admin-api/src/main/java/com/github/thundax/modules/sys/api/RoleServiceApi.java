@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author wdit */
 @Api(tags = "02-04.系统-权限")
 @SysLogger(module = {"系统", "权限"})
 @RequestMapping(value = "/api/sys/role")
@@ -65,8 +64,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<RoleResponse> list(@RequestBody @ApiParam("角色查询请求") RoleQueryRequest request)
-            throws ApiException;
+    List<RoleResponse> list(@RequestBody @ApiParam("角色查询请求") RoleQueryRequest request) throws ApiException;
 
     /**
      * 添加
@@ -85,8 +83,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    RoleResponse add(@RequestBody @ApiParam(value = "角色保存请求") RoleSaveRequest request)
-            throws ApiException;
+    RoleResponse add(@RequestBody @ApiParam(value = "角色保存请求") RoleSaveRequest request) throws ApiException;
 
     /**
      * 更新
@@ -105,8 +102,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    RoleResponse update(@RequestBody @ApiParam("角色保存请求") RoleSaveRequest request)
-            throws ApiException;
+    RoleResponse update(@RequestBody @ApiParam("角色保存请求") RoleSaveRequest request) throws ApiException;
 
     /**
      * 启用/禁用
@@ -125,8 +121,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("角色状态请求列表") List<RoleStatusRequest> list)
-            throws ApiException;
+    Boolean updateEnableFlag(@RequestBody @ApiParam("角色状态请求列表") List<RoleStatusRequest> list) throws ApiException;
 
     /**
      * 排序
@@ -145,8 +140,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("排序")
     @RequestMapping(value = "priority", method = RequestMethod.POST)
-    Boolean updatePriority(@RequestBody @ApiParam("角色排序请求列表") List<RolePriorityRequest> list)
-            throws ApiException;
+    Boolean updatePriority(@RequestBody @ApiParam("角色排序请求列表") List<RolePriorityRequest> list) throws ApiException;
 
     /**
      * 删除
@@ -216,8 +210,7 @@ public interface RoleServiceApi {
                 dataTypeClass = String.class),
     })
     @RequestMapping(value = "user/list", method = RequestMethod.POST)
-    List<RoleUserResponse> userList(@RequestBody @ApiParam("角色标识请求") RoleIdRequest request)
-            throws ApiException;
+    List<RoleUserResponse> userList(@RequestBody @ApiParam("角色标识请求") RoleIdRequest request) throws ApiException;
 
     /**
      * 授权用户
@@ -236,6 +229,5 @@ public interface RoleServiceApi {
     })
     @SysLogger("授权")
     @RequestMapping(value = "user/assign", method = RequestMethod.POST)
-    Boolean assignUser(@RequestBody @ApiParam("角色授权用户请求") RoleAssignUserRequest request)
-            throws ApiException;
+    Boolean assignUser(@RequestBody @ApiParam("角色授权用户请求") RoleAssignUserRequest request) throws ApiException;
 }

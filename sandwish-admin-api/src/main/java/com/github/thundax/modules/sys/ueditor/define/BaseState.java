@@ -4,7 +4,6 @@ import com.github.thundax.modules.sys.ueditor.Encoder;
 import java.util.HashMap;
 import java.util.Map;
 
-/** @author wdit */
 public class BaseState implements State {
 
     private boolean state = false;

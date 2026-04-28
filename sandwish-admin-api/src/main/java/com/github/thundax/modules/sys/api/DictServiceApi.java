@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author thundax */
 @Api(tags = "02-05.系统-字典")
 @SysLogger(module = {"系统", "字典"})
 @RequestMapping(value = "/api/sys/dict")
@@ -61,8 +60,7 @@ public interface DictServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<DictResponse> list(@RequestBody @ApiParam("字典查询请求") DictQueryRequest request)
-            throws ApiException;
+    List<DictResponse> list(@RequestBody @ApiParam("字典查询请求") DictQueryRequest request) throws ApiException;
 
     /**
      * 获取分页列表
@@ -81,8 +79,7 @@ public interface DictServiceApi {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<DictResponse> page(@RequestBody @ApiParam("字典分页查询请求") DictPageRequest request)
-            throws ApiException;
+    PageVo<DictResponse> page(@RequestBody @ApiParam("字典分页查询请求") DictPageRequest request) throws ApiException;
 
     /**
      * 添加
@@ -120,8 +117,7 @@ public interface DictServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    DictResponse update(@RequestBody @ApiParam("字典保存请求") DictSaveRequest request)
-            throws ApiException;
+    DictResponse update(@RequestBody @ApiParam("字典保存请求") DictSaveRequest request) throws ApiException;
 
     /**
      * 删除

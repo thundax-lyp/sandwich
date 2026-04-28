@@ -4,7 +4,6 @@ import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.utils.IdGen;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
@@ -26,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -42,9 +42,7 @@ public class AuthServiceImpl implements AuthService {
 
     private static final char[] VALIDATE_CAPTCHA_CODE = {'2', '3', '4', '5', '6', '7', '8', '9'};
 
-    private static final char[] VALIDATE_SMS_VALIDATE_CODE = {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-    };
+    private static final char[] VALIDATE_SMS_VALIDATE_CODE = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
     private final AuthProperties properties;
     private final LoginProperties loginProperties;
@@ -72,8 +70,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginForm createLoginForm()
-            throws TooManyLoginRequestException, TooManyOnlineUserException {
+    public LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException {
         // 检测是否登录请求过多
         if (loginFormDao.getLoginCount() > properties.getMaxLoginCount()) {
             throw new TooManyLoginRequestException();
@@ -142,8 +139,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String getCaptcha(String loginToken)
-            throws InvalidTokenException, InvalidCaptchaException {
+    public String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
         LoginForm form = loginFormDao.getByToken(loginToken);
         if (form == null || !form.validateCheckCode()) {
             throw new InvalidTokenException();
@@ -168,8 +164,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String createSmsValidateCode(String loginToken, String mobile)
-            throws InvalidTokenException {
+    public String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException {
         if (!loginFormDao.tokenExists(loginToken)) {
             throw new InvalidTokenException();
         }
@@ -183,8 +178,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String getSmsValidateCode(String loginToken)
-            throws InvalidTokenException, InvalidCaptchaException {
+    public String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
         LoginForm form = loginFormDao.getByToken(loginToken);
         if (form == null) {
             throw new InvalidTokenException();
@@ -209,8 +203,7 @@ public class AuthServiceImpl implements AuthService {
         if (form == null) {
             throw new InvalidTokenException();
 
-        } else if (StringUtils.isEmpty(form.getMobile())
-                || StringUtils.isEmpty(form.getMobileValidateCode())) {
+        } else if (StringUtils.isEmpty(form.getMobile()) || StringUtils.isEmpty(form.getMobileValidateCode())) {
             throw new InvalidCaptchaException();
         }
 
@@ -329,12 +322,11 @@ public class AuthServiceImpl implements AuthService {
             loginLockDao.deleteFailCount(user.getLoginName());
             throw new ApiException("帐号已被锁定，请等待（" + loginProperties.getLockTime() + "）秒后自动解锁!");
         } else {
-            String message =
-                    "密码输入错误"
-                            + loginProperties.getMaxFailCount()
-                            + "次后将被锁定，剩余"
-                            + (loginProperties.getMaxFailCount() - failCount)
-                            + "次";
+            String message = "密码输入错误"
+                    + loginProperties.getMaxFailCount()
+                    + "次后将被锁定，剩余"
+                    + (loginProperties.getMaxFailCount() - failCount)
+                    + "次";
             throw new ApiException(message);
         }
     }

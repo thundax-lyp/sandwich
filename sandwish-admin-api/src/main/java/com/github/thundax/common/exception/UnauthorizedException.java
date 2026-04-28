@@ -2,7 +2,6 @@ package com.github.thundax.common.exception;
 
 import com.github.thundax.common.i18n.I18nMessages;
 
-/** @author wdit */
 public class UnauthorizedException extends ApiException {
 
     public UnauthorizedException() {

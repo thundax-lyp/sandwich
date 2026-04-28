@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** @author wdit */
 @RestController
 public class LogApiController extends BaseApiController implements LogServiceApi {
 
@@ -23,10 +22,7 @@ public class LogApiController extends BaseApiController implements LogServiceApi
     private final LogInterfaceAssembler logInterfaceAssembler;
 
     @Autowired
-    public LogApiController(
-            LogService logService,
-            Validator validator,
-            LogInterfaceAssembler logInterfaceAssembler) {
+    public LogApiController(LogService logService, Validator validator, LogInterfaceAssembler logInterfaceAssembler) {
         super(validator);
         this.logService = logService;
         this.logInterfaceAssembler = logInterfaceAssembler;
@@ -50,9 +46,7 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         queryCondition.setEndDate(request.getEndDate());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(
-                logService.findPage(query, readLogPage(request)),
-                logInterfaceAssembler::toResponse);
+        return entityPageToVo(logService.findPage(query, readLogPage(request)), logInterfaceAssembler::toResponse);
     }
 
     private Page<Log> readLogPage(LogPageRequest request) {

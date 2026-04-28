@@ -17,7 +17,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-/** @author wdit */
 @ApiModel(value = "User", description = "用户")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -75,9 +74,7 @@ public class UserVo extends BaseVo {
 
     @ApiModelProperty(name = "loginPass", value = "登录密码")
     @JsonProperty("loginPass")
-    @Pattern(
-            regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN,
-            message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
+    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     public String getLoginPass() {
         return loginPass;
     }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author thundax */
 @Api(tags = "08-04.辅助-签名与验签")
 @SysLogger(module = {"辅助", "签名"})
 @RequestMapping(value = "/api/assist/signature")
@@ -42,8 +41,7 @@ public interface SignatureServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<SignatureResponse> page(@RequestBody @ApiParam("签名分页查询请求") SignaturePageRequest request)
-            throws ApiException;
+    PageVo<SignatureResponse> page(@RequestBody @ApiParam("签名分页查询请求") SignaturePageRequest request) throws ApiException;
 
     /**
      * 更新
@@ -62,8 +60,7 @@ public interface SignatureServiceApi {
     })
     @SysLogger("校验")
     @RequestMapping(value = "verify", method = RequestMethod.POST)
-    SignatureVerifyResponse verify(@RequestBody @ApiParam("签名验签请求") SignatureVerifyRequest request)
-            throws ApiException;
+    SignatureVerifyResponse verify(@RequestBody @ApiParam("签名验签请求") SignatureVerifyRequest request) throws ApiException;
 
     /**
      * 删除
@@ -82,6 +79,5 @@ public interface SignatureServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("签名删除请求列表") List<SignatureDeleteRequest> list)
-            throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("签名删除请求列表") List<SignatureDeleteRequest> list) throws ApiException;
 }

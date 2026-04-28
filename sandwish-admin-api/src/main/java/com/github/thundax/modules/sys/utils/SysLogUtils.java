@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 @Lazy(value = false)
 public class SysLogUtils {
@@ -72,8 +71,7 @@ public class SysLogUtils {
                 LogServiceHolder.getService().save(log);
 
                 try {
-                    String filename =
-                            LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
+                    String filename = LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
 
                     FileUtils.writeLines(
                             new File(getProperties().getStoragePath(), filename),

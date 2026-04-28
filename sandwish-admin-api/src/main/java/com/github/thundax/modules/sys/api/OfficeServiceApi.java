@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author wdit */
 @Api(tags = "02-02.系统-组织机构")
 @SysLogger(module = {"系统", "组织机构"})
 @RequestMapping(value = "/api/sys/office")
@@ -41,8 +40,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    OfficeResponse get(@RequestBody @ApiParam("机构标识请求") OfficeIdRequest request)
-            throws ApiException;
+    OfficeResponse get(@RequestBody @ApiParam("机构标识请求") OfficeIdRequest request) throws ApiException;
 
     /**
      * 获取列表
@@ -61,8 +59,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    List<OfficeResponse> list(@RequestBody @ApiParam("机构查询请求") OfficeQueryRequest request)
-            throws ApiException;
+    List<OfficeResponse> list(@RequestBody @ApiParam("机构查询请求") OfficeQueryRequest request) throws ApiException;
 
     /**
      * 添加
@@ -81,8 +78,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    OfficeResponse add(@RequestBody @ApiParam(value = "机构保存请求") OfficeSaveRequest request)
-            throws ApiException;
+    OfficeResponse add(@RequestBody @ApiParam(value = "机构保存请求") OfficeSaveRequest request) throws ApiException;
 
     /**
      * 更新
@@ -101,8 +97,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    OfficeResponse update(@RequestBody @ApiParam("机构保存请求") OfficeSaveRequest request)
-            throws ApiException;
+    OfficeResponse update(@RequestBody @ApiParam("机构保存请求") OfficeSaveRequest request) throws ApiException;
 
     /**
      * 删除
@@ -121,8 +116,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    Boolean delete(@RequestBody @ApiParam("机构标识请求列表") List<OfficeIdRequest> list)
-            throws ApiException;
+    Boolean delete(@RequestBody @ApiParam("机构标识请求列表") List<OfficeIdRequest> list) throws ApiException;
 
     /**
      * 获取树形结构
@@ -141,8 +135,7 @@ public interface OfficeServiceApi {
     })
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
-    List<OfficeResponse> tree(
-            @RequestBody @ApiParam("排除机构标识请求列表") List<OfficeIdRequest> excludeList)
+    List<OfficeResponse> tree(@RequestBody @ApiParam("排除机构标识请求列表") List<OfficeIdRequest> excludeList)
             throws ApiException;
 
     /**

@@ -18,7 +18,6 @@ public class PermissionAuthorizationService {
         return authentication != null
                 && authentication.isAuthenticated()
                 && permissionMatcher.matches(
-                        PermissionAuthorities.toPermissions(authentication.getAuthorities()),
-                        permission);
+                        PermissionAuthorities.toPermissions(authentication.getAuthorities()), permission);
     }
 }

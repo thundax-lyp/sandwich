@@ -72,8 +72,7 @@ public interface AuthService {
      * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
-    boolean validateCaptcha(String loginToken, String captcha)
-            throws InvalidTokenException, InvalidCaptchaException;
+    boolean validateCaptcha(String loginToken, String captcha) throws InvalidTokenException, InvalidCaptchaException;
 
     /**
      * 创建短信验证码
@@ -93,8 +92,7 @@ public interface AuthService {
      * @throws InvalidTokenException token不正确
      * @throws InvalidCaptchaException 验证码并未生成
      */
-    String getSmsValidateCode(String loginToken)
-            throws InvalidTokenException, InvalidCaptchaException;
+    String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
 
     /**
      * 校验短信验证码

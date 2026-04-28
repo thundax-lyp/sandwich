@@ -19,13 +19,12 @@ public final class ActionMap {
     public static final int UPLOAD_IMAGE = 1;
 
     static {
-        MAPPING =
-                new HashMap<String, Integer>() {
-                    {
-                        put("config", ActionMap.CONFIG);
-                        put("uploadimage", ActionMap.UPLOAD_IMAGE);
-                    }
-                };
+        MAPPING = new HashMap<String, Integer>() {
+            {
+                put("config", ActionMap.CONFIG);
+                put("uploadimage", ActionMap.UPLOAD_IMAGE);
+            }
+        };
     }
 
     public static int getType(String key) {

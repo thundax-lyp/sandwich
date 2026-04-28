@@ -10,7 +10,6 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/** @author wdit */
 @ApiModel(value = "Role", description = "权限")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

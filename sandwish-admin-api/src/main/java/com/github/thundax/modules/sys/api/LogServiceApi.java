@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author thundax */
 @Api(tags = "02-06.系统-日志")
 @RequestMapping(value = "/api/sys/log")
 public interface LogServiceApi {
@@ -35,6 +34,5 @@ public interface LogServiceApi {
                 dataTypeClass = String.class),
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    PageVo<LogResponse> page(@RequestBody @ApiParam("日志分页查询请求") LogPageRequest request)
-            throws ApiException;
+    PageVo<LogResponse> page(@RequestBody @ApiParam("日志分页查询请求") LogPageRequest request) throws ApiException;
 }

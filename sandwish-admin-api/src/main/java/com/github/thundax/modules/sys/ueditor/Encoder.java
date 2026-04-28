@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.ueditor;
 
-/** @author wdit */
 public class Encoder {
 
     public static String toUnicode(String input) {

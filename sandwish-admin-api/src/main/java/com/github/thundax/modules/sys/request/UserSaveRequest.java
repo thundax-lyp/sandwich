@@ -46,9 +46,7 @@ public class UserSaveRequest implements Serializable {
 
     @ApiModelProperty(name = "loginPass", value = "登录密码")
     @JsonProperty("loginPass")
-    @Pattern(
-            regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN,
-            message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
+    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     private String loginPass;
 
     @ApiModelProperty(name = "ranks", value = "等级")

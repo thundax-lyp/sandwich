@@ -1,12 +1,11 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.auth.service.PasswordService;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-/** @author wdit */
 @Service
 public class PasswordServiceImpl implements PasswordService {
 

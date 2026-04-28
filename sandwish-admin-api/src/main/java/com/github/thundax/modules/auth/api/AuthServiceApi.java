@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** @author wdit */
 @Api(tags = "01-01. 鉴权")
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
@@ -40,8 +39,7 @@ public interface AuthServiceApi {
     @ApiOperation(value = "刷新登录令牌", notes = "ignore")
     @PostMapping(value = "form/refresh")
     @SysLogger("刷新登录令牌")
-    AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request)
-            throws ApiException;
+    AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request) throws ApiException;
 
     /**
      * 用户/密码登录

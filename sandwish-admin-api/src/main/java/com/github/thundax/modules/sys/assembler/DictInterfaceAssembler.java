@@ -45,8 +45,7 @@ public class DictInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(
-            T entity, DictSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, DictSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** @author wdit */
 public class PathFormat {
 
     private static final String TIME = "time";
@@ -20,8 +19,7 @@ public class PathFormat {
 
     private static Date currentDate = null;
 
-    public static final Pattern PARSE_PATTERN =
-            Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern PARSE_PATTERN = Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
 
     public static String parse(String input) {
         Matcher matcher = PARSE_PATTERN.matcher(input);
@@ -50,8 +48,7 @@ public class PathFormat {
         return input.replace("\\", "/");
     }
 
-    public static final Pattern PARSE_FILENAME_PATTERN =
-            Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
+    public static final Pattern PARSE_FILENAME_PATTERN = Pattern.compile("\\{([^\\}]+)\\}", Pattern.CASE_INSENSITIVE);
 
     public static String parse(String input, String filename) {
         Matcher matcher = PARSE_FILENAME_PATTERN.matcher(input);

@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.List;
 
-/** @author wdit */
 @ApiModel(value = "Page", description = "分页")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

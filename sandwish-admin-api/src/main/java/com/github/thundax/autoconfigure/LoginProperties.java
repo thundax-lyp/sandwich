@@ -47,28 +47,20 @@ public class LoginProperties {
 
     public String getHours() {
         if (expire % 3600 == 0) {
-            BigDecimal divide =
-                    (new BigDecimal(expire)
-                            .divide(new BigDecimal(3600), 0, BigDecimal.ROUND_HALF_UP));
+            BigDecimal divide = (new BigDecimal(expire).divide(new BigDecimal(3600), 0, BigDecimal.ROUND_HALF_UP));
             return divide.toString();
         } else {
-            BigDecimal divide =
-                    (new BigDecimal(expire)
-                            .divide(new BigDecimal(3600), 1, BigDecimal.ROUND_HALF_UP));
+            BigDecimal divide = (new BigDecimal(expire).divide(new BigDecimal(3600), 1, BigDecimal.ROUND_HALF_UP));
             return divide.toString();
         }
     }
 
     public String getLockHours() {
         if (lockTime % 3600 == 0) {
-            BigDecimal divide =
-                    (new BigDecimal(lockTime)
-                            .divide(new BigDecimal(3600), 0, BigDecimal.ROUND_HALF_UP));
+            BigDecimal divide = (new BigDecimal(lockTime).divide(new BigDecimal(3600), 0, BigDecimal.ROUND_HALF_UP));
             return divide.toString();
         } else {
-            BigDecimal divide =
-                    (new BigDecimal(lockTime)
-                            .divide(new BigDecimal(3600), 1, BigDecimal.ROUND_HALF_UP));
+            BigDecimal divide = (new BigDecimal(lockTime).divide(new BigDecimal(3600), 1, BigDecimal.ROUND_HALF_UP));
             return divide.toString();
         }
     }

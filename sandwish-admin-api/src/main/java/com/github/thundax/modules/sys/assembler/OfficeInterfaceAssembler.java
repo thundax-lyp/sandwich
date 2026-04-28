@@ -1,10 +1,10 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.persistence.DataEntity;
-import org.apache.commons.lang3.StringUtils;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -67,8 +67,7 @@ public class OfficeInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(
-            T entity, OfficeSaveRequest request) {
+    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, OfficeSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

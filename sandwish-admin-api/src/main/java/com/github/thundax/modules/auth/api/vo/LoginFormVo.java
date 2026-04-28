@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.UUID;
 
-/** @author wdit */
 @ApiModel(value = "LoginForm", description = "登录表单")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

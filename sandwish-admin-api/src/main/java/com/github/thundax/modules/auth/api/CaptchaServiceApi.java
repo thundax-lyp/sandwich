@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** @author wdit */
 @Api(tags = "01-02. 鉴权-图形验证码")
 @RequestMapping(value = "/api/auth")
 public interface CaptchaServiceApi {
@@ -38,6 +37,5 @@ public interface CaptchaServiceApi {
      */
     @ApiOperation(value = "刷新图形验证码", notes = "ignore")
     @PostMapping(value = "captcha/refresh")
-    CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request)
-            throws ApiException;
+    CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException;
 }

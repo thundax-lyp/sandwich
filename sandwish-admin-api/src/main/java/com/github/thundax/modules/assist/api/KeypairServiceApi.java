@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/** @author wdit */
 @Api(tags = "08-05.辅助-公钥与私钥")
 @SysLogger(module = {"辅助", "公私钥对"})
 @RequestMapping(value = "/api/assist/keypair")
@@ -36,6 +35,5 @@ public interface KeypairServiceApi {
     })
     @SysLogger("获取公钥")
     @RequestMapping(value = "public", method = RequestMethod.POST)
-    KeypairPublicKeyResponse publicKey(@RequestBody KeypairPublicKeyRequest request)
-            throws ApiException;
+    KeypairPublicKeyResponse publicKey(@RequestBody KeypairPublicKeyRequest request) throws ApiException;
 }

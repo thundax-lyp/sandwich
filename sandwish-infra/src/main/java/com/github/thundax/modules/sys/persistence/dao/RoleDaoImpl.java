@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class RoleDaoImpl implements RoleDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final RoleMapper mapper;
     private final MenuRoleMapper menuRoleMapper;
@@ -93,6 +97,8 @@ public class RoleDaoImpl implements RoleDao {
     public String insert(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<RoleDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
         return dataObject.getId();
     }
@@ -122,20 +128,6 @@ public class RoleDaoImpl implements RoleDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
-
-    @Override
-    public int updateDelFlag(Role entity) {
-        RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(RoleDO::getDelFlag, dataObject.getDelFlag())
-                        .set(RoleDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(RoleDO::getUpdateBy, dataObject.getUpdateBy()));
-        cacheSupport.removeById(entity.getId());
-        return count;
-    }
-
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);
@@ -224,7 +216,7 @@ public class RoleDaoImpl implements RoleDao {
 
     private LambdaQueryWrapper<RoleDO> buildListWrapper(String enableFlag) {
         LambdaQueryWrapper<RoleDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(RoleDO::getDelFlag, RoleDO.DEL_FLAG_NORMAL);
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(enableFlag)) {
             wrapper.eq(RoleDO::getEnableFlag, enableFlag);
         }

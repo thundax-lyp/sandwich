@@ -1,9 +1,7 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 /**
@@ -19,7 +17,6 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
     protected String remarks;
     protected Date createDate;
     protected Date updateDate;
-    protected String delFlag;
 
     public DataEntity() {
         super();
@@ -31,7 +28,6 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 
     @Override
     protected void initialize() {
-        this.delFlag = DEL_FLAG_NORMAL;
         this.setPriority(0);
     }
 
@@ -85,19 +81,5 @@ public abstract class DataEntity<T> extends BaseEntity<T> {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
-    }
-
-    @JsonIgnore
-    public String getDelFlag() {
-        return delFlag;
-    }
-
-    public void setDelFlag(String delFlag) {
-        this.delFlag = delFlag;
-    }
-
-    @JsonIgnore
-    public boolean isDeleted() {
-        return StringUtils.equals(getDelFlag(), DEL_FLAG_DELETE);
     }
 }

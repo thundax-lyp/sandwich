@@ -20,8 +20,6 @@ public interface DictDao {
 
     int updatePriority(Dict dict);
 
-    int updateDelFlag(Dict dict);
-
     int delete(String id);
 
     /**

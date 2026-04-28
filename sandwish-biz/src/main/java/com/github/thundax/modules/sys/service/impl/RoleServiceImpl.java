@@ -227,20 +227,6 @@ public class RoleServiceImpl implements RoleService {
     public int updatePriority(List<Role> list) {
         return batchOperate(list, this::updatePriority);
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(Role role) {
-        role.preUpdate();
-        return dao.updateDelFlag(role);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<Role> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     private int batchOperate(Collection<Role> collection, Function<Role, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {

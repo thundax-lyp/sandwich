@@ -108,14 +108,4 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     public int updatePriority(List<UserEncrypt> list) {
         return 0;
     }
-
-    @Override
-    public int updateDelFlag(UserEncrypt entity) {
-        return 0;
-    }
-
-    @Override
-    public int updateDelFlag(List<UserEncrypt> list) {
-        return 0;
-    }
 }

@@ -21,8 +21,6 @@ public interface MenuDao {
 
     int updatePriority(Menu menu);
 
-    int updateDelFlag(Menu menu);
-
     int delete(String id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);

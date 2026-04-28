@@ -232,19 +232,6 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         return batchOperate(list, this::updatePriority);
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(UserEncrypt entity) {
-        entity.preUpdate();
-        return dao.updateDelFlag(entity);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<UserEncrypt> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     private void addDirect(UserEncrypt entity) {
         entity.preInsert();
         dao.insert(entity);

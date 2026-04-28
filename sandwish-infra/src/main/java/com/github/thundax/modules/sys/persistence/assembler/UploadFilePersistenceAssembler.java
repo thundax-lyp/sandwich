@@ -21,14 +21,7 @@ public final class UploadFilePersistenceAssembler {
         dataObject.setMimeType(entity.getMimeType());
         dataObject.setSize(entity.getSize());
         dataObject.setPath(entity.getPath());
-        dataObject.setContent(entity.getContent());
-        dataObject.setPriority(entity.getPriority());
-        dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -43,14 +36,7 @@ public final class UploadFilePersistenceAssembler {
         entity.setMimeType(dataObject.getMimeType());
         entity.setSize(dataObject.getSize());
         entity.setPath(dataObject.getPath());
-        entity.setContent(dataObject.getContent());
-        entity.setPriority(dataObject.getPriority());
-        entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

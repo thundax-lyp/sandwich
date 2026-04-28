@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
@@ -23,37 +22,20 @@ public class UploadFileDO {
 
     private String name;
 
-    @TableField("extend_name")
     private String extendName;
 
-    @TableField("mime_type")
     private String mimeType;
 
     private Long size;
 
     private String path;
 
-    @TableField(exist = false)
-    private byte[] content;
 
-    @TableField(exist = false)
-    private Integer priority;
 
-    @TableField(exist = false)
-    private String remarks;
 
-    @TableField("create_date")
     private Date createDate;
 
-    @TableField(exist = false)
-    private String createBy;
 
-    @TableField(exist = false)
-    private Date updateDate;
 
-    @TableField(exist = false)
-    private String updateBy;
 
-    @TableField(exist = false)
-    private String delFlag;
 }

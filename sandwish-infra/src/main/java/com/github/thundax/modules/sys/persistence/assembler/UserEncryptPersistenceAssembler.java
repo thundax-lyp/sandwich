@@ -20,13 +20,10 @@ public final class UserEncryptPersistenceAssembler {
         dataObject.setEmail(entity.getEmail());
         dataObject.setMobile(entity.getMobile());
         dataObject.setTel(entity.getTel());
-        dataObject.setPriority(entity.getPriority());
-        dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setCreateBy(entity.getCreateUserId());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateBy(entity.getUpdateUserId());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -40,13 +37,10 @@ public final class UserEncryptPersistenceAssembler {
         entity.setEmail(dataObject.getEmail());
         entity.setMobile(dataObject.getMobile());
         entity.setTel(dataObject.getTel());
-        entity.setPriority(dataObject.getPriority());
-        entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setCreateUserId(dataObject.getCreateBy());
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateBy());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

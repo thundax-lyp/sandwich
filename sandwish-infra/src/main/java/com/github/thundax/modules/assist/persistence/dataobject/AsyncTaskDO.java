@@ -24,5 +24,4 @@ public class AsyncTaskDO {
     private String createBy;
     private Date updateDate;
     private String updateBy;
-    private String delFlag;
 }

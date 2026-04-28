@@ -238,17 +238,6 @@ public class AuthPermissionLifecycleTest {
         public int updatePriority(List<User> list) {
             return list.size();
         }
-
-        @Override
-        public int updateDelFlag(User entity) {
-            return 1;
-        }
-
-        @Override
-        public int updateDelFlag(List<User> list) {
-            return list.size();
-        }
-
         private User user() {
             User user = new User("u1");
             user.setLoginName("tester");
@@ -361,17 +350,6 @@ public class AuthPermissionLifecycleTest {
         public int updatePriority(List<Menu> list) {
             return list.size();
         }
-
-        @Override
-        public int updateDelFlag(Menu entity) {
-            return 1;
-        }
-
-        @Override
-        public int updateDelFlag(List<Menu> list) {
-            return list.size();
-        }
-
         private List<Menu> menus() {
             Menu menu = new Menu("m1");
             menu.setPerms("sys:role,sys:user:view");

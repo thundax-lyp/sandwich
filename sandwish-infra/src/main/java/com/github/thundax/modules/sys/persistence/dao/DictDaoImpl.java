@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class DictDaoImpl implements DictDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final DictMapper mapper;
     private final DictCacheSupport cacheSupport;
@@ -81,6 +85,8 @@ public class DictDaoImpl implements DictDao {
     public String insert(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<DictDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -97,8 +103,7 @@ public class DictDaoImpl implements DictDao {
                         .set(DictDO::getPriority, dataObject.getPriority())
                         .set(DictDO::getRemarks, dataObject.getRemarks())
                         .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy())
-                        .set(DictDO::getDelFlag, dataObject.getDelFlag()));
+                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeAll();
         return count;
     }
@@ -119,20 +124,6 @@ public class DictDaoImpl implements DictDao {
     public int updateStatus(Dict entity) {
         return 0;
     }
-
-    @Override
-    public int updateDelFlag(Dict entity) {
-        DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(DictDO::getDelFlag, dataObject.getDelFlag())
-                        .set(DictDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(DictDO::getUpdateBy, dataObject.getUpdateBy()));
-        cacheSupport.removeAll();
-        return count;
-    }
-
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);
@@ -154,7 +145,7 @@ public class DictDaoImpl implements DictDao {
 
     private QueryWrapper<DictDO> buildQueryWrapper(String type, String label, String remarks) {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag", DictDO.DEL_FLAG_NORMAL);
+        wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(type)) {
             wrapper.eq("type", type);
         }

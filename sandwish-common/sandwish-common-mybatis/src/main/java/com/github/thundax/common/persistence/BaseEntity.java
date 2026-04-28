@@ -54,8 +54,4 @@ public abstract class BaseEntity<T> implements Serializable {
         return this.getId().equals(((BaseEntity<?>) obj).getId());
     }
 
-
-    public static final String DEL_FLAG_NORMAL = "0";
-
-    public static final String DEL_FLAG_DELETE = "1";
 }

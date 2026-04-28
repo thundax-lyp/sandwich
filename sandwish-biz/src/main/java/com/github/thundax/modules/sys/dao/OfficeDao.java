@@ -21,8 +21,6 @@ public interface OfficeDao {
 
     int updatePriority(Office office);
 
-    int updateDelFlag(Office office);
-
     int delete(String id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);

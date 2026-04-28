@@ -117,20 +117,6 @@ public class UploadFileServiceImpl implements UploadFileService {
     public int updatePriority(List<UploadFile> list) {
         return batchOperate(list, this::updatePriority);
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(UploadFile entity) {
-        entity.preUpdate();
-        return dao.updateDelFlag(entity);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<UploadFile> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     @Override
     public UploadFile getContent(UploadFile uploadFile) {
         return uploadFile == null ? null : dao.getContent(uploadFile.getId());

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
 import com.github.thundax.common.test.architecture.ModelAnnotationArchitectureRuleSupport;
@@ -16,6 +17,8 @@ import org.junit.Test;
 public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTest {
 
     private static final String BASE_PACKAGE = "com.github.thundax.modules";
+    private static final String DEFAULT_ENCRYPT_TYPE_HANDLER =
+            "com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler";
 
     private static final String[] AUTO_ID_DATA_OBJECTS = {
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
@@ -81,6 +84,37 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             assertFalse(javaClass.getFullName() + " must not declare updateUserId field", javaClass
                     .tryGetField("updateUserId")
                     .isPresent());
+        }
+    }
+
+    @Test
+    public void shouldKeepDataObjectsAlignedWithDatabaseColumns() {
+        JavaClasses classes = importPackages(BASE_PACKAGE);
+
+        for (JavaClass javaClass : classes) {
+            if (!isDataObjectClass(javaClass)) {
+                continue;
+            }
+            assertFalse(javaClass.getFullName() + " must not declare delFlag field", javaClass.tryGetField("delFlag")
+                    .isPresent());
+            for (JavaField field : javaClass.getFields()) {
+                if (!field.isAnnotatedWith(TableField.class)) {
+                    continue;
+                }
+                TableField tableField = field.getAnnotationOfType(TableField.class);
+                assertEquals(
+                        field.getFullName() + " TableField is only allowed for typeHandler",
+                        "",
+                        tableField.value());
+                assertEquals(
+                        field.getFullName() + " TableField must map to a real database column",
+                        true,
+                        tableField.exist());
+                assertEquals(
+                        field.getFullName() + " only DefaultEncryptTypeHandler may use TableField",
+                        DEFAULT_ENCRYPT_TYPE_HANDLER,
+                        tableField.typeHandler().getName());
+            }
         }
     }
 

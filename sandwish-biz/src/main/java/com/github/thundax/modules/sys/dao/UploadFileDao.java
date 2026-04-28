@@ -20,8 +20,6 @@ public interface UploadFileDao {
 
     int updatePriority(UploadFile uploadFile);
 
-    int updateDelFlag(UploadFile uploadFile);
-
     int delete(String id);
 
     UploadFile getContent(String id);

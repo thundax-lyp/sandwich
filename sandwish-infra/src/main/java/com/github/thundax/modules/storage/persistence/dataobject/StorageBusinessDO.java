@@ -1,10 +1,8 @@
 package com.github.thundax.modules.storage.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,30 +19,16 @@ public class StorageBusinessDO {
     @TableId(value = "file_id", type = IdType.INPUT)
     private String storageId;
 
-    @TableField("business_id")
     private String businessId;
 
-    @TableField("business_type")
     private String businessType;
 
-    @TableField("business_params")
     private String businessParams;
 
-    @TableField("public_flag")
     private String publicFlag;
 
-    @TableField(exist = false)
-    private Integer priority;
 
-    @TableField(exist = false)
-    private String remarks;
 
-    @TableField(exist = false)
-    private Date createDate;
 
-    @TableField(exist = false)
-    private Date updateDate;
 
-    @TableField(exist = false)
-    private String delFlag;
 }

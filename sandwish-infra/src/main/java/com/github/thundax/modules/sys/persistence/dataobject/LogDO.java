@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
@@ -21,48 +20,28 @@ public class LogDO {
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
-    @TableField("user_id")
     private String userId;
 
     private String type;
 
-    @TableField("log_date")
     private Date logDate;
 
     private String title;
 
-    @TableField("remote_addr")
     private String remoteAddr;
 
-    @TableField("user_agent")
     private String userAgent;
 
     private String method;
 
-    @TableField("request_uri")
     private String requestUri;
 
-    @TableField("request_params")
     private String requestParams;
 
-    @TableField(exist = false)
-    private Integer priority;
 
-    @TableField(exist = false)
-    private String remarks;
 
-    @TableField(exist = false)
-    private Date createDate;
 
-    @TableField(exist = false)
-    private String createBy;
 
-    @TableField(exist = false)
-    private Date updateDate;
 
-    @TableField(exist = false)
-    private String updateBy;
 
-    @TableField(exist = false)
-    private String delFlag;
 }

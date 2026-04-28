@@ -67,12 +67,6 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     public int updatePriority(UserEncrypt entity) {
         return 0;
     }
-
-    @Override
-    public int updateDelFlag(UserEncrypt entity) {
-        return 0;
-    }
-
     @Override
     public int delete(String id) {
         return mapper.deleteById(id);

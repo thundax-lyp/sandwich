@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.persistence.TreeEntity;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class OfficeDaoImpl implements OfficeDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final OfficeMapper mapper;
     private final OfficeCacheSupport cacheSupport;
@@ -90,6 +94,8 @@ public class OfficeDaoImpl implements OfficeDao {
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<OfficeDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -125,20 +131,6 @@ public class OfficeDaoImpl implements OfficeDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
-
-    @Override
-    public int updateDelFlag(Office entity) {
-        OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(OfficeDO::getDelFlag, dataObject.getDelFlag())
-                        .set(OfficeDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OfficeDO::getUpdateBy, dataObject.getUpdateBy()));
-        cacheSupport.removeById(entity.getId());
-        return count;
-    }
-
     @Override
     public int delete(String id) {
         OfficeDO node = getTreeNode(id);
@@ -280,7 +272,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     private LambdaQueryWrapper<OfficeDO> buildListWrapper(String parentId, String name, String remarks) {
         LambdaQueryWrapper<OfficeDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(OfficeDO::getDelFlag, OfficeDO.DEL_FLAG_NORMAL);
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(parentId)) {
             if (StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
                 wrapper.isNull(OfficeDO::getParentId);

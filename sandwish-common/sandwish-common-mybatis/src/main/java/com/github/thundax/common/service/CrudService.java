@@ -127,19 +127,4 @@ public interface CrudService<T> extends BaseService {
      */
     int updatePriority(List<T> list);
 
-    /**
-     * 更新删除标记
-     *
-     * @param entity 对象
-     * @return 影响记录数
-     */
-    int updateDelFlag(T entity);
-
-    /**
-     * 更新删除标记
-     *
-     * @param list 列表
-     * @return 影响记录数
-     */
-    int updateDelFlag(List<T> list);
 }

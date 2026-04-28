@@ -15,16 +15,12 @@ public final class SignaturePersistenceAssembler {
             return null;
         }
         SignatureDO dataObject = new SignatureDO();
-        dataObject.setId(entity.getId());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setSignature(entity.getSignature());
         dataObject.setIsVerifySign(entity.getIsVerifySign());
-        dataObject.setPriority(entity.getPriority());
-        dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -33,16 +29,13 @@ public final class SignaturePersistenceAssembler {
             return null;
         }
         Signature entity = new Signature();
-        entity.setId(dataObject.getId() == null ? dataObject.getBusinessId() : dataObject.getId());
+        entity.setId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setSignature(dataObject.getSignature());
         entity.setIsVerifySign(dataObject.getIsVerifySign());
-        entity.setPriority(dataObject.getPriority());
-        entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

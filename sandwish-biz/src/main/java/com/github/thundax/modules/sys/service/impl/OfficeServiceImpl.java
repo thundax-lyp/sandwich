@@ -132,20 +132,6 @@ public class OfficeServiceImpl implements OfficeService {
     public int updatePriority(List<Office> list) {
         return batchOperate(list, this::updatePriority);
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(Office office) {
-        office.preUpdate();
-        return dao.updateDelFlag(office);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<Office> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {

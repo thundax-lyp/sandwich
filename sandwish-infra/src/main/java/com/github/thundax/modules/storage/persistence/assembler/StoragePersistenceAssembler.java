@@ -28,7 +28,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -48,7 +47,6 @@ public final class StoragePersistenceAssembler {
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 
@@ -73,11 +71,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
         dataObject.setPublicFlag(entity.getPublicFlag());
-        dataObject.setPriority(entity.getPriority());
-        dataObject.setRemarks(entity.getRemarks());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -91,11 +84,6 @@ public final class StoragePersistenceAssembler {
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessParams(dataObject.getBusinessParams());
         entity.setPublicFlag(dataObject.getPublicFlag());
-        entity.setPriority(dataObject.getPriority());
-        entity.setRemarks(dataObject.getRemarks());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

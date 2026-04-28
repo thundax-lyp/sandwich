@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
@@ -21,7 +20,6 @@ public class UserEncryptDO {
     @TableId(value = "id", type = IdType.INPUT)
     private String userId;
 
-    @TableField("login_pass")
     private String loginPass;
 
     private String email;
@@ -30,24 +28,14 @@ public class UserEncryptDO {
 
     private String tel;
 
-    @TableField(exist = false)
-    private Integer priority;
 
-    @TableField(exist = false)
-    private String remarks;
 
-    @TableField("create_date")
     private Date createDate;
 
-    @TableField("create_by")
     private String createBy;
 
-    @TableField("update_date")
     private Date updateDate;
 
-    @TableField("update_by")
     private String updateBy;
 
-    @TableField(exist = false)
-    private String delFlag;
 }

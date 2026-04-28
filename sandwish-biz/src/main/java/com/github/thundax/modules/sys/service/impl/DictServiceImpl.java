@@ -149,20 +149,6 @@ public class DictServiceImpl implements DictService {
     public int updatePriority(List<Dict> list) {
         return batchOperate(list, this::updatePriority);
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(Dict dict) {
-        dict.preUpdate();
-        return dao.updateDelFlag(dict);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<Dict> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     @Override
     public String getDictionaryRevision() {
         return dao.getDictionaryRevision();

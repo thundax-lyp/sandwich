@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
@@ -25,6 +26,8 @@ public class UserDaoImpl implements UserDao {
     private static final String OFFICE_TREE_FILTER_SQL = "office_id IN (SELECT o.id FROM sys_office query_office "
             + "JOIN sys_office o ON o.lft BETWEEN query_office.lft AND query_office.rgt "
             + "WHERE query_office.id = {0})";
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final UserMapper mapper;
     private final UserRoleMapper userRoleMapper;
@@ -102,6 +105,8 @@ public class UserDaoImpl implements UserDao {
     public String insert(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<UserDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         removeUserCaches(dataObject.getId());
         return dataObject.getId();
     }
@@ -125,7 +130,6 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getRemarks, dataObject.getRemarks())
                         .set(UserDO::getUpdateDate, dataObject.getUpdateDate())
                         .set(UserDO::getUpdateBy, dataObject.getUpdateBy())
-                        .set(UserDO::getDelFlag, dataObject.getDelFlag())
                         .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
         removeUserCaches(entity.getId());
         return count;
@@ -139,13 +143,6 @@ public class UserDaoImpl implements UserDao {
         removeUserCaches(entity.getId());
         return count;
     }
-
-    @Override
-    public int updateDelFlag(User entity) {
-        removeUserCaches(entity.getId());
-        return 0;
-    }
-
     @Override
     public int delete(String id) {
         int count = mapper.deleteById(id);
@@ -249,7 +246,7 @@ public class UserDaoImpl implements UserDao {
     private QueryWrapper<UserDO> buildListWrapper(
             String officeId, String loginName, String name, String enableFlag, String superFlag) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
-        wrapper.eq("del_flag", UserDO.DEL_FLAG_NORMAL);
+        wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(officeId)) {
             wrapper.apply(OFFICE_TREE_FILTER_SQL, officeId);
         }

@@ -20,8 +20,6 @@ public interface UserEncryptDao {
 
     int updatePriority(UserEncrypt userEncrypt);
 
-    int updateDelFlag(UserEncrypt userEncrypt);
-
     int delete(String id);
 
     /**

@@ -27,8 +27,6 @@ public interface UserDao {
 
     int updatePriority(User user);
 
-    int updateDelFlag(User user);
-
     int delete(String id);
 
     /**

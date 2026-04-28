@@ -125,12 +125,6 @@ public class UploadFileServiceImplTest {
         public int updatePriority(UploadFile uploadFile) {
             return 1;
         }
-
-        @Override
-        public int updateDelFlag(UploadFile uploadFile) {
-            return 1;
-        }
-
         @Override
         public int delete(String id) {
             return 1;

@@ -20,8 +20,6 @@ public interface RoleDao {
 
     int updatePriority(Role role);
 
-    int updateDelFlag(Role role);
-
     int delete(String id);
 
     /**

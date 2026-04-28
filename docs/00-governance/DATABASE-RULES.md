@@ -55,6 +55,7 @@
 - 不为追随外部规则强制迁移为 `Instant`
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
 - `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
+- `del_flag` 是数据库逻辑删除审计字段，默认值为 `0`；`Entity` 与 `DO/DataObject` 不声明 `delFlag`，DAO insert 时负责写入 `del_flag = '0'`，DAO list/page 查询固定追加 `del_flag = '0'` 条件。
 
 ## Primary Key Rules
 
@@ -89,6 +90,7 @@
 - Service 不感知 `DO/DataObject`。
 - Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
 - `DO/DataObject` 只承载数据库字段、必要关系字段和持久化查询所需的显式字段。
+- `DO/DataObject` 字段名默认依赖 MyBatis-Plus camelCase 到 snake_case 自动映射，禁止使用 `@TableField` 做列名映射，禁止 `@TableField(exist = false)` 非表字段；仅允许加密等持久化类型处理场景使用 `@TableField(typeHandler = ...)`。
 - `DO/DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不通过父类继承公共查询容器。
 - Mapper 方法查询参数固定为一级显式参数或 `sandwish-infra` 内部 persistence 参数对象。
 - `PersistenceAssembler` 不负责 `Entity.query` 与 `DO.query` 互转；业务查询条件必须在 Service / DAO implementation 中显式拆解。

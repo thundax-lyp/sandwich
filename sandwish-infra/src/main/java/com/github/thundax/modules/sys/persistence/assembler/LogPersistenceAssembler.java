@@ -25,13 +25,6 @@ public final class LogPersistenceAssembler {
         dataObject.setMethod(entity.getMethod());
         dataObject.setRequestUri(entity.getRequestUri());
         dataObject.setRequestParams(entity.getRequestParams());
-        dataObject.setPriority(entity.getPriority());
-        dataObject.setRemarks(entity.getRemarks());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -50,13 +43,6 @@ public final class LogPersistenceAssembler {
         entity.setMethod(dataObject.getMethod());
         entity.setRequestUri(dataObject.getRequestUri());
         entity.setRequestParams(dataObject.getRequestParams());
-        entity.setPriority(dataObject.getPriority());
-        entity.setRemarks(dataObject.getRemarks());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

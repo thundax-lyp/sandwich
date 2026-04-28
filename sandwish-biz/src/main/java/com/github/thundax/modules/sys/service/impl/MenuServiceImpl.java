@@ -152,20 +152,6 @@ public class MenuServiceImpl implements MenuService {
     public int updatePriority(List<Menu> list) {
         return batchOperate(list, this::updatePriority);
     }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(Menu menu) {
-        menu.preUpdate();
-        return dao.updateDelFlag(menu);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updateDelFlag(List<Menu> list) {
-        return batchOperate(list, this::updateDelFlag);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Menu menu) {

@@ -40,7 +40,6 @@ public final class UserPersistenceAssembler {
         dataObject.setCreateBy(entity.getCreateUserId());
         dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setUpdateBy(entity.getUpdateUserId());
-        dataObject.setDelFlag(entity.getDelFlag());
         return dataObject;
     }
 
@@ -73,7 +72,6 @@ public final class UserPersistenceAssembler {
         entity.setCreateUserId(dataObject.getCreateBy());
         entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setUpdateUserId(dataObject.getUpdateBy());
-        entity.setDelFlag(dataObject.getDelFlag());
         return entity;
     }
 

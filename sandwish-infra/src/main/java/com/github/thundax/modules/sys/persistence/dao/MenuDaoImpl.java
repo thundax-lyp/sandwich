@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.persistence.TreeEntity;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class MenuDaoImpl implements MenuDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final MenuMapper mapper;
     private final MenuRoleMapper menuRoleMapper;
@@ -94,6 +98,8 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<MenuDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return dataObject.getId();
     }
@@ -120,8 +126,7 @@ public class MenuDaoImpl implements MenuDao {
                         .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
                         .set(MenuDO::getRemarks, dataObject.getRemarks())
                         .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy())
-                        .set(MenuDO::getDelFlag, dataObject.getDelFlag()));
+                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
         cacheSupport.removeAll();
         return count;
     }
@@ -138,20 +143,6 @@ public class MenuDaoImpl implements MenuDao {
         cacheSupport.removeById(entity.getId());
         return count;
     }
-
-    @Override
-    public int updateDelFlag(Menu entity) {
-        MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MenuDO::getDelFlag, dataObject.getDelFlag())
-                        .set(MenuDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MenuDO::getUpdateBy, dataObject.getUpdateBy()));
-        cacheSupport.removeById(entity.getId());
-        return count;
-    }
-
     @Override
     public int delete(String id) {
         MenuDO node = getTreeNode(id);
@@ -313,7 +304,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private LambdaQueryWrapper<MenuDO> buildListWrapper(String parentId, String displayFlag, Integer maxRank) {
         LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MenuDO::getDelFlag, MenuDO.DEL_FLAG_NORMAL);
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (parentId != null) {
             if (StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
                 wrapper.isNull(MenuDO::getParentId);

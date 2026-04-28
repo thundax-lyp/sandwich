@@ -3,6 +3,7 @@ package com.github.thundax.modules.storage.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class StorageDaoImpl implements StorageDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final StorageMapper mapper;
     private final StorageBusinessMapper businessMapper;
@@ -99,6 +103,9 @@ public class StorageDaoImpl implements StorageDao {
     public String insert(Storage entity) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
+        mapper.update(
+                null,
+                new UpdateWrapper<StorageDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
         return dataObject.getId();
     }
@@ -117,8 +124,7 @@ public class StorageDaoImpl implements StorageDao {
                         .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(StorageDO::getPriority, dataObject.getPriority())
                         .set(StorageDO::getRemarks, dataObject.getRemarks())
-                        .set(StorageDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(StorageDO::getDelFlag, dataObject.getDelFlag()));
+                        .set(StorageDO::getUpdateDate, dataObject.getUpdateDate()));
         cacheSupport.removeById(entity.getId());
         return count;
     }
@@ -210,7 +216,7 @@ public class StorageDaoImpl implements StorageDao {
     private LambdaQueryWrapper<StorageDO> buildListWrapper(
             String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks) {
         LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageDO::getDelFlag, StorageDO.DEL_FLAG_NORMAL);
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(mimeType)) {
             wrapper.eq(StorageDO::getMimeType, mimeType);
         }

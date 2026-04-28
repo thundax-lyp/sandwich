@@ -3,6 +3,7 @@ package com.github.thundax.modules.member.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class MemberDaoImpl implements MemberDao {
+
+    private static final String DEL_FLAG_COLUMN = "del_flag";
+    private static final String NORMAL_DEL_FLAG = "0";
 
     private final MemberMapper mapper;
 
@@ -92,6 +96,8 @@ public class MemberDaoImpl implements MemberDao {
     public String insert(Member entity) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
+        mapper.update(
+                null, new UpdateWrapper<MemberDO>().set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG).eq("id", dataObject.getId()));
         return dataObject.getId();
     }
 
@@ -214,7 +220,7 @@ public class MemberDaoImpl implements MemberDao {
             Date endLoginDate,
             String mobile) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberDO::getDelFlag, MemberDO.DEL_FLAG_NORMAL);
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(enableFlag)) {
             wrapper.eq(MemberDO::getEnableFlag, enableFlag);
         }

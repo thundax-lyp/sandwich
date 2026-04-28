@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
@@ -18,8 +17,6 @@ import lombok.Setter;
 @TableName("sys_dict")
 public class DictDO {
 
-    @TableField(exist = false)
-    public static final String DEL_FLAG_NORMAL = "0";
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
@@ -31,13 +28,10 @@ public class DictDO {
     private String remarks;
     private Date createDate;
 
-    @TableField("create_by")
     private String createBy;
 
     private Date updateDate;
 
-    @TableField("update_by")
     private String updateBy;
 
-    private String delFlag;
 }

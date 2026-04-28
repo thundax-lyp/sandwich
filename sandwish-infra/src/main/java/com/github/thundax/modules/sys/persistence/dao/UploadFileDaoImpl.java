@@ -67,12 +67,6 @@ public class UploadFileDaoImpl implements UploadFileDao {
     public int updatePriority(UploadFile entity) {
         return 0;
     }
-
-    @Override
-    public int updateDelFlag(UploadFile entity) {
-        return 0;
-    }
-
     @Override
     public int delete(String id) {
         return mapper.deleteById(id);

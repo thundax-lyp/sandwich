@@ -18,7 +18,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
 
     private static final String BASE_PACKAGE = "com.github.thundax.modules";
     private static final String DEFAULT_ENCRYPT_TYPE_HANDLER =
-            "com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler";
+            "com.github.thundax.common.persistence.typehandler.DefaultEncryptTypeHandler";
 
     private static final String[] AUTO_ID_DATA_OBJECTS = {
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",

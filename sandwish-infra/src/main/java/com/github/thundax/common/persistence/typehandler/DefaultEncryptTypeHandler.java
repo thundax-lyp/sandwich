@@ -1,4 +1,4 @@
-package com.github.thundax.common.persistence.entity;
+package com.github.thundax.common.persistence.typehandler;
 
 import com.github.thundax.common.utils.EncryptUtils;
 import java.sql.CallableStatement;

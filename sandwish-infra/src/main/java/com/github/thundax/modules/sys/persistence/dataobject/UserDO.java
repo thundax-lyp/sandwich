@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.thundax.common.persistence.entity.DefaultEncryptTypeHandler;
+import com.github.thundax.common.persistence.typehandler.DefaultEncryptTypeHandler;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

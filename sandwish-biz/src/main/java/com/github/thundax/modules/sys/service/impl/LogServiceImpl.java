@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -72,7 +73,7 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Log log) {
-        log.setId(dao.insert(log));
+        log.setEntityId(EntityIdCodec.toDomain(dao.insert(log)));
 
         if (log.isSignable()) {
             signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
@@ -111,7 +112,7 @@ public class LogServiceImpl implements LogService {
             List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
             List<String> idList = dao.insertList(subList);
             for (int i = 0; i < idList.size(); i++) {
-                subList.get(i).setId(idList.get(i));
+                subList.get(i).setEntityId(EntityIdCodec.toDomain(idList.get(i)));
             }
             count += idList.size();
         }

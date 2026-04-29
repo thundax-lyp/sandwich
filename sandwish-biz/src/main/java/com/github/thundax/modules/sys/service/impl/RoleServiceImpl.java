@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
@@ -108,7 +109,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Role role) {
-        role.setId(dao.insert(role));
+        role.setEntityId(EntityIdCodec.toDomain(dao.insert(role)));
         afterWrite(role);
     }
 
@@ -120,9 +121,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private void afterWrite(Role role) {
-        dao.deleteRoleMenu(role.getId());
+        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getEntityId()));
         if (role.getMenuIdList() != null && !role.getMenuIdList().isEmpty()) {
-            dao.insertRoleMenu(role.getId(), role.getMenuIdList());
+            dao.insertRoleMenu(EntityIdCodec.toValue(role.getEntityId()), role.getMenuIdList());
         }
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
@@ -132,10 +133,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserList(Role role, List<User> userList) {
-        dao.deleteRoleUser(role.getId());
+        dao.deleteRoleUser(EntityIdCodec.toValue(role.getEntityId()));
 
         if (userList != null && !userList.isEmpty()) {
-            dao.insertRoleUser(role.getId(), userList.stream().map(User::getId).collect(Collectors.toList()));
+            dao.insertRoleUser(
+                    EntityIdCodec.toValue(role.getEntityId()),
+                    userList.stream()
+                            .map(user -> EntityIdCodec.toValue(user.getEntityId()))
+                            .collect(Collectors.toList()));
         }
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
@@ -162,8 +167,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Role role) {
-        dao.deleteRoleMenu(role.getId());
-        dao.deleteRoleUser(role.getId());
+        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getEntityId()));
+        dao.deleteRoleUser(EntityIdCodec.toValue(role.getEntityId()));
         int retVal = dao.delete(role.getEntityId());
 
         signService.deleteSign(role.getSignName(), role.getSignId());
@@ -176,7 +181,9 @@ public class RoleServiceImpl implements RoleService {
     public List<User> findRoleUser(Role role) {
         List<String> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
-                .computeIfAbsent(role.getId(), roleId -> dao.findRoleUser(role.getId()));
+                .computeIfAbsent(
+                        EntityIdCodec.toValue(role.getEntityId()),
+                        roleId -> dao.findRoleUser(EntityIdCodec.toValue(role.getEntityId())));
 
         return userIdList.stream().map(userId -> new User(userId)).collect(Collectors.toList());
     }
@@ -185,7 +192,9 @@ public class RoleServiceImpl implements RoleService {
     public List<Menu> findRoleMenu(Role role) {
         List<String> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)
-                .computeIfAbsent(String.valueOf(role.getId()), roleId -> dao.findRoleMenu(role.getId()));
+                .computeIfAbsent(
+                        EntityIdCodec.toValue(role.getEntityId()),
+                        roleId -> dao.findRoleMenu(EntityIdCodec.toValue(role.getEntityId())));
 
         return menuIdList.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
     }

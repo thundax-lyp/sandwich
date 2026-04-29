@@ -4,7 +4,7 @@ package com.github.thundax.common.persistence;
  * @param <T>
  * @author thundax
  */
-public abstract class TreeEntity<T> extends DataEntity<T> {
+public abstract class TreeEntity<T extends TreeEntity<T>> extends DataEntity<T> {
 
     public static final String ROOT_ID = "ROOT";
 

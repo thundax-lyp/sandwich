@@ -9,7 +9,7 @@ import org.springframework.lang.NonNull;
  *
  * @author thundax
  */
-public abstract class DataEntity<T> extends BaseEntity<T> {
+public abstract class DataEntity<T extends DataEntity<T>> extends BaseEntity<T> {
 
     protected Integer priority;
     protected String remarks;

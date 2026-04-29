@@ -68,21 +68,21 @@ public class User extends BaseUser {
     }
 
     public void setOffice(Office office) {
-        this.setOfficeId(office == null ? null : office.getId());
+        this.setOfficeId(office == null ? null : EntityIdCodec.toValue(office.getEntityId()));
     }
 
     public boolean isBelongTo(Office office) {
-        return office != null && Objects.equals(this.getOfficeId(), office.getId());
+        return office != null && Objects.equals(this.getOfficeId(), EntityIdCodec.toValue(office.getEntityId()));
     }
 
     @NotNull
     public List<String> getRoleIdList() {
         if (this.roleIdList == null) {
-            if (StringUtils.isBlank(this.getId())) {
+            if (StringUtils.isBlank(EntityIdCodec.toValue(getEntityId()))) {
                 this.roleIdList = new ArrayList<>();
             } else {
                 this.roleIdList = UserServiceHolder.getService().findUserRole(this).stream()
-                        .map(role -> role.getId())
+                        .map(role -> EntityIdCodec.toValue(role.getEntityId()))
                         .collect(Collectors.toList());
             }
         }
@@ -104,12 +104,15 @@ public class User extends BaseUser {
     public void setRoleList(List<Role> roleList) {
         this.roleIdList = roleList == null
                 ? new ArrayList<>()
-                : roleList.stream().map(role -> role.getId()).collect(Collectors.toList());
+                : roleList.stream()
+                        .map(role -> EntityIdCodec.toValue(role.getEntityId()))
+                        .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public boolean hasRole(@NotNull Role target) {
-        return getRoleIdList().stream().anyMatch(roleId -> StringUtils.equals(roleId, target.getId()));
+        return getRoleIdList().stream()
+                .anyMatch(roleId -> StringUtils.equals(roleId, EntityIdCodec.toValue(target.getEntityId())));
     }
 
     @JsonIgnore

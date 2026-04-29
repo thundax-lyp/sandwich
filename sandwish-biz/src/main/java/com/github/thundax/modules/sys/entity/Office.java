@@ -36,7 +36,7 @@ public class Office extends BaseOffice {
     }
 
     public void setParent(Office parent) {
-        this.setParentId(parent == null ? null : parent.getId());
+        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getEntityId()));
     }
 
     /**
@@ -48,7 +48,7 @@ public class Office extends BaseOffice {
     public String getNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
-        while (node != null && node.getId() != null) {
+        while (node != null && EntityIdCodec.toValue(node.getEntityId()) != null) {
             node = OfficeServiceHolder.getService().get(node.getEntityId());
             if (node != null) {
                 nameList.add(0, node.getName());
@@ -80,7 +80,7 @@ public class Office extends BaseOffice {
     public String getDisplayNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
-        while (node != null && node.getId() != null) {
+        while (node != null && EntityIdCodec.toValue(node.getEntityId()) != null) {
             node = OfficeServiceHolder.getService().get(node.getEntityId());
             if (node != null) {
                 nameList.add(0, node.getDisplayName());

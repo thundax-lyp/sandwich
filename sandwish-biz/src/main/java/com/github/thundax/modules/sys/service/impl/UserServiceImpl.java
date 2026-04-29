@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
@@ -122,7 +123,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(User user) {
-        user.setId(dao.insert(user));
+        user.setEntityId(EntityIdCodec.toDomain(dao.insert(user)));
         afterWrite(user, true);
     }
 
@@ -134,13 +135,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void afterWrite(User user, boolean added) {
-        dao.deleteUserRole(user.getId());
+        dao.deleteUserRole(EntityIdCodec.toValue(user.getEntityId()));
         if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
-            dao.insertUserRole(user.getId(), user.getRoleIdList());
+            dao.insertUserRole(EntityIdCodec.toValue(user.getEntityId()), user.getRoleIdList());
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(user.getId());
+        userEncrypt.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(user.getEntityId())));
         userEncrypt.setEmail(user.getEmail());
         userEncrypt.setMobile(user.getMobile());
         userEncrypt.setTel(user.getTel());
@@ -157,7 +158,7 @@ public class UserServiceImpl implements UserService {
         dao.updateLoginPass(user);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(user.getId());
+        userEncrypt.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(user.getEntityId())));
         userEncrypt.setLoginPass(user.getLoginPass());
         userEncryptService.updateLoginPass(userEncrypt);
     }
@@ -188,7 +189,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(User user) {
-        dao.deleteUserRole(user.getId());
+        dao.deleteUserRole(EntityIdCodec.toValue(user.getEntityId()));
 
         int result = dao.delete(user.getEntityId());
 
@@ -199,7 +200,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Role> findUserRole(User user) {
-        return dao.findUserRole(user.getId()).stream().map(Role::new).collect(Collectors.toList());
+        return dao.findUserRole(EntityIdCodec.toValue(user.getEntityId())).stream()
+                .map(Role::new)
+                .collect(Collectors.toList());
     }
 
     @Override

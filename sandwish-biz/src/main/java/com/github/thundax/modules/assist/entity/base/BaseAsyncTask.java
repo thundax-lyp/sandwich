@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.entity.base;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.AdminDataEntity;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
@@ -17,7 +18,7 @@ public class BaseAsyncTask extends AdminDataEntity<AsyncTask> {
     public BaseAsyncTask() {}
 
     public BaseAsyncTask(String id) {
-        setId(id);
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     public String getTitle() {

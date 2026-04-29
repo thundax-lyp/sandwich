@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.base.BaseStorage;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import java.io.Serializable;
@@ -47,7 +48,7 @@ public class Storage extends BaseStorage {
 
     @JsonIgnore
     public String getFileName() {
-        return this.getId() + MetaFile.DOT + this.getExtendName();
+        return EntityIdCodec.toValue(getEntityId()) + MetaFile.DOT + this.getExtendName();
     }
 
     @JsonIgnore

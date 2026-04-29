@@ -2,6 +2,7 @@ package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -71,7 +72,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Storage storage) {
-        storage.setId(dao.insert(storage));
+        storage.setEntityId(EntityIdCodec.toDomain(dao.insert(storage)));
     }
 
     @Override

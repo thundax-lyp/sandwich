@@ -2,6 +2,7 @@ package com.github.thundax.modules.member.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
@@ -91,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Member member) {
-        member.setId(dao.insert(member));
+        member.setEntityId(EntityIdCodec.toDomain(dao.insert(member)));
     }
 
     @Override

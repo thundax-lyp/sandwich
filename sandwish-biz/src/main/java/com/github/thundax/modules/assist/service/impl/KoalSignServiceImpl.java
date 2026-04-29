@@ -2,6 +2,7 @@ package com.github.thundax.modules.assist.service.impl;
 
 import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.plugins.koal.sign.SignRequestParam;
@@ -140,7 +141,7 @@ public class KoalSignServiceImpl extends AbstractSignServiceImpl {
             if (existing == null) {
                 signatureService.add(signature);
             } else {
-                signature.setId(existing.getId());
+                signature.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(existing.getEntityId())));
                 signatureService.update(signature);
             }
 

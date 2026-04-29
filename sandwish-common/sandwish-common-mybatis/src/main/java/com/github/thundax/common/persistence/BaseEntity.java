@@ -1,5 +1,6 @@
 package com.github.thundax.common.persistence;
 
+import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import java.io.Serializable;
@@ -9,9 +10,7 @@ import java.io.Serializable;
  *
  * @author thundax
  */
-public abstract class BaseEntity<T> implements Serializable {
-
-    protected EntityId id;
+public abstract class BaseEntity<T extends BaseEntity<T>> extends Entity<T> implements Serializable {
 
     public BaseEntity() {
         initialize();
@@ -19,31 +18,15 @@ public abstract class BaseEntity<T> implements Serializable {
 
     public BaseEntity(String id) {
         this();
-        this.id = EntityIdCodec.toDomain(id);
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     public BaseEntity(EntityId id) {
         this();
-        this.id = id;
+        setEntityId(id);
     }
 
     protected abstract void initialize();
-
-    public String getId() {
-        return EntityIdCodec.toValue(id);
-    }
-
-    public EntityId getEntityId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = EntityIdCodec.toDomain(id);
-    }
-
-    public void setId(EntityId id) {
-        this.id = id;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -53,9 +36,9 @@ public abstract class BaseEntity<T> implements Serializable {
             return true;
         } else if (!getClass().equals(obj.getClass())) {
             return false;
-        } else if (this.getId() == null) {
+        } else if (this.getEntityId() == null) {
             return false;
         }
-        return this.getId().equals(((BaseEntity<?>) obj).getId());
+        return this.getEntityId().equals(((BaseEntity<?>) obj).getEntityId());
     }
 }

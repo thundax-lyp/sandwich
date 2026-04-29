@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signable {
+public abstract class AdminTreeEntity<T extends AdminTreeEntity<T>> extends TreeEntity<T> implements Signable {
 
     protected String createUserId;
     protected String updateUserId;
@@ -50,7 +50,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
     }
 
     public void setCreateBy(User createBy) {
-        this.setCreateUserId(createBy == null ? null : createBy.getId());
+        this.setCreateUserId(createBy == null ? null : EntityIdCodec.toValue(createBy.getEntityId()));
     }
 
     @JsonIgnore
@@ -59,7 +59,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
     }
 
     public void setUpdateBy(User updateBy) {
-        this.setUpdateUserId(updateBy == null ? null : updateBy.getId());
+        this.setUpdateUserId(updateBy == null ? null : EntityIdCodec.toValue(updateBy.getEntityId()));
     }
 
     public Map<String, Object> toTreeData() {
@@ -71,7 +71,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
             idPrefix = StringUtils.EMPTY;
         }
         Map<String, Object> map = Maps.newHashMap();
-        map.put("id", idPrefix + this.getId());
+        map.put("id", idPrefix + EntityIdCodec.toValue(this.getEntityId()));
         map.put("pId", this.getParentId() == null ? "0" : idPrefix + this.getParentId());
         map.put("name", this.getName());
         return map;
@@ -86,7 +86,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
     @Override
     @JsonIgnore
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getEntityId());
     }
 
     @Override

@@ -57,7 +57,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     }
 
     public void setParent(Menu parent) {
-        this.setParentId(parent == null ? null : parent.getId());
+        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getEntityId()));
     }
 
     @JsonIgnore

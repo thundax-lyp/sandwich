@@ -59,7 +59,7 @@ public class UserServiceHolder {
         if (user.isSuper()) {
             // 超级管理员可以看到全部菜单
             menuIdList = MenuServiceHolder.getService().findList(new Menu()).stream()
-                    .map(menu -> menu.getId())
+                    .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
                     .collect(Collectors.toList());
 
         } else {
@@ -75,7 +75,7 @@ public class UserServiceHolder {
             if (isAdmin) {
                 // 一般管理员可以看到比自己级别低的菜单
                 menuIdList = MenuServiceHolder.getService().findList(user.getRanks()).stream()
-                        .map(menu -> menu.getId())
+                        .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
                         .collect(Collectors.toList());
 
             } else {
@@ -83,7 +83,7 @@ public class UserServiceHolder {
                 Set<String> menuIds = Sets.newHashSet();
                 for (Role role : roleList) {
                     menuIds.addAll(role.getMenuList().stream()
-                            .map(menu -> menu.getId())
+                            .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
                             .collect(Collectors.toList()));
                 }
 

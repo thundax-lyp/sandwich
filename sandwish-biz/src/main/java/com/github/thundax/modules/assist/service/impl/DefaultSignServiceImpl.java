@@ -1,6 +1,7 @@
 package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.codec.Sm3Utils;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         if (existing == null) {
             signatureService.add(signature);
         } else {
-            signature.setId(existing.getId());
+            signature.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(existing.getEntityId())));
             signatureService.update(signature);
         }
 

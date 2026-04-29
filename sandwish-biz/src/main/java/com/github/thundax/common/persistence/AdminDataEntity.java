@@ -3,6 +3,7 @@ package com.github.thundax.common.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.github.thundax.common.id.EntityIdCodec;
 
 /**
  * 管理后台DataEntity
@@ -11,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * @author wdit
  */
 @JsonInclude(Include.NON_NULL)
-public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signable {
+public abstract class AdminDataEntity<T extends AdminDataEntity<T>> extends DataEntity<T> implements Signable {
 
     private String createUserId;
     private String updateUserId;
@@ -49,7 +50,7 @@ public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signab
     @Override
     @JsonIgnore
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getEntityId());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
@@ -90,7 +91,7 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Office entity) {
-        entity.setId(dao.insert(entity));
+        entity.setEntityId(EntityIdCodec.toDomain(dao.insert(entity)));
     }
 
     @Override
@@ -133,12 +134,15 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {
-        dao.moveTreeNode(from.getId(), to.getId(), moveType);
+        dao.moveTreeNode(EntityIdCodec.toValue(from.getEntityId()), EntityIdCodec.toValue(to.getEntityId()), moveType);
     }
 
     @Override
     public boolean isChildOf(Office child, Office parent) {
-        return child != null && parent != null && dao.isChildOf(child.getId(), parent.getId());
+        return child != null
+                && parent != null
+                && dao.isChildOf(
+                        EntityIdCodec.toValue(child.getEntityId()), EntityIdCodec.toValue(parent.getEntityId()));
     }
 
     private int batchOperate(Collection<Office> collection, Function<Office, Integer> operator) {

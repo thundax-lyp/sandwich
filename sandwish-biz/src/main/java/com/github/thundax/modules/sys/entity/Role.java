@@ -51,11 +51,11 @@ public class Role extends BaseRole {
 
     public List<String> getMenuIdList() {
         if (this.menuIdList == null) {
-            if (StringUtils.isBlank(this.getId())) {
+            if (StringUtils.isBlank(EntityIdCodec.toValue(getEntityId()))) {
                 this.menuIdList = new ArrayList<>();
             } else {
                 this.menuIdList = RoleServiceHolder.getService().findRoleMenu(this).stream()
-                        .map(menu -> menu.getId())
+                        .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
                         .collect(Collectors.toList());
             }
         }
@@ -76,7 +76,9 @@ public class Role extends BaseRole {
     public void setMenuList(List<Menu> menuList) {
         this.menuIdList = menuList == null
                 ? new ArrayList<>()
-                : menuList.stream().map(menu -> menu.getId()).collect(Collectors.toList());
+                : menuList.stream()
+                        .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
+                        .collect(Collectors.toList());
     }
 
     @JsonIgnore

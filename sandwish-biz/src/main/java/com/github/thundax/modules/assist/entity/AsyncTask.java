@@ -1,6 +1,7 @@
 package com.github.thundax.modules.assist.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.base.BaseAsyncTask;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Objects;
@@ -62,6 +63,6 @@ public class AsyncTask extends BaseAsyncTask {
     }
 
     public boolean isBelongTo(User user) {
-        return user != null && Objects.equals(user.getId(), getCreateUserId());
+        return user != null && Objects.equals(EntityIdCodec.toValue(user.getEntityId()), getCreateUserId());
     }
 }

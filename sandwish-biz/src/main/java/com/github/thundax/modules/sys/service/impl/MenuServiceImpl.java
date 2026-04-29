@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
@@ -106,7 +107,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Menu menu) {
-        menu.setId(dao.insert(menu));
+        menu.setEntityId(EntityIdCodec.toDomain(dao.insert(menu)));
         afterWrite(menu);
     }
 
@@ -152,7 +153,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Menu menu) {
-        dao.deleteMenuRole(menu.getId());
+        dao.deleteMenuRole(EntityIdCodec.toValue(menu.getEntityId()));
         Menu bean = this.get(menu.getEntityId());
         if (bean == null) {
             return 0;
@@ -175,13 +176,16 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Menu from, Menu to, MoveTreeNodeType moveType) {
-        dao.moveTreeNode(from.getId(), to.getId(), moveType);
+        dao.moveTreeNode(EntityIdCodec.toValue(from.getEntityId()), EntityIdCodec.toValue(to.getEntityId()), moveType);
         notifyCacheChanged();
     }
 
     @Override
     public boolean isChildOf(Menu child, Menu parent) {
-        return child != null && parent != null && dao.isChildOf(child.getId(), parent.getId());
+        return child != null
+                && parent != null
+                && dao.isChildOf(
+                        EntityIdCodec.toValue(child.getEntityId()), EntityIdCodec.toValue(parent.getEntityId()));
     }
 
     private void notifyCacheChanged() {

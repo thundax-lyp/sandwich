@@ -25,6 +25,8 @@
   读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：
   再读 `00-governance/NAMING-AND-PLACEMENT-RULES.md`
+- 重塑业务 Entity、删除旧实体基类、迁移审计/排序/备注字段、清理 domain 中的 JSON 注解：
+  读 `00-governance/how-to/HOW-TO-REMODEL-DOMAIN-ENTITY.md`
 - 数据库、实体、DAO、Mapper、SQL、持久化查询：
   再读 `00-governance/DATABASE-RULES.md`
   再读对应 `20-database/*-DATABASE-DESIGN.md`

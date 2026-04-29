@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
+import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,5 +95,9 @@ public final class UserPersistenceAssembler {
             roles.add(new Role(roleId));
         }
         return roles;
+    }
+
+    public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {
+        return new UserRoleDO(userId, roleId);
     }
 }

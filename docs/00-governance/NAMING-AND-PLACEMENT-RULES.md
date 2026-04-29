@@ -65,6 +65,7 @@
 - `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
 - `LAYER_INTERFACE_ASSEMBLER_NO_DO`：`InterfaceAssembler` 不转换 `DO` / `DataObject`
 - `LAYER_DAO_NO_WEB`：DAO / Mapper 不感知 HTTP、Session 和权限适配
+- `LAYER_DATA_OBJECT_CREATION_ASSEMBLER_ONLY`：生产代码中 `new DO/DataObject` 只能出现在 `PersistenceAssembler` 中，DAO implementation 不直接构造 `DO/DataObject`。
 - `LAYER_NO_SERVER_PAGE`：不得新增服务端页面模板、页面装饰器或标签库作为业务入口
 - `LAYER_NO_EXTRA_ARCH_DEFAULT`：不得默认新增 `interfaces / application / domain / facade / repository` 等额外分层目录
 - `LAYER_INFRA_NO_BUSINESS_FLOW`：`sandwish-infra` 不承载业务流程，不暴露 HTTP 模型，不让 Controller 直接调用

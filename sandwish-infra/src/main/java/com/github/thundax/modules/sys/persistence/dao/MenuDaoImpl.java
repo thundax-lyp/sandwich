@@ -185,10 +185,7 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeLfts(fromNode.getLft(), -treeSpan(fromNode));
         moveTreeRgts(fromNode.getLft(), -treeSpan(fromNode));
 
-        MenuDO parentUpdate = new MenuDO();
-        parentUpdate.setId(fromId);
-        parentUpdate.setParentId(newParentId);
-        updateParent(parentUpdate);
+        updateParent(MenuPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
         cacheSupport.removeAll();
     }
 

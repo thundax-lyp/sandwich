@@ -177,10 +177,7 @@ public class OfficeDaoImpl implements OfficeDao {
         moveTreeLfts(fromNode.getLft(), -treeSpan(fromNode));
         moveTreeRgts(fromNode.getLft(), -treeSpan(fromNode));
 
-        OfficeDO parentUpdate = new OfficeDO();
-        parentUpdate.setId(fromId);
-        parentUpdate.setParentId(newParentId);
-        updateParent(parentUpdate);
+        updateParent(OfficePersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
         cacheSupport.removeAll();
     }
 

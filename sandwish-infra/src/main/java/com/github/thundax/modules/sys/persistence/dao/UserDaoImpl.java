@@ -227,7 +227,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void insertUserRole(String userId, List<String> roleIdList) {
         for (String roleId : roleIdList) {
-            userRoleMapper.insert(new UserRoleDO(userId, roleId));
+            userRoleMapper.insert(UserPersistenceAssembler.toUserRoleDataObject(userId, roleId));
         }
         removeUserCaches(userId);
     }

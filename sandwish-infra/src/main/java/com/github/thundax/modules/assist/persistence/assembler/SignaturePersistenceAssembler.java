@@ -48,4 +48,15 @@ public final class SignaturePersistenceAssembler {
         }
         return entities;
     }
+
+    public static SignatureDO toUpdateDataObject(SignatureDO dataObject) {
+        if (dataObject == null) {
+            return null;
+        }
+        SignatureDO update = new SignatureDO();
+        update.setSignature(dataObject.getSignature());
+        update.setIsVerifySign(dataObject.getIsVerifySign());
+        update.setUpdateDate(dataObject.getUpdateDate());
+        return update;
+    }
 }

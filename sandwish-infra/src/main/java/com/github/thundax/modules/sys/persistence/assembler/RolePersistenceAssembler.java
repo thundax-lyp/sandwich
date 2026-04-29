@@ -2,7 +2,9 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
+import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,5 +79,13 @@ public final class RolePersistenceAssembler {
             userIds.add(user.getId());
         }
         return userIds;
+    }
+
+    public static MenuRoleDO toMenuRoleDataObject(String roleId, String menuId) {
+        return new MenuRoleDO(roleId, menuId);
+    }
+
+    public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {
+        return new UserRoleDO(userId, roleId);
     }
 }

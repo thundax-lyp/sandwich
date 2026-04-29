@@ -21,6 +21,8 @@ public class PersistenceMigrationArchitectureTest {
             "sandwish-common", "sandwish-biz", "sandwish-infra", "sandwish-admin-api", "sandwish-front-api");
     private static final Pattern DATA_OBJECT_REFERENCE_PATTERN =
             Pattern.compile("\\b[A-Z][A-Za-z0-9]*(?:DO|DataObject)\\b|\\.persistence\\.dataobject\\b");
+    private static final Pattern NEW_DATA_OBJECT_PATTERN =
+            Pattern.compile("\\bnew\\s+[A-Z][A-Za-z0-9]*(?:DO|DataObject)\\s*\\(");
 
     @Test
     public void shouldNotKeepMapperXmlInMainSources() throws IOException {
@@ -99,6 +101,25 @@ public class PersistenceMigrationArchitectureTest {
                 violations.isEmpty());
     }
 
+    @Test
+    public void shouldCreateDataObjectsOnlyInPersistenceAssemblers() throws IOException {
+        Path root = repositoryRoot();
+        List<Path> violations = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(root)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(this::isMainJavaSource)
+                    .filter(path -> !isArchitectureTestSupportSource(path))
+                    .filter(this::containsNewDataObject)
+                    .filter(path -> !path.getFileName().toString().endsWith("PersistenceAssembler.java"))
+                    .forEach(violations::add);
+        }
+
+        assertTrue(
+                "DO/DataObject constructors must only be called in PersistenceAssembler: " + violations,
+                violations.isEmpty());
+    }
+
     private boolean isProjectSource(Path path) {
         String value = path.toString();
         return value.endsWith(".java") || value.endsWith(".xml") || value.endsWith("pom.xml");
@@ -148,6 +169,15 @@ public class PersistenceMigrationArchitectureTest {
             return DATA_OBJECT_REFERENCE_PATTERN
                     .matcher(removeJavaComments(content))
                     .find();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private boolean containsNewDataObject(Path path) {
+        try {
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return NEW_DATA_OBJECT_PATTERN.matcher(removeJavaComments(content)).find();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -55,4 +55,11 @@ public final class OfficePersistenceAssembler {
         }
         return entities;
     }
+
+    public static OfficeDO toParentUpdateDataObject(String id, String parentId) {
+        OfficeDO dataObject = new OfficeDO();
+        dataObject.setId(id);
+        dataObject.setParentId(parentId);
+        return dataObject;
+    }
 }

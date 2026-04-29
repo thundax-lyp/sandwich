@@ -59,21 +59,13 @@ public class SignatureDaoImpl implements SignatureDao {
     public int update(Signature entity) {
         SignatureDO dataObject = SignaturePersistenceAssembler.toDataObject(entity);
         return mapper.update(
-                buildUpdateDataObject(dataObject),
+                SignaturePersistenceAssembler.toUpdateDataObject(dataObject),
                 buildBusinessKeyWrapper(dataObject.getBusinessType(), dataObject.getBusinessId()));
     }
 
     @Override
     public int delete(String businessType, String businessId) {
         return mapper.delete(buildBusinessKeyWrapper(businessType, businessId));
-    }
-
-    private SignatureDO buildUpdateDataObject(SignatureDO dataObject) {
-        SignatureDO update = new SignatureDO();
-        update.setSignature(dataObject.getSignature());
-        update.setIsVerifySign(dataObject.getIsVerifySign());
-        update.setUpdateDate(dataObject.getUpdateDate());
-        return update;
     }
 
     private LambdaQueryWrapper<SignatureDO> buildBusinessKeyWrapper(String businessType, String businessId) {

@@ -171,7 +171,7 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public void insertRoleMenu(String roleId, List<String> menuIdList) {
         for (String menuId : menuIdList) {
-            menuRoleMapper.insert(new MenuRoleDO(roleId, menuId));
+            menuRoleMapper.insert(RolePersistenceAssembler.toMenuRoleDataObject(roleId, menuId));
         }
         removeRoleCaches(roleId);
     }
@@ -201,7 +201,7 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public void insertRoleUser(String roleId, List<String> userIdList) {
         for (String userId : userIdList) {
-            userRoleMapper.insert(new UserRoleDO(userId, roleId));
+            userRoleMapper.insert(RolePersistenceAssembler.toUserRoleDataObject(userId, roleId));
         }
         removeRoleCaches(roleId);
     }

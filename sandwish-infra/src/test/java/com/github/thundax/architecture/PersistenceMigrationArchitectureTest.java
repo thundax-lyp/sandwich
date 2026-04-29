@@ -1,14 +1,17 @@
 package com.github.thundax.architecture;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.Test;
 
@@ -16,6 +19,8 @@ public class PersistenceMigrationArchitectureTest {
 
     private static final List<String> MODULES = Arrays.asList(
             "sandwish-common", "sandwish-biz", "sandwish-infra", "sandwish-admin-api", "sandwish-front-api");
+    private static final Pattern DATA_OBJECT_REFERENCE_PATTERN =
+            Pattern.compile("\\b[A-Z][A-Za-z0-9]*(?:DO|DataObject)\\b|\\.persistence\\.dataobject\\b");
 
     @Test
     public void shouldNotKeepMapperXmlInMainSources() throws IOException {
@@ -75,9 +80,40 @@ public class PersistenceMigrationArchitectureTest {
         }
     }
 
+    @Test
+    public void shouldKeepDataObjectsOnlyInInfraMainSources() throws IOException {
+        Path root = repositoryRoot();
+        List<Path> violations = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(root)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(this::isMainJavaSource)
+                    .filter(path -> !isInfraMainJavaSource(path))
+                    .filter(path -> !isArchitectureTestSupportSource(path))
+                    .filter(this::containsDataObjectReference)
+                    .forEach(violations::add);
+        }
+
+        assertTrue(
+                "DO/DataObject must only be defined or referenced in sandwish-infra: " + violations,
+                violations.isEmpty());
+    }
+
     private boolean isProjectSource(Path path) {
         String value = path.toString();
         return value.endsWith(".java") || value.endsWith(".xml") || value.endsWith("pom.xml");
+    }
+
+    private boolean isMainJavaSource(Path path) {
+        return path.toString().contains("/src/main/java/");
+    }
+
+    private boolean isInfraMainJavaSource(Path path) {
+        return path.toString().contains("/sandwish-infra/src/main/java/");
+    }
+
+    private boolean isArchitectureTestSupportSource(Path path) {
+        return path.toString().contains("/sandwish-common/sandwish-common-test/src/main/java/");
     }
 
     private boolean containsForbiddenPersistenceToken(Path path) {
@@ -104,6 +140,53 @@ public class PersistenceMigrationArchitectureTest {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    private boolean containsDataObjectReference(Path path) {
+        try {
+            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return DATA_OBJECT_REFERENCE_PATTERN
+                    .matcher(removeJavaComments(content))
+                    .find();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private String removeJavaComments(String content) {
+        StringBuilder builder = new StringBuilder(content.length());
+        boolean inLineComment = false;
+        boolean inBlockComment = false;
+        for (int i = 0; i < content.length(); i++) {
+            char current = content.charAt(i);
+            char next = i + 1 < content.length() ? content.charAt(i + 1) : '\0';
+            if (inLineComment) {
+                if (current == '\n') {
+                    inLineComment = false;
+                    builder.append(current);
+                }
+                continue;
+            }
+            if (inBlockComment) {
+                if (current == '*' && next == '/') {
+                    inBlockComment = false;
+                    i++;
+                }
+                continue;
+            }
+            if (current == '/' && next == '/') {
+                inLineComment = true;
+                i++;
+                continue;
+            }
+            if (current == '/' && next == '*') {
+                inBlockComment = true;
+                i++;
+                continue;
+            }
+            builder.append(current);
+        }
+        return builder.toString();
     }
 
     private Path repositoryRoot() {

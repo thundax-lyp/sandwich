@@ -173,7 +173,7 @@ public class StorageController extends BaseAdminController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = StorageServiceHolder.get(id);
+        Storage storage = StorageServiceHolder.get(storageInterfaceAssembler.toEntityId(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -250,7 +250,7 @@ public class StorageController extends BaseAdminController {
             return false;
         }
 
-        Storage bean = StorageServiceHolder.get(id);
+        Storage bean = StorageServiceHolder.get(storageInterfaceAssembler.toEntityId(id));
         if (bean == null) {
             addWarningMessage(redirectAttributes, "无效的数据");
             return false;

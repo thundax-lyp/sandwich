@@ -34,7 +34,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
 
     @Override
     public DictResponse get(@RequestBody DictIdRequest request) throws ApiException {
-        return dictInterfaceAssembler.toResponse(dictService.get(new Dict(request.getId())));
+        return dictInterfaceAssembler.toResponse(dictService.get(dictInterfaceAssembler.toEntityId(request.getId())));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DictController extends BaseApiController implements DictServiceApi 
 
     @Override
     public DictResponse update(@RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictService.get(new Dict(request.getId()));
+        Dict dict = dictService.get(dictInterfaceAssembler.toEntityId(request.getId()));
         if (dict == null) {
             throw new ApiException("id not exist");
         }
@@ -72,7 +72,8 @@ public class DictController extends BaseApiController implements DictServiceApi 
 
     @Override
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList = validateList(list, vo -> dictService.get(vo.getId()), null, null);
+        List<Dict> beanList =
+                validateList(list, vo -> dictService.get(dictInterfaceAssembler.toEntityId(vo.getId())), null, null);
         dictService.delete(beanList);
         return true;
     }

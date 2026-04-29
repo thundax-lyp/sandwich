@@ -37,7 +37,7 @@ public class AsyncTaskApiController extends BaseApiController implements AsyncTa
     public AsyncTaskResponse get(@RequestBody AsyncTaskIdRequest request) throws ApiException {
         validate(request);
 
-        AsyncTask bean = asyncTaskService.get(request.getId());
+        AsyncTask bean = asyncTaskService.get(asyncTaskInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             return new AsyncTaskResponse();
         }

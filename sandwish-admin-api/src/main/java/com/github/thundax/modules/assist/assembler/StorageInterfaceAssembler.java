@@ -1,5 +1,7 @@
 package com.github.thundax.modules.assist.assembler;
 
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
@@ -14,6 +16,10 @@ public class StorageInterfaceAssembler {
 
     public StorageInterfaceAssembler(StorageConverter storageConverter) {
         this.storageConverter = storageConverter;
+    }
+
+    public EntityId toEntityId(String id) {
+        return EntityIdCodec.toDomain(id);
     }
 
     @NonNull

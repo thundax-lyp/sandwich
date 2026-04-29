@@ -93,13 +93,13 @@ public class SignatureApiController extends BaseApiController implements Signatu
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
             case Log.BEAN_NAME:
-                return LogServiceHolder.get(bean.getBusinessId());
+                return LogServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case User.BEAN_NAME:
-                return UserServiceHolder.get(bean.getBusinessId());
+                return UserServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Menu.BEAN_NAME:
-                return MenuServiceHolder.get(bean.getBusinessId());
+                return MenuServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Role.BEAN_NAME:
-                return RoleServiceHolder.get(bean.getBusinessId());
+                return RoleServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             default:
                 return null;
         }

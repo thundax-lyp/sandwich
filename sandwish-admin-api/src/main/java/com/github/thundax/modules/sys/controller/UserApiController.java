@@ -91,7 +91,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public UserResponse get(@RequestBody UserIdRequest request) throws ApiException {
-        User bean = userService.get(request.getId());
+        User bean = userService.get(userInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
@@ -143,7 +143,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
 
         if (StringUtils.isNotEmpty(entity.getId())) {
-            User bean = userService.get(entity.getId());
+            User bean = userService.get(userInterfaceAssembler.toEntityId(entity.getId()));
             if (bean != null) {
                 throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
             }
@@ -180,7 +180,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new InvalidParameterException("ssoLoginName");
         }
 
-        User bean = userService.get(request.getId());
+        User bean = userService.get(userInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
@@ -233,7 +233,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         List<User> beanList = validateList(
                 list,
-                vo -> userService.get(vo.getId()),
+                vo -> userService.get(userInterfaceAssembler.toEntityId(vo.getId())),
                 (bean, vo) -> {
                     if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
                         throw new PermissionDeniedException();
@@ -254,7 +254,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         List<User> beanList = validateList(
                 list,
-                vo -> userService.get(vo.getId()),
+                vo -> userService.get(userInterfaceAssembler.toEntityId(vo.getId())),
                 (bean, vo) -> {
                     if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
                         throw new PermissionDeniedException();
@@ -336,7 +336,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {
-            Office office = OfficeServiceHolder.get(request.getOfficeId());
+            Office office = OfficeServiceHolder.get(userInterfaceAssembler.toEntityId(request.getOfficeId()));
             if (office == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
@@ -355,7 +355,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new InvalidParameterException("office.id");
 
         } else {
-            Office bean = OfficeServiceHolder.get(request.getId());
+            Office bean = OfficeServiceHolder.get(userInterfaceAssembler.toEntityId(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getId());
             }
@@ -371,7 +371,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                Role bean = RoleServiceHolder.get(request.getId());
+                Role bean = RoleServiceHolder.get(userInterfaceAssembler.toEntityId(request.getId()));
                 if (bean == null) {
                     throw new NullBeanException(Role.BEAN_NAME, request.getId());
                 }

@@ -1,6 +1,8 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
@@ -19,6 +21,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserInterfaceAssembler {
+
+    public EntityId toEntityId(String id) {
+        return EntityIdCodec.toDomain(id);
+    }
 
     @NonNull
     public UserResponse toResponse(User entity) {

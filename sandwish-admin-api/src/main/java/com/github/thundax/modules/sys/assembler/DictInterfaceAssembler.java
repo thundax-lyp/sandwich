@@ -1,5 +1,7 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
@@ -9,6 +11,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DictInterfaceAssembler {
+
+    public EntityId toEntityId(String id) {
+        return EntityIdCodec.toDomain(id);
+    }
 
     @NonNull
     public DictResponse toResponse(Dict entity) {

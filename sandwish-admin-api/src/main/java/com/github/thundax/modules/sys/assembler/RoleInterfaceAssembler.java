@@ -1,6 +1,8 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
@@ -20,6 +22,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RoleInterfaceAssembler {
+
+    public EntityId toEntityId(String id) {
+        return EntityIdCodec.toDomain(id);
+    }
 
     @NonNull
     public RoleResponse toResponse(Role entity) {

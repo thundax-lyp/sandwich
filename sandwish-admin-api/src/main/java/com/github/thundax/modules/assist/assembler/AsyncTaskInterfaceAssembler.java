@@ -1,5 +1,7 @@
 package com.github.thundax.modules.assist.assembler;
 
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
@@ -8,6 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AsyncTaskInterfaceAssembler {
+
+    public EntityId toEntityId(String id) {
+        return EntityIdCodec.toDomain(id);
+    }
 
     @NonNull
     public AsyncTaskResponse toResponse(AsyncTask entity) {

@@ -1,13 +1,14 @@
 package com.github.thundax.modules.storage.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
 
 public interface StorageDao {
 
-    Storage get(String id);
+    Storage get(EntityId id);
 
     List<Storage> getMany(List<String> idList);
 
@@ -28,7 +29,7 @@ public interface StorageDao {
 
     int update(Storage entity);
 
-    int delete(String id);
+    int delete(EntityId id);
 
     /**
      * 获取MIME列表

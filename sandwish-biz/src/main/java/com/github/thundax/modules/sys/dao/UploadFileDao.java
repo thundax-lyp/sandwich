@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.List;
 
 public interface UploadFileDao {
 
-    UploadFile get(String id);
+    UploadFile get(EntityId id);
 
     List<UploadFile> getMany(List<String> idList);
 
@@ -20,9 +21,9 @@ public interface UploadFileDao {
 
     int updatePriority(UploadFile uploadFile);
 
-    int delete(String id);
+    int delete(EntityId id);
 
-    UploadFile getContent(String id);
+    UploadFile getContent(EntityId id);
 
     List<UploadFile> findByFileIds(List<String> fileIds);
 }

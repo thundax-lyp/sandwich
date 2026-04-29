@@ -1,6 +1,7 @@
 package com.github.thundax.modules.member.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
@@ -25,8 +26,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Member get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -141,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) {
             return 0;
         }
-        return dao.delete(member.getId());
+        return dao.delete(member.getEntityId());
     }
 
     @Override

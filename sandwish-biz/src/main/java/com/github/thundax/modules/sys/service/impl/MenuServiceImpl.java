@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
@@ -10,7 +11,6 @@ import com.github.thundax.modules.sys.service.MenuService;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,12 +40,12 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Menu get(Menu entity) {
-        return entity == null ? null : get(entity.getId());
+        return entity == null ? null : get(entity.getEntityId());
     }
 
     @Override
-    public Menu get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Menu get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -153,12 +153,12 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public int delete(Menu menu) {
         dao.deleteMenuRole(menu.getId());
-        Menu bean = this.get(menu.getId());
+        Menu bean = this.get(menu.getEntityId());
         if (bean == null) {
             return 0;
         }
 
-        int retVal = dao.delete(bean.getId());
+        int retVal = dao.delete(bean.getEntityId());
 
         signService.deleteSign(menu.getSignName(), menu.getSignId());
         notifyCacheChanged();

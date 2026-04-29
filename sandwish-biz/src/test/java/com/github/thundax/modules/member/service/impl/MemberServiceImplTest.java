@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class MemberServiceImplTest {
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertSame(expected, service.get("m1"));
+        assertSame(expected, service.get(EntityId.of("m1")));
         assertEquals("m1", dao.id);
     }
 
@@ -30,7 +31,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertEquals(null, service.get(""));
+        assertEquals(null, service.get((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -121,9 +122,9 @@ public class MemberServiceImplTest {
         private String ywtbId;
 
         @Override
-        public Member get(String id) {
+        public Member get(EntityId id) {
             this.getCalls++;
-            this.id = id;
+            this.id = id.value();
             return getResult;
         }
 
@@ -186,7 +187,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
+        public int delete(EntityId id) {
             return 1;
         }
 

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
@@ -8,7 +9,6 @@ import com.github.thundax.modules.sys.service.OfficeService;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +34,12 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public Office get(Office entity) {
-        return entity == null ? null : get(entity.getId());
+        return entity == null ? null : get(entity.getEntityId());
     }
 
     @Override
-    public Office get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Office get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -102,12 +102,12 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Office entity) {
-        Office bean = this.get(entity.getId());
+        Office bean = this.get(entity.getEntityId());
         if (bean == null) {
             return 0;
         }
 
-        int count = dao.delete(bean.getId());
+        int count = dao.delete(bean.getEntityId());
 
         return count;
     }

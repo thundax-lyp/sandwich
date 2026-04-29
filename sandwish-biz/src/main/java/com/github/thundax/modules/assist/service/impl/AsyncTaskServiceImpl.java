@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.service.impl;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
@@ -17,7 +18,7 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     }
 
     @Override
-    public AsyncTask get(String id) {
+    public AsyncTask get(EntityId id) {
         return asyncTaskDao.get(id);
     }
 

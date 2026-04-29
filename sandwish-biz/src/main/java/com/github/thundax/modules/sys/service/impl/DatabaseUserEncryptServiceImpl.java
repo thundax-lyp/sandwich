@@ -3,6 +3,8 @@ package com.github.thundax.modules.sys.service.impl;
 import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
@@ -81,9 +83,9 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public UserEncrypt get(String id) {
-        if (StringUtils.isNotBlank(id)) {
-            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(newEntity(id)));
+    public UserEncrypt get(EntityId id) {
+        if (id != null) {
+            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(newEntity(EntityIdCodec.toValue(id))));
         }
         return null;
     }
@@ -165,7 +167,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
             if (userEncryptPre == null) {
                 return;
             }
-            dao.get(userEncryptPre.getId());
+            dao.get(userEncryptPre.getEntityId());
 
         } catch (RestClientException e) {
             logger.error("加密对象：{}，加密异常：{}", encryptEntity, e.getMessage());
@@ -208,7 +210,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UserEncrypt entity) {
-        return entity == null ? 0 : dao.delete(entity.getId());
+        return entity == null ? 0 : dao.delete(entity.getEntityId());
     }
 
     @Override

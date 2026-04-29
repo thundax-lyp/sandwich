@@ -1,5 +1,6 @@
 package com.github.thundax.modules.member.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public interface MemberService {
 
-    Member get(String id);
+    Member get(EntityId id);
 
     List<Member> getMany(List<String> ids);
 

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.utils;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
@@ -12,7 +13,7 @@ public class UserAccessHolder {
 
     @NonNull
     public static User currentUser() {
-        User user = UserServiceHolder.get(currentUserId());
+        User user = UserServiceHolder.get(EntityIdCodec.toDomain(currentUserId()));
         if (user != null) {
             return user;
         }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -22,7 +23,7 @@ public class StorageServiceImplTest {
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
 
-        assertSame(expected, service.get("s1"));
+        assertSame(expected, service.get(EntityId.of("s1")));
         assertEquals("s1", dao.id);
     }
 
@@ -109,8 +110,8 @@ public class StorageServiceImplTest {
         private String deletedBusinessKey;
 
         @Override
-        public Storage get(String id) {
-            this.id = id;
+        public Storage get(EntityId id) {
+            this.id = id.value();
             return getResult;
         }
 
@@ -158,8 +159,8 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
-            deletedIds.add(id);
+        public int delete(EntityId id) {
+            deletedIds.add(id.value());
             return 1;
         }
 

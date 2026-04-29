@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.utils;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
@@ -23,7 +24,7 @@ public class LogServiceHolder {
         return service;
     }
 
-    public static Log get(String id) {
+    public static Log get(EntityId id) {
         return getService().get(id);
     }
 }

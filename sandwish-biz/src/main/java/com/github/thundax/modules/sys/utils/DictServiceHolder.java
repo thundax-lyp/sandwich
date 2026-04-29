@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.utils;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
@@ -25,7 +26,7 @@ public class DictServiceHolder {
     private static final Map<String, List<Dict>> TYPE_DICT_MAP = new ConcurrentHashMap<>();
     private static String lastCacheVersion = IdGen.uuid();
 
-    private static final PooledThreadLocal<Map<String, Dict>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<EntityId, Dict>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
     private static final PooledThreadLocal<String> CACHE_VERSION_HOLDER = new PooledThreadLocal<>();
 
     @Autowired
@@ -40,8 +41,8 @@ public class DictServiceHolder {
         return service;
     }
 
-    public static Dict get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public static Dict get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return ID_OBJECT_HOLDER.computeIfAbsent(HashMap::new).computeIfAbsent(id, (key) -> getService()

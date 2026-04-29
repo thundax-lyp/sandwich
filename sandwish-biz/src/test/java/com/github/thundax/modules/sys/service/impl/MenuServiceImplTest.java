@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.assist.service.SignService;
@@ -20,7 +21,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        assertEquals(null, service.get(""));
+        assertEquals(null, service.get((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -142,7 +143,7 @@ public class MenuServiceImplTest {
         private int pageSize;
 
         @Override
-        public Menu get(String id) {
+        public Menu get(EntityId id) {
             this.getCalls++;
             return getResult;
         }
@@ -192,8 +193,8 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
-            this.deletedId = id;
+        public int delete(EntityId id) {
+            this.deletedId = id.value();
             return 1;
         }
 

@@ -1,5 +1,7 @@
 package com.github.thundax.common.persistence;
 
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import java.io.Serializable;
 
 /**
@@ -9,7 +11,7 @@ import java.io.Serializable;
  */
 public abstract class BaseEntity<T> implements Serializable {
 
-    protected String id;
+    protected EntityId id;
 
     public BaseEntity() {
         initialize();
@@ -17,16 +19,29 @@ public abstract class BaseEntity<T> implements Serializable {
 
     public BaseEntity(String id) {
         this();
+        this.id = EntityIdCodec.toDomain(id);
+    }
+
+    public BaseEntity(EntityId id) {
+        this();
         this.id = id;
     }
 
     protected abstract void initialize();
 
     public String getId() {
+        return EntityIdCodec.toValue(id);
+    }
+
+    public EntityId getEntityId() {
         return id;
     }
 
     public void setId(String id) {
+        this.id = EntityIdCodec.toDomain(id);
+    }
+
+    public void setId(EntityId id) {
         this.id = id;
     }
 

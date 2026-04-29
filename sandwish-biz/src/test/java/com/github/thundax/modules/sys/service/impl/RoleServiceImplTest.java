@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
@@ -100,7 +101,7 @@ public class RoleServiceImplTest {
         private List<String> userIdList;
 
         @Override
-        public Role get(String id) {
+        public Role get(EntityId id) {
             return null;
         }
 
@@ -144,8 +145,8 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
-            this.deletedRoleId = id;
+        public int delete(EntityId id) {
+            this.deletedRoleId = id.value();
             return 1;
         }
 

@@ -17,7 +17,7 @@ public class BaseAsyncTask extends AdminDataEntity<AsyncTask> {
     public BaseAsyncTask() {}
 
     public BaseAsyncTask(String id) {
-        this.id = id;
+        setId(id);
     }
 
     public String getTitle() {

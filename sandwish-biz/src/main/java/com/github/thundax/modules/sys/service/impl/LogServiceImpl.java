@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -8,7 +9,6 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +26,8 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Log get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Log get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -91,7 +91,7 @@ public class LogServiceImpl implements LogService {
         if (log == null) {
             return 0;
         }
-        return dao.delete(log.getId());
+        return dao.delete(log.getEntityId());
     }
 
     @Override

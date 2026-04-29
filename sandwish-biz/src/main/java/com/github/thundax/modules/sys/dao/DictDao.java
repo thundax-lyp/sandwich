@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.List;
 
 public interface DictDao {
 
-    Dict get(String id);
+    Dict get(EntityId id);
 
     List<Dict> getMany(List<String> idList);
 
@@ -20,7 +21,7 @@ public interface DictDao {
 
     int updatePriority(Dict dict);
 
-    int delete(String id);
+    int delete(EntityId id);
 
     /**
      * 获取类型列表

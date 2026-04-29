@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.base.BaseRole;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
@@ -35,7 +36,7 @@ public class Role extends BaseRole {
     }
 
     public Role toBean() {
-        return RoleServiceHolder.get(this.getId());
+        return RoleServiceHolder.get(this.getEntityId());
     }
 
     @JsonIgnore
@@ -68,7 +69,7 @@ public class Role extends BaseRole {
     @JsonIgnore
     public List<Menu> getMenuList() {
         return getMenuIdList().stream()
-                .map(menuId -> MenuServiceHolder.get(menuId))
+                .map(menuId -> MenuServiceHolder.get(EntityIdCodec.toDomain(menuId)))
                 .collect(Collectors.toList());
     }
 

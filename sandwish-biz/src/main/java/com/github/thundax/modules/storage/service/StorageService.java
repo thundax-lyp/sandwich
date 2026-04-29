@@ -1,5 +1,6 @@
 package com.github.thundax.modules.storage.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -7,7 +8,7 @@ import java.util.List;
 
 public interface StorageService {
 
-    Storage get(String id);
+    Storage get(EntityId id);
 
     List<Storage> getMany(List<String> ids);
 

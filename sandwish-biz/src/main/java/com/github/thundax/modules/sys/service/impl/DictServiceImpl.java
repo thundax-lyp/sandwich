@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -35,12 +36,12 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public Dict get(Dict entity) {
-        return entity == null ? null : get(entity.getId());
+        return entity == null ? null : get(entity.getEntityId());
     }
 
     @Override
-    public Dict get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Dict get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -126,7 +127,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Dict dict) {
-        return dict == null ? 0 : dao.delete(dict.getId());
+        return dict == null ? 0 : dao.delete(dict.getEntityId());
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
@@ -46,12 +47,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User get(String id) {
-        User user = cacheSupport.getById(id);
+    public User get(EntityId id) {
+        User user = cacheSupport.getById(id.value());
         if (user != null) {
             return user;
         }
-        user = UserPersistenceAssembler.toEntity(mapper.selectById(id));
+        user = UserPersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(user);
         return user;
     }
@@ -146,9 +147,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int delete(String id) {
-        int count = mapper.deleteById(id);
-        removeUserCaches(id);
+    public int delete(EntityId id) {
+        int count = mapper.deleteById(id.value());
+        removeUserCaches(id.value());
         roleCacheSupport.removeAll();
         return count;
     }

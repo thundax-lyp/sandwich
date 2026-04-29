@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 
 public interface AsyncTaskService {
@@ -10,7 +11,7 @@ public interface AsyncTaskService {
      * @param id id
      * @return 对象
      */
-    AsyncTask get(String id);
+    AsyncTask get(EntityId id);
 
     /**
      * 新增

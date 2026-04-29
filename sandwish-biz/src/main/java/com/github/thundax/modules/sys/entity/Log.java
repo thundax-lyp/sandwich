@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.base.BaseLog;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
@@ -32,7 +33,7 @@ public class Log extends BaseLog {
 
     @JsonIgnore
     public User getUser() {
-        return UserServiceHolder.get(this.getUserId());
+        return UserServiceHolder.get(EntityIdCodec.toDomain(this.getUserId()));
     }
 
     public boolean isSignable() {

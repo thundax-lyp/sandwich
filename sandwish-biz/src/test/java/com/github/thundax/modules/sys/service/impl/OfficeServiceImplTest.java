@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.OfficeDao;
@@ -19,7 +20,7 @@ public class OfficeServiceImplTest {
         RecordingOfficeDao dao = new RecordingOfficeDao();
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        assertEquals(null, service.get(""));
+        assertEquals(null, service.get((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -119,7 +120,7 @@ public class OfficeServiceImplTest {
         private int priorityCalls;
 
         @Override
-        public Office get(String id) {
+        public Office get(EntityId id) {
             this.getCalls++;
             return getResult;
         }
@@ -170,8 +171,8 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
-            this.deletedId = id;
+        public int delete(EntityId id) {
+            this.deletedId = id.value();
             return 1;
         }
 

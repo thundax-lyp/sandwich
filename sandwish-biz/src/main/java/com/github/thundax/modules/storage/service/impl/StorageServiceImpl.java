@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -9,7 +10,6 @@ import com.github.thundax.modules.storage.service.StorageService;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +24,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Storage get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Storage get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -86,7 +86,7 @@ public class StorageServiceImpl implements StorageService {
         if (storage == null) {
             return 0;
         }
-        return dao.delete(storage.getId());
+        return dao.delete(storage.getEntityId());
     }
 
     @Override

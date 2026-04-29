@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
@@ -28,8 +29,8 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Member get(String id) {
-        return MemberPersistenceAssembler.toEntity(mapper.selectById(id));
+    public Member get(EntityId id) {
+        return MemberPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
@@ -128,8 +129,8 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public int delete(String id) {
-        return mapper.deleteById(id);
+    public int delete(EntityId id) {
+        return mapper.deleteById(id.value());
     }
 
     @Override

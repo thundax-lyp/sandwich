@@ -4,6 +4,7 @@ import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.AccessToken;
@@ -184,7 +185,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public User get(String id) {
+        public User get(EntityId id) {
             return user();
         }
 
@@ -297,7 +298,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public Menu get(String id) {
+        public Menu get(EntityId id) {
             return menus().get(0);
         }
 

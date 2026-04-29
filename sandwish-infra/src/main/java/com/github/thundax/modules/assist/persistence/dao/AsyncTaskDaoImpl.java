@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersistenceAssembler;
@@ -22,8 +23,8 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     private Cache<String, AsyncTaskDO> cache;
 
     @Override
-    public AsyncTask get(String id) {
-        return AsyncTaskPersistenceAssembler.toEntity(cache.get(cacheKey(id)));
+    public AsyncTask get(EntityId id) {
+        return AsyncTaskPersistenceAssembler.toEntity(cache.get(cacheKey(id.value())));
     }
 
     @Override

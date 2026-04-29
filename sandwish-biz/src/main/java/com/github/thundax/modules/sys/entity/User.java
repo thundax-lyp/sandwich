@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.base.BaseUser;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
@@ -63,7 +64,7 @@ public class User extends BaseUser {
 
     @JsonIgnore
     public Office getOffice() {
-        return OfficeServiceHolder.getService().get(this.getOfficeId());
+        return OfficeServiceHolder.getService().get(EntityIdCodec.toDomain(this.getOfficeId()));
     }
 
     public void setOffice(Office office) {
@@ -96,7 +97,7 @@ public class User extends BaseUser {
     @NotNull
     public List<Role> getRoleList() {
         return getRoleIdList().stream()
-                .map(roleId -> RoleServiceHolder.get(roleId))
+                .map(roleId -> RoleServiceHolder.get(EntityIdCodec.toDomain(roleId)))
                 .collect(Collectors.toList());
     }
 

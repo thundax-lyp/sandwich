@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import java.util.List;
 
 public interface UserEncryptDao {
 
-    UserEncrypt get(String id);
+    UserEncrypt get(EntityId id);
 
     List<UserEncrypt> getMany(List<String> idList);
 
@@ -20,7 +21,7 @@ public interface UserEncryptDao {
 
     int updatePriority(UserEncrypt userEncrypt);
 
-    int delete(String id);
+    int delete(EntityId id);
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
@@ -24,8 +25,8 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public Log get(String id) {
-        return LogPersistenceAssembler.toEntity(mapper.selectById(id));
+    public Log get(EntityId id) {
+        return LogPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
@@ -82,8 +83,8 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int delete(String id) {
-        return mapper.deleteById(id);
+    public int delete(EntityId id) {
+        return mapper.deleteById(id.value());
     }
 
     @Override

@@ -5,6 +5,7 @@ import static com.github.thundax.modules.sys.entity.Menu.PERM_SEPARATOR;
 import static com.github.thundax.modules.sys.entity.Menu.PERM_SUPER;
 import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -90,7 +91,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private Set<String> loadPermissions(String userId) {
-        User user = UserServiceHolder.get(userId);
+        User user = UserServiceHolder.get(EntityIdCodec.toDomain(userId));
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();

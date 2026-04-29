@@ -1,13 +1,14 @@
 package com.github.thundax.modules.member.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Date;
 import java.util.List;
 
 public interface MemberDao {
 
-    Member get(String id);
+    Member get(EntityId id);
 
     List<Member> getMany(List<String> idList);
 
@@ -41,7 +42,7 @@ public interface MemberDao {
 
     int updatePriority(Member entity);
 
-    int delete(String id);
+    int delete(EntityId id);
 
     /**
      * 根据 loginName 获取

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
@@ -18,7 +19,7 @@ public class UploadFileServiceImplTest {
         RecordingUploadFileDao dao = new RecordingUploadFileDao();
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        assertEquals(null, service.get(""));
+        assertEquals(null, service.get((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -84,7 +85,7 @@ public class UploadFileServiceImplTest {
         private List<String> fileIds;
 
         @Override
-        public UploadFile get(String id) {
+        public UploadFile get(EntityId id) {
             this.getCalls++;
             return null;
         }
@@ -127,13 +128,13 @@ public class UploadFileServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
+        public int delete(EntityId id) {
             return 1;
         }
 
         @Override
-        public UploadFile getContent(String id) {
-            this.contentId = id;
+        public UploadFile getContent(EntityId id) {
+            this.contentId = id.value();
             return contentResult;
         }
 

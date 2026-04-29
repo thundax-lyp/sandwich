@@ -1,13 +1,14 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 import java.util.List;
 
 public interface LogDao {
 
-    Log get(String id);
+    Log get(EntityId id);
 
     List<Log> getMany(List<String> idList);
 
@@ -37,7 +38,7 @@ public interface LogDao {
 
     int update(Log log);
 
-    int delete(String id);
+    int delete(EntityId id);
 
     /**
      * 写入

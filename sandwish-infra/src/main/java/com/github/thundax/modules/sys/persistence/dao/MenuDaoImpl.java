@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.MenuDao;
@@ -38,13 +39,13 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public Menu get(String id) {
-        Menu menu = cacheSupport.getById(id);
+    public Menu get(EntityId id) {
+        Menu menu = cacheSupport.getById(id.value());
         if (menu != null) {
             return menu;
         }
 
-        menu = MenuPersistenceAssembler.toEntity(mapper.selectById(id));
+        menu = MenuPersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(menu);
         return menu;
     }
@@ -142,14 +143,14 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public int delete(String id) {
-        MenuDO node = getTreeNode(id);
+    public int delete(EntityId id) {
+        MenuDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;
         }
         moveTreeRgts(node.getLft(), -treeSpan(node));
         moveTreeLfts(node.getLft(), -treeSpan(node));
-        int count = mapper.deleteById(id);
+        int count = mapper.deleteById(id.value());
         cacheSupport.removeAll();
         return count;
     }

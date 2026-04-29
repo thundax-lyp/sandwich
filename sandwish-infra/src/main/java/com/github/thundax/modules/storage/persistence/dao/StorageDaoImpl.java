@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -37,13 +38,13 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public Storage get(String id) {
-        Storage storage = cacheSupport.getById(id);
+    public Storage get(EntityId id) {
+        Storage storage = cacheSupport.getById(id.value());
         if (storage != null) {
             return storage;
         }
 
-        storage = StoragePersistenceAssembler.toEntity(mapper.selectById(id));
+        storage = StoragePersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(storage);
         return storage;
     }
@@ -130,9 +131,9 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int delete(String id) {
-        int count = mapper.deleteById(id);
-        cacheSupport.removeById(id);
+    public int delete(EntityId id) {
+        int count = mapper.deleteById(id.value());
+        cacheSupport.removeById(id.value());
         return count;
     }
 

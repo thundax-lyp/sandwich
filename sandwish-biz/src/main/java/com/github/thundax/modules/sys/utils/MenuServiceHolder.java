@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.utils;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -18,7 +19,7 @@ public class MenuServiceHolder {
 
     private static MenuService service;
 
-    private static final PooledThreadLocal<Map<String, Menu>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<EntityId, Menu>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
 
     @Autowired
     public MenuServiceHolder(MenuService targetService) {
@@ -32,8 +33,8 @@ public class MenuServiceHolder {
         return service;
     }
 
-    public static Menu get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public static Menu get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return ID_OBJECT_HOLDER.computeIfAbsent(HashMap::new).computeIfAbsent(id, (key) -> getService()

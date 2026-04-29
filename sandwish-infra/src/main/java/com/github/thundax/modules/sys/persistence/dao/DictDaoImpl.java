@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssembler;
@@ -31,13 +32,13 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public Dict get(String id) {
-        Dict dict = cacheSupport.getById(id);
+    public Dict get(EntityId id) {
+        Dict dict = cacheSupport.getById(id.value());
         if (dict != null) {
             return dict;
         }
 
-        dict = DictPersistenceAssembler.toEntity(mapper.selectById(id));
+        dict = DictPersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(dict);
         return dict;
     }
@@ -122,8 +123,8 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public int delete(String id) {
-        int count = mapper.deleteById(id);
+    public int delete(EntityId id) {
+        int count = mapper.deleteById(id.value());
         cacheSupport.removeAll();
         return count;
     }

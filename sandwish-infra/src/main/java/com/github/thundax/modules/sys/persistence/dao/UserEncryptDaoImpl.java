@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.persistence.assembler.UserEncryptPersistenceAssembler;
@@ -21,8 +22,8 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public UserEncrypt get(String id) {
-        return UserEncryptPersistenceAssembler.toEntity(mapper.selectById(id));
+    public UserEncrypt get(EntityId id) {
+        return UserEncryptPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
@@ -67,8 +68,8 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public int delete(String id) {
-        return mapper.deleteById(id);
+    public int delete(EntityId id) {
+        return mapper.deleteById(id.value());
     }
 
     @Override

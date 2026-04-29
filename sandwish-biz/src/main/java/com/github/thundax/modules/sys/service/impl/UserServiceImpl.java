@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
@@ -13,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,12 +43,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(User entity) {
-        return entity == null ? null : get(entity.getId());
+        return entity == null ? null : get(entity.getEntityId());
     }
 
     @Override
-    public User get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public User get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
     public User getByLoginName(String loginName) {
         User user = dao.getByLoginName(loginName);
         if (user != null) {
-            userEncryptService.get(user.getId());
+            userEncryptService.get(user.getEntityId());
         }
         return user;
     }
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
     public User getBySsoLoginName(String ssoLoginName) {
         User user = dao.getBySsoLoginName(ssoLoginName);
         if (user != null) {
-            userEncryptService.get(user.getId());
+            userEncryptService.get(user.getEntityId());
         }
         return user;
     }
@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService {
     public int delete(User user) {
         dao.deleteUserRole(user.getId());
 
-        int result = dao.delete(user.getId());
+        int result = dao.delete(user.getEntityId());
 
         signService.deleteSign(user.getSignName(), user.getSignId());
 

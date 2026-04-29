@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -20,7 +21,7 @@ public class LogServiceImplTest {
         RecordingLogDao dao = new RecordingLogDao();
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        assertEquals(null, service.get(""));
+        assertEquals(null, service.get((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -31,7 +32,7 @@ public class LogServiceImplTest {
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        assertSame(expected, service.get("log-1"));
+        assertSame(expected, service.get(EntityId.of("log-1")));
 
         assertEquals("log-1", dao.id);
     }
@@ -175,9 +176,9 @@ public class LogServiceImplTest {
         private int secondBatchSize;
 
         @Override
-        public Log get(String id) {
+        public Log get(EntityId id) {
             this.getCalls++;
-            this.id = id;
+            this.id = id.value();
             return getResult;
         }
 
@@ -233,7 +234,7 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public int delete(String id) {
+        public int delete(EntityId id) {
             return 1;
         }
 

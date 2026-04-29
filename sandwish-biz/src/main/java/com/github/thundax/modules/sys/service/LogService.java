@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.List;
 
 public interface LogService {
 
-    Log get(String id);
+    Log get(EntityId id);
 
     List<Log> findList(Log log);
 

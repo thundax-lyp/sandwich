@@ -1,5 +1,6 @@
 package com.github.thundax.common.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public interface CrudService<T> extends BaseService {
      * @param id id
      * @return 对象
      */
-    T get(String id);
+    T get(EntityId id);
 
     /**
      * 根据id获取多条数据

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.base.BaseMenu;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
@@ -42,7 +43,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     }
 
     public Menu toBean() {
-        return MenuServiceHolder.get(getId());
+        return MenuServiceHolder.get(getEntityId());
     }
 
     @Override
@@ -52,7 +53,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
 
     @JsonIgnore
     public Menu getParent() {
-        return MenuServiceHolder.get(this.getParentId());
+        return MenuServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
     }
 
     public void setParent(Menu parent) {

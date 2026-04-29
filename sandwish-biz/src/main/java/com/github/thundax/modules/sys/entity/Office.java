@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.base.BaseOffice;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.google.common.collect.Lists;
@@ -26,12 +27,12 @@ public class Office extends BaseOffice {
 
     @JsonIgnore
     public Office toBean() {
-        return OfficeServiceHolder.get(this.getId());
+        return OfficeServiceHolder.get(this.getEntityId());
     }
 
     @JsonIgnore
     public Office getParent() {
-        return OfficeServiceHolder.get(this.getParentId());
+        return OfficeServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
     }
 
     public void setParent(Office parent) {
@@ -48,7 +49,7 @@ public class Office extends BaseOffice {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
         while (node != null && node.getId() != null) {
-            node = OfficeServiceHolder.getService().get(node.getId());
+            node = OfficeServiceHolder.getService().get(node.getEntityId());
             if (node != null) {
                 nameList.add(0, node.getName());
                 node = node.getParent();
@@ -80,7 +81,7 @@ public class Office extends BaseOffice {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
         while (node != null && node.getId() != null) {
-            node = OfficeServiceHolder.getService().get(node.getId());
+            node = OfficeServiceHolder.getService().get(node.getEntityId());
             if (node != null) {
                 nameList.add(0, node.getDisplayName());
                 node = node.getParent();

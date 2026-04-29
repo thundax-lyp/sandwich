@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
@@ -9,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,12 +35,12 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public UploadFile get(UploadFile entity) {
-        return entity == null ? null : get(entity.getId());
+        return entity == null ? null : get(entity.getEntityId());
     }
 
     @Override
-    public UploadFile get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public UploadFile get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return dao.get(id);
@@ -94,7 +94,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UploadFile entity) {
-        return entity == null ? 0 : dao.delete(entity.getId());
+        return entity == null ? 0 : dao.delete(entity.getEntityId());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public UploadFile getContent(UploadFile uploadFile) {
-        return uploadFile == null ? null : dao.getContent(uploadFile.getId());
+        return uploadFile == null ? null : dao.getContent(uploadFile.getEntityId());
     }
 
     @Override

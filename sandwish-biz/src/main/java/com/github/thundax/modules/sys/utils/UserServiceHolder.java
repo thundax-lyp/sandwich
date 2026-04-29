@@ -1,5 +1,7 @@
 package com.github.thundax.modules.sys.utils;
 
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -13,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class UserServiceHolder {
 
     private static UserService service;
 
-    private static final PooledThreadLocal<Map<String, User>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
+    private static final PooledThreadLocal<Map<EntityId, User>> ID_OBJECT_HOLDER = new PooledThreadLocal<>();
 
     @Autowired
     public UserServiceHolder(UserService targetService) {
@@ -38,8 +39,8 @@ public class UserServiceHolder {
         return service;
     }
 
-    public static User get(String id) {
-        if (StringUtils.isBlank(id)) {
+    public static User get(EntityId id) {
+        if (id == null) {
             return null;
         }
         return ID_OBJECT_HOLDER.computeIfAbsent(HashMap::new).computeIfAbsent(id, (key) -> getService()
@@ -63,7 +64,7 @@ public class UserServiceHolder {
 
         } else {
             List<Role> roleList = user.getRoleList().stream()
-                    .map(role -> RoleServiceHolder.get(role.getId()))
+                    .map(role -> RoleServiceHolder.get(role.getEntityId()))
                     .collect(Collectors.toList());
             boolean isAdmin = user.isAdmin();
             if (!isAdmin) {
@@ -87,7 +88,7 @@ public class UserServiceHolder {
                 }
 
                 menuIds.removeIf(menuId -> {
-                    Menu menuBean = MenuServiceHolder.get(menuId);
+                    Menu menuBean = MenuServiceHolder.get(EntityIdCodec.toDomain(menuId));
                     return menuBean == null || menuBean.getRanks() > user.getRanks();
                 });
 

@@ -1,6 +1,7 @@
 package com.github.thundax.common.persistence;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import com.google.common.collect.Maps;
@@ -45,7 +46,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
 
     @JsonIgnore
     public User getCreateBy() {
-        return UserServiceHolder.get(getCreateUserId());
+        return UserServiceHolder.get(EntityIdCodec.toDomain(getCreateUserId()));
     }
 
     public void setCreateBy(User createBy) {
@@ -54,7 +55,7 @@ public abstract class AdminTreeEntity<T> extends TreeEntity<T> implements Signab
 
     @JsonIgnore
     public User getUpdateBy() {
-        return UserServiceHolder.get(getUpdateUserId());
+        return UserServiceHolder.get(EntityIdCodec.toDomain(getUpdateUserId()));
     }
 
     public void setUpdateBy(User updateBy) {

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.persistence.assembler.RolePersistenceAssembler;
@@ -47,12 +48,12 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public Role get(String id) {
-        Role role = cacheSupport.getById(id);
+    public Role get(EntityId id) {
+        Role role = cacheSupport.getById(id.value());
         if (role != null) {
             return role;
         }
-        role = RolePersistenceAssembler.toEntity(mapper.selectById(id));
+        role = RolePersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(role);
         return role;
     }
@@ -131,9 +132,9 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public int delete(String id) {
-        int count = mapper.deleteById(id);
-        removeRoleCaches(id);
+    public int delete(EntityId id) {
+        int count = mapper.deleteById(id.value());
+        removeRoleCaches(id.value());
         return count;
     }
 

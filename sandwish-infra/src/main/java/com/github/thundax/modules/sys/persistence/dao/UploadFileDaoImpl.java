@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.persistence.assembler.UploadFilePersistenceAssembler;
@@ -21,8 +22,8 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public UploadFile get(String id) {
-        return UploadFilePersistenceAssembler.toEntity(mapper.selectById(id));
+    public UploadFile get(EntityId id) {
+        return UploadFilePersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
@@ -69,12 +70,12 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public int delete(String id) {
-        return mapper.deleteById(id);
+    public int delete(EntityId id) {
+        return mapper.deleteById(id.value());
     }
 
     @Override
-    public UploadFile getContent(String id) {
+    public UploadFile getContent(EntityId id) {
         return get(id);
     }
 

@@ -11,8 +11,6 @@ import org.springframework.lang.NonNull;
  */
 public abstract class DataEntity<T> extends BaseEntity<T> {
 
-    private static final long serialVersionUID = 1L;
-
     protected Integer priority;
     protected String remarks;
     protected Date createDate;

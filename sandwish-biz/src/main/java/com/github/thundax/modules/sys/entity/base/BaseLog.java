@@ -6,8 +6,6 @@ import java.util.Date;
 
 public abstract class BaseLog extends AdminDataEntity<Log> {
 
-    private static final long serialVersionUID = 1L;
-
     public BaseLog() {
         super();
     }

@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class MultiMobileException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public MultiMobileException() {
         super(I18nMessages.getMessage("auth.exception.multi-mobile"));
     }

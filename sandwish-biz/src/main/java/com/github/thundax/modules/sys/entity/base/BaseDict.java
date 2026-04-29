@@ -5,8 +5,6 @@ import com.github.thundax.modules.sys.entity.Dict;
 
 public abstract class BaseDict extends AdminDataEntity<Dict> {
 
-    private static final long serialVersionUID = 1L;
-
     public BaseDict() {}
 
     public BaseDict(String id) {

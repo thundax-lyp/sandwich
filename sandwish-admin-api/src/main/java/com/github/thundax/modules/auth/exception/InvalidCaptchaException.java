@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidCaptchaException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidCaptchaException() {
         super(I18nMessages.getMessage("auth.exception.invalid-captcha"));
     }

@@ -12,8 +12,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccessTokenVo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String token;
 
     public AccessTokenVo() {}

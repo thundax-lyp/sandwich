@@ -16,7 +16,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ExtraAnnotationFixtureRequest implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String id;
 }

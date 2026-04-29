@@ -64,7 +64,5 @@ public class PooledThreadLocal<T> {
         THREAD_LOCAL_HOLDER.remove();
     }
 
-    private static class PolledThreadLocalMap extends HashMap<PooledThreadLocal<?>, Object> {
-        private static final long serialVersionUID = 1L;
-    }
+    private static class PolledThreadLocalMap extends HashMap<PooledThreadLocal<?>, Object> {}
 }

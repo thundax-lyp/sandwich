@@ -12,8 +12,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Config implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private Long imageMaxSize;
 
     private List<String> imageAllowFiles;

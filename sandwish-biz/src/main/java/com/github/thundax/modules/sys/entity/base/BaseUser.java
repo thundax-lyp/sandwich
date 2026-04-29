@@ -6,8 +6,6 @@ import java.util.Date;
 
 public abstract class BaseUser extends AdminDataEntity<User> {
 
-    private static final long serialVersionUID = 1L;
-
     private String officeId;
 
     private String loginName;

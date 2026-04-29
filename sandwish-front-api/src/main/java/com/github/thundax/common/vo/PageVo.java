@@ -10,8 +10,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PageVo<T> implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private Integer pageNo;
     private Integer pageSize;
     private Integer totalPage;

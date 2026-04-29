@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidLoginCountException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidLoginCountException(String expire, String maxFailCount, String lockTime, String remainCount) {
         super(I18nMessages.getMessage(
                 "auth.exception.invalid-login-count", expire, maxFailCount, lockTime, remainCount));

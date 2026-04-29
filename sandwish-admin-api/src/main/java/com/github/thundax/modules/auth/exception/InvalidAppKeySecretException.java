@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidAppKeySecretException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidAppKeySecretException() {
         super(I18nMessages.getMessage("auth.exception.invalid-appKey-appSecret"));
     }

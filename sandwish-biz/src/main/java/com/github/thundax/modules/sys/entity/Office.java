@@ -102,8 +102,6 @@ public class Office extends BaseOffice {
 
     public static class Query implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-
         public static final String PROP_PARENT_ID = "parentId";
         public static final String PROP_NAME = "name";
         public static final String PROP_REMARKS = "remarks";

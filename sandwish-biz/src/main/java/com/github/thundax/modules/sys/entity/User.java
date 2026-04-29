@@ -167,8 +167,6 @@ public class User extends BaseUser {
 
     public static class Query implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-
         public static final String PROP_OFFICE_ID = "officeId";
         public static final String PROP_LOGIN_NAME = "loginName";
         public static final String PROP_NAME = "name";

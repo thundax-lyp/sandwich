@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidPasswordException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidPasswordException() {
         super(I18nMessages.getMessage("auth.exception.invalid-password"));
     }

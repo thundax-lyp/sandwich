@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.http.HttpStatus;
 
 public class ReturnObject extends HashMap<String, Object> {
-    private static final long serialVersionUID = 1L;
 
     public ReturnObject() {
         put("code", 0);

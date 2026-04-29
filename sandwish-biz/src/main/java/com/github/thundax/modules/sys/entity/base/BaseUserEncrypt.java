@@ -5,8 +5,6 @@ import com.github.thundax.modules.sys.entity.UserEncrypt;
 
 public abstract class BaseUserEncrypt extends AdminDataEntity<UserEncrypt> {
 
-    private static final long serialVersionUID = 1L;
-
     private String loginPass;
     private String email;
     private String mobile;

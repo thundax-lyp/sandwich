@@ -154,8 +154,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
 
     public static class Query implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-
         public static final String PROP_PARENT_ID = "parentId";
         public static final String PROP_DISPLAY_FLAG = "displayFlag";
         public static final String PROP_MAX_RANK = "maxRank";

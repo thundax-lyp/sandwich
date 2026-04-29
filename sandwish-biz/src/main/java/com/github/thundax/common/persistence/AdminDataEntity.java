@@ -13,8 +13,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public abstract class AdminDataEntity<T> extends DataEntity<T> implements Signable {
 
-    private static final long serialVersionUID = 1L;
-
     private String createUserId;
     private String updateUserId;
 

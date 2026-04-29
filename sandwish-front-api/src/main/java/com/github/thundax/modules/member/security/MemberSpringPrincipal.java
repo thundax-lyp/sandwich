@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 public class MemberSpringPrincipal implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private final String id;
 
     public MemberSpringPrincipal(String id) {

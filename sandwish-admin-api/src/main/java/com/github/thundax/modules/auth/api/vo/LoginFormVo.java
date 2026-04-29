@@ -13,8 +13,6 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginFormVo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String loginToken;
     private String refreshToken;
     private Integer expireSeconds;

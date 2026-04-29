@@ -5,8 +5,6 @@ import com.github.thundax.modules.storage.entity.Storage;
 
 public abstract class BaseStorage extends DataEntity<Storage> {
 
-    private static final long serialVersionUID = 1L;
-
     public BaseStorage() {}
 
     public BaseStorage(String id) {

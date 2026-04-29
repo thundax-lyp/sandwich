@@ -13,8 +13,6 @@ import javax.validation.constraints.Size;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseVo implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String id;
     private Integer priority;
     private String remarks;

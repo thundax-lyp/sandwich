@@ -14,8 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Storage extends BaseStorage {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
 
     private static final String PATH_FORMAT = "yyyyMM";
@@ -74,8 +72,6 @@ public class Storage extends BaseStorage {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         public static final String PROP_MIME_TYPE = "mimeType";
         public static final String PROP_BUSINESS_ID = "businessId";

@@ -5,8 +5,6 @@ import com.github.thundax.modules.sys.entity.Role;
 
 public abstract class BaseRole extends AdminDataEntity<Role> {
 
-    private static final long serialVersionUID = 1L;
-
     public BaseRole() {
         super();
     }

@@ -22,8 +22,6 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class ValidateCodeServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
     public static final String VALIDATE_CODE = "validateCode";
     public static final int VALIDATE_CODE_LENGTH = 4;
 

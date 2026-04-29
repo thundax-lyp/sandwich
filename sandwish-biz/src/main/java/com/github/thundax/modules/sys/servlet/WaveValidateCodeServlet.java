@@ -17,8 +17,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class WaveValidateCodeServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
     public WaveValidateCodeServlet() {
         super();
     }

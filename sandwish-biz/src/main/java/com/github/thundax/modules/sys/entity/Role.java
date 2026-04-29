@@ -126,8 +126,6 @@ public class Role extends BaseRole {
 
     public static class Query implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-
         public static final String PROP_ENABLE_FLAG = "enableFlag";
 
         private String enableFlag;

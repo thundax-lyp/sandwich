@@ -15,8 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Log extends BaseLog {
-
-    private static final long serialVersionUID = 1L;
     public static final String BEAN_NAME = "Log";
 
     public static final String TYPE_ACCESS = "1";
@@ -100,8 +98,6 @@ public class Log extends BaseLog {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         public static final String PROP_TYPE = "type";
         public static final String PROP_REMOTE_ADDR = "remoteAddr";

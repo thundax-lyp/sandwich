@@ -4,8 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class ApiException extends Exception {
 
-    private static final long serialVersionUID = 1L;
-
     private int code = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
     public ApiException() {

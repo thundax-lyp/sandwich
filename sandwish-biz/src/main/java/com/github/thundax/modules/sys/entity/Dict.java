@@ -10,8 +10,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Dict extends BaseDict {
 
-    private static final long serialVersionUID = 1L;
-
     public Dict() {
         super();
     }
@@ -32,8 +30,6 @@ public class Dict extends BaseDict {
     }
 
     public static class Query implements Serializable {
-
-        private static final long serialVersionUID = 1L;
 
         public static final String PROP_TYPE = "type";
         public static final String PROP_REMARKS = "remarks";

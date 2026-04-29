@@ -13,8 +13,6 @@ import io.swagger.annotations.ApiModelProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserTreeNodeVo extends BaseVo {
 
-    private static final long serialVersionUID = 1L;
-
     private String parentId;
     private String name;
 

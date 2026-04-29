@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidWhiteIpException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidWhiteIpException() {
         super(I18nMessages.getMessage("auth.exception.invalid-ip"));
     }

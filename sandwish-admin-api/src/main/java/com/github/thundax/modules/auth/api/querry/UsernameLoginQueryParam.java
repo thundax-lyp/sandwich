@@ -18,8 +18,6 @@ import javax.validation.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UsernameLoginQueryParam implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String loginToken;
     private String username;
     private String password;

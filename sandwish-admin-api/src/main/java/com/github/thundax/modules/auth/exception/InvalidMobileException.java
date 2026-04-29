@@ -10,8 +10,6 @@ import com.github.thundax.common.i18n.I18nMessages;
  */
 public class InvalidMobileException extends ApiException {
 
-    private static final long serialVersionUID = 1L;
-
     public InvalidMobileException() {
         super(I18nMessages.getMessage("auth.exception.invalid-mobile"));
     }

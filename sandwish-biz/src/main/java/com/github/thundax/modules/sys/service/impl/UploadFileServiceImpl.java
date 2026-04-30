@@ -31,7 +31,9 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public UploadFile newEntity(String id) {
-        return new UploadFile(id);
+        UploadFile uploadFile = new UploadFile();
+        uploadFile.setId(id);
+        return uploadFile;
     }
 
     @Override

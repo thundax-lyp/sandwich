@@ -39,7 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User newEntity(String id) {
-        return new User(id);
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 
     @Override
@@ -201,8 +203,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Role> findUserRole(User user) {
         return dao.findUserRole(EntityIdCodec.toValue(user.getEntityId())).stream()
-                .map(Role::new)
+                .map(this::newRole)
                 .collect(Collectors.toList());
+    }
+
+    private Role newRole(String id) {
+        Role role = new Role();
+        role.setId(id);
+        return role;
     }
 
     @Override

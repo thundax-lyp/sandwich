@@ -13,10 +13,6 @@ public class UserEncrypt extends BaseUserEncrypt {
         super();
     }
 
-    public UserEncrypt(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         super.initialize();

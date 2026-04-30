@@ -6,10 +6,6 @@ public class UploadFile extends BaseUploadFile {
 
     public UploadFile() {}
 
-    public UploadFile(String id) {
-        super(id);
-    }
-
     private static final String IMG_EXT = "png,jpg,jpeg";
 
     public boolean isImage() {

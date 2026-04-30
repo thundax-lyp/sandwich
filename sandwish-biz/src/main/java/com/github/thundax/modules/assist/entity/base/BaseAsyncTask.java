@@ -3,7 +3,6 @@ package com.github.thundax.modules.assist.entity.base;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import java.util.Date;
 import org.springframework.lang.NonNull;
@@ -27,11 +26,6 @@ public class BaseAsyncTask extends Entity<AsyncTask> implements Auditable, Sorta
 
     public BaseAsyncTask() {
         initialize();
-    }
-
-    public BaseAsyncTask(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     protected void initialize() {

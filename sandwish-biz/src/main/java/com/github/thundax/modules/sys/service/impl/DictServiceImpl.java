@@ -32,7 +32,9 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public Dict newEntity(String id) {
-        return new Dict(id);
+        Dict dict = new Dict();
+        dict.setId(id);
+        return dict;
     }
 
     @Override

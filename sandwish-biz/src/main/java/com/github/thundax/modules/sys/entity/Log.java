@@ -22,10 +22,6 @@ public class Log extends BaseLog {
         super();
     }
 
-    public Log(String id) {
-        super(id);
-    }
-
     public User getUser() {
         return UserServiceHolder.get(EntityIdCodec.toDomain(this.getUserId()));
     }

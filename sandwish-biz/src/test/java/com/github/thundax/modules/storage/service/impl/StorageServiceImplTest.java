@@ -18,7 +18,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldGetStorageById() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        Storage expected = new Storage("s1");
+        Storage expected = storage("s1");
         dao.getResult = expected;
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
@@ -73,7 +73,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         StorageServiceImpl service = new StorageServiceImpl(dao);
 
-        int count = service.delete(Arrays.asList(new Storage("s1"), new Storage("s2")));
+        int count = service.delete(Arrays.asList(storage("s1"), storage("s2")));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList("s1", "s2"), dao.deletedIds);
@@ -83,13 +83,25 @@ public class StorageServiceImplTest {
     public void shouldDelegateBusinessOperations() {
         RecordingStorageDao dao = new RecordingStorageDao();
         StorageServiceImpl service = new StorageServiceImpl(dao);
-        List<StorageBusiness> list = Arrays.asList(new StorageBusiness("s1"));
+        List<StorageBusiness> list = Arrays.asList(storageBusiness("s1"));
 
         service.insertBusiness(list);
         service.removeBusiness("User", "u1");
 
         assertSame(list, dao.businessList);
         assertEquals("User:u1", dao.deletedBusinessKey);
+    }
+
+    private static Storage storage(String id) {
+        Storage storage = new Storage();
+        storage.setId(id);
+        return storage;
+    }
+
+    private static StorageBusiness storageBusiness(String id) {
+        StorageBusiness storageBusiness = new StorageBusiness();
+        storageBusiness.setId(id);
+        return storageBusiness;
     }
 
     private static class RecordingStorageDao implements StorageDao {

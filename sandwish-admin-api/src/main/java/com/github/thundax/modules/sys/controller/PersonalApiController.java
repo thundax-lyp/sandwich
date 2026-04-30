@@ -141,7 +141,7 @@ public class PersonalApiController extends BaseApiController implements Personal
         // 获取可见菜单
         List<Menu> allMenuList = UserServiceHolder.findMenuList(currentUser());
 
-        Menu rootMenu = new Menu(null);
+        Menu rootMenu = new Menu();
         List<Menu> menuList = Lists.newArrayList(rootMenu);
         // 构建parent-child关系，并递归下去
         for (int idx = 0; idx < menuList.size(); idx++) {

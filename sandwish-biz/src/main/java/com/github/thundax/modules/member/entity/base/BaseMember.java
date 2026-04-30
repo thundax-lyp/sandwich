@@ -3,7 +3,6 @@ package com.github.thundax.modules.member.entity.base;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Date;
 import org.springframework.lang.NonNull;
@@ -39,11 +38,6 @@ public class BaseMember extends Entity<Member> implements Auditable, Sortable {
 
     public BaseMember() {
         initialize();
-    }
-
-    public BaseMember(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     protected void initialize() {

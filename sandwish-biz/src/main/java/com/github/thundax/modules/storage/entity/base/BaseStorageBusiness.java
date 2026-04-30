@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.entity.base;
 
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 
 public abstract class BaseStorageBusiness extends Entity<StorageBusiness> {
@@ -13,11 +12,6 @@ public abstract class BaseStorageBusiness extends Entity<StorageBusiness> {
 
     public BaseStorageBusiness() {
         initialize();
-    }
-
-    public BaseStorageBusiness(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     protected void initialize() {}

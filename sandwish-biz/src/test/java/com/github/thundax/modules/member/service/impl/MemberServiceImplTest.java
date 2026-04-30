@@ -17,7 +17,7 @@ public class MemberServiceImplTest {
     @Test
     public void shouldGetMemberById() {
         RecordingMemberDao dao = new RecordingMemberDao();
-        Member expected = new Member("m1");
+        Member expected = member("m1");
         dao.getResult = expected;
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
@@ -82,7 +82,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        int count = service.updateEnableFlag(Arrays.asList(new Member("m1"), new Member("m2")));
+        int count = service.updateEnableFlag(Arrays.asList(member("m1"), member("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.enableUpdateCalls);
@@ -102,6 +102,12 @@ public class MemberServiceImplTest {
 
         assertEquals("310000", dao.zjhm);
         assertEquals("ywtb-1", dao.ywtbId);
+    }
+
+    private static Member member(String id) {
+        Member member = new Member();
+        member.setId(id);
+        return member;
     }
 
     private static class RecordingMemberDao implements MemberDao {

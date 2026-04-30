@@ -30,7 +30,9 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public Office newEntity(String id) {
-        return new Office(id);
+        Office office = new Office();
+        office.setId(id);
+        return office;
     }
 
     @Override

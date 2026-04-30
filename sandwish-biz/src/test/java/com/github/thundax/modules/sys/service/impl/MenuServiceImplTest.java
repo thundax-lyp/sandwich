@@ -90,7 +90,7 @@ public class MenuServiceImplTest {
     public void shouldPrepareAndSignMenuBeforeUpdate() {
         RecordingMenuDao dao = new RecordingMenuDao();
         RecordingSignService signService = new RecordingSignService();
-        Menu menu = new Menu("menu-1");
+        Menu menu = menu("menu-1");
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
         service.update(menu);
@@ -103,12 +103,12 @@ public class MenuServiceImplTest {
     @Test
     public void shouldDeleteMenuRoleBeforeDeletingMenu() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        Menu stored = new Menu("menu-1");
+        Menu stored = menu("menu-1");
         dao.getResult = stored;
         RecordingSignService signService = new RecordingSignService();
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
-        int count = service.delete(new Menu("menu-1"));
+        int count = service.delete(menu("menu-1"));
 
         assertEquals(1, count);
         assertEquals("menu-1", dao.deletedMenuRoleId);
@@ -121,10 +121,16 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        int count = service.updateDisplayFlag(Arrays.asList(new Menu("m1"), new Menu("m2")));
+        int count = service.updateDisplayFlag(Arrays.asList(menu("m1"), menu("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.displayFlagCalls);
+    }
+
+    private static Menu menu(String id) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        return menu;
     }
 
     private static class RecordingMenuDao implements MenuDao {

@@ -21,11 +21,6 @@ public abstract class BaseUserEncrypt extends Entity<UserEncrypt> implements Aud
         initialize();
     }
 
-    public BaseUserEncrypt(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
-
     protected void initialize() {}
 
     public String getId() {

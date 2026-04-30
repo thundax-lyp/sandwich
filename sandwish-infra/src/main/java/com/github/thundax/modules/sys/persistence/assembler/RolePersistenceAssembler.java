@@ -65,7 +65,9 @@ public final class RolePersistenceAssembler {
         }
         List<User> users = new ArrayList<>();
         for (String userId : userIds) {
-            users.add(new User(userId));
+            User user = new User();
+            user.setId(userId);
+            users.add(user);
         }
         return users;
     }

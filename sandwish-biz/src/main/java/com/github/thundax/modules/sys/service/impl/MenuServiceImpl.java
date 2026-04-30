@@ -36,7 +36,9 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Menu newEntity(String id) {
-        return new Menu(id);
+        Menu menu = new Menu();
+        menu.setId(id);
+        return menu;
     }
 
     @Override

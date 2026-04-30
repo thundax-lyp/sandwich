@@ -16,10 +16,6 @@ public class Office extends BaseOffice {
         super();
     }
 
-    public Office(String id) {
-        super(id);
-    }
-
     public Office toBean() {
         return OfficeServiceHolder.get(this.getEntityId());
     }

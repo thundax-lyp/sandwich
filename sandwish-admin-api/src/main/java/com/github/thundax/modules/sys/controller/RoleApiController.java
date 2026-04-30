@@ -221,9 +221,15 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         roleService.updateUserList(
                 roleBean,
-                request.getUsers().stream().map(vo -> new User(vo.getId())).collect(Collectors.toList()));
+                request.getUsers().stream().map(vo -> newUser(vo.getId())).collect(Collectors.toList()));
 
         return true;
+    }
+
+    private User newUser(String id) {
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {

@@ -45,7 +45,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role newEntity(String id) {
-        return new Role(id);
+        Role role = new Role();
+        role.setId(id);
+        return role;
     }
 
     @Override
@@ -185,7 +187,7 @@ public class RoleServiceImpl implements RoleService {
                         EntityIdCodec.toValue(role.getEntityId()),
                         roleId -> dao.findRoleUser(EntityIdCodec.toValue(role.getEntityId())));
 
-        return userIdList.stream().map(userId -> new User(userId)).collect(Collectors.toList());
+        return userIdList.stream().map(this::newUser).collect(Collectors.toList());
     }
 
     @Override
@@ -196,7 +198,19 @@ public class RoleServiceImpl implements RoleService {
                         EntityIdCodec.toValue(role.getEntityId()),
                         roleId -> dao.findRoleMenu(EntityIdCodec.toValue(role.getEntityId())));
 
-        return menuIdList.stream().map(menuId -> new Menu(menuId)).collect(Collectors.toList());
+        return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
+    }
+
+    private User newUser(String id) {
+        User user = new User();
+        user.setId(id);
+        return user;
+    }
+
+    private Menu newMenu(String id) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        return menu;
     }
 
     private void notifyCacheChanged() {

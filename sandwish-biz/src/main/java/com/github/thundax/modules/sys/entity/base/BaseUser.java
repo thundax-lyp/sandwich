@@ -44,11 +44,6 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
         initialize();
     }
 
-    public BaseUser(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
-
     protected void initialize() {
         this.setPriority(0);
     }

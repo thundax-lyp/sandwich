@@ -9,10 +9,6 @@ public class Dict extends BaseDict {
         super();
     }
 
-    public Dict(String id) {
-        super(id);
-    }
-
     private Query query;
 
     public Query getQuery() {

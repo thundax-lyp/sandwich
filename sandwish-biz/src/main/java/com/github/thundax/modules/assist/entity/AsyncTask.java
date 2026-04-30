@@ -22,10 +22,6 @@ public class AsyncTask extends BaseAsyncTask {
         super();
     }
 
-    public AsyncTask(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         super.initialize();

@@ -26,10 +26,6 @@ public class Role extends BaseRole {
         super();
     }
 
-    public Role(String id) {
-        super(id);
-    }
-
     public Role toBean() {
         return RoleServiceHolder.get(this.getEntityId());
     }

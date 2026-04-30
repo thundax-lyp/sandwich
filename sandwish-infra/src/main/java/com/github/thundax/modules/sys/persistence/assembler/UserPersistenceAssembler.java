@@ -92,7 +92,9 @@ public final class UserPersistenceAssembler {
         }
         List<Role> roles = new ArrayList<>();
         for (String roleId : roleIds) {
-            roles.add(new Role(roleId));
+            Role role = new Role();
+            role.setId(roleId);
+            roles.add(role);
         }
         return roles;
     }

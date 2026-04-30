@@ -15,11 +15,6 @@ public abstract class BaseRole extends Entity<Role> implements Auditable, Signab
         initialize();
     }
 
-    public BaseRole(String id) {
-        this();
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
-
     private String name;
     private String adminFlag;
     private String enableFlag;

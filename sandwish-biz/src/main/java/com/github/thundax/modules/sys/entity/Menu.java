@@ -27,10 +27,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         super();
     }
 
-    public Menu(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         super.initialize();

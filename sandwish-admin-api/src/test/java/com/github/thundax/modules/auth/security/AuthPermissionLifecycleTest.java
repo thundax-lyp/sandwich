@@ -176,7 +176,9 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public User newEntity(String id) {
-            return new User(id);
+            User user = new User();
+            user.setId(id);
+            return user;
         }
 
         @Override
@@ -241,7 +243,8 @@ public class AuthPermissionLifecycleTest {
         }
 
         private User user() {
-            User user = new User("u1");
+            User user = new User();
+            user.setId("u1");
             user.setLoginName("tester");
             user.setLoginPass("secret");
             user.setEnableFlag(Global.YES);
@@ -289,7 +292,9 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public Menu newEntity(String id) {
-            return new Menu(id);
+            Menu menu = new Menu();
+            menu.setId(id);
+            return menu;
         }
 
         @Override
@@ -354,7 +359,8 @@ public class AuthPermissionLifecycleTest {
         }
 
         private List<Menu> menus() {
-            Menu menu = new Menu("m1");
+            Menu menu = new Menu();
+            menu.setId("m1");
             menu.setPerms("sys:role,sys:user:view");
             menu.setName("system");
             menu.setRanks(0);

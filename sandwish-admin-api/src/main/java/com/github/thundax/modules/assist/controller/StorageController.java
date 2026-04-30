@@ -206,10 +206,16 @@ public class StorageController extends BaseAdminController {
         }
 
         int count = storageService.delete(new ArrayList<>(Arrays.asList(ids))
-                .stream().map(id -> new Storage(id)).collect(Collectors.toList()));
+                .stream().map(this::newStorage).collect(Collectors.toList()));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
         return "redirect:" + modulePath + "/list?reload";
+    }
+
+    private Storage newStorage(String id) {
+        Storage storage = new Storage();
+        storage.setId(id);
+        return storage;
     }
 
     @RequestMapping(value = "treeData")

@@ -73,7 +73,7 @@ public class OfficeServiceImplTest {
     @Test
     public void shouldPrepareOfficeBeforeUpdate() {
         RecordingOfficeDao dao = new RecordingOfficeDao();
-        Office office = new Office("office-1");
+        Office office = office("office-1");
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
         service.update(office);
@@ -85,10 +85,10 @@ public class OfficeServiceImplTest {
     @Test
     public void shouldDeleteStoredOffice() {
         RecordingOfficeDao dao = new RecordingOfficeDao();
-        dao.getResult = new Office("office-1");
+        dao.getResult = office("office-1");
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        int count = service.delete(new Office("office-1"));
+        int count = service.delete(office("office-1"));
 
         assertEquals(1, count);
         assertEquals("office-1", dao.deletedId);
@@ -99,10 +99,16 @@ public class OfficeServiceImplTest {
         RecordingOfficeDao dao = new RecordingOfficeDao();
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        int count = service.updatePriority(Arrays.asList(new Office("o1"), new Office("o2")));
+        int count = service.updatePriority(Arrays.asList(office("o1"), office("o2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.priorityCalls);
+    }
+
+    private static Office office(String id) {
+        Office office = new Office();
+        office.setId(id);
+        return office;
     }
 
     private static class RecordingOfficeDao implements OfficeDao {

@@ -54,11 +54,11 @@ public class UploadFileServiceImplTest {
     @Test
     public void shouldLoadContentById() {
         RecordingUploadFileDao dao = new RecordingUploadFileDao();
-        UploadFile expected = new UploadFile("file-1");
+        UploadFile expected = uploadFile("file-1");
         dao.contentResult = expected;
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        UploadFile actual = service.getContent(new UploadFile("file-1"));
+        UploadFile actual = service.getContent(uploadFile("file-1"));
 
         assertSame(expected, actual);
         assertEquals("file-1", dao.contentId);
@@ -72,6 +72,12 @@ public class UploadFileServiceImplTest {
         service.findByFileIds(new String[] {"f1", "f2"});
 
         assertEquals(Arrays.asList("f1", "f2"), dao.fileIds);
+    }
+
+    private static UploadFile uploadFile(String id) {
+        UploadFile uploadFile = new UploadFile();
+        uploadFile.setId(id);
+        return uploadFile;
     }
 
     private static class RecordingUploadFileDao implements UploadFileDao {

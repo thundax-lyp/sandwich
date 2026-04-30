@@ -21,10 +21,6 @@ public class Storage extends BaseStorage {
         super();
     }
 
-    public Storage(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         super.initialize();

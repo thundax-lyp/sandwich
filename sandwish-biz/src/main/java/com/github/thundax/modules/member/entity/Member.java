@@ -19,10 +19,6 @@ public class Member extends BaseMember {
         super();
     }
 
-    public Member(String id) {
-        super(id);
-    }
-
     @Override
     public void setEnableFlag(String enableFlag) {
         super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);

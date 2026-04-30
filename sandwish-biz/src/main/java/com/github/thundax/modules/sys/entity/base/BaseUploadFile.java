@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.Date;
 
@@ -15,10 +14,6 @@ public class BaseUploadFile extends Entity<UploadFile> {
     private Date createDate;
 
     public BaseUploadFile() {}
-
-    public BaseUploadFile(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
 
     public String getName() {
         return name;

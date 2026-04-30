@@ -2,17 +2,12 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Signable;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 
 public abstract class BaseLog extends Entity<Log> implements Signable {
 
     public BaseLog() {}
-
-    public BaseLog(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
 
     private String userId;
 

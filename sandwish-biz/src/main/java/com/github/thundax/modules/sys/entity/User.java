@@ -30,10 +30,6 @@ public class User extends BaseUser {
         super();
     }
 
-    public User(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         super.initialize();

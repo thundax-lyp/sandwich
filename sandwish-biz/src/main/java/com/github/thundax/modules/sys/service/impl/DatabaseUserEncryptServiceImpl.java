@@ -51,7 +51,9 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     @Override
     public UserEncrypt newEntity(String id) {
-        return new UserEncrypt(id);
+        UserEncrypt userEncrypt = new UserEncrypt();
+        userEncrypt.setId(id);
+        return userEncrypt;
     }
 
     /**

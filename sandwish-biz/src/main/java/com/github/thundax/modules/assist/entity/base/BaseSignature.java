@@ -1,7 +1,6 @@
 package com.github.thundax.modules.assist.entity.base;
 
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.Signature;
 import java.util.Date;
 
@@ -23,10 +22,6 @@ public abstract class BaseSignature extends Entity<Signature> {
     private Date updateDate;
 
     public BaseSignature() {}
-
-    public BaseSignature(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
 
     public String getBusinessType() {
         return businessType;

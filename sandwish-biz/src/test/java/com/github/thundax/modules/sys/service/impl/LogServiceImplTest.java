@@ -28,7 +28,7 @@ public class LogServiceImplTest {
     @Test
     public void shouldGetLogById() {
         RecordingLogDao dao = new RecordingLogDao();
-        Log expected = new Log("log-1");
+        Log expected = log("log-1");
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
@@ -153,6 +153,12 @@ public class LogServiceImplTest {
         assertEquals("/api", dao.requestUri);
         assertEquals(begin, dao.beginDate);
         assertEquals(end, dao.endDate);
+    }
+
+    private static Log log(String id) {
+        Log log = new Log();
+        log.setId(id);
+        return log;
     }
 
     private static class RecordingLogDao implements LogDao {

@@ -65,11 +65,11 @@ public class RoleServiceImplTest {
     @Test
     public void shouldUpdateUserListByIds() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        Role role = new Role("role-1");
+        Role role = role("role-1");
         role.setMenuIdList(Arrays.asList());
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        service.updateUserList(role, Arrays.asList(new User("u1"), new User("u2")));
+        service.updateUserList(role, Arrays.asList(user("u1"), user("u2")));
 
         assertEquals("role-1", dao.deletedRoleUserId);
         assertEquals(Arrays.asList("u1", "u2"), dao.userIdList);
@@ -80,12 +80,24 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        int count = service.delete(new Role("role-1"));
+        int count = service.delete(role("role-1"));
 
         assertEquals(1, count);
         assertEquals("role-1", dao.deletedRoleMenuId);
         assertEquals("role-1", dao.deletedRoleUserId);
         assertEquals("role-1", dao.deletedRoleId);
+    }
+
+    private static Role role(String id) {
+        Role role = new Role();
+        role.setId(id);
+        return role;
+    }
+
+    private static User user(String id) {
+        User user = new User();
+        user.setId(id);
+        return user;
     }
 
     private static class RecordingRoleDao implements RoleDao {

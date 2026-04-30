@@ -16,7 +16,8 @@ public class Signature extends BaseSignature {
     }
 
     public Signature(String id, String businessType, String businessId) {
-        super(id);
+        this();
+        setId(id);
         this.setBusinessType(businessType);
         this.setBusinessId(businessId);
     }

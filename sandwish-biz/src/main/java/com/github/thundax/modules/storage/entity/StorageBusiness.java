@@ -13,10 +13,6 @@ public class StorageBusiness extends BaseStorageBusiness {
         super();
     }
 
-    public StorageBusiness(String id) {
-        super(id);
-    }
-
     @Override
     protected void initialize() {
         this.setPublicFlag(Global.NO);

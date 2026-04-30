@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 @Getter
@@ -21,18 +20,11 @@ import org.springframework.lang.NonNull;
 public class AsyncTask implements Auditable, Sortable {
     public static final int DEFAULT_EXPIRED_SECONDS = 1800;
 
-    public static final String STATUS_IDLE = "idle";
-
-    public static final String STATUS_ACTIVE = "active";
-    public static final String STATUS_SUSPENDED = "suspended";
-    public static final String STATUS_SUCCESS = "success";
-    public static final String STATUS_ERROR = "error";
-
     private EntityId id;
 
     private String title;
 
-    private String status = STATUS_IDLE;
+    private AsyncTaskStatus status = AsyncTaskStatus.IDLE;
     private String message;
     private String data;
 
@@ -69,15 +61,15 @@ public class AsyncTask implements Auditable, Sortable {
     }
 
     public boolean isActive() {
-        return StringUtils.equals(STATUS_ACTIVE, getStatus());
+        return AsyncTaskStatus.ACTIVE == getStatus();
     }
 
     public boolean isSuspended() {
-        return StringUtils.equals(STATUS_SUSPENDED, getStatus());
+        return AsyncTaskStatus.SUSPENDED == getStatus();
     }
 
     public boolean isSuccess() {
-        return StringUtils.equals(STATUS_SUCCESS, getStatus());
+        return AsyncTaskStatus.SUCCESS == getStatus();
     }
 
     public boolean isBelongTo(User user) {

@@ -21,7 +21,7 @@ public class AsyncTaskInterfaceAssembler {
         }
 
         AsyncTaskResponse response = baseEntityToResponse(new AsyncTaskResponse(), entity);
-        response.setStatus(entity.getStatus());
+        response.setStatus(entity.getStatus().value());
         response.setMessage(entity.getMessage());
         response.setData(entity.getData());
         return response;

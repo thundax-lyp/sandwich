@@ -2,6 +2,7 @@ package com.github.thundax.modules.assist.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.AsyncTask;
+import com.github.thundax.modules.assist.entity.AsyncTaskStatus;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 
 public final class AsyncTaskPersistenceAssembler {
@@ -15,7 +16,7 @@ public final class AsyncTaskPersistenceAssembler {
         AsyncTaskDO dataObject = new AsyncTaskDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setTitle(entity.getTitle());
-        dataObject.setStatus(entity.getStatus());
+        dataObject.setStatus(entity.getStatus().value());
         dataObject.setMessage(entity.getMessage());
         dataObject.setData(entity.getData());
         dataObject.setIsPrivate(entity.getPrivate());
@@ -36,7 +37,7 @@ public final class AsyncTaskPersistenceAssembler {
         AsyncTask entity = new AsyncTask();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setTitle(dataObject.getTitle());
-        entity.setStatus(dataObject.getStatus());
+        entity.setStatus(AsyncTaskStatus.from(dataObject.getStatus()));
         entity.setMessage(dataObject.getMessage());
         entity.setData(dataObject.getData());
         entity.setPrivate(dataObject.getIsPrivate());

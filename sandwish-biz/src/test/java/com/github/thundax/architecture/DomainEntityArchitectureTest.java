@@ -22,6 +22,12 @@ public class DomainEntityArchitectureTest {
                     + "|extends\\s+(BaseEntity|DataEntity|AdminDataEntity|TreeEntity|AdminTreeEntity)\\b");
     private static final Pattern JACKSON_REFERENCE_PATTERN =
             Pattern.compile("com\\.fasterxml\\.jackson\\.annotation\\.|@Json[A-Za-z0-9_]*\\b");
+    private static final Pattern ENUM_ILLEGAL_ARGUMENT_EXCEPTION_PATTERN =
+            Pattern.compile("IllegalArgumentException\\s*\\(");
+    private static final Pattern ENUM_DECLARATION_PATTERN = Pattern.compile("\\benum\\s+[A-Za-z0-9_]+\\b");
+    private static final Pattern ENUM_FROM_STRING_PATTERN =
+            Pattern.compile("\\bfrom\\s*\\(\\s*String\\s+[A-Za-z0-9_]+\\s*\\)");
+    private static final Pattern BIZ_EXCEPTION_PATTERN = Pattern.compile("\\bBizException\\b");
 
     private static final Set<String> LEGACY_OLD_ENTITY_BASE_SOURCES = new LinkedHashSet<>();
 
@@ -45,6 +51,22 @@ public class DomainEntityArchitectureTest {
                 violations.isEmpty());
     }
 
+    @Test
+    public void shouldUseBizExceptionForDomainEnumParsingFailures() throws IOException {
+        Path root = repositoryRoot();
+        Path sourceRoot = root.resolve("sandwish-biz").resolve("src/main/java/com/github/thundax/modules");
+        List<String> violations = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(this::isModuleEnumSource)
+                    .filter(path -> containsPattern(path, ENUM_DECLARATION_PATTERN))
+                    .forEach(path -> collectEnumParsingViolation(root, path, violations));
+        }
+
+        assertTrue("Domain enum parsing failures must use BizException: " + violations, violations.isEmpty());
+    }
+
     private List<String> findViolations(Pattern pattern, Set<String> legacySources) throws IOException {
         Path root = repositoryRoot();
         Path sourceRoot = root.resolve("sandwish-biz").resolve("src/main/java/com/github/thundax/modules");
@@ -66,10 +88,31 @@ public class DomainEntityArchitectureTest {
         return value.contains("/modules/") && value.contains("/entity/");
     }
 
+    private boolean isModuleEnumSource(Path path) {
+        String value = normalizePath(path);
+        return value.contains("/modules/") && value.contains("/entity/") && value.endsWith(".java");
+    }
+
+    private void collectEnumParsingViolation(Path root, Path path, List<String> violations) {
+        String content = readSourceWithoutComments(path);
+        boolean hasFromString = ENUM_FROM_STRING_PATTERN.matcher(content).find();
+        boolean hasIllegalArgumentException =
+                ENUM_ILLEGAL_ARGUMENT_EXCEPTION_PATTERN.matcher(content).find();
+        boolean missesBizException =
+                hasFromString && !BIZ_EXCEPTION_PATTERN.matcher(content).find();
+        if (hasIllegalArgumentException || missesBizException) {
+            violations.add(toRepositoryPath(root, path));
+        }
+    }
+
     private boolean containsPattern(Path path, Pattern pattern) {
+        return pattern.matcher(readSourceWithoutComments(path)).find();
+    }
+
+    private String readSourceWithoutComments(Path path) {
         try {
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            return pattern.matcher(removeJavaComments(content)).find();
+            return removeJavaComments(content);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

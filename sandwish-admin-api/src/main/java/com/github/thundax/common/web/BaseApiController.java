@@ -4,14 +4,12 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.EmptyCollectionException;
 import com.github.thundax.common.exception.InvalidBeanException;
 import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.function.ThrowableBiConsumer;
 import com.github.thundax.common.utils.function.ThrowableBiPredicate;
 import com.github.thundax.common.utils.function.ThrowableFunction;
-import com.github.thundax.common.vo.BaseVo;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.vo.query.MoveTreeNodeQueryParam;
 import com.github.thundax.common.vo.query.PageQueryParam;
@@ -131,25 +129,6 @@ public abstract class BaseApiController extends BaseController {
         }
 
         return beanList;
-    }
-
-    protected static <T extends DataEntity<T>, V extends BaseVo> V baseEntityToVo(V vo, T entity) {
-        vo.setId(entity.getId());
-        vo.setRemarks(entity.getRemarks());
-        vo.setCreateDate(entity.getCreateDate());
-        vo.setUpdateDate(entity.getUpdateDate());
-        vo.setPriority(entity.getPriority());
-        return vo;
-    }
-
-    protected static <T extends DataEntity<T>, V extends BaseVo> T baseVoToEntity(T entity, V vo) {
-        entity.setId(vo.getId());
-        if (vo.getPriority() != null) {
-            entity.setPriority(vo.getPriority());
-        }
-        entity.setRemarks(vo.getRemarks());
-
-        return entity;
     }
 
     /**

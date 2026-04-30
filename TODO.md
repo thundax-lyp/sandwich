@@ -13,13 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `admin-base-controller`：清理入口层旧通用拷贝方法
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/common/web/BaseApiController.java`
-  - 处理动作：删除入口层基于 `DataEntity` 的通用字段拷贝方法。
-  - 验收点：`BaseApiController` 不再 import `DataEntity`，不再提供基于 `DataEntity` 的 `baseEntityToVo`、`baseVoToEntity`。
-  - 重要度：9/10
-
 - [ ] `assist`：迁移辅助域实体与装配
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/base/BaseAsyncTask.java`

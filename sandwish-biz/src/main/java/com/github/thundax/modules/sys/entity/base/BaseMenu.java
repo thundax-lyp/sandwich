@@ -8,11 +8,10 @@ import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
 
+@Getter
+@Setter
 public abstract class BaseMenu implements Auditable, Signable, Sortable {
-    @Getter
-    @Setter
     private EntityId id;
 
     public static final String ROOT_ID = "ROOT";
@@ -39,123 +38,9 @@ public abstract class BaseMenu implements Auditable, Signable, Sortable {
 
     protected void initialize() {}
 
-    public String getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPerms() {
-        return perms;
-    }
-
-    public void setPerms(String perms) {
-        this.perms = perms;
-    }
-
-    public Integer getRanks() {
-        return ranks;
-    }
-
-    public void setRanks(Integer ranks) {
-        this.ranks = ranks;
-    }
-
-    public String getDisplayFlag() {
-        return displayFlag;
-    }
-
-    public void setDisplayFlag(String displayFlag) {
-        this.displayFlag = displayFlag;
-    }
-
-    public String getDisplayParams() {
-        return displayParams;
-    }
-
-    public void setDisplayParams(String displayParams) {
-        this.displayParams = displayParams;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getTarget() {
-        return target;
-    }
-
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
-    @Override
-    @NonNull
-    public int getPriority() {
-        return priority;
-    }
-
     @Override
     public void setPriority(int priority) {
         this.priority = priority >= 0 ? priority : 0;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    @Override
-    public String getCreateUserId() {
-        return createUserId;
-    }
-
-    @Override
-    public void setCreateUserId(String createUserId) {
-        this.createUserId = createUserId;
-    }
-
-    @Override
-    public String getUpdateUserId() {
-        return updateUserId;
-    }
-
-    @Override
-    public void setUpdateUserId(String updateUserId) {
-        this.updateUserId = updateUserId;
     }
 
     @Override

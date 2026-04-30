@@ -4,10 +4,9 @@ import com.github.thundax.common.id.EntityId;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public abstract class BaseStorageBusiness {
-
-    @Getter
-    @Setter
     private EntityId id;
 
     private String businessId;
@@ -20,36 +19,4 @@ public abstract class BaseStorageBusiness {
     }
 
     protected void initialize() {}
-
-    public String getBusinessId() {
-        return businessId;
-    }
-
-    public void setBusinessId(String businessId) {
-        this.businessId = businessId;
-    }
-
-    public String getBusinessType() {
-        return businessType;
-    }
-
-    public void setBusinessType(String businessType) {
-        this.businessType = businessType;
-    }
-
-    public String getBusinessParams() {
-        return businessParams;
-    }
-
-    public void setBusinessParams(String businessParams) {
-        this.businessParams = businessParams;
-    }
-
-    public String getPublicFlag() {
-        return publicFlag;
-    }
-
-    public void setPublicFlag(String publicFlag) {
-        this.publicFlag = publicFlag;
-    }
 }

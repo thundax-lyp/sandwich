@@ -5,11 +5,10 @@ import com.github.thundax.common.id.EntityId;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
 
+@Getter
+@Setter
 public abstract class BaseStorage implements Sortable {
-    @Getter
-    @Setter
     private EntityId id;
 
     public BaseStorage() {
@@ -29,86 +28,8 @@ public abstract class BaseStorage implements Sortable {
 
     protected void initialize() {}
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getExtendName() {
-        return extendName;
-    }
-
-    public void setExtendName(String extendName) {
-        this.extendName = extendName;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
-
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public String getOwnerType() {
-        return ownerType;
-    }
-
-    public void setOwnerType(String ownerType) {
-        this.ownerType = ownerType;
-    }
-
-    public String getEnableFlag() {
-        return enableFlag;
-    }
-
-    public void setEnableFlag(String enableFlag) {
-        this.enableFlag = enableFlag;
-    }
-
-    @Override
-    @NonNull
-    public int getPriority() {
-        return priority;
-    }
-
     @Override
     public void setPriority(int priority) {
         this.priority = priority >= 0 ? priority : 0;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
     }
 }

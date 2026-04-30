@@ -13,29 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-user-role`：迁移用户、用户加密和角色实体
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUser.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUserEncrypt.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseRole.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/UserEncrypt.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Role.java`
-  - 处理动作：下沉用户、用户加密、角色实体字段，移除旧基类和 Jackson 注解依赖。
-  - 验收点：上述实体不再继承 `AdminDataEntity`，不再 import `com.fasterxml.jackson.annotation..`，审计和排序语义显式实现对应 interface。
-  - 重要度：10/10
-
-- [ ] `sys-user-role-assembler`：同步用户、用户加密和角色装配
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/UserInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/RoleInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserEncryptPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/RolePersistenceAssembler.java`
-  - 处理动作：显式转换用户、用户加密、角色字段，移除 `DataEntity` 通用拷贝依赖。
-  - 验收点：API assembler 不再 import `DataEntity`；persistence assembler 显式完成 `Entity <-> DO` 字段转换。
-  - 重要度：10/10
-
 - [ ] `sys-basic`：迁移字典、日志和上传文件实体
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseDict.java`

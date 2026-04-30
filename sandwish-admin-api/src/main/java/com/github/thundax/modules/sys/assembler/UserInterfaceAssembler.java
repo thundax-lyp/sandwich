@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Office;
@@ -120,7 +119,7 @@ public class UserInterfaceAssembler {
         return entity;
     }
 
-    private static UserResponse baseEntityToResponse(UserResponse response, DataEntity entity) {
+    private static UserResponse baseEntityToResponse(UserResponse response, User entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
@@ -129,7 +128,7 @@ public class UserInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, UserSaveRequest request) {
+    private static User baseRequestToEntity(User entity, UserSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

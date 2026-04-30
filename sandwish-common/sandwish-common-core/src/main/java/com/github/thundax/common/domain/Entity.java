@@ -1,6 +1,7 @@
 package com.github.thundax.common.domain;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Objects;
 
 public abstract class Entity<T extends Entity<T>> {
@@ -13,6 +14,14 @@ public abstract class Entity<T extends Entity<T>> {
 
     public void setEntityId(EntityId id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return EntityIdCodec.toValue(getEntityId());
+    }
+
+    public void setId(String id) {
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     @Override

@@ -34,10 +34,7 @@ public class DomainEntityArchitectureTest {
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseLog.java",
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseMenu.java",
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseOffice.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseRole.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUploadFile.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUser.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUserEncrypt.java"));
+            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUploadFile.java"));
 
     private static final Set<String> LEGACY_JACKSON_ENTITY_SOURCES = new LinkedHashSet<>(Arrays.asList(
             "sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/AsyncTask.java",
@@ -50,10 +47,7 @@ public class DomainEntityArchitectureTest {
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Dict.java",
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Log.java",
             "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Menu.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Office.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Role.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/UserEncrypt.java"));
+            "sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Office.java"));
 
     @Test
     public void shouldNotIntroduceOldEntityBaseDependencyInDomainEntities() throws IOException {

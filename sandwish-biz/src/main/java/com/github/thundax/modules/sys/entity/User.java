@@ -1,8 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
@@ -21,8 +18,6 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends BaseUser {
 
     public static final String BEAN_NAME = "User";
@@ -62,7 +57,6 @@ public class User extends BaseUser {
         }
     }
 
-    @JsonIgnore
     public Office getOffice() {
         return OfficeServiceHolder.getService().get(EntityIdCodec.toDomain(this.getOfficeId()));
     }
@@ -93,7 +87,6 @@ public class User extends BaseUser {
         this.roleIdList = roleIdList;
     }
 
-    @JsonIgnore
     @NotNull
     public List<Role> getRoleList() {
         return getRoleIdList().stream()
@@ -109,35 +102,29 @@ public class User extends BaseUser {
                         .collect(Collectors.toList());
     }
 
-    @JsonIgnore
     public boolean hasRole(@NotNull Role target) {
         return getRoleIdList().stream()
                 .anyMatch(roleId -> StringUtils.equals(roleId, EntityIdCodec.toValue(target.getEntityId())));
     }
 
-    @JsonIgnore
     public boolean isSuper() {
         return Global.YES.equals(this.getSuperFlag());
     }
 
-    @JsonIgnore
     public boolean isAdmin() {
         return Global.YES.equals(this.getAdminFlag());
     }
 
-    @JsonIgnore
     public boolean isEnable() {
         return Global.YES.equals(this.getEnableFlag());
     }
 
     @Override
-    @JsonIgnore
     public String getSignName() {
         return BEAN_NAME;
     }
 
     @Override
-    @JsonIgnore
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("officeId", this.getOfficeId());
@@ -160,7 +147,6 @@ public class User extends BaseUser {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

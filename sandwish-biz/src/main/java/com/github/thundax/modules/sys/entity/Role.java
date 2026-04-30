@@ -1,8 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
@@ -19,8 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Role extends BaseRole {
 
     public static final String BEAN_NAME = "Role";
@@ -39,12 +34,10 @@ public class Role extends BaseRole {
         return RoleServiceHolder.get(this.getEntityId());
     }
 
-    @JsonIgnore
     public boolean isAdmin() {
         return Global.YES.equals(this.getAdminFlag());
     }
 
-    @JsonIgnore
     public boolean isEnable() {
         return Global.YES.equals(this.getEnableFlag());
     }
@@ -66,7 +59,6 @@ public class Role extends BaseRole {
         this.menuIdList = menuIdList;
     }
 
-    @JsonIgnore
     public List<Menu> getMenuList() {
         return getMenuIdList().stream()
                 .map(menuId -> MenuServiceHolder.get(EntityIdCodec.toDomain(menuId)))
@@ -81,12 +73,10 @@ public class Role extends BaseRole {
                         .collect(Collectors.toList());
     }
 
-    @JsonIgnore
     public List<User> getUserList() {
         return RoleServiceHolder.getService().findRoleUser(this);
     }
 
-    @JsonIgnore
     public Set<String> getPerms() {
         Set<String> allPerms = new HashSet<>();
         for (Menu menu : this.getMenuList()) {
@@ -96,13 +86,11 @@ public class Role extends BaseRole {
     }
 
     @Override
-    @JsonIgnore
     public String getSignName() {
         return BEAN_NAME;
     }
 
     @Override
-    @JsonIgnore
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("name", this.getName());
@@ -118,7 +106,6 @@ public class Role extends BaseRole {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

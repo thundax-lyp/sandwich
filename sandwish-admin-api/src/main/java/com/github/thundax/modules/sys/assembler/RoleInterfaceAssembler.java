@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
@@ -133,7 +132,7 @@ public class RoleInterfaceAssembler {
         return "OFFICE_" + id;
     }
 
-    private static RoleResponse baseEntityToResponse(RoleResponse response, DataEntity entity) {
+    private static RoleResponse baseEntityToResponse(RoleResponse response, Role entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
@@ -142,7 +141,7 @@ public class RoleInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, RoleSaveRequest request) {
+    private static Role baseRequestToEntity(Role entity, RoleSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

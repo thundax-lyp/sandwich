@@ -5,24 +5,11 @@
 - `TODO.md` 是未关闭任务面板，不是完成历史。
 - 宏观任务必须先讨论边界，再拆解为可执行 TODO。
 - 以下任务项来自 `docs/00-governance/how-to/HOW-TO-REMODEL-DOMAIN-ENTITY.md`。
-- KOAL 签名实现删除是当前顶级任务；领域实体重塑任务排在 KOAL 删除之后。
 - 领域实体重塑拆解仍处于人工审阅阶段，审阅通过前不得执行。
 - 已完成任务必须删除，不在 `TODO.md` 中打勾长期保留。
 - 完成历史保留在 commit 或 PR 中。
 
 ## 当前任务项
-
-- [ ] `assist-koal`：删除 KOAL 签名实现
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/KoalSignServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/BaseResponse.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/SignRequestParam.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/SignResponseParam.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/VerifySignRequestParam.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/VerifySignResponseParam.java`
-  - 处理动作：删除 KOAL 专用签名实现和第三方签名传输对象，保留默认签名服务链路。
-  - 验收点：生产代码中不再出现 `koal`、`KoalSignServiceImpl` 或 `modules.assist.plugins.koal` 引用；默认 `SignService` 装配不受影响。
-  - 重要度：10/10
 
 ## 待审阅任务项
 

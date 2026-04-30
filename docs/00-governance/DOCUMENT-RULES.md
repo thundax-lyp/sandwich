@@ -32,7 +32,8 @@
 - 架构、模块边界、三层职责：[`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - 命名、目录、类归属：[`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
 - 数据库、DAO、Mapper、SQL、持久化对象：[`DATABASE-RULES.md`](./DATABASE-RULES.md)
-- 文档写作、路由、TODO 和提交口径：本文档
+- TODO 格式、协作、删除、测试检查和提交收口规则：[`TODO-RULES.md`](./TODO-RULES.md)
+- 文档写作、路由和提交口径：本文档
 - 部署单元、运行入口、前后台流量边界：[`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
 
 新增稳定治理规则时，必须放入对应入口文档。临时迁移步骤只放入 `docs/30-designs/` 或 `how-to/`，不得混入长期架构红线。
@@ -125,7 +126,7 @@
 
 - `TODO.md` 是任务执行队列，不是完成历史。
 - 完成历史保留在 commit / PR 中。
-- 任务收口必须按 `how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md` 检查。
+- 任务收口必须按 `TODO-RULES.md` 检查。
 - 提交格式固定为 `Type(domain): 中文说明`。
 - 已完成 `TODO.md` 项必须删除、拆分或收窄，并与对应文档、代码或测试改动放在同一个 commit。
 

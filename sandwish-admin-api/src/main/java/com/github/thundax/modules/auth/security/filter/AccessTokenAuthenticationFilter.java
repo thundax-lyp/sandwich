@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.security.filter;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PermissionSession;
@@ -10,6 +11,7 @@ import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.UserService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -38,16 +40,19 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthService authService;
     private final PermissionService permissionService;
+    private final UserService userService;
 
     public AccessTokenAuthenticationFilter(
             VltavaProperties.AccessTokenFilterProperties properties,
             AuthService authService,
-            PermissionService permissionService) {
+            PermissionService permissionService,
+            UserService userService) {
         if (properties.getExcludePath() != null) {
             this.excludePatternList.addAll(properties.getExcludePath());
         }
         this.authService = authService;
         this.permissionService = permissionService;
+        this.userService = userService;
     }
 
     @Override
@@ -81,7 +86,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         UserAccessHolder.currentUserId(accessToken.getUserId(), token);
 
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = userService.get(EntityIdCodec.toDomain(accessToken.getUserId()));
         if (currentUser.getId() == null || !currentUser.isEnable()) {
             writeError(response);
             return;

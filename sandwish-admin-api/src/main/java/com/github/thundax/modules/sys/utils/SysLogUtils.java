@@ -6,6 +6,7 @@ import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.service.LogService;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,11 +38,13 @@ public class SysLogUtils {
     private static VltavaProperties.LogProperties properties;
 
     private static AmqpTemplate template;
+    private final LogService logService;
 
     @Autowired
-    public SysLogUtils(AmqpTemplate targetTemplate, VltavaProperties vltavaProperties) {
+    public SysLogUtils(AmqpTemplate targetTemplate, VltavaProperties vltavaProperties, LogService logService) {
         template = targetTemplate;
         properties = vltavaProperties.getLog();
+        this.logService = logService;
     }
 
     public static AmqpTemplate getTemplate() {
@@ -68,7 +71,7 @@ public class SysLogUtils {
         try {
             Log log = JsonUtils.fromJson(paramString, Log.class);
             if (log != null) {
-                LogServiceHolder.getService().add(log);
+                logService.add(log);
 
                 try {
                     String filename = LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
@@ -99,6 +102,6 @@ public class SysLogUtils {
         queryCondition.setBeginDate(DateUtils.addDays(new Date(), -9999));
         queryCondition.setEndDate(DateUtils.addDays(new Date(), -properties.getAliveDays()));
         query.setQuery(queryCondition);
-        LogServiceHolder.getService().batchDelete(query);
+        logService.batchDelete(query);
     }
 }

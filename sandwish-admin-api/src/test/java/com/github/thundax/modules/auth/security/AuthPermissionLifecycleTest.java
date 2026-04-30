@@ -23,9 +23,8 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserPrivilege;
 import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.utils.MenuServiceHolder;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -53,7 +52,8 @@ public class AuthPermissionLifecycleTest {
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
 
-        permissionService = new PermissionServiceImpl(permissionDao, authProperties);
+        permissionService = new PermissionServiceImpl(
+                permissionDao, authProperties, new TestUserService(), new TestRoleService(), new TestMenuService());
         authService = new AuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
@@ -62,9 +62,6 @@ public class AuthPermissionLifecycleTest {
                 new InMemoryLoginLockDaoImpl(),
                 new PlainPasswordService(),
                 permissionService);
-
-        new UserServiceHolder(new TestUserService());
-        new MenuServiceHolder(new TestMenuService());
     }
 
     @After
@@ -93,7 +90,10 @@ public class AuthPermissionLifecycleTest {
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(), authService, permissionService);
+                new VltavaProperties.AccessTokenFilterProperties(),
+                authService,
+                permissionService,
+                new TestUserService());
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
@@ -112,7 +112,10 @@ public class AuthPermissionLifecycleTest {
     @Test
     public void shouldRejectRequestWithoutToken() throws Exception {
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(), authService, permissionService);
+                new VltavaProperties.AccessTokenFilterProperties(),
+                authService,
+                permissionService,
+                new TestUserService());
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -366,6 +369,113 @@ public class AuthPermissionLifecycleTest {
             menu.setName("system");
             menu.setRanks(0);
             return Arrays.asList(menu);
+        }
+    }
+
+    private static class TestRoleService implements RoleService {
+
+        @Override
+        public List<com.github.thundax.modules.sys.entity.Role> findValidList() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public int updateStatus(com.github.thundax.modules.sys.entity.Role role) {
+            return 1;
+        }
+
+        @Override
+        public int updateStatus(List<com.github.thundax.modules.sys.entity.Role> list) {
+            return list.size();
+        }
+
+        @Override
+        public void updateUserList(com.github.thundax.modules.sys.entity.Role role, List<User> userList) {}
+
+        @Override
+        public List<User> findRoleUser(com.github.thundax.modules.sys.entity.Role role) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<Menu> findRoleMenu(com.github.thundax.modules.sys.entity.Role role) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public Class<com.github.thundax.modules.sys.entity.Role> getElementType() {
+            return com.github.thundax.modules.sys.entity.Role.class;
+        }
+
+        @Override
+        public com.github.thundax.modules.sys.entity.Role newEntity(String id) {
+            com.github.thundax.modules.sys.entity.Role role = new com.github.thundax.modules.sys.entity.Role();
+            role.setId(EntityIdCodec.toDomain(id));
+            return role;
+        }
+
+        @Override
+        public com.github.thundax.modules.sys.entity.Role get(com.github.thundax.modules.sys.entity.Role entity) {
+            return entity;
+        }
+
+        @Override
+        public com.github.thundax.modules.sys.entity.Role get(EntityId id) {
+            return newEntity(id.value());
+        }
+
+        @Override
+        public List<com.github.thundax.modules.sys.entity.Role> getMany(List<String> ids) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<com.github.thundax.modules.sys.entity.Role> findList(
+                com.github.thundax.modules.sys.entity.Role entity) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public com.github.thundax.modules.sys.entity.Role findOne(com.github.thundax.modules.sys.entity.Role entity) {
+            return entity;
+        }
+
+        @Override
+        public Page<com.github.thundax.modules.sys.entity.Role> findPage(
+                com.github.thundax.modules.sys.entity.Role entity,
+                Page<com.github.thundax.modules.sys.entity.Role> page) {
+            return page;
+        }
+
+        @Override
+        public long count(com.github.thundax.modules.sys.entity.Role entity) {
+            return 0;
+        }
+
+        @Override
+        public void add(com.github.thundax.modules.sys.entity.Role entity) {}
+
+        @Override
+        public void update(com.github.thundax.modules.sys.entity.Role entity) {}
+
+        @Override
+        public int delete(com.github.thundax.modules.sys.entity.Role entity) {
+            return 1;
+        }
+
+        @Override
+        public int delete(List<com.github.thundax.modules.sys.entity.Role> list) {
+            return list.size();
+        }
+
+        @Override
+        public int updatePriority(com.github.thundax.modules.sys.entity.Role entity) {
+            return 1;
+        }
+
+        @Override
+        public int updatePriority(List<com.github.thundax.modules.sys.entity.Role> list) {
+            return list.size();
         }
     }
 }

@@ -6,9 +6,6 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
-import com.github.thundax.modules.sys.utils.RoleServiceHolder;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -88,10 +85,6 @@ public class User implements Auditable, Signable, Sortable {
         }
     }
 
-    public Office getOffice() {
-        return OfficeServiceHolder.getService().get(EntityIdCodec.toDomain(this.getOfficeId()));
-    }
-
     public void setOffice(Office office) {
         this.setOfficeId(office == null ? null : EntityIdCodec.toValue(office.getId()));
     }
@@ -103,26 +96,13 @@ public class User implements Auditable, Signable, Sortable {
     @NotNull
     public List<String> getRoleIdList() {
         if (this.roleIdList == null) {
-            if (StringUtils.isBlank(EntityIdCodec.toValue(getId()))) {
-                this.roleIdList = new ArrayList<>();
-            } else {
-                this.roleIdList = UserServiceHolder.getService().findUserRole(this).stream()
-                        .map(role -> EntityIdCodec.toValue(role.getId()))
-                        .collect(Collectors.toList());
-            }
+            this.roleIdList = new ArrayList<>();
         }
         return this.roleIdList;
     }
 
     public void setRoleIdList(List<String> roleIdList) {
         this.roleIdList = roleIdList;
-    }
-
-    @NotNull
-    public List<Role> getRoleList() {
-        return getRoleIdList().stream()
-                .map(roleId -> RoleServiceHolder.get(EntityIdCodec.toDomain(roleId)))
-                .collect(Collectors.toList());
     }
 
     public void setRoleList(List<Role> roleList) {

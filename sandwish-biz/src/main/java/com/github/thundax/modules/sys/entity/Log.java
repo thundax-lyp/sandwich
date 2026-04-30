@@ -4,7 +4,6 @@ import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -43,10 +42,6 @@ public class Log implements Signable {
     public static final String BEAN_NAME = "Log";
 
     private boolean signable = false;
-
-    public User getUser() {
-        return UserServiceHolder.get(EntityIdCodec.toDomain(this.getUserId()));
-    }
 
     public boolean isSignable() {
         return signable;

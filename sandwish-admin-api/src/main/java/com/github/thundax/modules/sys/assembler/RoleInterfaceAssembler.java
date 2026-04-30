@@ -14,7 +14,11 @@ import com.github.thundax.modules.sys.response.RoleOfficeResponse;
 import com.github.thundax.modules.sys.response.RoleResponse;
 import com.github.thundax.modules.sys.response.RoleUserResponse;
 import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.RoleService;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -22,6 +26,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RoleInterfaceAssembler {
+
+    private final RoleService roleService;
+    private final MenuService menuService;
+    private final OfficeService officeService;
+
+    public RoleInterfaceAssembler(RoleService roleService, MenuService menuService, OfficeService officeService) {
+        this.roleService = roleService;
+        this.menuService = menuService;
+        this.officeService = officeService;
+    }
 
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
@@ -38,10 +52,11 @@ public class RoleInterfaceAssembler {
         response.setName(entity.getName());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
+        List<Menu> menuList = roleService.findRoleMenu(entity);
         response.setMenuList(
-                entity.getMenuList() == null
+                menuList == null
                         ? new ArrayList<>()
-                        : entity.getMenuList().stream()
+                        : menuList.stream()
                                 .map(menu -> this.toMenuResponse(menu))
                                 .collect(Collectors.toList()));
 
@@ -73,7 +88,7 @@ public class RoleInterfaceAssembler {
         RoleOfficeResponse response = new RoleOfficeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setNamePath(entity.getNamePath());
+        response.setNamePath(namePath(entity));
         return response;
     }
 
@@ -87,7 +102,7 @@ public class RoleInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setLoginName(entity.getLoginName());
-        response.setOffice(toOfficeResponse(entity.getOffice()));
+        response.setOffice(toOfficeResponse(officeService.get(EntityIdCodec.toDomain(entity.getOfficeId()))));
         return response;
     }
 
@@ -149,5 +164,18 @@ public class RoleInterfaceAssembler {
         }
         entity.setRemarks(request.getRemarks());
         return entity;
+    }
+
+    private String namePath(Office office) {
+        List<String> names = new ArrayList<>();
+        Office node = office;
+        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+            node = officeService.get(node.getId());
+            if (node != null) {
+                names.add(0, node.getName());
+                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+            }
+        }
+        return StringUtils.join(names, "/");
     }
 }

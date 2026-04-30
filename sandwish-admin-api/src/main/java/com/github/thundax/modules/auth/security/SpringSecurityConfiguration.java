@@ -4,6 +4,7 @@ import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.sys.service.UserService;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,12 +20,17 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final VltavaProperties properties;
     private final AuthService authService;
     private final PermissionService permissionService;
+    private final UserService userService;
 
     public SpringSecurityConfiguration(
-            VltavaProperties properties, AuthService authService, PermissionService permissionService) {
+            VltavaProperties properties,
+            AuthService authService,
+            PermissionService permissionService,
+            UserService userService) {
         this.properties = properties;
         this.authService = authService;
         this.permissionService = permissionService;
+        this.userService = userService;
     }
 
     @Override
@@ -53,7 +59,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(
                         new AccessTokenAuthenticationFilter(
-                                properties.getAccessTokenFilter(), authService, permissionService),
+                                properties.getAccessTokenFilter(), authService, permissionService, userService),
                         UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -13,7 +13,6 @@ import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.utils.StorageServiceHolder;
 import com.github.thundax.modules.storage.utils.StorageUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,17 +48,20 @@ public class StorageController extends BaseAdminController {
 
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
+    private final StorageUtils storageUtils;
     private final StorageInterfaceAssembler storageInterfaceAssembler;
 
     @Autowired
     public StorageController(
             VltavaProperties properties,
             StorageService storageService,
+            StorageUtils storageUtils,
             Validator validator,
             StorageInterfaceAssembler storageInterfaceAssembler) {
         super(validator);
         this.properties = properties.getUpload();
         this.storageService = storageService;
+        this.storageUtils = storageUtils;
         this.storageInterfaceAssembler = storageInterfaceAssembler;
     }
 
@@ -111,7 +113,7 @@ public class StorageController extends BaseAdminController {
 
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId(UserAccessHolder.currentUserId());
-        StorageUtils.saveFile(file, storage);
+        storageUtils.saveFile(file, storage);
 
         return storageInterfaceAssembler.toUploadResponse(storage);
     }
@@ -168,7 +170,7 @@ public class StorageController extends BaseAdminController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = StorageServiceHolder.get(storageInterfaceAssembler.toEntityId(id));
+        Storage storage = storageService.get(storageInterfaceAssembler.toEntityId(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -250,7 +252,7 @@ public class StorageController extends BaseAdminController {
             return false;
         }
 
-        Storage bean = StorageServiceHolder.get(storageInterfaceAssembler.toEntityId(id));
+        Storage bean = storageService.get(storageInterfaceAssembler.toEntityId(id));
         if (bean == null) {
             addWarningMessage(redirectAttributes, "无效的数据");
             return false;

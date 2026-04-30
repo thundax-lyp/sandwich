@@ -2,8 +2,9 @@ package com.github.thundax.modules.auth.utils;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.thread.PooledThreadLocal;
+import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
+import com.github.thundax.modules.sys.service.UserService;
 import org.springframework.lang.NonNull;
 
 public class UserAccessHolder {
@@ -13,7 +14,7 @@ public class UserAccessHolder {
 
     @NonNull
     public static User currentUser() {
-        User user = UserServiceHolder.get(EntityIdCodec.toDomain(currentUserId()));
+        User user = SpringContextHolder.getBean(UserService.class).get(EntityIdCodec.toDomain(currentUserId()));
         if (user != null) {
             return user;
         }

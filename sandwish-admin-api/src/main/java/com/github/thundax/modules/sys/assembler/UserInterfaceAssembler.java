@@ -13,7 +13,10 @@ import com.github.thundax.modules.sys.request.UserSaveRequest;
 import com.github.thundax.modules.sys.response.UserOfficeResponse;
 import com.github.thundax.modules.sys.response.UserResponse;
 import com.github.thundax.modules.sys.response.UserRoleResponse;
+import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -21,6 +24,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserInterfaceAssembler {
+
+    private final OfficeService officeService;
+    private final UserService userService;
+
+    public UserInterfaceAssembler(OfficeService officeService, UserService userService) {
+        this.officeService = officeService;
+        this.userService = userService;
+    }
 
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
@@ -52,11 +63,12 @@ public class UserInterfaceAssembler {
         response.setLastLoginDate(entity.getLastLoginDate());
         response.setLastLoginIp(entity.getLastLoginIp());
 
-        response.setOffice(toOfficeResponse(entity.getOffice()));
+        response.setOffice(toOfficeResponse(officeService.get(EntityIdCodec.toDomain(entity.getOfficeId()))));
+        List<Role> roleList = userService.findUserRole(entity);
         response.setRoleList(
-                entity.getRoleList() == null
+                roleList == null
                         ? new ArrayList<>()
-                        : entity.getRoleList().stream()
+                        : roleList.stream()
                                 .map(role -> this.toRoleResponse(role))
                                 .collect(Collectors.toList()));
 
@@ -75,7 +87,7 @@ public class UserInterfaceAssembler {
             response.setParentId(entity.getParentId());
         }
         response.setName(entity.getName());
-        response.setNamePath(entity.getNamePath());
+        response.setNamePath(namePath(entity));
 
         return response;
     }
@@ -137,5 +149,18 @@ public class UserInterfaceAssembler {
         }
         entity.setRemarks(request.getRemarks());
         return entity;
+    }
+
+    private String namePath(Office office) {
+        List<String> names = new ArrayList<>();
+        Office node = office;
+        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+            node = officeService.get(node.getId());
+            if (node != null) {
+                names.add(0, node.getName());
+                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+            }
+        }
+        return StringUtils.join(names, "/");
     }
 }

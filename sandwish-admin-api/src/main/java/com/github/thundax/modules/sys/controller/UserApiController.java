@@ -33,8 +33,6 @@ import com.github.thundax.modules.sys.response.UserRoleResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
-import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.github.thundax.modules.utils.IPUtils;
 import java.io.File;
@@ -338,7 +336,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {
-            Office office = OfficeServiceHolder.get(userInterfaceAssembler.toEntityId(request.getOfficeId()));
+            Office office = officeService.get(userInterfaceAssembler.toEntityId(request.getOfficeId()));
             if (office == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
@@ -357,7 +355,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new InvalidParameterException("office.id");
 
         } else {
-            Office bean = OfficeServiceHolder.get(userInterfaceAssembler.toEntityId(request.getId()));
+            Office bean = officeService.get(userInterfaceAssembler.toEntityId(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getId());
             }
@@ -373,7 +371,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                Role bean = RoleServiceHolder.get(userInterfaceAssembler.toEntityId(request.getId()));
+                Role bean = roleService.get(userInterfaceAssembler.toEntityId(request.getId()));
                 if (bean == null) {
                     throw new NullBeanException(Role.BEAN_NAME, request.getId());
                 }

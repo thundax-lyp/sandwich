@@ -4,11 +4,8 @@ import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
-import com.google.common.collect.Lists;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,34 +39,8 @@ public class Office implements Auditable, Sortable {
 
     public static final String BEAN_NAME = "Office";
 
-    public Office toBean() {
-        return OfficeServiceHolder.get(this.getId());
-    }
-
-    public Office getParent() {
-        return OfficeServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
-    }
-
     public void setParent(Office parent) {
         this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
-    }
-
-    /**
-     * 获取名称路径
-     *
-     * @return /一级部门/二级部门/....
-     */
-    public String getNamePath() {
-        List<String> nameList = Lists.newArrayList();
-        Office node = this;
-        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = OfficeServiceHolder.getService().get(node.getId());
-            if (node != null) {
-                nameList.add(0, node.getName());
-                node = node.getParent();
-            }
-        }
-        return StringUtils.join(nameList, "/");
     }
 
     /**
@@ -82,24 +53,6 @@ public class Office implements Auditable, Sortable {
             return this.getShortName();
         }
         return this.getName();
-    }
-
-    /**
-     * 获取显示名的路径
-     *
-     * @return 路径
-     */
-    public String getDisplayNamePath() {
-        List<String> nameList = Lists.newArrayList();
-        Office node = this;
-        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = OfficeServiceHolder.getService().get(node.getId());
-            if (node != null) {
-                nameList.add(0, node.getDisplayName());
-                node = node.getParent();
-            }
-        }
-        return StringUtils.join(nameList, "/");
     }
 
     private Query query;

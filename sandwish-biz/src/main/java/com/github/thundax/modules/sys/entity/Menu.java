@@ -7,7 +7,6 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.Serializable;
@@ -63,16 +62,8 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     public static final String PERM_ADMIN = "admin";
     public static final String PERM_SUPER = "super";
 
-    public Menu toBean() {
-        return MenuServiceHolder.get(getId());
-    }
-
     public void setParentId(String parentId) {
         this.parentId = StringUtils.isBlank(parentId) ? null : parentId;
-    }
-
-    public Menu getParent() {
-        return MenuServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
     }
 
     public void setParent(Menu parent) {

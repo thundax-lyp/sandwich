@@ -14,6 +14,7 @@ import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.api.PersonalServiceApi;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.PersonalAvatarDeleteRequest;
 import com.github.thundax.modules.sys.request.PersonalAvatarUploadRequest;
@@ -23,16 +24,19 @@ import com.github.thundax.modules.sys.response.PersonalAvatarResponse;
 import com.github.thundax.modules.sys.response.PersonalInfoResponse;
 import com.github.thundax.modules.sys.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.response.PersonalPermsResponse;
+import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +49,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PersonalApiController extends BaseApiController implements PersonalServiceApi {
 
     private final UserService userService;
+    private final RoleService roleService;
+    private final MenuService menuService;
     private final PasswordService passwordService;
     private final KeypairService keypairService;
     private final PersonalInterfaceAssembler personalInterfaceAssembler;
@@ -52,12 +58,16 @@ public class PersonalApiController extends BaseApiController implements Personal
     public PersonalApiController(
             Validator validator,
             UserService userService,
+            RoleService roleService,
+            MenuService menuService,
             PasswordService passwordService,
             KeypairService keypairService,
             PersonalInterfaceAssembler personalInterfaceAssembler) {
         super(validator);
 
         this.userService = userService;
+        this.roleService = roleService;
+        this.menuService = menuService;
         this.passwordService = passwordService;
         this.keypairService = keypairService;
         this.personalInterfaceAssembler = personalInterfaceAssembler;
@@ -142,7 +152,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     @Override
     public List<PersonalMenuResponse> menus() {
         // 获取可见菜单
-        List<Menu> allMenuList = UserServiceHolder.findMenuList(currentUser());
+        List<Menu> allMenuList = findMenuList(currentUser());
 
         Menu rootMenu = new Menu();
         List<Menu> menuList = Lists.newArrayList(rootMenu);
@@ -164,6 +174,41 @@ public class PersonalApiController extends BaseApiController implements Personal
         return menuList.stream()
                 .map(menu -> personalInterfaceAssembler.toMenuResponse(menu))
                 .collect(Collectors.toList());
+    }
+
+    private List<Menu> findMenuList(User user) {
+        List<String> menuIdList;
+
+        if (user.isSuper()) {
+            menuIdList = menuService.findList(new Menu()).stream()
+                    .map(menu -> EntityIdCodec.toValue(menu.getId()))
+                    .collect(Collectors.toList());
+        } else {
+            List<Role> roleList = userService.findUserRole(user);
+            boolean isAdmin = user.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
+
+            if (isAdmin) {
+                menuIdList = menuService.findList(user.getRanks()).stream()
+                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
+                        .collect(Collectors.toList());
+            } else {
+                Set<String> menuIds = Sets.newHashSet();
+                for (Role role : roleList) {
+                    menuIds.addAll(roleService.findRoleMenu(role).stream()
+                            .map(menu -> EntityIdCodec.toValue(menu.getId()))
+                            .collect(Collectors.toList()));
+                }
+                menuIds.removeIf(menuId -> {
+                    Menu menu = menuService.get(EntityIdCodec.toDomain(menuId));
+                    return menu == null || menu.getRanks() > user.getRanks();
+                });
+                menuIdList = new ArrayList<>(menuIds);
+            }
+        }
+
+        List<Menu> menuList = menuService.getMany(menuIdList);
+        menuList.sort(Menu::compareTo);
+        return menuList;
     }
 
     @Override

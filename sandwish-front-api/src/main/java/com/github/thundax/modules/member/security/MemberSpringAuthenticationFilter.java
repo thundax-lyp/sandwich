@@ -13,7 +13,10 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
 
     public static final String DEFAULT_CAPTCHA_PARAM = "validateCode";
 
-    public MemberSpringAuthenticationFilter() {
+    private final RsaSessionUtils rsaSessionUtils;
+
+    public MemberSpringAuthenticationFilter(RsaSessionUtils rsaSessionUtils) {
+        this.rsaSessionUtils = rsaSessionUtils;
         setFilterProcessesUrl("/auth/login");
     }
 
@@ -40,6 +43,6 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
         if (StringUtils.isEmpty(encryptedValue)) {
             return StringUtils.EMPTY;
         }
-        return RsaSessionUtils.decryptRsaValue(request, encryptedValue);
+        return rsaSessionUtils.decryptRsaValue(request, encryptedValue);
     }
 }

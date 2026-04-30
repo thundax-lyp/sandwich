@@ -6,6 +6,7 @@ import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.vo.StorageVo;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +35,12 @@ public class StorageUtils {
 
     private static VltavaProperties.UploadProperties properties;
     private static StorageConverter converter;
+    private static StorageService storageService;
+
+    public StorageUtils(StorageService targetStorageService, StorageConverter targetConverter) {
+        storageService = targetStorageService;
+        converter = targetConverter;
+    }
 
     private static VltavaProperties.UploadProperties getProperties() {
         if (properties == null) {
@@ -152,7 +159,7 @@ public class StorageUtils {
             }
         }
 
-        StorageServiceHolder.getService().add(storage);
+        storageService.add(storage);
     }
 
     @NonNull

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.member.security;
 
+import com.github.thundax.modules.member.utils.RsaSessionUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,9 +11,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final MemberSpringAuthenticationProvider authenticationProvider;
+    private final RsaSessionUtils rsaSessionUtils;
 
-    public FrontSpringSecurityConfiguration(MemberSpringAuthenticationProvider authenticationProvider) {
+    public FrontSpringSecurityConfiguration(
+            MemberSpringAuthenticationProvider authenticationProvider, RsaSessionUtils rsaSessionUtils) {
         this.authenticationProvider = authenticationProvider;
+        this.rsaSessionUtils = rsaSessionUtils;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
     }
 
     private MemberSpringAuthenticationFilter memberSpringAuthenticationFilter() throws Exception {
-        MemberSpringAuthenticationFilter filter = new MemberSpringAuthenticationFilter();
+        MemberSpringAuthenticationFilter filter = new MemberSpringAuthenticationFilter(rsaSessionUtils);
         filter.setAuthenticationManager(authenticationManager());
         return filter;
     }

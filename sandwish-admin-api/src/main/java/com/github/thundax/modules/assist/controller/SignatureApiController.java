@@ -19,10 +19,10 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.utils.LogServiceHolder;
-import com.github.thundax.modules.sys.utils.MenuServiceHolder;
-import com.github.thundax.modules.sys.utils.RoleServiceHolder;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
+import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserService;
 import java.util.List;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,18 +35,30 @@ public class SignatureApiController extends BaseApiController implements Signatu
 
     private final SignatureService signatureService;
     private final SignService signService;
+    private final LogService logService;
+    private final UserService userService;
+    private final MenuService menuService;
+    private final RoleService roleService;
     private final SignatureInterfaceAssembler signatureInterfaceAssembler;
 
     @Autowired
     public SignatureApiController(
             SignatureService signatureService,
             SignService signService,
+            LogService logService,
+            UserService userService,
+            MenuService menuService,
+            RoleService roleService,
             Validator validator,
             SignatureInterfaceAssembler signatureInterfaceAssembler) {
         super(validator);
 
         this.signatureService = signatureService;
         this.signService = signService;
+        this.logService = logService;
+        this.userService = userService;
+        this.menuService = menuService;
+        this.roleService = roleService;
         this.signatureInterfaceAssembler = signatureInterfaceAssembler;
     }
 
@@ -93,13 +105,13 @@ public class SignatureApiController extends BaseApiController implements Signatu
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
             case Log.BEAN_NAME:
-                return LogServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return logService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case User.BEAN_NAME:
-                return UserServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return userService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Menu.BEAN_NAME:
-                return MenuServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return menuService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Role.BEAN_NAME:
-                return RoleServiceHolder.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return roleService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             default:
                 return null;
         }

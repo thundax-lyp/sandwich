@@ -29,9 +29,6 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.utils.MenuServiceHolder;
-import com.github.thundax.modules.sys.utils.RoleServiceHolder;
-import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -209,7 +206,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         return roleService.findRoleUser(bean).stream()
                 .map(user -> roleInterfaceAssembler.toUserResponse(
-                        UserServiceHolder.get(roleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(user.getId())))))
+                        userService.get(roleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(user.getId())))))
                 .collect(Collectors.toList());
     }
 
@@ -218,7 +215,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     public Boolean assignUser(@RequestBody RoleAssignUserRequest request) throws ApiException {
         validateAssignUser(request);
 
-        Role roleBean = RoleServiceHolder.get(roleInterfaceAssembler.toEntityId(request.getRoleId()));
+        Role roleBean = roleService.get(roleInterfaceAssembler.toEntityId(request.getRoleId()));
         Assert.notNull(roleBean, "role can not be null");
 
         roleService.updateUserList(
@@ -237,7 +234,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {
         validate(request);
 
-        Role roleBean = RoleServiceHolder.get(roleInterfaceAssembler.toEntityId(request.getRoleId()));
+        Role roleBean = roleService.get(roleInterfaceAssembler.toEntityId(request.getRoleId()));
         if (roleBean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getRoleId());
         }
@@ -247,7 +244,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         }
 
         for (RoleUserRequest userRequest : request.getUsers()) {
-            User userBean = UserServiceHolder.get(roleInterfaceAssembler.toEntityId(userRequest.getId()));
+            User userBean = userService.get(roleInterfaceAssembler.toEntityId(userRequest.getId()));
             if (userBean == null) {
                 throw new NullBeanException(User.BEAN_NAME, userRequest.getId());
             }
@@ -263,7 +260,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
                 throw new InvalidParameterException("menus.id");
 
             } else {
-                Menu bean = MenuServiceHolder.get(roleInterfaceAssembler.toEntityId(request.getId()));
+                Menu bean = menuService.get(roleInterfaceAssembler.toEntityId(request.getId()));
                 if (bean == null) {
                     throw new NullBeanException(Menu.BEAN_NAME, request.getId());
                 }

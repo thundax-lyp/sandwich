@@ -6,16 +6,12 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.utils.MenuServiceHolder;
-import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,10 +49,6 @@ public class Role implements Auditable, Signable, Sortable {
 
     private List<String> menuIdList;
 
-    public Role toBean() {
-        return RoleServiceHolder.get(this.getId());
-    }
-
     public boolean isAdmin() {
         return RolePrivilege.ADMIN == getPrivilege();
     }
@@ -67,13 +59,7 @@ public class Role implements Auditable, Signable, Sortable {
 
     public List<String> getMenuIdList() {
         if (this.menuIdList == null) {
-            if (StringUtils.isBlank(EntityIdCodec.toValue(getId()))) {
-                this.menuIdList = new ArrayList<>();
-            } else {
-                this.menuIdList = RoleServiceHolder.getService().findRoleMenu(this).stream()
-                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
-                        .collect(Collectors.toList());
-            }
+            this.menuIdList = new ArrayList<>();
         }
         return this.menuIdList;
     }
@@ -82,30 +68,12 @@ public class Role implements Auditable, Signable, Sortable {
         this.menuIdList = menuIdList;
     }
 
-    public List<Menu> getMenuList() {
-        return getMenuIdList().stream()
-                .map(menuId -> MenuServiceHolder.get(EntityIdCodec.toDomain(menuId)))
-                .collect(Collectors.toList());
-    }
-
     public void setMenuList(List<Menu> menuList) {
         this.menuIdList = menuList == null
                 ? new ArrayList<>()
                 : menuList.stream()
                         .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
-    }
-
-    public List<User> getUserList() {
-        return RoleServiceHolder.getService().findRoleUser(this);
-    }
-
-    public Set<String> getPerms() {
-        Set<String> allPerms = new HashSet<>();
-        for (Menu menu : this.getMenuList()) {
-            allPerms.addAll(menu.getAllPerms());
-        }
-        return allPerms;
     }
 
     @Override

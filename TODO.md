@@ -13,17 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `legacy-entity-base`：删除旧实体继承链
-  - 范围文件：
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/BaseEntity.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/DataEntity.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/TreeEntity.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/common/persistence/AdminDataEntity.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/common/persistence/AdminTreeEntity.java`
-  - 处理动作：删除已经没有生产引用的旧实体基类文件。
-  - 验收点：旧基类文件已删除；生产代码不再引用 `BaseEntity`、`DataEntity`、`AdminDataEntity`、`TreeEntity`、`AdminTreeEntity`。
-  - 重要度：10/10
-
 - [ ] `migration-cleanup`：全量验证并清理迁移现场
   - 范围文件：
     - `docs/AGENT.md`

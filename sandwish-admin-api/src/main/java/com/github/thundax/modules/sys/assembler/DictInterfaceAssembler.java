@@ -37,7 +37,6 @@ public class DictInterfaceAssembler {
         entity.setType(request.getType());
         entity.setValue(request.getValue());
         entity.setRemarks(request.getRemarks());
-        entity.setPriority(request.getPriority());
         return entity;
     }
 

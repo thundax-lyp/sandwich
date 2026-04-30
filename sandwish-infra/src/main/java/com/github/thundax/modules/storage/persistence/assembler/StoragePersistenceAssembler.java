@@ -42,7 +42,7 @@ public final class StoragePersistenceAssembler {
         entity.setOwnerId(dataObject.getOwnerId());
         entity.setOwnerType(dataObject.getOwnerType());
         entity.setEnableFlag(dataObject.getEnableFlag());
-        entity.setPriority(dataObject.getPriority());
+        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setUpdateDate(dataObject.getUpdateDate());
@@ -58,6 +58,10 @@ public final class StoragePersistenceAssembler {
             entities.add(toEntity(dataObject));
         }
         return entities;
+    }
+
+    private static int priorityOrDefault(Integer priority) {
+        return priority == null ? 0 : priority;
     }
 
     public static StorageBusinessDO toBusinessDataObject(StorageBusiness entity) {

@@ -33,7 +33,7 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
     private String enableFlag;
     private String ssoLoginName;
 
-    private Integer priority;
+    private int priority;
     private String remarks;
     private Date createDate;
     private Date updateDate;
@@ -44,9 +44,7 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
         initialize();
     }
 
-    protected void initialize() {
-        this.setPriority(0);
-    }
+    protected void initialize() {}
 
     public String getId() {
         return EntityIdCodec.toValue(getEntityId());
@@ -194,13 +192,13 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
 
     @Override
     @NonNull
-    public Integer getPriority() {
-        return priority == null ? 0 : priority;
+    public int getPriority() {
+        return priority;
     }
 
     @Override
-    public void setPriority(Integer priority) {
-        this.priority = priority != null && priority >= 0 ? priority : 0;
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
     }
 
     public String getRemarks() {

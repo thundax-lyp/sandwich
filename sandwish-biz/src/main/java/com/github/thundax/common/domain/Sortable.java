@@ -5,7 +5,7 @@ package com.github.thundax.common.domain;
  */
 public interface Sortable {
 
-    Integer getPriority();
+    int getPriority();
 
-    void setPriority(Integer priority);
+    void setPriority(int priority);
 }

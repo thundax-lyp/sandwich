@@ -46,7 +46,7 @@ public final class MenuPersistenceAssembler {
         entity.setDisplayParams(dataObject.getDisplayParams());
         entity.setUrl(dataObject.getUrl());
         entity.setTarget(dataObject.getTarget());
-        entity.setPriority(dataObject.getPriority());
+        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setCreateUserId(dataObject.getCreateBy());
@@ -71,5 +71,9 @@ public final class MenuPersistenceAssembler {
         dataObject.setId(id);
         dataObject.setParentId(parentId);
         return dataObject;
+    }
+
+    private static int priorityOrDefault(Integer priority) {
+        return priority == null ? 0 : priority;
     }
 }

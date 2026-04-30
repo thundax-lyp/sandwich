@@ -155,7 +155,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
                 list,
                 vo -> roleService.get(roleInterfaceAssembler.toEntityId(vo.getId())),
                 null,
-                (bean, vo) -> bean.setPriority(vo.getPriority()));
+                (bean, vo) -> bean.setPriority(vo.getPriority() == null ? 0 : vo.getPriority()));
 
         roleService.updatePriority(beanList);
 

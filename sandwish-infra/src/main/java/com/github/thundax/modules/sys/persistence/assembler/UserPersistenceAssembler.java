@@ -66,7 +66,7 @@ public final class UserPersistenceAssembler {
         entity.setAdminFlag(dataObject.getAdminFlag());
         entity.setEnableFlag(dataObject.getEnableFlag());
         entity.setSsoLoginName(dataObject.getSsoLoginName());
-        entity.setPriority(dataObject.getPriority());
+        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
         entity.setCreateUserId(dataObject.getCreateBy());
@@ -101,5 +101,9 @@ public final class UserPersistenceAssembler {
 
     public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {
         return new UserRoleDO(userId, roleId);
+    }
+
+    private static int priorityOrDefault(Integer priority) {
+        return priority == null ? 0 : priority;
     }
 }

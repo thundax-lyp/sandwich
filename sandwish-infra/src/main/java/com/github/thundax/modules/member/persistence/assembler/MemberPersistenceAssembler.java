@@ -1,5 +1,6 @@
 package com.github.thundax.modules.member.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class MemberPersistenceAssembler {
             return null;
         }
         MemberDO dataObject = new MemberDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setLoginName(entity.getLoginName());
         dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());
@@ -44,7 +45,7 @@ public final class MemberPersistenceAssembler {
             return null;
         }
         Member entity = new Member();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setLoginName(dataObject.getLoginName());
         entity.setLoginPass(dataObject.getLoginPass());
         entity.setEmail(dataObject.getEmail());

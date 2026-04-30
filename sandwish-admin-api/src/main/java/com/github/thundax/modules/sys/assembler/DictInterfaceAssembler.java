@@ -41,7 +41,7 @@ public class DictInterfaceAssembler {
     }
 
     private static DictResponse baseEntityToResponse(DictResponse response, Dict entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
@@ -50,7 +50,7 @@ public class DictInterfaceAssembler {
     }
 
     private static Dict baseRequestToEntity(Dict entity, DictSaveRequest request) {
-        entity.setId(request.getId());
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }

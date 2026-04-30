@@ -58,21 +58,21 @@ public class User extends BaseUser {
     }
 
     public void setOffice(Office office) {
-        this.setOfficeId(office == null ? null : EntityIdCodec.toValue(office.getEntityId()));
+        this.setOfficeId(office == null ? null : EntityIdCodec.toValue(office.getId()));
     }
 
     public boolean isBelongTo(Office office) {
-        return office != null && Objects.equals(this.getOfficeId(), EntityIdCodec.toValue(office.getEntityId()));
+        return office != null && Objects.equals(this.getOfficeId(), EntityIdCodec.toValue(office.getId()));
     }
 
     @NotNull
     public List<String> getRoleIdList() {
         if (this.roleIdList == null) {
-            if (StringUtils.isBlank(EntityIdCodec.toValue(getEntityId()))) {
+            if (StringUtils.isBlank(EntityIdCodec.toValue(getId()))) {
                 this.roleIdList = new ArrayList<>();
             } else {
                 this.roleIdList = UserServiceHolder.getService().findUserRole(this).stream()
-                        .map(role -> EntityIdCodec.toValue(role.getEntityId()))
+                        .map(role -> EntityIdCodec.toValue(role.getId()))
                         .collect(Collectors.toList());
             }
         }
@@ -94,13 +94,13 @@ public class User extends BaseUser {
         this.roleIdList = roleList == null
                 ? new ArrayList<>()
                 : roleList.stream()
-                        .map(role -> EntityIdCodec.toValue(role.getEntityId()))
+                        .map(role -> EntityIdCodec.toValue(role.getId()))
                         .collect(Collectors.toList());
     }
 
     public boolean hasRole(@NotNull Role target) {
         return getRoleIdList().stream()
-                .anyMatch(roleId -> StringUtils.equals(roleId, EntityIdCodec.toValue(target.getEntityId())));
+                .anyMatch(roleId -> StringUtils.equals(roleId, EntityIdCodec.toValue(target.getId())));
     }
 
     public boolean isSuper() {

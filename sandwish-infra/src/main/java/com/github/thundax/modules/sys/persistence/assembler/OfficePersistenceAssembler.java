@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class OfficePersistenceAssembler {
             return null;
         }
         OfficeDO dataObject = new OfficeDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
@@ -32,7 +33,7 @@ public final class OfficePersistenceAssembler {
             return null;
         }
         Office entity = new Office();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());

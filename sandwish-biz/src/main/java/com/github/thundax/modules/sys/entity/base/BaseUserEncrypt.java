@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import java.util.Date;
 
@@ -22,14 +21,6 @@ public abstract class BaseUserEncrypt extends Entity<UserEncrypt> implements Aud
     }
 
     protected void initialize() {}
-
-    public String getId() {
-        return EntityIdCodec.toValue(getEntityId());
-    }
-
-    public void setId(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
 
     public String getLoginPass() {
         return loginPass;

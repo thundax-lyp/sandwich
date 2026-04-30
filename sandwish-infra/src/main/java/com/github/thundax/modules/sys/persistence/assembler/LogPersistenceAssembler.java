@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class LogPersistenceAssembler {
             return null;
         }
         LogDO dataObject = new LogDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setUserId(entity.getUserId());
         dataObject.setType(entity.getType());
         dataObject.setLogDate(entity.getLogDate());
@@ -32,7 +33,7 @@ public final class LogPersistenceAssembler {
             return null;
         }
         Log entity = new Log();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setUserId(dataObject.getUserId());
         entity.setType(dataObject.getType());
         entity.setLogDate(dataObject.getLogDate());

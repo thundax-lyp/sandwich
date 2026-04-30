@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.persistence.dataobject.SignatureDO;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public final class SignaturePersistenceAssembler {
             return null;
         }
         Signature entity = new Signature();
-        entity.setId(dataObject.getBusinessId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getBusinessId()));
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setSignature(dataObject.getSignature());

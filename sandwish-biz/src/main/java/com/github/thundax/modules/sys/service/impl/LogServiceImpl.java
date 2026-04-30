@@ -73,7 +73,7 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Log log) {
-        log.setEntityId(EntityIdCodec.toDomain(dao.insert(log)));
+        log.setId(EntityIdCodec.toDomain(dao.insert(log)));
 
         if (log.isSignable()) {
             signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
@@ -92,7 +92,7 @@ public class LogServiceImpl implements LogService {
         if (log == null) {
             return 0;
         }
-        return dao.delete(log.getEntityId());
+        return dao.delete(log.getId());
     }
 
     @Override
@@ -112,7 +112,7 @@ public class LogServiceImpl implements LogService {
             List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
             List<String> idList = dao.insertList(subList);
             for (int i = 0; i < idList.size(); i++) {
-                subList.get(i).setEntityId(EntityIdCodec.toDomain(idList.get(i)));
+                subList.get(i).setId(EntityIdCodec.toDomain(idList.get(i)));
             }
             count += idList.size();
         }

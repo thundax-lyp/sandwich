@@ -17,7 +17,7 @@ public class Office extends BaseOffice {
     }
 
     public Office toBean() {
-        return OfficeServiceHolder.get(this.getEntityId());
+        return OfficeServiceHolder.get(this.getId());
     }
 
     public Office getParent() {
@@ -25,7 +25,7 @@ public class Office extends BaseOffice {
     }
 
     public void setParent(Office parent) {
-        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getEntityId()));
+        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
     }
 
     /**
@@ -36,8 +36,8 @@ public class Office extends BaseOffice {
     public String getNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
-        while (node != null && EntityIdCodec.toValue(node.getEntityId()) != null) {
-            node = OfficeServiceHolder.getService().get(node.getEntityId());
+        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+            node = OfficeServiceHolder.getService().get(node.getId());
             if (node != null) {
                 nameList.add(0, node.getName());
                 node = node.getParent();
@@ -66,8 +66,8 @@ public class Office extends BaseOffice {
     public String getDisplayNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
-        while (node != null && EntityIdCodec.toValue(node.getEntityId()) != null) {
-            node = OfficeServiceHolder.getService().get(node.getEntityId());
+        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+            node = OfficeServiceHolder.getService().get(node.getId());
             if (node != null) {
                 nameList.add(0, node.getDisplayName());
                 node = node.getParent();

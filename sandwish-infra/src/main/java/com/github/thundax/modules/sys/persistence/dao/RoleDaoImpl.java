@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.persistence.assembler.RolePersistenceAssembler;
@@ -118,7 +119,7 @@ public class RoleDaoImpl implements RoleDao {
                         .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(RoleDO::getPriority, dataObject.getPriority())
                         .set(RoleDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeById(entity.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -127,7 +128,7 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(RoleDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(entity.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -143,7 +144,7 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(RoleDO::getEnableFlag, dataObject.getEnableFlag()));
-        cacheSupport.removeById(role.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(role.getId()));
         return count;
     }
 

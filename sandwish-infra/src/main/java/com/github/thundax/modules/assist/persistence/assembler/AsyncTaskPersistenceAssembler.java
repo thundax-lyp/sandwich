@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
 
@@ -12,7 +13,7 @@ public final class AsyncTaskPersistenceAssembler {
             return null;
         }
         AsyncTaskDO dataObject = new AsyncTaskDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setTitle(entity.getTitle());
         dataObject.setStatus(entity.getStatus());
         dataObject.setMessage(entity.getMessage());
@@ -33,7 +34,7 @@ public final class AsyncTaskPersistenceAssembler {
             return null;
         }
         AsyncTask entity = new AsyncTask();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setTitle(dataObject.getTitle());
         entity.setStatus(dataObject.getStatus());
         entity.setMessage(dataObject.getMessage());

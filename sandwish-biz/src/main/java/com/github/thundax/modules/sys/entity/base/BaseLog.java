@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 
@@ -112,6 +113,6 @@ public abstract class BaseLog extends Entity<Log> implements Signable {
 
     @Override
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getId());
     }
 }

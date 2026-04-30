@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
@@ -119,7 +120,9 @@ public class PersonalApiController extends BaseApiController implements Personal
         User currentUser = UserAccessHolder.currentUser();
 
         try {
-            AvatarUtils.saveAvatar(currentUser.getId(), request.getAvatar().getInputStream());
+            AvatarUtils.saveAvatar(
+                    EntityIdCodec.toValue(currentUser.getId()),
+                    request.getAvatar().getInputStream());
         } catch (IOException e) {
             throw new ApiException(e.getMessage());
         }
@@ -131,7 +134,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     public PersonalAvatarResponse deleteAvatar(@RequestBody(required = false) PersonalAvatarDeleteRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
-        AvatarUtils.deleteAvatar(currentUser.getId());
+        AvatarUtils.deleteAvatar(EntityIdCodec.toValue(currentUser.getId()));
 
         return personalInterfaceAssembler.toAvatarResponse(currentUser);
     }

@@ -37,7 +37,7 @@ public class Storage extends BaseStorage {
     }
 
     public String getFileName() {
-        return EntityIdCodec.toValue(getEntityId()) + MetaFile.DOT + this.getExtendName();
+        return EntityIdCodec.toValue(getId()) + MetaFile.DOT + this.getExtendName();
     }
 
     public String getOriginalFileName() {

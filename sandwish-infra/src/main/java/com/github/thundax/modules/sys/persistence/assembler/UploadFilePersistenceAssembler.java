@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class UploadFilePersistenceAssembler {
             return null;
         }
         UploadFileDO dataObject = new UploadFileDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -29,7 +30,7 @@ public final class UploadFilePersistenceAssembler {
             return null;
         }
         UploadFile entity = new UploadFile();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());

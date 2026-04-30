@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
@@ -94,13 +95,13 @@ public class StorageServiceImplTest {
 
     private static Storage storage(String id) {
         Storage storage = new Storage();
-        storage.setId(id);
+        storage.setId(EntityIdCodec.toDomain(id));
         return storage;
     }
 
     private static StorageBusiness storageBusiness(String id) {
         StorageBusiness storageBusiness = new StorageBusiness();
-        storageBusiness.setId(id);
+        storageBusiness.setId(EntityIdCodec.toDomain(id));
         return storageBusiness;
     }
 

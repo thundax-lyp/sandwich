@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
@@ -57,7 +58,7 @@ public class RoleServiceImplTest {
 
         assertNotNull(role.getId());
         assertSame(role, dao.inserted);
-        assertEquals(role.getId(), dao.deletedRoleMenuId);
+        assertEquals(EntityIdCodec.toValue(role.getId()), dao.deletedRoleMenuId);
         assertEquals(Arrays.asList("m1", "m2"), dao.menuIdList);
         assertEquals(Role.BEAN_NAME, signService.businessType);
     }
@@ -90,13 +91,13 @@ public class RoleServiceImplTest {
 
     private static Role role(String id) {
         Role role = new Role();
-        role.setId(id);
+        role.setId(EntityIdCodec.toDomain(id));
         return role;
     }
 
     private static User user(String id) {
         User user = new User();
-        user.setId(id);
+        user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 

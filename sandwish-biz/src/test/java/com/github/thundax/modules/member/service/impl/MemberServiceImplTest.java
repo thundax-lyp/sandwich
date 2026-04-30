@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public class MemberServiceImplTest {
 
     private static Member member(String id) {
         Member member = new Member();
-        member.setId(id);
+        member.setId(EntityIdCodec.toDomain(id));
         return member;
     }
 

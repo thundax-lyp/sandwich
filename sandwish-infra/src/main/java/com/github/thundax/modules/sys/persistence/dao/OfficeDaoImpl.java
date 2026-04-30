@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
@@ -106,7 +107,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     @Override
     public int update(Office entity) {
-        OfficeDO oldNode = getTreeNode(entity.getId());
+        OfficeDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
@@ -130,7 +131,7 @@ public class OfficeDaoImpl implements OfficeDao {
         OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(OfficeDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(entity.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 

@@ -41,7 +41,7 @@ public class OfficeInterfaceAssembler {
         }
 
         OfficeResponse response = new OfficeResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         if (StringUtils.isNotBlank(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -64,7 +64,7 @@ public class OfficeInterfaceAssembler {
     }
 
     private static OfficeResponse baseEntityToResponse(OfficeResponse response, Office entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
@@ -73,7 +73,7 @@ public class OfficeInterfaceAssembler {
     }
 
     private static Office baseRequestToEntity(Office entity, OfficeSaveRequest request) {
-        entity.setId(request.getId());
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }

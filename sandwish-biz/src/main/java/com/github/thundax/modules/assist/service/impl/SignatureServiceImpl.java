@@ -49,7 +49,7 @@ public class SignatureServiceImpl implements SignatureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Signature entity) {
-        entity.setEntityId(EntityIdCodec.toDomain(dao.insert(entity)));
+        entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
     }
 
     @Override

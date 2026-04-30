@@ -1,5 +1,6 @@
 package com.github.thundax.modules.storage.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
@@ -16,7 +17,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StorageDO dataObject = new StorageDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -35,7 +36,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         Storage entity = new Storage();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());
@@ -69,7 +70,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StorageBusinessDO dataObject = new StorageBusinessDO();
-        dataObject.setStorageId(entity.getId());
+        dataObject.setStorageId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
@@ -82,7 +83,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StorageBusiness entity = new StorageBusiness();
-        entity.setId(dataObject.getStorageId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getStorageId()));
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessParams(dataObject.getBusinessParams());

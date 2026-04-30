@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.OfficeServiceApi;
@@ -75,10 +76,10 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         validate(request);
 
         Office entity = officeInterfaceAssembler.toEntity(new Office(), request);
-        if (StringUtils.isNotEmpty(entity.getId())) {
-            Office bean = officeService.get(officeInterfaceAssembler.toEntityId(entity.getId()));
+        if (entity.getId() != null) {
+            Office bean = officeService.get(officeInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
-                throw new InsertBeanExistException(Office.BEAN_NAME, entity.getId());
+                throw new InsertBeanExistException(Office.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
@@ -138,7 +139,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
                 ? new HashSet<>()
                 : new HashSet<>(
                         excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
-        beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
+        beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
 
         removeTreeNode(
                 beanList,
@@ -146,7 +147,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
                     @Override
                     public String getId(Office entity) {
-                        return entity.getId();
+                        return EntityIdCodec.toValue(entity.getId());
                     }
 
                     @Override

@@ -72,7 +72,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Storage storage) {
-        storage.setEntityId(EntityIdCodec.toDomain(dao.insert(storage)));
+        storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class StorageServiceImpl implements StorageService {
         if (storage == null) {
             return 0;
         }
-        return dao.delete(storage.getEntityId());
+        return dao.delete(storage.getId());
     }
 
     @Override

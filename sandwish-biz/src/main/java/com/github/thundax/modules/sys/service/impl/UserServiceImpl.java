@@ -40,13 +40,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User newEntity(String id) {
         User user = new User();
-        user.setId(id);
+        user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 
     @Override
     public User get(User entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
     public User getByLoginName(String loginName) {
         User user = dao.getByLoginName(loginName);
         if (user != null) {
-            userEncryptService.get(user.getEntityId());
+            userEncryptService.get(user.getId());
         }
         return user;
     }
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
     public User getBySsoLoginName(String ssoLoginName) {
         User user = dao.getBySsoLoginName(ssoLoginName);
         if (user != null) {
-            userEncryptService.get(user.getEntityId());
+            userEncryptService.get(user.getId());
         }
         return user;
     }
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(User user) {
-        user.setEntityId(EntityIdCodec.toDomain(dao.insert(user)));
+        user.setId(EntityIdCodec.toDomain(dao.insert(user)));
         afterWrite(user, true);
     }
 
@@ -137,13 +137,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private void afterWrite(User user, boolean added) {
-        dao.deleteUserRole(EntityIdCodec.toValue(user.getEntityId()));
+        dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
         if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
-            dao.insertUserRole(EntityIdCodec.toValue(user.getEntityId()), user.getRoleIdList());
+            dao.insertUserRole(EntityIdCodec.toValue(user.getId()), user.getRoleIdList());
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(user.getEntityId())));
+        userEncrypt.setId(user.getId());
         userEncrypt.setEmail(user.getEmail());
         userEncrypt.setMobile(user.getMobile());
         userEncrypt.setTel(user.getTel());
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
         dao.updateLoginPass(user);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setEntityId(EntityIdCodec.toDomain(EntityIdCodec.toValue(user.getEntityId())));
+        userEncrypt.setId(user.getId());
         userEncrypt.setLoginPass(user.getLoginPass());
         userEncryptService.updateLoginPass(userEncrypt);
     }
@@ -191,9 +191,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(User user) {
-        dao.deleteUserRole(EntityIdCodec.toValue(user.getEntityId()));
+        dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
 
-        int result = dao.delete(user.getEntityId());
+        int result = dao.delete(user.getId());
 
         signService.deleteSign(user.getSignName(), user.getSignId());
 
@@ -202,14 +202,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Role> findUserRole(User user) {
-        return dao.findUserRole(EntityIdCodec.toValue(user.getEntityId())).stream()
+        return dao.findUserRole(EntityIdCodec.toValue(user.getId())).stream()
                 .map(this::newRole)
                 .collect(Collectors.toList());
     }
 
     private Role newRole(String id) {
         Role role = new Role();
-        role.setId(id);
+        role.setId(EntityIdCodec.toDomain(id));
         return role;
     }
 

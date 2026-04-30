@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
@@ -17,7 +18,7 @@ public final class RolePersistenceAssembler {
             return null;
         }
         RoleDO dataObject = new RoleDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setAdminFlag(entity.getAdminFlag());
         dataObject.setEnableFlag(entity.getEnableFlag());
@@ -35,7 +36,7 @@ public final class RolePersistenceAssembler {
             return null;
         }
         Role entity = new Role();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setAdminFlag(dataObject.getAdminFlag());
         entity.setEnableFlag(dataObject.getEnableFlag());
@@ -66,7 +67,7 @@ public final class RolePersistenceAssembler {
         List<User> users = new ArrayList<>();
         for (String userId : userIds) {
             User user = new User();
-            user.setId(userId);
+            user.setId(EntityIdCodec.toDomain(userId));
             users.add(user);
         }
         return users;
@@ -78,7 +79,7 @@ public final class RolePersistenceAssembler {
         }
         List<String> userIds = new ArrayList<>();
         for (User user : users) {
-            userIds.add(user.getId());
+            userIds.add(EntityIdCodec.toValue(user.getId()));
         }
         return userIds;
     }

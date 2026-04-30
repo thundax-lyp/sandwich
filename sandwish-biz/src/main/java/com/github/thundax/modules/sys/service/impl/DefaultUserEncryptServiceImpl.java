@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
@@ -66,7 +67,7 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     @Override
     public UserEncrypt newEntity(String id) {
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(id);
+        userEncrypt.setId(EntityIdCodec.toDomain(id));
         return userEncrypt;
     }
 

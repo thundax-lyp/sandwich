@@ -34,7 +34,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     }
 
     public Menu toBean() {
-        return MenuServiceHolder.get(getEntityId());
+        return MenuServiceHolder.get(getId());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     }
 
     public void setParent(Menu parent) {
-        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getEntityId()));
+        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
     }
 
     public Set<String> getAllPerms() {

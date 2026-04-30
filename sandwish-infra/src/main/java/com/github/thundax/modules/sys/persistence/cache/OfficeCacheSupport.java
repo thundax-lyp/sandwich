@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.sys.entity.Office;
 import java.util.HashSet;
@@ -41,8 +42,8 @@ public class OfficeCacheSupport {
     }
 
     public void putById(Office office) {
-        if (office != null && StringUtils.isNotBlank(office.getId())) {
-            String key = objectKey(office.getId());
+        if (office != null && StringUtils.isNotBlank(EntityIdCodec.toValue(office.getId()))) {
+            String key = objectKey(EntityIdCodec.toValue(office.getId()));
             cache.put(key, office, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }

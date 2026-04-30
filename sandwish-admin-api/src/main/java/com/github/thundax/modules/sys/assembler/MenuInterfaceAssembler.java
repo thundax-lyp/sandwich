@@ -45,7 +45,7 @@ public class MenuInterfaceAssembler {
         }
 
         MenuResponse response = new MenuResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(entity.getParentId());
         response.setName(entity.getName());
         return response;
@@ -69,7 +69,7 @@ public class MenuInterfaceAssembler {
     }
 
     private static MenuResponse baseEntityToResponse(MenuResponse response, Menu entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
@@ -78,7 +78,7 @@ public class MenuInterfaceAssembler {
     }
 
     private static Menu baseRequestToEntity(Menu entity, MenuSaveRequest request) {
-        entity.setId(request.getId());
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }

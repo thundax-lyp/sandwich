@@ -5,6 +5,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersistenceAssembler;
@@ -47,7 +48,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     @Override
     public void delete(AsyncTask asyncTask) {
-        cache.remove(cacheKey(asyncTask.getId()));
+        cache.remove(cacheKey(EntityIdCodec.toValue(asyncTask.getId())));
     }
 
     private String cacheKey(String id) {
@@ -56,7 +57,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private void put(AsyncTask asyncTask) {
         cache.put(
-                cacheKey(asyncTask.getId()),
+                cacheKey(EntityIdCodec.toValue(asyncTask.getId())),
                 AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
                 asyncTask.getExpiredSeconds(),
                 TimeUnit.SECONDS);

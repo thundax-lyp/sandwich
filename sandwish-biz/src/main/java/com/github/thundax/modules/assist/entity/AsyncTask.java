@@ -54,6 +54,6 @@ public class AsyncTask extends BaseAsyncTask {
     }
 
     public boolean isBelongTo(User user) {
-        return user != null && Objects.equals(EntityIdCodec.toValue(user.getEntityId()), getCreateUserId());
+        return user != null && Objects.equals(EntityIdCodec.toValue(user.getId()), getCreateUserId());
     }
 }

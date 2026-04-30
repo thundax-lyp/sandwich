@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class MenuPersistenceAssembler {
             return null;
         }
         MenuDO dataObject = new MenuDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
@@ -37,7 +38,7 @@ public final class MenuPersistenceAssembler {
             return null;
         }
         Menu entity = new Menu();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());

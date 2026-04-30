@@ -4,6 +4,7 @@ import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import java.util.Date;
 import org.springframework.lang.NonNull;
@@ -155,6 +156,6 @@ public abstract class BaseMenu extends Entity<Menu> implements Auditable, Signab
 
     @Override
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getId());
     }
 }

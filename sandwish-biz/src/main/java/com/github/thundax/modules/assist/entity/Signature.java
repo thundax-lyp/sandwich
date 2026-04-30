@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.entity;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.base.BaseSignature;
 import java.io.Serializable;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Signature extends BaseSignature {
 
     public Signature(String id, String businessType, String businessId) {
         this();
-        setId(id);
+        setId(EntityIdCodec.toDomain(id));
         this.setBusinessType(businessType);
         this.setBusinessId(businessId);
     }

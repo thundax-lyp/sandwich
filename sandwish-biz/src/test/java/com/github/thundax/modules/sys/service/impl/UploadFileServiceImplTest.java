@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
@@ -76,7 +77,7 @@ public class UploadFileServiceImplTest {
 
     private static UploadFile uploadFile(String id) {
         UploadFile uploadFile = new UploadFile();
-        uploadFile.setId(id);
+        uploadFile.setId(EntityIdCodec.toDomain(id));
         return uploadFile;
     }
 

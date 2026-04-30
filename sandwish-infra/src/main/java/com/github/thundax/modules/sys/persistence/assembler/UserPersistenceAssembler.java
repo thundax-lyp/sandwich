@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
@@ -16,7 +17,7 @@ public final class UserPersistenceAssembler {
             return null;
         }
         UserDO dataObject = new UserDO();
-        dataObject.setId(entity.getId());
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setOfficeId(entity.getOfficeId());
         dataObject.setLoginName(entity.getLoginName());
         dataObject.setLoginPass(entity.getLoginPass());
@@ -48,7 +49,7 @@ public final class UserPersistenceAssembler {
             return null;
         }
         User entity = new User();
-        entity.setId(dataObject.getId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setOfficeId(dataObject.getOfficeId());
         entity.setLoginName(dataObject.getLoginName());
         entity.setLoginPass(dataObject.getLoginPass());
@@ -93,7 +94,7 @@ public final class UserPersistenceAssembler {
         List<Role> roles = new ArrayList<>();
         for (String roleId : roleIds) {
             Role role = new Role();
-            role.setId(roleId);
+            role.setId(EntityIdCodec.toDomain(roleId));
             roles.add(role);
         }
         return roles;

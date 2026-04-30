@@ -2,6 +2,7 @@ package com.github.thundax.modules.assist.controller;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.web.BaseAdminController;
@@ -141,14 +142,14 @@ public class StorageController extends BaseAdminController {
                     }
 
                     Storage storage = new Storage();
-                    storage.setId(IdGen.uuid());
+                    storage.setId(storageInterfaceAssembler.toEntityId(IdGen.uuid()));
 
                     storage.setName(FilenameUtils.getBaseName(originalFilename));
                     storage.setExtendName(extendName);
                     storage.setMimeType(file.getContentType());
 
                     storage.setOwnerType(Storage.OWNER_TYPE_USER);
-                    storage.setOwnerId(currentUser().getId());
+                    storage.setOwnerId(EntityIdCodec.toValue(currentUser().getId()));
 
                     //                    File localFile = new File(properties.getStoragePath() +
                     // storage.getFilename());
@@ -214,7 +215,7 @@ public class StorageController extends BaseAdminController {
 
     private Storage newStorage(String id) {
         Storage storage = new Storage();
-        storage.setId(id);
+        storage.setId(storageInterfaceAssembler.toEntityId(id));
         return storage;
     }
 

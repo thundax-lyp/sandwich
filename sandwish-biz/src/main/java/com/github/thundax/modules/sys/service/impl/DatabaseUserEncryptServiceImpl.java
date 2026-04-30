@@ -52,7 +52,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     public UserEncrypt newEntity(String id) {
         UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(id);
+        userEncrypt.setId(EntityIdCodec.toDomain(id));
         return userEncrypt;
     }
 
@@ -167,7 +167,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
             if (userEncryptPre == null) {
                 return;
             }
-            dao.get(userEncryptPre.getEntityId());
+            dao.get(userEncryptPre.getId());
 
         } catch (RestClientException e) {
             logger.error("加密对象：{}，加密异常：{}", encryptEntity, e.getMessage());
@@ -210,7 +210,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UserEncrypt entity) {
-        return entity == null ? 0 : dao.delete(entity.getEntityId());
+        return entity == null ? 0 : dao.delete(entity.getId());
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.HashSet;
@@ -43,8 +44,8 @@ public class UserCacheSupport {
     }
 
     public void putById(User user) {
-        if (user != null && StringUtils.isNotBlank(user.getId())) {
-            String key = objectKey(user.getId());
+        if (user != null && StringUtils.isNotBlank(EntityIdCodec.toValue(user.getId()))) {
+            String key = objectKey(EntityIdCodec.toValue(user.getId()));
             cache.put(key, user, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }

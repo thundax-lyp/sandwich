@@ -31,13 +31,13 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     public Office newEntity(String id) {
         Office office = new Office();
-        office.setId(id);
+        office.setId(EntityIdCodec.toDomain(id));
         return office;
     }
 
     @Override
     public Office get(Office entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Office entity) {
-        entity.setEntityId(EntityIdCodec.toDomain(dao.insert(entity)));
+        entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
     }
 
     @Override
@@ -105,12 +105,12 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Office entity) {
-        Office bean = this.get(entity.getEntityId());
+        Office bean = this.get(entity.getId());
         if (bean == null) {
             return 0;
         }
 
-        int count = dao.delete(bean.getEntityId());
+        int count = dao.delete(bean.getId());
 
         return count;
     }
@@ -136,15 +136,14 @@ public class OfficeServiceImpl implements OfficeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {
-        dao.moveTreeNode(EntityIdCodec.toValue(from.getEntityId()), EntityIdCodec.toValue(to.getEntityId()), moveType);
+        dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
     }
 
     @Override
     public boolean isChildOf(Office child, Office parent) {
         return child != null
                 && parent != null
-                && dao.isChildOf(
-                        EntityIdCodec.toValue(child.getEntityId()), EntityIdCodec.toValue(parent.getEntityId()));
+                && dao.isChildOf(EntityIdCodec.toValue(child.getId()), EntityIdCodec.toValue(parent.getId()));
     }
 
     private int batchOperate(Collection<Office> collection, Function<Office, Integer> operator) {

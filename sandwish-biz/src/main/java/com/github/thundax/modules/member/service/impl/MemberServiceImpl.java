@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Member member) {
-        member.setEntityId(EntityIdCodec.toDomain(dao.insert(member)));
+        member.setId(EntityIdCodec.toDomain(dao.insert(member)));
     }
 
     @Override
@@ -143,7 +143,7 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) {
             return 0;
         }
-        return dao.delete(member.getEntityId());
+        return dao.delete(member.getId());
     }
 
     @Override

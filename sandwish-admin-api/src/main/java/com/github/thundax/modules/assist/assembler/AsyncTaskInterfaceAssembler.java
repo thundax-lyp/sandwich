@@ -28,7 +28,7 @@ public class AsyncTaskInterfaceAssembler {
     }
 
     private static AsyncTaskResponse baseEntityToResponse(AsyncTaskResponse response, AsyncTask entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());

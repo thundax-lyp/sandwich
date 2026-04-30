@@ -5,6 +5,7 @@ import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.AccessToken;
@@ -177,7 +178,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public User newEntity(String id) {
             User user = new User();
-            user.setId(id);
+            user.setId(EntityIdCodec.toDomain(id));
             return user;
         }
 
@@ -244,7 +245,7 @@ public class AuthPermissionLifecycleTest {
 
         private User user() {
             User user = new User();
-            user.setId("u1");
+            user.setId(EntityIdCodec.toDomain("u1"));
             user.setLoginName("tester");
             user.setLoginPass("secret");
             user.setEnableFlag(Global.YES);
@@ -293,7 +294,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public Menu newEntity(String id) {
             Menu menu = new Menu();
-            menu.setId(id);
+            menu.setId(EntityIdCodec.toDomain(id));
             return menu;
         }
 
@@ -360,7 +361,7 @@ public class AuthPermissionLifecycleTest {
 
         private List<Menu> menus() {
             Menu menu = new Menu();
-            menu.setId("m1");
+            menu.setId(EntityIdCodec.toDomain("m1"));
             menu.setPerms("sys:role,sys:user:view");
             menu.setName("system");
             menu.setRanks(0);

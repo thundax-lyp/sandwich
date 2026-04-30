@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.assist.service.SignService;
@@ -129,7 +130,7 @@ public class MenuServiceImplTest {
 
     private static Menu menu(String id) {
         Menu menu = new Menu();
-        menu.setId(id);
+        menu.setId(EntityIdCodec.toDomain(id));
         return menu;
     }
 

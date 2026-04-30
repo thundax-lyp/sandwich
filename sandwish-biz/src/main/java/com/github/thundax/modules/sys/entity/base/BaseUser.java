@@ -46,14 +46,6 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
 
     protected void initialize() {}
 
-    public String getId() {
-        return EntityIdCodec.toValue(getEntityId());
-    }
-
-    public void setId(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
-
     public String getOfficeId() {
         return officeId;
     }
@@ -247,6 +239,6 @@ public abstract class BaseUser extends Entity<User> implements Auditable, Signab
 
     @Override
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getId());
     }
 }

@@ -37,13 +37,13 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Menu newEntity(String id) {
         Menu menu = new Menu();
-        menu.setId(id);
+        menu.setId(EntityIdCodec.toDomain(id));
         return menu;
     }
 
     @Override
     public Menu get(Menu entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -109,7 +109,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Menu menu) {
-        menu.setEntityId(EntityIdCodec.toDomain(dao.insert(menu)));
+        menu.setId(EntityIdCodec.toDomain(dao.insert(menu)));
         afterWrite(menu);
     }
 
@@ -155,13 +155,13 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Menu menu) {
-        dao.deleteMenuRole(EntityIdCodec.toValue(menu.getEntityId()));
-        Menu bean = this.get(menu.getEntityId());
+        dao.deleteMenuRole(EntityIdCodec.toValue(menu.getId()));
+        Menu bean = this.get(menu.getId());
         if (bean == null) {
             return 0;
         }
 
-        int retVal = dao.delete(bean.getEntityId());
+        int retVal = dao.delete(bean.getId());
 
         signService.deleteSign(menu.getSignName(), menu.getSignId());
         notifyCacheChanged();
@@ -178,7 +178,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveTreeNode(Menu from, Menu to, MoveTreeNodeType moveType) {
-        dao.moveTreeNode(EntityIdCodec.toValue(from.getEntityId()), EntityIdCodec.toValue(to.getEntityId()), moveType);
+        dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
         notifyCacheChanged();
     }
 
@@ -186,8 +186,7 @@ public class MenuServiceImpl implements MenuService {
     public boolean isChildOf(Menu child, Menu parent) {
         return child != null
                 && parent != null
-                && dao.isChildOf(
-                        EntityIdCodec.toValue(child.getEntityId()), EntityIdCodec.toValue(parent.getEntityId()));
+                && dao.isChildOf(EntityIdCodec.toValue(child.getId()), EntityIdCodec.toValue(parent.getId()));
     }
 
     private void notifyCacheChanged() {

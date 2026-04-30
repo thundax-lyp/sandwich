@@ -29,7 +29,7 @@ public class StorageInterfaceAssembler {
         }
 
         StorageUploadResponse response = new StorageUploadResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getOriginalFileName());
         response.setExtendName(entity.getExtendName());
         response.setMimeType(entity.getMimeType());

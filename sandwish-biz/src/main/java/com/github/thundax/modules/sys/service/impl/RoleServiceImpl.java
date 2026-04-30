@@ -46,13 +46,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Role newEntity(String id) {
         Role role = new Role();
-        role.setId(id);
+        role.setId(EntityIdCodec.toDomain(id));
         return role;
     }
 
     @Override
     public Role get(Role entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -111,7 +111,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Role role) {
-        role.setEntityId(EntityIdCodec.toDomain(dao.insert(role)));
+        role.setId(EntityIdCodec.toDomain(dao.insert(role)));
         afterWrite(role);
     }
 
@@ -123,9 +123,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private void afterWrite(Role role) {
-        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getEntityId()));
+        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getId()));
         if (role.getMenuIdList() != null && !role.getMenuIdList().isEmpty()) {
-            dao.insertRoleMenu(EntityIdCodec.toValue(role.getEntityId()), role.getMenuIdList());
+            dao.insertRoleMenu(EntityIdCodec.toValue(role.getId()), role.getMenuIdList());
         }
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
@@ -135,13 +135,13 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserList(Role role, List<User> userList) {
-        dao.deleteRoleUser(EntityIdCodec.toValue(role.getEntityId()));
+        dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
 
         if (userList != null && !userList.isEmpty()) {
             dao.insertRoleUser(
-                    EntityIdCodec.toValue(role.getEntityId()),
+                    EntityIdCodec.toValue(role.getId()),
                     userList.stream()
-                            .map(user -> EntityIdCodec.toValue(user.getEntityId()))
+                            .map(user -> EntityIdCodec.toValue(user.getId()))
                             .collect(Collectors.toList()));
         }
 
@@ -169,9 +169,9 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Role role) {
-        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getEntityId()));
-        dao.deleteRoleUser(EntityIdCodec.toValue(role.getEntityId()));
-        int retVal = dao.delete(role.getEntityId());
+        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getId()));
+        dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
+        int retVal = dao.delete(role.getId());
 
         signService.deleteSign(role.getSignName(), role.getSignId());
         notifyCacheChanged();
@@ -184,8 +184,8 @@ public class RoleServiceImpl implements RoleService {
         List<String> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
-                        EntityIdCodec.toValue(role.getEntityId()),
-                        roleId -> dao.findRoleUser(EntityIdCodec.toValue(role.getEntityId())));
+                        EntityIdCodec.toValue(role.getId()),
+                        roleId -> dao.findRoleUser(EntityIdCodec.toValue(role.getId())));
 
         return userIdList.stream().map(this::newUser).collect(Collectors.toList());
     }
@@ -195,21 +195,21 @@ public class RoleServiceImpl implements RoleService {
         List<String> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
-                        EntityIdCodec.toValue(role.getEntityId()),
-                        roleId -> dao.findRoleMenu(EntityIdCodec.toValue(role.getEntityId())));
+                        EntityIdCodec.toValue(role.getId()),
+                        roleId -> dao.findRoleMenu(EntityIdCodec.toValue(role.getId())));
 
         return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
     }
 
     private User newUser(String id) {
         User user = new User();
-        user.setId(id);
+        user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 
     private Menu newMenu(String id) {
         Menu menu = new Menu();
-        menu.setId(id);
+        menu.setId(EntityIdCodec.toDomain(id));
         return menu;
     }
 

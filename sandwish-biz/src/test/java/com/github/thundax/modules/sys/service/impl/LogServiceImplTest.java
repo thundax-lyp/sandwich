@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -157,7 +158,7 @@ public class LogServiceImplTest {
 
     private static Log log(String id) {
         Log log = new Log();
-        log.setId(id);
+        log.setId(EntityIdCodec.toDomain(id));
         return log;
     }
 

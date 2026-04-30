@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
@@ -142,10 +143,10 @@ public class UserApiController extends BaseApiController implements UserServiceA
         User entity = userInterfaceAssembler.toEntity(new User(), request);
         entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
 
-        if (StringUtils.isNotEmpty(entity.getId())) {
-            User bean = userService.get(userInterfaceAssembler.toEntityId(entity.getId()));
+        if (entity.getId() != null) {
+            User bean = userService.get(userInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
-                throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
+                throw new InsertBeanExistException(User.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
@@ -341,7 +342,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
 
-            queryCondition.setOfficeId(office.getId());
+            queryCondition.setOfficeId(EntityIdCodec.toValue(office.getId()));
         }
 
         queryCondition.setOrderBy(request.getOrderBy());
@@ -406,7 +407,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             return true;
         }
 
-        return StringUtils.equals(bean.getId(), id);
+        return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
     }
 
     private boolean isSsoLoginNameAvailable(String ssoLoginName, String id) {
@@ -418,7 +419,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             return true;
         }
 
-        return StringUtils.equals(bean.getId(), id);
+        return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
     }
 
     public static String getAvatarUrl(String userId, String token) {

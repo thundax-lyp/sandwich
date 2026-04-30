@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
@@ -126,7 +127,7 @@ public class StorageDaoImpl implements StorageDao {
                         .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(StorageDO::getPriority, dataObject.getPriority())
                         .set(StorageDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeById(entity.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -158,7 +159,7 @@ public class StorageDaoImpl implements StorageDao {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getEnableFlag, dataObject.getEnableFlag()));
-        cacheSupport.removeById(storage.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
 
@@ -167,14 +168,14 @@ public class StorageDaoImpl implements StorageDao {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));
-        cacheSupport.removeById(storage.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
 
     @Override
     public List<StorageBusiness> findBusiness(Storage entity) {
         LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getStorageId, entity.getId());
+        wrapper.eq(StorageBusinessDO::getStorageId, EntityIdCodec.toValue(entity.getId()));
         return StoragePersistenceAssembler.toBusinessEntityList(businessMapper.selectList(wrapper));
     }
 

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -25,7 +26,7 @@ public class PersonalInterfaceAssembler {
         }
 
         PersonalInfoResponse response = new PersonalInfoResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(entity.getLoginName());
         response.setRanks(entity.getRanks());
         response.setName(entity.getName());
@@ -55,7 +56,7 @@ public class PersonalInterfaceAssembler {
         }
 
         PersonalMenuResponse response = new PersonalMenuResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(entity.getParentId());
         response.setName(entity.getName());
         response.setPriority(entity.getPriority());
@@ -80,9 +81,10 @@ public class PersonalInterfaceAssembler {
     }
 
     private String readAvatarUrl(User entity) {
-        if (entity == null || StringUtils.isBlank(entity.getId()) || !AvatarUtils.existAvatar(entity.getId())) {
+        String id = entity == null ? null : EntityIdCodec.toValue(entity.getId());
+        if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;
         }
-        return UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken());
+        return UserApiController.getAvatarUrl(id, UserAccessHolder.currentToken());
     }
 }

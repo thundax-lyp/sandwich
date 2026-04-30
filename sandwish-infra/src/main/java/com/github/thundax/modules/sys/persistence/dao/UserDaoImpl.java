@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
@@ -133,7 +134,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks())
                         .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
-        removeUserCaches(entity.getId());
+        removeUserCaches(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -142,7 +143,7 @@ public class UserDaoImpl implements UserDao {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(UserDO::getPriority, dataObject.getPriority()));
-        removeUserCaches(entity.getId());
+        removeUserCaches(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -181,7 +182,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getLastLoginDate, dataObject.getLastLoginDate())
                         .set(UserDO::getLastLoginIp, dataObject.getLastLoginIp())
                         .set(UserDO::getLoginCount, dataObject.getLoginCount()));
-        removeUserCaches(user.getId());
+        removeUserCaches(EntityIdCodec.toValue(user.getId()));
     }
 
     @Override
@@ -192,7 +193,7 @@ public class UserDaoImpl implements UserDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(UserDO::getLoginCount, 0));
-        removeUserCaches(user.getId());
+        removeUserCaches(EntityIdCodec.toValue(user.getId()));
         return count;
     }
 
@@ -200,7 +201,7 @@ public class UserDaoImpl implements UserDao {
     public void updateLoginPass(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
         mapper.update(null, buildIdUpdateWrapper(dataObject).set(UserDO::getLoginPass, dataObject.getLoginPass()));
-        removeUserCaches(user.getId());
+        removeUserCaches(EntityIdCodec.toValue(user.getId()));
     }
 
     @Override

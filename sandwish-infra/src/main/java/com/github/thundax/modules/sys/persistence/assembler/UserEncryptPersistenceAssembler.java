@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public final class UserEncryptPersistenceAssembler {
             return null;
         }
         UserEncryptDO dataObject = new UserEncryptDO();
-        dataObject.setUserId(entity.getId());
+        dataObject.setUserId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());
         dataObject.setMobile(entity.getMobile());
@@ -31,7 +32,7 @@ public final class UserEncryptPersistenceAssembler {
             return null;
         }
         UserEncrypt entity = new UserEncrypt();
-        entity.setId(dataObject.getUserId());
+        entity.setId(EntityIdCodec.toDomain(dataObject.getUserId()));
         entity.setLoginPass(dataObject.getLoginPass());
         entity.setEmail(dataObject.getEmail());
         entity.setMobile(dataObject.getMobile());

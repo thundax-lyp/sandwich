@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
@@ -72,7 +73,7 @@ public class SignatureServiceImplTest {
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
         service.update(signature);
 
-        assertEquals("s1", signature.getId());
+        assertEquals("s1", EntityIdCodec.toValue(signature.getId()));
         assertEquals(null, signature.getUpdateDate());
         assertEquals(null, signature.getCreateDate());
         assertSame(signature, dao.updatedEntity);

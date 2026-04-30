@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.HashSet;
@@ -41,8 +42,8 @@ public class DictCacheSupport {
     }
 
     public void putById(Dict dict) {
-        if (dict != null && StringUtils.isNotBlank(dict.getId())) {
-            String key = objectKey(dict.getId());
+        if (dict != null && StringUtils.isNotBlank(EntityIdCodec.toValue(dict.getId()))) {
+            String key = objectKey(EntityIdCodec.toValue(dict.getId()));
             cache.put(key, dict, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }

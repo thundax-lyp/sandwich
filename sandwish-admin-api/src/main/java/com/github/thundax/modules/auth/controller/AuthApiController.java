@@ -4,6 +4,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.api.AuthServiceApi;
@@ -115,7 +116,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
 
         authService.deleteLoginForm(request.getLoginToken());
 
-        AccessToken accessToken = authService.findByUserId(user.getId());
+        AccessToken accessToken = authService.findByUserId(EntityIdCodec.toValue(user.getId()));
         if (accessToken != null) {
             authService.deleteAccessToken(accessToken);
         }
@@ -125,7 +126,8 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
         userService.updateLoginInfo(user);
 
-        return authInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(user.getId()));
+        return authInterfaceAssembler.toAccessTokenResponse(
+                authService.createAccessToken(EntityIdCodec.toValue(user.getId())));
     }
 
     @Override

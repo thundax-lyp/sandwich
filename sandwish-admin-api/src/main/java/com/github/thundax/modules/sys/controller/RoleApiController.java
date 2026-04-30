@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.RoleServiceApi;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
@@ -104,10 +105,10 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         validateMenus(request.getMenuList());
 
         Role entity = roleInterfaceAssembler.toEntity(new Role(), request);
-        if (StringUtils.isNotEmpty(entity.getId())) {
-            Role bean = roleService.get(roleInterfaceAssembler.toEntityId(entity.getId()));
+        if (entity.getId() != null) {
+            Role bean = roleService.get(roleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
-                throw new InsertBeanExistException(Role.BEAN_NAME, entity.getId());
+                throw new InsertBeanExistException(Role.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
@@ -207,7 +208,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         return roleService.findRoleUser(bean).stream()
                 .map(user -> roleInterfaceAssembler.toUserResponse(
-                        UserServiceHolder.get(roleInterfaceAssembler.toEntityId(user.getId()))))
+                        UserServiceHolder.get(roleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(user.getId())))))
                 .collect(Collectors.toList());
     }
 
@@ -228,7 +229,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
     private User newUser(String id) {
         User user = new User();
-        user.setId(id);
+        user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 

@@ -32,13 +32,13 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     public UploadFile newEntity(String id) {
         UploadFile uploadFile = new UploadFile();
-        uploadFile.setId(id);
+        uploadFile.setId(EntityIdCodec.toDomain(id));
         return uploadFile;
     }
 
     @Override
     public UploadFile get(UploadFile entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(UploadFile entity) {
-        entity.setEntityId(EntityIdCodec.toDomain(dao.insert(entity)));
+        entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
     }
 
     @Override
@@ -97,7 +97,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UploadFile entity) {
-        return entity == null ? 0 : dao.delete(entity.getEntityId());
+        return entity == null ? 0 : dao.delete(entity.getId());
     }
 
     @Override
@@ -120,7 +120,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public UploadFile getContent(UploadFile uploadFile) {
-        return uploadFile == null ? null : dao.getContent(uploadFile.getEntityId());
+        return uploadFile == null ? null : dao.getContent(uploadFile.getId());
     }
 
     @Override

@@ -33,13 +33,13 @@ public class DictServiceImpl implements DictService {
     @Override
     public Dict newEntity(String id) {
         Dict dict = new Dict();
-        dict.setId(id);
+        dict.setId(EntityIdCodec.toDomain(id));
         return dict;
     }
 
     @Override
     public Dict get(Dict entity) {
-        return entity == null ? null : get(entity.getEntityId());
+        return entity == null ? null : get(entity.getId());
     }
 
     @Override
@@ -118,7 +118,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void add(Dict dict) {
-        dict.setEntityId(EntityIdCodec.toDomain(dao.insert(dict)));
+        dict.setId(EntityIdCodec.toDomain(dao.insert(dict)));
     }
 
     @Override
@@ -130,7 +130,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Dict dict) {
-        return dict == null ? 0 : dao.delete(dict.getEntityId());
+        return dict == null ? 0 : dao.delete(dict.getId());
     }
 
     @Override

@@ -40,7 +40,7 @@ public class SignatureInterfaceAssembler {
     }
 
     private static SignatureResponse baseEntityToResponse(SignatureResponse response, Signature entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());

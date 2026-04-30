@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.util.concurrent.TimeUnit;
@@ -31,8 +32,12 @@ public class StorageCacheSupport {
     }
 
     public void putById(Storage storage) {
-        if (storage != null && StringUtils.isNotBlank(storage.getId())) {
-            cache.put(objectKey(storage.getId()), storage, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toValue(storage.getId()))) {
+            cache.put(
+                    objectKey(EntityIdCodec.toValue(storage.getId())),
+                    storage,
+                    OBJECT_EXPIRE_SECONDS,
+                    TimeUnit.SECONDS);
         }
     }
 

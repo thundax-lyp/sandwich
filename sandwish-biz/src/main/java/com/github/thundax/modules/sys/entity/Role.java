@@ -27,7 +27,7 @@ public class Role extends BaseRole {
     }
 
     public Role toBean() {
-        return RoleServiceHolder.get(this.getEntityId());
+        return RoleServiceHolder.get(this.getId());
     }
 
     public boolean isAdmin() {
@@ -40,11 +40,11 @@ public class Role extends BaseRole {
 
     public List<String> getMenuIdList() {
         if (this.menuIdList == null) {
-            if (StringUtils.isBlank(EntityIdCodec.toValue(getEntityId()))) {
+            if (StringUtils.isBlank(EntityIdCodec.toValue(getId()))) {
                 this.menuIdList = new ArrayList<>();
             } else {
                 this.menuIdList = RoleServiceHolder.getService().findRoleMenu(this).stream()
-                        .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
+                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
             }
         }
@@ -65,7 +65,7 @@ public class Role extends BaseRole {
         this.menuIdList = menuList == null
                 ? new ArrayList<>()
                 : menuList.stream()
-                        .map(menu -> EntityIdCodec.toValue(menu.getEntityId()))
+                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
     }
 

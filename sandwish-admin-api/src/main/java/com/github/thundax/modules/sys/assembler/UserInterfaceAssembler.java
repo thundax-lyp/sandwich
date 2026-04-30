@@ -39,7 +39,8 @@ public class UserInterfaceAssembler {
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
-        response.setAvatar(UserApiController.getAvatarUrl(entity.getId(), UserAccessHolder.currentToken()));
+        response.setAvatar(
+                UserApiController.getAvatarUrl(EntityIdCodec.toValue(entity.getId()), UserAccessHolder.currentToken()));
 
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
@@ -68,7 +69,7 @@ public class UserInterfaceAssembler {
         }
 
         UserOfficeResponse response = new UserOfficeResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         if (StringUtils.isNotBlank(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -85,7 +86,7 @@ public class UserInterfaceAssembler {
         }
 
         UserRoleResponse response = new UserRoleResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
 
         return response;
@@ -120,7 +121,7 @@ public class UserInterfaceAssembler {
     }
 
     private static UserResponse baseEntityToResponse(UserResponse response, User entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
@@ -129,7 +130,7 @@ public class UserInterfaceAssembler {
     }
 
     private static User baseRequestToEntity(User entity, UserSaveRequest request) {
-        entity.setId(request.getId());
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }

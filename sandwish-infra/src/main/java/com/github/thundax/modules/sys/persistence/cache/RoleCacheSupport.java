@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.modules.sys.entity.Role;
 import java.util.HashSet;
@@ -44,8 +45,8 @@ public class RoleCacheSupport {
     }
 
     public void putById(Role role) {
-        if (role != null && StringUtils.isNotBlank(role.getId())) {
-            String key = objectKey(role.getId());
+        if (role != null && StringUtils.isNotBlank(EntityIdCodec.toValue(role.getId()))) {
+            String key = objectKey(EntityIdCodec.toValue(role.getId()));
             cache.put(key, role, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }

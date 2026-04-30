@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.User;
@@ -40,7 +41,7 @@ public class LogInterfaceAssembler {
         }
 
         LogUserResponse response = new LogUserResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(entity.getLoginName());
         response.setName(entity.getName());
         response.setOffice(toOfficeResponse(entity.getOffice()));
@@ -54,14 +55,14 @@ public class LogInterfaceAssembler {
         }
 
         LogOfficeResponse response = new LogOfficeResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setNamePath(entity.getNamePath());
         return response;
     }
 
     private static LogResponse baseEntityToResponse(LogResponse response, Log entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         return response;

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.storage.converter.StorageConverter;
@@ -71,8 +72,8 @@ public class StorageUtils {
                 extendName = ALLOW_CONTENT_TYPES.get(StringUtils.lowerCase(file.getContentType()));
             }
 
-            if (StringUtils.isBlank(storage.getId())) {
-                storage.setId(IdGen.uuid());
+            if (StringUtils.isBlank(EntityIdCodec.toValue(storage.getId()))) {
+                storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
                 storage.setCreateDate(new Date());
             }
 
@@ -103,8 +104,8 @@ public class StorageUtils {
                 storage.setMimeType(MimeTypeUtils.IMAGE_JPEG_VALUE);
             }
 
-            if (StringUtils.isBlank(storage.getId())) {
-                storage.setId(IdGen.uuid());
+            if (StringUtils.isBlank(EntityIdCodec.toValue(storage.getId()))) {
+                storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
                 storage.setCreateDate(new Date());
             }
 
@@ -161,7 +162,7 @@ public class StorageUtils {
         }
 
         StorageVo vo = new StorageVo();
-        vo.setId(entity.getId());
+        vo.setId(EntityIdCodec.toValue(entity.getId()));
         vo.setName(entity.getName() + "." + entity.getExtendName());
         vo.setMimeType(entity.getMimeType());
         vo.setUrl(getConverter().toPreviewUrl(entity));

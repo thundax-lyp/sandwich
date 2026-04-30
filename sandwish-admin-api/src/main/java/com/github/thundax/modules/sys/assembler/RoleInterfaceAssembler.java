@@ -54,7 +54,7 @@ public class RoleInterfaceAssembler {
         }
 
         RoleMenuResponse response = new RoleMenuResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         if (StringUtils.isNotBlank(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -70,7 +70,7 @@ public class RoleInterfaceAssembler {
         }
 
         RoleOfficeResponse response = new RoleOfficeResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setNamePath(entity.getNamePath());
         return response;
@@ -83,7 +83,7 @@ public class RoleInterfaceAssembler {
         }
 
         RoleUserResponse response = new RoleUserResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setLoginName(entity.getLoginName());
         response.setOffice(toOfficeResponse(entity.getOffice()));
@@ -104,7 +104,7 @@ public class RoleInterfaceAssembler {
     @NonNull
     public RoleUserTreeNodeResponse toUserTreeNode(String officeIdPrefix, User entity) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(officeIdPrefix + entity.getOfficeId());
         response.setName(entity.getName());
         response.setUser(toUserResponse(entity));
@@ -133,7 +133,7 @@ public class RoleInterfaceAssembler {
     }
 
     private static RoleResponse baseEntityToResponse(RoleResponse response, Role entity) {
-        response.setId(entity.getId());
+        response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
@@ -142,7 +142,7 @@ public class RoleInterfaceAssembler {
     }
 
     private static Role baseRequestToEntity(Role entity, RoleSaveRequest request) {
-        entity.setId(request.getId());
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }

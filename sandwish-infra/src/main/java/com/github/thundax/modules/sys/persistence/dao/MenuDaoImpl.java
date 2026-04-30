@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -110,7 +111,7 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public int update(Menu entity) {
-        MenuDO oldNode = getTreeNode(entity.getId());
+        MenuDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
@@ -138,7 +139,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MenuDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(entity.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -202,7 +203,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag()));
-        cacheSupport.removeById(menu.getId());
+        cacheSupport.removeById(EntityIdCodec.toValue(menu.getId()));
         return count;
     }
 

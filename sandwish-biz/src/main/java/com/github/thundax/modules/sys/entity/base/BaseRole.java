@@ -27,14 +27,6 @@ public abstract class BaseRole extends Entity<Role> implements Auditable, Signab
 
     protected void initialize() {}
 
-    public String getId() {
-        return EntityIdCodec.toValue(getEntityId());
-    }
-
-    public void setId(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
-    }
-
     public String getName() {
         return name;
     }
@@ -116,6 +108,6 @@ public abstract class BaseRole extends Entity<Role> implements Auditable, Signab
 
     @Override
     public String getSignId() {
-        return getId();
+        return EntityIdCodec.toValue(getId());
     }
 }

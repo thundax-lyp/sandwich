@@ -1,27 +1,18 @@
 package com.github.thundax.common.domain;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Objects;
 
 public abstract class Entity<T extends Entity<T>> {
 
     protected EntityId id;
 
-    public EntityId getEntityId() {
+    public EntityId getId() {
         return id;
     }
 
-    public void setEntityId(EntityId id) {
+    public void setId(EntityId id) {
         this.id = id;
-    }
-
-    public String getId() {
-        return EntityIdCodec.toValue(getEntityId());
-    }
-
-    public void setId(String id) {
-        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     @Override
@@ -32,14 +23,14 @@ public abstract class Entity<T extends Entity<T>> {
             return true;
         } else if (!getClass().equals(obj.getClass())) {
             return false;
-        } else if (this.getEntityId() == null) {
+        } else if (this.getId() == null) {
             return false;
         }
-        return this.getEntityId().equals(((Entity<?>) obj).getEntityId());
+        return this.getId().equals(((Entity<?>) obj).getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), getEntityId());
+        return Objects.hash(getClass(), getId());
     }
 }

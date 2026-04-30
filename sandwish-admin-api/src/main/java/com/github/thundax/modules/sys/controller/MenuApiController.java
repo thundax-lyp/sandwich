@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
@@ -78,10 +79,10 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
         validate(request);
 
         Menu entity = menuInterfaceAssembler.toEntity(new Menu(), request);
-        if (StringUtils.isNotEmpty(entity.getId())) {
-            Menu bean = menuService.get(menuInterfaceAssembler.toEntityId(entity.getId()));
+        if (entity.getId() != null) {
+            Menu bean = menuService.get(menuInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
-                throw new InsertBeanExistException(Menu.BEAN_NAME, entity.getId());
+                throw new InsertBeanExistException(Menu.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
@@ -155,7 +156,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
                 ? new HashSet<>()
                 : new HashSet<>(
                         excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
-        beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
+        beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
 
         removeTreeNode(
                 beanList,
@@ -163,7 +164,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
                     @Override
                     public String getId(Menu menu) {
-                        return menu.getId();
+                        return EntityIdCodec.toValue(menu.getId());
                     }
 
                     @Override

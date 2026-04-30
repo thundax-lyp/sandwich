@@ -1,15 +1,10 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class LoginForm implements Serializable {
 
     public static final int REFRESH_TOKEN_SIZE = 5;
@@ -38,7 +33,6 @@ public class LoginForm implements Serializable {
         this.captcha = NULL_CAPTCHA;
     }
 
-    @JsonIgnore
     public String getLoginToken() {
         return loginToken;
     }
@@ -79,7 +73,6 @@ public class LoginForm implements Serializable {
         this.mobileValidateCode = mobileValidateCode;
     }
 
-    @JsonIgnore
     public Integer getExpiredSeconds() {
         return expiredSeconds;
     }
@@ -96,7 +89,6 @@ public class LoginForm implements Serializable {
         this.checkCode = checkCode;
     }
 
-    @JsonIgnore
     public boolean isNullCaptcha() {
         return isNullCaptcha(captcha);
     }

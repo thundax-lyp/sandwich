@@ -1,5 +1,6 @@
 package com.github.thundax.modules.member.security;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
@@ -34,7 +35,7 @@ public class MemberSpringAuthenticationProvider implements AuthenticationProvide
         String username = String.valueOf(authentication.getPrincipal());
         String password = String.valueOf(authentication.getCredentials());
 
-        Member member = memberService.get(username);
+        Member member = memberService.get(EntityIdCodec.toDomain(username));
         if (member == null) {
             throw new BadCredentialsException("用户名或密码错误。");
         }

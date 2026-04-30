@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,13 +23,9 @@ public class DomainEntityArchitectureTest {
     private static final Pattern JACKSON_REFERENCE_PATTERN =
             Pattern.compile("com\\.fasterxml\\.jackson\\.annotation\\.|@Json[A-Za-z0-9_]*\\b");
 
-    private static final Set<String> LEGACY_OLD_ENTITY_BASE_SOURCES = new LinkedHashSet<>(
-            Arrays.asList("sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/base/BaseMember.java"));
+    private static final Set<String> LEGACY_OLD_ENTITY_BASE_SOURCES = new LinkedHashSet<>();
 
-    private static final Set<String> LEGACY_JACKSON_ENTITY_SOURCES = new LinkedHashSet<>(Arrays.asList(
-            "sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AccessToken.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/LoginForm.java",
-            "sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java"));
+    private static final Set<String> LEGACY_JACKSON_ENTITY_SOURCES = new LinkedHashSet<>();
 
     @Test
     public void shouldNotIntroduceOldEntityBaseDependencyInDomainEntities() throws IOException {

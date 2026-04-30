@@ -1,7 +1,5 @@
 package com.github.thundax.modules.member.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.member.entity.base.BaseMember;
 import java.io.Serializable;
@@ -34,14 +32,12 @@ public class Member extends BaseMember {
         return StringUtils.equals(Global.ENABLE, getEnableFlag());
     }
 
-    @JsonIgnore
     public boolean isMale() {
         return MALE.equals(getGender());
     }
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }
@@ -111,7 +107,6 @@ public class Member extends BaseMember {
             this.remarks = remarks;
         }
 
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         public Date getBeginRegisterDate() {
             return beginRegisterDate;
         }
@@ -123,7 +118,6 @@ public class Member extends BaseMember {
             this.beginRegisterDate = beginRegisterDate;
         }
 
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         public Date getEndRegisterDate() {
             return endRegisterDate;
         }
@@ -135,7 +129,6 @@ public class Member extends BaseMember {
             this.endRegisterDate = endRegisterDate;
         }
 
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         public Date getBeginLoginDate() {
             return beginLoginDate;
         }
@@ -147,7 +140,6 @@ public class Member extends BaseMember {
             this.beginLoginDate = beginLoginDate;
         }
 
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         public Date getEndLoginDate() {
             return endLoginDate;
         }

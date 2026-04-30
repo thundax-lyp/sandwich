@@ -13,19 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `member-auth`：迁移会员与认证实体边界
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/base/BaseMember.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AccessToken.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/LoginForm.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/assembler/MemberLoginInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthPersistenceAssembler.java`
-  - 处理动作：下沉会员实体字段，清理认证对象中的 Controller 层 JSON 注解。
-  - 验收点：`Member` 不再继承 `AdminDataEntity`；`Member`、`AccessToken`、`LoginForm` 不再 import `com.fasterxml.jackson.annotation..`；JSON 日期格式移动到 API 模型。
-  - 重要度：8/10
-
 - [ ] `legacy-entity-base`：删除旧实体继承链
   - 范围文件：
     - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/BaseEntity.java`

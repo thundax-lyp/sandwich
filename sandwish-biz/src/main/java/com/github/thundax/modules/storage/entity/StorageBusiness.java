@@ -9,15 +9,6 @@ public class StorageBusiness extends BaseStorageBusiness {
 
     public static final String BEAN_NAME = "ResourceBusiness";
 
-    public StorageBusiness() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        this.setPublicFlag(Global.NO);
-    }
-
     @Override
     public void setPublicFlag(String publicFlag) {
         super.setPublicFlag(StringUtils.equals(Global.YES, publicFlag) ? Global.YES : Global.NO);

@@ -2,7 +2,9 @@ package com.github.thundax.modules.assist.entity.base;
 
 import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -10,6 +12,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseSignature {
     private EntityId id;
 
@@ -24,8 +28,6 @@ public abstract class BaseSignature {
     private String remarks;
     private Date createDate;
     private Date updateDate;
-
-    public BaseSignature() {}
 
     public void setPriority(int priority) {
         this.priority = priority >= 0 ? priority : 0;

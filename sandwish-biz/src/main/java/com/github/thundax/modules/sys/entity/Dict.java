@@ -4,11 +4,6 @@ import com.github.thundax.modules.sys.entity.base.BaseDict;
 import java.io.Serializable;
 
 public class Dict extends BaseDict {
-
-    public Dict() {
-        super();
-    }
-
     private Query query;
 
     public Query getQuery() {

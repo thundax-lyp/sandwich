@@ -18,10 +18,6 @@ public class Log extends BaseLog {
     public static final String TYPE_EXCEPTION = "2";
     private boolean signable = false;
 
-    public Log() {
-        super();
-    }
-
     public User getUser() {
         return UserServiceHolder.get(EntityIdCodec.toDomain(this.getUserId()));
     }

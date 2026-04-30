@@ -22,10 +22,6 @@ public class Role extends BaseRole {
 
     private List<String> menuIdList;
 
-    public Role() {
-        super();
-    }
-
     public Role toBean() {
         return RoleServiceHolder.get(this.getId());
     }

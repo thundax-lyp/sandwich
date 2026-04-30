@@ -3,9 +3,6 @@ package com.github.thundax.modules.sys.entity;
 import com.github.thundax.modules.sys.entity.base.BaseUploadFile;
 
 public class UploadFile extends BaseUploadFile {
-
-    public UploadFile() {}
-
     private static final String IMG_EXT = "png,jpg,jpeg";
 
     public boolean isImage() {

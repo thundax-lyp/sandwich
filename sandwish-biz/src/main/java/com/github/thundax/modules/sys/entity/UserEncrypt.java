@@ -8,13 +8,4 @@ import com.github.thundax.modules.sys.entity.base.BaseUserEncrypt;
 public class UserEncrypt extends BaseUserEncrypt {
 
     public static final String BEAN_NAME = "UserEncrypt";
-
-    public UserEncrypt() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-    }
 }

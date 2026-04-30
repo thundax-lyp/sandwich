@@ -1,16 +1,21 @@
 package com.github.thundax.modules.sys.entity.base;
 
+import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseMenu implements Auditable, Signable, Sortable {
     private EntityId id;
 
@@ -21,7 +26,7 @@ public abstract class BaseMenu implements Auditable, Signable, Sortable {
     private String name;
     private String perms;
     private Integer ranks;
-    private String displayFlag;
+    private String displayFlag = Global.SHOW;
     private String displayParams;
     private String url;
     private String target;
@@ -31,12 +36,6 @@ public abstract class BaseMenu implements Auditable, Signable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    public BaseMenu() {
-        initialize();
-    }
-
-    protected void initialize() {}
 
     @Override
     public void setPriority(int priority) {

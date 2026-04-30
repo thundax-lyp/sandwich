@@ -6,18 +6,17 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseRole implements Auditable, Signable, Sortable {
     private EntityId id;
-
-    public BaseRole() {
-        initialize();
-    }
-
     private String name;
     private String adminFlag;
     private String enableFlag;
@@ -27,8 +26,6 @@ public abstract class BaseRole implements Auditable, Signable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    protected void initialize() {}
 
     @Override
     public void setPriority(int priority) {

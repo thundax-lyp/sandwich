@@ -2,11 +2,15 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseUploadFile {
     private EntityId id;
 
@@ -17,6 +21,4 @@ public class BaseUploadFile {
     private String path;
     private byte[] content;
     private Date createDate;
-
-    public BaseUploadFile() {}
 }

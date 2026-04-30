@@ -23,16 +23,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     public static final String PERM_ADMIN = "admin";
     public static final String PERM_SUPER = "super";
 
-    public Menu() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        this.setDisplayFlag(Global.SHOW);
-    }
-
     public Menu toBean() {
         return MenuServiceHolder.get(getId());
     }

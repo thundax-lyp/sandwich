@@ -17,16 +17,6 @@ public class Storage extends BaseStorage {
     public static final String OWNER_TYPE_USER = "user";
     public static final String OWNER_TYPE_MEMBER = "member";
 
-    public Storage() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        this.setEnableFlag(Global.ENABLE);
-    }
-
     @Override
     public void setEnableFlag(String enableFlag) {
         super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);

@@ -8,28 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public class AsyncTask extends BaseAsyncTask {
-
-    public static final int DEFAULT_EXPIRED_SECONDS = 1800;
-
-    public static final String STATUS_IDLE = "idle";
-
-    public static final String STATUS_ACTIVE = "active";
-    public static final String STATUS_SUSPENDED = "suspended";
-    public static final String STATUS_SUCCESS = "success";
-    public static final String STATUS_ERROR = "error";
-
-    public AsyncTask() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        this.setStatus(STATUS_IDLE);
-        this.setPrivate(false);
-        this.setExpiredSeconds(DEFAULT_EXPIRED_SECONDS);
-    }
-
     @Override
     @NonNull
     public Integer getExpiredSeconds() {

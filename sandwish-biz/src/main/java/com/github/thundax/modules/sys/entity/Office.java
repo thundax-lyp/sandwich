@@ -12,10 +12,6 @@ public class Office extends BaseOffice {
 
     public static final String BEAN_NAME = "Office";
 
-    public Office() {
-        super();
-    }
-
     public Office toBean() {
         return OfficeServiceHolder.get(this.getId());
     }

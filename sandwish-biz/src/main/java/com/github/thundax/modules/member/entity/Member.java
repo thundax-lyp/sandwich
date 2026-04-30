@@ -15,10 +15,6 @@ public class Member extends BaseMember {
     public static final String MALE = "1";
     public static final String FEMALE = "0";
 
-    public Member() {
-        super();
-    }
-
     @Override
     public void setEnableFlag(String enableFlag) {
         super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);

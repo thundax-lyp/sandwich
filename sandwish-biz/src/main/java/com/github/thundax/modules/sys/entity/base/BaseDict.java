@@ -4,18 +4,17 @@ import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseDict implements Auditable, Sortable {
     private EntityId id;
-
-    public BaseDict() {
-        initialize();
-    }
-
     private String type;
     private String label;
     private String value;
@@ -25,8 +24,6 @@ public abstract class BaseDict implements Auditable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    protected void initialize() {}
 
     @Override
     public void setPriority(int priority) {

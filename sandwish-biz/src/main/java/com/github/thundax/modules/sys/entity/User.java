@@ -26,20 +26,6 @@ public class User extends BaseUser {
 
     private List<String> roleIdList;
 
-    public User() {
-        super();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        this.setLoginCount(0);
-        this.setRanks(0);
-        this.setSuperFlag(Global.NO);
-        this.setAdminFlag(Global.NO);
-    }
-
     @Override
     @NonNull
     public Integer getRanks() {

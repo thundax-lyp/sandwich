@@ -1,15 +1,19 @@
 package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.entity.User;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
-public abstract class BaseUser extends Entity<User> implements Auditable, Signable, Sortable {
+public abstract class BaseUser implements Auditable, Signable, Sortable {
+    @Getter
+    @Setter
+    private EntityId id;
 
     private String officeId;
 

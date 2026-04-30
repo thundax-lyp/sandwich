@@ -1,11 +1,15 @@
 package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Entity;
-import com.github.thundax.modules.sys.entity.UserEncrypt;
+import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class BaseUserEncrypt extends Entity<UserEncrypt> implements Auditable {
+public abstract class BaseUserEncrypt implements Auditable {
+    @Getter
+    @Setter
+    private EntityId id;
 
     private String loginPass;
     private String email;

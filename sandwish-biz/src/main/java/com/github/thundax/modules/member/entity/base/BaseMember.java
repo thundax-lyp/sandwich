@@ -1,13 +1,17 @@
 package com.github.thundax.modules.member.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
-public class BaseMember extends Entity<Member> implements Auditable, Sortable {
+public class BaseMember implements Auditable, Sortable {
+    @Getter
+    @Setter
+    private EntityId id;
 
     private String loginName;
     private String loginPass;

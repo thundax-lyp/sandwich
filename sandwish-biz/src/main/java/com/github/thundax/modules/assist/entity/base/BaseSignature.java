@@ -1,13 +1,18 @@
 package com.github.thundax.modules.assist.entity.base;
 
-import com.github.thundax.common.domain.Entity;
-import com.github.thundax.modules.assist.entity.Signature;
+import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 签名存储基类
  */
-public abstract class BaseSignature extends Entity<Signature> {
+public abstract class BaseSignature {
+
+    @Getter
+    @Setter
+    private EntityId id;
 
     private String businessType;
 

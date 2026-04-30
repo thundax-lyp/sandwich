@@ -1,13 +1,17 @@
 package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.common.id.EntityId;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
-public abstract class BaseOffice extends Entity<Office> implements Auditable, Sortable {
+public abstract class BaseOffice implements Auditable, Sortable {
+    @Getter
+    @Setter
+    private EntityId id;
 
     public static final String ROOT_ID = "ROOT";
 

@@ -1,9 +1,14 @@
 package com.github.thundax.modules.storage.entity.base;
 
-import com.github.thundax.common.domain.Entity;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.common.id.EntityId;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class BaseStorageBusiness extends Entity<StorageBusiness> {
+public abstract class BaseStorageBusiness {
+
+    @Getter
+    @Setter
+    private EntityId id;
 
     private String businessId;
     private String businessType;

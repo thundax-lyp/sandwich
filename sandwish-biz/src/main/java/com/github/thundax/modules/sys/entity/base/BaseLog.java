@@ -1,12 +1,16 @@
 package com.github.thundax.modules.sys.entity.base;
 
-import com.github.thundax.common.domain.Entity;
 import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class BaseLog extends Entity<Log> implements Signable {
+public abstract class BaseLog implements Signable {
+    @Getter
+    @Setter
+    private EntityId id;
 
     public BaseLog() {}
 

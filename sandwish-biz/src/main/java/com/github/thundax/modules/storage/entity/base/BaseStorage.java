@@ -1,13 +1,13 @@
 package com.github.thundax.modules.storage.entity.base;
 
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.domain.Sorted;
+import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.util.Date;
 import org.springframework.lang.NonNull;
 
-public abstract class BaseStorage extends Entity<Storage> implements Sorted {
+public abstract class BaseStorage extends Entity<Storage> implements Sortable {
 
     public BaseStorage() {
         initialize();

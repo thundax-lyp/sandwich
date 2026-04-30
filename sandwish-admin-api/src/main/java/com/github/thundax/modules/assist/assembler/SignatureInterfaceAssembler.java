@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.assembler;
 
+import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;

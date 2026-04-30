@@ -1,4 +1,4 @@
-package com.github.thundax.common.persistence;
+package com.github.thundax.common.domain;
 
 /**
  * 接口：签名对象

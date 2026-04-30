@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.controller;
 
+import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.api.SignatureServiceApi;

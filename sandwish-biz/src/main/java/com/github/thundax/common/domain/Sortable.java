@@ -1,6 +1,6 @@
 package com.github.thundax.common.domain;
 
-public interface Sorted {
+public interface Sortable {
 
     Integer getPriority();
 

@@ -2,13 +2,13 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.domain.Sorted;
+import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.Date;
 import org.springframework.lang.NonNull;
 
-public abstract class BaseDict extends Entity<Dict> implements Auditable, Sorted {
+public abstract class BaseDict extends Entity<Dict> implements Auditable, Sortable {
 
     public BaseDict() {
         initialize();

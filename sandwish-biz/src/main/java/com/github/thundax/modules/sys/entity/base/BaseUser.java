@@ -2,14 +2,14 @@ package com.github.thundax.modules.sys.entity.base;
 
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Entity;
-import com.github.thundax.common.domain.Sorted;
+import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Date;
 import org.springframework.lang.NonNull;
 
-public abstract class BaseUser extends Entity<User> implements Auditable, Signable, Sorted {
+public abstract class BaseUser extends Entity<User> implements Auditable, Signable, Sortable {
 
     private String officeId;
 

@@ -13,14 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `biz-domain`：建立领域能力接口
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/common/domain/Auditable.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/common/domain/Prioritized.java`
-  - 处理动作：新增 `Auditable`、`Prioritized`，只表达领域能力契约。
-  - 验收点：两个类型均为 interface，不继承 `Entity`，不依赖 Jackson、MyBatis、Spring Web 或当前登录态。
-  - 重要度：10/10
-
 - [ ] `biz-architecture`：建立领域实体架构门禁
   - 范围文件：
     - `sandwish-biz/src/test/java/com/github/thundax/architecture/DomainEntityArchitectureTest.java`

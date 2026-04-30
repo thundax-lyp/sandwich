@@ -107,9 +107,9 @@ rg "com\\.fasterxml\\.jackson|@Json" -n sandwish-biz/src/main/java
 - 没有排序业务含义：不迁移到业务 `Entity`
 - API 仍需展示排序值：由对应 `Response` 承接
 
-允许定义排序能力接口，但它只能表达业务排序能力，不得变成新的排序字段父类。
+允许定义 `Sorted` 排序能力接口，但它只能表达业务排序能力，不得变成新的排序字段父类。
 
-排序能力接口固定满足以下规则：
+`Sorted` 固定满足以下规则：
 
 - 只能是 interface
 - 归属 `sandwish-biz`
@@ -118,12 +118,12 @@ rg "com\\.fasterxml\\.jackson|@Json" -n sandwish-biz/src/main/java
 - 不依赖 Jackson、MyBatis 或 Spring Web
 - 不替代具体业务对象对排序语义的命名和校验
 
-允许进入排序能力接口的方法固定为业务排序视角：
+允许进入 `Sorted` 的方法固定为业务排序视角：
 
 - `getPriority`
 - `setPriority`
 
-不得把排序能力接口用于以下场景：
+不得把 `Sorted` 用于以下场景：
 
 - 只是为了让所有业务实体都有 `priority`
 - 只是为了复用 `DataEntity` 的旧字段结构
@@ -271,7 +271,7 @@ rg "com\\.fasterxml\\.jackson|@Json" -n sandwish-biz/src/main/java
 - `sandwish-front-api/src/main/java/com/github/thundax/modules/*/{request,response,vo,assembler}/**/*.java`
 - `sandwish-infra/src/main/java/com/github/thundax/modules/*/persistence/{dataobject,assembler}/**/*.java`
 - `sandwish-biz/src/main/java/com/github/thundax/common/**/Auditable.java`
-- `sandwish-biz/src/main/java/com/github/thundax/common/**/Prioritized.java`
+- `sandwish-biz/src/main/java/com/github/thundax/common/**/Sorted.java`
 - 对应架构测试
 
 通常不应修改：
@@ -285,7 +285,7 @@ rg "com\\.fasterxml\\.jackson|@Json" -n sandwish-biz/src/main/java
 
 - 删除 `DataEntity` 后新增另一个等价的通用业务父类
 - 把 `Auditable` 做成带字段的抽象类
-- 把排序能力接口做成带字段的抽象类
+- 把 `Sorted` 做成带字段的抽象类
 - 把 `createDate`、`updateDate` 机械搬进所有业务 `Entity`
 - 为了保留 JSON 输出效果，在 domain 中继续使用 Jackson 注解
 - 让 `Response` 继承业务 `Entity`

@@ -1,8 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -17,8 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Menu extends BaseMenu implements Comparable<Menu> {
 
     public static final String BEAN_NAME = "Menu";
@@ -51,7 +46,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         super.setParentId(StringUtils.isBlank(parentId) ? null : parentId);
     }
 
-    @JsonIgnore
     public Menu getParent() {
         return MenuServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
     }
@@ -60,7 +54,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getEntityId()));
     }
 
-    @JsonIgnore
     public Set<String> getAllPerms() {
         Set<String> allPerms = Sets.newHashSet();
         if (StringUtils.isNotBlank(this.getPerms())) {
@@ -73,7 +66,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return allPerms;
     }
 
-    @JsonIgnore
     public boolean isDisplay() {
         return Global.SHOW.equals(this.getDisplayFlag());
     }
@@ -86,7 +78,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return map.get(paramName);
     }
 
-    @JsonIgnore
     public Map<String, Object> getDisplayParamMap() {
         String displayParams = this.getDisplayParams();
         if (StringUtils.isEmpty(displayParams)) {
@@ -122,13 +113,11 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
     }
 
     @Override
-    @JsonIgnore
     public String getSignName() {
         return BEAN_NAME;
     }
 
     @Override
-    @JsonIgnore
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("name", this.getName());
@@ -144,7 +133,6 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

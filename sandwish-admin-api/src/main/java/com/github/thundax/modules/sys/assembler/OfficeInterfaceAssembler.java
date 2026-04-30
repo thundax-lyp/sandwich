@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
@@ -64,7 +63,7 @@ public class OfficeInterfaceAssembler {
         return entity;
     }
 
-    private static OfficeResponse baseEntityToResponse(OfficeResponse response, DataEntity entity) {
+    private static OfficeResponse baseEntityToResponse(OfficeResponse response, Office entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
@@ -73,7 +72,7 @@ public class OfficeInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, OfficeSaveRequest request) {
+    private static Office baseRequestToEntity(Office entity, OfficeSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

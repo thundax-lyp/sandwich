@@ -1,8 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.base.BaseOffice;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
@@ -11,8 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Office extends BaseOffice {
 
     public static final String BEAN_NAME = "Office";
@@ -25,12 +20,10 @@ public class Office extends BaseOffice {
         super(id);
     }
 
-    @JsonIgnore
     public Office toBean() {
         return OfficeServiceHolder.get(this.getEntityId());
     }
 
-    @JsonIgnore
     public Office getParent() {
         return OfficeServiceHolder.get(EntityIdCodec.toDomain(this.getParentId()));
     }
@@ -44,7 +37,6 @@ public class Office extends BaseOffice {
      *
      * @return /一级部门/二级部门/....
      */
-    @JsonIgnore
     public String getNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
@@ -63,7 +55,6 @@ public class Office extends BaseOffice {
      *
      * @return 显示名称
      */
-    @JsonIgnore
     public String getDisplayName() {
         if (StringUtils.isNotBlank(this.getShortName())) {
             return this.getShortName();
@@ -76,7 +67,6 @@ public class Office extends BaseOffice {
      *
      * @return 路径
      */
-    @JsonIgnore
     public String getDisplayNamePath() {
         List<String> nameList = Lists.newArrayList();
         Office node = this;
@@ -92,7 +82,6 @@ public class Office extends BaseOffice {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

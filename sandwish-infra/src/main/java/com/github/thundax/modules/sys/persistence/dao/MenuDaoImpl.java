@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -27,6 +26,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
+    private static final String ROOT_ID = "ROOT";
 
     private final MenuMapper mapper;
     private final MenuRoleMapper menuRoleMapper;
@@ -215,7 +215,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private Integer allocateInsertPosition(MenuDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), ROOT_ID)) {
             MenuDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -241,7 +241,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     private Integer getInsertPosition(String parentId) {
-        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, ROOT_ID)) {
             MenuDO parent = getTreeNode(parentId);
             return parent.getRgt();
         }
@@ -298,7 +298,7 @@ public class MenuDaoImpl implements MenuDao {
         LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (parentId != null) {
-            if (StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
+            if (StringUtils.equals(parentId, ROOT_ID)) {
                 wrapper.isNull(MenuDO::getParentId);
             } else {
                 wrapper.eq(MenuDO::getParentId, parentId);
@@ -316,8 +316,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private static void normalizeParentId(MenuDO node) {
         if (node != null
-                && (StringUtils.isBlank(node.getParentId())
-                        || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
+                && (StringUtils.isBlank(node.getParentId()) || StringUtils.equals(node.getParentId(), ROOT_ID))) {
             node.setParentId(null);
         }
     }

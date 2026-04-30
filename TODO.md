@@ -13,28 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-tree`：迁移菜单和机构树实体
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseMenu.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseOffice.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Menu.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Office.java`
-  - 处理动作：下沉菜单、机构树字段，移除 `AdminTreeEntity` 和 Jackson 注解依赖。
-  - 验收点：`Menu`、`Office` 不再继承 `AdminTreeEntity`，不再 import `com.fasterxml.jackson.annotation..`，树输出形态不在业务实体父类中。
-  - 重要度：10/10
-
-- [ ] `sys-tree-assembler`：同步菜单和机构装配
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/MenuInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/OfficeInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/MenuPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/OfficePersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/MenuDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/OfficeDaoImpl.java`
-  - 处理动作：显式转换菜单、机构字段，并移除 infra 对 `TreeEntity` 的引用。
-  - 验收点：API assembler 不再 import `DataEntity`；`MenuDaoImpl`、`OfficeDaoImpl` 不再 import `TreeEntity`。
-  - 重要度：10/10
-
 - [ ] `admin-base-controller`：清理入口层旧通用拷贝方法
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/common/web/BaseApiController.java`

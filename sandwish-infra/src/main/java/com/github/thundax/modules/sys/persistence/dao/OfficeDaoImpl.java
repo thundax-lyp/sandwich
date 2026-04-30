@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.persistence.TreeEntity;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
@@ -25,6 +24,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
+    private static final String ROOT_ID = "ROOT";
 
     private final OfficeMapper mapper;
     private final OfficeCacheSupport cacheSupport;
@@ -191,7 +191,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     private Integer allocateInsertPosition(OfficeDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), ROOT_ID)) {
             OfficeDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -217,7 +217,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     private Integer getInsertPosition(String parentId) {
-        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
+        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, ROOT_ID)) {
             OfficeDO parent = getTreeNode(parentId);
             return parent.getRgt();
         }
@@ -274,7 +274,7 @@ public class OfficeDaoImpl implements OfficeDao {
         LambdaQueryWrapper<OfficeDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(parentId)) {
-            if (StringUtils.equals(parentId, TreeEntity.ROOT_ID)) {
+            if (StringUtils.equals(parentId, ROOT_ID)) {
                 wrapper.isNull(OfficeDO::getParentId);
             } else {
                 wrapper.eq(OfficeDO::getParentId, parentId);
@@ -292,8 +292,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     private static void normalizeParentId(OfficeDO node) {
         if (node != null
-                && (StringUtils.isBlank(node.getParentId())
-                        || StringUtils.equals(node.getParentId(), TreeEntity.ROOT_ID))) {
+                && (StringUtils.isBlank(node.getParentId()) || StringUtils.equals(node.getParentId(), ROOT_ID))) {
             node.setParentId(null);
         }
     }

@@ -10,6 +10,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Arrays;
 import java.util.List;
@@ -22,13 +23,13 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         Role role = new Role();
         Role.Query query = new Role.Query();
-        query.setEnableFlag("1");
+        query.setStatus(RoleStatus.ENABLED);
         role.setQuery(query);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
         service.findList(role);
 
-        assertEquals("1", dao.enableFlag);
+        assertEquals("ENABLED", dao.enableFlag);
     }
 
     @Test

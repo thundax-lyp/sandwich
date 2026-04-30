@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -8,6 +7,8 @@ import com.github.thundax.modules.sys.controller.UserApiController;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserPrivilege;
+import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.request.UserSaveRequest;
 import com.github.thundax.modules.sys.response.UserOfficeResponse;
 import com.github.thundax.modules.sys.response.UserResponse;
@@ -107,8 +108,8 @@ public class UserInterfaceAssembler {
         entity.setEmail(request.getEmail());
         entity.setMobile(request.getMobile());
 
-        entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL);
+        entity.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
 
         entity.setRoleIdList(
                 request.getRoleList() == null

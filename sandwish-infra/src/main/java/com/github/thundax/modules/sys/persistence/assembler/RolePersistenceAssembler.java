@@ -1,7 +1,10 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RolePrivilege;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
@@ -20,8 +23,8 @@ public final class RolePersistenceAssembler {
         RoleDO dataObject = new RoleDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
-        dataObject.setAdminFlag(entity.getAdminFlag());
-        dataObject.setEnableFlag(entity.getEnableFlag());
+        dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
+        dataObject.setEnableFlag(statusValue(entity.getStatus()));
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -38,8 +41,8 @@ public final class RolePersistenceAssembler {
         Role entity = new Role();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
-        entity.setAdminFlag(dataObject.getAdminFlag());
-        entity.setEnableFlag(dataObject.getEnableFlag());
+        entity.setPrivilege(privilegeFrom(dataObject.getAdminFlag()));
+        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -94,5 +97,21 @@ public final class RolePersistenceAssembler {
 
     private static int priorityOrDefault(Integer priority) {
         return priority == null ? 0 : priority;
+    }
+
+    private static String adminFlag(RolePrivilege privilege) {
+        return RolePrivilege.ADMIN == privilege ? Global.YES : Global.NO;
+    }
+
+    private static RolePrivilege privilegeFrom(String adminFlag) {
+        return Global.YES.equals(adminFlag) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL;
+    }
+
+    private static String statusValue(RoleStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private static RoleStatus statusFrom(String status) {
+        return status == null ? null : RoleStatus.from(status);
     }
 }

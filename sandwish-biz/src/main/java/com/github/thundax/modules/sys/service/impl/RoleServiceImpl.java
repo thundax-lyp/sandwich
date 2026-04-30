@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
@@ -11,6 +10,7 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.RoleService;
 import java.util.Collection;
@@ -71,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> findList(Role role) {
         Role.Query query = role == null ? null : role.getQuery();
-        return dao.findList(query == null ? null : query.getEnableFlag());
+        return dao.findList(query == null ? null : statusValue(query.getStatus()));
     }
 
     @Override
@@ -85,7 +85,9 @@ public class RoleServiceImpl implements RoleService {
         Page<Role> normalizedPage = normalizePage(page);
         Role.Query query = role == null ? null : role.getQuery();
         IPage<Role> dataPage = dao.findPage(
-                query == null ? null : query.getEnableFlag(), normalizedPage.getPageNo(), normalizedPage.getPageSize());
+                query == null ? null : statusValue(query.getStatus()),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -103,7 +105,7 @@ public class RoleServiceImpl implements RoleService {
     public List<Role> findValidList() {
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
-        queryCondition.setEnableFlag(Global.ENABLE);
+        queryCondition.setStatus(RoleStatus.ENABLED);
         query.setQuery(queryCondition);
         return this.findList(query);
     }
@@ -225,6 +227,10 @@ public class RoleServiceImpl implements RoleService {
     public interface CacheChangedListener {
 
         void onRoleCacheChanged();
+    }
+
+    private String statusValue(RoleStatus status) {
+        return status == null ? null : status.value();
     }
 
     @Override

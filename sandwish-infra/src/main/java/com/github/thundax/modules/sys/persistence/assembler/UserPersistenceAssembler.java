@@ -1,8 +1,11 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
+import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserPrivilege;
+import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import java.util.ArrayList;
@@ -31,9 +34,9 @@ public final class UserPersistenceAssembler {
         dataObject.setLastLoginDate(entity.getLastLoginDate());
         dataObject.setLastLoginIp(entity.getLastLoginIp());
         dataObject.setLoginCount(entity.getLoginCount());
-        dataObject.setSuperFlag(entity.getSuperFlag());
-        dataObject.setAdminFlag(entity.getAdminFlag());
-        dataObject.setEnableFlag(entity.getEnableFlag());
+        dataObject.setSuperFlag(superFlag(entity.getPrivilege()));
+        dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
+        dataObject.setEnableFlag(statusValue(entity.getStatus()));
         dataObject.setSsoLoginName(entity.getSsoLoginName());
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
@@ -63,9 +66,8 @@ public final class UserPersistenceAssembler {
         entity.setLastLoginDate(dataObject.getLastLoginDate());
         entity.setLastLoginIp(dataObject.getLastLoginIp());
         entity.setLoginCount(dataObject.getLoginCount());
-        entity.setSuperFlag(dataObject.getSuperFlag());
-        entity.setAdminFlag(dataObject.getAdminFlag());
-        entity.setEnableFlag(dataObject.getEnableFlag());
+        entity.setPrivilege(privilegeFrom(dataObject.getSuperFlag(), dataObject.getAdminFlag()));
+        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
         entity.setSsoLoginName(dataObject.getSsoLoginName());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
@@ -106,5 +108,28 @@ public final class UserPersistenceAssembler {
 
     private static int priorityOrDefault(Integer priority) {
         return priority == null ? 0 : priority;
+    }
+
+    private static String superFlag(UserPrivilege privilege) {
+        return UserPrivilege.SUPER == privilege ? Global.YES : Global.NO;
+    }
+
+    private static String adminFlag(UserPrivilege privilege) {
+        return UserPrivilege.ADMIN == privilege ? Global.YES : Global.NO;
+    }
+
+    private static UserPrivilege privilegeFrom(String superFlag, String adminFlag) {
+        if (Global.YES.equals(superFlag)) {
+            return UserPrivilege.SUPER;
+        }
+        return Global.YES.equals(adminFlag) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL;
+    }
+
+    private static String statusValue(UserStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private static UserStatus statusFrom(String status) {
+        return status == null ? null : UserStatus.from(status);
     }
 }

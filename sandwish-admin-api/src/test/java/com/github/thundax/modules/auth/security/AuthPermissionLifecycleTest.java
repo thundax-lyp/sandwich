@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.security;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
@@ -21,6 +20,8 @@ import com.github.thundax.modules.auth.testsupport.InMemoryLoginLockDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserPrivilege;
+import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
@@ -248,9 +249,8 @@ public class AuthPermissionLifecycleTest {
             user.setId(EntityIdCodec.toDomain("u1"));
             user.setLoginName("tester");
             user.setLoginPass("secret");
-            user.setEnableFlag(Global.YES);
-            user.setAdminFlag(Global.YES);
-            user.setSuperFlag(Global.YES);
+            user.setStatus(UserStatus.ENABLED);
+            user.setPrivilege(UserPrivilege.SUPER);
             user.setRanks(0);
             return user;
         }

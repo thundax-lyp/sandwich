@@ -1,11 +1,12 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RolePrivilege;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.RoleSaveRequest;
 import com.github.thundax.modules.sys.response.RoleMenuResponse;
@@ -116,8 +117,8 @@ public class RoleInterfaceAssembler {
         baseRequestToEntity(entity, request);
 
         entity.setName(request.getName());
-        entity.setAdminFlag(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO);
-        entity.setEnableFlag(Boolean.TRUE.equals(request.getEnable()) ? Global.ENABLE : Global.DISABLE);
+        entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
+        entity.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
         entity.setMenuIdList(
                 request.getMenuList() == null
                         ? new ArrayList<>()

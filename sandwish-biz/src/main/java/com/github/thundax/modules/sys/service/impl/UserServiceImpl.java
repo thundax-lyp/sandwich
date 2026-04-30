@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
@@ -9,6 +10,8 @@ import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
+import com.github.thundax.modules.sys.entity.UserPrivilege;
+import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.Collection;
@@ -69,8 +72,8 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : query.getOfficeId(),
                 query == null ? null : query.getLoginName(),
                 query == null ? null : query.getName(),
-                query == null ? null : query.getEnableFlag(),
-                query == null ? null : query.getSuperFlag());
+                query == null ? null : statusValue(query.getStatus()),
+                query == null ? null : superFlagValue(query.getPrivilege()));
     }
 
     @Override
@@ -87,8 +90,8 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : query.getOfficeId(),
                 query == null ? null : query.getLoginName(),
                 query == null ? null : query.getName(),
-                query == null ? null : query.getEnableFlag(),
-                query == null ? null : query.getSuperFlag(),
+                query == null ? null : statusValue(query.getStatus()),
+                query == null ? null : superFlagValue(query.getPrivilege()),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -250,5 +253,13 @@ public class UserServiceImpl implements UserService {
             normalizedPage.setPageSize(Page.DEFAULT_PAGE_SIZE);
         }
         return normalizedPage;
+    }
+
+    private String statusValue(UserStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private String superFlagValue(UserPrivilege privilege) {
+        return UserPrivilege.SUPER == privilege ? Global.YES : null;
     }
 }

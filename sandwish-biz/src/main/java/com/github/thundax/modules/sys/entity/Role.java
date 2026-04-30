@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
@@ -31,8 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 public class Role implements Auditable, Signable, Sortable {
     private EntityId id;
     private String name;
-    private String adminFlag;
-    private String enableFlag;
+    private RolePrivilege privilege = RolePrivilege.NORMAL;
+    private RoleStatus status;
     private int priority;
     private String remarks;
     private Date createDate;
@@ -59,11 +58,11 @@ public class Role implements Auditable, Signable, Sortable {
     }
 
     public boolean isAdmin() {
-        return Global.YES.equals(this.getAdminFlag());
+        return RolePrivilege.ADMIN == getPrivilege();
     }
 
     public boolean isEnable() {
-        return Global.YES.equals(this.getEnableFlag());
+        return RoleStatus.ENABLED == getStatus();
     }
 
     public List<String> getMenuIdList() {
@@ -140,16 +139,20 @@ public class Role implements Auditable, Signable, Sortable {
 
     public static class Query implements Serializable {
 
-        public static final String PROP_ENABLE_FLAG = "enableFlag";
+        public static final String PROP_STATUS = "status";
 
-        private String enableFlag;
+        private RoleStatus status;
 
-        public String getEnableFlag() {
-            return enableFlag;
+        public RoleStatus getStatus() {
+            return status;
         }
 
-        public void setEnableFlag(String enableFlag) {
-            this.enableFlag = enableFlag;
+        public void setStatus(RoleStatus status) {
+            this.status = status;
+        }
+
+        public void setStatus(String status) {
+            this.status = StringUtils.isBlank(status) ? null : RoleStatus.from(status);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -17,7 +16,9 @@ import com.github.thundax.modules.sys.api.UserServiceApi;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserStatus;
 import com.github.thundax.modules.sys.request.UserAvatarRequest;
 import com.github.thundax.modules.sys.request.UserCheckRequest;
 import com.github.thundax.modules.sys.request.UserIdRequest;
@@ -186,8 +187,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
         // 非超管用户无权限开启/关闭管理员
-        if (!currentUser().isSuper()
-                && !(Boolean.TRUE.equals(request.getAdmin()) ? Global.YES : Global.NO).equals(bean.getAdminFlag())) {
+        if (!currentUser().isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw new PermissionDeniedException();
         }
         // 无权限修改超管/等级高于自身的用户信息
@@ -241,7 +241,8 @@ public class UserApiController extends BaseApiController implements UserServiceA
                     }
                     return true;
                 },
-                (bean, vo) -> bean.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE));
+                (bean, vo) ->
+                        bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
 
         userService.updateEnableFlag(beanList);
 
@@ -294,7 +295,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     public List<UserRoleResponse> roleList() {
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
-        queryCondition.setEnableFlag(Global.ENABLE);
+        queryCondition.setStatus(RoleStatus.ENABLED);
         query.setQuery(queryCondition);
 
         return roleService.findList(query).stream()
@@ -333,7 +334,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         queryCondition.setName(request.getName());
 
         if (request.getEnable() != null) {
-            queryCondition.setEnableFlag(request.getEnable() ? Global.ENABLE : Global.DISABLE);
+            queryCondition.setStatus(request.getEnable() ? UserStatus.ENABLED : UserStatus.DISABLED);
         }
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {

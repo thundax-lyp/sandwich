@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -12,6 +11,7 @@ import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.RoleStatus;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.RoleAssignUserRequest;
 import com.github.thundax.modules.sys.request.RoleIdRequest;
@@ -89,7 +89,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
         if (request.getEnable() != null) {
-            queryCondition.setEnableFlag(request.getEnable() ? Global.ENABLE : Global.DISABLE);
+            queryCondition.setStatus(request.getEnable() ? RoleStatus.ENABLED : RoleStatus.DISABLED);
         }
         query.setQuery(queryCondition);
 
@@ -142,7 +142,8 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
                 list,
                 vo -> roleService.get(roleInterfaceAssembler.toEntityId(vo.getId())),
                 null,
-                (bean, vo) -> bean.setEnableFlag(Boolean.TRUE.equals(vo.getEnable()) ? Global.ENABLE : Global.DISABLE));
+                (bean, vo) ->
+                        bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED));
 
         roleService.updateEnableFlag(beanList);
 

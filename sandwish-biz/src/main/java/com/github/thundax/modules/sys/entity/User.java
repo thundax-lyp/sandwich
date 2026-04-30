@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
@@ -50,9 +49,8 @@ public class User implements Auditable, Signable, Sortable {
     private String lastLoginIp;
     private Integer loginCount = 0;
 
-    private String superFlag = Global.NO;
-    private String adminFlag = Global.NO;
-    private String enableFlag;
+    private UserPrivilege privilege = UserPrivilege.NORMAL;
+    private UserStatus status;
     private String ssoLoginName;
 
     private int priority;
@@ -141,15 +139,15 @@ public class User implements Auditable, Signable, Sortable {
     }
 
     public boolean isSuper() {
-        return Global.YES.equals(this.getSuperFlag());
+        return UserPrivilege.SUPER == getPrivilege();
     }
 
     public boolean isAdmin() {
-        return Global.YES.equals(this.getAdminFlag());
+        return UserPrivilege.ADMIN == getPrivilege();
     }
 
     public boolean isEnable() {
-        return Global.YES.equals(this.getEnableFlag());
+        return UserStatus.ENABLED == getStatus();
     }
 
     @Override
@@ -193,15 +191,15 @@ public class User implements Auditable, Signable, Sortable {
         public static final String PROP_OFFICE_ID = "officeId";
         public static final String PROP_LOGIN_NAME = "loginName";
         public static final String PROP_NAME = "name";
-        public static final String PROP_ENABLE_FLAG = "enableFlag";
-        public static final String PROP_SUPER_FLAG = "superFlag";
+        public static final String PROP_STATUS = "status";
+        public static final String PROP_PRIVILEGE = "privilege";
         public static final String PROP_ORDER_BY = "orderBy";
 
         private String officeId; // 按照机构查询
         private String loginName; // 按照登录名查询
         private String name; // 按照姓名名查询
-        private String enableFlag; // 按照enableFlag查询
-        private String superFlag; // 按照superFlag查询
+        private UserStatus status;
+        private UserPrivilege privilege;
 
         private String orderBy;
 
@@ -231,22 +229,28 @@ public class User implements Auditable, Signable, Sortable {
             this.name = name;
         }
 
-        // a.enable_flag = #{query.enableFlag}
-        public String getEnableFlag() {
-            return this.enableFlag;
+        public UserStatus getStatus() {
+            return status;
         }
 
-        public void setEnableFlag(String enableFlag) {
-            this.enableFlag = enableFlag;
+        public void setStatus(UserStatus status) {
+            this.status = status;
         }
 
-        // a.super_flag = #{query.superFlag}
-        public String getSuperFlag() {
-            return this.superFlag;
+        public void setStatus(String status) {
+            this.status = StringUtils.isBlank(status) ? null : UserStatus.from(status);
         }
 
-        public void setSuperFlag(String superFlag) {
-            this.superFlag = superFlag;
+        public UserPrivilege getPrivilege() {
+            return privilege;
+        }
+
+        public void setPrivilege(UserPrivilege privilege) {
+            this.privilege = privilege;
+        }
+
+        public void setPrivilege(String privilege) {
+            this.privilege = StringUtils.isBlank(privilege) ? null : UserPrivilege.from(privilege);
         }
 
         public String getOrderBy() {

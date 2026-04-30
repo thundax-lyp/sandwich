@@ -13,18 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `storage`：迁移存储域实体与装配
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/base/BaseStorage.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/base/BaseStorageBusiness.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/Storage.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StorageBusiness.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/StorageInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java`
-  - 处理动作：下沉存储域实体字段，移除旧基类和 Jackson 注解依赖。
-  - 验收点：`Storage`、`StorageBusiness` 不再继承 `DataEntity`，不再 import `com.fasterxml.jackson.annotation..`；API 输出由入口层模型承接 JSON 形态。
-  - 重要度：8/10
-
 - [ ] `member-auth`：迁移会员与认证实体边界
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/base/BaseMember.java`

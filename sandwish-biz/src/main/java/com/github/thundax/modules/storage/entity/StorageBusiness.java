@@ -1,15 +1,10 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.storage.entity.base.BaseStorageBusiness;
 import java.io.Serializable;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class StorageBusiness extends BaseStorageBusiness {
 
     public static final String BEAN_NAME = "ResourceBusiness";
@@ -32,14 +27,12 @@ public class StorageBusiness extends BaseStorageBusiness {
         super.setPublicFlag(StringUtils.equals(Global.YES, publicFlag) ? Global.YES : Global.NO);
     }
 
-    @JsonIgnore
     public boolean isPublic() {
         return StringUtils.equals(Global.YES, getPublicFlag());
     }
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

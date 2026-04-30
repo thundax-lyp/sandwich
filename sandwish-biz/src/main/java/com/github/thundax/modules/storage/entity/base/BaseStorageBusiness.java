@@ -1,9 +1,10 @@
 package com.github.thundax.modules.storage.entity.base;
 
-import com.github.thundax.common.persistence.DataEntity;
+import com.github.thundax.common.domain.Entity;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 
-public abstract class BaseStorageBusiness extends DataEntity<StorageBusiness> {
+public abstract class BaseStorageBusiness extends Entity<StorageBusiness> {
 
     private String businessId;
     private String businessType;
@@ -11,12 +12,15 @@ public abstract class BaseStorageBusiness extends DataEntity<StorageBusiness> {
     private String publicFlag;
 
     public BaseStorageBusiness() {
-        super();
+        initialize();
     }
 
     public BaseStorageBusiness(String id) {
-        super(id);
+        this();
+        setEntityId(EntityIdCodec.toDomain(id));
     }
+
+    protected void initialize() {}
 
     public String getBusinessId() {
         return businessId;

@@ -1,14 +1,21 @@
 package com.github.thundax.modules.storage.entity.base;
 
-import com.github.thundax.common.persistence.DataEntity;
+import com.github.thundax.common.domain.Entity;
+import com.github.thundax.common.domain.Sorted;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
+import java.util.Date;
+import org.springframework.lang.NonNull;
 
-public abstract class BaseStorage extends DataEntity<Storage> {
+public abstract class BaseStorage extends Entity<Storage> implements Sorted {
 
-    public BaseStorage() {}
+    public BaseStorage() {
+        initialize();
+    }
 
     public BaseStorage(String id) {
-        super(id);
+        this();
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     private String name;
@@ -17,6 +24,14 @@ public abstract class BaseStorage extends DataEntity<Storage> {
     private String ownerId;
     private String ownerType;
     private String enableFlag;
+    private Integer priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+
+    protected void initialize() {
+        this.setPriority(0);
+    }
 
     public String getName() {
         return name;
@@ -64,5 +79,40 @@ public abstract class BaseStorage extends DataEntity<Storage> {
 
     public void setEnableFlag(String enableFlag) {
         this.enableFlag = enableFlag;
+    }
+
+    @Override
+    @NonNull
+    public Integer getPriority() {
+        return priority == null ? 0 : priority;
+    }
+
+    @Override
+    public void setPriority(Integer priority) {
+        this.priority = priority != null && priority >= 0 ? priority : 0;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

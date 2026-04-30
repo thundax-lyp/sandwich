@@ -1,8 +1,5 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.base.BaseStorage;
@@ -11,8 +8,6 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Storage extends BaseStorage {
 
     public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
@@ -41,29 +36,24 @@ public class Storage extends BaseStorage {
         super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
     }
 
-    @JsonIgnore
     public boolean isEnable() {
         return StringUtils.equals(Global.ENABLE, getEnableFlag());
     }
 
-    @JsonIgnore
     public String getFileName() {
         return EntityIdCodec.toValue(getEntityId()) + MetaFile.DOT + this.getExtendName();
     }
 
-    @JsonIgnore
     public String getOriginalFileName() {
         return this.getName() + MetaFile.DOT + this.getExtendName();
     }
 
-    @JsonIgnore
     public String getPathName() {
         return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate()) + MetaFile.SEPARATOR + this.getFileName();
     }
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

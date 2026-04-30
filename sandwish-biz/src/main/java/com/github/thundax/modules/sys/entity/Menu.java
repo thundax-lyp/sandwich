@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
@@ -36,7 +35,7 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     private String name;
     private String perms;
     private Integer ranks;
-    private String displayFlag = Global.SHOW;
+    private MenuVisibility visibility = MenuVisibility.VISIBLE;
     private String displayParams;
     private String url;
     private String target;
@@ -93,7 +92,7 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     }
 
     public boolean isDisplay() {
-        return Global.SHOW.equals(this.getDisplayFlag());
+        return MenuVisibility.VISIBLE == getVisibility();
     }
 
     public Object getDisplayParam(String paramName, Object defaultValue) {
@@ -170,11 +169,11 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     public static class Query implements Serializable {
 
         public static final String PROP_PARENT_ID = "parentId";
-        public static final String PROP_DISPLAY_FLAG = "displayFlag";
+        public static final String PROP_VISIBILITY = "visibility";
         public static final String PROP_MAX_RANK = "maxRank";
 
         private String parentId;
-        private String displayFlag;
+        private MenuVisibility visibility;
         private Integer maxRank; // 按照rank查询
 
         public String getParentId() {
@@ -185,12 +184,16 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
             this.parentId = parentId;
         }
 
-        public String getDisplayFlag() {
-            return displayFlag;
+        public MenuVisibility getVisibility() {
+            return visibility;
         }
 
-        public void setDisplayFlag(String displayFlag) {
-            this.displayFlag = displayFlag;
+        public void setVisibility(MenuVisibility visibility) {
+            this.visibility = visibility;
+        }
+
+        public void setVisibility(String visibility) {
+            this.visibility = StringUtils.isBlank(visibility) ? null : MenuVisibility.from(visibility);
         }
 
         public Integer getMaxRank() {

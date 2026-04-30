@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.MenuVisibility;
 import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +61,8 @@ public class MenuInterfaceAssembler {
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());
         entity.setRanks(request.getRanks());
-        entity.setDisplayFlag(Boolean.TRUE.equals(request.getDisplay()) ? Global.SHOW : Global.HIDE);
+        entity.setVisibility(
+                Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
 

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -12,6 +11,7 @@ import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.MenuVisibility;
 import com.github.thundax.modules.sys.request.MenuDisplayRequest;
 import com.github.thundax.modules.sys.request.MenuIdRequest;
 import com.github.thundax.modules.sys.request.MenuMoveRequest;
@@ -64,7 +64,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
         queryCondition.setParentId(request.getParentId());
         if (request.getDisplay() != null) {
-            queryCondition.setDisplayFlag(request.getDisplay() ? Global.SHOW : Global.HIDE);
+            queryCondition.setVisibility(request.getDisplay() ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         }
         query.setQuery(queryCondition);
 
@@ -129,7 +129,8 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
                 list,
                 vo -> menuService.get(menuInterfaceAssembler.toEntityId(vo.getId())),
                 null,
-                (bean, vo) -> bean.setDisplayFlag(Boolean.TRUE.equals(vo.getDisplay()) ? Global.SHOW : Global.HIDE));
+                (bean, vo) -> bean.setVisibility(
+                        Boolean.TRUE.equals(vo.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
 
         menuService.updateDisplayFlag(beanList);
 

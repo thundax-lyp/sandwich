@@ -8,6 +8,7 @@ import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.MenuVisibility;
 import com.github.thundax.modules.sys.service.MenuService;
 import java.util.Collection;
 import java.util.List;
@@ -64,7 +65,7 @@ public class MenuServiceImpl implements MenuService {
         Menu.Query query = menu == null ? null : menu.getQuery();
         return dao.findList(
                 query == null ? null : query.getParentId(),
-                query == null ? null : query.getDisplayFlag(),
+                query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getMaxRank());
     }
 
@@ -80,7 +81,7 @@ public class MenuServiceImpl implements MenuService {
         Menu.Query query = menu == null ? null : menu.getQuery();
         IPage<Menu> dataPage = dao.findPage(
                 query == null ? null : query.getParentId(),
-                query == null ? null : query.getDisplayFlag(),
+                query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getMaxRank(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
@@ -222,5 +223,9 @@ public class MenuServiceImpl implements MenuService {
             normalizedPage.setPageSize(Page.DEFAULT_PAGE_SIZE);
         }
         return normalizedPage;
+    }
+
+    private String visibilityValue(MenuVisibility visibility) {
+        return visibility == null ? null : visibility.value();
     }
 }

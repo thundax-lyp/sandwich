@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.MenuVisibility;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public final class MenuPersistenceAssembler {
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
         dataObject.setRanks(entity.getRanks());
-        dataObject.setDisplayFlag(entity.getDisplayFlag());
+        dataObject.setDisplayFlag(visibilityValue(entity.getVisibility()));
         dataObject.setDisplayParams(entity.getDisplayParams());
         dataObject.setUrl(entity.getUrl());
         dataObject.setTarget(entity.getTarget());
@@ -43,7 +44,7 @@ public final class MenuPersistenceAssembler {
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
         entity.setRanks(dataObject.getRanks());
-        entity.setDisplayFlag(dataObject.getDisplayFlag());
+        entity.setVisibility(visibilityFrom(dataObject.getDisplayFlag()));
         entity.setDisplayParams(dataObject.getDisplayParams());
         entity.setUrl(dataObject.getUrl());
         entity.setTarget(dataObject.getTarget());
@@ -76,5 +77,13 @@ public final class MenuPersistenceAssembler {
 
     private static int priorityOrDefault(Integer priority) {
         return priority == null ? 0 : priority;
+    }
+
+    private static String visibilityValue(MenuVisibility visibility) {
+        return visibility == null ? null : visibility.value();
+    }
+
+    private static MenuVisibility visibilityFrom(String visibility) {
+        return visibility == null ? null : MenuVisibility.from(visibility);
     }
 }

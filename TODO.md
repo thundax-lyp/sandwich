@@ -13,13 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `biz-architecture`：建立领域实体架构门禁
-  - 范围文件：
-    - `sandwish-biz/src/test/java/com/github/thundax/architecture/DomainEntityArchitectureTest.java`
-  - 处理动作：新增架构测试，禁止旧实体基类和 Jackson 注解回流到业务实体。
-  - 验收点：测试覆盖 `modules..entity..` 禁止 Jackson 注解依赖，禁止继承 `BaseEntity`、`DataEntity`、`AdminDataEntity`、`TreeEntity`、`AdminTreeEntity`。
-  - 重要度：10/10
-
 - [ ] `sys-user-role`：迁移用户、用户加密和角色实体
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUser.java`

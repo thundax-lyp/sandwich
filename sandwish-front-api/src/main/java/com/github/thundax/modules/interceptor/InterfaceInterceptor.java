@@ -1,6 +1,6 @@
 package com.github.thundax.modules.interceptor;
 
-import com.github.thundax.common.exception.WditException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.utils.encrypt.Md5;
 import com.github.thundax.modules.annotation.ApiLogin;
 import java.util.Date;
@@ -38,16 +38,16 @@ public class InterfaceInterceptor extends HandlerInterceptorAdapter {
         String nonce = request.getHeader("nonce");
         String sign = request.getHeader("sign");
         if (StringUtils.isEmpty(nonce) || StringUtils.isEmpty(sign)) {
-            throw new WditException("非法请求");
+            throw new BizException("非法请求");
         }
         // 判断请求是否在五分钟之内
         if (!validateDate(Long.parseLong(nonce))) {
-            throw new WditException("请求已过时");
+            throw new BizException("请求已过时");
         }
 
         String encode = encode(authCode, nonce);
         if (!StringUtils.equals(encode, sign)) {
-            throw new WditException("非法请求");
+            throw new BizException("非法请求");
         }
         return true;
     }

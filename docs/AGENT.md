@@ -26,6 +26,8 @@
   读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：
   再读 `00-governance/NAMING-AND-PLACEMENT-RULES.md`
+- 新增或修改领域值对象、领域枚举、状态枚举：
+  再读 `00-governance/DOMAIN-VALUE-RULES.md`
 - 数据库、实体、DAO、Mapper、SQL、持久化查询：
   再读 `00-governance/DATABASE-RULES.md`
   再读对应 `20-database/*-DATABASE-DESIGN.md`

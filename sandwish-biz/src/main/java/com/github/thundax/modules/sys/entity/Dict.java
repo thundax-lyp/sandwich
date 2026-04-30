@@ -1,13 +1,8 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.modules.sys.entity.base.BaseDict;
 import java.io.Serializable;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Dict extends BaseDict {
 
     public Dict() {
@@ -20,7 +15,6 @@ public class Dict extends BaseDict {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

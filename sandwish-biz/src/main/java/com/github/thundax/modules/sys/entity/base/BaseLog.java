@@ -1,17 +1,17 @@
 package com.github.thundax.modules.sys.entity.base;
 
-import com.github.thundax.common.persistence.AdminDataEntity;
+import com.github.thundax.common.domain.Entity;
+import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.modules.sys.entity.Log;
 import java.util.Date;
 
-public abstract class BaseLog extends AdminDataEntity<Log> {
+public abstract class BaseLog extends Entity<Log> implements Signable {
 
-    public BaseLog() {
-        super();
-    }
+    public BaseLog() {}
 
     public BaseLog(String id) {
-        super(id);
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     private String userId;
@@ -24,6 +24,8 @@ public abstract class BaseLog extends AdminDataEntity<Log> {
     private String method;
     private String requestUri;
     private String requestParams;
+    private String remarks;
+    private Date createDate;
 
     public String getType() {
         return type;
@@ -95,5 +97,26 @@ public abstract class BaseLog extends AdminDataEntity<Log> {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    @Override
+    public String getSignId() {
+        return getId();
     }
 }

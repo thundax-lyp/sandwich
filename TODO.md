@@ -13,29 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-basic`：迁移字典、日志和上传文件实体
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseDict.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseLog.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseUploadFile.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Dict.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Log.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/UploadFile.java`
-  - 处理动作：下沉字典、日志、上传文件实体字段，移除旧基类和 Jackson 注解依赖。
-  - 验收点：上述实体不再继承 `AdminDataEntity`，不再 import `com.fasterxml.jackson.annotation..`，`remarks` 不进入 `Auditable`。
-  - 重要度：9/10
-
-- [ ] `sys-basic-assembler`：同步字典、日志和上传文件装配
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/LogInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/DictPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/LogPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UploadFilePersistenceAssembler.java`
-  - 处理动作：显式转换字典、日志、上传文件字段，移除 `DataEntity` 通用拷贝依赖。
-  - 验收点：API assembler 不再 import `DataEntity`；persistence assembler 显式完成 `Entity <-> DO` 字段转换。
-  - 重要度：9/10
-
 - [ ] `sys-tree`：迁移菜单和机构树实体
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/base/BaseMenu.java`

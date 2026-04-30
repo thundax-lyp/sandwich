@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.User;
@@ -61,7 +60,7 @@ public class LogInterfaceAssembler {
         return response;
     }
 
-    private static LogResponse baseEntityToResponse(LogResponse response, DataEntity entity) {
+    private static LogResponse baseEntityToResponse(LogResponse response, Log entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());

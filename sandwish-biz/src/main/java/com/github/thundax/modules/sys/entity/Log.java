@@ -1,8 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.base.BaseLog;
@@ -13,8 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Log extends BaseLog {
     public static final String BEAN_NAME = "Log";
 
@@ -31,7 +26,6 @@ public class Log extends BaseLog {
         super(id);
     }
 
-    @JsonIgnore
     public User getUser() {
         return UserServiceHolder.get(EntityIdCodec.toDomain(this.getUserId()));
     }
@@ -45,13 +39,11 @@ public class Log extends BaseLog {
     }
 
     @Override
-    @JsonIgnore
     public String getSignName() {
         return BEAN_NAME;
     }
 
     @Override
-    @JsonIgnore
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("userId", this.getUserId());
@@ -89,7 +81,6 @@ public class Log extends BaseLog {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

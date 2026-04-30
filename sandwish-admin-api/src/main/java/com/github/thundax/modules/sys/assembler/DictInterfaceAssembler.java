@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
@@ -42,7 +41,7 @@ public class DictInterfaceAssembler {
         return entity;
     }
 
-    private static DictResponse baseEntityToResponse(DictResponse response, DataEntity entity) {
+    private static DictResponse baseEntityToResponse(DictResponse response, Dict entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
@@ -51,7 +50,7 @@ public class DictInterfaceAssembler {
         return response;
     }
 
-    private static <T extends DataEntity<T>> T baseRequestToEntity(T entity, DictSaveRequest request) {
+    private static Dict baseRequestToEntity(Dict entity, DictSaveRequest request) {
         entity.setId(request.getId());
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

@@ -1,20 +1,23 @@
 package com.github.thundax.modules.sys.entity.base;
 
-import com.github.thundax.common.persistence.AdminDataEntity;
+import com.github.thundax.common.domain.Entity;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.UploadFile;
+import java.util.Date;
 
-public class BaseUploadFile extends AdminDataEntity<UploadFile> {
+public class BaseUploadFile extends Entity<UploadFile> {
     private String name;
     private String extendName;
     private String mimeType;
     private Long size;
     private String path;
     private byte[] content;
+    private Date createDate;
 
     public BaseUploadFile() {}
 
     public BaseUploadFile(String id) {
-        super(id);
+        setEntityId(EntityIdCodec.toDomain(id));
     }
 
     public String getName() {
@@ -63,5 +66,13 @@ public class BaseUploadFile extends AdminDataEntity<UploadFile> {
 
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

@@ -2,19 +2,60 @@ package com.github.thundax.modules.sys.entity;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.domain.Auditable;
+import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.entity.base.BaseMenu;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class Menu extends BaseMenu implements Comparable<Menu> {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
+    private EntityId id;
+
+    public static final String ROOT_ID = "ROOT";
+
+    private String parentId;
+
+    private String name;
+    private String perms;
+    private Integer ranks;
+    private String displayFlag = Global.SHOW;
+    private String displayParams;
+    private String url;
+    private String target;
+    private int priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String createUserId;
+    private String updateUserId;
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
+    }
+
+    @Override
+    public String getSignId() {
+        return EntityIdCodec.toValue(getId());
+    }
 
     public static final String BEAN_NAME = "Menu";
 
@@ -27,9 +68,8 @@ public class Menu extends BaseMenu implements Comparable<Menu> {
         return MenuServiceHolder.get(getId());
     }
 
-    @Override
     public void setParentId(String parentId) {
-        super.setParentId(StringUtils.isBlank(parentId) ? null : parentId);
+        this.parentId = StringUtils.isBlank(parentId) ? null : parentId;
     }
 
     public Menu getParent() {

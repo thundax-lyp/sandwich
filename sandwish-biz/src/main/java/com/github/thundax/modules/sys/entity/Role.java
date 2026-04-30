@@ -1,22 +1,54 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.domain.Auditable;
+import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.entity.base.BaseRole;
 import com.github.thundax.modules.sys.utils.MenuServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class Role extends BaseRole {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Role implements Auditable, Signable, Sortable {
+    private EntityId id;
+    private String name;
+    private String adminFlag;
+    private String enableFlag;
+    private int priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String createUserId;
+    private String updateUserId;
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
+    }
+
+    @Override
+    public String getSignId() {
+        return EntityIdCodec.toValue(getId());
+    }
 
     public static final String BEAN_NAME = "Role";
 

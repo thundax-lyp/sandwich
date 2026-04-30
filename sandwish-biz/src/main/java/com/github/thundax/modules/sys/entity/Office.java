@@ -1,14 +1,44 @@
 package com.github.thundax.modules.sys.entity;
 
+import com.github.thundax.common.domain.Auditable;
+import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.entity.base.BaseOffice;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.google.common.collect.Lists;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class Office extends BaseOffice {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Office implements Auditable, Sortable {
+    private EntityId id;
+
+    public static final String ROOT_ID = "ROOT";
+
+    private String parentId;
+
+    private String name;
+    private String shortName;
+    private int priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String createUserId;
+    private String updateUserId;
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
+    }
 
     public static final String BEAN_NAME = "Office";
 

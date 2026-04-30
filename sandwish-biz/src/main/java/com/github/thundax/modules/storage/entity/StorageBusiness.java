@@ -1,17 +1,30 @@
 package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.config.Global;
-import com.github.thundax.modules.storage.entity.base.BaseStorageBusiness;
+import com.github.thundax.common.id.EntityId;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class StorageBusiness extends BaseStorageBusiness {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class StorageBusiness {
+    private EntityId id;
+
+    private String businessId;
+    private String businessType;
+    private String businessParams;
+    private String publicFlag = Global.NO;
 
     public static final String BEAN_NAME = "ResourceBusiness";
 
-    @Override
     public void setPublicFlag(String publicFlag) {
-        super.setPublicFlag(StringUtils.equals(Global.YES, publicFlag) ? Global.YES : Global.NO);
+        this.publicFlag = StringUtils.equals(Global.YES, publicFlag) ? Global.YES : Global.NO;
     }
 
     public boolean isPublic() {

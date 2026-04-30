@@ -1,14 +1,40 @@
 package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.storage.entity.base.BaseStorage;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class Storage extends BaseStorage {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Storage implements Sortable {
+    private EntityId id;
+    private String name;
+    private String extendName;
+    private String mimeType;
+    private String ownerId;
+    private String ownerType;
+    private String enableFlag = Global.ENABLE;
+    private int priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
+    }
 
     public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
 
@@ -17,9 +43,8 @@ public class Storage extends BaseStorage {
     public static final String OWNER_TYPE_USER = "user";
     public static final String OWNER_TYPE_MEMBER = "member";
 
-    @Override
     public void setEnableFlag(String enableFlag) {
-        super.setEnableFlag(StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE);
+        this.enableFlag = StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE;
     }
 
     public boolean isEnable() {

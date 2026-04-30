@@ -1,24 +1,76 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.config.Global;
+import com.github.thundax.common.domain.Auditable;
+import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.domain.Sortable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.entity.base.BaseUser;
 import com.github.thundax.modules.sys.utils.OfficeServiceHolder;
 import com.github.thundax.modules.sys.utils.RoleServiceHolder;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class User extends BaseUser {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class User implements Auditable, Signable, Sortable {
+    private EntityId id;
+
+    private String officeId;
+
+    private String loginName;
+    private String loginPass;
+    private String email;
+    private String mobile;
+    private String tel;
+    private String name;
+    private Integer ranks = 0;
+
+    private Date registerDate;
+    private String registerIp;
+
+    private Date lastLoginDate;
+    private String lastLoginIp;
+    private Integer loginCount = 0;
+
+    private String superFlag = Global.NO;
+    private String adminFlag = Global.NO;
+    private String enableFlag;
+    private String ssoLoginName;
+
+    private int priority;
+    private String remarks;
+    private Date createDate;
+    private Date updateDate;
+    private String createUserId;
+    private String updateUserId;
+
+    @Override
+    public void setPriority(int priority) {
+        this.priority = priority >= 0 ? priority : 0;
+    }
+
+    @Override
+    public String getSignId() {
+        return EntityIdCodec.toValue(getId());
+    }
 
     public static final String BEAN_NAME = "User";
 
@@ -26,10 +78,9 @@ public class User extends BaseUser {
 
     private List<String> roleIdList;
 
-    @Override
     @NonNull
     public Integer getRanks() {
-        Integer ranks = super.getRanks();
+        Integer ranks = this.ranks;
         if (ranks == null || ranks < 0) {
             return 0;
         } else if (ranks >= MAX_RANKS) {

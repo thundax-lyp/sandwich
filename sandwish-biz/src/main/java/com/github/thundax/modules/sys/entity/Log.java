@@ -1,16 +1,45 @@
 package com.github.thundax.modules.sys.entity;
 
+import com.github.thundax.common.domain.Signable;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.sys.entity.base.BaseLog;
 import com.github.thundax.modules.sys.utils.UserServiceHolder;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
-public class Log extends BaseLog {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Log implements Signable {
+    private EntityId id;
+
+    private String userId;
+
+    private String type;
+    private Date logDate;
+    private String title;
+    private String remoteAddr;
+    private String userAgent;
+    private String method;
+    private String requestUri;
+    private String requestParams;
+    private String remarks;
+    private Date createDate;
+
+    @Override
+    public String getSignId() {
+        return EntityIdCodec.toValue(getId());
+    }
+
     public static final String BEAN_NAME = "Log";
 
     public static final String TYPE_ACCESS = "1";

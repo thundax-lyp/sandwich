@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -25,7 +24,8 @@ public class Storage implements Sortable {
     private String mimeType;
     private String ownerId;
     private StorageOwnerType ownerType;
-    private String enableFlag = Global.ENABLE;
+    private StorageStatus status = StorageStatus.ENABLED;
+    private StorageVisibility visibility = StorageVisibility.PRIVATE;
     private int priority;
     private String remarks;
     private Date createDate;
@@ -40,8 +40,20 @@ public class Storage implements Sortable {
 
     private static final String PATH_FORMAT = "yyyyMM";
 
-    public void setEnableFlag(String enableFlag) {
-        this.enableFlag = StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE;
+    public void setStatus(String status) {
+        this.status = StringUtils.isBlank(status) ? null : StorageStatus.from(status);
+    }
+
+    public void setStatus(StorageStatus status) {
+        this.status = status;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
+    }
+
+    public void setVisibility(StorageVisibility visibility) {
+        this.visibility = visibility;
     }
 
     public void setOwnerType(String ownerType) {
@@ -53,7 +65,7 @@ public class Storage implements Sortable {
     }
 
     public boolean isEnable() {
-        return StringUtils.equals(Global.ENABLE, getEnableFlag());
+        return StorageStatus.ENABLED == getStatus();
     }
 
     public String getFileName() {
@@ -85,8 +97,8 @@ public class Storage implements Sortable {
         public static final String PROP_BUSINESS_TYPE = "businessType";
         public static final String PROP_OWNER_ID = "ownerId";
         public static final String PROP_OWNER_TYPE = "ownerType";
-        public static final String PROP_ENABLE_FLAG = "enableFlag";
-        public static final String PROP_PUBLIC_FLAG = "publicFlag";
+        public static final String PROP_STATUS = "status";
+        public static final String PROP_VISIBILITY = "visibility";
         public static final String PROP_NAME = "name";
         public static final String PROP_REMARKS = "remarks";
 
@@ -95,8 +107,8 @@ public class Storage implements Sortable {
         private String businessType;
         private String ownerId;
         private StorageOwnerType ownerType;
-        private String enableFlag;
-        private String publicFlag;
+        private StorageStatus status;
+        private StorageVisibility visibility;
         private String name;
         private String remarks;
 
@@ -144,20 +156,28 @@ public class Storage implements Sortable {
             this.ownerType = ownerType;
         }
 
-        public String getEnableFlag() {
-            return enableFlag;
+        public StorageStatus getStatus() {
+            return status;
         }
 
-        public void setEnableFlag(String enableFlag) {
-            this.enableFlag = enableFlag;
+        public void setStatus(String status) {
+            this.status = StringUtils.isBlank(status) ? null : StorageStatus.from(status);
         }
 
-        public String getPublicFlag() {
-            return publicFlag;
+        public void setStatus(StorageStatus status) {
+            this.status = status;
         }
 
-        public void setPublicFlag(String publicFlag) {
-            this.publicFlag = publicFlag;
+        public StorageVisibility getVisibility() {
+            return visibility;
+        }
+
+        public void setVisibility(String visibility) {
+            this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
+        }
+
+        public void setVisibility(StorageVisibility visibility) {
+            this.visibility = visibility;
         }
 
         public String getName() {

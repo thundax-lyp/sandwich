@@ -76,9 +76,15 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public List<Storage> findList(
-            String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks) {
-        return StoragePersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(mimeType, ownerId, ownerType, enableFlag, name, remarks)));
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String publicFlag,
+            String name,
+            String remarks) {
+        return StoragePersistenceAssembler.toEntityList(mapper.selectList(
+                buildListWrapper(mimeType, ownerId, ownerType, enableFlag, publicFlag, name, remarks)));
     }
 
     @Override
@@ -87,13 +93,14 @@ public class StorageDaoImpl implements StorageDao {
             String ownerId,
             String ownerType,
             String enableFlag,
+            String publicFlag,
             String name,
             String remarks,
             int pageNo,
             int pageSize) {
         Page<StorageDO> dataObjectPage = mapper.selectPage(
                 new Page<>(pageNo, pageSize),
-                buildListWrapper(mimeType, ownerId, ownerType, enableFlag, name, remarks));
+                buildListWrapper(mimeType, ownerId, ownerType, enableFlag, publicFlag, name, remarks));
         Page<Storage> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -210,7 +217,13 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     private LambdaQueryWrapper<StorageDO> buildListWrapper(
-            String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks) {
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String publicFlag,
+            String name,
+            String remarks) {
         LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(mimeType)) {
@@ -224,6 +237,9 @@ public class StorageDaoImpl implements StorageDao {
         }
         if (StringUtils.isNotBlank(enableFlag)) {
             wrapper.eq(StorageDO::getEnableFlag, enableFlag);
+        }
+        if (StringUtils.isNotBlank(publicFlag)) {
+            wrapper.eq(StorageDO::getPublicFlag, publicFlag);
         }
         if (StringUtils.isNotBlank(name)) {
             wrapper.like(StorageDO::getName, name);

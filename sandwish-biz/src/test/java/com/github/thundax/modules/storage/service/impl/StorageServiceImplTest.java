@@ -10,6 +10,8 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StorageStatus;
+import com.github.thundax.modules.storage.entity.StorageVisibility;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -36,7 +38,8 @@ public class StorageServiceImplTest {
         condition.setMimeType("image/png");
         condition.setOwnerId("owner-1");
         condition.setOwnerType("user");
-        condition.setEnableFlag("1");
+        condition.setStatus(StorageStatus.ENABLED);
+        condition.setVisibility(StorageVisibility.PUBLIC);
         condition.setName("avatar");
         condition.setRemarks("remark");
         query.setQuery(condition);
@@ -48,7 +51,8 @@ public class StorageServiceImplTest {
         assertEquals("image/png", dao.mimeType);
         assertEquals("owner-1", dao.ownerId);
         assertEquals("USER", dao.ownerType);
-        assertEquals("1", dao.enableFlag);
+        assertEquals("ENABLED", dao.enableFlag);
+        assertEquals("PUBLIC", dao.publicFlag);
         assertEquals("avatar", dao.name);
         assertEquals("remark", dao.remarks);
         assertEquals(page.getPageNo(), dao.pageNo);
@@ -113,6 +117,7 @@ public class StorageServiceImplTest {
         private String ownerId;
         private String ownerType;
         private String enableFlag;
+        private String publicFlag;
         private String name;
         private String remarks;
         private int pageNo;
@@ -135,7 +140,13 @@ public class StorageServiceImplTest {
 
         @Override
         public List<Storage> findList(
-                String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks) {
+                String mimeType,
+                String ownerId,
+                String ownerType,
+                String enableFlag,
+                String publicFlag,
+                String name,
+                String remarks) {
             return null;
         }
 
@@ -145,6 +156,7 @@ public class StorageServiceImplTest {
                 String ownerId,
                 String ownerType,
                 String enableFlag,
+                String publicFlag,
                 String name,
                 String remarks,
                 int pageNo,
@@ -153,6 +165,7 @@ public class StorageServiceImplTest {
             this.ownerId = ownerId;
             this.ownerType = ownerType;
             this.enableFlag = enableFlag;
+            this.publicFlag = publicFlag;
             this.name = name;
             this.remarks = remarks;
             this.pageNo = pageNo;

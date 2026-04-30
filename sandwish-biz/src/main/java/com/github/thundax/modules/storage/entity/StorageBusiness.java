@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
@@ -19,16 +18,20 @@ public class StorageBusiness {
     private String businessId;
     private String businessType;
     private String businessParams;
-    private String publicFlag = Global.NO;
+    private StorageVisibility visibility = StorageVisibility.PRIVATE;
 
     public static final String BEAN_NAME = "ResourceBusiness";
 
-    public void setPublicFlag(String publicFlag) {
-        this.publicFlag = StringUtils.equals(Global.YES, publicFlag) ? Global.YES : Global.NO;
+    public void setVisibility(String visibility) {
+        this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
+    }
+
+    public void setVisibility(StorageVisibility visibility) {
+        this.visibility = visibility;
     }
 
     public boolean isPublic() {
-        return StringUtils.equals(Global.YES, getPublicFlag());
+        return StorageVisibility.PUBLIC == getVisibility();
     }
 
     private Query query;
@@ -47,13 +50,13 @@ public class StorageBusiness {
         public static final String PROP_BUSINESS_TYPE = "businessType";
         public static final String PROP_BUSINESS_PARAMS = "businessParams";
 
-        public static final String PROP_PUBLIC_FLAG = "publicFlag";
+        public static final String PROP_VISIBILITY = "visibility";
 
         private String businessId;
         private String businessType;
         private String businessParams;
 
-        private String publicFlag;
+        private StorageVisibility visibility;
 
         public String getBusinessId() {
             return businessId;
@@ -79,12 +82,16 @@ public class StorageBusiness {
             this.businessParams = businessParams;
         }
 
-        public String getPublicFlag() {
-            return publicFlag;
+        public StorageVisibility getVisibility() {
+            return visibility;
         }
 
-        public void setPublicFlag(String publicFlag) {
-            this.publicFlag = publicFlag;
+        public void setVisibility(String visibility) {
+            this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
+        }
+
+        public void setVisibility(StorageVisibility visibility) {
+            this.visibility = visibility;
         }
     }
 }

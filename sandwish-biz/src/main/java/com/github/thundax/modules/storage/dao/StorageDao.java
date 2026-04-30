@@ -13,13 +13,20 @@ public interface StorageDao {
     List<Storage> getMany(List<String> idList);
 
     List<Storage> findList(
-            String mimeType, String ownerId, String ownerType, String enableFlag, String name, String remarks);
+            String mimeType,
+            String ownerId,
+            String ownerType,
+            String enableFlag,
+            String publicFlag,
+            String name,
+            String remarks);
 
     Page<Storage> findPage(
             String mimeType,
             String ownerId,
             String ownerType,
             String enableFlag,
+            String publicFlag,
             String name,
             String remarks,
             int pageNo,

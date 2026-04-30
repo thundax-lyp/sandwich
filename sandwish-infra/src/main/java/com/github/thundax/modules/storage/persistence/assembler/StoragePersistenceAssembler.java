@@ -4,6 +4,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.entity.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.StorageStatus;
+import com.github.thundax.modules.storage.entity.StorageVisibility;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import java.util.ArrayList;
@@ -24,7 +26,8 @@ public final class StoragePersistenceAssembler {
         dataObject.setMimeType(entity.getMimeType());
         dataObject.setOwnerId(entity.getOwnerId());
         dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
-        dataObject.setEnableFlag(entity.getEnableFlag());
+        dataObject.setEnableFlag(statusValue(entity.getStatus()));
+        dataObject.setPublicFlag(visibilityValue(entity.getVisibility()));
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -43,7 +46,8 @@ public final class StoragePersistenceAssembler {
         entity.setMimeType(dataObject.getMimeType());
         entity.setOwnerId(dataObject.getOwnerId());
         entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
-        entity.setEnableFlag(dataObject.getEnableFlag());
+        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
+        entity.setVisibility(visibilityFrom(dataObject.getPublicFlag()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -74,6 +78,22 @@ public final class StoragePersistenceAssembler {
         return ownerType == null ? null : StorageOwnerType.from(ownerType);
     }
 
+    private static String statusValue(StorageStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private static StorageStatus statusFrom(String status) {
+        return status == null ? null : StorageStatus.from(status);
+    }
+
+    private static String visibilityValue(StorageVisibility visibility) {
+        return visibility == null ? null : visibility.value();
+    }
+
+    private static StorageVisibility visibilityFrom(String visibility) {
+        return visibility == null ? null : StorageVisibility.from(visibility);
+    }
+
     public static StorageBusinessDO toBusinessDataObject(StorageBusiness entity) {
         if (entity == null) {
             return null;
@@ -83,7 +103,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
-        dataObject.setPublicFlag(entity.getPublicFlag());
+        dataObject.setPublicFlag(visibilityValue(entity.getVisibility()));
         return dataObject;
     }
 
@@ -96,7 +116,7 @@ public final class StoragePersistenceAssembler {
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setBusinessParams(dataObject.getBusinessParams());
-        entity.setPublicFlag(dataObject.getPublicFlag());
+        entity.setVisibility(visibilityFrom(dataObject.getPublicFlag()));
         return entity;
     }
 

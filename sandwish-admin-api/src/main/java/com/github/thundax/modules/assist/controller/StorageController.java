@@ -113,13 +113,6 @@ public class StorageController extends BaseAdminController {
         storage.setOwnerId(UserAccessHolder.currentUserId());
         StorageUtils.saveFile(file, storage);
 
-        // TODO 保存关系
-        //        StorageBusiness storageBusiness = new StorageBusiness();
-        //        storageBusiness.setPublicFlag(Global.NO);
-        //        storageBusiness.setBusinessType("");
-        //        storageBusiness.setBusinessId("");
-        //        storageBusiness.setBusinessParams("");
-
         return storageInterfaceAssembler.toUploadResponse(storage);
     }
 
@@ -238,10 +231,9 @@ public class StorageController extends BaseAdminController {
         queryCondition.setBusinessType(
                 readReloadString("query.businessId", "storage.query.businessId", request, response));
 
-        queryCondition.setEnableFlag(
-                readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
+        queryCondition.setStatus(readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
 
-        queryCondition.setPublicFlag(
+        queryCondition.setVisibility(
                 readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
 
         queryCondition.setName(readReloadString("query.name", "storage.query.name", request, response));

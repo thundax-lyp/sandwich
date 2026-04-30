@@ -8,6 +8,8 @@ import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.entity.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.StorageStatus;
+import com.github.thundax.modules.storage.entity.StorageVisibility;
 import com.github.thundax.modules.storage.service.StorageService;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +47,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : query.getEnableFlag(),
+                query == null ? null : statusValue(query.getStatus()),
+                query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
@@ -58,7 +61,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : query.getEnableFlag(),
+                query == null ? null : statusValue(query.getStatus()),
+                query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
@@ -154,5 +158,13 @@ public class StorageServiceImpl implements StorageService {
 
     private String ownerTypeValue(StorageOwnerType ownerType) {
         return ownerType == null ? null : ownerType.value();
+    }
+
+    private String statusValue(StorageStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private String visibilityValue(StorageVisibility visibility) {
+        return visibility == null ? null : visibility.value();
     }
 }

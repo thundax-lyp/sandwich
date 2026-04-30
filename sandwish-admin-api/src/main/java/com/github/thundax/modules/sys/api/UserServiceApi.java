@@ -210,7 +210,7 @@ public interface UserServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("用户状态请求列表") List<UserStatusRequest> list) throws ApiException;
+    Boolean updateStatus(@RequestBody @ApiParam("用户状态请求列表") List<UserStatusRequest> list) throws ApiException;
 
     /**
      * 删除

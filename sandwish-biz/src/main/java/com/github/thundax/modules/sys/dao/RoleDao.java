@@ -29,7 +29,7 @@ public interface RoleDao {
      * @param role 权限
      * @return 影响记录数
      */
-    int updateEnableFlag(Role role);
+    int updateStatus(Role role);
 
     List<String> findRoleMenu(String roleId);
 

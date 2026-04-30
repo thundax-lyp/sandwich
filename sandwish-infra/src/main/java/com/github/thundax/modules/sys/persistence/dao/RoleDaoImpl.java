@@ -140,7 +140,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public int updateEnableFlag(Role role) {
+    public int updateStatus(Role role) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(RoleDO::getEnableFlag, dataObject.getEnableFlag()));

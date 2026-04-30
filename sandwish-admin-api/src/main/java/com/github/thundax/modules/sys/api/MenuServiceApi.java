@@ -117,7 +117,7 @@ public interface MenuServiceApi {
     })
     @SysLogger("显示")
     @RequestMapping(value = "display", method = RequestMethod.POST)
-    Boolean updateDisplayFlag(@RequestBody @ApiParam("菜单显示状态请求列表") List<MenuDisplayRequest> list) throws ApiException;
+    Boolean updateVisibility(@RequestBody @ApiParam("菜单显示状态请求列表") List<MenuDisplayRequest> list) throws ApiException;
 
     /**
      * 删除

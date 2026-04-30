@@ -54,12 +54,12 @@ public interface UserDao {
     void updateLoginInfo(User user);
 
     /**
-     * 启用/禁用：enableFlag, updateDate, updateBy
+     * 更新状态
      *
      * @param user 用户
      * @return 影响记录数
      */
-    int updateEnableFlag(User user);
+    int updateStatus(User user);
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

@@ -116,14 +116,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(Member member) {
-        return dao.updateEnableFlag(member);
+    public int updateStatus(Member member) {
+        return dao.updateStatus(member);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(List<Member> list) {
-        return batchOperate(list, this::updateEnableFlag);
+    public int updateStatus(List<Member> list) {
+        return batchOperate(list, this::updateStatus);
     }
 
     @Override

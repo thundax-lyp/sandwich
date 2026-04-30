@@ -178,7 +178,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public int updateEnableFlag(Member member) {
+    public int updateStatus(Member member) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
         return mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MemberDO::getEnableFlag, dataObject.getEnableFlag()));

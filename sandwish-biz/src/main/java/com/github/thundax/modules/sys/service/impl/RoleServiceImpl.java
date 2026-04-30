@@ -153,8 +153,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(Role role) {
-        int result = dao.updateEnableFlag(role);
+    public int updateStatus(Role role) {
+        int result = dao.updateStatus(role);
 
         signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
         notifyCacheChanged();
@@ -164,8 +164,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(List<Role> list) {
-        return batchOperate(list, this::updateEnableFlag);
+    public int updateStatus(List<Role> list) {
+        return batchOperate(list, this::updateStatus);
     }
 
     @Override

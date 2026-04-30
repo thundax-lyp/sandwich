@@ -43,7 +43,7 @@ public interface UserService extends CrudService<User> {
      * @param user 用户
      * @return 影响记录数
      */
-    int updateEnableFlag(User user);
+    int updateStatus(User user);
 
     /**
      * 启用/禁用
@@ -51,7 +51,7 @@ public interface UserService extends CrudService<User> {
      * @param list 列表
      * @return 影响记录数
      */
-    int updateEnableFlag(List<User> list);
+    int updateStatus(List<User> list);
 
     /**
      * 获取用户权限列表

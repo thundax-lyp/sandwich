@@ -137,7 +137,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public Boolean updateEnableFlag(@RequestBody List<RoleStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@RequestBody List<RoleStatusRequest> list) throws ApiException {
         List<Role> beanList = validateList(
                 list,
                 vo -> roleService.get(roleInterfaceAssembler.toEntityId(vo.getId())),
@@ -145,7 +145,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
                 (bean, vo) ->
                         bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED));
 
-        roleService.updateEnableFlag(beanList);
+        roleService.updateStatus(beanList);
 
         return true;
     }

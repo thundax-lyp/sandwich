@@ -21,7 +21,7 @@ public interface RoleService extends CrudService<Role> {
      * @param role 权限
      * @return 影响记录数
      */
-    int updateEnableFlag(Role role);
+    int updateStatus(Role role);
 
     /**
      * 启用/禁用
@@ -29,7 +29,7 @@ public interface RoleService extends CrudService<Role> {
      * @param list 列表
      * @return 影响记录数
      */
-    int updateEnableFlag(List<Role> list);
+    int updateStatus(List<Role> list);
 
     /**
      * 更新用户列表

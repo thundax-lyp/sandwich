@@ -113,14 +113,14 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(Storage storage) {
-        return dao.updateEnableFlag(storage);
+    public int updateStatus(Storage storage) {
+        return dao.updateStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updatePublicFlag(Storage storage) {
-        return dao.updatePublicFlag(storage);
+    public int updateVisibility(Storage storage) {
+        return dao.updateVisibility(storage);
     }
 
     @Override

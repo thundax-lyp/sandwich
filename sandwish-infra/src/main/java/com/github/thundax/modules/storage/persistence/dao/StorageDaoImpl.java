@@ -162,7 +162,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int updateEnableFlag(Storage storage) {
+    public int updateStatus(Storage storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getEnableFlag, dataObject.getEnableFlag()));
@@ -171,7 +171,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int updatePublicFlag(Storage storage) {
+    public int updateVisibility(Storage storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));

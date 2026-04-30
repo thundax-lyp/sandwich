@@ -165,7 +165,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int updateEnableFlag(Role role) {
+        public int updateStatus(Role role) {
             return 1;
         }
 

@@ -23,18 +23,18 @@ public interface MenuService extends TreeService<Menu> {
     List<Menu> findChildList(String parentId);
 
     /**
-     * 更新 displayFlag
+     * 更新显示状态
      *
      * @param menu 对象
      * @return 影响记录数
      */
-    int updateDisplayFlag(Menu menu);
+    int updateVisibility(Menu menu);
 
     /**
-     * 更新 displayFlag
+     * 更新显示状态
      *
      * @param list 列表
      * @return 影响记录数
      */
-    int updateDisplayFlag(List<Menu> list);
+    int updateVisibility(List<Menu> list);
 }

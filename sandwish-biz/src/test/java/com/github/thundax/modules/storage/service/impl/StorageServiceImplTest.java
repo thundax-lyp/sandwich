@@ -201,12 +201,12 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int updateEnableFlag(Storage storage) {
+        public int updateStatus(Storage storage) {
             return 1;
         }
 
         @Override
-        public int updatePublicFlag(Storage storage) {
+        public int updateVisibility(Storage storage) {
             return 1;
         }
 

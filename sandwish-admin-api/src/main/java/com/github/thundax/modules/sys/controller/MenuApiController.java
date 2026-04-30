@@ -124,7 +124,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public Boolean updateDisplayFlag(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
+    public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = validateList(
                 list,
                 vo -> menuService.get(menuInterfaceAssembler.toEntityId(vo.getId())),
@@ -132,7 +132,7 @@ public class MenuApiController extends BaseApiController implements MenuServiceA
                 (bean, vo) -> bean.setVisibility(
                         Boolean.TRUE.equals(vo.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
 
-        menuService.updateDisplayFlag(beanList);
+        menuService.updateVisibility(beanList);
 
         return true;
     }

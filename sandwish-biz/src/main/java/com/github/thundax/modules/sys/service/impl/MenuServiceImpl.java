@@ -128,8 +128,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateDisplayFlag(Menu menu) {
-        int result = dao.updateDisplayFlag(menu);
+    public int updateVisibility(Menu menu) {
+        int result = dao.updateVisibility(menu);
         signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
         notifyCacheChanged();
         return result;
@@ -137,8 +137,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateDisplayFlag(List<Menu> list) {
-        return batchOperate(list, this::updateDisplayFlag);
+    public int updateVisibility(List<Menu> list) {
+        return batchOperate(list, this::updateVisibility);
     }
 
     @Override

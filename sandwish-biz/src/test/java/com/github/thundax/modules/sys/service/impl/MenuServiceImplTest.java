@@ -123,7 +123,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        int count = service.updateDisplayFlag(Arrays.asList(menu("m1"), menu("m2")));
+        int count = service.updateVisibility(Arrays.asList(menu("m1"), menu("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.displayFlagCalls);
@@ -215,7 +215,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int updateDisplayFlag(Menu menu) {
+        public int updateVisibility(Menu menu) {
             this.displayFlagCalls++;
             return 1;
         }

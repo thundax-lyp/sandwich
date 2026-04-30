@@ -177,8 +177,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(User user) {
-        int result = dao.updateEnableFlag(user);
+    public int updateStatus(User user) {
+        int result = dao.updateStatus(user);
 
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
 
@@ -187,8 +187,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateEnableFlag(List<User> list) {
-        return batchOperate(list, this::updateEnableFlag);
+    public int updateStatus(List<User> list) {
+        return batchOperate(list, this::updateStatus);
     }
 
     @Override

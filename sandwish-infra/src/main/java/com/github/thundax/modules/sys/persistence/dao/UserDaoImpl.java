@@ -186,7 +186,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int updateEnableFlag(User user) {
+    public int updateStatus(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
         int count = mapper.update(
                 null,

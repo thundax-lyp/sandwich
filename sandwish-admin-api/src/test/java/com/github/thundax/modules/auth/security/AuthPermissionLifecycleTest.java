@@ -157,12 +157,12 @@ public class AuthPermissionLifecycleTest {
         public void updateLoginInfo(User user) {}
 
         @Override
-        public int updateEnableFlag(User user) {
+        public int updateStatus(User user) {
             return 1;
         }
 
         @Override
-        public int updateEnableFlag(List<User> list) {
+        public int updateStatus(List<User> list) {
             return list.size();
         }
 
@@ -269,12 +269,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public int updateDisplayFlag(Menu menu) {
+        public int updateVisibility(Menu menu) {
             return 1;
         }
 
         @Override
-        public int updateDisplayFlag(List<Menu> list) {
+        public int updateVisibility(List<Menu> list) {
             return list.size();
         }
 

@@ -87,7 +87,7 @@ public interface MemberDao {
      * @param member 对象
      * @return 影响记录数
      */
-    int updateEnableFlag(Member member);
+    int updateStatus(Member member);
 
     Member getByZjhm(String zjhm);
 

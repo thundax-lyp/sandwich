@@ -53,20 +53,20 @@ public interface StorageDao {
     List<String> findBusinessTypeList();
 
     /**
-     * 启用/禁用
+     * 更新状态
      *
      * @param storage 资源
      * @return 影响记录数
      */
-    int updateEnableFlag(Storage storage);
+    int updateStatus(Storage storage);
 
     /**
-     * 更新发布标记
+     * 更新可见性
      *
      * @param storage 资源
      * @return 影响记录数
      */
-    int updatePublicFlag(Storage storage);
+    int updateVisibility(Storage storage);
 
     /**
      * 读取

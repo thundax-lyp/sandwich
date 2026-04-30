@@ -121,7 +121,7 @@ public interface RoleServiceApi {
     })
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    Boolean updateEnableFlag(@RequestBody @ApiParam("角色状态请求列表") List<RoleStatusRequest> list) throws ApiException;
+    Boolean updateStatus(@RequestBody @ApiParam("角色状态请求列表") List<RoleStatusRequest> list) throws ApiException;
 
     /**
      * 排序

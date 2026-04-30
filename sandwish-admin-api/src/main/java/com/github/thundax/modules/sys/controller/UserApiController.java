@@ -229,7 +229,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
     @Override
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public Boolean updateEnableFlag(@RequestBody List<UserStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = currentUser();
 
         List<User> beanList = validateList(
@@ -244,7 +244,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 (bean, vo) ->
                         bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
 
-        userService.updateEnableFlag(beanList);
+        userService.updateStatus(beanList);
 
         return true;
     }

@@ -199,7 +199,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public int updateDisplayFlag(Menu menu) {
+    public int updateVisibility(Menu menu) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag()));

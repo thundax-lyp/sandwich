@@ -84,7 +84,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        int count = service.updateEnableFlag(Arrays.asList(member("m1"), member("m2")));
+        int count = service.updateStatus(Arrays.asList(member("m1"), member("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.enableUpdateCalls);
@@ -219,7 +219,7 @@ public class MemberServiceImplTest {
         public void updateLoginPass(Member member) {}
 
         @Override
-        public int updateEnableFlag(Member member) {
+        public int updateStatus(Member member) {
             this.enableUpdateCalls++;
             return 1;
         }

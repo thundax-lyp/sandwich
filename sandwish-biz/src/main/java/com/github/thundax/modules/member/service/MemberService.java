@@ -73,7 +73,7 @@ public interface MemberService {
      * @param member 对象
      * @return 影响记录数
      */
-    int updateEnableFlag(Member member);
+    int updateStatus(Member member);
 
     /**
      * 启用/禁用
@@ -81,7 +81,7 @@ public interface MemberService {
      * @param list 列表
      * @return 影响记录数
      */
-    int updateEnableFlag(List<Member> list);
+    int updateStatus(List<Member> list);
 
     Member getByZjhm(Member member);
 

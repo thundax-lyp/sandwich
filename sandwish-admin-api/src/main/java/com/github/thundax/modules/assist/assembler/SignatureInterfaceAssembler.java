@@ -2,7 +2,6 @@ package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.common.persistence.Signable;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.response.SignatureResponse;
@@ -40,7 +39,7 @@ public class SignatureInterfaceAssembler {
         return response;
     }
 
-    private static SignatureResponse baseEntityToResponse(SignatureResponse response, DataEntity entity) {
+    private static SignatureResponse baseEntityToResponse(SignatureResponse response, Signature entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());

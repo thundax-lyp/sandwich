@@ -1,6 +1,5 @@
 package com.github.thundax.modules.assist.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.base.BaseAsyncTask;
 import com.github.thundax.modules.sys.entity.User;
@@ -42,22 +41,18 @@ public class AsyncTask extends BaseAsyncTask {
         return expiredSeconds != null ? expiredSeconds : DEFAULT_EXPIRED_SECONDS;
     }
 
-    @JsonIgnore
     public boolean isPrivate() {
         return Boolean.TRUE.equals(getPrivate());
     }
 
-    @JsonIgnore
     public boolean isActive() {
         return StringUtils.equals(STATUS_ACTIVE, getStatus());
     }
 
-    @JsonIgnore
     public boolean isSuspended() {
         return StringUtils.equals(STATUS_SUSPENDED, getStatus());
     }
 
-    @JsonIgnore
     public boolean isSuccess() {
         return StringUtils.equals(STATUS_SUCCESS, getStatus());
     }

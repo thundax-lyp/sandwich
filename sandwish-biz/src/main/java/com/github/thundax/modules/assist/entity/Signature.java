@@ -1,8 +1,5 @@
 package com.github.thundax.modules.assist.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.thundax.modules.assist.entity.base.BaseSignature;
 import java.io.Serializable;
 import java.util.List;
@@ -12,8 +9,6 @@ import java.util.List;
  *
  * @author wdit
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Signature extends BaseSignature {
 
     public static final String BEAN_NAME = "Signature";
@@ -30,7 +25,6 @@ public class Signature extends BaseSignature {
 
     private Query query;
 
-    @JsonIgnore
     public Query getQuery() {
         return this.query;
     }

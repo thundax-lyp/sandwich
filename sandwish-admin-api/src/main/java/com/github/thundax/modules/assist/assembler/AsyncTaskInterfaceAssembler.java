@@ -2,7 +2,6 @@ package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.DataEntity;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
 import org.springframework.lang.NonNull;
@@ -28,7 +27,7 @@ public class AsyncTaskInterfaceAssembler {
         return response;
     }
 
-    private static AsyncTaskResponse baseEntityToResponse(AsyncTaskResponse response, DataEntity entity) {
+    private static AsyncTaskResponse baseEntityToResponse(AsyncTaskResponse response, AsyncTask entity) {
         response.setId(entity.getId());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());

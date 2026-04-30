@@ -13,20 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `assist`：迁移辅助域实体与装配
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/base/BaseAsyncTask.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/base/BaseSignature.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/AsyncTask.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/Signature.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/AsyncTaskInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/SignatureInterfaceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/assembler/AsyncTaskPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/assembler/SignaturePersistenceAssembler.java`
-  - 处理动作：下沉辅助域实体字段，移除旧基类、Jackson 注解和 `DataEntity` 装配依赖。
-  - 验收点：`AsyncTask`、`Signature` 不再继承 `DataEntity` 或 `AdminDataEntity`，不再 import `com.fasterxml.jackson.annotation..`；assist assembler 不再 import `DataEntity`。
-  - 重要度：8/10
-
 - [ ] `storage`：迁移存储域实体与装配
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/base/BaseStorage.java`

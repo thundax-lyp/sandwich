@@ -7,9 +7,6 @@ import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
  * 本地化配置文件取值转换器，用于处理配置文件中加密属性
  *
  * <p>加密方式使用Sm4.encrypt(data, EncryptUtil.KEY)
- *
- * @author wdit
- * @date 2019/3/31
  */
 public class NativePropertyPlaceConfigurer extends PropertyPlaceholderConfigurer {
 

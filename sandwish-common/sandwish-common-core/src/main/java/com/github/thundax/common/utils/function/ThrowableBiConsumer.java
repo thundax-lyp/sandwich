@@ -3,11 +3,10 @@ package com.github.thundax.common.utils.function;
 import java.util.Objects;
 
 /**
- * copy from java.util.function.BiConsumer
+ * 允许抛出异常的 BiConsumer 变体。
  *
- * @param <T>
- * @param <U>
- * @author thundax
+ * @param <T> 第一个输入类型
+ * @param <U> 第二个输入类型
  */
 @FunctionalInterface
 public interface ThrowableBiConsumer<T, U> {

@@ -13,8 +13,6 @@ import org.apache.ibatis.type.MappedTypes;
 
 /**
  * 默认加密转换器
- *
- * @author wdit
  */
 @MappedJdbcTypes(JdbcType.VARCHAR)
 @MappedTypes({String.class})

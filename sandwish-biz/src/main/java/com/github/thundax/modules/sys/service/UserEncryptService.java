@@ -5,8 +5,6 @@ import com.github.thundax.modules.sys.entity.UserEncrypt;
 
 /**
  * 用户重要信息加密
- *
- * @author wdit
  */
 public interface UserEncryptService extends CrudService<UserEncrypt> {
 

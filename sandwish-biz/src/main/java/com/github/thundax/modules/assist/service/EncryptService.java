@@ -2,8 +2,6 @@ package com.github.thundax.modules.assist.service;
 
 /**
  * 国密服务
- *
- * @author wdit
  */
 public interface EncryptService {
 

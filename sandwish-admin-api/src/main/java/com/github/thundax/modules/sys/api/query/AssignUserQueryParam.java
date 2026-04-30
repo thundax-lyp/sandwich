@@ -11,11 +11,6 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-/**
- * AssignUserQueryParam
- *
- * @author wdit
- */
 @ApiModel(value = "AssignUserQueryParam", description = "用户授权参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -8,8 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * SM3加密
- *
- * @author wdit
  */
 public class Sm3PasswordServiceImpl implements PasswordService {
 

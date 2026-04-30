@@ -24,8 +24,6 @@ import org.springframework.web.client.RestClientException;
 
 /**
  * 用户重要信息加密数据库加密服务 数据库列加密
- *
- * @author wdit
  */
 @Service
 @Transactional(readOnly = true)

@@ -1,8 +1,9 @@
 package com.github.thundax.common.service;
 
 /**
- * @param <T> entity
- * @author thundax
+ * 树形实体服务接口。
+ *
+ * @param <T> 实体类型
  */
 public interface TreeService<T> extends CrudService<T> {
 

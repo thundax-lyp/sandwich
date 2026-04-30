@@ -20,8 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * 包装API返回值
- *
- * @author wdit
  */
 public class ResponseWrapperFilter extends OncePerRequestFilter {
 

@@ -9,8 +9,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * @author: someone
- * @date: 2023/7/25
+ * 富文本资源路径清理工具。
  */
 public class HtmlResourceUtils {
 

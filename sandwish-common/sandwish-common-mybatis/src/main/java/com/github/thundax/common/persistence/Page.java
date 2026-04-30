@@ -11,8 +11,6 @@ import org.apache.ibatis.type.Alias;
 
 /**
  * 分页类
- *
- * @author thundax
  */
 @Alias("Page")
 public class Page<T> {

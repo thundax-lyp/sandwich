@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 执行时间过滤器
- *
- * @author thundax
  */
 public class ProcessTimeFilter implements Filter {
 

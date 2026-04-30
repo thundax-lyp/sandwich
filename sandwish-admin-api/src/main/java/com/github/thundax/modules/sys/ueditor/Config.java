@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * 为了统一JSON解析的代码，将百度编辑器中的引用的JSONObject换成反序列化的方式 删除了视频上传、涂鸦、截图、文件上传功能，只提供图片上传功能
- *
- * @author wdit
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Config implements Serializable {

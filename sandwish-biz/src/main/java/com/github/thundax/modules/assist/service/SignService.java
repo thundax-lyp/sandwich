@@ -2,8 +2,6 @@ package com.github.thundax.modules.assist.service;
 
 /**
  * 签名服务
- *
- * @author wdit
  */
 public interface SignService {
 

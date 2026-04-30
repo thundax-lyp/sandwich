@@ -12,8 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 生成验证码WAVE文件
- *
- * @author wdit
  */
 public class WaveValidateCodeServlet extends HttpServlet {
 

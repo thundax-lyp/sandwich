@@ -10,8 +10,6 @@ import org.springframework.core.io.Resource;
 
 /**
  * 配置管理器
- *
- * @author wdit
  */
 public final class ConfigManager {
 

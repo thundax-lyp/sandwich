@@ -3,11 +3,10 @@ package com.github.thundax.common.utils.function;
 import java.util.Objects;
 
 /**
- * copy from java.util.function.Function
+ * 允许抛出异常的 Function 变体。
  *
- * @param <T>
- * @param <R>
- * @author thundax
+ * @param <T> 输入类型
+ * @param <R> 返回类型
  */
 @FunctionalInterface
 public interface ThrowableFunction<T, R> {

@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * 签名存储
- *
- * @author wdit
  */
 public class Signature extends BaseSignature {
 

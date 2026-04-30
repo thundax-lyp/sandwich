@@ -5,8 +5,9 @@ import com.github.thundax.common.persistence.Page;
 import java.util.List;
 
 /**
- * @param <T> Class
- * @author thundax
+ * 通用 CRUD 服务接口。
+ *
+ * @param <T> 实体类型
  */
 public interface CrudService<T> extends BaseService {
 

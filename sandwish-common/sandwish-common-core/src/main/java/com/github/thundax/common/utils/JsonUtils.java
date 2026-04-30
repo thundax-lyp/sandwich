@@ -9,8 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * JSON工具类，使用jackson库
- *
- * @author thundax
  */
 public class JsonUtils {
 

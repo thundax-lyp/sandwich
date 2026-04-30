@@ -11,10 +11,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
-/**
- * @author zhangwei
- * @date 2021/10/24/15:36
- */
 public class Sm4Util {
 
     private static final String KEY = "F7EFA739963909A0BEA56F8C2DE7CAC8";

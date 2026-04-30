@@ -15,8 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 生成随机验证码
- *
- * @author wdit
  */
 public class SmsValidateCodeServlet extends HttpServlet {
 

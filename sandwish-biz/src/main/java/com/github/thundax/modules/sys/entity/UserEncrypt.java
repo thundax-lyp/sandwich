@@ -4,8 +4,6 @@ import com.github.thundax.modules.sys.entity.base.BaseUserEncrypt;
 
 /**
  * 用户重要信息加密
- *
- * @author wdit
  */
 public class UserEncrypt extends BaseUserEncrypt {
 

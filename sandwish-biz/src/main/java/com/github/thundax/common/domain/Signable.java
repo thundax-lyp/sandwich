@@ -1,9 +1,7 @@
 package com.github.thundax.common.domain;
 
 /**
- * 接口：签名对象
- *
- * @author wdit
+ * 签名字段承载能力。
  */
 public interface Signable {
 

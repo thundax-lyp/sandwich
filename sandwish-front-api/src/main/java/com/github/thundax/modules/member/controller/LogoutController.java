@@ -11,10 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/**
- * @author zhangwei
- * @date 2021/08/23/16:35
- */
 @Controller
 @RequestMapping(value = "/auth")
 public class LogoutController {

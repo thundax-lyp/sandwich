@@ -2,8 +2,6 @@ package com.github.thundax.modules.sys.ueditor.define;
 
 /**
  * 处理状态接口
- *
- * @author hancong03@baidu.com
  */
 public interface State {
 

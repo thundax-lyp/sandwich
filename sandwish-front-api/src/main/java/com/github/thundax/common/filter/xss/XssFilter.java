@@ -16,11 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * XssFilter
- *
- * @author wdit
- */
 public class XssFilter implements Filter {
 
     private List<String> urlExcludes = new ArrayList<>();

@@ -15,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 签名存储SERVICE-IMPL
- *
- * @author wdit
  */
 @Service
 @Transactional(readOnly = true)

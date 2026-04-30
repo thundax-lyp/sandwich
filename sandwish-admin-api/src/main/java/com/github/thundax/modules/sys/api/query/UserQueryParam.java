@@ -15,11 +15,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Size;
 
-/**
- * UserQueryParam
- *
- * @author wdit
- */
 @ApiModel(value = "UserQueryParam", description = "用户查询参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

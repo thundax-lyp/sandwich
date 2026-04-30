@@ -6,8 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 国密服务默认实现
- *
- * @author wdit
  */
 public class DefaultEncryptServiceImpl implements EncryptService {
 

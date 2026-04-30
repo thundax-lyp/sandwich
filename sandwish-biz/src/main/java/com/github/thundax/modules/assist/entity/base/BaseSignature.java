@@ -7,8 +7,6 @@ import java.util.Date;
 
 /**
  * 签名存储基类
- *
- * @author wdit
  */
 public abstract class BaseSignature extends Entity<Signature> {
 

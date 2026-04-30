@@ -18,8 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * XSS过滤处理
- *
- * @author wdit
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 

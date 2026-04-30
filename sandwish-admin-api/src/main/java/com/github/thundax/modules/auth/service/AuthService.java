@@ -10,11 +10,6 @@ import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 
-/**
- * AuthService
- *
- * @author wdit
- */
 public interface AuthService {
 
     /**

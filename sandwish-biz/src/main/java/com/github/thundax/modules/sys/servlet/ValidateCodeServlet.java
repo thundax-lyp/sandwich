@@ -17,8 +17,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * 生成随机验证码
- *
- * @author wdit
  */
 public class ValidateCodeServlet extends HttpServlet {
 

@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 抽象签名服务
- *
- * @author wdit
  */
 public abstract class AbstractSignServiceImpl implements SignService {
 

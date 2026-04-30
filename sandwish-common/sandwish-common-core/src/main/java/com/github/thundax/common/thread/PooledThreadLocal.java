@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 /**
  * @param <T>
- * @author thundax
  */
 public class PooledThreadLocal<T> {
 

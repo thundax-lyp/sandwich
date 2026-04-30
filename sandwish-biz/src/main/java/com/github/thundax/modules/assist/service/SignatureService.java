@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * 签名存储SERVICE
- *
- * @author wdit
  */
 public interface SignatureService {
 

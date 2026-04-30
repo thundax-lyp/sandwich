@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 签名服务默认配置
- *
- * @author wdit
  */
 @Configuration
 public class DefaultSignatureConfiguration {

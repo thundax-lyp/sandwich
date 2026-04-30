@@ -13,8 +13,6 @@ import org.springframework.lang.NonNull;
 
 /**
  * 提供附件
- *
- * @author
  */
 public class StorageServlet extends HttpServlet {
 

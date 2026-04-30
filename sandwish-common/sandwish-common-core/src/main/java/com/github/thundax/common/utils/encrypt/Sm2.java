@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 仅适配前端 sm-crypto
- *
- * @author thundax
  */
 public class Sm2 {
 

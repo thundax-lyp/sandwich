@@ -1,10 +1,5 @@
 package com.github.thundax.modules.auth.service;
 
-/**
- * PasswordService
- *
- * @author wdit
- */
 public interface PasswordService {
 
     /**

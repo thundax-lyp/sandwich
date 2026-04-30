@@ -7,8 +7,6 @@ import java.util.List;
 
 /**
  * 会员Service
- *
- * @author wdit
  */
 public interface MemberService {
 

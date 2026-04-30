@@ -37,8 +37,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 一网通办相关
- *
- * @author 51678
  */
 @Component
 public class HuidaoUtils {

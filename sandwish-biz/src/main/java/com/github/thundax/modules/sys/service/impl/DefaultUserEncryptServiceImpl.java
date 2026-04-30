@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 用户重要信息加密默认服务
- *
- * @author wdit
  */
 @Service
 @Transactional(readOnly = true)

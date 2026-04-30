@@ -8,11 +8,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 
-/**
- * UsernameLoginQueryParam
- *
- * @author wdit
- */
 @ApiModel(value = "UsernameLoginQueryParam", description = "用户名/密码登录参数")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

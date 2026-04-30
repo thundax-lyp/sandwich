@@ -6,8 +6,6 @@ import org.jasypt.encryption.StringEncryptor;
 
 /**
  * 为配置中的敏感信息加密
- *
- * @author thundax
  */
 public class JasyptStringEncryptor implements StringEncryptor {
 

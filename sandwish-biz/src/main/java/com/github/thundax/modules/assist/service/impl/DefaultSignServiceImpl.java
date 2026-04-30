@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 默认签名服务
- *
- * @author wdit
  */
 public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
 

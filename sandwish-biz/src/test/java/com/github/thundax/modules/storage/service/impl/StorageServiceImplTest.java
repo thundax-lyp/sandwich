@@ -47,7 +47,7 @@ public class StorageServiceImplTest {
 
         assertEquals("image/png", dao.mimeType);
         assertEquals("owner-1", dao.ownerId);
-        assertEquals("user", dao.ownerType);
+        assertEquals("USER", dao.ownerType);
         assertEquals("1", dao.enableFlag);
         assertEquals("avatar", dao.name);
         assertEquals("remark", dao.remarks);

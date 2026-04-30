@@ -3,6 +3,7 @@ package com.github.thundax.modules.storage.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StorageOwnerType;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
         dataObject.setOwnerId(entity.getOwnerId());
-        dataObject.setOwnerType(entity.getOwnerType());
+        dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
         dataObject.setEnableFlag(entity.getEnableFlag());
         dataObject.setPriority(entity.getPriority());
         dataObject.setRemarks(entity.getRemarks());
@@ -41,7 +42,7 @@ public final class StoragePersistenceAssembler {
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());
         entity.setOwnerId(dataObject.getOwnerId());
-        entity.setOwnerType(dataObject.getOwnerType());
+        entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
         entity.setEnableFlag(dataObject.getEnableFlag());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
@@ -63,6 +64,14 @@ public final class StoragePersistenceAssembler {
 
     private static int priorityOrDefault(Integer priority) {
         return priority == null ? 0 : priority;
+    }
+
+    private static String ownerTypeValue(StorageOwnerType ownerType) {
+        return ownerType == null ? null : ownerType.value();
+    }
+
+    private static StorageOwnerType ownerTypeFrom(String ownerType) {
+        return ownerType == null ? null : StorageOwnerType.from(ownerType);
     }
 
     public static StorageBusinessDO toBusinessDataObject(StorageBusiness entity) {

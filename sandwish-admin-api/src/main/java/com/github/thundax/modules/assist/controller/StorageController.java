@@ -11,6 +11,7 @@ import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.StorageServiceHolder;
 import com.github.thundax.modules.storage.utils.StorageUtils;
@@ -108,7 +109,7 @@ public class StorageController extends BaseAdminController {
     public StorageUploadResponse uploadTest(MultipartFile file) throws ApiException {
         Storage storage = new Storage();
 
-        storage.setOwnerType(Storage.OWNER_TYPE_USER);
+        storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId(UserAccessHolder.currentUserId());
         StorageUtils.saveFile(file, storage);
 
@@ -148,7 +149,7 @@ public class StorageController extends BaseAdminController {
                     storage.setExtendName(extendName);
                     storage.setMimeType(file.getContentType());
 
-                    storage.setOwnerType(Storage.OWNER_TYPE_USER);
+                    storage.setOwnerType(StorageOwnerType.USER);
                     storage.setOwnerId(EntityIdCodec.toValue(currentUser().getId()));
 
                     //                    File localFile = new File(properties.getStoragePath() +

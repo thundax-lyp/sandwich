@@ -7,6 +7,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,7 @@ public class StorageServiceImpl implements StorageService {
         return dao.findList(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
-                query == null ? null : query.getOwnerType(),
+                query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : query.getEnableFlag(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
@@ -56,7 +57,7 @@ public class StorageServiceImpl implements StorageService {
         IPage<Storage> dataPage = dao.findPage(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
-                query == null ? null : query.getOwnerType(),
+                query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : query.getEnableFlag(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
@@ -149,5 +150,9 @@ public class StorageServiceImpl implements StorageService {
         Page<Storage> normalizedPage = page == null ? new Page<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
+    }
+
+    private String ownerTypeValue(StorageOwnerType ownerType) {
+        return ownerType == null ? null : ownerType.value();
     }
 }

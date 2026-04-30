@@ -24,7 +24,7 @@ public class Storage implements Sortable {
     private String extendName;
     private String mimeType;
     private String ownerId;
-    private String ownerType;
+    private StorageOwnerType ownerType;
     private String enableFlag = Global.ENABLE;
     private int priority;
     private String remarks;
@@ -40,11 +40,16 @@ public class Storage implements Sortable {
 
     private static final String PATH_FORMAT = "yyyyMM";
 
-    public static final String OWNER_TYPE_USER = "user";
-    public static final String OWNER_TYPE_MEMBER = "member";
-
     public void setEnableFlag(String enableFlag) {
         this.enableFlag = StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = StringUtils.isBlank(ownerType) ? null : StorageOwnerType.from(ownerType);
+    }
+
+    public void setOwnerType(StorageOwnerType ownerType) {
+        this.ownerType = ownerType;
     }
 
     public boolean isEnable() {
@@ -89,7 +94,7 @@ public class Storage implements Sortable {
         private String businessId;
         private String businessType;
         private String ownerId;
-        private String ownerType;
+        private StorageOwnerType ownerType;
         private String enableFlag;
         private String publicFlag;
         private String name;
@@ -127,11 +132,15 @@ public class Storage implements Sortable {
             this.ownerId = ownerId;
         }
 
-        public String getOwnerType() {
+        public StorageOwnerType getOwnerType() {
             return ownerType;
         }
 
         public void setOwnerType(String ownerType) {
+            this.ownerType = StringUtils.isBlank(ownerType) ? null : StorageOwnerType.from(ownerType);
+        }
+
+        public void setOwnerType(StorageOwnerType ownerType) {
             this.ownerType = ownerType;
         }
 

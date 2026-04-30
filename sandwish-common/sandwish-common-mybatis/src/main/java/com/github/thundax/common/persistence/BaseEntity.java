@@ -27,18 +27,4 @@ public abstract class BaseEntity<T extends BaseEntity<T>> extends Entity<T> impl
     }
 
     protected abstract void initialize();
-
-    @Override
-    public boolean equals(Object obj) {
-        if (null == obj) {
-            return false;
-        } else if (this == obj) {
-            return true;
-        } else if (!getClass().equals(obj.getClass())) {
-            return false;
-        } else if (this.getEntityId() == null) {
-            return false;
-        }
-        return this.getEntityId().equals(((BaseEntity<?>) obj).getEntityId());
-    }
 }

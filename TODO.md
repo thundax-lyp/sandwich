@@ -13,16 +13,6 @@
 
 ## 待审阅任务项
 
-- [ ] `common-domain`：收敛领域实体身份根
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/domain/Entity.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/BaseEntity.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/DataEntity.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/TreeEntity.java`
-  - 处理动作：把实体身份与相等性收敛到 `Entity`，旧基类只保留过渡职责。
-  - 验收点：`Entity` 承载 `EntityId`、getter/setter 和同类同 id 相等性；当前步骤可编译。
-  - 重要度：10/10
-
 - [ ] `biz-domain`：建立领域能力接口
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/common/domain/Auditable.java`

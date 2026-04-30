@@ -2,6 +2,7 @@ package com.github.thundax.modules.member.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class MemberPersistenceAssembler {
         dataObject.setMobile(entity.getMobile());
         dataObject.setAddress(entity.getAddress());
         dataObject.setZipcode(entity.getZipcode());
-        dataObject.setEnableFlag(entity.getEnableFlag());
+        dataObject.setEnableFlag(statusValue(entity.getStatus()));
         dataObject.setRegisterIp(entity.getRegisterIp());
         dataObject.setRegisterDate(entity.getRegisterDate());
         dataObject.setLastLoginIp(entity.getLastLoginIp());
@@ -54,7 +55,7 @@ public final class MemberPersistenceAssembler {
         entity.setMobile(dataObject.getMobile());
         entity.setAddress(dataObject.getAddress());
         entity.setZipcode(dataObject.getZipcode());
-        entity.setEnableFlag(dataObject.getEnableFlag());
+        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
         entity.setRegisterIp(dataObject.getRegisterIp());
         entity.setRegisterDate(dataObject.getRegisterDate());
         entity.setLastLoginIp(dataObject.getLastLoginIp());
@@ -83,5 +84,13 @@ public final class MemberPersistenceAssembler {
 
     private static int priorityOrDefault(Integer priority) {
         return priority == null ? 0 : priority;
+    }
+
+    private static String statusValue(MemberStatus status) {
+        return status == null ? null : status.value();
+    }
+
+    private static MemberStatus statusFrom(String status) {
+        return status == null ? null : MemberStatus.from(status);
     }
 }

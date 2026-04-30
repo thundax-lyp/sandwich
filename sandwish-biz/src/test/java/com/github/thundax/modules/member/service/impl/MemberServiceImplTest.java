@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.MemberStatus;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,7 @@ public class MemberServiceImplTest {
         Member.Query condition = new Member.Query();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
-        condition.setEnableFlag("1");
+        condition.setStatus(MemberStatus.ENABLED);
         condition.setEmail("a@example.com");
         condition.setName("alice");
         condition.setRemarks("remark");
@@ -55,7 +56,7 @@ public class MemberServiceImplTest {
         MemberServiceImpl service = new MemberServiceImpl(dao);
         service.findList(query);
 
-        assertEquals("1", dao.enableFlag);
+        assertEquals("ENABLED", dao.enableFlag);
         assertEquals("a@example.com", dao.email);
         assertEquals("alice", dao.name);
         assertEquals("remark", dao.remarks);

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.member.entity;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
@@ -31,7 +30,7 @@ public class Member implements Auditable, Sortable {
     private String address;
     private String zipcode;
 
-    private String enableFlag;
+    private MemberStatus status = MemberStatus.ENABLED;
 
     private String registerIp;
     private Date registerDate;
@@ -58,12 +57,16 @@ public class Member implements Auditable, Sortable {
     public static final String MALE = "1";
     public static final String FEMALE = "0";
 
-    public void setEnableFlag(String enableFlag) {
-        this.enableFlag = StringUtils.equals(Global.ENABLE, enableFlag) ? Global.ENABLE : Global.DISABLE;
+    public void setStatus(String status) {
+        this.status = StringUtils.isBlank(status) ? null : MemberStatus.from(status);
+    }
+
+    public void setStatus(MemberStatus status) {
+        this.status = status;
     }
 
     public boolean isEnable() {
-        return StringUtils.equals(Global.ENABLE, getEnableFlag());
+        return MemberStatus.ENABLED == getStatus();
     }
 
     public boolean isMale() {
@@ -82,7 +85,7 @@ public class Member implements Auditable, Sortable {
 
     public static class Query implements Serializable {
 
-        public static final String PROP_ENABLE_FLAG = "enableFlag";
+        public static final String PROP_STATUS = "status";
         public static final String PROP_EMAIL = "email";
         public static final String PROP_NAME = "name";
         public static final String PROP_REMARKS = "remarks";
@@ -93,7 +96,7 @@ public class Member implements Auditable, Sortable {
         public static final String PROP_END_LOGIN_DATE = "endLoginDate";
         public static final String PROP_MOBILE = "mobile";
 
-        private String enableFlag;
+        private MemberStatus status;
         private String email;
         private String name;
         private String remarks; // 按照rank查询
@@ -109,12 +112,16 @@ public class Member implements Auditable, Sortable {
 
         private String mobile;
 
-        public String getEnableFlag() {
-            return enableFlag;
+        public MemberStatus getStatus() {
+            return status;
         }
 
-        public void setEnableFlag(String enableFlag) {
-            this.enableFlag = enableFlag;
+        public void setStatus(String status) {
+            this.status = StringUtils.isBlank(status) ? null : MemberStatus.from(status);
+        }
+
+        public void setStatus(MemberStatus status) {
+            this.status = status;
         }
 
         public String getEmail() {

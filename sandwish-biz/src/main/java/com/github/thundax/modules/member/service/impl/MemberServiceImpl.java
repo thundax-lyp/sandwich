@@ -6,6 +6,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
     public List<Member> findList(Member member) {
         Member.Query query = member == null ? null : member.getQuery();
         return dao.findList(
-                query == null ? null : query.getEnableFlag(),
+                query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
@@ -59,7 +60,7 @@ public class MemberServiceImpl implements MemberService {
         Page<Member> normalizedPage = normalizePage(page);
         Member.Query query = member == null ? null : member.getQuery();
         IPage<Member> dataPage = dao.findPage(
-                query == null ? null : query.getEnableFlag(),
+                query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
@@ -187,5 +188,9 @@ public class MemberServiceImpl implements MemberService {
         Page<Member> normalizedPage = page == null ? new Page<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
+    }
+
+    private String statusValue(MemberStatus status) {
+        return status == null ? null : status.value();
     }
 }

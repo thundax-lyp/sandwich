@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ public final class LogPersistenceAssembler {
         LogDO dataObject = new LogDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setUserId(entity.getUserId());
-        dataObject.setType(entity.getType());
+        dataObject.setType(typeValue(entity.getType()));
         dataObject.setLogDate(entity.getLogDate());
         dataObject.setTitle(entity.getTitle());
         dataObject.setRemoteAddr(entity.getRemoteAddr());
@@ -35,7 +36,7 @@ public final class LogPersistenceAssembler {
         Log entity = new Log();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setUserId(dataObject.getUserId());
-        entity.setType(dataObject.getType());
+        entity.setType(typeFrom(dataObject.getType()));
         entity.setLogDate(dataObject.getLogDate());
         entity.setTitle(dataObject.getTitle());
         entity.setRemoteAddr(dataObject.getRemoteAddr());
@@ -66,5 +67,13 @@ public final class LogPersistenceAssembler {
             dataObjects.add(toDataObject(entity));
         }
         return dataObjects;
+    }
+
+    private static String typeValue(LogType type) {
+        return type == null ? null : type.value();
+    }
+
+    private static LogType typeFrom(String type) {
+        return type == null ? null : LogType.from(type);
     }
 }

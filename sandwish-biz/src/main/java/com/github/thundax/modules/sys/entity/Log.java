@@ -24,7 +24,7 @@ public class Log implements Signable {
 
     private String userId;
 
-    private String type;
+    private LogType type;
     private Date logDate;
     private String title;
     private String remoteAddr;
@@ -42,9 +42,6 @@ public class Log implements Signable {
 
     public static final String BEAN_NAME = "Log";
 
-    public static final String TYPE_ACCESS = "1";
-
-    public static final String TYPE_EXCEPTION = "2";
     private boolean signable = false;
 
     public User getUser() {
@@ -68,7 +65,7 @@ public class Log implements Signable {
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("userId", this.getUserId());
-        map.put("type", this.getType());
+        map.put("type", getType() == null ? null : getType().value());
         map.put("logDate", this.getLogDate());
         map.put("title", this.getTitle());
         map.put("remoteAddr", this.getRemoteAddr());
@@ -100,6 +97,14 @@ public class Log implements Signable {
         }
     }
 
+    public void setType(String type) {
+        this.type = StringUtils.isBlank(type) ? null : LogType.from(type);
+    }
+
+    public void setType(LogType type) {
+        this.type = type;
+    }
+
     private Query query;
 
     public Query getQuery() {
@@ -123,7 +128,7 @@ public class Log implements Signable {
         public static final String PROP_BEGIN_DATE = "beginDate";
         public static final String PROP_END_DATE = "endDate";
 
-        private String type;
+        private LogType type;
         private String remoteAddr;
         private String title;
         private String requestUri;
@@ -134,11 +139,15 @@ public class Log implements Signable {
         private Date beginDate;
         private Date endDate;
 
-        public String getType() {
+        public LogType getType() {
             return type;
         }
 
         public void setType(String type) {
+            this.type = StringUtils.isBlank(type) ? null : LogType.from(type);
+        }
+
+        public void setType(LogType type) {
             this.type = type;
         }
 

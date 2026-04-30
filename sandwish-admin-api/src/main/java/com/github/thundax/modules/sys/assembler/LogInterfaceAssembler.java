@@ -21,7 +21,7 @@ public class LogInterfaceAssembler {
 
         LogResponse response = baseEntityToResponse(new LogResponse(), entity);
 
-        response.setType(entity.getType());
+        response.setType(entity.getType() == null ? null : entity.getType().value());
         response.setTitle(entity.getTitle());
         response.setRemoteAddr(entity.getRemoteAddr());
         response.setUserAgent(entity.getUserAgent());

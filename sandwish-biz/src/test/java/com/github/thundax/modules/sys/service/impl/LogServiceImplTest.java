@@ -10,6 +10,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.LogType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,7 +46,7 @@ public class LogServiceImplTest {
         Log.Query query = new Log.Query();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
-        query.setType(Log.TYPE_ACCESS);
+        query.setType(LogType.ACCESS);
         query.setRemoteAddr("127.0.0.1");
         query.setUserLoginName("admin");
         query.setUserName("系统管理员");
@@ -59,7 +60,7 @@ public class LogServiceImplTest {
 
         service.findPage(log, page);
 
-        assertEquals(Log.TYPE_ACCESS, dao.type);
+        assertEquals("ACCESS", dao.type);
         assertEquals("127.0.0.1", dao.remoteAddr);
         assertEquals("admin", dao.userLoginName);
         assertEquals("系统管理员", dao.userName);
@@ -92,7 +93,7 @@ public class LogServiceImplTest {
         RecordingSignService signService = new RecordingSignService();
         Log log = new Log();
         log.setSignable(true);
-        log.setType(Log.TYPE_EXCEPTION);
+        log.setType(LogType.EXCEPTION);
         LogServiceImpl service = new LogServiceImpl(dao, signService);
 
         service.add(log);
@@ -133,7 +134,7 @@ public class LogServiceImplTest {
         Log.Query query = new Log.Query();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
-        query.setType(Log.TYPE_EXCEPTION);
+        query.setType(LogType.EXCEPTION);
         query.setRemoteAddr("10.0.0.1");
         query.setUserLoginName("ignored");
         query.setUserName("ignored");
@@ -146,7 +147,7 @@ public class LogServiceImplTest {
 
         service.batchDelete(log);
 
-        assertEquals(Log.TYPE_EXCEPTION, dao.type);
+        assertEquals("EXCEPTION", dao.type);
         assertEquals("10.0.0.1", dao.remoteAddr);
         assertEquals(null, dao.userLoginName);
         assertEquals(null, dao.userName);

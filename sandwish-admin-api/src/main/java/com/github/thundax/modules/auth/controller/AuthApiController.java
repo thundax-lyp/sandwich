@@ -21,6 +21,7 @@ import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.LogType;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
@@ -158,7 +159,7 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
-        log.setType("1");
+        log.setType(LogType.ACCESS);
         log.setRequestParams(authInterfaceAssembler.toLogJson(request));
         log.setSignable(true);
         SysLogUtils.saveLog(log);

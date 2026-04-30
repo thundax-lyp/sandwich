@@ -7,6 +7,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.LogType;
 import com.github.thundax.modules.sys.service.LogService;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class LogServiceImpl implements LogService {
     public List<Log> findList(Log log) {
         Log.Query query = log == null ? null : log.getQuery();
         return dao.findList(
-                query == null ? null : query.getType(),
+                query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
                 query == null ? null : query.getUserLoginName(),
                 query == null ? null : query.getUserName(),
@@ -53,7 +54,7 @@ public class LogServiceImpl implements LogService {
         Page<Log> normalizedPage = normalizePage(page);
         Log.Query query = log == null ? null : log.getQuery();
         IPage<Log> dataPage = dao.findPage(
-                query == null ? null : query.getType(),
+                query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
                 query == null ? null : query.getUserLoginName(),
                 query == null ? null : query.getUserName(),
@@ -125,7 +126,7 @@ public class LogServiceImpl implements LogService {
     public int batchDelete(Log log) {
         Log.Query query = log == null ? null : log.getQuery();
         return dao.batchDelete(
-                query == null ? null : query.getType(),
+                query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
                 query == null ? null : query.getTitle(),
                 query == null ? null : query.getRequestUri(),
@@ -142,5 +143,9 @@ public class LogServiceImpl implements LogService {
             normalizedPage.setPageSize(Page.DEFAULT_PAGE_SIZE);
         }
         return normalizedPage;
+    }
+
+    private String typeValue(LogType type) {
+        return type == null ? null : type.value();
     }
 }

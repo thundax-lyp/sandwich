@@ -19,7 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,9 +36,7 @@ public class LogApiController extends BaseApiController {
     private final OfficeService officeService;
 
     @Autowired
-    public LogApiController(
-            LogService logService, Validator validator, UserService userService, OfficeService officeService) {
-        super(validator);
+    public LogApiController(LogService logService, UserService userService, OfficeService officeService) {
         this.logService = logService;
         this.userService = userService;
         this.officeService = officeService;
@@ -53,9 +51,7 @@ public class LogApiController extends BaseApiController {
                 dataTypeClass = String.class),
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    public PageVo<LogResponse> page(@RequestBody LogPageRequest request) throws ApiException {
-        validate(request);
-
+    public PageVo<LogResponse> page(@Valid @RequestBody LogPageRequest request) throws ApiException {
         Log query = new Log();
         Log.Query queryCondition = new Log.Query();
 

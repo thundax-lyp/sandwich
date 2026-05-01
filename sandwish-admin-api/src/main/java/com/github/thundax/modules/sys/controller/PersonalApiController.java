@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -66,13 +66,11 @@ public class PersonalApiController extends BaseApiController {
     private final KeypairService keypairService;
 
     public PersonalApiController(
-            Validator validator,
             UserService userService,
             RoleService roleService,
             MenuService menuService,
             PasswordService passwordService,
             KeypairService keypairService) {
-        super(validator);
 
         this.userService = userService;
         this.roleService = roleService;
@@ -109,9 +107,7 @@ public class PersonalApiController extends BaseApiController {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request) throws ApiException {
-        validate(request);
-
+    public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
         PersonalInterfaceAssembler.toEntity(currentUser, request);
@@ -130,7 +126,7 @@ public class PersonalApiController extends BaseApiController {
     })
     @SysLogger("更新密码")
     @RequestMapping(value = "password", method = RequestMethod.POST)
-    public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
+    public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
         String privateKey = keypairService.getPrivateKey(request.getToken());
@@ -138,8 +134,6 @@ public class PersonalApiController extends BaseApiController {
         String oldPassword = Sm2.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);
         request.setOldPassword(oldPassword);
-        validate(request);
-
         if (StringUtils.isBlank(password)) {
             throw new InvalidParameterException("password");
         } else if (!password.matches(SysApiUtils.PASSWORD_VALIDATE_PATTERN)) {
@@ -171,8 +165,7 @@ public class PersonalApiController extends BaseApiController {
             value = "avatar/upload",
             method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request) throws ApiException {
-        validate(request);
+    public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
         try {

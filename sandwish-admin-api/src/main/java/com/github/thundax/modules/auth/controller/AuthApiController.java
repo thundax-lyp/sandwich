@@ -30,7 +30,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,8 +50,7 @@ public class AuthApiController extends BaseApiController {
     private final UserService userService;
 
     @Autowired
-    public AuthApiController(Validator validator, AuthService authService, UserService userService) {
-        super(validator);
+    public AuthApiController(AuthService authService, UserService userService) {
 
         this.authService = authService;
         this.userService = userService;
@@ -67,7 +66,7 @@ public class AuthApiController extends BaseApiController {
     @ApiOperation(value = "刷新登录令牌", notes = "ignore")
     @PostMapping(value = "form/refresh")
     @SysLogger("刷新登录令牌")
-    public AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request)
+    public AuthLoginFormResponse refreshLoginForm(@Valid @RequestBody AuthLoginFormRefreshRequest request)
             throws ApiException {
         if (StringUtils.isBlank(request.getRefreshToken())) {
             throw new InvalidParameterException("refreshToken");
@@ -79,8 +78,7 @@ public class AuthApiController extends BaseApiController {
     @ApiOperation(value = "用户/密码登录", notes = "ignore")
     @PostMapping(value = "login")
     @SysLogger("用户/密码登录")
-    public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException {
-        validate(request);
+    public AuthAccessTokenResponse login(@Valid @RequestBody AuthLoginRequest request) throws ApiException {
         HttpServletRequest currentRequest =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         if (!authService.validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
@@ -141,7 +139,7 @@ public class AuthApiController extends BaseApiController {
     @ApiOperation(value = "登出", notes = "ignore")
     @PostMapping(value = "logout")
     @SysLogger("登出")
-    public Boolean logout(@RequestBody AuthLogoutRequest request) throws ApiException {
+    public Boolean logout(@Valid @RequestBody AuthLogoutRequest request) throws ApiException {
         if (StringUtils.isEmpty(request.getToken())) {
             throw new InvalidTokenException();
         }

@@ -14,7 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +30,7 @@ public class AsyncTaskApiController extends BaseApiController {
     private final AsyncTaskService asyncTaskService;
 
     @Autowired
-    public AsyncTaskApiController(AsyncTaskService asyncTaskService, Validator validator) {
-        super(validator);
+    public AsyncTaskApiController(AsyncTaskService asyncTaskService) {
 
         this.asyncTaskService = asyncTaskService;
     }
@@ -46,9 +45,7 @@ public class AsyncTaskApiController extends BaseApiController {
     })
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
-    public AsyncTaskResponse get(@RequestBody AsyncTaskIdRequest request) throws ApiException {
-        validate(request);
-
+    public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
         AsyncTask bean = asyncTaskService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             return new AsyncTaskResponse();

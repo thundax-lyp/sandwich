@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,8 +44,7 @@ public class OfficeApiController extends BaseApiController {
     private final OfficeService officeService;
 
     @Autowired
-    public OfficeApiController(OfficeService officeService, Validator validator) {
-        super(validator);
+    public OfficeApiController(OfficeService officeService) {
         this.officeService = officeService;
     }
 
@@ -60,7 +59,7 @@ public class OfficeApiController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
-    public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
+    public OfficeResponse get(@Valid @RequestBody OfficeIdRequest request) throws ApiException {
         Office bean = officeService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getId());
@@ -79,9 +78,7 @@ public class OfficeApiController extends BaseApiController {
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
-    public List<OfficeResponse> list(@RequestBody OfficeQueryRequest request) throws ApiException {
-        validate(request);
-
+    public List<OfficeResponse> list(@Valid @RequestBody OfficeQueryRequest request) throws ApiException {
         Office query = new Office();
         Office.Query queryCondition = new Office.Query();
 
@@ -106,9 +103,7 @@ public class OfficeApiController extends BaseApiController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
-    public OfficeResponse add(@RequestBody OfficeSaveRequest request) throws ApiException {
-        validate(request);
-
+    public OfficeResponse add(@Valid @RequestBody OfficeSaveRequest request) throws ApiException {
         Office entity = OfficeInterfaceAssembler.toEntity(new Office(), request);
         if (entity.getId() != null) {
             Office bean = officeService.get(entity.getId());
@@ -140,9 +135,7 @@ public class OfficeApiController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
-    public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
-        validate(request);
-
+    public OfficeResponse update(@Valid @RequestBody OfficeSaveRequest request) throws ApiException {
         Office bean = officeService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
@@ -239,9 +232,7 @@ public class OfficeApiController extends BaseApiController {
     @SysLogger("移动")
     @RequestMapping(value = "move", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
-    public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
-        validate(request);
-
+    public Boolean move(@Valid @RequestBody OfficeMoveRequest request) throws ApiException {
         Office fromBean = officeService.get(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getFromNodeId());

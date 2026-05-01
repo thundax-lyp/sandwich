@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,8 +46,7 @@ public class MenuApiController extends BaseApiController {
     private final MenuService menuService;
 
     @Autowired
-    public MenuApiController(MenuService menuService, Validator validator) {
-        super(validator);
+    public MenuApiController(MenuService menuService) {
         this.menuService = menuService;
     }
 
@@ -62,7 +61,7 @@ public class MenuApiController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public MenuResponse get(@RequestBody MenuIdRequest request) throws ApiException {
+    public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
         Menu bean = menuService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getId());
@@ -81,9 +80,7 @@ public class MenuApiController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public List<MenuResponse> list(@RequestBody MenuQueryRequest request) throws ApiException {
-        validate(request);
-
+    public List<MenuResponse> list(@Valid @RequestBody MenuQueryRequest request) throws ApiException {
         Menu query = new Menu();
         Menu.Query queryCondition = new Menu.Query();
 
@@ -109,9 +106,7 @@ public class MenuApiController extends BaseApiController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public MenuResponse add(@RequestBody MenuSaveRequest request) throws ApiException {
-        validate(request);
-
+    public MenuResponse add(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
             Menu bean = menuService.get(entity.getId());
@@ -143,9 +138,7 @@ public class MenuApiController extends BaseApiController {
     @SysLogger("修改")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public MenuResponse update(@RequestBody MenuSaveRequest request) throws ApiException {
-        validate(request);
-
+    public MenuResponse update(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu bean = menuService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
@@ -265,9 +258,7 @@ public class MenuApiController extends BaseApiController {
     @SysLogger("排序")
     @RequestMapping(value = "move", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public Boolean move(@RequestBody MenuMoveRequest request) throws ApiException {
-        validate(request);
-
+    public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
         Menu fromBean = menuService.get(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getFromNodeId());

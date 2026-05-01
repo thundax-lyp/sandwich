@@ -19,7 +19,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +45,7 @@ public class CaptchaApiController extends BaseApiController {
     private final AuthService authService;
 
     @Autowired
-    public CaptchaApiController(Validator validator, AuthService authService) {
-        super(validator);
+    public CaptchaApiController(AuthService authService) {
 
         this.authService = authService;
     }

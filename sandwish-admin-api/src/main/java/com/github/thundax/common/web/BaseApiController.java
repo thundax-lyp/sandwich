@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,30 +31,8 @@ public abstract class BaseApiController extends BaseController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected Validator validator;
-
-    public BaseApiController(Validator validator) {
-        this.validator = validator;
-    }
-
     public User currentUser() {
         return UserAccessHolder.currentUser();
-    }
-
-    protected <T> void validate(T object, String... propertyNames) throws ApiException {
-        for (String propertyName : propertyNames) {
-            Set<ConstraintViolation<T>> constraintViolations = validator.validateProperty(object, propertyName);
-            if (constraintViolations.size() > 0) {
-                throw new ApiException(constraintViolations.iterator().next().getMessage());
-            }
-        }
-    }
-
-    protected <T> void validate(T object) throws ApiException {
-        Set<ConstraintViolation<T>> constraintViolations = validator.validate(object);
-        if (constraintViolations.size() > 0) {
-            throw new ApiException(constraintViolations.iterator().next().getMessage());
-        }
     }
 
     /**

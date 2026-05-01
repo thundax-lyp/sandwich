@@ -37,7 +37,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,12 +62,7 @@ public class RoleApiController extends BaseApiController {
 
     @Autowired
     public RoleApiController(
-            RoleService roleService,
-            MenuService menuService,
-            OfficeService officeService,
-            UserService userService,
-            Validator validator) {
-        super(validator);
+            RoleService roleService, MenuService menuService, OfficeService officeService, UserService userService) {
 
         this.roleService = roleService;
         this.menuService = menuService;
@@ -86,7 +81,7 @@ public class RoleApiController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
-    public RoleResponse get(@RequestBody RoleIdRequest request) throws ApiException {
+    public RoleResponse get(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
@@ -105,9 +100,7 @@ public class RoleApiController extends BaseApiController {
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
-    public List<RoleResponse> list(@RequestBody RoleQueryRequest request) throws ApiException {
-        validate(request);
-
+    public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) throws ApiException {
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
         if (request.getEnable() != null) {
@@ -131,8 +124,7 @@ public class RoleApiController extends BaseApiController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public RoleResponse add(@RequestBody RoleSaveRequest request) throws ApiException {
-        validate(request);
+    public RoleResponse add(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
         Role entity = RoleInterfaceAssembler.toEntity(new Role(), request);
@@ -159,8 +151,7 @@ public class RoleApiController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public RoleResponse update(@RequestBody RoleSaveRequest request) throws ApiException {
-        validate(request);
+    public RoleResponse update(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
         Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
@@ -295,7 +286,7 @@ public class RoleApiController extends BaseApiController {
     })
     @RequestMapping(value = "user/list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
-    public List<RoleUserResponse> userList(@RequestBody RoleIdRequest request) throws ApiException {
+    public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
@@ -317,7 +308,7 @@ public class RoleApiController extends BaseApiController {
     @SysLogger("授权")
     @RequestMapping(value = "user/assign", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public Boolean assignUser(@RequestBody RoleAssignUserRequest request) throws ApiException {
+    public Boolean assignUser(@Valid @RequestBody RoleAssignUserRequest request) throws ApiException {
         validateAssignUser(request);
 
         Role roleBean = roleService.get(EntityIdCodec.toDomain(request.getRoleId()));
@@ -346,8 +337,6 @@ public class RoleApiController extends BaseApiController {
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {
-        validate(request);
-
         Role roleBean = roleService.get(EntityIdCodec.toDomain(request.getRoleId()));
         if (roleBean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getRoleId());

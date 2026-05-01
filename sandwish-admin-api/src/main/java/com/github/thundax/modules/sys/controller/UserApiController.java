@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,10 +84,8 @@ public class UserApiController extends BaseApiController {
             UserService userService,
             OfficeService officeService,
             RoleService roleService,
-            Validator validator,
             KeypairService keypairService,
             PasswordService passwordService) {
-        super(validator);
 
         this.userService = userService;
         this.officeService = officeService;
@@ -107,7 +105,7 @@ public class UserApiController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public UserResponse get(@RequestBody UserIdRequest request) throws ApiException {
+    public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
@@ -126,9 +124,7 @@ public class UserApiController extends BaseApiController {
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public List<UserResponse> list(@RequestBody UserQueryRequest request) throws ApiException {
-        validate(request);
-
+    public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         User query = readQuery(request);
 
         return userService.findList(query).stream()
@@ -147,9 +143,7 @@ public class UserApiController extends BaseApiController {
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public PageVo<UserResponse> page(@RequestBody UserQueryRequest request) throws ApiException {
-        validate(request);
-
+    public PageVo<UserResponse> page(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
@@ -167,11 +161,10 @@ public class UserApiController extends BaseApiController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
+    public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
-        validate(request);
         validateOffice(request.getOffice());
         validateRoles(request.getRoleList());
 
@@ -214,14 +207,13 @@ public class UserApiController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
+    public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
             String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }
-        validate(request);
         validateOffice(request.getOffice());
         validateRoles(request.getRoleList());
 
@@ -290,7 +282,7 @@ public class UserApiController extends BaseApiController {
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public Boolean deleteAvatar(@RequestBody UserAvatarRequest request) throws ApiException {
+    public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
         return true;
     }
 
@@ -304,7 +296,7 @@ public class UserApiController extends BaseApiController {
     })
     @RequestMapping(value = "avatar", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public String avatar(@RequestBody UserAvatarRequest request) throws ApiException {
+    public String avatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
         return "";
     }
 
@@ -379,7 +371,7 @@ public class UserApiController extends BaseApiController {
     })
     @RequestMapping(value = "check", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public Boolean check(@RequestBody UserCheckRequest request) {
+    public Boolean check(@Valid @RequestBody UserCheckRequest request) {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
 
@@ -393,7 +385,7 @@ public class UserApiController extends BaseApiController {
     })
     @RequestMapping(value = "check-sso-loginName", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public Boolean checkSsoLoginName(@RequestBody UserCheckRequest request) {
+    public Boolean checkSsoLoginName(@Valid @RequestBody UserCheckRequest request) {
         return isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId());
     }
 

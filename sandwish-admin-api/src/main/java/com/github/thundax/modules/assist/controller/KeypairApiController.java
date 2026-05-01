@@ -17,7 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,8 +35,7 @@ public class KeypairApiController extends BaseApiController {
     private final KeypairService keypairService;
 
     @Autowired
-    public KeypairApiController(Validator validator, AuthService authService, KeypairService keypairService) {
-        super(validator);
+    public KeypairApiController(AuthService authService, KeypairService keypairService) {
 
         this.authService = authService;
         this.keypairService = keypairService;
@@ -59,8 +58,7 @@ public class KeypairApiController extends BaseApiController {
     })
     @SysLogger("获取公钥")
     @RequestMapping(value = "public", method = RequestMethod.POST)
-    public KeypairPublicKeyResponse publicKey(@RequestBody KeypairPublicKeyRequest request) throws ApiException {
-        validate(request);
+    public KeypairPublicKeyResponse publicKey(@Valid @RequestBody KeypairPublicKeyRequest request) throws ApiException {
         if (StringUtils.isEmpty(request.getToken())) {
             throw new InvalidTokenException();
         }

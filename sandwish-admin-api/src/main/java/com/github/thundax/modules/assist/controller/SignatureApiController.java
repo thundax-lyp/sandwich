@@ -30,7 +30,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
-import javax.validation.Validator;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,9 +58,7 @@ public class SignatureApiController extends BaseApiController {
             LogService logService,
             UserService userService,
             MenuService menuService,
-            RoleService roleService,
-            Validator validator) {
-        super(validator);
+            RoleService roleService) {
 
         this.signatureService = signatureService;
         this.signService = signService;
@@ -81,9 +79,7 @@ public class SignatureApiController extends BaseApiController {
     @SysLogger("列表")
     @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
-    public PageVo<SignatureResponse> page(@RequestBody SignaturePageRequest request) throws ApiException {
-        validate(request);
-
+    public PageVo<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
         return entityPageToVo(
                 signatureService.findPage(request.getBusinessType(), readSignaturePage(request)),
                 this::entityToResponse);
@@ -100,8 +96,7 @@ public class SignatureApiController extends BaseApiController {
     @SysLogger("校验")
     @RequestMapping(value = "verify", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
-    public SignatureVerifyResponse verify(@RequestBody SignatureVerifyRequest request) throws ApiException {
-        validate(request);
+    public SignatureVerifyResponse verify(@Valid @RequestBody SignatureVerifyRequest request) throws ApiException {
         Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
 
         if (bean == null) {

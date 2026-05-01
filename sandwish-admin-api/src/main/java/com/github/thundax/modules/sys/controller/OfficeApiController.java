@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.controller;
 
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -8,7 +9,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.sys.api.OfficeServiceApi;
+import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeIdRequest;
@@ -17,6 +18,10 @@ import com.github.thundax.modules.sys.request.OfficeQueryRequest;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,10 +31,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "02-02.系统-组织机构")
+@SysLogger(module = {"系统", "组织机构"})
+@RequestMapping(value = "/api/sys/office")
 @RestController
-public class OfficeApiController extends BaseApiController implements OfficeServiceApi {
+public class OfficeApiController extends BaseApiController {
 
     private final OfficeService officeService;
     private final OfficeInterfaceAssembler officeInterfaceAssembler;
@@ -41,7 +51,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         this.officeInterfaceAssembler = new OfficeInterfaceAssembler();
     }
 
-    @Override
+    @ApiOperation(value = "获取对象", notes = "sys:office:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("读取")
+    @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
         Office bean = officeService.get(officeInterfaceAssembler.toEntityId(request.getId()));
@@ -51,7 +70,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(bean, officeService::get);
     }
 
-    @Override
+    @ApiOperation(value = "获取列表", notes = "sys:office:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("列表")
+    @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public List<OfficeResponse> list(@RequestBody OfficeQueryRequest request) throws ApiException {
         validate(request);
@@ -69,7 +97,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @ApiOperation(value = "添加", notes = "sys:office:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("添加")
+    @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public OfficeResponse add(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
@@ -94,7 +131,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
-    @Override
+    @ApiOperation(value = "更新", notes = "sys:office:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("更新")
+    @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
@@ -118,7 +164,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return officeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
-    @Override
+    @ApiOperation(value = "删除", notes = "sys:office:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("删除")
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
         List<Office> beanList = validateList(
@@ -129,7 +184,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "获取列表", notes = "super")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("读取")
+    @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public List<OfficeResponse> tree(@RequestBody List<OfficeIdRequest> excludeList) {
         List<Office> beanList = officeService.findList(new Office());
@@ -166,7 +230,16 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @ApiOperation(value = "移动", notes = "sys:office:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("移动")
+    @RequestMapping(value = "move", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
         validate(request);

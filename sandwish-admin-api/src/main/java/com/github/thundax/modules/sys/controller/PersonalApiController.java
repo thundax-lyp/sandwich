@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.controller;
 
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
@@ -11,7 +12,7 @@ import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.api.PersonalServiceApi;
+import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -31,6 +32,10 @@ import com.github.thundax.modules.sys.utils.SysApiUtils;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,13 +45,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "02-01.系统/个人")
+@SysLogger(module = {"系统", "个人"})
+@RequestMapping(value = "/api/sys/personal")
 @RestController
-public class PersonalApiController extends BaseApiController implements PersonalServiceApi {
+public class PersonalApiController extends BaseApiController {
 
     private final UserService userService;
     private final RoleService roleService;
@@ -71,7 +82,15 @@ public class PersonalApiController extends BaseApiController implements Personal
         this.keypairService = keypairService;
     }
 
-    @Override
+    @ApiOperation(value = "当前用户信息", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "info", method = RequestMethod.POST)
     public PersonalInfoResponse info() throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
         if (currentUser.getId() == null || !currentUser.isEnable()) {
@@ -81,7 +100,16 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
-    @Override
+    @ApiOperation(value = "更新用户信息，包括：name, email, mobile", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("更新")
+    @RequestMapping(value = "update", method = RequestMethod.POST)
     public PersonalInfoResponse updateInfo(@RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         validate(request);
 
@@ -93,7 +121,16 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
-    @Override
+    @ApiOperation(value = "更新用户密码", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("更新密码")
+    @RequestMapping(value = "password", method = RequestMethod.POST)
     public Boolean updatePassword(@RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
@@ -122,7 +159,19 @@ public class PersonalApiController extends BaseApiController implements Personal
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "上传头像", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("上传头像")
+    @RequestMapping(
+            value = "avatar/upload",
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PersonalAvatarResponse uploadAvatar(PersonalAvatarUploadRequest request) throws ApiException {
         validate(request);
         User currentUser = UserAccessHolder.currentUser();
@@ -138,7 +187,16 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
-    @Override
+    @ApiOperation(value = "删除头像", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("删除头像")
+    @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
     public PersonalAvatarResponse deleteAvatar(@RequestBody(required = false) PersonalAvatarDeleteRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -147,7 +205,15 @@ public class PersonalApiController extends BaseApiController implements Personal
         return personalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
-    @Override
+    @ApiOperation(value = "菜单列表", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "menus", method = RequestMethod.POST)
     public List<PersonalMenuResponse> menus() {
         // 获取可见菜单
         List<Menu> allMenuList = findMenuList(currentUser());
@@ -209,7 +275,15 @@ public class PersonalApiController extends BaseApiController implements Personal
         return menuList;
     }
 
-    @Override
+    @ApiOperation(value = "权限列表", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "perms", method = RequestMethod.POST)
     public PersonalPermsResponse perms() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

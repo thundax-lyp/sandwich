@@ -1,10 +1,10 @@
 package com.github.thundax.modules.assist.controller;
 
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.assist.api.KeypairServiceApi;
 import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
 import com.github.thundax.modules.assist.request.KeypairPublicKeyRequest;
 import com.github.thundax.modules.assist.response.KeypairPublicKeyResponse;
@@ -12,13 +12,24 @@ import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
+import com.github.thundax.modules.sys.aop.annotation.SysLogger;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "08-05.辅助-公钥与私钥")
+@SysLogger(module = {"辅助", "公私钥对"})
+@RequestMapping(value = "/api/assist/keypair")
 @RestController
-public class KeypairApiController extends BaseApiController implements KeypairServiceApi {
+public class KeypairApiController extends BaseApiController {
 
     private final AuthService authService;
     private final KeypairService keypairService;
@@ -39,8 +50,17 @@ public class KeypairApiController extends BaseApiController implements KeypairSe
      * @return 公钥
      * @throws ApiException API异常
      */
-    @Override
-    public KeypairPublicKeyResponse publicKey(KeypairPublicKeyRequest request) throws ApiException {
+    @ApiOperation(value = "获取公钥", notes = "")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("获取公钥")
+    @RequestMapping(value = "public", method = RequestMethod.POST)
+    public KeypairPublicKeyResponse publicKey(@RequestBody KeypairPublicKeyRequest request) throws ApiException {
         validate(request);
         if (StringUtils.isEmpty(request.getToken())) {
             throw new InvalidTokenException();

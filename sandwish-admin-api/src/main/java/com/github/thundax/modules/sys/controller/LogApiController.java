@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.controller;
 
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.sys.api.LogServiceApi;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
@@ -15,13 +15,21 @@ import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "02-06.系统-日志")
+@RequestMapping(value = "/api/sys/log")
 @RestController
-public class LogApiController extends BaseApiController implements LogServiceApi {
+public class LogApiController extends BaseApiController {
 
     private final LogService logService;
     private final UserService userService;
@@ -37,7 +45,15 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         this.officeService = officeService;
     }
 
-    @Override
+    @ApiOperation(value = "获取列表", notes = "super")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageVo<LogResponse> page(@RequestBody LogPageRequest request) throws ApiException {
         validate(request);
 

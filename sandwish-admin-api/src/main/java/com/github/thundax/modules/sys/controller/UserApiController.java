@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.controller;
 
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -12,7 +13,7 @@ import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
-import com.github.thundax.modules.sys.api.UserServiceApi;
+import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
@@ -35,6 +36,10 @@ import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.github.thundax.modules.utils.IPUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -50,15 +55,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+@Api(tags = "02-05.系统-用户")
+@SysLogger(module = {"系统", "用户"})
+@RequestMapping(value = "/api/sys/user")
 @RestController
-public class UserApiController extends BaseApiController implements UserServiceApi {
+public class UserApiController extends BaseApiController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
 
@@ -87,7 +98,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         this.userInterfaceAssembler = new UserInterfaceAssembler();
     }
 
-    @Override
+    @ApiOperation(value = "获取对象", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("读取")
+    @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public UserResponse get(@RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.get(userInterfaceAssembler.toEntityId(request.getId()));
@@ -97,7 +117,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return toResponse(bean);
     }
 
-    @Override
+    @ApiOperation(value = "获取列表", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("列表")
+    @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserResponse> list(@RequestBody UserQueryRequest request) throws ApiException {
         validate(request);
@@ -109,7 +138,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @ApiOperation(value = "获取分页列表", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("分页")
+    @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public PageVo<UserResponse> page(@RequestBody UserQueryRequest request) throws ApiException {
         validate(request);
@@ -120,7 +158,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return entityPageToVo(userService.findPage(query, page), this::toResponse);
     }
 
-    @Override
+    @ApiOperation(value = "添加", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("添加")
+    @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse add(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
@@ -158,7 +205,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return toResponse(entity);
     }
 
-    @Override
+    @ApiOperation(value = "更新", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("更新")
+    @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse update(@RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
@@ -206,25 +262,64 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return toResponse(entity);
     }
 
-    @Override
+    @ApiOperation(value = "上传头像", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(name = "id", value = "用户ID", required = true, dataTypeClass = String.class),
+    })
+    @SysLogger("上传头像")
+    @RequestMapping(
+            value = "avatar/upload",
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "删除头像", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("删除头像")
+    @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean deleteAvatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "获取头像相对路径", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "avatar", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public String avatar(@RequestBody UserAvatarRequest request) throws ApiException {
         return "";
     }
 
-    @Override
+    @ApiOperation(value = "启用/禁用", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("启用")
+    @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean updateStatus(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = currentUser();
@@ -246,7 +341,16 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "删除", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @SysLogger("删除")
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = currentUser();
@@ -267,19 +371,43 @@ public class UserApiController extends BaseApiController implements UserServiceA
         return true;
     }
 
-    @Override
+    @ApiOperation(value = "检查 [loginName]是否存在", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "check", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public Boolean check(@RequestBody UserCheckRequest request) {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
 
-    @Override
+    @ApiOperation(value = "检查 [ssoLoginName]是否存在", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "check-sso-loginName", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public Boolean checkSsoLoginName(@RequestBody UserCheckRequest request) {
         return isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId());
     }
 
-    @Override
+    @ApiOperation(value = "获取部门树", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "office/tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserOfficeResponse> officeTree() {
         return officeService.findList(new Office()).stream()
@@ -287,7 +415,15 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @ApiOperation(value = "获取权限列表", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "role/list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserRoleResponse> roleList() {
         Role query = new Role();
@@ -300,7 +436,8 @@ public class UserApiController extends BaseApiController implements UserServiceA
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @ApiOperation(value = "用户头像", notes = "user")
+    @GetMapping(value = "avatar")
     @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
     public void avatarImage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userId = request.getParameter("id");

@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.web.BaseApiController;
-import com.github.thundax.modules.auth.api.AuthServiceApi;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
@@ -20,24 +19,32 @@ import com.github.thundax.modules.auth.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
+import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import com.github.thundax.modules.utils.IPUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+@Api(tags = "01-01. 鉴权")
+@RequestMapping(value = "/api/auth")
+@SysLogger(module = {"系统", "登录"})
 @RestController
-public class AuthApiController extends BaseApiController implements AuthServiceApi {
+public class AuthApiController extends BaseApiController {
 
     private final AuthService authService;
     private final UserService userService;
@@ -51,12 +58,16 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         this.userService = userService;
     }
 
-    @Override
+    @ApiOperation(value = "请求登录令牌", notes = "ignore")
+    @PostMapping(value = "form")
+    @SysLogger("请求登录令牌")
     public AuthLoginFormResponse loginForm() throws ApiException {
         return authInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
     }
 
-    @Override
+    @ApiOperation(value = "刷新登录令牌", notes = "ignore")
+    @PostMapping(value = "form/refresh")
+    @SysLogger("刷新登录令牌")
     public AuthLoginFormResponse refreshLoginForm(@RequestBody AuthLoginFormRefreshRequest request)
             throws ApiException {
         if (StringUtils.isBlank(request.getRefreshToken())) {
@@ -66,7 +77,9 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
         return authInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
     }
 
-    @Override
+    @ApiOperation(value = "用户/密码登录", notes = "ignore")
+    @PostMapping(value = "login")
+    @SysLogger("用户/密码登录")
     public AuthAccessTokenResponse login(@RequestBody AuthLoginRequest request) throws ApiException {
         validate(request);
         HttpServletRequest currentRequest =
@@ -126,7 +139,9 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
                 authService.createAccessToken(EntityIdCodec.toValue(user.getId())));
     }
 
-    @Override
+    @ApiOperation(value = "登出", notes = "ignore")
+    @PostMapping(value = "logout")
+    @SysLogger("登出")
     public Boolean logout(@RequestBody AuthLogoutRequest request) throws ApiException {
         if (StringUtils.isEmpty(request.getToken())) {
             throw new InvalidTokenException();

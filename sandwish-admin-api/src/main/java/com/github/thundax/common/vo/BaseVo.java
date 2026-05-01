@@ -18,9 +18,7 @@ public class BaseVo implements Serializable {
     private Integer priority;
     private String remarks;
 
-    private UserVo createUser;
     private Date createDate;
-    private UserVo updateUser;
     private Date updateDate;
 
     public BaseVo() {}
@@ -62,16 +60,6 @@ public class BaseVo implements Serializable {
         this.remarks = remarks;
     }
 
-    @ApiModelProperty(name = "createUser", value = "创建人")
-    @JsonProperty("createUser")
-    public UserVo getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(UserVo createUser) {
-        this.createUser = createUser;
-    }
-
     @ApiModelProperty(name = "createDate", value = "创建时间")
     @JsonProperty("createDate")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -81,16 +69,6 @@ public class BaseVo implements Serializable {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
-    }
-
-    @ApiModelProperty(name = "updateUser", value = "修改人")
-    @JsonProperty("updateUser")
-    public UserVo getUpdateUser() {
-        return updateUser;
-    }
-
-    public void setUpdateUser(UserVo updateUser) {
-        this.updateUser = updateUser;
     }
 
     @ApiModelProperty(name = "updateDate", value = "修改时间")

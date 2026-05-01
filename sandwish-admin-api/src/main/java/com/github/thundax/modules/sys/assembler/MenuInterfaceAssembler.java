@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
@@ -11,10 +10,6 @@ import org.springframework.lang.NonNull;
 
 public final class MenuInterfaceAssembler {
     private MenuInterfaceAssembler() {}
-
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
 
     @NonNull
     public static MenuResponse toResponse(Menu entity) {

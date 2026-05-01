@@ -14,10 +14,6 @@ import org.springframework.lang.NonNull;
 public final class OfficeInterfaceAssembler {
     private OfficeInterfaceAssembler() {}
 
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
-
     @NonNull
     public static OfficeResponse toResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {

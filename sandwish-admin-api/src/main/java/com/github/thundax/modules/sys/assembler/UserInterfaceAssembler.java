@@ -23,10 +23,6 @@ import org.springframework.lang.NonNull;
 public final class UserInterfaceAssembler {
     private UserInterfaceAssembler() {}
 
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
-
     @NonNull
     public static UserResponse toResponse(
             User entity, Office office, List<Role> roleList, Function<EntityId, Office> officeLoader) {

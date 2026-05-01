@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
@@ -51,7 +52,7 @@ public class DictController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public DictResponse get(@RequestBody DictIdRequest request) throws ApiException {
-        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toEntityId(request.getId())));
+        return DictInterfaceAssembler.toResponse(dictService.get(EntityIdCodec.toDomain(request.getId())));
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
@@ -114,7 +115,7 @@ public class DictController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public DictResponse update(@RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictService.get(DictInterfaceAssembler.toEntityId(request.getId()));
+        Dict dict = dictService.get(EntityIdCodec.toDomain(request.getId()));
         if (dict == null) {
             throw new ApiException("id not exist");
         }
@@ -134,8 +135,7 @@ public class DictController extends BaseApiController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList =
-                validateList(list, vo -> dictService.get(DictInterfaceAssembler.toEntityId(vo.getId())), null, null);
+        List<Dict> beanList = validateList(list, vo -> dictService.get(EntityIdCodec.toDomain(vo.getId())), null, null);
         dictService.delete(beanList);
         return true;
     }

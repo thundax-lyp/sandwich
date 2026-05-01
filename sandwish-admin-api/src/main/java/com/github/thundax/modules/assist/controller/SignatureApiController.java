@@ -3,6 +3,7 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
@@ -139,13 +140,13 @@ public class SignatureApiController extends BaseApiController {
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
             case Log.BEAN_NAME:
-                return logService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return logService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
             case User.BEAN_NAME:
-                return userService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return userService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
             case Menu.BEAN_NAME:
-                return menuService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return menuService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
             case Role.BEAN_NAME:
-                return roleService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return roleService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
             default:
                 return null;
         }

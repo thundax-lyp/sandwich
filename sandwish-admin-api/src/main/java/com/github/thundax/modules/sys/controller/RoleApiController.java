@@ -87,7 +87,7 @@ public class RoleApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public RoleResponse get(@RequestBody RoleIdRequest request) throws ApiException {
-        Role bean = roleService.get(RoleInterfaceAssembler.toEntityId(request.getId()));
+        Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
         }
@@ -137,7 +137,7 @@ public class RoleApiController extends BaseApiController {
 
         Role entity = RoleInterfaceAssembler.toEntity(new Role(), request);
         if (entity.getId() != null) {
-            Role bean = roleService.get(RoleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
+            Role bean = roleService.get(entity.getId());
             if (bean != null) {
                 throw new InsertBeanExistException(Role.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
@@ -163,7 +163,7 @@ public class RoleApiController extends BaseApiController {
         validate(request);
         validateMenus(request.getMenuList());
 
-        Role bean = roleService.get(RoleInterfaceAssembler.toEntityId(request.getId()));
+        Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
         }
@@ -189,7 +189,7 @@ public class RoleApiController extends BaseApiController {
     public Boolean updateStatus(@RequestBody List<RoleStatusRequest> list) throws ApiException {
         List<Role> beanList = validateList(
                 list,
-                vo -> roleService.get(RoleInterfaceAssembler.toEntityId(vo.getId())),
+                vo -> roleService.get(EntityIdCodec.toDomain(vo.getId())),
                 null,
                 (bean, vo) ->
                         bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED));
@@ -213,7 +213,7 @@ public class RoleApiController extends BaseApiController {
     public Boolean updatePriority(@RequestBody List<RolePriorityRequest> list) throws ApiException {
         List<Role> beanList = validateList(
                 list,
-                vo -> roleService.get(RoleInterfaceAssembler.toEntityId(vo.getId())),
+                vo -> roleService.get(EntityIdCodec.toDomain(vo.getId())),
                 null,
                 (bean, vo) -> bean.setPriority(vo.getPriority() == null ? 0 : vo.getPriority()));
 
@@ -234,8 +234,7 @@ public class RoleApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean delete(@RequestBody List<RoleIdRequest> list) throws ApiException {
-        List<Role> beanList =
-                validateList(list, vo -> roleService.get(RoleInterfaceAssembler.toEntityId(vo.getId())), null, null);
+        List<Role> beanList = validateList(list, vo -> roleService.get(EntityIdCodec.toDomain(vo.getId())), null, null);
 
         roleService.delete(beanList);
 
@@ -279,7 +278,7 @@ public class RoleApiController extends BaseApiController {
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         OFFICE_ID_PREFIX,
                         user,
-                        officeService.get(RoleInterfaceAssembler.toEntityId(user.getOfficeId())),
+                        officeService.get(EntityIdCodec.toDomain(user.getOfficeId())),
                         officeService::get))
                 .collect(Collectors.toList()));
 
@@ -297,14 +296,13 @@ public class RoleApiController extends BaseApiController {
     @RequestMapping(value = "user/list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public List<RoleUserResponse> userList(@RequestBody RoleIdRequest request) throws ApiException {
-        Role bean = roleService.get(RoleInterfaceAssembler.toEntityId(request.getId()));
+        Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
         }
 
         return roleService.findRoleUser(bean).stream()
-                .map(user -> toUserResponse(
-                        userService.get(RoleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(user.getId())))))
+                .map(user -> toUserResponse(userService.get(user.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -322,7 +320,7 @@ public class RoleApiController extends BaseApiController {
     public Boolean assignUser(@RequestBody RoleAssignUserRequest request) throws ApiException {
         validateAssignUser(request);
 
-        Role roleBean = roleService.get(RoleInterfaceAssembler.toEntityId(request.getRoleId()));
+        Role roleBean = roleService.get(EntityIdCodec.toDomain(request.getRoleId()));
         Assert.notNull(roleBean, "role can not be null");
 
         roleService.updateUserList(
@@ -344,13 +342,13 @@ public class RoleApiController extends BaseApiController {
 
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
-                user, officeService.get(RoleInterfaceAssembler.toEntityId(user.getOfficeId())), officeService::get);
+                user, officeService.get(EntityIdCodec.toDomain(user.getOfficeId())), officeService::get);
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {
         validate(request);
 
-        Role roleBean = roleService.get(RoleInterfaceAssembler.toEntityId(request.getRoleId()));
+        Role roleBean = roleService.get(EntityIdCodec.toDomain(request.getRoleId()));
         if (roleBean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getRoleId());
         }
@@ -360,7 +358,7 @@ public class RoleApiController extends BaseApiController {
         }
 
         for (RoleUserRequest userRequest : request.getUsers()) {
-            User userBean = userService.get(RoleInterfaceAssembler.toEntityId(userRequest.getId()));
+            User userBean = userService.get(EntityIdCodec.toDomain(userRequest.getId()));
             if (userBean == null) {
                 throw new NullBeanException(User.BEAN_NAME, userRequest.getId());
             }
@@ -376,7 +374,7 @@ public class RoleApiController extends BaseApiController {
                 throw new InvalidParameterException("menus.id");
 
             } else {
-                Menu bean = menuService.get(RoleInterfaceAssembler.toEntityId(request.getId()));
+                Menu bean = menuService.get(EntityIdCodec.toDomain(request.getId()));
                 if (bean == null) {
                     throw new NullBeanException(Menu.BEAN_NAME, request.getId());
                 }

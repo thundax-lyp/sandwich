@@ -1,7 +1,6 @@
 package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.domain.Signable;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.response.SignatureResponse;
@@ -10,10 +9,6 @@ import org.springframework.lang.NonNull;
 
 public final class SignatureInterfaceAssembler {
     private SignatureInterfaceAssembler() {}
-
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
 
     @NonNull
     public static SignatureResponse toResponse(Signature entity, Signable signable) {

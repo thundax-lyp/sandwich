@@ -59,4 +59,23 @@ public class InterfaceAssemblerArchitectureTest extends AbstractArchitectureTest
 
         assertTrue("InterfaceAssembler public methods must be static: " + violations, violations.isEmpty());
     }
+
+    @Test
+    public void shouldKeepEntityIdConversionOutOfInterfaceAssemblers() {
+        JavaClasses classes = importPackages("com.github.thundax.modules");
+        List<String> violations = new ArrayList<>();
+
+        for (JavaClass javaClass : classes) {
+            if (!javaClass.getSimpleName().endsWith("InterfaceAssembler")) {
+                continue;
+            }
+            for (JavaMethod method : javaClass.getMethods()) {
+                if (method.getModifiers().contains(JavaModifier.PUBLIC) && "toEntityId".equals(method.getName())) {
+                    violations.add(method.getFullName());
+                }
+            }
+        }
+
+        assertTrue("InterfaceAssembler must not wrap EntityId conversion: " + violations, violations.isEmpty());
+    }
 }

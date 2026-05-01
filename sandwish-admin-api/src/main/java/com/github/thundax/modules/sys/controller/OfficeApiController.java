@@ -61,7 +61,7 @@ public class OfficeApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
-        Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getId()));
+        Office bean = officeService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getId());
         }
@@ -111,14 +111,14 @@ public class OfficeApiController extends BaseApiController {
 
         Office entity = OfficeInterfaceAssembler.toEntity(new Office(), request);
         if (entity.getId() != null) {
-            Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
+            Office bean = officeService.get(entity.getId());
             if (bean != null) {
                 throw new InsertBeanExistException(Office.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {
-            Office parent = officeService.get(OfficeInterfaceAssembler.toEntityId(entity.getParentId()));
+            Office parent = officeService.get(EntityIdCodec.toDomain(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -143,13 +143,13 @@ public class OfficeApiController extends BaseApiController {
     public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
 
-        Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getId()));
+        Office bean = officeService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (StringUtils.isNotEmpty(request.getParentId())) {
-            Office parent = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getParentId()));
+            Office parent = officeService.get(EntityIdCodec.toDomain(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -174,8 +174,8 @@ public class OfficeApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
-        List<Office> beanList = validateList(
-                list, vo -> officeService.get(OfficeInterfaceAssembler.toEntityId(vo.getId())), null, null);
+        List<Office> beanList =
+                validateList(list, vo -> officeService.get(EntityIdCodec.toDomain(vo.getId())), null, null);
 
         officeService.delete(beanList);
 
@@ -242,12 +242,12 @@ public class OfficeApiController extends BaseApiController {
     public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
         validate(request);
 
-        Office fromBean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getFromNodeId()));
+        Office fromBean = officeService.get(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getFromNodeId());
         }
 
-        Office toBean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getToNodeId()));
+        Office toBean = officeService.get(EntityIdCodec.toDomain(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getToNodeId());
         }

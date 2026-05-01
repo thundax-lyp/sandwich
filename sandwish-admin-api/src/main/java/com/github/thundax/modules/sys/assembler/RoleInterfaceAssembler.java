@@ -24,10 +24,6 @@ import org.springframework.lang.NonNull;
 public final class RoleInterfaceAssembler {
     private RoleInterfaceAssembler() {}
 
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
-
     @NonNull
     public static RoleResponse toResponse(Role entity, List<Menu> menuList) {
         if (entity == null) {

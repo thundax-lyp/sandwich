@@ -139,7 +139,7 @@ public class StorageController extends BaseAdminController {
                     }
 
                     Storage storage = new Storage();
-                    storage.setId(StorageInterfaceAssembler.toEntityId(IdGen.uuid()));
+                    storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
 
                     storage.setName(FilenameUtils.getBaseName(originalFilename));
                     storage.setExtendName(extendName);
@@ -171,7 +171,7 @@ public class StorageController extends BaseAdminController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = storageService.get(StorageInterfaceAssembler.toEntityId(id));
+        Storage storage = storageService.get(EntityIdCodec.toDomain(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -212,7 +212,7 @@ public class StorageController extends BaseAdminController {
 
     private Storage newStorage(String id) {
         Storage storage = new Storage();
-        storage.setId(StorageInterfaceAssembler.toEntityId(id));
+        storage.setId(EntityIdCodec.toDomain(id));
         return storage;
     }
 
@@ -253,7 +253,7 @@ public class StorageController extends BaseAdminController {
             return false;
         }
 
-        Storage bean = storageService.get(StorageInterfaceAssembler.toEntityId(id));
+        Storage bean = storageService.get(EntityIdCodec.toDomain(id));
         if (bean == null) {
             addWarningMessage(redirectAttributes, "无效的数据");
             return false;

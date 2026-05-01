@@ -3,6 +3,7 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.AsyncTask;
@@ -48,7 +49,7 @@ public class AsyncTaskApiController extends BaseApiController {
     public AsyncTaskResponse get(@RequestBody AsyncTaskIdRequest request) throws ApiException {
         validate(request);
 
-        AsyncTask bean = asyncTaskService.get(AsyncTaskInterfaceAssembler.toEntityId(request.getId()));
+        AsyncTask bean = asyncTaskService.get(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             return new AsyncTaskResponse();
         }

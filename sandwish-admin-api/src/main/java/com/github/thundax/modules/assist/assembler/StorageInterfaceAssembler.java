@@ -1,6 +1,5 @@
 package com.github.thundax.modules.assist.assembler;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
@@ -10,10 +9,6 @@ import org.springframework.lang.NonNull;
 
 public final class StorageInterfaceAssembler {
     private StorageInterfaceAssembler() {}
-
-    public static EntityId toEntityId(String id) {
-        return EntityIdCodec.toDomain(id);
-    }
 
     @NonNull
     public static StorageUploadResponse toUploadResponse(Storage entity, StorageConverter storageConverter) {

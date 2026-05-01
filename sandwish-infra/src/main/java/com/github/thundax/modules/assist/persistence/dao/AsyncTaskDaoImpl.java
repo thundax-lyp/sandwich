@@ -24,7 +24,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     private Cache<String, AsyncTaskDO> cache;
 
     @Override
-    public AsyncTask get(EntityId id) {
+    public AsyncTask getById(EntityId id) {
         return AsyncTaskPersistenceAssembler.toEntity(cache.get(cacheKey(id.value())));
     }
 
@@ -47,8 +47,8 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     }
 
     @Override
-    public void delete(AsyncTask asyncTask) {
-        cache.remove(cacheKey(EntityIdCodec.toValue(asyncTask.getId())));
+    public void deleteById(EntityId id) {
+        cache.remove(cacheKey(EntityIdCodec.toValue(id)));
     }
 
     private String cacheKey(String id) {

@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface StorageDao {
 
-    Storage get(EntityId id);
+    Storage getById(EntityId id);
 
-    List<Storage> getMany(List<String> idList);
+    List<Storage> batchGetByIds(List<String> idList);
 
-    List<Storage> findList(
+    List<Storage> list(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -21,7 +21,7 @@ public interface StorageDao {
             String name,
             String remarks);
 
-    Page<Storage> findPage(
+    Page<Storage> page(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -36,21 +36,21 @@ public interface StorageDao {
 
     int update(Storage entity);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 获取MIME列表
      *
      * @return MIME列表
      */
-    List<String> findMimeTypeList();
+    List<String> listMimeTypes();
 
     /**
      * 获取业务类型列表
      *
      * @return 业务类型列表
      */
-    List<String> findBusinessTypeList();
+    List<String> listBusinessTypes();
 
     /**
      * 更新状态
@@ -74,7 +74,7 @@ public interface StorageDao {
      * @param entity entity
      * @return 列表
      */
-    List<StorageBusiness> findBusiness(Storage entity);
+    List<StorageBusiness> listBusiness(Storage entity);
 
     /**
      * 写入

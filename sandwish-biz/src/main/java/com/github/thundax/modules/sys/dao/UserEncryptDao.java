@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface UserEncryptDao {
 
-    UserEncrypt get(EntityId id);
+    UserEncrypt getById(EntityId id);
 
-    List<UserEncrypt> getMany(List<String> idList);
+    List<UserEncrypt> batchGetByIds(List<String> idList);
 
-    List<UserEncrypt> findList();
+    List<UserEncrypt> list();
 
-    Page<UserEncrypt> findPage(int pageNo, int pageSize);
+    Page<UserEncrypt> page(int pageNo, int pageSize);
 
     int insert(UserEncrypt userEncrypt);
 
@@ -21,7 +21,7 @@ public interface UserEncryptDao {
 
     int updatePriority(UserEncrypt userEncrypt);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 更新密码, loginPass, updateDate, updateBy

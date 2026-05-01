@@ -45,7 +45,7 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
     }
 
     @Override
-    public int getOnlineCount() {
+    public int count() {
         return countExistingTokenKeys();
     }
 
@@ -94,10 +94,13 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
     }
 
     @Override
-    public void delete(AccessToken accessToken) {
-        String tokenKey = TOKEN_PREFIX + accessToken.getToken();
+    public void deleteByToken(String token) {
+        String tokenKey = TOKEN_PREFIX + token;
+        String userId = (String) cache.get(tokenKey);
         cache.remove(tokenKey);
-        cache.remove(USER_ID_PREFIX + accessToken.getUserId());
+        if (userId != null) {
+            cache.remove(USER_ID_PREFIX + userId);
+        }
         forgetTokenKey(tokenKey);
     }
 

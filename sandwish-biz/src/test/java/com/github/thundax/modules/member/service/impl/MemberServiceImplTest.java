@@ -130,19 +130,19 @@ public class MemberServiceImplTest {
         private String ywtbId;
 
         @Override
-        public Member get(EntityId id) {
+        public Member getById(EntityId id) {
             this.getCalls++;
             this.id = id.value();
             return getResult;
         }
 
         @Override
-        public List<Member> getMany(List<String> idList) {
+        public List<Member> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Member> findList(
+        public List<Member> list(
                 String enableFlag,
                 String email,
                 String name,
@@ -163,7 +163,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> page(
                 String enableFlag,
                 String email,
                 String name,
@@ -195,17 +195,17 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public List<Member> findByLoginName(String loginName) {
+        public List<Member> listByLoginName(String loginName) {
             return null;
         }
 
         @Override
-        public List<Member> findByEmail(String email) {
+        public List<Member> listByEmail(String email) {
             return null;
         }
 

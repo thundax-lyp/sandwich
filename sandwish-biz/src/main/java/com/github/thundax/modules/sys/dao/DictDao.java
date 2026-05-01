@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface DictDao {
 
-    Dict get(EntityId id);
+    Dict getById(EntityId id);
 
-    List<Dict> getMany(List<String> idList);
+    List<Dict> batchGetByIds(List<String> idList);
 
-    List<Dict> findList(String type, String label, String remarks);
+    List<Dict> list(String type, String label, String remarks);
 
-    Page<Dict> findPage(String type, String label, String remarks, int pageNo, int pageSize);
+    Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
 
     String insert(Dict dict);
 
@@ -21,14 +21,14 @@ public interface DictDao {
 
     int updatePriority(Dict dict);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 获取类型列表
      *
      * @return 类型列表
      */
-    List<String> findTypeList();
+    List<String> listTypes();
 
     /**
      * 获取字典修订号。

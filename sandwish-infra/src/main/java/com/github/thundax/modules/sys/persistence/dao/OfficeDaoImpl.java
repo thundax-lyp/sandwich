@@ -36,7 +36,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public Office get(EntityId id) {
+    public Office getById(EntityId id) {
         Office office = cacheSupport.getById(id.value());
         if (office != null) {
             return office;
@@ -48,7 +48,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public List<Office> getMany(List<String> idList) {
+    public List<Office> batchGetByIds(List<String> idList) {
         List<Office> officeList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -72,12 +72,12 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public List<Office> findList(String parentId, String name, String remarks) {
+    public List<Office> list(String parentId, String name, String remarks) {
         return OfficePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(parentId, name, remarks)));
     }
 
     @Override
-    public Page<Office> findPage(String parentId, String name, String remarks, int pageNo, int pageSize) {
+    public Page<Office> page(String parentId, String name, String remarks, int pageNo, int pageSize) {
         IPage<OfficeDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, name, remarks));
         Page<Office> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -136,7 +136,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         OfficeDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;

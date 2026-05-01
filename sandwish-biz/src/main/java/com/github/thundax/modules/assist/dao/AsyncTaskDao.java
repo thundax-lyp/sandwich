@@ -5,11 +5,11 @@ import com.github.thundax.modules.assist.entity.AsyncTask;
 
 public interface AsyncTaskDao {
 
-    AsyncTask get(EntityId id);
+    AsyncTask getById(EntityId id);
 
     void insert(AsyncTask asyncTask);
 
     void update(AsyncTask asyncTask);
 
-    void delete(AsyncTask asyncTask);
+    void deleteById(EntityId id);
 }

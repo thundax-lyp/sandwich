@@ -151,18 +151,18 @@ public class MenuServiceImplTest {
         private int pageSize;
 
         @Override
-        public Menu get(EntityId id) {
+        public Menu getById(EntityId id) {
             this.getCalls++;
             return getResult;
         }
 
         @Override
-        public List<Menu> getMany(List<String> idList) {
+        public List<Menu> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Menu> findList(String parentId, String displayFlag, Integer maxRank) {
+        public List<Menu> list(String parentId, String displayFlag, Integer maxRank) {
             this.parentId = parentId;
             this.displayFlag = displayFlag;
             this.maxRank = maxRank;
@@ -170,7 +170,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Menu> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Menu> page(
                 String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
             this.parentId = parentId;
             this.displayFlag = displayFlag;
@@ -201,7 +201,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             this.deletedId = id.value();
             return 1;
         }

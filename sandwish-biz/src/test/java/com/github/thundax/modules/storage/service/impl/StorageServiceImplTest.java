@@ -128,18 +128,18 @@ public class StorageServiceImplTest {
         private String deletedBusinessKey;
 
         @Override
-        public Storage get(EntityId id) {
+        public Storage getById(EntityId id) {
             this.id = id.value();
             return getResult;
         }
 
         @Override
-        public List<Storage> getMany(List<String> idList) {
+        public List<Storage> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Storage> findList(
+        public List<Storage> list(
                 String mimeType,
                 String ownerId,
                 String ownerType,
@@ -151,7 +151,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Storage> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Storage> page(
                 String mimeType,
                 String ownerId,
                 String ownerType,
@@ -185,18 +185,18 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             deletedIds.add(id.value());
             return 1;
         }
 
         @Override
-        public List<String> findMimeTypeList() {
+        public List<String> listMimeTypes() {
             return null;
         }
 
         @Override
-        public List<String> findBusinessTypeList() {
+        public List<String> listBusinessTypes() {
             return null;
         }
 
@@ -211,7 +211,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public List<StorageBusiness> findBusiness(Storage entity) {
+        public List<StorageBusiness> listBusiness(Storage entity) {
             return null;
         }
 

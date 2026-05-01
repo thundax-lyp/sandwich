@@ -67,12 +67,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException {
         // 检测是否登录请求过多
-        if (loginFormDao.getLoginCount() > properties.getMaxLoginCount()) {
+        if (loginFormDao.count() > properties.getMaxLoginCount()) {
             throw new TooManyLoginRequestException();
         }
 
         // 检测是否在线用户过多
-        if (accessTokenDao.getOnlineCount() > properties.getMaxOnlineCount()) {
+        if (accessTokenDao.count() > properties.getMaxOnlineCount()) {
             throw new TooManyOnlineUserException();
         }
 
@@ -250,7 +250,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void deleteAccessToken(AccessToken accessToken) {
-        accessTokenDao.delete(accessToken);
+        accessTokenDao.deleteByToken(accessToken.getToken());
         permissionService.release(accessToken.getToken());
     }
 

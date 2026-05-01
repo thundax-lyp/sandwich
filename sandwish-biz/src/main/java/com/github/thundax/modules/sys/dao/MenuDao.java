@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface MenuDao {
 
-    Menu get(EntityId id);
+    Menu getById(EntityId id);
 
-    List<Menu> getMany(List<String> idList);
+    List<Menu> batchGetByIds(List<String> idList);
 
-    List<Menu> findList(String parentId, String displayFlag, Integer maxRank);
+    List<Menu> list(String parentId, String displayFlag, Integer maxRank);
 
-    Page<Menu> findPage(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
+    Page<Menu> page(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
 
     String insert(Menu menu);
 
@@ -22,7 +22,7 @@ public interface MenuDao {
 
     int updatePriority(Menu menu);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
 

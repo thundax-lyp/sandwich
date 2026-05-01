@@ -92,24 +92,23 @@ public class UploadFileServiceImplTest {
         private List<String> fileIds;
 
         @Override
-        public UploadFile get(EntityId id) {
+        public UploadFile getById(EntityId id) {
             this.getCalls++;
             return null;
         }
 
         @Override
-        public List<UploadFile> getMany(List<String> idList) {
+        public List<UploadFile> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<UploadFile> findList() {
+        public List<UploadFile> list() {
             return null;
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<UploadFile> findPage(
-                int pageNo, int pageSize) {
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<UploadFile> page(int pageNo, int pageSize) {
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<UploadFile> dataPage =
@@ -135,18 +134,18 @@ public class UploadFileServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public UploadFile getContent(EntityId id) {
+        public UploadFile getContentById(EntityId id) {
             this.contentId = id.value();
             return contentResult;
         }
 
         @Override
-        public List<UploadFile> findByFileIds(List<String> fileIds) {
+        public List<UploadFile> batchGetByFileIds(List<String> fileIds) {
             this.fileIds = fileIds;
             return null;
         }

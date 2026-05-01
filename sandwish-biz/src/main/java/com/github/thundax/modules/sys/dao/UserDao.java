@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface UserDao {
 
-    User get(EntityId id);
+    User getById(EntityId id);
 
-    List<User> getMany(List<String> idList);
+    List<User> batchGetByIds(List<String> idList);
 
-    List<User> findList(String officeId, String loginName, String name, String enableFlag, String superFlag);
+    List<User> list(String officeId, String loginName, String name, String enableFlag, String superFlag);
 
-    Page<User> findPage(
+    Page<User> page(
             String officeId,
             String loginName,
             String name,
@@ -28,7 +28,7 @@ public interface UserDao {
 
     int updatePriority(User user);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 根据loginName获取
@@ -74,7 +74,7 @@ public interface UserDao {
      * @param user 用户
      * @return 权限列表
      */
-    List<String> findUserRole(String userId);
+    List<String> listUserRoles(String userId);
 
     /**
      * 删除用户权限列表

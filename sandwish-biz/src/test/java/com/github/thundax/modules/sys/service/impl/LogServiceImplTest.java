@@ -118,7 +118,7 @@ public class LogServiceImplTest {
         int count = service.insertList(logs);
 
         assertEquals(51, count);
-        assertEquals(2, dao.insertListCalls);
+        assertEquals(2, dao.batchInsertCalls);
         assertEquals(50, dao.firstBatchSize);
         assertEquals(1, dao.secondBatchSize);
         for (Log log : logs) {
@@ -179,24 +179,24 @@ public class LogServiceImplTest {
         private int pageNo;
         private int pageSize;
         private Log inserted;
-        private int insertListCalls;
+        private int batchInsertCalls;
         private int firstBatchSize;
         private int secondBatchSize;
 
         @Override
-        public Log get(EntityId id) {
+        public Log getById(EntityId id) {
             this.getCalls++;
             this.id = id.value();
             return getResult;
         }
 
         @Override
-        public List<Log> getMany(List<String> idList) {
+        public List<Log> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Log> findList(
+        public List<Log> list(
                 String type,
                 String remoteAddr,
                 String userLoginName,
@@ -210,7 +210,7 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Log> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Log> page(
                 String type,
                 String remoteAddr,
                 String userLoginName,
@@ -242,21 +242,21 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public List<String> insertList(List<Log> list) {
-            this.insertListCalls++;
-            if (insertListCalls == 1) {
+        public List<String> batchInsert(List<Log> list) {
+            this.batchInsertCalls++;
+            if (batchInsertCalls == 1) {
                 firstBatchSize = list.size();
             } else {
                 secondBatchSize = list.size();
             }
             List<String> idList = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                idList.add("generated-log-id-" + insertListCalls + "-" + i);
+                idList.add("generated-log-id-" + batchInsertCalls + "-" + i);
             }
             return idList;
         }

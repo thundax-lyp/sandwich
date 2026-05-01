@@ -167,7 +167,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
             if (userEncryptPre == null) {
                 return;
             }
-            dao.get(userEncryptPre.getId());
+            dao.getById(userEncryptPre.getId());
 
         } catch (RestClientException e) {
             logger.error("加密对象：{}，加密异常：{}", encryptEntity, e.getMessage());
@@ -176,12 +176,12 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     @Override
     public List<UserEncrypt> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<UserEncrypt> findList(UserEncrypt entity) {
-        return dao.findList();
+        return dao.list();
     }
 
     @Override
@@ -193,7 +193,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     public Page<UserEncrypt> findPage(UserEncrypt entity, Page<UserEncrypt> page) {
         Page<UserEncrypt> normalizedPage = normalizePage(page);
-        IPage<UserEncrypt> dataPage = dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<UserEncrypt> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -210,7 +210,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UserEncrypt entity) {
-        return entity == null ? 0 : dao.delete(entity.getId());
+        return entity == null ? 0 : dao.deleteById(entity.getId());
     }
 
     @Override

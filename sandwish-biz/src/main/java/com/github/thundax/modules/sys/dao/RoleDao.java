@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface RoleDao {
 
-    Role get(EntityId id);
+    Role getById(EntityId id);
 
-    List<Role> getMany(List<String> idList);
+    List<Role> batchGetByIds(List<String> idList);
 
-    List<Role> findList(String enableFlag);
+    List<Role> list(String enableFlag);
 
-    Page<Role> findPage(String enableFlag, int pageNo, int pageSize);
+    Page<Role> page(String enableFlag, int pageNo, int pageSize);
 
     String insert(Role role);
 
@@ -21,7 +21,7 @@ public interface RoleDao {
 
     int updatePriority(Role role);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 启用/禁用
@@ -31,13 +31,13 @@ public interface RoleDao {
      */
     int updateStatus(Role role);
 
-    List<String> findRoleMenu(String roleId);
+    List<String> listRoleMenus(String roleId);
 
     void deleteRoleMenu(String roleId);
 
     void insertRoleMenu(String roleId, List<String> menuIdList);
 
-    List<String> findRoleUser(String roleId);
+    List<String> listRoleUsers(String roleId);
 
     void deleteRoleUser(String roleId);
 

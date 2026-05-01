@@ -48,7 +48,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
     }
 
     @Override
-    public int getLoginCount() {
+    public int count() {
         return countExistingRefreshKeys();
     }
 

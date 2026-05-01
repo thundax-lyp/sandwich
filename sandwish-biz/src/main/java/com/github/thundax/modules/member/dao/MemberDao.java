@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface MemberDao {
 
-    Member get(EntityId id);
+    Member getById(EntityId id);
 
-    List<Member> getMany(List<String> idList);
+    List<Member> batchGetByIds(List<String> idList);
 
-    List<Member> findList(
+    List<Member> list(
             String enableFlag,
             String email,
             String name,
@@ -23,7 +23,7 @@ public interface MemberDao {
             Date endLoginDate,
             String mobile);
 
-    Page<Member> findPage(
+    Page<Member> page(
             String enableFlag,
             String email,
             String name,
@@ -42,7 +42,7 @@ public interface MemberDao {
 
     int updatePriority(Member entity);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 根据 loginName 获取
@@ -50,7 +50,7 @@ public interface MemberDao {
      * @param loginName loginName
      * @return 列表
      */
-    List<Member> findByLoginName(String loginName);
+    List<Member> listByLoginName(String loginName);
 
     /**
      * 根据 email 获取
@@ -58,7 +58,7 @@ public interface MemberDao {
      * @param email email
      * @return 列表
      */
-    List<Member> findByEmail(String email);
+    List<Member> listByEmail(String email);
 
     /**
      * 更新登录信息

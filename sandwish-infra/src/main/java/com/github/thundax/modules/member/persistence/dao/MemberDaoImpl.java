@@ -29,17 +29,17 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Member get(EntityId id) {
+    public Member getById(EntityId id) {
         return MemberPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
-    public List<Member> getMany(List<String> idList) {
+    public List<Member> batchGetByIds(List<String> idList) {
         return MemberPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    public List<Member> findList(
+    public List<Member> list(
             String enableFlag,
             String email,
             String name,
@@ -62,7 +62,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Page<Member> findPage(
+    public Page<Member> page(
             String enableFlag,
             String email,
             String name,
@@ -129,19 +129,19 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         return mapper.deleteById(id.value());
     }
 
     @Override
-    public List<Member> findByLoginName(String loginName) {
+    public List<Member> listByLoginName(String loginName) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MemberDO::getLoginName, loginName);
         return MemberPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
     }
 
     @Override
-    public List<Member> findByEmail(String email) {
+    public List<Member> listByEmail(String email) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MemberDO::getEmail, email);
         return MemberPersistenceAssembler.toEntityList(mapper.selectList(wrapper));

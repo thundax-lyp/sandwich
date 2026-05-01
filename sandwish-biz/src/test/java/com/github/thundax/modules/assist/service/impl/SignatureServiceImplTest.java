@@ -108,7 +108,7 @@ public class SignatureServiceImplTest {
         private List<String> deletedBusinessKeys = new java.util.ArrayList<>();
 
         @Override
-        public Signature find(String businessType, String businessId) {
+        public Signature getByBusiness(String businessType, String businessId) {
             this.findCalls++;
             this.businessType = businessType;
             this.businessId = businessId;
@@ -116,18 +116,18 @@ public class SignatureServiceImplTest {
         }
 
         @Override
-        public List<Signature> findByBusinessIds(List<String> businessIdList) {
+        public List<Signature> batchGetByBusinessIds(List<String> businessIdList) {
             return null;
         }
 
         @Override
-        public List<Signature> findList(
+        public List<Signature> list(
                 String businessType, String businessId, List<String> businessIdList, String isVerifySign) {
             return null;
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Signature> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Signature> page(
                 String businessType, int pageNo, int pageSize) {
             this.pageBusinessType = businessType;
             this.pageNo = pageNo;
@@ -153,7 +153,7 @@ public class SignatureServiceImplTest {
         }
 
         @Override
-        public int delete(String businessType, String businessId) {
+        public int deleteByBusiness(String businessType, String businessId) {
             deletedBusinessKeys.add(businessType + ":" + businessId);
             return 1;
         }

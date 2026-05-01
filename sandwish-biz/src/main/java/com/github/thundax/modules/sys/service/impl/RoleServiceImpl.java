@@ -60,18 +60,18 @@ public class RoleServiceImpl implements RoleService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Role> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<Role> findList(Role role) {
         Role.Query query = role == null ? null : role.getQuery();
-        return dao.findList(query == null ? null : statusValue(query.getStatus()));
+        return dao.list(query == null ? null : statusValue(query.getStatus()));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class RoleServiceImpl implements RoleService {
     public Page<Role> findPage(Role role, Page<Role> page) {
         Page<Role> normalizedPage = normalizePage(page);
         Role.Query query = role == null ? null : role.getQuery();
-        IPage<Role> dataPage = dao.findPage(
+        IPage<Role> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
@@ -173,7 +173,7 @@ public class RoleServiceImpl implements RoleService {
     public int delete(Role role) {
         dao.deleteRoleMenu(EntityIdCodec.toValue(role.getId()));
         dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
-        int retVal = dao.delete(role.getId());
+        int retVal = dao.deleteById(role.getId());
 
         signService.deleteSign(role.getSignName(), role.getSignId());
         notifyCacheChanged();
@@ -187,7 +187,7 @@ public class RoleServiceImpl implements RoleService {
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
                         EntityIdCodec.toValue(role.getId()),
-                        roleId -> dao.findRoleUser(EntityIdCodec.toValue(role.getId())));
+                        roleId -> dao.listRoleUsers(EntityIdCodec.toValue(role.getId())));
 
         return userIdList.stream().map(this::newUser).collect(Collectors.toList());
     }
@@ -198,7 +198,7 @@ public class RoleServiceImpl implements RoleService {
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
                         EntityIdCodec.toValue(role.getId()),
-                        roleId -> dao.findRoleMenu(EntityIdCodec.toValue(role.getId())));
+                        roleId -> dao.listRoleMenus(EntityIdCodec.toValue(role.getId())));
 
         return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
     }

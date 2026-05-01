@@ -31,14 +31,13 @@ public class SignatureServiceImpl implements SignatureService {
         if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId)) {
             return null;
         }
-        return dao.find(businessType, businessId);
+        return dao.getByBusiness(businessType, businessId);
     }
 
     @Override
     public Page<Signature> findPage(String businessType, Page<Signature> page) {
         Page<Signature> normalizedPage = normalizePage(page);
-        IPage<Signature> dataPage =
-                dao.findPage(businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<Signature> dataPage = dao.page(businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -64,7 +63,7 @@ public class SignatureServiceImpl implements SignatureService {
         if (entity == null) {
             return 0;
         }
-        return dao.delete(entity.getBusinessType(), entity.getBusinessId());
+        return dao.deleteByBusiness(entity.getBusinessType(), entity.getBusinessId());
     }
 
     @Override

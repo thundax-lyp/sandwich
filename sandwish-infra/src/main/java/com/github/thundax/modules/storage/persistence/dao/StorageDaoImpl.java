@@ -39,7 +39,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public Storage get(EntityId id) {
+    public Storage getById(EntityId id) {
         Storage storage = cacheSupport.getById(id.value());
         if (storage != null) {
             return storage;
@@ -51,7 +51,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<Storage> getMany(List<String> idList) {
+    public List<Storage> batchGetByIds(List<String> idList) {
         List<Storage> storageList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -75,7 +75,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<Storage> findList(
+    public List<Storage> list(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -88,7 +88,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public Page<Storage> findPage(
+    public Page<Storage> page(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -139,14 +139,14 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         int count = mapper.deleteById(id.value());
         cacheSupport.removeById(id.value());
         return count;
     }
 
     @Override
-    public List<String> findMimeTypeList() {
+    public List<String> listMimeTypes() {
         return toStringList(mapper.selectObjs(new QueryWrapper<StorageDO>()
                 .select("mime_type")
                 .groupBy("mime_type")
@@ -154,7 +154,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<String> findBusinessTypeList() {
+    public List<String> listBusinessTypes() {
         return toStringList(businessMapper.selectObjs(new QueryWrapper<StorageBusinessDO>()
                 .select("business_type")
                 .groupBy("business_type")
@@ -180,7 +180,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<StorageBusiness> findBusiness(Storage entity) {
+    public List<StorageBusiness> listBusiness(Storage entity) {
         LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StorageBusinessDO::getStorageId, EntityIdCodec.toValue(entity.getId()));
         return StoragePersistenceAssembler.toBusinessEntityList(businessMapper.selectList(wrapper));

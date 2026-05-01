@@ -22,22 +22,22 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public UploadFile get(EntityId id) {
+    public UploadFile getById(EntityId id) {
         return UploadFilePersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
-    public List<UploadFile> getMany(List<String> idList) {
+    public List<UploadFile> batchGetByIds(List<String> idList) {
         return UploadFilePersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    public List<UploadFile> findList() {
+    public List<UploadFile> list() {
         return UploadFilePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper()));
     }
 
     @Override
-    public Page<UploadFile> findPage(int pageNo, int pageSize) {
+    public Page<UploadFile> page(int pageNo, int pageSize) {
         Page<UploadFileDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper());
         Page<UploadFile> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
@@ -70,17 +70,17 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         return mapper.deleteById(id.value());
     }
 
     @Override
-    public UploadFile getContent(EntityId id) {
-        return get(id);
+    public UploadFile getContentById(EntityId id) {
+        return getById(id);
     }
 
     @Override
-    public List<UploadFile> findByFileIds(List<String> fileIds) {
+    public List<UploadFile> batchGetByFileIds(List<String> fileIds) {
         return UploadFilePersistenceAssembler.toEntityList(mapper.selectBatchIds(fileIds));
     }
 

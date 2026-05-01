@@ -47,17 +47,17 @@ public class DictServiceImpl implements DictService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Dict> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<String> findTypeList() {
-        return dao.findTypeList();
+        return dao.listTypes();
     }
 
     public List<String> findLabelList(String type) {
@@ -80,7 +80,7 @@ public class DictServiceImpl implements DictService {
     @Override
     public List<Dict> findList(Dict dict) {
         Dict.Query query = dict == null ? null : dict.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
                 query == null ? null : query.getRemarks());
@@ -96,7 +96,7 @@ public class DictServiceImpl implements DictService {
     public Page<Dict> findPage(Dict dict, Page<Dict> page) {
         Page<Dict> normalizedPage = normalizePage(page);
         Dict.Query query = dict == null ? null : dict.getQuery();
-        IPage<Dict> dataPage = dao.findPage(
+        IPage<Dict> dataPage = dao.page(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
                 query == null ? null : query.getRemarks(),
@@ -130,7 +130,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(Dict dict) {
-        return dict == null ? 0 : dao.delete(dict.getId());
+        return dict == null ? 0 : dao.deleteById(dict.getId());
     }
 
     @Override

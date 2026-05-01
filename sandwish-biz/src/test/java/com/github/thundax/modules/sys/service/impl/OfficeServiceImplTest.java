@@ -127,18 +127,18 @@ public class OfficeServiceImplTest {
         private int priorityCalls;
 
         @Override
-        public Office get(EntityId id) {
+        public Office getById(EntityId id) {
             this.getCalls++;
             return getResult;
         }
 
         @Override
-        public List<Office> getMany(List<String> idList) {
+        public List<Office> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Office> findList(String parentId, String name, String remarks) {
+        public List<Office> list(String parentId, String name, String remarks) {
             this.parentId = parentId;
             this.name = name;
             this.remarks = remarks;
@@ -146,7 +146,7 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Office> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Office> page(
                 String parentId, String name, String remarks, int pageNo, int pageSize) {
             this.parentId = parentId;
             this.name = name;
@@ -178,7 +178,7 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             this.deletedId = id.value();
             return 1;
         }

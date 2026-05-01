@@ -115,23 +115,23 @@ public class RoleServiceImplTest {
         private List<String> userIdList;
 
         @Override
-        public Role get(EntityId id) {
+        public Role getById(EntityId id) {
             return null;
         }
 
         @Override
-        public List<Role> getMany(List<String> idList) {
+        public List<Role> batchGetByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Role> findList(String enableFlag) {
+        public List<Role> list(String enableFlag) {
             this.enableFlag = enableFlag;
             return null;
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Role> findPage(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Role> page(
                 String enableFlag, int pageNo, int pageSize) {
             this.enableFlag = enableFlag;
             this.pageNo = pageNo;
@@ -159,7 +159,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int delete(EntityId id) {
+        public int deleteById(EntityId id) {
             this.deletedRoleId = id.value();
             return 1;
         }
@@ -170,7 +170,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<String> findRoleMenu(String roleId) {
+        public List<String> listRoleMenus(String roleId) {
             return null;
         }
 
@@ -185,7 +185,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<String> findRoleUser(String roleId) {
+        public List<String> listRoleUsers(String roleId) {
             return null;
         }
 

@@ -32,7 +32,7 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public Dict get(EntityId id) {
+    public Dict getById(EntityId id) {
         Dict dict = cacheSupport.getById(id.value());
         if (dict != null) {
             return dict;
@@ -44,7 +44,7 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public List<Dict> getMany(List<String> idList) {
+    public List<Dict> batchGetByIds(List<String> idList) {
         List<Dict> dictList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -67,12 +67,12 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public List<Dict> findList(String type, String label, String remarks) {
+    public List<Dict> list(String type, String label, String remarks) {
         return DictPersistenceAssembler.toEntityList(mapper.selectList(buildQueryWrapper(type, label, remarks)));
     }
 
     @Override
-    public Page<Dict> findPage(String type, String label, String remarks, int pageNo, int pageSize) {
+    public Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize) {
         Page<DictDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildQueryWrapper(type, label, remarks));
         Page<Dict> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -123,14 +123,14 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         int count = mapper.deleteById(id.value());
         cacheSupport.removeAll();
         return count;
     }
 
     @Override
-    public List<String> findTypeList() {
+    public List<String> listTypes() {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
         wrapper.select("type").groupBy("type").orderByAsc("type");
         return mapper.selectObjs(wrapper).stream().map(String::valueOf).collect(Collectors.toList());

@@ -40,7 +40,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public Menu get(EntityId id) {
+    public Menu getById(EntityId id) {
         Menu menu = cacheSupport.getById(id.value());
         if (menu != null) {
             return menu;
@@ -52,7 +52,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> getMany(List<String> idList) {
+    public List<Menu> batchGetByIds(List<String> idList) {
         List<Menu> menuList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -75,13 +75,13 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> findList(String parentId, String displayFlag, Integer maxRank) {
+    public List<Menu> list(String parentId, String displayFlag, Integer maxRank) {
         return MenuPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(parentId, displayFlag, maxRank)));
     }
 
     @Override
-    public Page<Menu> findPage(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+    public Page<Menu> page(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
         IPage<MenuDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, displayFlag, maxRank));
         Page<Menu> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -144,7 +144,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         MenuDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;

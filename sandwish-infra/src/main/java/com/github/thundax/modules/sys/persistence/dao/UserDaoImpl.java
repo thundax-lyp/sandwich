@@ -48,7 +48,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User get(EntityId id) {
+    public User getById(EntityId id) {
         User user = cacheSupport.getById(id.value());
         if (user != null) {
             return user;
@@ -59,7 +59,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> getMany(List<String> idList) {
+    public List<User> batchGetByIds(List<String> idList) {
         List<User> userList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -81,13 +81,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findList(String officeId, String loginName, String name, String enableFlag, String superFlag) {
+    public List<User> list(String officeId, String loginName, String name, String enableFlag, String superFlag) {
         return UserPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(officeId, loginName, name, enableFlag, superFlag)));
     }
 
     @Override
-    public Page<User> findPage(
+    public Page<User> page(
             String officeId,
             String loginName,
             String name,
@@ -148,7 +148,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         int count = mapper.deleteById(id.value());
         removeUserCaches(id.value());
         roleCacheSupport.removeAll();
@@ -205,7 +205,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<String> findUserRole(String userId) {
+    public List<String> listUserRoles(String userId) {
         List<String> roleIds = cacheSupport.getUserRoleIds(userId);
         if (roleIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();

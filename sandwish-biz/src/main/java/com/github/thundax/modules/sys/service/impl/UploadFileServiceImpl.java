@@ -46,17 +46,17 @@ public class UploadFileServiceImpl implements UploadFileService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<UploadFile> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<UploadFile> findList(UploadFile entity) {
-        return dao.findList();
+        return dao.list();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     public Page<UploadFile> findPage(UploadFile entity, Page<UploadFile> page) {
         Page<UploadFile> normalizedPage = normalizePage(page);
-        IPage<UploadFile> dataPage = dao.findPage(normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<UploadFile> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());
@@ -97,7 +97,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int delete(UploadFile entity) {
-        return entity == null ? 0 : dao.delete(entity.getId());
+        return entity == null ? 0 : dao.deleteById(entity.getId());
     }
 
     @Override
@@ -120,12 +120,12 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public UploadFile getContent(UploadFile uploadFile) {
-        return uploadFile == null ? null : dao.getContent(uploadFile.getId());
+        return uploadFile == null ? null : dao.getContentById(uploadFile.getId());
     }
 
     @Override
     public List<UploadFile> findByFileIds(String[] fileId) {
-        return dao.findByFileIds(Arrays.asList(fileId));
+        return dao.batchGetByFileIds(Arrays.asList(fileId));
     }
 
     private int batchOperate(Collection<UploadFile> collection, Function<UploadFile, Integer> operator) {

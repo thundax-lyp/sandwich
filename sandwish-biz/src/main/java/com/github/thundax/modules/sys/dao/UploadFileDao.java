@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface UploadFileDao {
 
-    UploadFile get(EntityId id);
+    UploadFile getById(EntityId id);
 
-    List<UploadFile> getMany(List<String> idList);
+    List<UploadFile> batchGetByIds(List<String> idList);
 
-    List<UploadFile> findList();
+    List<UploadFile> list();
 
-    Page<UploadFile> findPage(int pageNo, int pageSize);
+    Page<UploadFile> page(int pageNo, int pageSize);
 
     String insert(UploadFile uploadFile);
 
@@ -21,9 +21,9 @@ public interface UploadFileDao {
 
     int updatePriority(UploadFile uploadFile);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
-    UploadFile getContent(EntityId id);
+    UploadFile getContentById(EntityId id);
 
-    List<UploadFile> findByFileIds(List<String> fileIds);
+    List<UploadFile> batchGetByFileIds(List<String> fileIds);
 }

@@ -25,17 +25,17 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public Log get(EntityId id) {
+    public Log getById(EntityId id) {
         return LogPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
-    public List<Log> getMany(List<String> idList) {
+    public List<Log> batchGetByIds(List<String> idList) {
         return LogPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    public List<Log> findList(
+    public List<Log> list(
             String type,
             String remoteAddr,
             String userLoginName,
@@ -49,7 +49,7 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public Page<Log> findPage(
+    public Page<Log> page(
             String type,
             String remoteAddr,
             String userLoginName,
@@ -83,12 +83,12 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         return mapper.deleteById(id.value());
     }
 
     @Override
-    public List<String> insertList(List<Log> list) {
+    public List<String> batchInsert(List<Log> list) {
         List<String> idList = new ArrayList<>();
         for (LogDO dataObject : LogPersistenceAssembler.toDataObjectList(list)) {
             mapper.insert(dataObject);

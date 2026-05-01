@@ -16,7 +16,7 @@ public interface SignatureDao {
      * @param businessId 业务主键
      * @return 签名数据
      */
-    Signature find(String businessType, String businessId);
+    Signature getByBusiness(String businessType, String businessId);
 
     /**
      * 按业务主键批量查询签名。
@@ -24,7 +24,7 @@ public interface SignatureDao {
      * @param businessIdList 业务主键列表
      * @return 签名列表
      */
-    List<Signature> findByBusinessIds(List<String> businessIdList);
+    List<Signature> batchGetByBusinessIds(List<String> businessIdList);
 
     /**
      * 按显式条件查询签名列表。
@@ -35,7 +35,7 @@ public interface SignatureDao {
      * @param isVerifySign 验签状态
      * @return 签名列表
      */
-    List<Signature> findList(String businessType, String businessId, List<String> businessIdList, String isVerifySign);
+    List<Signature> list(String businessType, String businessId, List<String> businessIdList, String isVerifySign);
 
     /**
      * 按业务分类分页查询签名。
@@ -45,7 +45,7 @@ public interface SignatureDao {
      * @param pageSize 分页大小
      * @return 分页结果
      */
-    Page<Signature> findPage(String businessType, int pageNo, int pageSize);
+    Page<Signature> page(String businessType, int pageNo, int pageSize);
 
     /**
      * 插入签名。
@@ -70,5 +70,5 @@ public interface SignatureDao {
      * @param businessId 业务主键
      * @return 变更数量
      */
-    int delete(String businessType, String businessId);
+    int deleteByBusiness(String businessType, String businessId);
 }

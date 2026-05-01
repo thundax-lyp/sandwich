@@ -32,18 +32,18 @@ public class StorageServiceImpl implements StorageService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Storage> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<Storage> findList(Storage storage) {
         Storage.Query query = storage == null ? null : storage.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
@@ -57,7 +57,7 @@ public class StorageServiceImpl implements StorageService {
     public Page<Storage> findPage(Storage storage, Page<Storage> page) {
         Page<Storage> normalizedPage = normalizePage(page);
         Storage.Query query = storage == null ? null : storage.getQuery();
-        IPage<Storage> dataPage = dao.findPage(
+        IPage<Storage> dataPage = dao.page(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
@@ -92,7 +92,7 @@ public class StorageServiceImpl implements StorageService {
         if (storage == null) {
             return 0;
         }
-        return dao.delete(storage.getId());
+        return dao.deleteById(storage.getId());
     }
 
     @Override
@@ -103,12 +103,12 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<String> findMimeTypeList() {
-        return dao.findMimeTypeList();
+        return dao.listMimeTypes();
     }
 
     @Override
     public List<String> findBusinessTypeList() {
-        return dao.findBusinessTypeList();
+        return dao.listBusinessTypes();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<StorageBusiness> findBusiness(Storage entity) {
-        return dao.findBusiness(entity);
+        return dao.listBusiness(entity);
     }
 
     private int batchOperate(Collection<Storage> collection, Function<Storage, Integer> operator) {

@@ -22,22 +22,22 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public UserEncrypt get(EntityId id) {
+    public UserEncrypt getById(EntityId id) {
         return UserEncryptPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
     @Override
-    public List<UserEncrypt> getMany(List<String> idList) {
+    public List<UserEncrypt> batchGetByIds(List<String> idList) {
         return UserEncryptPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
     @Override
-    public List<UserEncrypt> findList() {
+    public List<UserEncrypt> list() {
         return UserEncryptPersistenceAssembler.toEntityList(mapper.selectList(new LambdaQueryWrapper<>()));
     }
 
     @Override
-    public Page<UserEncrypt> findPage(int pageNo, int pageSize) {
+    public Page<UserEncrypt> page(int pageNo, int pageSize) {
         Page<UserEncryptDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), new LambdaQueryWrapper<>());
         Page<UserEncrypt> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -68,7 +68,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         return mapper.deleteById(id.value());
     }
 

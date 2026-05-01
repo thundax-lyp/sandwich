@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface OfficeDao {
 
-    Office get(EntityId id);
+    Office getById(EntityId id);
 
-    List<Office> getMany(List<String> idList);
+    List<Office> batchGetByIds(List<String> idList);
 
-    List<Office> findList(String parentId, String name, String remarks);
+    List<Office> list(String parentId, String name, String remarks);
 
-    Page<Office> findPage(String parentId, String name, String remarks, int pageNo, int pageSize);
+    Page<Office> page(String parentId, String name, String remarks, int pageNo, int pageSize);
 
     String insert(Office office);
 
@@ -22,7 +22,7 @@ public interface OfficeDao {
 
     int updatePriority(Office office);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType);
 

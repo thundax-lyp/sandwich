@@ -21,26 +21,26 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     @Override
-    public Signature find(String businessType, String businessId) {
+    public Signature getByBusiness(String businessType, String businessId) {
         return SignaturePersistenceAssembler.toEntity(
                 mapper.selectOne(buildBusinessKeyWrapper(businessType, businessId)));
     }
 
     @Override
-    public List<Signature> findByBusinessIds(List<String> businessIdList) {
+    public List<Signature> batchGetByBusinessIds(List<String> businessIdList) {
         return SignaturePersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(null, null, businessIdList, null)));
     }
 
     @Override
-    public List<Signature> findList(
+    public List<Signature> list(
             String businessType, String businessId, List<String> businessIdList, String isVerifySign) {
         return SignaturePersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(businessType, businessId, businessIdList, isVerifySign)));
     }
 
     @Override
-    public Page<Signature> findPage(String businessType, int pageNo, int pageSize) {
+    public Page<Signature> page(String businessType, int pageNo, int pageSize) {
         Page<SignatureDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(businessType, null, null, null));
         Page<Signature> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -64,7 +64,7 @@ public class SignatureDaoImpl implements SignatureDao {
     }
 
     @Override
-    public int delete(String businessType, String businessId) {
+    public int deleteByBusiness(String businessType, String businessId) {
         return mapper.delete(buildBusinessKeyWrapper(businessType, businessId));
     }
 

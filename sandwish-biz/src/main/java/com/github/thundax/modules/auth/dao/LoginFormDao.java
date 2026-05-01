@@ -4,7 +4,7 @@ import com.github.thundax.modules.auth.entity.LoginForm;
 
 public interface LoginFormDao {
 
-    int getLoginCount();
+    int count();
 
     LoginForm getByToken(String loginToken);
 

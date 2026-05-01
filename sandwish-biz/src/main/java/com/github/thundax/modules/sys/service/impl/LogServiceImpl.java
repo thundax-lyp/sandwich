@@ -32,13 +32,13 @@ public class LogServiceImpl implements LogService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Log> findList(Log log) {
         Log.Query query = log == null ? null : log.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
                 query == null ? null : query.getUserLoginName(),
@@ -53,7 +53,7 @@ public class LogServiceImpl implements LogService {
     public Page<Log> findPage(Log log, Page<Log> page) {
         Page<Log> normalizedPage = normalizePage(page);
         Log.Query query = log == null ? null : log.getQuery();
-        IPage<Log> dataPage = dao.findPage(
+        IPage<Log> dataPage = dao.page(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
                 query == null ? null : query.getUserLoginName(),
@@ -93,7 +93,7 @@ public class LogServiceImpl implements LogService {
         if (log == null) {
             return 0;
         }
-        return dao.delete(log.getId());
+        return dao.deleteById(log.getId());
     }
 
     @Override
@@ -111,7 +111,7 @@ public class LogServiceImpl implements LogService {
             int fromIndex = pageSize * pageNo;
             int toIndex = Math.min(fromIndex + pageSize, list.size());
             List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
-            List<String> idList = dao.insertList(subList);
+            List<String> idList = dao.batchInsert(subList);
             for (int i = 0; i < idList.size(); i++) {
                 subList.get(i).setId(EntityIdCodec.toDomain(idList.get(i)));
             }

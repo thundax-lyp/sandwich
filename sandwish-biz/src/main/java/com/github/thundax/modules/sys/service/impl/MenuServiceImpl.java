@@ -52,18 +52,18 @@ public class MenuServiceImpl implements MenuService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Menu> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<Menu> findList(Menu menu) {
         Menu.Query query = menu == null ? null : menu.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getMaxRank());
@@ -79,7 +79,7 @@ public class MenuServiceImpl implements MenuService {
     public Page<Menu> findPage(Menu menu, Page<Menu> page) {
         Page<Menu> normalizedPage = normalizePage(page);
         Menu.Query query = menu == null ? null : menu.getQuery();
-        IPage<Menu> dataPage = dao.findPage(
+        IPage<Menu> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getMaxRank(),
@@ -99,12 +99,12 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> findList(Integer maxRank) {
-        return dao.findList(null, null, maxRank);
+        return dao.list(null, null, maxRank);
     }
 
     @Override
     public List<Menu> findChildList(String parentId) {
-        return dao.findList(parentId, null, null);
+        return dao.list(parentId, null, null);
     }
 
     @Override
@@ -162,7 +162,7 @@ public class MenuServiceImpl implements MenuService {
             return 0;
         }
 
-        int retVal = dao.delete(bean.getId());
+        int retVal = dao.deleteById(bean.getId());
 
         signService.deleteSign(menu.getSignName(), menu.getSignId());
         notifyCacheChanged();

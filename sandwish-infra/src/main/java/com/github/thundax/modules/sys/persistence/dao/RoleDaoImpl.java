@@ -49,7 +49,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public Role get(EntityId id) {
+    public Role getById(EntityId id) {
         Role role = cacheSupport.getById(id.value());
         if (role != null) {
             return role;
@@ -60,7 +60,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> getMany(List<String> idList) {
+    public List<Role> batchGetByIds(List<String> idList) {
         List<Role> roleList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
@@ -82,12 +82,12 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> findList(String enableFlag) {
+    public List<Role> list(String enableFlag) {
         return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(enableFlag)));
     }
 
     @Override
-    public Page<Role> findPage(String enableFlag, int pageNo, int pageSize) {
+    public Page<Role> page(String enableFlag, int pageNo, int pageSize) {
         Page<RoleDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(enableFlag));
         Page<Role> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
@@ -133,7 +133,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public int delete(EntityId id) {
+    public int deleteById(EntityId id) {
         int count = mapper.deleteById(id.value());
         removeRoleCaches(id.value());
         return count;
@@ -149,7 +149,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<String> findRoleMenu(String roleId) {
+    public List<String> listRoleMenus(String roleId) {
         List<String> menuIds = cacheSupport.getRoleMenuIds(roleId);
         if (menuIds == null) {
             LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
@@ -179,7 +179,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<String> findRoleUser(String roleId) {
+    public List<String> listRoleUsers(String roleId) {
         List<String> userIds = cacheSupport.getRoleUserIds(roleId);
         if (userIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();

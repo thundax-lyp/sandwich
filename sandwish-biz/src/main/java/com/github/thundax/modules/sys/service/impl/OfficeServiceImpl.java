@@ -45,18 +45,18 @@ public class OfficeServiceImpl implements OfficeService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Office> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<Office> findList(Office office) {
         Office.Query query = office == null ? null : office.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
@@ -72,7 +72,7 @@ public class OfficeServiceImpl implements OfficeService {
     public Page<Office> findPage(Office office, Page<Office> page) {
         Page<Office> normalizedPage = normalizePage(page);
         Office.Query query = office == null ? null : office.getQuery();
-        IPage<Office> dataPage = dao.findPage(
+        IPage<Office> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
@@ -110,7 +110,7 @@ public class OfficeServiceImpl implements OfficeService {
             return 0;
         }
 
-        int count = dao.delete(bean.getId());
+        int count = dao.deleteById(bean.getId());
 
         return count;
     }

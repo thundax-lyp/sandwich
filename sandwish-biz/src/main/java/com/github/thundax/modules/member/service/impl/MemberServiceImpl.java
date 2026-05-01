@@ -32,18 +32,18 @@ public class MemberServiceImpl implements MemberService {
         if (id == null) {
             return null;
         }
-        return dao.get(id);
+        return dao.getById(id);
     }
 
     @Override
     public List<Member> getMany(List<String> ids) {
-        return dao.getMany(ids);
+        return dao.batchGetByIds(ids);
     }
 
     @Override
     public List<Member> findList(Member member) {
         Member.Query query = member == null ? null : member.getQuery();
-        return dao.findList(
+        return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
     public Page<Member> findPage(Member member, Page<Member> page) {
         Page<Member> normalizedPage = normalizePage(page);
         Member.Query query = member == null ? null : member.getQuery();
-        IPage<Member> dataPage = dao.findPage(
+        IPage<Member> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
@@ -80,13 +80,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member getByLoginName(String loginName) {
-        List<Member> members = dao.findByLoginName(loginName);
+        List<Member> members = dao.listByLoginName(loginName);
         return members == null || members.isEmpty() ? null : members.get(0);
     }
 
     @Override
     public Member getByEmail(String email) {
-        List<Member> members = dao.findByEmail(email);
+        List<Member> members = dao.listByEmail(email);
         return members == null || members.isEmpty() ? null : members.get(0);
     }
 
@@ -144,7 +144,7 @@ public class MemberServiceImpl implements MemberService {
         if (member == null) {
             return 0;
         }
-        return dao.delete(member.getId());
+        return dao.deleteById(member.getId());
     }
 
     @Override

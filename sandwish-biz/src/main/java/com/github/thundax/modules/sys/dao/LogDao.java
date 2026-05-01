@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface LogDao {
 
-    Log get(EntityId id);
+    Log getById(EntityId id);
 
-    List<Log> getMany(List<String> idList);
+    List<Log> batchGetByIds(List<String> idList);
 
-    List<Log> findList(
+    List<Log> list(
             String type,
             String remoteAddr,
             String userLoginName,
@@ -22,7 +22,7 @@ public interface LogDao {
             Date beginDate,
             Date endDate);
 
-    Page<Log> findPage(
+    Page<Log> page(
             String type,
             String remoteAddr,
             String userLoginName,
@@ -38,7 +38,7 @@ public interface LogDao {
 
     int update(Log log);
 
-    int delete(EntityId id);
+    int deleteById(EntityId id);
 
     /**
      * 写入
@@ -46,7 +46,7 @@ public interface LogDao {
      * @param list 列表
      * @return 写入后的主键列表
      */
-    List<String> insertList(List<Log> list);
+    List<String> batchInsert(List<Log> list);
 
     /**
      * 批量删除

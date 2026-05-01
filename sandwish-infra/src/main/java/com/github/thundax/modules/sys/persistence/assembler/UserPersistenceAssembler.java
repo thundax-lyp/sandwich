@@ -38,7 +38,7 @@ public final class UserPersistenceAssembler {
         dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
         dataObject.setEnableFlag(statusValue(entity.getStatus()));
         dataObject.setSsoLoginName(entity.getSsoLoginName());
-        dataObject.setPriority(entity.getPriority());
+        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setCreateBy(entity.getCreateUserId());
@@ -107,7 +107,7 @@ public final class UserPersistenceAssembler {
     }
 
     private static int priorityOrDefault(Integer priority) {
-        return priority == null ? 0 : priority;
+        return priority == null || priority < 0 ? 0 : priority;
     }
 
     private static String superFlag(UserPrivilege privilege) {

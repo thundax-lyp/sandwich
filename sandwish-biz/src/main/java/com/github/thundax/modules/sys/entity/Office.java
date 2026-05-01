@@ -32,11 +32,6 @@ public class Office implements Auditable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     public static final String BEAN_NAME = "Office";
 
     public void setParent(Office parent) {

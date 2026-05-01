@@ -30,4 +30,17 @@ public class MenuPersistenceAssemblerTest {
 
         assertEquals("HIDDEN", dataObject.getDisplayFlag());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        Menu entity = new Menu();
+        entity.setPriority(-1);
+        MenuDO dataObject = new MenuDO();
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                MenuPersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, MenuPersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

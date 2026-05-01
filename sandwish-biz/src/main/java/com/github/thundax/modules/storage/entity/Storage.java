@@ -34,11 +34,6 @@ public class Storage implements Sortable {
     private Date createDate;
     private Date updateDate;
 
-    @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
 
     private static final String PATH_FORMAT = "yyyyMM";

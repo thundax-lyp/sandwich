@@ -37,4 +37,17 @@ public class UserPersistenceAssemblerTest {
         assertEquals(Global.YES, dataObject.getAdminFlag());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        User entity = new User();
+        entity.setPriority(-1);
+        UserDO dataObject = new UserDO();
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                UserPersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, UserPersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

@@ -48,11 +48,6 @@ public class Member implements Auditable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     public static final String BEAN_NAME = "Member";
 
     public static final String MALE = "1";

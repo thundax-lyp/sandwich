@@ -21,7 +21,7 @@ public final class AsyncTaskPersistenceAssembler {
         dataObject.setData(entity.getData());
         dataObject.setIsPrivate(entity.getPrivate());
         dataObject.setExpiredSeconds(entity.getExpiredSeconds());
-        dataObject.setPriority(entity.getPriority());
+        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setCreateBy(entity.getCreateUserId());
@@ -52,6 +52,6 @@ public final class AsyncTaskPersistenceAssembler {
     }
 
     private static int priorityOrDefault(Integer priority) {
-        return priority == null ? 0 : priority;
+        return priority == null || priority < 0 ? 0 : priority;
     }
 }

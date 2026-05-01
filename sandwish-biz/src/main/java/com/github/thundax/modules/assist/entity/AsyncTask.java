@@ -46,11 +46,6 @@ public class AsyncTask implements Auditable, Sortable {
         isPrivate = aPrivate;
     }
 
-    @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     @NonNull
     public Integer getExpiredSeconds() {
         Integer expiredSeconds = this.expiredSeconds;

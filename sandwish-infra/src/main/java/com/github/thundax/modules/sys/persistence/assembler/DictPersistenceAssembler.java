@@ -19,7 +19,7 @@ public final class DictPersistenceAssembler {
         dataObject.setType(entity.getType());
         dataObject.setLabel(entity.getLabel());
         dataObject.setValue(entity.getValue());
-        dataObject.setPriority(entity.getPriority());
+        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setCreateBy(entity.getCreateUserId());
@@ -58,6 +58,6 @@ public final class DictPersistenceAssembler {
     }
 
     private static int priorityOrDefault(Integer priority) {
-        return priority == null ? 0 : priority;
+        return priority == null || priority < 0 ? 0 : priority;
     }
 }

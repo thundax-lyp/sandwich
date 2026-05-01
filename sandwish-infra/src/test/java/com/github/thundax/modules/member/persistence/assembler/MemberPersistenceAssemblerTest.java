@@ -30,4 +30,17 @@ public class MemberPersistenceAssemblerTest {
 
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        Member entity = new Member();
+        entity.setPriority(-1);
+        MemberDO dataObject = new MemberDO();
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                MemberPersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, MemberPersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

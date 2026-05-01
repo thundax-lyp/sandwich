@@ -29,4 +29,18 @@ public class AsyncTaskPersistenceAssemblerTest {
 
         assertEquals("SUCCESS", dataObject.getStatus());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        AsyncTask entity = new AsyncTask();
+        entity.setPriority(-1);
+        AsyncTaskDO dataObject = new AsyncTaskDO();
+        dataObject.setStatus("IDLE");
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                AsyncTaskPersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, AsyncTaskPersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

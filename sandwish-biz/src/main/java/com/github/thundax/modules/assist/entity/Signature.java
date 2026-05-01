@@ -32,10 +32,6 @@ public class Signature {
     private Date createDate;
     private Date updateDate;
 
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     public static final String BEAN_NAME = "Signature";
 
     public Signature(String id, String businessType, String businessId) {

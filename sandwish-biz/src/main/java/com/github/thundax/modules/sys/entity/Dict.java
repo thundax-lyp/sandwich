@@ -26,11 +26,6 @@ public class Dict implements Auditable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
     private Query query;
 
     public Query getQuery() {

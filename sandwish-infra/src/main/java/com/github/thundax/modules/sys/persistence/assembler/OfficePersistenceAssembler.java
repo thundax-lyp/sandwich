@@ -19,7 +19,7 @@ public final class OfficePersistenceAssembler {
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
-        dataObject.setPriority(entity.getPriority());
+        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
         dataObject.setCreateBy(entity.getCreateUserId());
@@ -65,6 +65,6 @@ public final class OfficePersistenceAssembler {
     }
 
     private static int priorityOrDefault(Integer priority) {
-        return priority == null ? 0 : priority;
+        return priority == null || priority < 0 ? 0 : priority;
     }
 }

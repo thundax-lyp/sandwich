@@ -47,11 +47,6 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     private String updateUserId;
 
     @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
-    @Override
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }

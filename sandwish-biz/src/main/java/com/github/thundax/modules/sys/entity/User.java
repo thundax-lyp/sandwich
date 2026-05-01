@@ -60,11 +60,6 @@ public class User implements Auditable, Signable, Sortable {
     private String updateUserId;
 
     @Override
-    public void setPriority(int priority) {
-        this.priority = priority >= 0 ? priority : 0;
-    }
-
-    @Override
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }

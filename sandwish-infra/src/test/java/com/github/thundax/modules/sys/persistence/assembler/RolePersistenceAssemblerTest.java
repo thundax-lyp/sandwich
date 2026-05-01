@@ -35,4 +35,17 @@ public class RolePersistenceAssemblerTest {
         assertEquals(Global.NO, dataObject.getAdminFlag());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        Role entity = new Role();
+        entity.setPriority(-1);
+        RoleDO dataObject = new RoleDO();
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                RolePersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, RolePersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

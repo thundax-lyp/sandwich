@@ -71,4 +71,17 @@ public class StoragePersistenceAssemblerTest {
                 "PUBLIC",
                 StoragePersistenceAssembler.toBusinessDataObject(entity).getPublicFlag());
     }
+
+    @Test
+    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+        Storage entity = new Storage();
+        entity.setPriority(-1);
+        StorageDO dataObject = new StorageDO();
+        dataObject.setPriority(-1);
+
+        assertEquals(
+                Integer.valueOf(0),
+                StoragePersistenceAssembler.toDataObject(entity).getPriority());
+        assertEquals(0, StoragePersistenceAssembler.toEntity(dataObject).getPriority());
+    }
 }

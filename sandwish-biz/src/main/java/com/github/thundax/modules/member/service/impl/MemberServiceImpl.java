@@ -6,7 +6,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberStatus;
+import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Collection;
 import java.util.List;

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.LogType;
+import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import org.junit.Test;
 

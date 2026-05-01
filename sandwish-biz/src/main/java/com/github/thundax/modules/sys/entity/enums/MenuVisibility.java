@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.sys.entity.enums;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;

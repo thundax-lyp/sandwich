@@ -8,7 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberStatus;
+import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

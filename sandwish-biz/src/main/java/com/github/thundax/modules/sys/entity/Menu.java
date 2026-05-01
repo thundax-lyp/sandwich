@@ -7,6 +7,7 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.io.Serializable;

@@ -11,7 +11,7 @@ import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.MenuServiceApi;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.MenuVisibility;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.request.MenuDisplayRequest;
 import com.github.thundax.modules.sys.request.MenuIdRequest;
 import com.github.thundax.modules.sys.request.MenuMoveRequest;

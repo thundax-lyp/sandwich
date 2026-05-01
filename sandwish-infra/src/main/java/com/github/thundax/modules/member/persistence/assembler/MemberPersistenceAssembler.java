@@ -2,7 +2,7 @@ package com.github.thundax.modules.member.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberStatus;
+import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
 import java.util.List;

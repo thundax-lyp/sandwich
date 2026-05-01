@@ -1,21 +1,20 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.sys.entity.enums;
 
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum UserPrivilege {
+public enum RolePrivilege {
     NORMAL,
-    ADMIN,
-    SUPER;
+    ADMIN;
 
     public String value() {
         return name();
     }
 
-    public static UserPrivilege from(String value) {
+    public static RolePrivilege from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown user privilege: " + value));
+                .orElseThrow(() -> new BizException("Unknown role privilege: " + value));
     }
 }

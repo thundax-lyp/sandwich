@@ -4,6 +4,7 @@ import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.sys.entity.enums.LogType;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;

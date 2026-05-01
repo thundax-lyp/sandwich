@@ -10,7 +10,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.LogType;
+import com.github.thundax.modules.sys.entity.enums.LogType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

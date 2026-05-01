@@ -8,7 +8,7 @@ import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.MenuVisibility;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.service.MenuService;
 import java.util.Collection;
 import java.util.List;

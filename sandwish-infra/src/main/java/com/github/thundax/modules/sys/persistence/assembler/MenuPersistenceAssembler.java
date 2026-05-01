@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.MenuVisibility;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import java.util.ArrayList;
 import java.util.List;

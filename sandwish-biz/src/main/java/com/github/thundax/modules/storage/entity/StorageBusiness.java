@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

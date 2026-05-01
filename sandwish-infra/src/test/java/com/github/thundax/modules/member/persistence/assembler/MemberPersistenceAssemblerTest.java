@@ -5,7 +5,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberStatus;
+import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import org.junit.Test;
 

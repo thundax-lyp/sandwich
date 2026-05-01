@@ -1,25 +1,26 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.sys.entity.enums;
 
+import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum LogType {
-    ACCESS,
-    EXCEPTION;
+public enum RoleStatus {
+    ENABLED,
+    DISABLED;
 
     public String value() {
         return name();
     }
 
-    public static LogType from(String value) {
+    public static RoleStatus from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown log type: " + value));
+                .orElseThrow(() -> new BizException("Unknown role status: " + value));
     }
 
     private String legacyValue() {
-        return String.valueOf(ordinal() + 1);
+        return this == ENABLED ? Global.ENABLE : Global.DISABLE;
     }
 }

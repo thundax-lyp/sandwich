@@ -11,7 +11,7 @@ import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.MenuVisibility;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;

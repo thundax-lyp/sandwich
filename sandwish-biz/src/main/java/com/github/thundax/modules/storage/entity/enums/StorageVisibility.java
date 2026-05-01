@@ -1,26 +1,26 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.storage.entity.enums;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum UserStatus {
-    ENABLED,
-    DISABLED;
+public enum StorageVisibility {
+    PUBLIC,
+    PRIVATE;
 
     public String value() {
         return name();
     }
 
-    public static UserStatus from(String value) {
+    public static StorageVisibility from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown user status: " + value));
+                .orElseThrow(() -> new BizException("Unknown storage visibility: " + value));
     }
 
     private String legacyValue() {
-        return this == ENABLED ? Global.ENABLE : Global.DISABLE;
+        return this == PUBLIC ? Global.YES : Global.NO;
     }
 }

@@ -11,7 +11,7 @@ import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.StorageUtils;
 import java.io.File;

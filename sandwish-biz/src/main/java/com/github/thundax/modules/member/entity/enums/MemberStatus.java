@@ -1,10 +1,10 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.member.entity.enums;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum RoleStatus {
+public enum MemberStatus {
     ENABLED,
     DISABLED;
 
@@ -12,12 +12,12 @@ public enum RoleStatus {
         return name();
     }
 
-    public static RoleStatus from(String value) {
+    public static MemberStatus from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown role status: " + value));
+                .orElseThrow(() -> new BizException("Unknown member status: " + value));
     }
 
     private String legacyValue() {

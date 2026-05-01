@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.LogType;
+import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
 import java.util.List;

@@ -6,6 +6,8 @@ import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;

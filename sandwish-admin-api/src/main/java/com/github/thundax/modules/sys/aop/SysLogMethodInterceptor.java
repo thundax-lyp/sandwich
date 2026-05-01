@@ -4,7 +4,7 @@ import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.LogType;
+import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import com.github.thundax.modules.utils.IPUtils;
 import java.lang.annotation.Annotation;

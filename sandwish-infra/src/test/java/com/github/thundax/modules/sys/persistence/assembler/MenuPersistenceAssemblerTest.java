@@ -5,7 +5,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.MenuVisibility;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import org.junit.Test;
 

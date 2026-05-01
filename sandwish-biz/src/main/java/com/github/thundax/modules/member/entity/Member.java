@@ -3,6 +3,7 @@ package com.github.thundax.modules.member.entity;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;

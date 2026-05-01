@@ -4,6 +4,7 @@ import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Date;
 import java.util.Objects;

@@ -5,8 +5,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.Role;
-import com.github.thundax.modules.sys.entity.RolePrivilege;
-import com.github.thundax.modules.sys.entity.RoleStatus;
+import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
+import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import org.junit.Test;
 

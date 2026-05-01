@@ -5,8 +5,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserPrivilege;
-import com.github.thundax.modules.sys.entity.UserStatus;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import org.junit.Test;
 

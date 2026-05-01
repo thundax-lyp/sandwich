@@ -76,8 +76,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             RoleService roleService,
             Validator validator,
             KeypairService keypairService,
-            PasswordService passwordService,
-            UserInterfaceAssembler userInterfaceAssembler) {
+            PasswordService passwordService) {
         super(validator);
 
         this.userService = userService;
@@ -85,7 +84,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         this.roleService = roleService;
         this.keypairService = keypairService;
         this.passwordService = passwordService;
-        this.userInterfaceAssembler = userInterfaceAssembler;
+        this.userInterfaceAssembler = new UserInterfaceAssembler();
     }
 
     @Override
@@ -95,7 +94,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
-        return userInterfaceAssembler.toResponse(bean);
+        return toResponse(bean);
     }
 
     @Override
@@ -106,7 +105,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         User query = readQuery(request);
 
         return userService.findList(query).stream()
-                .map(user -> userInterfaceAssembler.toResponse(user))
+                .map(user -> toResponse(user))
                 .collect(Collectors.toList());
     }
 
@@ -118,7 +117,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
-        return entityPageToVo(userService.findPage(query, page), userInterfaceAssembler::toResponse);
+        return entityPageToVo(userService.findPage(query, page), this::toResponse);
     }
 
     @Override
@@ -156,7 +155,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
 
         userService.add(entity);
 
-        return userInterfaceAssembler.toResponse(entity);
+        return toResponse(entity);
     }
 
     @Override
@@ -204,7 +203,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
             userService.updatePassword(entity);
         }
 
-        return userInterfaceAssembler.toResponse(entity);
+        return toResponse(entity);
     }
 
     @Override
@@ -284,7 +283,7 @@ public class UserApiController extends BaseApiController implements UserServiceA
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserOfficeResponse> officeTree() {
         return officeService.findList(new Office()).stream()
-                .map(office -> userInterfaceAssembler.toOfficeResponse(office))
+                .map(office -> userInterfaceAssembler.toOfficeResponse(office, officeService::get))
                 .collect(Collectors.toList());
     }
 
@@ -419,6 +418,12 @@ public class UserApiController extends BaseApiController implements UserServiceA
         }
 
         return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
+    }
+
+    private UserResponse toResponse(User user) {
+        Office office = officeService.get(userInterfaceAssembler.toEntityId(user.getOfficeId()));
+        List<Role> roleList = userService.findUserRole(user);
+        return userInterfaceAssembler.toResponse(user, office, roleList, officeService::get);
     }
 
     public static String getAvatarUrl(String userId, String token) {

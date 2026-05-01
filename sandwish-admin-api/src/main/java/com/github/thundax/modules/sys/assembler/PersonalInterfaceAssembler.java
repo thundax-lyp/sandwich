@@ -14,17 +14,13 @@ import com.github.thundax.modules.utils.AvatarUtils;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class PersonalInterfaceAssembler {
-
     @NonNull
     public PersonalInfoResponse toInfoResponse(User entity) {
         if (entity == null) {
             return new PersonalInfoResponse();
         }
-
         PersonalInfoResponse response = new PersonalInfoResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(entity.getLoginName());
@@ -54,7 +50,6 @@ public class PersonalInterfaceAssembler {
         if (entity == null) {
             return new PersonalMenuResponse();
         }
-
         PersonalMenuResponse response = new PersonalMenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(entity.getParentId());

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
@@ -7,33 +8,21 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.response.LogOfficeResponse;
 import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.response.LogUserResponse;
-import com.github.thundax.modules.sys.service.OfficeService;
-import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LogInterfaceAssembler {
 
-    private final UserService userService;
-    private final OfficeService officeService;
-
-    public LogInterfaceAssembler(UserService userService, OfficeService officeService) {
-        this.userService = userService;
-        this.officeService = officeService;
-    }
-
     @NonNull
-    public LogResponse toResponse(Log entity) {
+    public LogResponse toResponse(Log entity, User user, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogResponse();
         }
 
         LogResponse response = baseEntityToResponse(new LogResponse(), entity);
-
         response.setType(entity.getType() == null ? null : entity.getType().value());
         response.setTitle(entity.getTitle());
         response.setRemoteAddr(entity.getRemoteAddr());
@@ -42,13 +31,12 @@ public class LogInterfaceAssembler {
         response.setRequestUri(entity.getRequestUri());
         response.setRequestParams(entity.getRequestParams());
         response.setCreateDate(entity.getLogDate());
-        response.setCreateUser(toUserResponse(userService.get(EntityIdCodec.toDomain(entity.getUserId()))));
-
+        response.setCreateUser(toUserResponse(user, office, officeLoader));
         return response;
     }
 
     @NonNull
-    public LogUserResponse toUserResponse(User entity) {
+    public LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogUserResponse();
         }
@@ -57,12 +45,12 @@ public class LogInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(entity.getLoginName());
         response.setName(entity.getName());
-        response.setOffice(toOfficeResponse(officeService.get(EntityIdCodec.toDomain(entity.getOfficeId()))));
+        response.setOffice(toOfficeResponse(office, officeLoader));
         return response;
     }
 
     @NonNull
-    public LogOfficeResponse toOfficeResponse(Office entity) {
+    public LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogOfficeResponse();
         }
@@ -70,7 +58,7 @@ public class LogInterfaceAssembler {
         LogOfficeResponse response = new LogOfficeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity));
+        response.setNamePath(namePath(entity, officeLoader));
         return response;
     }
 
@@ -81,14 +69,14 @@ public class LogInterfaceAssembler {
         return response;
     }
 
-    private String namePath(Office office) {
+    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeService.get(node.getId());
+            node = officeLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

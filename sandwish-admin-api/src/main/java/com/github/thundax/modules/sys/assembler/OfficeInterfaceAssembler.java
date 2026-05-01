@@ -5,41 +5,31 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
-import com.github.thundax.modules.sys.service.OfficeService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class OfficeInterfaceAssembler {
-
-    private final OfficeService officeService;
-
-    public OfficeInterfaceAssembler(OfficeService officeService) {
-        this.officeService = officeService;
-    }
 
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public OfficeResponse toResponse(Office entity) {
+    public OfficeResponse toResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new OfficeResponse();
         }
 
         OfficeResponse response = baseEntityToResponse(new OfficeResponse(), entity);
-
         if (StringUtils.isNotEmpty(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
         response.setName(entity.getName());
         response.setShortName(entity.getShortName());
-        response.setNamePath(namePath(entity));
-
+        response.setNamePath(namePath(entity, officeLoader));
         return response;
     }
 
@@ -68,7 +58,6 @@ public class OfficeInterfaceAssembler {
         }
         entity.setName(request.getName());
         entity.setShortName(request.getShortName());
-
         return entity;
     }
 
@@ -90,14 +79,14 @@ public class OfficeInterfaceAssembler {
         return entity;
     }
 
-    private String namePath(Office office) {
+    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeService.get(node.getId());
+            node = officeLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

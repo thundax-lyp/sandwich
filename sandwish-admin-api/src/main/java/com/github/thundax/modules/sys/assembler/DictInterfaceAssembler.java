@@ -6,11 +6,8 @@ import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class DictInterfaceAssembler {
-
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
@@ -20,7 +17,6 @@ public class DictInterfaceAssembler {
         if (entity == null) {
             return new DictResponse();
         }
-
         DictResponse response = baseEntityToResponse(new DictResponse(), entity);
         response.setLabel(entity.getLabel());
         response.setType(entity.getType());

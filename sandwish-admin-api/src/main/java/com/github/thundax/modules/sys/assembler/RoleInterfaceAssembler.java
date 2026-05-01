@@ -14,52 +14,35 @@ import com.github.thundax.modules.sys.response.RoleOfficeResponse;
 import com.github.thundax.modules.sys.response.RoleResponse;
 import com.github.thundax.modules.sys.response.RoleUserResponse;
 import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
-import com.github.thundax.modules.sys.service.MenuService;
-import com.github.thundax.modules.sys.service.OfficeService;
-import com.github.thundax.modules.sys.service.RoleService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class RoleInterfaceAssembler {
-
-    private final RoleService roleService;
-    private final MenuService menuService;
-    private final OfficeService officeService;
-
-    public RoleInterfaceAssembler(RoleService roleService, MenuService menuService, OfficeService officeService) {
-        this.roleService = roleService;
-        this.menuService = menuService;
-        this.officeService = officeService;
-    }
 
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public RoleResponse toResponse(Role entity) {
+    public RoleResponse toResponse(Role entity, List<Menu> menuList) {
         if (entity == null) {
             return new RoleResponse();
         }
 
         RoleResponse response = baseEntityToResponse(new RoleResponse(), entity);
-
         response.setName(entity.getName());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
-        List<Menu> menuList = roleService.findRoleMenu(entity);
         response.setMenuList(
                 menuList == null
                         ? new ArrayList<>()
                         : menuList.stream()
                                 .map(menu -> this.toMenuResponse(menu))
                                 .collect(Collectors.toList()));
-
         return response;
     }
 
@@ -80,7 +63,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleOfficeResponse toOfficeResponse(Office entity) {
+    public RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new RoleOfficeResponse();
         }
@@ -88,12 +71,12 @@ public class RoleInterfaceAssembler {
         RoleOfficeResponse response = new RoleOfficeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity));
+        response.setNamePath(namePath(entity, officeLoader));
         return response;
     }
 
     @NonNull
-    public RoleUserResponse toUserResponse(User entity) {
+    public RoleUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new RoleUserResponse();
         }
@@ -102,7 +85,7 @@ public class RoleInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setLoginName(entity.getLoginName());
-        response.setOffice(toOfficeResponse(officeService.get(EntityIdCodec.toDomain(entity.getOfficeId()))));
+        response.setOffice(toOfficeResponse(office, officeLoader));
         return response;
     }
 
@@ -118,12 +101,13 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleUserTreeNodeResponse toUserTreeNode(String officeIdPrefix, User entity) {
+    public RoleUserTreeNodeResponse toUserTreeNode(
+            String officeIdPrefix, User entity, Office office, Function<EntityId, Office> officeLoader) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(officeIdPrefix + entity.getOfficeId());
         response.setName(entity.getName());
-        response.setUser(toUserResponse(entity));
+        response.setUser(toUserResponse(entity, office, officeLoader));
         return response;
     }
 
@@ -140,7 +124,6 @@ public class RoleInterfaceAssembler {
                         : request.getMenuList().stream()
                                 .map(menu -> menu.getId())
                                 .collect(Collectors.toList()));
-
         return entity;
     }
 
@@ -166,14 +149,14 @@ public class RoleInterfaceAssembler {
         return entity;
     }
 
-    private String namePath(Office office) {
+    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeService.get(node.getId());
+            node = officeLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

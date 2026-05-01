@@ -57,15 +57,14 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
             MenuService menuService,
             OfficeService officeService,
             UserService userService,
-            Validator validator,
-            RoleInterfaceAssembler roleInterfaceAssembler) {
+            Validator validator) {
         super(validator);
 
         this.roleService = roleService;
         this.menuService = menuService;
         this.officeService = officeService;
         this.userService = userService;
-        this.roleInterfaceAssembler = roleInterfaceAssembler;
+        this.roleInterfaceAssembler = new RoleInterfaceAssembler();
     }
 
     @Override
@@ -75,7 +74,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         if (bean == null) {
             throw new NullBeanException(Role.BEAN_NAME, request.getId());
         }
-        return roleInterfaceAssembler.toResponse(bean);
+        return toResponse(bean);
     }
 
     @Override
@@ -91,7 +90,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         query.setQuery(queryCondition);
 
         return roleService.findList(query).stream()
-                .map(role -> roleInterfaceAssembler.toResponse(role))
+                .map(role -> toResponse(role))
                 .collect(Collectors.toList());
     }
 
@@ -111,7 +110,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         roleService.add(entity);
 
-        return roleInterfaceAssembler.toResponse(entity);
+        return toResponse(entity);
     }
 
     @Override
@@ -129,7 +128,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
 
         roleService.update(entity);
 
-        return roleInterfaceAssembler.toResponse(entity);
+        return toResponse(entity);
     }
 
     @Override
@@ -190,7 +189,11 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
                 .collect(Collectors.toList()));
 
         list.addAll(userService.findList(new User()).stream()
-                .map(user -> roleInterfaceAssembler.toUserTreeNode(OFFICE_ID_PREFIX, user))
+                .map(user -> roleInterfaceAssembler.toUserTreeNode(
+                        OFFICE_ID_PREFIX,
+                        user,
+                        officeService.get(roleInterfaceAssembler.toEntityId(user.getOfficeId())),
+                        officeService::get))
                 .collect(Collectors.toList()));
 
         return list;
@@ -205,7 +208,7 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         }
 
         return roleService.findRoleUser(bean).stream()
-                .map(user -> roleInterfaceAssembler.toUserResponse(
+                .map(user -> toUserResponse(
                         userService.get(roleInterfaceAssembler.toEntityId(EntityIdCodec.toValue(user.getId())))))
                 .collect(Collectors.toList());
     }
@@ -229,6 +232,15 @@ public class RoleApiController extends BaseApiController implements RoleServiceA
         User user = new User();
         user.setId(EntityIdCodec.toDomain(id));
         return user;
+    }
+
+    private RoleResponse toResponse(Role role) {
+        return roleInterfaceAssembler.toResponse(role, roleService.findRoleMenu(role));
+    }
+
+    private RoleUserResponse toUserResponse(User user) {
+        return roleInterfaceAssembler.toUserResponse(
+                user, officeService.get(roleInterfaceAssembler.toEntityId(user.getOfficeId())), officeService::get);
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {

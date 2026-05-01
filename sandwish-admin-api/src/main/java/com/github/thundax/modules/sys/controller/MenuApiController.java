@@ -34,14 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuApiController extends BaseApiController implements MenuServiceApi {
 
     private final MenuService menuService;
-    private final MenuInterfaceAssembler menuInterfaceAssembler;
+    private final MenuInterfaceAssembler menuInterfaceAssembler = new MenuInterfaceAssembler();
 
     @Autowired
-    public MenuApiController(
-            MenuService menuService, Validator validator, MenuInterfaceAssembler menuInterfaceAssembler) {
+    public MenuApiController(MenuService menuService, Validator validator) {
         super(validator);
         this.menuService = menuService;
-        this.menuInterfaceAssembler = menuInterfaceAssembler;
     }
 
     @Override

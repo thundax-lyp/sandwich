@@ -7,11 +7,8 @@ import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class SignatureInterfaceAssembler {
-
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
@@ -21,7 +18,6 @@ public class SignatureInterfaceAssembler {
         if (entity == null) {
             return new SignatureResponse();
         }
-
         SignatureResponse response = baseEntityToResponse(new SignatureResponse(), entity);
         response.setBusinessType(entity.getBusinessType());
         response.setBusinessId(entity.getBusinessId());

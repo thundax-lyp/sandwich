@@ -19,17 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AsyncTaskApiController extends BaseApiController implements AsyncTaskServiceApi {
 
     private final AsyncTaskService asyncTaskService;
-    private final AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler;
+    private final AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler = new AsyncTaskInterfaceAssembler();
 
     @Autowired
-    public AsyncTaskApiController(
-            AsyncTaskService asyncTaskService,
-            Validator validator,
-            AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler) {
+    public AsyncTaskApiController(AsyncTaskService asyncTaskService, Validator validator) {
         super(validator);
 
         this.asyncTaskService = asyncTaskService;
-        this.asyncTaskInterfaceAssembler = asyncTaskInterfaceAssembler;
     }
 
     @Override

@@ -7,17 +7,13 @@ import com.github.thundax.modules.auth.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AuthInterfaceAssembler {
-
     @NonNull
     public AuthLoginFormResponse toLoginFormResponse(LoginForm entity) {
         if (entity == null) {
             return new AuthLoginFormResponse();
         }
-
         AuthLoginFormResponse response = new AuthLoginFormResponse();
         response.setLoginToken(entity.getLoginToken());
         response.setRefreshToken(entity.getRefreshTokenList().get(0));
@@ -39,7 +35,6 @@ public class AuthInterfaceAssembler {
         if (request == null) {
             return null;
         }
-
         AuthLoginRequest maskedRequest = new AuthLoginRequest();
         maskedRequest.setLoginToken(request.getLoginToken());
         maskedRequest.setUsername(request.getUsername());

@@ -10,6 +10,7 @@ import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
@@ -57,12 +58,12 @@ public class StorageController extends BaseAdminController {
             StorageService storageService,
             StorageUtils storageUtils,
             Validator validator,
-            StorageInterfaceAssembler storageInterfaceAssembler) {
+            StorageConverter storageConverter) {
         super(validator);
         this.properties = properties.getUpload();
         this.storageService = storageService;
         this.storageUtils = storageUtils;
-        this.storageInterfaceAssembler = storageInterfaceAssembler;
+        this.storageInterfaceAssembler = new StorageInterfaceAssembler(storageConverter);
     }
 
     @RequestMapping(value = {"", "index"})

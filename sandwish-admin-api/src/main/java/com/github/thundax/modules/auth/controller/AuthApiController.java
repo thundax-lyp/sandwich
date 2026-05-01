@@ -41,19 +41,14 @@ public class AuthApiController extends BaseApiController implements AuthServiceA
 
     private final AuthService authService;
     private final UserService userService;
-    private final AuthInterfaceAssembler authInterfaceAssembler;
+    private final AuthInterfaceAssembler authInterfaceAssembler = new AuthInterfaceAssembler();
 
     @Autowired
-    public AuthApiController(
-            Validator validator,
-            AuthService authService,
-            UserService userService,
-            AuthInterfaceAssembler authInterfaceAssembler) {
+    public AuthApiController(Validator validator, AuthService authService, UserService userService) {
         super(validator);
 
         this.authService = authService;
         this.userService = userService;
-        this.authInterfaceAssembler = authInterfaceAssembler;
     }
 
     @Override

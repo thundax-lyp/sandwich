@@ -7,11 +7,8 @@ import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class StorageInterfaceAssembler {
-
     private final StorageConverter storageConverter;
 
     public StorageInterfaceAssembler(StorageConverter storageConverter) {
@@ -27,7 +24,6 @@ public class StorageInterfaceAssembler {
         if (entity == null) {
             return new StorageUploadResponse();
         }
-
         StorageUploadResponse response = new StorageUploadResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getOriginalFileName());

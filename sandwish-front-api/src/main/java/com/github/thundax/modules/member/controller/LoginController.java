@@ -28,12 +28,11 @@ public class LoginController extends BaseFrontController {
     private String successUrl;
 
     private final YwtbProperties properties;
-    private final MemberLoginInterfaceAssembler memberLoginInterfaceAssembler;
+    private final MemberLoginInterfaceAssembler memberLoginInterfaceAssembler = new MemberLoginInterfaceAssembler();
 
     @Autowired
-    public LoginController(YwtbProperties properties, MemberLoginInterfaceAssembler memberLoginInterfaceAssembler) {
+    public LoginController(YwtbProperties properties) {
         this.properties = properties;
-        this.memberLoginInterfaceAssembler = memberLoginInterfaceAssembler;
     }
 
     // 第三方登录页面入口保留 Model 和视图跳转适配，不作为本轮核心 API 模型隔离目标。

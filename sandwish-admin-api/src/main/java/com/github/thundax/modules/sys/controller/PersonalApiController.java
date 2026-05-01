@@ -53,7 +53,7 @@ public class PersonalApiController extends BaseApiController implements Personal
     private final MenuService menuService;
     private final PasswordService passwordService;
     private final KeypairService keypairService;
-    private final PersonalInterfaceAssembler personalInterfaceAssembler;
+    private final PersonalInterfaceAssembler personalInterfaceAssembler = new PersonalInterfaceAssembler();
 
     public PersonalApiController(
             Validator validator,
@@ -61,8 +61,7 @@ public class PersonalApiController extends BaseApiController implements Personal
             RoleService roleService,
             MenuService menuService,
             PasswordService passwordService,
-            KeypairService keypairService,
-            PersonalInterfaceAssembler personalInterfaceAssembler) {
+            KeypairService keypairService) {
         super(validator);
 
         this.userService = userService;
@@ -70,7 +69,6 @@ public class PersonalApiController extends BaseApiController implements Personal
         this.menuService = menuService;
         this.passwordService = passwordService;
         this.keypairService = keypairService;
-        this.personalInterfaceAssembler = personalInterfaceAssembler;
     }
 
     @Override

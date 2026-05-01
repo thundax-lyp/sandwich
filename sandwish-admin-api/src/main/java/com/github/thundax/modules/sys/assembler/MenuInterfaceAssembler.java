@@ -8,11 +8,8 @@ import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MenuInterfaceAssembler {
-
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
@@ -22,9 +19,7 @@ public class MenuInterfaceAssembler {
         if (entity == null) {
             return new MenuResponse();
         }
-
         MenuResponse response = baseEntityToResponse(new MenuResponse(), entity);
-
         if (StringUtils.isNotEmpty(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -34,7 +29,6 @@ public class MenuInterfaceAssembler {
         response.setDisplay(entity.isDisplay());
         response.setDisplayParams(entity.getDisplayParams());
         response.setUrl(entity.getUrl());
-
         return response;
     }
 
@@ -43,7 +37,6 @@ public class MenuInterfaceAssembler {
         if (entity == null) {
             return new MenuResponse();
         }
-
         MenuResponse response = new MenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(entity.getParentId());
@@ -54,7 +47,6 @@ public class MenuInterfaceAssembler {
     @NonNull
     public Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
         baseRequestToEntity(entity, request);
-
         if (StringUtils.isNotEmpty(request.getParentId())) {
             entity.setParentId(request.getParentId());
         }
@@ -65,7 +57,6 @@ public class MenuInterfaceAssembler {
                 Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
-
         return entity;
     }
 

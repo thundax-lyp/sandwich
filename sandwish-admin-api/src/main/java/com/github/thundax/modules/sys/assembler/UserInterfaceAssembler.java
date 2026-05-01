@@ -13,70 +13,53 @@ import com.github.thundax.modules.sys.request.UserSaveRequest;
 import com.github.thundax.modules.sys.response.UserOfficeResponse;
 import com.github.thundax.modules.sys.response.UserResponse;
 import com.github.thundax.modules.sys.response.UserRoleResponse;
-import com.github.thundax.modules.sys.service.OfficeService;
-import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class UserInterfaceAssembler {
-
-    private final OfficeService officeService;
-    private final UserService userService;
-
-    public UserInterfaceAssembler(OfficeService officeService, UserService userService) {
-        this.officeService = officeService;
-        this.userService = userService;
-    }
 
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public UserResponse toResponse(User entity) {
+    public UserResponse toResponse(
+            User entity, Office office, List<Role> roleList, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new UserResponse();
         }
 
         UserResponse response = baseEntityToResponse(new UserResponse(), entity);
-
         response.setLoginName(entity.getLoginName());
         response.setRanks(entity.getRanks());
-
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
         response.setAvatar(
                 UserApiController.getAvatarUrl(EntityIdCodec.toValue(entity.getId()), UserAccessHolder.currentToken()));
-
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
-
         response.setRegisterDate(entity.getRegisterDate());
         response.setRegisterIp(entity.getRegisterIp());
         response.setLastLoginDate(entity.getLastLoginDate());
         response.setLastLoginIp(entity.getLastLoginIp());
-
-        response.setOffice(toOfficeResponse(officeService.get(EntityIdCodec.toDomain(entity.getOfficeId()))));
-        List<Role> roleList = userService.findUserRole(entity);
+        response.setOffice(toOfficeResponse(office, officeLoader));
         response.setRoleList(
                 roleList == null
                         ? new ArrayList<>()
                         : roleList.stream()
                                 .map(role -> this.toRoleResponse(role))
                                 .collect(Collectors.toList()));
-
         return response;
     }
 
     @NonNull
-    public UserOfficeResponse toOfficeResponse(Office entity) {
+    public UserOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new UserOfficeResponse();
         }
@@ -87,8 +70,7 @@ public class UserInterfaceAssembler {
             response.setParentId(entity.getParentId());
         }
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity));
-
+        response.setNamePath(namePath(entity, officeLoader));
         return response;
     }
 
@@ -101,7 +83,6 @@ public class UserInterfaceAssembler {
         UserRoleResponse response = new UserRoleResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-
         return response;
     }
 
@@ -112,24 +93,19 @@ public class UserInterfaceAssembler {
         if (request.getOffice() != null) {
             entity.setOfficeId(request.getOffice().getId());
         }
-
         entity.setLoginName(request.getLoginName());
         entity.setRanks(request.getRanks());
-
         entity.setName(request.getName());
         entity.setEmail(request.getEmail());
         entity.setMobile(request.getMobile());
-
         entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL);
         entity.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
-
         entity.setRoleIdList(
                 request.getRoleList() == null
                         ? new ArrayList<>()
                         : request.getRoleList().stream()
                                 .map(role -> role.getId())
                                 .collect(Collectors.toList()));
-
         return entity;
     }
 
@@ -151,14 +127,14 @@ public class UserInterfaceAssembler {
         return entity;
     }
 
-    private String namePath(Office office) {
+    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeService.get(node.getId());
+            node = officeLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeService.get(EntityIdCodec.toDomain(node.getParentId()));
+                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

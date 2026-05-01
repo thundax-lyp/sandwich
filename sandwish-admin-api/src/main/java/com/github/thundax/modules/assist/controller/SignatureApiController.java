@@ -39,7 +39,7 @@ public class SignatureApiController extends BaseApiController implements Signatu
     private final UserService userService;
     private final MenuService menuService;
     private final RoleService roleService;
-    private final SignatureInterfaceAssembler signatureInterfaceAssembler;
+    private final SignatureInterfaceAssembler signatureInterfaceAssembler = new SignatureInterfaceAssembler();
 
     @Autowired
     public SignatureApiController(
@@ -49,8 +49,7 @@ public class SignatureApiController extends BaseApiController implements Signatu
             UserService userService,
             MenuService menuService,
             RoleService roleService,
-            Validator validator,
-            SignatureInterfaceAssembler signatureInterfaceAssembler) {
+            Validator validator) {
         super(validator);
 
         this.signatureService = signatureService;
@@ -59,7 +58,6 @@ public class SignatureApiController extends BaseApiController implements Signatu
         this.userService = userService;
         this.menuService = menuService;
         this.roleService = roleService;
-        this.signatureInterfaceAssembler = signatureInterfaceAssembler;
     }
 
     @Override

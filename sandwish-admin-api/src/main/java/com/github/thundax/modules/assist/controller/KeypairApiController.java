@@ -22,19 +22,14 @@ public class KeypairApiController extends BaseApiController implements KeypairSe
 
     private final AuthService authService;
     private final KeypairService keypairService;
-    private final KeypairInterfaceAssembler keypairInterfaceAssembler;
+    private final KeypairInterfaceAssembler keypairInterfaceAssembler = new KeypairInterfaceAssembler();
 
     @Autowired
-    public KeypairApiController(
-            Validator validator,
-            AuthService authService,
-            KeypairService keypairService,
-            KeypairInterfaceAssembler keypairInterfaceAssembler) {
+    public KeypairApiController(Validator validator, AuthService authService, KeypairService keypairService) {
         super(validator);
 
         this.authService = authService;
         this.keypairService = keypairService;
-        this.keypairInterfaceAssembler = keypairInterfaceAssembler;
     }
 
     /**

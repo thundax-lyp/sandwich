@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class DictController extends BaseApiController implements DictServiceApi {
 
     private final DictService dictService;
-    private final DictInterfaceAssembler dictInterfaceAssembler;
+    private final DictInterfaceAssembler dictInterfaceAssembler = new DictInterfaceAssembler();
 
-    public DictController(Validator validator, DictService dictService, DictInterfaceAssembler dictInterfaceAssembler) {
+    public DictController(Validator validator, DictService dictService) {
         super(validator);
         this.dictService = dictService;
-        this.dictInterfaceAssembler = dictInterfaceAssembler;
     }
 
     @Override

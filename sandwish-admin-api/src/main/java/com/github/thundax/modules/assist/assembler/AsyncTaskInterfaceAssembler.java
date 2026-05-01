@@ -5,11 +5,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AsyncTaskInterfaceAssembler {
-
     public EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
@@ -19,7 +16,6 @@ public class AsyncTaskInterfaceAssembler {
         if (entity == null) {
             return new AsyncTaskResponse();
         }
-
         AsyncTaskResponse response = baseEntityToResponse(new AsyncTaskResponse(), entity);
         response.setStatus(entity.getStatus().value());
         response.setMessage(entity.getMessage());

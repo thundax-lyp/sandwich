@@ -35,11 +35,10 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
     private final OfficeInterfaceAssembler officeInterfaceAssembler;
 
     @Autowired
-    public OfficeApiController(
-            OfficeService officeService, Validator validator, OfficeInterfaceAssembler officeInterfaceAssembler) {
+    public OfficeApiController(OfficeService officeService, Validator validator) {
         super(validator);
         this.officeService = officeService;
-        this.officeInterfaceAssembler = officeInterfaceAssembler;
+        this.officeInterfaceAssembler = new OfficeInterfaceAssembler();
     }
 
     @Override
@@ -49,7 +48,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         if (bean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getId());
         }
-        return officeInterfaceAssembler.toResponse(bean);
+        return officeInterfaceAssembler.toResponse(bean, officeService::get);
     }
 
     @Override
@@ -66,7 +65,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
         query.setQuery(queryCondition);
 
         return officeService.findList(query).stream()
-                .map(office -> officeInterfaceAssembler.toResponse(office))
+                .map(office -> officeInterfaceAssembler.toResponse(office, officeService::get))
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +91,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
         officeService.add(entity);
 
-        return officeInterfaceAssembler.toResponse(entity);
+        return officeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
     @Override
@@ -116,7 +115,7 @@ public class OfficeApiController extends BaseApiController implements OfficeServ
 
         officeService.update(entity);
 
-        return officeInterfaceAssembler.toResponse(entity);
+        return officeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
     @Override

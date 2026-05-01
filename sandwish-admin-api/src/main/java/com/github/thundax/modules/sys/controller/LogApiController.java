@@ -1,15 +1,20 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.api.LogServiceApi;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.LogPageRequest;
 import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.UserService;
 import javax.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,13 +24,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class LogApiController extends BaseApiController implements LogServiceApi {
 
     private final LogService logService;
-    private final LogInterfaceAssembler logInterfaceAssembler;
+    private final UserService userService;
+    private final OfficeService officeService;
+    private final LogInterfaceAssembler logInterfaceAssembler = new LogInterfaceAssembler();
 
     @Autowired
-    public LogApiController(LogService logService, Validator validator, LogInterfaceAssembler logInterfaceAssembler) {
+    public LogApiController(
+            LogService logService, Validator validator, UserService userService, OfficeService officeService) {
         super(validator);
         this.logService = logService;
-        this.logInterfaceAssembler = logInterfaceAssembler;
+        this.userService = userService;
+        this.officeService = officeService;
     }
 
     @Override
@@ -46,7 +55,13 @@ public class LogApiController extends BaseApiController implements LogServiceApi
         queryCondition.setEndDate(request.getEndDate());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(logService.findPage(query, readLogPage(request)), logInterfaceAssembler::toResponse);
+        return entityPageToVo(logService.findPage(query, readLogPage(request)), this::toResponse);
+    }
+
+    private LogResponse toResponse(Log log) {
+        User user = userService.get(EntityIdCodec.toDomain(log.getUserId()));
+        Office office = user == null ? null : officeService.get(EntityIdCodec.toDomain(user.getOfficeId()));
+        return logInterfaceAssembler.toResponse(log, user, office, officeService::get);
     }
 
     private Page<Log> readLogPage(LogPageRequest request) {

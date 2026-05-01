@@ -38,15 +38,13 @@ public class CaptchaApiController extends BaseApiController implements CaptchaSe
     private static final int MAX_COLOR = 255;
 
     private final AuthService authService;
-    private final CaptchaInterfaceAssembler captchaInterfaceAssembler;
+    private final CaptchaInterfaceAssembler captchaInterfaceAssembler = new CaptchaInterfaceAssembler();
 
     @Autowired
-    public CaptchaApiController(
-            Validator validator, AuthService authService, CaptchaInterfaceAssembler captchaInterfaceAssembler) {
+    public CaptchaApiController(Validator validator, AuthService authService) {
         super(validator);
 
         this.authService = authService;
-        this.captchaInterfaceAssembler = captchaInterfaceAssembler;
     }
 
     @Override

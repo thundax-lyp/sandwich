@@ -21,7 +21,7 @@ public class OfficeServiceImplTest {
         RecordingOfficeDao dao = new RecordingOfficeDao();
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        assertEquals(null, service.get((EntityId) null));
+        assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -36,7 +36,7 @@ public class OfficeServiceImplTest {
         office.setQuery(query);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.findList(office);
+        service.list(office);
 
         assertEquals("ROOT", dao.parentId);
         assertEquals("总部", dao.name);
@@ -51,7 +51,7 @@ public class OfficeServiceImplTest {
         page.setPageSize(0);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.findPage(new Office(), page);
+        service.page(new Office(), page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -89,7 +89,7 @@ public class OfficeServiceImplTest {
         dao.getResult = office("office-1");
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        int count = service.delete(office("office-1"));
+        int count = service.deleteById(office("office-1"));
 
         assertEquals(1, count);
         assertEquals("office-1", dao.deletedId);

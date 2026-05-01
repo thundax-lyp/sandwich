@@ -28,7 +28,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member get(EntityId id) {
+    public Member getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -36,12 +36,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> getMany(List<String> ids) {
+    public List<Member> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<Member> findList(Member member) {
+    public List<Member> list(Member member) {
         Member.Query query = member == null ? null : member.getQuery();
         return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
@@ -56,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> findPage(Member member, Page<Member> page) {
+    public Page<Member> page(Member member, Page<Member> page) {
         Page<Member> normalizedPage = normalizePage(page);
         Member.Query query = member == null ? null : member.getQuery();
         IPage<Member> dataPage = dao.page(
@@ -140,7 +140,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Member member) {
+    public int deleteById(Member member) {
         if (member == null) {
             return 0;
         }
@@ -149,8 +149,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Member> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Member> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

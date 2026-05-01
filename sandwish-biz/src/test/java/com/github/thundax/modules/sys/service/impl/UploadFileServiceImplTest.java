@@ -20,7 +20,7 @@ public class UploadFileServiceImplTest {
         RecordingUploadFileDao dao = new RecordingUploadFileDao();
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        assertEquals(null, service.get((EntityId) null));
+        assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -32,7 +32,7 @@ public class UploadFileServiceImplTest {
         page.setPageSize(0);
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        service.findPage(new UploadFile(), page);
+        service.page(new UploadFile(), page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -70,7 +70,7 @@ public class UploadFileServiceImplTest {
         RecordingUploadFileDao dao = new RecordingUploadFileDao();
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
 
-        service.findByFileIds(new String[] {"f1", "f2"});
+        service.batchGetByFileIds(new String[] {"f1", "f2"});
 
         assertEquals(Arrays.asList("f1", "f2"), dao.fileIds);
     }

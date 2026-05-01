@@ -27,7 +27,7 @@ public class SignatureServiceImpl implements SignatureService {
     }
 
     @Override
-    public Signature find(String businessType, String businessId) {
+    public Signature getByBusiness(String businessType, String businessId) {
         if (StringUtils.isBlank(businessType) || StringUtils.isBlank(businessId)) {
             return null;
         }
@@ -35,7 +35,7 @@ public class SignatureServiceImpl implements SignatureService {
     }
 
     @Override
-    public Page<Signature> findPage(String businessType, Page<Signature> page) {
+    public Page<Signature> page(String businessType, Page<Signature> page) {
         Page<Signature> normalizedPage = normalizePage(page);
         IPage<Signature> dataPage = dao.page(businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -59,7 +59,7 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Signature entity) {
+    public int deleteByBusiness(Signature entity) {
         if (entity == null) {
             return 0;
         }
@@ -68,8 +68,8 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Signature> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteByBusiness(List<Signature> list) {
+        return batchOperate(list, this::deleteByBusiness);
     }
 
     private int batchOperate(Collection<Signature> collection, Function<Signature, Integer> operator) {

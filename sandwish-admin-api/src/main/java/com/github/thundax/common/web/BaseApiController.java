@@ -39,7 +39,7 @@ public abstract class BaseApiController extends BaseController {
      * 校验并转换 VO list
      *
      * @param sourceList VO list
-     * @param supplier service.get(vo.getId())
+     * @param supplier service.getById(vo.getId())
      * @param <E> entity
      * @param <V> vo
      * @return entiry list
@@ -55,7 +55,7 @@ public abstract class BaseApiController extends BaseController {
      * 校验并转换 VO list
      *
      * @param sourceList VO list
-     * @param supplier service.get(vo.getId())
+     * @param supplier service.getById(vo.getId())
      * @param validator validate(bean, vo)
      * @param processor bean.setXXX(vo.getXXX)
      * @param <E> entity

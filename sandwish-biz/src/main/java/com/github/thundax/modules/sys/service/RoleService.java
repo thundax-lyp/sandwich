@@ -13,7 +13,7 @@ public interface RoleService extends CrudService<Role> {
      *
      * @return 可用列表
      */
-    List<Role> findValidList();
+    List<Role> listEnabled();
 
     /**
      * 启用/禁用
@@ -45,7 +45,7 @@ public interface RoleService extends CrudService<Role> {
      * @param role 权限
      * @return 用户列表
      */
-    List<User> findRoleUser(Role role);
+    List<User> listRoleUsers(Role role);
 
     /**
      * 获取菜单列表
@@ -53,5 +53,5 @@ public interface RoleService extends CrudService<Role> {
      * @param role 权限
      * @return 菜单列表
      */
-    List<Menu> findRoleMenu(Role role);
+    List<Menu> listRoleMenus(Role role);
 }

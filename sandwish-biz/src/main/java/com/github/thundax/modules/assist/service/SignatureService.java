@@ -16,7 +16,7 @@ public interface SignatureService {
      * @param businessId 业务主键
      * @return Signature 签名结果
      */
-    Signature find(String businessType, String businessId);
+    Signature getByBusiness(String businessType, String businessId);
 
     /**
      * 按业务分类分页查询签名结果。
@@ -25,7 +25,7 @@ public interface SignatureService {
      * @param page 分页对象
      * @return 分页结果
      */
-    Page<Signature> findPage(String businessType, Page<Signature> page);
+    Page<Signature> page(String businessType, Page<Signature> page);
 
     /**
      * 新增签名结果。
@@ -47,7 +47,7 @@ public interface SignatureService {
      * @param entity 签名结果
      * @return 变更数量
      */
-    int delete(Signature entity);
+    int deleteByBusiness(Signature entity);
 
     /**
      * 批量删除签名结果。
@@ -55,5 +55,5 @@ public interface SignatureService {
      * @param list 签名结果列表
      * @return 变更数量
      */
-    int delete(List<Signature> list);
+    int batchDeleteByBusiness(List<Signature> list);
 }

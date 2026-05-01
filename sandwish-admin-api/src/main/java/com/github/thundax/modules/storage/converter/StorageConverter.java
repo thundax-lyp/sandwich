@@ -35,7 +35,7 @@ public class StorageConverter {
         String filename = names[names.length - 1];
 
         String[] parts = StringUtils.split(filename, ".");
-        return storageService.get(EntityIdCodec.toDomain(parts[0]));
+        return storageService.getById(EntityIdCodec.toDomain(parts[0]));
     }
 
     public File toFile(Storage storage) {

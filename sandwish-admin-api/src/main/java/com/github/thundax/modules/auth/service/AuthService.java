@@ -125,7 +125,7 @@ public interface AuthService {
      * @param userId userId
      * @return AccessToken
      */
-    AccessToken findByUserId(String userId);
+    AccessToken getByUserId(String userId);
 
     /**
      * 校验 accessToken

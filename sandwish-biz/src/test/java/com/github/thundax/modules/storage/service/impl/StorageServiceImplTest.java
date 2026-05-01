@@ -26,7 +26,7 @@ public class StorageServiceImplTest {
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
 
-        assertSame(expected, service.get(EntityId.of("s1")));
+        assertSame(expected, service.getById(EntityId.of("s1")));
         assertEquals("s1", dao.id);
     }
 
@@ -46,7 +46,7 @@ public class StorageServiceImplTest {
         Page<Storage> page = new Page<>(2, 20);
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
-        service.findPage(query, page);
+        service.page(query, page);
 
         assertEquals("image/png", dao.mimeType);
         assertEquals("owner-1", dao.ownerId);
@@ -78,7 +78,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         StorageServiceImpl service = new StorageServiceImpl(dao);
 
-        int count = service.delete(Arrays.asList(storage("s1"), storage("s2")));
+        int count = service.batchDeleteById(Arrays.asList(storage("s1"), storage("s2")));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList("s1", "s2"), dao.deletedIds);

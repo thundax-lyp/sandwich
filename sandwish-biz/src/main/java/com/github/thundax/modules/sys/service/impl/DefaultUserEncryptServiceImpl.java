@@ -45,17 +45,17 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public UserEncrypt get(EntityId id) {
+    public UserEncrypt getById(EntityId id) {
         return null;
     }
 
     @Override
-    public UserEncrypt get(UserEncrypt query) {
+    public UserEncrypt getById(UserEncrypt query) {
         return null;
     }
 
     @Override
-    public UserEncrypt findOne(UserEncrypt query) {
+    public UserEncrypt getOne(UserEncrypt query) {
         return null;
     }
 
@@ -72,17 +72,17 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public List<UserEncrypt> getMany(List<String> ids) {
+    public List<UserEncrypt> batchGetByIds(List<String> ids) {
         return null;
     }
 
     @Override
-    public List<UserEncrypt> findList(UserEncrypt entity) {
+    public List<UserEncrypt> list(UserEncrypt entity) {
         return null;
     }
 
     @Override
-    public Page<UserEncrypt> findPage(UserEncrypt entity, Page<UserEncrypt> page) {
+    public Page<UserEncrypt> page(UserEncrypt entity, Page<UserEncrypt> page) {
         return page;
     }
 
@@ -92,12 +92,12 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public int delete(UserEncrypt entity) {
+    public int deleteById(UserEncrypt entity) {
         return 0;
     }
 
     @Override
-    public int delete(List<UserEncrypt> list) {
+    public int batchDeleteById(List<UserEncrypt> list) {
         return 0;
     }
 

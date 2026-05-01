@@ -22,7 +22,7 @@ public class SignatureServiceImplTest {
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
 
-        assertSame(expected, service.find("User", "u1"));
+        assertSame(expected, service.getByBusiness("User", "u1"));
         assertEquals("User", dao.businessType);
         assertEquals("u1", dao.businessId);
     }
@@ -32,7 +32,7 @@ public class SignatureServiceImplTest {
         RecordingSignatureDao dao = new RecordingSignatureDao();
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
 
-        assertEquals(null, service.find("", "u1"));
+        assertEquals(null, service.getByBusiness("", "u1"));
         assertEquals(0, dao.findCalls);
     }
 
@@ -44,7 +44,7 @@ public class SignatureServiceImplTest {
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
 
-        assertSame(page, service.findPage("Log", page));
+        assertSame(page, service.page("Log", page));
         assertEquals("Log", dao.pageBusinessType);
         assertEquals(page.getPageNo(), dao.pageNo);
         assertEquals(page.getPageSize(), dao.pageSize);
@@ -87,7 +87,7 @@ public class SignatureServiceImplTest {
         List<Signature> signatures =
                 Arrays.asList(new Signature(null, "User", "u1"), new Signature(null, "Role", "r1"));
 
-        int count = service.delete(signatures);
+        int count = service.batchDeleteByBusiness(signatures);
 
         assertEquals(2, count);
         assertEquals(Arrays.asList("User:u1", "Role:r1"), dao.deletedBusinessKeys);

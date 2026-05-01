@@ -170,7 +170,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> findUserRole(User user) {
+        public List<com.github.thundax.modules.sys.entity.Role> listUserRoles(User user) {
             return Collections.emptyList();
         }
 
@@ -187,32 +187,32 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public User get(User entity) {
+        public User getById(User entity) {
             return user();
         }
 
         @Override
-        public User get(EntityId id) {
+        public User getById(EntityId id) {
             return user();
         }
 
         @Override
-        public List<User> getMany(List<String> ids) {
+        public List<User> batchGetByIds(List<String> ids) {
             return Collections.singletonList(user());
         }
 
         @Override
-        public List<User> findList(User entity) {
+        public List<User> list(User entity) {
             return Collections.singletonList(user());
         }
 
         @Override
-        public User findOne(User entity) {
+        public User getOne(User entity) {
             return user();
         }
 
         @Override
-        public Page<User> findPage(User entity, Page<User> page) {
+        public Page<User> page(User entity, Page<User> page) {
             return page;
         }
 
@@ -228,12 +228,12 @@ public class AuthPermissionLifecycleTest {
         public void update(User entity) {}
 
         @Override
-        public int delete(User entity) {
+        public int deleteById(User entity) {
             return 1;
         }
 
         @Override
-        public int delete(List<User> list) {
+        public int batchDeleteById(List<User> list) {
             return list.size();
         }
 
@@ -262,12 +262,12 @@ public class AuthPermissionLifecycleTest {
     private static class TestMenuService implements MenuService {
 
         @Override
-        public List<Menu> findList(Integer maxRank) {
+        public List<Menu> list(Integer maxRank) {
             return menus();
         }
 
         @Override
-        public List<Menu> findChildList(String parentId) {
+        public List<Menu> listChildren(String parentId) {
             return Collections.emptyList();
         }
 
@@ -302,32 +302,32 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public Menu get(Menu entity) {
+        public Menu getById(Menu entity) {
             return menus().get(0);
         }
 
         @Override
-        public Menu get(EntityId id) {
+        public Menu getById(EntityId id) {
             return menus().get(0);
         }
 
         @Override
-        public List<Menu> getMany(List<String> ids) {
+        public List<Menu> batchGetByIds(List<String> ids) {
             return menus();
         }
 
         @Override
-        public List<Menu> findList(Menu entity) {
+        public List<Menu> list(Menu entity) {
             return menus();
         }
 
         @Override
-        public Menu findOne(Menu entity) {
+        public Menu getOne(Menu entity) {
             return menus().get(0);
         }
 
         @Override
-        public Page<Menu> findPage(Menu entity, Page<Menu> page) {
+        public Page<Menu> page(Menu entity, Page<Menu> page) {
             return page;
         }
 
@@ -343,12 +343,12 @@ public class AuthPermissionLifecycleTest {
         public void update(Menu entity) {}
 
         @Override
-        public int delete(Menu entity) {
+        public int deleteById(Menu entity) {
             return 1;
         }
 
         @Override
-        public int delete(List<Menu> list) {
+        public int batchDeleteById(List<Menu> list) {
             return list.size();
         }
 
@@ -375,7 +375,7 @@ public class AuthPermissionLifecycleTest {
     private static class TestRoleService implements RoleService {
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> findValidList() {
+        public List<com.github.thundax.modules.sys.entity.Role> listEnabled() {
             return Collections.emptyList();
         }
 
@@ -393,12 +393,12 @@ public class AuthPermissionLifecycleTest {
         public void updateUserList(com.github.thundax.modules.sys.entity.Role role, List<User> userList) {}
 
         @Override
-        public List<User> findRoleUser(com.github.thundax.modules.sys.entity.Role role) {
+        public List<User> listRoleUsers(com.github.thundax.modules.sys.entity.Role role) {
             return Collections.emptyList();
         }
 
         @Override
-        public List<Menu> findRoleMenu(com.github.thundax.modules.sys.entity.Role role) {
+        public List<Menu> listRoleMenus(com.github.thundax.modules.sys.entity.Role role) {
             return Collections.emptyList();
         }
 
@@ -415,33 +415,33 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public com.github.thundax.modules.sys.entity.Role get(com.github.thundax.modules.sys.entity.Role entity) {
+        public com.github.thundax.modules.sys.entity.Role getById(com.github.thundax.modules.sys.entity.Role entity) {
             return entity;
         }
 
         @Override
-        public com.github.thundax.modules.sys.entity.Role get(EntityId id) {
+        public com.github.thundax.modules.sys.entity.Role getById(EntityId id) {
             return newEntity(id.value());
         }
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> getMany(List<String> ids) {
+        public List<com.github.thundax.modules.sys.entity.Role> batchGetByIds(List<String> ids) {
             return Collections.emptyList();
         }
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> findList(
+        public List<com.github.thundax.modules.sys.entity.Role> list(
                 com.github.thundax.modules.sys.entity.Role entity) {
             return Collections.emptyList();
         }
 
         @Override
-        public com.github.thundax.modules.sys.entity.Role findOne(com.github.thundax.modules.sys.entity.Role entity) {
+        public com.github.thundax.modules.sys.entity.Role getOne(com.github.thundax.modules.sys.entity.Role entity) {
             return entity;
         }
 
         @Override
-        public Page<com.github.thundax.modules.sys.entity.Role> findPage(
+        public Page<com.github.thundax.modules.sys.entity.Role> page(
                 com.github.thundax.modules.sys.entity.Role entity,
                 Page<com.github.thundax.modules.sys.entity.Role> page) {
             return page;
@@ -459,12 +459,12 @@ public class AuthPermissionLifecycleTest {
         public void update(com.github.thundax.modules.sys.entity.Role entity) {}
 
         @Override
-        public int delete(com.github.thundax.modules.sys.entity.Role entity) {
+        public int deleteById(com.github.thundax.modules.sys.entity.Role entity) {
             return 1;
         }
 
         @Override
-        public int delete(List<com.github.thundax.modules.sys.entity.Role> list) {
+        public int batchDeleteById(List<com.github.thundax.modules.sys.entity.Role> list) {
             return list.size();
         }
 

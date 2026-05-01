@@ -16,7 +16,7 @@ public class InMemoryAccessTokenDaoImpl implements AccessTokenDao {
     private int activeCount;
 
     @Override
-    public int getOnlineCount() {
+    public int count() {
         return tokenUserIds.size();
     }
 
@@ -42,9 +42,11 @@ public class InMemoryAccessTokenDaoImpl implements AccessTokenDao {
     }
 
     @Override
-    public void delete(AccessToken accessToken) {
-        tokenUserIds.remove(accessToken.getToken());
-        userTokens.remove(accessToken.getUserId());
+    public void deleteByToken(String token) {
+        String userId = tokenUserIds.remove(token);
+        if (userId != null) {
+            userTokens.remove(userId);
+        }
     }
 
     public int getActiveCount() {

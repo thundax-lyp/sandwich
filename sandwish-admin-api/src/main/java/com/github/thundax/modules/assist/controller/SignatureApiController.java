@@ -81,8 +81,7 @@ public class SignatureApiController extends BaseApiController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
     public PageVo<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
         return entityPageToVo(
-                signatureService.findPage(request.getBusinessType(), readSignaturePage(request)),
-                this::entityToResponse);
+                signatureService.page(request.getBusinessType(), readSignaturePage(request)), this::entityToResponse);
     }
 
     @ApiOperation(value = "校验", notes = "assist:signature:view")
@@ -97,7 +96,7 @@ public class SignatureApiController extends BaseApiController {
     @RequestMapping(value = "verify", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
     public SignatureVerifyResponse verify(@Valid @RequestBody SignatureVerifyRequest request) throws ApiException {
-        Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
+        Signature bean = signatureService.getByBusiness(request.getBusinessType(), request.getBusinessId());
 
         if (bean == null) {
             return SignatureInterfaceAssembler.toVerifyResponse(false);
@@ -125,9 +124,9 @@ public class SignatureApiController extends BaseApiController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
         List<Signature> beanList =
-                validateList(list, vo -> signatureService.find(vo.getBusinessType(), vo.getBusinessId()));
+                validateList(list, vo -> signatureService.getByBusiness(vo.getBusinessType(), vo.getBusinessId()));
 
-        signatureService.delete(beanList);
+        signatureService.batchDeleteByBusiness(beanList);
 
         return true;
     }
@@ -135,13 +134,13 @@ public class SignatureApiController extends BaseApiController {
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
             case Log.BEAN_NAME:
-                return logService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
+                return logService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             case User.BEAN_NAME:
-                return userService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
+                return userService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             case Menu.BEAN_NAME:
-                return menuService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
+                return menuService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             case Role.BEAN_NAME:
-                return roleService.get(EntityIdCodec.toDomain(bean.getBusinessId()));
+                return roleService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             default:
                 return null;
         }

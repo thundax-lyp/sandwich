@@ -108,11 +108,11 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private Set<String> loadPermissions(String userId) {
-        User user = userService.get(EntityIdCodec.toDomain(userId));
+        User user = userService.getById(EntityIdCodec.toDomain(userId));
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
-        List<Menu> menuList = findMenuList(user);
+        List<Menu> menuList = listPermittedMenus(user);
         if (menuList != null && !menuList.isEmpty()) {
             menuList.forEach(menu -> {
                 if (StringUtils.isNotBlank(menu.getPerms())) {
@@ -138,37 +138,37 @@ public class PermissionServiceImpl implements PermissionService {
         return permissions;
     }
 
-    private List<Menu> findMenuList(User user) {
+    private List<Menu> listPermittedMenus(User user) {
         List<String> menuIdList;
 
         if (user.isSuper()) {
-            menuIdList = menuService.findList(new Menu()).stream()
+            menuIdList = menuService.list(new Menu()).stream()
                     .map(menu -> EntityIdCodec.toValue(menu.getId()))
                     .collect(Collectors.toList());
         } else {
-            List<Role> roleList = userService.findUserRole(user);
+            List<Role> roleList = userService.listUserRoles(user);
             boolean isAdmin = user.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
 
             if (isAdmin) {
-                menuIdList = menuService.findList(user.getRanks()).stream()
+                menuIdList = menuService.list(user.getRanks()).stream()
                         .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
             } else {
                 Set<String> menuIds = Sets.newHashSet();
                 for (Role role : roleList) {
-                    menuIds.addAll(roleService.findRoleMenu(role).stream()
+                    menuIds.addAll(roleService.listRoleMenus(role).stream()
                             .map(menu -> EntityIdCodec.toValue(menu.getId()))
                             .collect(Collectors.toList()));
                 }
                 menuIds.removeIf(menuId -> {
-                    Menu menu = menuService.get(EntityIdCodec.toDomain(menuId));
+                    Menu menu = menuService.getById(EntityIdCodec.toDomain(menuId));
                     return menu == null || menu.getRanks() > user.getRanks();
                 });
                 menuIdList = new ArrayList<>(menuIds);
             }
         }
 
-        List<Menu> menuList = menuService.getMany(menuIdList);
+        List<Menu> menuList = menuService.batchGetByIds(menuIdList);
         menuList.sort(Menu::compareTo);
         return menuList;
     }

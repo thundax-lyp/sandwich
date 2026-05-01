@@ -24,7 +24,7 @@ public class MemberServiceImplTest {
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertSame(expected, service.get(EntityId.of("m1")));
+        assertSame(expected, service.getById(EntityId.of("m1")));
         assertEquals("m1", dao.id);
     }
 
@@ -33,7 +33,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertEquals(null, service.get((EntityId) null));
+        assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -54,7 +54,7 @@ public class MemberServiceImplTest {
         query.setQuery(condition);
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
-        service.findList(query);
+        service.list(query);
 
         assertEquals("ENABLED", dao.enableFlag);
         assertEquals("a@example.com", dao.email);

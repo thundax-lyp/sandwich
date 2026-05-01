@@ -8,5 +8,5 @@ public interface UploadFileService extends CrudService<UploadFile> {
 
     UploadFile getContent(UploadFile uploadFile);
 
-    List<UploadFile> findByFileIds(String[] fileId);
+    List<UploadFile> batchGetByFileIds(String[] fileId);
 }

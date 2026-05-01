@@ -12,7 +12,7 @@ public interface MenuService extends TreeService<Menu> {
      * @param maxRank 等级
      * @return 列表
      */
-    List<Menu> findList(Integer maxRank);
+    List<Menu> list(Integer maxRank);
 
     /**
      * 获取子菜单
@@ -20,7 +20,7 @@ public interface MenuService extends TreeService<Menu> {
      * @param parentId 父节点id
      * @return 列表
      */
-    List<Menu> findChildList(String parentId);
+    List<Menu> listChildren(String parentId);
 
     /**
      * 更新显示状态

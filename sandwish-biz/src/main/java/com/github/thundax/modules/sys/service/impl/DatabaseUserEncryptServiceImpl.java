@@ -83,7 +83,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public UserEncrypt get(EntityId id) {
+    public UserEncrypt getById(EntityId id) {
         if (id != null) {
             amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(newEntity(EntityIdCodec.toValue(id))));
         }
@@ -91,7 +91,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public UserEncrypt get(UserEncrypt query) {
+    public UserEncrypt getById(UserEncrypt query) {
         if (query != null) {
             amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(query));
         }
@@ -175,23 +175,23 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public List<UserEncrypt> getMany(List<String> ids) {
+    public List<UserEncrypt> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<UserEncrypt> findList(UserEncrypt entity) {
+    public List<UserEncrypt> list(UserEncrypt entity) {
         return dao.list();
     }
 
     @Override
-    public UserEncrypt findOne(UserEncrypt query) {
-        List<UserEncrypt> list = findList(query);
+    public UserEncrypt getOne(UserEncrypt query) {
+        List<UserEncrypt> list = list(query);
         return list == null || list.isEmpty() ? null : list.get(0);
     }
 
     @Override
-    public Page<UserEncrypt> findPage(UserEncrypt entity, Page<UserEncrypt> page) {
+    public Page<UserEncrypt> page(UserEncrypt entity, Page<UserEncrypt> page) {
         Page<UserEncrypt> normalizedPage = normalizePage(page);
         IPage<UserEncrypt> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -203,20 +203,20 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     @Override
     public long count(UserEncrypt entity) {
-        List<UserEncrypt> list = findList(entity);
+        List<UserEncrypt> list = list(entity);
         return list == null ? 0 : list.size();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(UserEncrypt entity) {
+    public int deleteById(UserEncrypt entity) {
         return entity == null ? 0 : dao.deleteById(entity.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<UserEncrypt> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<UserEncrypt> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

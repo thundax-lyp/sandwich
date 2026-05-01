@@ -35,7 +35,7 @@ public class MemberSpringAuthenticationProvider implements AuthenticationProvide
         String username = String.valueOf(authentication.getPrincipal());
         String password = String.valueOf(authentication.getCredentials());
 
-        Member member = memberService.get(EntityIdCodec.toDomain(username));
+        Member member = memberService.getById(EntityIdCodec.toDomain(username));
         if (member == null) {
             throw new BadCredentialsException("用户名或密码错误。");
         }

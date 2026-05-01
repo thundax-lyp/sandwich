@@ -11,7 +11,7 @@ public interface AsyncTaskService {
      * @param id id
      * @return 对象
      */
-    AsyncTask get(EntityId id);
+    AsyncTask getById(EntityId id);
 
     /**
      * 新增
@@ -32,5 +32,5 @@ public interface AsyncTaskService {
      *
      * @param asyncTask asyncTask
      */
-    void delete(AsyncTask asyncTask);
+    void deleteById(AsyncTask asyncTask);
 }

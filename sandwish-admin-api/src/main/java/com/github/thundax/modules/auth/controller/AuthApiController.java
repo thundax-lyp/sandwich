@@ -122,7 +122,7 @@ public class AuthApiController extends BaseApiController {
 
         authService.deleteLoginForm(request.getLoginToken());
 
-        AccessToken accessToken = authService.findByUserId(EntityIdCodec.toValue(user.getId()));
+        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toValue(user.getId()));
         if (accessToken != null) {
             authService.deleteAccessToken(accessToken);
         }

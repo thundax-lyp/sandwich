@@ -46,7 +46,7 @@ public class AsyncTaskApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
     public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
-        AsyncTask bean = asyncTaskService.get(EntityIdCodec.toDomain(request.getId()));
+        AsyncTask bean = asyncTaskService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             return new AsyncTaskResponse();
         }

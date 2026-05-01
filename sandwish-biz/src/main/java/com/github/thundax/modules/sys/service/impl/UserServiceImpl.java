@@ -48,12 +48,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User get(User entity) {
-        return entity == null ? null : get(entity.getId());
+    public User getById(User entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public User get(EntityId id) {
+    public User getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -61,12 +61,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getMany(List<String> ids) {
+    public List<User> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<User> findList(User user) {
+    public List<User> list(User user) {
         User.Query query = user == null ? null : user.getQuery();
         return dao.list(
                 query == null ? null : query.getOfficeId(),
@@ -77,13 +77,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findOne(User user) {
-        List<User> users = findList(user);
+    public User getOne(User user) {
+        List<User> users = list(user);
         return users == null || users.isEmpty() ? null : users.get(0);
     }
 
     @Override
-    public Page<User> findPage(User user, Page<User> page) {
+    public Page<User> page(User user, Page<User> page) {
         Page<User> normalizedPage = normalizePage(page);
         User.Query query = user == null ? null : user.getQuery();
         IPage<User> dataPage = dao.page(
@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long count(User user) {
-        List<User> users = findList(user);
+        List<User> users = list(user);
         return users == null ? 0 : users.size();
     }
 
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
     public User getByLoginName(String loginName) {
         User user = dao.getByLoginName(loginName);
         if (user != null) {
-            userEncryptService.get(user.getId());
+            userEncryptService.getById(user.getId());
         }
         return user;
     }
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
     public User getBySsoLoginName(String ssoLoginName) {
         User user = dao.getBySsoLoginName(ssoLoginName);
         if (user != null) {
-            userEncryptService.get(user.getId());
+            userEncryptService.getById(user.getId());
         }
         return user;
     }
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(User user) {
+    public int deleteById(User user) {
         dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
 
         int result = dao.deleteById(user.getId());
@@ -204,7 +204,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Role> findUserRole(User user) {
+    public List<Role> listUserRoles(User user) {
         return dao.listUserRoles(EntityIdCodec.toValue(user.getId())).stream()
                 .map(this::newRole)
                 .collect(Collectors.toList());
@@ -218,8 +218,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<User> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<User> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Storage get(EntityId id) {
+    public Storage getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -36,12 +36,12 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> getMany(List<String> ids) {
+    public List<Storage> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<Storage> findList(Storage storage) {
+    public List<Storage> list(Storage storage) {
         Storage.Query query = storage == null ? null : storage.getQuery();
         return dao.list(
                 query == null ? null : query.getMimeType(),
@@ -54,7 +54,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Page<Storage> findPage(Storage storage, Page<Storage> page) {
+    public Page<Storage> page(Storage storage, Page<Storage> page) {
         Page<Storage> normalizedPage = normalizePage(page);
         Storage.Query query = storage == null ? null : storage.getQuery();
         IPage<Storage> dataPage = dao.page(
@@ -88,7 +88,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Storage storage) {
+    public int deleteById(Storage storage) {
         if (storage == null) {
             return 0;
         }
@@ -97,17 +97,17 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Storage> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Storage> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override
-    public List<String> findMimeTypeList() {
+    public List<String> listMimeTypes() {
         return dao.listMimeTypes();
     }
 
     @Override
-    public List<String> findBusinessTypeList() {
+    public List<String> listBusinessTypes() {
         return dao.listBusinessTypes();
     }
 
@@ -136,7 +136,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<StorageBusiness> findBusiness(Storage entity) {
+    public List<StorageBusiness> listBusiness(Storage entity) {
         return dao.listBusiness(entity);
     }
 

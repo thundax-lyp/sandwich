@@ -28,7 +28,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Log get(EntityId id) {
+    public Log getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -36,7 +36,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public List<Log> findList(Log log) {
+    public List<Log> list(Log log) {
         Log.Query query = log == null ? null : log.getQuery();
         return dao.list(
                 query == null ? null : typeValue(query.getType()),
@@ -50,7 +50,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Page<Log> findPage(Log log, Page<Log> page) {
+    public Page<Log> page(Log log, Page<Log> page) {
         Page<Log> normalizedPage = normalizePage(page);
         Log.Query query = log == null ? null : log.getQuery();
         IPage<Log> dataPage = dao.page(
@@ -89,7 +89,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Log log) {
+    public int deleteById(Log log) {
         if (log == null) {
             return 0;
         }
@@ -98,7 +98,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertList(List<Log> list) {
+    public int batchInsert(List<Log> list) {
         if (list == null || list.isEmpty()) {
             return 0;
         }

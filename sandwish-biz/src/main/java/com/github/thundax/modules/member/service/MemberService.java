@@ -10,21 +10,21 @@ import java.util.List;
  */
 public interface MemberService {
 
-    Member get(EntityId id);
+    Member getById(EntityId id);
 
-    List<Member> getMany(List<String> ids);
+    List<Member> batchGetByIds(List<String> ids);
 
-    List<Member> findList(Member member);
+    List<Member> list(Member member);
 
-    Page<Member> findPage(Member member, Page<Member> page);
+    Page<Member> page(Member member, Page<Member> page);
 
     void add(Member member);
 
     void update(Member member);
 
-    int delete(Member member);
+    int deleteById(Member member);
 
-    int delete(List<Member> list);
+    int batchDeleteById(List<Member> list);
 
     int updatePriority(Member member);
 

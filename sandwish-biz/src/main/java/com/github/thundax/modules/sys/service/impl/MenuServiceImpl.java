@@ -43,12 +43,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Menu get(Menu entity) {
-        return entity == null ? null : get(entity.getId());
+    public Menu getById(Menu entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public Menu get(EntityId id) {
+    public Menu getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -56,12 +56,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<Menu> getMany(List<String> ids) {
+    public List<Menu> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<Menu> findList(Menu menu) {
+    public List<Menu> list(Menu menu) {
         Menu.Query query = menu == null ? null : menu.getQuery();
         return dao.list(
                 query == null ? null : query.getParentId(),
@@ -70,13 +70,13 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Menu findOne(Menu menu) {
-        List<Menu> menus = findList(menu);
+    public Menu getOne(Menu menu) {
+        List<Menu> menus = list(menu);
         return menus == null || menus.isEmpty() ? null : menus.get(0);
     }
 
     @Override
-    public Page<Menu> findPage(Menu menu, Page<Menu> page) {
+    public Page<Menu> page(Menu menu, Page<Menu> page) {
         Page<Menu> normalizedPage = normalizePage(page);
         Menu.Query query = menu == null ? null : menu.getQuery();
         IPage<Menu> dataPage = dao.page(
@@ -94,16 +94,16 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public long count(Menu menu) {
-        return findList(menu).size();
+        return list(menu).size();
     }
 
     @Override
-    public List<Menu> findList(Integer maxRank) {
+    public List<Menu> list(Integer maxRank) {
         return dao.list(null, null, maxRank);
     }
 
     @Override
-    public List<Menu> findChildList(String parentId) {
+    public List<Menu> listChildren(String parentId) {
         return dao.list(parentId, null, null);
     }
 
@@ -155,9 +155,9 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Menu menu) {
+    public int deleteById(Menu menu) {
         dao.deleteMenuRole(EntityIdCodec.toValue(menu.getId()));
-        Menu bean = this.get(menu.getId());
+        Menu bean = this.getById(menu.getId());
         if (bean == null) {
             return 0;
         }
@@ -172,8 +172,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Menu> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Menu> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

@@ -59,5 +59,5 @@ public interface UserService extends CrudService<User> {
      * @param user 用户
      * @return 权限列表
      */
-    List<Role> findUserRole(User user);
+    List<Role> listUserRoles(User user);
 }

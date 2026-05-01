@@ -32,7 +32,7 @@ public interface CrudService<T> extends BaseService {
      * @param entity 对象
      * @return 对象
      */
-    T get(T entity);
+    T getById(T entity);
 
     /**
      * 获取对象
@@ -40,7 +40,7 @@ public interface CrudService<T> extends BaseService {
      * @param id id
      * @return 对象
      */
-    T get(EntityId id);
+    T getById(EntityId id);
 
     /**
      * 根据id获取多条数据
@@ -48,7 +48,7 @@ public interface CrudService<T> extends BaseService {
      * @param ids id list
      * @return 对象列表
      */
-    List<T> getMany(List<String> ids);
+    List<T> batchGetByIds(List<String> ids);
 
     /**
      * 获取列表
@@ -56,7 +56,7 @@ public interface CrudService<T> extends BaseService {
      * @param entity 查询条件
      * @return 列表
      */
-    List<T> findList(T entity);
+    List<T> list(T entity);
 
     /**
      * 获取对象
@@ -64,7 +64,7 @@ public interface CrudService<T> extends BaseService {
      * @param entity 查询条件
      * @return 对象
      */
-    T findOne(T entity);
+    T getOne(T entity);
 
     /**
      * 获取分页数据
@@ -73,7 +73,7 @@ public interface CrudService<T> extends BaseService {
      * @param page 分页
      * @return 分页
      */
-    Page<T> findPage(T entity, Page<T> page);
+    Page<T> page(T entity, Page<T> page);
 
     /**
      * 获取 count
@@ -103,7 +103,7 @@ public interface CrudService<T> extends BaseService {
      * @param entity 对象
      * @return 影响记录数
      */
-    int delete(T entity);
+    int deleteById(T entity);
 
     /**
      * 删除
@@ -111,7 +111,7 @@ public interface CrudService<T> extends BaseService {
      * @param list 列表
      * @return 影响记录数
      */
-    int delete(List<T> list);
+    int batchDeleteById(List<T> list);
 
     /**
      * 排序

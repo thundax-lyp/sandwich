@@ -62,7 +62,7 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
-        Menu bean = menuService.get(EntityIdCodec.toDomain(request.getId()));
+        Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getId());
         }
@@ -90,7 +90,7 @@ public class MenuApiController extends BaseApiController {
         }
         query.setQuery(queryCondition);
 
-        return menuService.findList(query).stream()
+        return menuService.list(query).stream()
                 .map(menu -> MenuInterfaceAssembler.toResponse(menu))
                 .collect(Collectors.toList());
     }
@@ -109,14 +109,14 @@ public class MenuApiController extends BaseApiController {
     public MenuResponse add(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
-            Menu bean = menuService.get(entity.getId());
+            Menu bean = menuService.getById(entity.getId());
             if (bean != null) {
                 throw new InsertBeanExistException(Menu.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {
-            Menu parent = menuService.get(EntityIdCodec.toDomain(entity.getParentId()));
+            Menu parent = menuService.getById(EntityIdCodec.toDomain(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -139,13 +139,13 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse update(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
-        Menu bean = menuService.get(EntityIdCodec.toDomain(request.getId()));
+        Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (StringUtils.isNotEmpty(request.getParentId())) {
-            Menu parent = menuService.get(EntityIdCodec.toDomain(request.getParentId()));
+            Menu parent = menuService.getById(EntityIdCodec.toDomain(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -172,7 +172,7 @@ public class MenuApiController extends BaseApiController {
     public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = validateList(
                 list,
-                vo -> menuService.get(EntityIdCodec.toDomain(vo.getId())),
+                vo -> menuService.getById(EntityIdCodec.toDomain(vo.getId())),
                 null,
                 (bean, vo) -> bean.setVisibility(
                         Boolean.TRUE.equals(vo.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
@@ -194,9 +194,10 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
-        List<Menu> beanList = validateList(list, vo -> menuService.get(EntityIdCodec.toDomain(vo.getId())), null, null);
+        List<Menu> beanList =
+                validateList(list, vo -> menuService.getById(EntityIdCodec.toDomain(vo.getId())), null, null);
 
-        menuService.delete(beanList);
+        menuService.batchDeleteById(beanList);
 
         return true;
     }
@@ -213,7 +214,7 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
-        List<Menu> beanList = menuService.findList(new Menu());
+        List<Menu> beanList = menuService.list(new Menu());
 
         Set<String> excludeIds = excludeList == null
                 ? new HashSet<>()
@@ -259,12 +260,12 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "move", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
-        Menu fromBean = menuService.get(EntityIdCodec.toDomain(request.getFromNodeId()));
+        Menu fromBean = menuService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getFromNodeId());
         }
 
-        Menu toBean = menuService.get(EntityIdCodec.toDomain(request.getToNodeId()));
+        Menu toBean = menuService.getById(EntityIdCodec.toDomain(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getToNodeId());
         }

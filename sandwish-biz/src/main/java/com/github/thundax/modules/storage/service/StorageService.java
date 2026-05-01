@@ -8,35 +8,35 @@ import java.util.List;
 
 public interface StorageService {
 
-    Storage get(EntityId id);
+    Storage getById(EntityId id);
 
-    List<Storage> getMany(List<String> ids);
+    List<Storage> batchGetByIds(List<String> ids);
 
-    List<Storage> findList(Storage storage);
+    List<Storage> list(Storage storage);
 
-    Page<Storage> findPage(Storage storage, Page<Storage> page);
+    Page<Storage> page(Storage storage, Page<Storage> page);
 
     void add(Storage storage);
 
     void update(Storage storage);
 
-    int delete(Storage storage);
+    int deleteById(Storage storage);
 
-    int delete(List<Storage> list);
+    int batchDeleteById(List<Storage> list);
 
     /**
      * 获取MIME列表
      *
      * @return MIME列表
      */
-    List<String> findMimeTypeList();
+    List<String> listMimeTypes();
 
     /**
      * 获取业务类型列表
      *
      * @return 业务类型列表
      */
-    List<String> findBusinessTypeList();
+    List<String> listBusinessTypes();
 
     /**
      * 更新状态
@@ -76,5 +76,5 @@ public interface StorageService {
      * @param entity
      * @return
      */
-    List<StorageBusiness> findBusiness(Storage entity);
+    List<StorageBusiness> listBusiness(Storage entity);
 }

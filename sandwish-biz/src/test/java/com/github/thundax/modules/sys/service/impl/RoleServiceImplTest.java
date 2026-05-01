@@ -27,7 +27,7 @@ public class RoleServiceImplTest {
         role.setQuery(query);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        service.findList(role);
+        service.list(role);
 
         assertEquals("ENABLED", dao.enableFlag);
     }
@@ -40,7 +40,7 @@ public class RoleServiceImplTest {
         page.setPageSize(0);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        service.findPage(new Role(), page);
+        service.page(new Role(), page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -82,7 +82,7 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        int count = service.delete(role("role-1"));
+        int count = service.deleteById(role("role-1"));
 
         assertEquals(1, count);
         assertEquals("role-1", dao.deletedRoleMenuId);

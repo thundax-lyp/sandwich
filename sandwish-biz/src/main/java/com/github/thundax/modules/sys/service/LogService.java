@@ -7,17 +7,17 @@ import java.util.List;
 
 public interface LogService {
 
-    Log get(EntityId id);
+    Log getById(EntityId id);
 
-    List<Log> findList(Log log);
+    List<Log> list(Log log);
 
-    Page<Log> findPage(Log log, Page<Log> page);
+    Page<Log> page(Log log, Page<Log> page);
 
     void add(Log log);
 
     void update(Log log);
 
-    int delete(Log log);
+    int deleteById(Log log);
 
     /**
      * 写入
@@ -25,7 +25,7 @@ public interface LogService {
      * @param list 列表
      * @return 影响记录数
      */
-    int insertList(List<Log> list);
+    int batchInsert(List<Log> list);
 
     /**
      * 批量删除

@@ -28,6 +28,6 @@ public abstract class AbstractSignServiceImpl implements SignService {
             return;
         }
 
-        signatureService.delete(new Signature(null, businessType, businessId));
+        signatureService.deleteByBusiness(new Signature(null, businessType, businessId));
     }
 }

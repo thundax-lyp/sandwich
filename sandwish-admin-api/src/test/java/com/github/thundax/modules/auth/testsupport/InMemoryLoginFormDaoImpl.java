@@ -15,7 +15,7 @@ public class InMemoryLoginFormDaoImpl implements LoginFormDao {
     private final Map<String, String> refreshTokens = new LinkedHashMap<>();
 
     @Override
-    public int getLoginCount() {
+    public int count() {
         return forms.size();
     }
 

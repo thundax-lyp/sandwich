@@ -75,11 +75,11 @@ public class StorageController extends BaseAdminController {
     @RequestMapping(value = "list")
     public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
         Storage storage = readQuery(request, response);
-        Page<Storage> page = storageService.findPage(storage, new Page<>(request, response));
+        Page<Storage> page = storageService.page(storage, new Page<>(request, response));
 
         model.addAttribute("storage", storage);
         model.addAttribute("page", page);
-        model.addAttribute("mimeTypeList", storageService.findMimeTypeList());
+        model.addAttribute("mimeTypeList", storageService.listMimeTypes());
 
         return "modules/assist/storageList";
     }
@@ -171,7 +171,7 @@ public class StorageController extends BaseAdminController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = storageService.get(EntityIdCodec.toDomain(id));
+        Storage storage = storageService.getById(EntityIdCodec.toDomain(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -203,7 +203,7 @@ public class StorageController extends BaseAdminController {
             return "redirect:" + modulePath + "/list?reload";
         }
 
-        int count = storageService.delete(new ArrayList<>(Arrays.asList(ids))
+        int count = storageService.batchDeleteById(new ArrayList<>(Arrays.asList(ids))
                 .stream().map(this::newStorage).collect(Collectors.toList()));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
@@ -219,7 +219,7 @@ public class StorageController extends BaseAdminController {
     @RequestMapping(value = "treeData")
     @ResponseBody
     public List<StorageTreeNodeResponse> treeData() {
-        return storageService.findBusinessTypeList().stream()
+        return storageService.listBusinessTypes().stream()
                 .map(businessType -> StorageInterfaceAssembler.toBusinessTypeTreeNode(businessType))
                 .collect(Collectors.toList());
     }
@@ -253,7 +253,7 @@ public class StorageController extends BaseAdminController {
             return false;
         }
 
-        Storage bean = storageService.get(EntityIdCodec.toDomain(id));
+        Storage bean = storageService.getById(EntityIdCodec.toDomain(id));
         if (bean == null) {
             addWarningMessage(redirectAttributes, "无效的数据");
             return false;

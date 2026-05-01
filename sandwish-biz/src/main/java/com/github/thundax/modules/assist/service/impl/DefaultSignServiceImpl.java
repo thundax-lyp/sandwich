@@ -29,7 +29,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
         signature.setBusinessId(businessId);
         signature.setSignature(createSignature(body));
         signature.setIsVerifySign("0");
-        Signature existing = signatureService.find(businessType, businessId);
+        Signature existing = signatureService.getByBusiness(businessType, businessId);
         if (existing == null) {
             signatureService.add(signature);
         } else {
@@ -46,7 +46,7 @@ public class DefaultSignServiceImpl extends AbstractSignServiceImpl {
             return null;
         }
 
-        Signature signature = signatureService.find(businessType, businessId);
+        Signature signature = signatureService.getByBusiness(businessType, businessId);
         if (signature == null) {
             return null;
         }

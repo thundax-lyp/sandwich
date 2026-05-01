@@ -23,7 +23,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        assertEquals(null, service.get((EntityId) null));
+        assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -38,7 +38,7 @@ public class MenuServiceImplTest {
         menu.setQuery(query);
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.findList(menu);
+        service.list(menu);
 
         assertEquals("ROOT", dao.parentId);
         assertEquals("VISIBLE", dao.displayFlag);
@@ -50,10 +50,10 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.findList(2);
+        service.list(2);
         assertEquals(Integer.valueOf(2), dao.maxRank);
 
-        service.findChildList("parent-1");
+        service.listChildren("parent-1");
         assertEquals("parent-1", dao.parentId);
     }
 
@@ -65,7 +65,7 @@ public class MenuServiceImplTest {
         page.setPageSize(0);
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.findPage(new Menu(), page);
+        service.page(new Menu(), page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -110,7 +110,7 @@ public class MenuServiceImplTest {
         RecordingSignService signService = new RecordingSignService();
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
-        int count = service.delete(menu("menu-1"));
+        int count = service.deleteById(menu("menu-1"));
 
         assertEquals(1, count);
         assertEquals("menu-1", dao.deletedMenuRoleId);

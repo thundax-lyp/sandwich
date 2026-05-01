@@ -38,12 +38,12 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public Dict get(Dict entity) {
-        return entity == null ? null : get(entity.getId());
+    public Dict getById(Dict entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public Dict get(EntityId id) {
+    public Dict getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -51,22 +51,22 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<Dict> getMany(List<String> ids) {
+    public List<Dict> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<String> findTypeList() {
+    public List<String> listTypes() {
         return dao.listTypes();
     }
 
-    public List<String> findLabelList(String type) {
+    public List<String> listLabels(String type) {
         List<String> result = new ArrayList<String>();
         Dict query = new Dict();
         Dict.Query queryCondition = new Dict.Query();
         queryCondition.setType(type);
         query.setQuery(queryCondition);
-        List<Dict> list = findList(query);
+        List<Dict> list = list(query);
         String s = "";
         for (Dict item : list) {
             s = item.getLabel();
@@ -78,7 +78,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<Dict> findList(Dict dict) {
+    public List<Dict> list(Dict dict) {
         Dict.Query query = dict == null ? null : dict.getQuery();
         return dao.list(
                 query == null ? null : query.getType(),
@@ -87,13 +87,13 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public Dict findOne(Dict dict) {
-        List<Dict> dicts = findList(dict);
+    public Dict getOne(Dict dict) {
+        List<Dict> dicts = list(dict);
         return dicts == null || dicts.isEmpty() ? null : dicts.get(0);
     }
 
     @Override
-    public Page<Dict> findPage(Dict dict, Page<Dict> page) {
+    public Page<Dict> page(Dict dict, Page<Dict> page) {
         Page<Dict> normalizedPage = normalizePage(page);
         Dict.Query query = dict == null ? null : dict.getQuery();
         IPage<Dict> dataPage = dao.page(
@@ -111,7 +111,7 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public long count(Dict dict) {
-        List<Dict> dicts = findList(dict);
+        List<Dict> dicts = list(dict);
         return dicts == null ? 0 : dicts.size();
     }
 
@@ -129,14 +129,14 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Dict dict) {
+    public int deleteById(Dict dict) {
         return dict == null ? 0 : dao.deleteById(dict.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Dict> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Dict> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

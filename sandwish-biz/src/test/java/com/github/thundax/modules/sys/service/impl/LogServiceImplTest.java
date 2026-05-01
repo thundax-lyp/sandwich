@@ -23,7 +23,7 @@ public class LogServiceImplTest {
         RecordingLogDao dao = new RecordingLogDao();
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        assertEquals(null, service.get((EntityId) null));
+        assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -34,7 +34,7 @@ public class LogServiceImplTest {
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        assertSame(expected, service.get(EntityId.of("log-1")));
+        assertSame(expected, service.getById(EntityId.of("log-1")));
 
         assertEquals("log-1", dao.id);
     }
@@ -58,7 +58,7 @@ public class LogServiceImplTest {
         Page<Log> page = new Page<>(2, 20, 100);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        service.findPage(log, page);
+        service.page(log, page);
 
         assertEquals("ACCESS", dao.type);
         assertEquals("127.0.0.1", dao.remoteAddr);
@@ -81,7 +81,7 @@ public class LogServiceImplTest {
         page.setPageSize(0);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        service.findPage(new Log(), page);
+        service.page(new Log(), page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -115,7 +115,7 @@ public class LogServiceImplTest {
             logs.add(new Log());
         }
 
-        int count = service.insertList(logs);
+        int count = service.batchInsert(logs);
 
         assertEquals(51, count);
         assertEquals(2, dao.batchInsertCalls);

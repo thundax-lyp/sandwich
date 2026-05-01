@@ -66,13 +66,13 @@ public class LogApiController extends BaseApiController {
         queryCondition.setEndDate(request.getEndDate());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(logService.findPage(query, readLogPage(request)), this::toResponse);
+        return entityPageToVo(logService.page(query, readLogPage(request)), this::toResponse);
     }
 
     private LogResponse toResponse(Log log) {
-        User user = userService.get(EntityIdCodec.toDomain(log.getUserId()));
-        Office office = user == null ? null : officeService.get(EntityIdCodec.toDomain(user.getOfficeId()));
-        return LogInterfaceAssembler.toResponse(log, user, office, officeService::get);
+        User user = userService.getById(EntityIdCodec.toDomain(log.getUserId()));
+        Office office = user == null ? null : officeService.getById(EntityIdCodec.toDomain(user.getOfficeId()));
+        return LogInterfaceAssembler.toResponse(log, user, office, officeService::getById);
     }
 
     private Page<Log> readLogPage(LogPageRequest request) {

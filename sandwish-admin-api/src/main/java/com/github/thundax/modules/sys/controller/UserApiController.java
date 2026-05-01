@@ -106,7 +106,7 @@ public class UserApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
-        User bean = userService.get(EntityIdCodec.toDomain(request.getId()));
+        User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
@@ -127,9 +127,7 @@ public class UserApiController extends BaseApiController {
     public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         User query = readQuery(request);
 
-        return userService.findList(query).stream()
-                .map(user -> toResponse(user))
-                .collect(Collectors.toList());
+        return userService.list(query).stream().map(user -> toResponse(user)).collect(Collectors.toList());
     }
 
     @ApiOperation(value = "获取分页列表", notes = "sys:user:view")
@@ -147,7 +145,7 @@ public class UserApiController extends BaseApiController {
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
-        return entityPageToVo(userService.findPage(query, page), this::toResponse);
+        return entityPageToVo(userService.page(query, page), this::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")
@@ -180,7 +178,7 @@ public class UserApiController extends BaseApiController {
         entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
 
         if (entity.getId() != null) {
-            User bean = userService.get(entity.getId());
+            User bean = userService.getById(entity.getId());
             if (bean != null) {
                 throw new InsertBeanExistException(User.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
@@ -225,7 +223,7 @@ public class UserApiController extends BaseApiController {
             throw new InvalidParameterException("ssoLoginName");
         }
 
-        User bean = userService.get(EntityIdCodec.toDomain(request.getId()));
+        User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
@@ -316,7 +314,7 @@ public class UserApiController extends BaseApiController {
 
         List<User> beanList = validateList(
                 list,
-                vo -> userService.get(EntityIdCodec.toDomain(vo.getId())),
+                vo -> userService.getById(EntityIdCodec.toDomain(vo.getId())),
                 (bean, vo) -> {
                     if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
                         throw new PermissionDeniedException();
@@ -347,7 +345,7 @@ public class UserApiController extends BaseApiController {
 
         List<User> beanList = validateList(
                 list,
-                vo -> userService.get(EntityIdCodec.toDomain(vo.getId())),
+                vo -> userService.getById(EntityIdCodec.toDomain(vo.getId())),
                 (bean, vo) -> {
                     if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
                         throw new PermissionDeniedException();
@@ -356,7 +354,7 @@ public class UserApiController extends BaseApiController {
                 },
                 null);
 
-        userService.delete(beanList);
+        userService.batchDeleteById(beanList);
 
         return true;
     }
@@ -400,8 +398,8 @@ public class UserApiController extends BaseApiController {
     @RequestMapping(value = "office/tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserOfficeResponse> officeTree() {
-        return officeService.findList(new Office()).stream()
-                .map(office -> UserInterfaceAssembler.toOfficeResponse(office, officeService::get))
+        return officeService.list(new Office()).stream()
+                .map(office -> UserInterfaceAssembler.toOfficeResponse(office, officeService::getById))
                 .collect(Collectors.toList());
     }
 
@@ -421,7 +419,7 @@ public class UserApiController extends BaseApiController {
         queryCondition.setStatus(RoleStatus.ENABLED);
         query.setQuery(queryCondition);
 
-        return roleService.findList(query).stream()
+        return roleService.list(query).stream()
                 .map(role -> UserInterfaceAssembler.toRoleResponse(role))
                 .collect(Collectors.toList());
     }
@@ -462,7 +460,7 @@ public class UserApiController extends BaseApiController {
         }
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {
-            Office office = officeService.get(EntityIdCodec.toDomain(request.getOfficeId()));
+            Office office = officeService.getById(EntityIdCodec.toDomain(request.getOfficeId()));
             if (office == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
@@ -481,7 +479,7 @@ public class UserApiController extends BaseApiController {
             throw new InvalidParameterException("office.id");
 
         } else {
-            Office bean = officeService.get(EntityIdCodec.toDomain(request.getId()));
+            Office bean = officeService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Office.BEAN_NAME, request.getId());
             }
@@ -497,7 +495,7 @@ public class UserApiController extends BaseApiController {
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                Role bean = roleService.get(EntityIdCodec.toDomain(request.getId()));
+                Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
                 if (bean == null) {
                     throw new NullBeanException(Role.BEAN_NAME, request.getId());
                 }
@@ -548,9 +546,9 @@ public class UserApiController extends BaseApiController {
     }
 
     private UserResponse toResponse(User user) {
-        Office office = officeService.get(EntityIdCodec.toDomain(user.getOfficeId()));
-        List<Role> roleList = userService.findUserRole(user);
-        return UserInterfaceAssembler.toResponse(user, office, roleList, officeService::get);
+        Office office = officeService.getById(EntityIdCodec.toDomain(user.getOfficeId()));
+        List<Role> roleList = userService.listUserRoles(user);
+        return UserInterfaceAssembler.toResponse(user, office, roleList, officeService::getById);
     }
 
     public static String getAvatarUrl(String userId, String token) {

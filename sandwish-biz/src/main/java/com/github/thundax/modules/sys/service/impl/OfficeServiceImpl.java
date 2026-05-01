@@ -36,12 +36,12 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public Office get(Office entity) {
-        return entity == null ? null : get(entity.getId());
+    public Office getById(Office entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public Office get(EntityId id) {
+    public Office getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -49,12 +49,12 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public List<Office> getMany(List<String> ids) {
+    public List<Office> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<Office> findList(Office office) {
+    public List<Office> list(Office office) {
         Office.Query query = office == null ? null : office.getQuery();
         return dao.list(
                 query == null ? null : query.getParentId(),
@@ -63,13 +63,13 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public Office findOne(Office office) {
-        List<Office> offices = findList(office);
+    public Office getOne(Office office) {
+        List<Office> offices = list(office);
         return offices == null || offices.isEmpty() ? null : offices.get(0);
     }
 
     @Override
-    public Page<Office> findPage(Office office, Page<Office> page) {
+    public Page<Office> page(Office office, Page<Office> page) {
         Page<Office> normalizedPage = normalizePage(page);
         Office.Query query = office == null ? null : office.getQuery();
         IPage<Office> dataPage = dao.page(
@@ -87,7 +87,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public long count(Office office) {
-        return findList(office).size();
+        return list(office).size();
     }
 
     @Override
@@ -104,8 +104,8 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Office entity) {
-        Office bean = this.get(entity.getId());
+    public int deleteById(Office entity) {
+        Office bean = this.getById(entity.getId());
         if (bean == null) {
             return 0;
         }
@@ -117,8 +117,8 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Office> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Office> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

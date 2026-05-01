@@ -37,12 +37,12 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public UploadFile get(UploadFile entity) {
-        return entity == null ? null : get(entity.getId());
+    public UploadFile getById(UploadFile entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public UploadFile get(EntityId id) {
+    public UploadFile getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -50,23 +50,23 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public List<UploadFile> getMany(List<String> ids) {
+    public List<UploadFile> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<UploadFile> findList(UploadFile entity) {
+    public List<UploadFile> list(UploadFile entity) {
         return dao.list();
     }
 
     @Override
-    public UploadFile findOne(UploadFile entity) {
-        List<UploadFile> files = findList(entity);
+    public UploadFile getOne(UploadFile entity) {
+        List<UploadFile> files = list(entity);
         return files == null || files.isEmpty() ? null : files.get(0);
     }
 
     @Override
-    public Page<UploadFile> findPage(UploadFile entity, Page<UploadFile> page) {
+    public Page<UploadFile> page(UploadFile entity, Page<UploadFile> page) {
         Page<UploadFile> normalizedPage = normalizePage(page);
         IPage<UploadFile> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -78,7 +78,7 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     public long count(UploadFile entity) {
-        List<UploadFile> files = findList(entity);
+        List<UploadFile> files = list(entity);
         return files == null ? 0 : files.size();
     }
 
@@ -96,14 +96,14 @@ public class UploadFileServiceImpl implements UploadFileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(UploadFile entity) {
+    public int deleteById(UploadFile entity) {
         return entity == null ? 0 : dao.deleteById(entity.getId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<UploadFile> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<UploadFile> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public List<UploadFile> findByFileIds(String[] fileId) {
+    public List<UploadFile> batchGetByFileIds(String[] fileId) {
         return dao.batchGetByFileIds(Arrays.asList(fileId));
     }
 

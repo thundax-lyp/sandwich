@@ -233,7 +233,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AccessToken findByUserId(String userId) {
+    public AccessToken getByUserId(String userId) {
         return accessTokenDao.getByUserId(userId);
     }
 

@@ -51,12 +51,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role get(Role entity) {
-        return entity == null ? null : get(entity.getId());
+    public Role getById(Role entity) {
+        return entity == null ? null : getById(entity.getId());
     }
 
     @Override
-    public Role get(EntityId id) {
+    public Role getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -64,24 +64,24 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> getMany(List<String> ids) {
+    public List<Role> batchGetByIds(List<String> ids) {
         return dao.batchGetByIds(ids);
     }
 
     @Override
-    public List<Role> findList(Role role) {
+    public List<Role> list(Role role) {
         Role.Query query = role == null ? null : role.getQuery();
         return dao.list(query == null ? null : statusValue(query.getStatus()));
     }
 
     @Override
-    public Role findOne(Role role) {
-        List<Role> roles = findList(role);
+    public Role getOne(Role role) {
+        List<Role> roles = list(role);
         return roles == null || roles.isEmpty() ? null : roles.get(0);
     }
 
     @Override
-    public Page<Role> findPage(Role role, Page<Role> page) {
+    public Page<Role> page(Role role, Page<Role> page) {
         Page<Role> normalizedPage = normalizePage(page);
         Role.Query query = role == null ? null : role.getQuery();
         IPage<Role> dataPage = dao.page(
@@ -97,17 +97,17 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public long count(Role role) {
-        List<Role> roles = findList(role);
+        List<Role> roles = list(role);
         return roles == null ? 0 : roles.size();
     }
 
     @Override
-    public List<Role> findValidList() {
+    public List<Role> listEnabled() {
         Role query = new Role();
         Role.Query queryCondition = new Role.Query();
         queryCondition.setStatus(RoleStatus.ENABLED);
         query.setQuery(queryCondition);
-        return this.findList(query);
+        return this.list(query);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(Role role) {
+    public int deleteById(Role role) {
         dao.deleteRoleMenu(EntityIdCodec.toValue(role.getId()));
         dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
         int retVal = dao.deleteById(role.getId());
@@ -182,7 +182,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<User> findRoleUser(Role role) {
+    public List<User> listRoleUsers(Role role) {
         List<String> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
@@ -193,7 +193,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Menu> findRoleMenu(Role role) {
+    public List<Menu> listRoleMenus(Role role) {
         List<String> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
@@ -235,8 +235,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int delete(List<Role> list) {
-        return batchOperate(list, this::delete);
+    public int batchDeleteById(List<Role> list) {
+        return batchOperate(list, this::deleteById);
     }
 
     @Override

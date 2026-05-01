@@ -50,7 +50,7 @@ public class DictController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public DictResponse get(@RequestBody DictIdRequest request) throws ApiException {
-        return DictInterfaceAssembler.toResponse(dictService.get(EntityIdCodec.toDomain(request.getId())));
+        return DictInterfaceAssembler.toResponse(dictService.getById(EntityIdCodec.toDomain(request.getId())));
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
@@ -65,7 +65,7 @@ public class DictController extends BaseApiController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public List<DictResponse> list(@RequestBody DictQueryRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
-        return dictService.findList(query).stream()
+        return dictService.list(query).stream()
                 .map(dict -> DictInterfaceAssembler.toResponse(dict))
                 .collect(Collectors.toList());
     }
@@ -83,7 +83,7 @@ public class DictController extends BaseApiController {
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         Page<Dict> page = readDictPage(request);
-        return entityPageToVo(dictService.findPage(query, page), DictInterfaceAssembler::toResponse);
+        return entityPageToVo(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")
@@ -113,7 +113,7 @@ public class DictController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public DictResponse update(@RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictService.get(EntityIdCodec.toDomain(request.getId()));
+        Dict dict = dictService.getById(EntityIdCodec.toDomain(request.getId()));
         if (dict == null) {
             throw new ApiException("id not exist");
         }
@@ -133,8 +133,9 @@ public class DictController extends BaseApiController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList = validateList(list, vo -> dictService.get(EntityIdCodec.toDomain(vo.getId())), null, null);
-        dictService.delete(beanList);
+        List<Dict> beanList =
+                validateList(list, vo -> dictService.getById(EntityIdCodec.toDomain(vo.getId())), null, null);
+        dictService.batchDeleteById(beanList);
         return true;
     }
 

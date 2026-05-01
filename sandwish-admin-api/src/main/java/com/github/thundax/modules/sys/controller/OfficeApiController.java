@@ -42,13 +42,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class OfficeApiController extends BaseApiController {
 
     private final OfficeService officeService;
-    private final OfficeInterfaceAssembler officeInterfaceAssembler;
 
     @Autowired
     public OfficeApiController(OfficeService officeService, Validator validator) {
         super(validator);
         this.officeService = officeService;
-        this.officeInterfaceAssembler = new OfficeInterfaceAssembler();
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:office:view")
@@ -63,11 +61,11 @@ public class OfficeApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public OfficeResponse get(@RequestBody OfficeIdRequest request) throws ApiException {
-        Office bean = officeService.get(officeInterfaceAssembler.toEntityId(request.getId()));
+        Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getId());
         }
-        return officeInterfaceAssembler.toResponse(bean, officeService::get);
+        return OfficeInterfaceAssembler.toResponse(bean, officeService::get);
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:office:view")
@@ -93,7 +91,7 @@ public class OfficeApiController extends BaseApiController {
         query.setQuery(queryCondition);
 
         return officeService.findList(query).stream()
-                .map(office -> officeInterfaceAssembler.toResponse(office, officeService::get))
+                .map(office -> OfficeInterfaceAssembler.toResponse(office, officeService::get))
                 .collect(Collectors.toList());
     }
 
@@ -111,16 +109,16 @@ public class OfficeApiController extends BaseApiController {
     public OfficeResponse add(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
 
-        Office entity = officeInterfaceAssembler.toEntity(new Office(), request);
+        Office entity = OfficeInterfaceAssembler.toEntity(new Office(), request);
         if (entity.getId() != null) {
-            Office bean = officeService.get(officeInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
+            Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
                 throw new InsertBeanExistException(Office.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {
-            Office parent = officeService.get(officeInterfaceAssembler.toEntityId(entity.getParentId()));
+            Office parent = officeService.get(OfficeInterfaceAssembler.toEntityId(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -128,7 +126,7 @@ public class OfficeApiController extends BaseApiController {
 
         officeService.add(entity);
 
-        return officeInterfaceAssembler.toResponse(entity, officeService::get);
+        return OfficeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
     @ApiOperation(value = "更新", notes = "sys:office:edit")
@@ -145,23 +143,23 @@ public class OfficeApiController extends BaseApiController {
     public OfficeResponse update(@RequestBody OfficeSaveRequest request) throws ApiException {
         validate(request);
 
-        Office bean = officeService.get(officeInterfaceAssembler.toEntityId(request.getId()));
+        Office bean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (StringUtils.isNotEmpty(request.getParentId())) {
-            Office parent = officeService.get(officeInterfaceAssembler.toEntityId(request.getParentId()));
+            Office parent = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        Office entity = officeInterfaceAssembler.toEntity(bean, request);
+        Office entity = OfficeInterfaceAssembler.toEntity(bean, request);
 
         officeService.update(entity);
 
-        return officeInterfaceAssembler.toResponse(entity, officeService::get);
+        return OfficeInterfaceAssembler.toResponse(entity, officeService::get);
     }
 
     @ApiOperation(value = "删除", notes = "sys:office:edit")
@@ -177,7 +175,7 @@ public class OfficeApiController extends BaseApiController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
         List<Office> beanList = validateList(
-                list, vo -> officeService.get(officeInterfaceAssembler.toEntityId(vo.getId())), null, null);
+                list, vo -> officeService.get(OfficeInterfaceAssembler.toEntityId(vo.getId())), null, null);
 
         officeService.delete(beanList);
 
@@ -226,7 +224,7 @@ public class OfficeApiController extends BaseApiController {
                 excludeIds);
 
         return beanList.stream()
-                .map(office -> officeInterfaceAssembler.toTreeResponse(office))
+                .map(office -> OfficeInterfaceAssembler.toTreeResponse(office))
                 .collect(Collectors.toList());
     }
 
@@ -244,12 +242,12 @@ public class OfficeApiController extends BaseApiController {
     public Boolean move(@RequestBody OfficeMoveRequest request) throws ApiException {
         validate(request);
 
-        Office fromBean = officeService.get(officeInterfaceAssembler.toEntityId(request.getFromNodeId()));
+        Office fromBean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getFromNodeId());
         }
 
-        Office toBean = officeService.get(officeInterfaceAssembler.toEntityId(request.getToNodeId()));
+        Office toBean = officeService.get(OfficeInterfaceAssembler.toEntityId(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(Office.BEAN_NAME, request.getToNodeId());
         }

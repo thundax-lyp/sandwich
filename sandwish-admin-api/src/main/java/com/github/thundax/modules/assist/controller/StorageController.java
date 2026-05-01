@@ -50,7 +50,7 @@ public class StorageController extends BaseAdminController {
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
     private final StorageUtils storageUtils;
-    private final StorageInterfaceAssembler storageInterfaceAssembler;
+    private final StorageConverter storageConverter;
 
     @Autowired
     public StorageController(
@@ -63,7 +63,7 @@ public class StorageController extends BaseAdminController {
         this.properties = properties.getUpload();
         this.storageService = storageService;
         this.storageUtils = storageUtils;
-        this.storageInterfaceAssembler = new StorageInterfaceAssembler(storageConverter);
+        this.storageConverter = storageConverter;
     }
 
     @RequestMapping(value = {"", "index"})
@@ -116,14 +116,14 @@ public class StorageController extends BaseAdminController {
         storage.setOwnerId(UserAccessHolder.currentUserId());
         storageUtils.saveFile(file, storage);
 
-        return storageInterfaceAssembler.toUploadResponse(storage);
+        return StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
     }
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     @ResponseBody
     public StorageUploadResponse upload(HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
-            return storageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
+            return StorageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
 
         } else {
             Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
@@ -135,11 +135,11 @@ public class StorageController extends BaseAdminController {
                     List<String> validExtNameList = properties.getAllowSuffix();
                     String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
                     if (!validExtNameList.contains(extendName)) {
-                        return storageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
+                        return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
                     }
 
                     Storage storage = new Storage();
-                    storage.setId(storageInterfaceAssembler.toEntityId(IdGen.uuid()));
+                    storage.setId(StorageInterfaceAssembler.toEntityId(IdGen.uuid()));
 
                     storage.setName(FilenameUtils.getBaseName(originalFilename));
                     storage.setExtendName(extendName);
@@ -155,11 +155,11 @@ public class StorageController extends BaseAdminController {
                     //                    file.transferTo(localFile);
                     storageService.add(storage);
 
-                    response = storageInterfaceAssembler.toUploadResponse(storage);
+                    response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return storageInterfaceAssembler.toUploadErrorResponse("系统错误");
+                    return StorageInterfaceAssembler.toUploadErrorResponse("系统错误");
                 }
             }
             return response;
@@ -171,7 +171,7 @@ public class StorageController extends BaseAdminController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = storageService.get(storageInterfaceAssembler.toEntityId(id));
+        Storage storage = storageService.get(StorageInterfaceAssembler.toEntityId(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -212,7 +212,7 @@ public class StorageController extends BaseAdminController {
 
     private Storage newStorage(String id) {
         Storage storage = new Storage();
-        storage.setId(storageInterfaceAssembler.toEntityId(id));
+        storage.setId(StorageInterfaceAssembler.toEntityId(id));
         return storage;
     }
 
@@ -220,7 +220,7 @@ public class StorageController extends BaseAdminController {
     @ResponseBody
     public List<StorageTreeNodeResponse> treeData() {
         return storageService.findBusinessTypeList().stream()
-                .map(businessType -> storageInterfaceAssembler.toBusinessTypeTreeNode(businessType))
+                .map(businessType -> StorageInterfaceAssembler.toBusinessTypeTreeNode(businessType))
                 .collect(Collectors.toList());
     }
 
@@ -253,7 +253,7 @@ public class StorageController extends BaseAdminController {
             return false;
         }
 
-        Storage bean = storageService.get(storageInterfaceAssembler.toEntityId(id));
+        Storage bean = storageService.get(StorageInterfaceAssembler.toEntityId(id));
         if (bean == null) {
             addWarningMessage(redirectAttributes, "无效的数据");
             return false;

@@ -49,7 +49,6 @@ public class SignatureApiController extends BaseApiController {
     private final UserService userService;
     private final MenuService menuService;
     private final RoleService roleService;
-    private final SignatureInterfaceAssembler signatureInterfaceAssembler = new SignatureInterfaceAssembler();
 
     @Autowired
     public SignatureApiController(
@@ -105,15 +104,15 @@ public class SignatureApiController extends BaseApiController {
         Signature bean = signatureService.find(request.getBusinessType(), request.getBusinessId());
 
         if (bean == null) {
-            return signatureInterfaceAssembler.toVerifyResponse(false);
+            return SignatureInterfaceAssembler.toVerifyResponse(false);
         }
 
         Signable signable = findSignable(bean);
         if (signable == null) {
-            return signatureInterfaceAssembler.toVerifyResponse(false);
+            return SignatureInterfaceAssembler.toVerifyResponse(false);
         }
 
-        return signatureInterfaceAssembler.toVerifyResponse(
+        return SignatureInterfaceAssembler.toVerifyResponse(
                 signService.verifySign(signable.getSignName(), signable.getSignId(), signable.getSignBody()));
     }
 
@@ -140,20 +139,20 @@ public class SignatureApiController extends BaseApiController {
     private Signable findSignable(Signature bean) {
         switch (bean.getBusinessType()) {
             case Log.BEAN_NAME:
-                return logService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return logService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case User.BEAN_NAME:
-                return userService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return userService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Menu.BEAN_NAME:
-                return menuService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return menuService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             case Role.BEAN_NAME:
-                return roleService.get(signatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
+                return roleService.get(SignatureInterfaceAssembler.toEntityId(bean.getBusinessId()));
             default:
                 return null;
         }
     }
 
     private SignatureResponse entityToResponse(Signature entity) {
-        return signatureInterfaceAssembler.toResponse(entity, findSignable(entity));
+        return SignatureInterfaceAssembler.toResponse(entity, findSignable(entity));
     }
 
     private Page<Signature> readSignaturePage(SignaturePageRequest request) {

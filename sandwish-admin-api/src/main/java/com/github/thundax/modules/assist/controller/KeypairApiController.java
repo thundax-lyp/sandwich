@@ -33,7 +33,6 @@ public class KeypairApiController extends BaseApiController {
 
     private final AuthService authService;
     private final KeypairService keypairService;
-    private final KeypairInterfaceAssembler keypairInterfaceAssembler = new KeypairInterfaceAssembler();
 
     @Autowired
     public KeypairApiController(Validator validator, AuthService authService, KeypairService keypairService) {
@@ -76,6 +75,6 @@ public class KeypairApiController extends BaseApiController {
         }
 
         String publicKey = keypairService.createPublicKey(request.getToken());
-        return keypairInterfaceAssembler.toPublicKeyResponse(publicKey);
+        return KeypairInterfaceAssembler.toPublicKeyResponse(publicKey);
     }
 }

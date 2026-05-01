@@ -64,7 +64,6 @@ public class PersonalApiController extends BaseApiController {
     private final MenuService menuService;
     private final PasswordService passwordService;
     private final KeypairService keypairService;
-    private final PersonalInterfaceAssembler personalInterfaceAssembler = new PersonalInterfaceAssembler();
 
     public PersonalApiController(
             Validator validator,
@@ -97,7 +96,7 @@ public class PersonalApiController extends BaseApiController {
             throw new InvalidTokenException();
         }
 
-        return personalInterfaceAssembler.toInfoResponse(currentUser);
+        return PersonalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
     @ApiOperation(value = "更新用户信息，包括：name, email, mobile", notes = "user")
@@ -115,10 +114,10 @@ public class PersonalApiController extends BaseApiController {
 
         User currentUser = UserAccessHolder.currentUser();
 
-        personalInterfaceAssembler.toEntity(currentUser, request);
+        PersonalInterfaceAssembler.toEntity(currentUser, request);
         userService.update(currentUser);
 
-        return personalInterfaceAssembler.toInfoResponse(currentUser);
+        return PersonalInterfaceAssembler.toInfoResponse(currentUser);
     }
 
     @ApiOperation(value = "更新用户密码", notes = "user")
@@ -184,7 +183,7 @@ public class PersonalApiController extends BaseApiController {
             throw new ApiException(e.getMessage());
         }
 
-        return personalInterfaceAssembler.toAvatarResponse(currentUser);
+        return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
     @ApiOperation(value = "删除头像", notes = "user")
@@ -202,7 +201,7 @@ public class PersonalApiController extends BaseApiController {
 
         AvatarUtils.deleteAvatar(EntityIdCodec.toValue(currentUser.getId()));
 
-        return personalInterfaceAssembler.toAvatarResponse(currentUser);
+        return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
     @ApiOperation(value = "菜单列表", notes = "user")
@@ -236,7 +235,7 @@ public class PersonalApiController extends BaseApiController {
         menuList.remove(0);
 
         return menuList.stream()
-                .map(menu -> personalInterfaceAssembler.toMenuResponse(menu))
+                .map(menu -> PersonalInterfaceAssembler.toMenuResponse(menu))
                 .collect(Collectors.toList());
     }
 
@@ -288,10 +287,10 @@ public class PersonalApiController extends BaseApiController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
-            return personalInterfaceAssembler.toPermsResponse(new HashSet<>());
+            return PersonalInterfaceAssembler.toPermsResponse(new HashSet<>());
         }
 
-        return personalInterfaceAssembler.toPermsResponse(
+        return PersonalInterfaceAssembler.toPermsResponse(
                 PermissionAuthorities.toPermissions(authentication.getAuthorities()));
     }
 }

@@ -6,13 +6,15 @@ import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
 import org.springframework.lang.NonNull;
 
-public class AsyncTaskInterfaceAssembler {
-    public EntityId toEntityId(String id) {
+public final class AsyncTaskInterfaceAssembler {
+    private AsyncTaskInterfaceAssembler() {}
+
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public AsyncTaskResponse toResponse(AsyncTask entity) {
+    public static AsyncTaskResponse toResponse(AsyncTask entity) {
         if (entity == null) {
             return new AsyncTaskResponse();
         }

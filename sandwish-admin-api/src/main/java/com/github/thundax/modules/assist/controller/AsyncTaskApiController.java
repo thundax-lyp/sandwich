@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AsyncTaskApiController extends BaseApiController {
 
     private final AsyncTaskService asyncTaskService;
-    private final AsyncTaskInterfaceAssembler asyncTaskInterfaceAssembler = new AsyncTaskInterfaceAssembler();
 
     @Autowired
     public AsyncTaskApiController(AsyncTaskService asyncTaskService, Validator validator) {
@@ -49,7 +48,7 @@ public class AsyncTaskApiController extends BaseApiController {
     public AsyncTaskResponse get(@RequestBody AsyncTaskIdRequest request) throws ApiException {
         validate(request);
 
-        AsyncTask bean = asyncTaskService.get(asyncTaskInterfaceAssembler.toEntityId(request.getId()));
+        AsyncTask bean = asyncTaskService.get(AsyncTaskInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             return new AsyncTaskResponse();
         }
@@ -58,6 +57,6 @@ public class AsyncTaskApiController extends BaseApiController {
             throw new PermissionDeniedException();
         }
 
-        return asyncTaskInterfaceAssembler.toResponse(bean);
+        return AsyncTaskInterfaceAssembler.toResponse(bean);
     }
 }

@@ -11,14 +11,15 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class OfficeInterfaceAssembler {
+public final class OfficeInterfaceAssembler {
+    private OfficeInterfaceAssembler() {}
 
-    public EntityId toEntityId(String id) {
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public OfficeResponse toResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static OfficeResponse toResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new OfficeResponse();
         }
@@ -39,7 +40,7 @@ public class OfficeInterfaceAssembler {
     }
 
     @NonNull
-    public OfficeResponse toTreeResponse(Office entity) {
+    public static OfficeResponse toTreeResponse(Office entity) {
         if (entity == null) {
             return new OfficeResponse();
         }
@@ -55,7 +56,7 @@ public class OfficeInterfaceAssembler {
     }
 
     @NonNull
-    public Office toEntity(@NonNull Office entity, @NonNull OfficeSaveRequest request) {
+    public static Office toEntity(@NonNull Office entity, @NonNull OfficeSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
@@ -69,7 +70,7 @@ public class OfficeInterfaceAssembler {
         return entity;
     }
 
-    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {

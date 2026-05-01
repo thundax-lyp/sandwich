@@ -8,19 +8,15 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import org.springframework.lang.NonNull;
 
-public class StorageInterfaceAssembler {
-    private final StorageConverter storageConverter;
+public final class StorageInterfaceAssembler {
+    private StorageInterfaceAssembler() {}
 
-    public StorageInterfaceAssembler(StorageConverter storageConverter) {
-        this.storageConverter = storageConverter;
-    }
-
-    public EntityId toEntityId(String id) {
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public StorageUploadResponse toUploadResponse(Storage entity) {
+    public static StorageUploadResponse toUploadResponse(Storage entity, StorageConverter storageConverter) {
         if (entity == null) {
             return new StorageUploadResponse();
         }
@@ -34,14 +30,14 @@ public class StorageInterfaceAssembler {
     }
 
     @NonNull
-    public StorageUploadResponse toUploadErrorResponse(String error) {
+    public static StorageUploadResponse toUploadErrorResponse(String error) {
         StorageUploadResponse response = new StorageUploadResponse();
         response.setError(error);
         return response;
     }
 
     @NonNull
-    public StorageTreeNodeResponse toBusinessTypeTreeNode(String businessType) {
+    public static StorageTreeNodeResponse toBusinessTypeTreeNode(String businessType) {
         StorageTreeNodeResponse response = new StorageTreeNodeResponse();
         response.setId(businessType);
         response.setParentId("ROOT");

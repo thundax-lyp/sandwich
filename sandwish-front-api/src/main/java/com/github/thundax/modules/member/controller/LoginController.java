@@ -28,7 +28,6 @@ public class LoginController extends BaseFrontController {
     private String successUrl;
 
     private final YwtbProperties properties;
-    private final MemberLoginInterfaceAssembler memberLoginInterfaceAssembler = new MemberLoginInterfaceAssembler();
 
     @Autowired
     public LoginController(YwtbProperties properties) {
@@ -77,6 +76,6 @@ public class LoginController extends BaseFrontController {
     @RequestMapping("check-login")
     @ResponseBody
     public MemberLoginStatusResponse checkLogin() {
-        return memberLoginInterfaceAssembler.toLoginStatusResponse(MemberSecurityContext.getPrincipal() != null);
+        return MemberLoginInterfaceAssembler.toLoginStatusResponse(MemberSecurityContext.getPrincipal() != null);
     }
 }

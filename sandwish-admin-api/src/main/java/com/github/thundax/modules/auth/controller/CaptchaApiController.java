@@ -44,7 +44,6 @@ public class CaptchaApiController extends BaseApiController {
     private static final int MAX_COLOR = 255;
 
     private final AuthService authService;
-    private final CaptchaInterfaceAssembler captchaInterfaceAssembler = new CaptchaInterfaceAssembler();
 
     @Autowired
     public CaptchaApiController(Validator validator, AuthService authService) {
@@ -111,7 +110,7 @@ public class CaptchaApiController extends BaseApiController {
 
         authService.createCaptcha(request.getLoginToken());
 
-        return captchaInterfaceAssembler.toRefreshResponse(true);
+        return CaptchaInterfaceAssembler.toRefreshResponse(true);
     }
 
     private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {

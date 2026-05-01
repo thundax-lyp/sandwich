@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DictController extends BaseApiController {
 
     private final DictService dictService;
-    private final DictInterfaceAssembler dictInterfaceAssembler = new DictInterfaceAssembler();
 
     public DictController(Validator validator, DictService dictService) {
         super(validator);
@@ -52,7 +51,7 @@ public class DictController extends BaseApiController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public DictResponse get(@RequestBody DictIdRequest request) throws ApiException {
-        return dictInterfaceAssembler.toResponse(dictService.get(dictInterfaceAssembler.toEntityId(request.getId())));
+        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toEntityId(request.getId())));
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
@@ -68,7 +67,7 @@ public class DictController extends BaseApiController {
     public List<DictResponse> list(@RequestBody DictQueryRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         return dictService.findList(query).stream()
-                .map(dict -> dictInterfaceAssembler.toResponse(dict))
+                .map(dict -> DictInterfaceAssembler.toResponse(dict))
                 .collect(Collectors.toList());
     }
 
@@ -85,7 +84,7 @@ public class DictController extends BaseApiController {
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         Page<Dict> page = readDictPage(request);
-        return entityPageToVo(dictService.findPage(query, page), dictInterfaceAssembler::toResponse);
+        return entityPageToVo(dictService.findPage(query, page), DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")
@@ -99,9 +98,9 @@ public class DictController extends BaseApiController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public DictResponse add(@RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictInterfaceAssembler.toEntity(new Dict(), request);
+        Dict dict = DictInterfaceAssembler.toEntity(new Dict(), request);
         dictService.add(dict);
-        return dictInterfaceAssembler.toResponse(dict);
+        return DictInterfaceAssembler.toResponse(dict);
     }
 
     @ApiOperation(value = "更新", notes = "sys:dict:edit")
@@ -115,13 +114,13 @@ public class DictController extends BaseApiController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public DictResponse update(@RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictService.get(dictInterfaceAssembler.toEntityId(request.getId()));
+        Dict dict = dictService.get(DictInterfaceAssembler.toEntityId(request.getId()));
         if (dict == null) {
             throw new ApiException("id not exist");
         }
-        Dict entity = dictInterfaceAssembler.toEntity(dict, request);
+        Dict entity = DictInterfaceAssembler.toEntity(dict, request);
         dictService.update(entity);
-        return dictInterfaceAssembler.toResponse(entity);
+        return DictInterfaceAssembler.toResponse(entity);
     }
 
     @ApiOperation(value = "删除", notes = "sys:dict:edit")
@@ -136,7 +135,7 @@ public class DictController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
         List<Dict> beanList =
-                validateList(list, vo -> dictService.get(dictInterfaceAssembler.toEntityId(vo.getId())), null, null);
+                validateList(list, vo -> dictService.get(DictInterfaceAssembler.toEntityId(vo.getId())), null, null);
         dictService.delete(beanList);
         return true;
     }

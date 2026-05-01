@@ -48,7 +48,6 @@ public class AuthApiController extends BaseApiController {
 
     private final AuthService authService;
     private final UserService userService;
-    private final AuthInterfaceAssembler authInterfaceAssembler = new AuthInterfaceAssembler();
 
     @Autowired
     public AuthApiController(Validator validator, AuthService authService, UserService userService) {
@@ -62,7 +61,7 @@ public class AuthApiController extends BaseApiController {
     @PostMapping(value = "form")
     @SysLogger("请求登录令牌")
     public AuthLoginFormResponse loginForm() throws ApiException {
-        return authInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
+        return AuthInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
     }
 
     @ApiOperation(value = "刷新登录令牌", notes = "ignore")
@@ -74,7 +73,7 @@ public class AuthApiController extends BaseApiController {
             throw new InvalidParameterException("refreshToken");
         }
 
-        return authInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
+        return AuthInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
     }
 
     @ApiOperation(value = "用户/密码登录", notes = "ignore")
@@ -135,7 +134,7 @@ public class AuthApiController extends BaseApiController {
         user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
         userService.updateLoginInfo(user);
 
-        return authInterfaceAssembler.toAccessTokenResponse(
+        return AuthInterfaceAssembler.toAccessTokenResponse(
                 authService.createAccessToken(EntityIdCodec.toValue(user.getId())));
     }
 
@@ -170,7 +169,7 @@ public class AuthApiController extends BaseApiController {
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
-        log.setRequestParams(authInterfaceAssembler.toLogJson(request));
+        log.setRequestParams(AuthInterfaceAssembler.toLogJson(request));
         log.setSignable(true);
         SysLogUtils.saveLog(log);
     }

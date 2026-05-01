@@ -21,14 +21,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class RoleInterfaceAssembler {
+public final class RoleInterfaceAssembler {
+    private RoleInterfaceAssembler() {}
 
-    public EntityId toEntityId(String id) {
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public RoleResponse toResponse(Role entity, List<Menu> menuList) {
+    public static RoleResponse toResponse(Role entity, List<Menu> menuList) {
         if (entity == null) {
             return new RoleResponse();
         }
@@ -46,13 +47,13 @@ public class RoleInterfaceAssembler {
                 menuList == null
                         ? new ArrayList<>()
                         : menuList.stream()
-                                .map(menu -> this.toMenuResponse(menu))
+                                .map(RoleInterfaceAssembler::toMenuResponse)
                                 .collect(Collectors.toList()));
         return response;
     }
 
     @NonNull
-    public RoleMenuResponse toMenuResponse(Menu entity) {
+    public static RoleMenuResponse toMenuResponse(Menu entity) {
         if (entity == null) {
             return new RoleMenuResponse();
         }
@@ -68,7 +69,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new RoleOfficeResponse();
         }
@@ -81,7 +82,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
+    public static RoleUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new RoleUserResponse();
         }
@@ -95,7 +96,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleUserTreeNodeResponse toOfficeTreeNode(String id, Office entity) {
+    public static RoleUserTreeNodeResponse toOfficeTreeNode(String id, Office entity) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(id);
         if (StringUtils.isNotBlank(entity.getParentId())) {
@@ -106,7 +107,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public RoleUserTreeNodeResponse toUserTreeNode(
+    public static RoleUserTreeNodeResponse toUserTreeNode(
             String officeIdPrefix, User entity, Office office, Function<EntityId, Office> officeLoader) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
@@ -117,7 +118,7 @@ public class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
+    public static Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
@@ -135,11 +136,11 @@ public class RoleInterfaceAssembler {
         return entity;
     }
 
-    private String idPrefix(String id) {
+    private static String idPrefix(String id) {
         return "OFFICE_" + id;
     }
 
-    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {

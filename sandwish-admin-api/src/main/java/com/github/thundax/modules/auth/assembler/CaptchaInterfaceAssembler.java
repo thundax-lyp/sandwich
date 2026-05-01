@@ -3,9 +3,11 @@ package com.github.thundax.modules.auth.assembler;
 import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
 import org.springframework.lang.NonNull;
 
-public class CaptchaInterfaceAssembler {
+public final class CaptchaInterfaceAssembler {
+    private CaptchaInterfaceAssembler() {}
+
     @NonNull
-    public CaptchaRefreshResponse toRefreshResponse(boolean refreshed) {
+    public static CaptchaRefreshResponse toRefreshResponse(boolean refreshed) {
         CaptchaRefreshResponse response = new CaptchaRefreshResponse();
         response.setRefreshed(refreshed);
         return response;

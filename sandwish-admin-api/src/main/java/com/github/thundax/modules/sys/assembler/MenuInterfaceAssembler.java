@@ -9,13 +9,15 @@ import com.github.thundax.modules.sys.response.MenuResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class MenuInterfaceAssembler {
-    public EntityId toEntityId(String id) {
+public final class MenuInterfaceAssembler {
+    private MenuInterfaceAssembler() {}
+
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public MenuResponse toResponse(Menu entity) {
+    public static MenuResponse toResponse(Menu entity) {
         if (entity == null) {
             return new MenuResponse();
         }
@@ -38,7 +40,7 @@ public class MenuInterfaceAssembler {
     }
 
     @NonNull
-    public MenuResponse toTreeResponse(Menu entity) {
+    public static MenuResponse toTreeResponse(Menu entity) {
         if (entity == null) {
             return new MenuResponse();
         }
@@ -50,7 +52,7 @@ public class MenuInterfaceAssembler {
     }
 
     @NonNull
-    public Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
+    public static Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

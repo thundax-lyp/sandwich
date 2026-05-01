@@ -15,9 +15,11 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class PersonalInterfaceAssembler {
+public final class PersonalInterfaceAssembler {
+    private PersonalInterfaceAssembler() {}
+
     @NonNull
-    public PersonalInfoResponse toInfoResponse(User entity) {
+    public static PersonalInfoResponse toInfoResponse(User entity) {
         if (entity == null) {
             return new PersonalInfoResponse();
         }
@@ -39,14 +41,14 @@ public class PersonalInterfaceAssembler {
     }
 
     @NonNull
-    public PersonalAvatarResponse toAvatarResponse(User entity) {
+    public static PersonalAvatarResponse toAvatarResponse(User entity) {
         PersonalAvatarResponse response = new PersonalAvatarResponse();
         response.setAvatar(readAvatarUrl(entity));
         return response;
     }
 
     @NonNull
-    public PersonalMenuResponse toMenuResponse(Menu entity) {
+    public static PersonalMenuResponse toMenuResponse(Menu entity) {
         if (entity == null) {
             return new PersonalMenuResponse();
         }
@@ -61,21 +63,21 @@ public class PersonalInterfaceAssembler {
     }
 
     @NonNull
-    public PersonalPermsResponse toPermsResponse(Set<String> perms) {
+    public static PersonalPermsResponse toPermsResponse(Set<String> perms) {
         PersonalPermsResponse response = new PersonalPermsResponse();
         response.setPerms(perms);
         return response;
     }
 
     @NonNull
-    public User toEntity(@NonNull User entity, @NonNull PersonalInfoUpdateRequest request) {
+    public static User toEntity(@NonNull User entity, @NonNull PersonalInfoUpdateRequest request) {
         entity.setName(request.getName());
         entity.setEmail(request.getEmail());
         entity.setMobile(request.getMobile());
         return entity;
     }
 
-    private String readAvatarUrl(User entity) {
+    private static String readAvatarUrl(User entity) {
         String id = entity == null ? null : EntityIdCodec.toValue(entity.getId());
         if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;

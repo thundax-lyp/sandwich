@@ -8,13 +8,15 @@ import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import org.springframework.lang.NonNull;
 
-public class SignatureInterfaceAssembler {
-    public EntityId toEntityId(String id) {
+public final class SignatureInterfaceAssembler {
+    private SignatureInterfaceAssembler() {}
+
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public SignatureResponse toResponse(Signature entity, Signable signable) {
+    public static SignatureResponse toResponse(Signature entity, Signable signable) {
         if (entity == null) {
             return new SignatureResponse();
         }
@@ -34,7 +36,7 @@ public class SignatureInterfaceAssembler {
     }
 
     @NonNull
-    public SignatureVerifyResponse toVerifyResponse(Boolean verified) {
+    public static SignatureVerifyResponse toVerifyResponse(Boolean verified) {
         SignatureVerifyResponse response = new SignatureVerifyResponse();
         response.setVerified(Boolean.TRUE.equals(verified));
         return response;

@@ -20,14 +20,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class UserInterfaceAssembler {
+public final class UserInterfaceAssembler {
+    private UserInterfaceAssembler() {}
 
-    public EntityId toEntityId(String id) {
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public UserResponse toResponse(
+    public static UserResponse toResponse(
             User entity, Office office, List<Role> roleList, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new UserResponse();
@@ -58,13 +59,13 @@ public class UserInterfaceAssembler {
                 roleList == null
                         ? new ArrayList<>()
                         : roleList.stream()
-                                .map(role -> this.toRoleResponse(role))
+                                .map(UserInterfaceAssembler::toRoleResponse)
                                 .collect(Collectors.toList()));
         return response;
     }
 
     @NonNull
-    public UserOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static UserOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new UserOfficeResponse();
         }
@@ -80,7 +81,7 @@ public class UserInterfaceAssembler {
     }
 
     @NonNull
-    public UserRoleResponse toRoleResponse(Role entity) {
+    public static UserRoleResponse toRoleResponse(Role entity) {
         if (entity == null) {
             return new UserRoleResponse();
         }
@@ -92,7 +93,7 @@ public class UserInterfaceAssembler {
     }
 
     @NonNull
-    public User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
+    public static User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
@@ -117,7 +118,7 @@ public class UserInterfaceAssembler {
         return entity;
     }
 
-    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {

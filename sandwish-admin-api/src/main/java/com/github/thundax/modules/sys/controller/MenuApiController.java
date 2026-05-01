@@ -44,7 +44,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuApiController extends BaseApiController {
 
     private final MenuService menuService;
-    private final MenuInterfaceAssembler menuInterfaceAssembler = new MenuInterfaceAssembler();
 
     @Autowired
     public MenuApiController(MenuService menuService, Validator validator) {
@@ -64,11 +63,11 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse get(@RequestBody MenuIdRequest request) throws ApiException {
-        Menu bean = menuService.get(menuInterfaceAssembler.toEntityId(request.getId()));
+        Menu bean = menuService.get(MenuInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getId());
         }
-        return menuInterfaceAssembler.toResponse(bean);
+        return MenuInterfaceAssembler.toResponse(bean);
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
@@ -95,7 +94,7 @@ public class MenuApiController extends BaseApiController {
         query.setQuery(queryCondition);
 
         return menuService.findList(query).stream()
-                .map(menu -> menuInterfaceAssembler.toResponse(menu))
+                .map(menu -> MenuInterfaceAssembler.toResponse(menu))
                 .collect(Collectors.toList());
     }
 
@@ -113,16 +112,16 @@ public class MenuApiController extends BaseApiController {
     public MenuResponse add(@RequestBody MenuSaveRequest request) throws ApiException {
         validate(request);
 
-        Menu entity = menuInterfaceAssembler.toEntity(new Menu(), request);
+        Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
-            Menu bean = menuService.get(menuInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
+            Menu bean = menuService.get(MenuInterfaceAssembler.toEntityId(EntityIdCodec.toValue(entity.getId())));
             if (bean != null) {
                 throw new InsertBeanExistException(Menu.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
 
         if (StringUtils.isNotEmpty(entity.getParentId())) {
-            Menu parent = menuService.get(menuInterfaceAssembler.toEntityId(entity.getParentId()));
+            Menu parent = menuService.get(MenuInterfaceAssembler.toEntityId(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -130,7 +129,7 @@ public class MenuApiController extends BaseApiController {
 
         menuService.add(entity);
 
-        return menuInterfaceAssembler.toResponse(entity);
+        return MenuInterfaceAssembler.toResponse(entity);
     }
 
     @ApiOperation(value = "更新", notes = "super")
@@ -147,23 +146,23 @@ public class MenuApiController extends BaseApiController {
     public MenuResponse update(@RequestBody MenuSaveRequest request) throws ApiException {
         validate(request);
 
-        Menu bean = menuService.get(menuInterfaceAssembler.toEntityId(request.getId()));
+        Menu bean = menuService.get(MenuInterfaceAssembler.toEntityId(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (StringUtils.isNotEmpty(request.getParentId())) {
-            Menu parent = menuService.get(menuInterfaceAssembler.toEntityId(request.getParentId()));
+            Menu parent = menuService.get(MenuInterfaceAssembler.toEntityId(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        Menu entity = menuInterfaceAssembler.toEntity(bean, request);
+        Menu entity = MenuInterfaceAssembler.toEntity(bean, request);
 
         menuService.update(entity);
 
-        return menuInterfaceAssembler.toResponse(entity);
+        return MenuInterfaceAssembler.toResponse(entity);
     }
 
     @ApiOperation(value = "显示/隐藏", notes = "super")
@@ -180,7 +179,7 @@ public class MenuApiController extends BaseApiController {
     public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = validateList(
                 list,
-                vo -> menuService.get(menuInterfaceAssembler.toEntityId(vo.getId())),
+                vo -> menuService.get(MenuInterfaceAssembler.toEntityId(vo.getId())),
                 null,
                 (bean, vo) -> bean.setVisibility(
                         Boolean.TRUE.equals(vo.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
@@ -203,7 +202,7 @@ public class MenuApiController extends BaseApiController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
         List<Menu> beanList =
-                validateList(list, vo -> menuService.get(menuInterfaceAssembler.toEntityId(vo.getId())), null, null);
+                validateList(list, vo -> menuService.get(MenuInterfaceAssembler.toEntityId(vo.getId())), null, null);
 
         menuService.delete(beanList);
 
@@ -252,7 +251,7 @@ public class MenuApiController extends BaseApiController {
                 excludeIds);
 
         return beanList.stream()
-                .map(menu -> menuInterfaceAssembler.toTreeResponse(menu))
+                .map(menu -> MenuInterfaceAssembler.toTreeResponse(menu))
                 .collect(Collectors.toList());
     }
 
@@ -270,12 +269,12 @@ public class MenuApiController extends BaseApiController {
     public Boolean move(@RequestBody MenuMoveRequest request) throws ApiException {
         validate(request);
 
-        Menu fromBean = menuService.get(menuInterfaceAssembler.toEntityId(request.getFromNodeId()));
+        Menu fromBean = menuService.get(MenuInterfaceAssembler.toEntityId(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getFromNodeId());
         }
 
-        Menu toBean = menuService.get(menuInterfaceAssembler.toEntityId(request.getToNodeId()));
+        Menu toBean = menuService.get(MenuInterfaceAssembler.toEntityId(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(Menu.BEAN_NAME, request.getToNodeId());
         }

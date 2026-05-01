@@ -7,13 +7,15 @@ import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
 import org.springframework.lang.NonNull;
 
-public class DictInterfaceAssembler {
-    public EntityId toEntityId(String id) {
+public final class DictInterfaceAssembler {
+    private DictInterfaceAssembler() {}
+
+    public static EntityId toEntityId(String id) {
         return EntityIdCodec.toDomain(id);
     }
 
     @NonNull
-    public DictResponse toResponse(Dict entity) {
+    public static DictResponse toResponse(Dict entity) {
         if (entity == null) {
             return new DictResponse();
         }
@@ -30,7 +32,7 @@ public class DictInterfaceAssembler {
     }
 
     @NonNull
-    public Dict toEntity(@NonNull Dict entity, @NonNull DictSaveRequest request) {
+    public static Dict toEntity(@NonNull Dict entity, @NonNull DictSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());

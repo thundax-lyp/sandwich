@@ -8,9 +8,11 @@ import com.github.thundax.modules.auth.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import org.springframework.lang.NonNull;
 
-public class AuthInterfaceAssembler {
+public final class AuthInterfaceAssembler {
+    private AuthInterfaceAssembler() {}
+
     @NonNull
-    public AuthLoginFormResponse toLoginFormResponse(LoginForm entity) {
+    public static AuthLoginFormResponse toLoginFormResponse(LoginForm entity) {
         if (entity == null) {
             return new AuthLoginFormResponse();
         }
@@ -23,7 +25,7 @@ public class AuthInterfaceAssembler {
     }
 
     @NonNull
-    public AuthAccessTokenResponse toAccessTokenResponse(AccessToken entity) {
+    public static AuthAccessTokenResponse toAccessTokenResponse(AccessToken entity) {
         AuthAccessTokenResponse response = new AuthAccessTokenResponse();
         if (entity != null) {
             response.setToken(entity.getToken());
@@ -31,7 +33,7 @@ public class AuthInterfaceAssembler {
         return response;
     }
 
-    public String toLogJson(AuthLoginRequest request) {
+    public static String toLogJson(AuthLoginRequest request) {
         if (request == null) {
             return null;
         }

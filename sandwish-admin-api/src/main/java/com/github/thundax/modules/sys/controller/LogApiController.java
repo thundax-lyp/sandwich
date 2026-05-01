@@ -34,7 +34,6 @@ public class LogApiController extends BaseApiController {
     private final LogService logService;
     private final UserService userService;
     private final OfficeService officeService;
-    private final LogInterfaceAssembler logInterfaceAssembler = new LogInterfaceAssembler();
 
     @Autowired
     public LogApiController(
@@ -77,7 +76,7 @@ public class LogApiController extends BaseApiController {
     private LogResponse toResponse(Log log) {
         User user = userService.get(EntityIdCodec.toDomain(log.getUserId()));
         Office office = user == null ? null : officeService.get(EntityIdCodec.toDomain(user.getOfficeId()));
-        return logInterfaceAssembler.toResponse(log, user, office, officeService::get);
+        return LogInterfaceAssembler.toResponse(log, user, office, officeService::get);
     }
 
     private Page<Log> readLogPage(LogPageRequest request) {

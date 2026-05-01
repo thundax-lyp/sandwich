@@ -14,10 +14,12 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public class LogInterfaceAssembler {
+public final class LogInterfaceAssembler {
+    private LogInterfaceAssembler() {}
 
     @NonNull
-    public LogResponse toResponse(Log entity, User user, Office office, Function<EntityId, Office> officeLoader) {
+    public static LogResponse toResponse(
+            Log entity, User user, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogResponse();
         }
@@ -39,7 +41,7 @@ public class LogInterfaceAssembler {
     }
 
     @NonNull
-    public LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
+    public static LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogUserResponse();
         }
@@ -53,7 +55,7 @@ public class LogInterfaceAssembler {
     }
 
     @NonNull
-    public LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogOfficeResponse();
         }
@@ -65,7 +67,7 @@ public class LogInterfaceAssembler {
         return response;
     }
 
-    private String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
         List<String> names = new ArrayList<>();
         Office node = office;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {

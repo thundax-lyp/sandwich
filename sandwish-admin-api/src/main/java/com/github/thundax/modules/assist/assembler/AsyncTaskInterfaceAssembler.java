@@ -16,19 +16,15 @@ public class AsyncTaskInterfaceAssembler {
         if (entity == null) {
             return new AsyncTaskResponse();
         }
-        AsyncTaskResponse response = baseEntityToResponse(new AsyncTaskResponse(), entity);
-        response.setStatus(entity.getStatus().value());
-        response.setMessage(entity.getMessage());
-        response.setData(entity.getData());
-        return response;
-    }
-
-    private static AsyncTaskResponse baseEntityToResponse(AsyncTaskResponse response, AsyncTask entity) {
+        AsyncTaskResponse response = new AsyncTaskResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
+        response.setStatus(entity.getStatus().value());
+        response.setMessage(entity.getMessage());
+        response.setData(entity.getData());
         return response;
     }
 }

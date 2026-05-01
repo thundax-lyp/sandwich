@@ -22,7 +22,10 @@ public class LogInterfaceAssembler {
             return new LogResponse();
         }
 
-        LogResponse response = baseEntityToResponse(new LogResponse(), entity);
+        LogResponse response = new LogResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
         response.setType(entity.getType() == null ? null : entity.getType().value());
         response.setTitle(entity.getTitle());
         response.setRemoteAddr(entity.getRemoteAddr());
@@ -59,13 +62,6 @@ public class LogInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setNamePath(namePath(entity, officeLoader));
-        return response;
-    }
-
-    private static LogResponse baseEntityToResponse(LogResponse response, Log entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
         return response;
     }
 

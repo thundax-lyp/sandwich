@@ -19,7 +19,12 @@ public class MenuInterfaceAssembler {
         if (entity == null) {
             return new MenuResponse();
         }
-        MenuResponse response = baseEntityToResponse(new MenuResponse(), entity);
+        MenuResponse response = new MenuResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setPriority(entity.getPriority());
         if (StringUtils.isNotEmpty(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -46,7 +51,11 @@ public class MenuInterfaceAssembler {
 
     @NonNull
     public Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
-        baseRequestToEntity(entity, request);
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        if (request.getPriority() != null) {
+            entity.setPriority(request.getPriority());
+        }
+        entity.setRemarks(request.getRemarks());
         if (StringUtils.isNotEmpty(request.getParentId())) {
             entity.setParentId(request.getParentId());
         }
@@ -57,24 +66,6 @@ public class MenuInterfaceAssembler {
                 Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
-        return entity;
-    }
-
-    private static MenuResponse baseEntityToResponse(MenuResponse response, Menu entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
-        response.setPriority(entity.getPriority());
-        return response;
-    }
-
-    private static Menu baseRequestToEntity(Menu entity, MenuSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
-        entity.setRemarks(request.getRemarks());
         return entity;
     }
 }

@@ -33,7 +33,12 @@ public class UserInterfaceAssembler {
             return new UserResponse();
         }
 
-        UserResponse response = baseEntityToResponse(new UserResponse(), entity);
+        UserResponse response = new UserResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setPriority(entity.getPriority());
         response.setLoginName(entity.getLoginName());
         response.setRanks(entity.getRanks());
         response.setName(entity.getName());
@@ -88,8 +93,11 @@ public class UserInterfaceAssembler {
 
     @NonNull
     public User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
-        baseRequestToEntity(entity, request);
-
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        if (request.getPriority() != null) {
+            entity.setPriority(request.getPriority());
+        }
+        entity.setRemarks(request.getRemarks());
         if (request.getOffice() != null) {
             entity.setOfficeId(request.getOffice().getId());
         }
@@ -106,24 +114,6 @@ public class UserInterfaceAssembler {
                         : request.getRoleList().stream()
                                 .map(role -> role.getId())
                                 .collect(Collectors.toList()));
-        return entity;
-    }
-
-    private static UserResponse baseEntityToResponse(UserResponse response, User entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
-        response.setPriority(entity.getPriority());
-        return response;
-    }
-
-    private static User baseRequestToEntity(User entity, UserSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
-        entity.setRemarks(request.getRemarks());
         return entity;
     }
 

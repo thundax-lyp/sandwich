@@ -33,7 +33,12 @@ public class RoleInterfaceAssembler {
             return new RoleResponse();
         }
 
-        RoleResponse response = baseEntityToResponse(new RoleResponse(), entity);
+        RoleResponse response = new RoleResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setPriority(entity.getPriority());
         response.setName(entity.getName());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
@@ -113,8 +118,11 @@ public class RoleInterfaceAssembler {
 
     @NonNull
     public Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
-        baseRequestToEntity(entity, request);
-
+        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        if (request.getPriority() != null) {
+            entity.setPriority(request.getPriority());
+        }
+        entity.setRemarks(request.getRemarks());
         entity.setName(request.getName());
         entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
         entity.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
@@ -129,24 +137,6 @@ public class RoleInterfaceAssembler {
 
     private String idPrefix(String id) {
         return "OFFICE_" + id;
-    }
-
-    private static RoleResponse baseEntityToResponse(RoleResponse response, Role entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
-        response.setPriority(entity.getPriority());
-        return response;
-    }
-
-    private static Role baseRequestToEntity(Role entity, RoleSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
-        entity.setRemarks(request.getRemarks());
-        return entity;
     }
 
     private String namePath(Office office, Function<EntityId, Office> officeLoader) {

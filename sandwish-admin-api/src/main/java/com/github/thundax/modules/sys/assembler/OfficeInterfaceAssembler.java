@@ -23,7 +23,12 @@ public class OfficeInterfaceAssembler {
             return new OfficeResponse();
         }
 
-        OfficeResponse response = baseEntityToResponse(new OfficeResponse(), entity);
+        OfficeResponse response = new OfficeResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setPriority(entity.getPriority());
         if (StringUtils.isNotEmpty(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
@@ -51,31 +56,16 @@ public class OfficeInterfaceAssembler {
 
     @NonNull
     public Office toEntity(@NonNull Office entity, @NonNull OfficeSaveRequest request) {
-        baseRequestToEntity(entity, request);
-
-        if (StringUtils.isNotEmpty(request.getParentId())) {
-            entity.setParentId(request.getParentId());
-        }
-        entity.setName(request.getName());
-        entity.setShortName(request.getShortName());
-        return entity;
-    }
-
-    private static OfficeResponse baseEntityToResponse(OfficeResponse response, Office entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
-        response.setPriority(entity.getPriority());
-        return response;
-    }
-
-    private static Office baseRequestToEntity(Office entity, OfficeSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }
         entity.setRemarks(request.getRemarks());
+        if (StringUtils.isNotEmpty(request.getParentId())) {
+            entity.setParentId(request.getParentId());
+        }
+        entity.setName(request.getName());
+        entity.setShortName(request.getShortName());
         return entity;
     }
 

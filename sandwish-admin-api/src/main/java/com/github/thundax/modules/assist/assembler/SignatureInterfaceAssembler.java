@@ -18,7 +18,12 @@ public class SignatureInterfaceAssembler {
         if (entity == null) {
             return new SignatureResponse();
         }
-        SignatureResponse response = baseEntityToResponse(new SignatureResponse(), entity);
+        SignatureResponse response = new SignatureResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setPriority(entity.getPriority());
         response.setBusinessType(entity.getBusinessType());
         response.setBusinessId(entity.getBusinessId());
         response.setSignature(entity.getSignature());
@@ -32,15 +37,6 @@ public class SignatureInterfaceAssembler {
     public SignatureVerifyResponse toVerifyResponse(Boolean verified) {
         SignatureVerifyResponse response = new SignatureVerifyResponse();
         response.setVerified(Boolean.TRUE.equals(verified));
-        return response;
-    }
-
-    private static SignatureResponse baseEntityToResponse(SignatureResponse response, Signature entity) {
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
-        response.setPriority(entity.getPriority());
         return response;
     }
 }

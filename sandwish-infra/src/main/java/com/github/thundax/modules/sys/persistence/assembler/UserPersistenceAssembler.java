@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -87,19 +86,6 @@ public final class UserPersistenceAssembler {
             entities.add(toEntity(dataObject));
         }
         return entities;
-    }
-
-    public static List<Role> toRoleList(List<String> roleIds) {
-        if (roleIds == null) {
-            return null;
-        }
-        List<Role> roles = new ArrayList<>();
-        for (String roleId : roleIds) {
-            Role role = new Role();
-            role.setId(EntityIdCodec.toDomain(roleId));
-            roles.add(role);
-        }
-        return roles;
     }
 
     public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {

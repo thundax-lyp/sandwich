@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.utils;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.SpringContextHolder;
@@ -33,20 +32,12 @@ public class StorageUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(StorageUtils.class);
 
-    private static VltavaProperties.UploadProperties properties;
     private static StorageConverter converter;
     private static StorageService storageService;
 
     public StorageUtils(StorageService targetStorageService, StorageConverter targetConverter) {
         storageService = targetStorageService;
         converter = targetConverter;
-    }
-
-    private static VltavaProperties.UploadProperties getProperties() {
-        if (properties == null) {
-            properties = SpringContextHolder.getBean(VltavaProperties.UploadProperties.class);
-        }
-        return properties;
     }
 
     private static StorageConverter getConverter() {

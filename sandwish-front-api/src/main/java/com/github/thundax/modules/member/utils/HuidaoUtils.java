@@ -3,12 +3,9 @@ package com.github.thundax.modules.member.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.KeyFactory;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.List;
 import javax.crypto.Cipher;
@@ -123,32 +120,6 @@ public class HuidaoUtils {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         byte[] bytes = cipher.doFinal(str.getBytes("UTF-8"));
         return new Base64().encodeToString(bytes);
-    }
-
-    private byte[] encryptByRSA(byte[] pubKeyInByte, byte[] data) throws Exception {
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(pubKeyInByte);
-        PublicKey pubKey = keyFactory.generatePublic(keySpec);
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        int inputLen = data.length;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int offSet = 0;
-        byte[] cache;
-        int i = 0;
-        // 对数据分段加密
-        int maxEncryptBlock = 117;
-        while (inputLen - offSet > 0) {
-            if (inputLen - offSet > maxEncryptBlock) {
-                cache = cipher.doFinal(data, offSet, maxEncryptBlock);
-            } else {
-                cache = cipher.doFinal(data, offSet, inputLen - offSet);
-            }
-            out.write(cache, 0, cache.length);
-            i++;
-            offSet = i * maxEncryptBlock;
-        }
-        return out.toByteArray();
     }
 
     private byte[] toByteArray(InputStream is) throws Exception {

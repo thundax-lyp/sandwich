@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
-import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
@@ -61,30 +60,6 @@ public final class RolePersistenceAssembler {
             entities.add(toEntity(dataObject));
         }
         return entities;
-    }
-
-    public static List<User> toUserList(List<String> userIds) {
-        if (userIds == null) {
-            return null;
-        }
-        List<User> users = new ArrayList<>();
-        for (String userId : userIds) {
-            User user = new User();
-            user.setId(EntityIdCodec.toDomain(userId));
-            users.add(user);
-        }
-        return users;
-    }
-
-    public static List<String> toUserIdList(List<User> users) {
-        if (users == null) {
-            return null;
-        }
-        List<String> userIds = new ArrayList<>();
-        for (User user : users) {
-            userIds.add(EntityIdCodec.toValue(user.getId()));
-        }
-        return userIds;
     }
 
     public static MenuRoleDO toMenuRoleDataObject(String roleId, String menuId) {

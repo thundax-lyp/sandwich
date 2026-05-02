@@ -2,13 +2,9 @@ package com.github.thundax.common.web;
 
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.CookieUtils;
-import com.github.thundax.common.vo.PageResponse;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -230,24 +226,6 @@ public class BaseFrontController {
         if (model != null) {
             model.addAttribute(ATTR_MESSAGE, MESSAGE_ERROR + ":" + message);
         }
-    }
-
-    public static <T, R> PageResponse<R> entityPageToResponse(Page<T> page, Function<T, R> mappingFunction) {
-        PageResponse<R> pageResponse = new PageResponse<>();
-
-        pageResponse.setPageNo(page.getPageNo());
-        pageResponse.setPageSize(page.getPageSize());
-        pageResponse.setTotalPage(page.getTotalPage());
-        pageResponse.setCount(page.getCount());
-
-        pageResponse.setRecords(
-                page.getList() == null
-                        ? new ArrayList<>()
-                        : page.getList().stream()
-                                .map(item -> mappingFunction.apply(item))
-                                .collect(Collectors.toList()));
-
-        return pageResponse;
     }
 
     public static <T> Page<T> readPage(Integer pageNo, Integer pageSize) {

@@ -35,10 +35,6 @@ public class AvatarUtils {
         return new File(new File(storageParent, userId), AVATAR_FILENAME);
     }
 
-    public static String getAvatarFilename(String userId) {
-        return "/" + userId + "/" + AVATAR_FILENAME;
-    }
-
     public static boolean existAvatar(String userId) {
         return getAvatarFile(userId).exists();
     }

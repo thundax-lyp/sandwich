@@ -46,6 +46,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping(value = "/api/assist/storage")
 public class StorageController extends BaseAdminController {
 
+    private static final String LIST_REDIRECT_URL = "redirect:/api/assist/storage/list?reload";
+
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
     private final StorageUtils storageUtils;
@@ -198,14 +200,14 @@ public class StorageController extends BaseAdminController {
     @RequestMapping(value = "delete")
     public String delete(String[] ids, RedirectAttributes redirectAttributes) {
         if (!validateDelete(ids, redirectAttributes)) {
-            return "redirect:" + modulePath + "/list?reload";
+            return LIST_REDIRECT_URL;
         }
 
         int count = storageService.batchDeleteById(new ArrayList<>(Arrays.asList(ids))
                 .stream().map(this::newStorage).collect(Collectors.toList()));
         addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
 
-        return "redirect:" + modulePath + "/list?reload";
+        return LIST_REDIRECT_URL;
     }
 
     private Storage newStorage(String id) {

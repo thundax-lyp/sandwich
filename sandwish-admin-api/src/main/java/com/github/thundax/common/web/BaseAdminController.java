@@ -1,13 +1,11 @@
 package com.github.thundax.common.web;
 
 import com.github.thundax.common.utils.CookieUtils;
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 public class BaseAdminController {
@@ -18,23 +16,6 @@ public class BaseAdminController {
 
     protected static final String MESSAGE_SUCCESS = "success";
     protected static final String MESSAGE_WARN = "warning";
-
-    protected String modulePath;
-
-    @PostConstruct
-    public void initModulePath() {
-        Class<?> clazz = getClass();
-        RequestMapping requestMapping = clazz.getAnnotation(RequestMapping.class);
-        if (requestMapping != null) {
-            String[] path = requestMapping.path();
-            if (path.length == 0) {
-                path = requestMapping.value();
-            }
-            if (path.length > 0) {
-                modulePath = path[0];
-            }
-        }
-    }
 
     protected void addSuccessMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
         redirectAttributes.addFlashAttribute(ATTR_MESSAGE, MESSAGE_SUCCESS + ":" + message);

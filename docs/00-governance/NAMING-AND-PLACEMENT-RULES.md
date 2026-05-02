@@ -38,6 +38,7 @@
 - API 响应对象：`Response`
 - 页面展示对象：`VO`
 - 接口传输对象：`DTO`
+- Service 查询对象：`XxxQuery`
 - API 模型装配器：`InterfaceAssembler`
 - 通用技术能力：`Utils` / `Helper`
 - 静态资源：放在所属 API 模块静态资源目录
@@ -54,6 +55,7 @@
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 - `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
+- `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
 
 ### Layer
 
@@ -61,6 +63,7 @@
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装，不把入口模型下沉到 Service
 - `LAYER_SERVICE_ENTITY_MODEL`：Service 固定使用 Entity 或稳定业务参数，不直接依赖 API `Request` / `Response`
+- `LAYER_SERVICE_QUERY_MODEL`：Service 读取条件使用 `XxxQuery` 表达时，`XxxQuery` 固定作为 Service 输入模型，只承载读取过滤条件，不承载 HTTP、Session、权限适配、分页状态或持久化实现类型。
 - `LAYER_ENTITY_NO_API_RESPONSE`：业务 Entity 不作为公开 HTTP 响应模型直接暴露
 - `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
 - `LAYER_INTERFACE_ASSEMBLER_NO_DO`：`InterfaceAssembler` 不转换 `DO` / `DataObject`
@@ -90,6 +93,7 @@
 - `NAME_REQUEST_REQUIRED_ANNOTATIONS`：API `Request` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_RESPONSE_REQUIRED_ANNOTATIONS`：API `Response` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_VO_DTO`：VO / DTO 命名必须表达使用场景或业务对象
+- `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 `Entity.Query` 内部类、`Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
 
 ## Review Rules（AI/人工审阅，暂不强门禁）
 

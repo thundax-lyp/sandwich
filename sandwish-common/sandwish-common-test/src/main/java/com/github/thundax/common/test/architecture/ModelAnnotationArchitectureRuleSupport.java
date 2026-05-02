@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public final class ModelAnnotationArchitectureRuleSupport {
 
@@ -181,7 +182,40 @@ public final class ModelAnnotationArchitectureRuleSupport {
                 return path;
             }
         }
+        Path workspaceSourcePath = workspaceSourcePath(sourcePath);
+        if (workspaceSourcePath != null) {
+            return workspaceSourcePath;
+        }
         return null;
+    }
+
+    private static Path workspaceSourcePath(String sourcePath) {
+        try {
+            Path currentDirectory = Paths.get(".");
+            List<String> sourceRootSuffixes =
+                    Arrays.asList("src/main/java/" + sourcePath, "src/test/java/" + sourcePath);
+            try (Stream<Path> paths = Files.walk(currentDirectory)) {
+                return paths.filter(Files::isRegularFile)
+                        .filter(path -> matchesAnySuffix(normalizePath(path), sourceRootSuffixes))
+                        .findFirst()
+                        .orElse(null);
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to search source file: " + sourcePath, ex);
+        }
+    }
+
+    private static boolean matchesAnySuffix(String path, List<String> suffixes) {
+        for (String suffix : suffixes) {
+            if (path.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String normalizePath(Path path) {
+        return path.normalize().toString().replace('\\', '/');
     }
 
     private static List<String> sourceRoots() {

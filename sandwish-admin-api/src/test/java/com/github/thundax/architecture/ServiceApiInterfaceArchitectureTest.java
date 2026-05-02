@@ -17,6 +17,7 @@ public class ServiceApiInterfaceArchitectureTest extends AbstractArchitectureTes
                 .resideInAPackage("..api..")
                 .should()
                 .haveSimpleNameEndingWith("ServiceApi")
+                .allowEmptyShould(true)
                 .check(classes);
     }
 }

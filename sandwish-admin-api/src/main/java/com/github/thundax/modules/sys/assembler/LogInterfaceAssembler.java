@@ -41,7 +41,7 @@ public final class LogInterfaceAssembler {
     }
 
     @NonNull
-    public static LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
+    private static LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogUserResponse();
         }
@@ -55,7 +55,7 @@ public final class LogInterfaceAssembler {
     }
 
     @NonNull
-    public static LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    private static LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new LogOfficeResponse();
         }

@@ -65,19 +65,6 @@ public final class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public static RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
-        if (entity == null) {
-            return new RoleOfficeResponse();
-        }
-
-        RoleOfficeResponse response = new RoleOfficeResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
-        response.setNamePath(namePath(entity, officeLoader));
-        return response;
-    }
-
-    @NonNull
     public static RoleUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
         if (entity == null) {
             return new RoleUserResponse();
@@ -130,6 +117,19 @@ public final class RoleInterfaceAssembler {
                                 .map(menu -> menu.getId())
                                 .collect(Collectors.toList()));
         return entity;
+    }
+
+    @NonNull
+    private static RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+        if (entity == null) {
+            return new RoleOfficeResponse();
+        }
+
+        RoleOfficeResponse response = new RoleOfficeResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setName(entity.getName());
+        response.setNamePath(namePath(entity, officeLoader));
+        return response;
     }
 
     private static String idPrefix(String id) {

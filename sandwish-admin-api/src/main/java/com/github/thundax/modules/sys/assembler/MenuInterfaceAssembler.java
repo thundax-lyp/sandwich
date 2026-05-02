@@ -3,8 +3,10 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.request.MenuQueryRequest;
 import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
@@ -44,6 +46,16 @@ public final class MenuInterfaceAssembler {
         response.setParentId(entity.getParentId());
         response.setName(entity.getName());
         return response;
+    }
+
+    @NonNull
+    public static MenuQuery toQuery(@NonNull MenuQueryRequest request) {
+        MenuQuery query = new MenuQuery();
+        query.setParentId(request.getParentId());
+        if (request.getDisplay() != null) {
+            query.setVisibility(request.getDisplay() ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
+        }
+        return query;
     }
 
     @NonNull

@@ -12,6 +12,7 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -30,15 +31,13 @@ public class MenuServiceImplTest {
     @Test
     public void shouldExpandFindListQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        Menu menu = new Menu();
-        Menu.Query query = new Menu.Query();
+        MenuQuery query = new MenuQuery();
         query.setParentId("ROOT");
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(3);
-        menu.setQuery(query);
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.list(menu);
+        service.list(query);
 
         assertEquals("ROOT", dao.parentId);
         assertEquals("VISIBLE", dao.displayFlag);

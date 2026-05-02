@@ -21,6 +21,7 @@ import com.github.thundax.modules.sys.request.MenuQueryRequest;
 import com.github.thundax.modules.sys.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.response.MenuResponse;
 import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -82,14 +83,7 @@ public class MenuApiController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> list(@Valid @RequestBody MenuQueryRequest request) throws ApiException {
-        Menu query = new Menu();
-        Menu.Query queryCondition = new Menu.Query();
-
-        queryCondition.setParentId(request.getParentId());
-        if (request.getDisplay() != null) {
-            queryCondition.setVisibility(request.getDisplay() ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
-        }
-        query.setQuery(queryCondition);
+        MenuQuery query = MenuInterfaceAssembler.toQuery(request);
 
         return menuService.list(query).stream()
                 .map(menu -> MenuInterfaceAssembler.toResponse(menu))

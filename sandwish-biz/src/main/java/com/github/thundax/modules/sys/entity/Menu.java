@@ -10,7 +10,6 @@ import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -141,54 +140,5 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
         map.put("target", this.getTarget());
 
         return JsonUtils.toJson(map);
-    }
-
-    private Query query;
-
-    public Query getQuery() {
-        return this.query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
-    }
-
-    public static class Query implements Serializable {
-
-        public static final String PROP_PARENT_ID = "parentId";
-        public static final String PROP_VISIBILITY = "visibility";
-        public static final String PROP_MAX_RANK = "maxRank";
-
-        private String parentId;
-        private MenuVisibility visibility;
-        private Integer maxRank; // 按照rank查询
-
-        public String getParentId() {
-            return parentId;
-        }
-
-        public void setParentId(String parentId) {
-            this.parentId = parentId;
-        }
-
-        public MenuVisibility getVisibility() {
-            return visibility;
-        }
-
-        public void setVisibility(MenuVisibility visibility) {
-            this.visibility = visibility;
-        }
-
-        public void setVisibility(String visibility) {
-            this.visibility = StringUtils.isBlank(visibility) ? null : MenuVisibility.from(visibility);
-        }
-
-        public Integer getMaxRank() {
-            return this.maxRank;
-        }
-
-        public void setMaxRank(Integer maxRank) {
-            this.maxRank = maxRank;
-        }
     }
 }

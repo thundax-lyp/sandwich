@@ -10,6 +10,7 @@ import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -62,7 +63,11 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> list(Menu menu) {
-        Menu.Query query = menu == null ? null : menu.getQuery();
+        return list((MenuQuery) null);
+    }
+
+    @Override
+    public List<Menu> list(MenuQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
@@ -77,8 +82,12 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Page<Menu> page(Menu menu, Page<Menu> page) {
+        return page((MenuQuery) null, page);
+    }
+
+    @Override
+    public Page<Menu> page(MenuQuery query, Page<Menu> page) {
         Page<Menu> normalizedPage = normalizePage(page);
-        Menu.Query query = menu == null ? null : menu.getQuery();
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),

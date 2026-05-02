@@ -8,12 +8,14 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.request.RoleQueryRequest;
 import com.github.thundax.modules.sys.request.RoleSaveRequest;
 import com.github.thundax.modules.sys.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.response.RoleOfficeResponse;
 import com.github.thundax.modules.sys.response.RoleResponse;
 import com.github.thundax.modules.sys.response.RoleUserResponse;
 import com.github.thundax.modules.sys.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -98,6 +100,15 @@ public final class RoleInterfaceAssembler {
         response.setName(entity.getName());
         response.setUser(toUserResponse(entity, office, officeLoader));
         return response;
+    }
+
+    @NonNull
+    public static RoleQuery toQuery(@NonNull RoleQueryRequest request) {
+        RoleQuery query = new RoleQuery();
+        if (request.getEnable() != null) {
+            query.setStatus(request.getEnable() ? RoleStatus.ENABLED : RoleStatus.DISABLED);
+        }
+        return query;
     }
 
     @NonNull

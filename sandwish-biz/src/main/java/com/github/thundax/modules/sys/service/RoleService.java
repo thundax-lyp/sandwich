@@ -1,12 +1,18 @@
 package com.github.thundax.modules.sys.service;
 
+import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.List;
 
 public interface RoleService extends CrudService<Role> {
+
+    List<Role> list(RoleQuery query);
+
+    Page<Role> page(RoleQuery query, Page<Role> page);
 
     /**
      * 获取可用列表

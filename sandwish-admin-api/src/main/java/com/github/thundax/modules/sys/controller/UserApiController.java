@@ -36,6 +36,8 @@ import com.github.thundax.modules.sys.response.UserRoleResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
 import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
@@ -127,7 +129,7 @@ public class UserApiController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
-        User query = readQuery(request);
+        UserQuery query = readQuery(request);
 
         return userService.list(query).stream().map(user -> toResponse(user)).collect(Collectors.toList());
     }
@@ -144,7 +146,7 @@ public class UserApiController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public PageVo<UserResponse> page(@Valid @RequestBody UserQueryRequest request) throws ApiException {
-        User query = readQuery(request);
+        UserQuery query = readQuery(request);
         Page<User> page = readUserPage(request);
 
         return PageVoHelper.fromEntityPage(userService.page(query, page), this::toResponse);
@@ -417,10 +419,8 @@ public class UserApiController {
     @RequestMapping(value = "role/list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public List<UserRoleResponse> roleList() {
-        Role query = new Role();
-        Role.Query queryCondition = new Role.Query();
-        queryCondition.setStatus(RoleStatus.ENABLED);
-        query.setQuery(queryCondition);
+        RoleQuery query = new RoleQuery();
+        query.setStatus(RoleStatus.ENABLED);
 
         return roleService.list(query).stream()
                 .map(role -> UserInterfaceAssembler.toRoleResponse(role))
@@ -451,16 +451,8 @@ public class UserApiController {
         IOUtils.write(FileUtils.readFileToByteArray(avatarFile), response.getOutputStream());
     }
 
-    private User readQuery(UserQueryRequest request) throws ApiException {
-        User query = new User();
-        User.Query queryCondition = new User.Query();
-
-        queryCondition.setLoginName(request.getLoginName());
-        queryCondition.setName(request.getName());
-
-        if (request.getEnable() != null) {
-            queryCondition.setStatus(request.getEnable() ? UserStatus.ENABLED : UserStatus.DISABLED);
-        }
+    private UserQuery readQuery(UserQueryRequest request) throws ApiException {
+        UserQuery query = UserInterfaceAssembler.toQuery(request);
 
         if (StringUtils.isNotBlank(request.getOfficeId())) {
             Office office = officeService.getById(EntityIdCodec.toDomain(request.getOfficeId()));
@@ -468,11 +460,8 @@ public class UserApiController {
                 throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
             }
 
-            queryCondition.setOfficeId(EntityIdCodec.toValue(office.getId()));
+            query.setOfficeId(EntityIdCodec.toValue(office.getId()));
         }
-
-        queryCondition.setOrderBy(request.getOrderBy());
-        query.setQuery(queryCondition);
 
         return query;
     }

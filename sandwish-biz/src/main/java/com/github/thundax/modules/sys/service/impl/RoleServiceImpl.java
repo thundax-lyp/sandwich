@@ -13,6 +13,7 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,11 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> list(Role role) {
-        Role.Query query = role == null ? null : role.getQuery();
+        return list((RoleQuery) null);
+    }
+
+    @Override
+    public List<Role> list(RoleQuery query) {
         return dao.list(query == null ? null : statusValue(query.getStatus()));
     }
 
@@ -82,8 +87,12 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Page<Role> page(Role role, Page<Role> page) {
+        return page((RoleQuery) null, page);
+    }
+
+    @Override
+    public Page<Role> page(RoleQuery query, Page<Role> page) {
         Page<Role> normalizedPage = normalizePage(page);
-        Role.Query query = role == null ? null : role.getQuery();
         IPage<Role> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 normalizedPage.getPageNo(),
@@ -103,10 +112,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> listEnabled() {
-        Role query = new Role();
-        Role.Query queryCondition = new Role.Query();
-        queryCondition.setStatus(RoleStatus.ENABLED);
-        query.setQuery(queryCondition);
+        RoleQuery query = new RoleQuery();
+        query.setStatus(RoleStatus.ENABLED);
         return this.list(query);
     }
 

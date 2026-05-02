@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -90,34 +89,5 @@ public class Role implements Auditable, Signable, Sortable {
         map.put("menus", menuIds);
 
         return JsonUtils.toJson(map);
-    }
-
-    private Query query;
-
-    public Query getQuery() {
-        return this.query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
-    }
-
-    public static class Query implements Serializable {
-
-        public static final String PROP_STATUS = "status";
-
-        private RoleStatus status;
-
-        public RoleStatus getStatus() {
-            return status;
-        }
-
-        public void setStatus(RoleStatus status) {
-            this.status = status;
-        }
-
-        public void setStatus(String status) {
-            this.status = StringUtils.isBlank(status) ? null : RoleStatus.from(status);
-        }
     }
 }

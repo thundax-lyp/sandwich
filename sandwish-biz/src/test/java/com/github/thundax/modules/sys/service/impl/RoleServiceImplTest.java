@@ -12,6 +12,7 @@ import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -21,13 +22,11 @@ public class RoleServiceImplTest {
     @Test
     public void shouldExpandFindListQuery() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        Role role = new Role();
-        Role.Query query = new Role.Query();
+        RoleQuery query = new RoleQuery();
         query.setStatus(RoleStatus.ENABLED);
-        role.setQuery(query);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        service.list(role);
+        service.list(query);
 
         assertEquals("ENABLED", dao.enableFlag);
     }

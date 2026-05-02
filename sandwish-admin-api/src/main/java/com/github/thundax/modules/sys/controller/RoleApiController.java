@@ -30,6 +30,7 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -101,12 +102,7 @@ public class RoleApiController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) throws ApiException {
-        Role query = new Role();
-        Role.Query queryCondition = new Role.Query();
-        if (request.getEnable() != null) {
-            queryCondition.setStatus(request.getEnable() ? RoleStatus.ENABLED : RoleStatus.DISABLED);
-        }
-        query.setQuery(queryCondition);
+        RoleQuery query = RoleInterfaceAssembler.toQuery(request);
 
         return roleService.list(query).stream().map(role -> toResponse(role)).collect(Collectors.toList());
     }

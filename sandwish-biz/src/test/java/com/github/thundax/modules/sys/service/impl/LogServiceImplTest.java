@@ -11,6 +11,7 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,8 +43,7 @@ public class LogServiceImplTest {
     @Test
     public void shouldExpandFindPageQuery() {
         RecordingLogDao dao = new RecordingLogDao();
-        Log log = new Log();
-        Log.Query query = new Log.Query();
+        LogQuery query = new LogQuery();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
         query.setType(LogType.ACCESS);
@@ -54,11 +54,10 @@ public class LogServiceImplTest {
         query.setRequestUri("/login");
         query.setBeginDate(begin);
         query.setEndDate(end);
-        log.setQuery(query);
         Page<Log> page = new Page<>(2, 20, 100);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        service.page(log, page);
+        service.page(query, page);
 
         assertEquals("ACCESS", dao.type);
         assertEquals("127.0.0.1", dao.remoteAddr);
@@ -81,7 +80,7 @@ public class LogServiceImplTest {
         page.setPageSize(0);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        service.page(new Log(), page);
+        service.page((LogQuery) null, page);
 
         assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
         assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
@@ -130,8 +129,7 @@ public class LogServiceImplTest {
     @Test
     public void shouldBatchDeleteWithoutUserFilters() {
         RecordingLogDao dao = new RecordingLogDao();
-        Log log = new Log();
-        Log.Query query = new Log.Query();
+        LogQuery query = new LogQuery();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
         query.setType(LogType.EXCEPTION);
@@ -142,10 +140,9 @@ public class LogServiceImplTest {
         query.setRequestUri("/api");
         query.setBeginDate(begin);
         query.setEndDate(end);
-        log.setQuery(query);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
-        service.batchDelete(log);
+        service.batchDelete(query);
 
         assertEquals("EXCEPTION", dao.type);
         assertEquals("10.0.0.1", dao.remoteAddr);

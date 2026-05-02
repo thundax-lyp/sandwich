@@ -5,9 +5,11 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.request.LogPageRequest;
 import com.github.thundax.modules.sys.response.LogOfficeResponse;
 import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.response.LogUserResponse;
+import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -38,6 +40,19 @@ public final class LogInterfaceAssembler {
         response.setCreateDate(entity.getLogDate());
         response.setCreateUser(toUserResponse(user, office, officeLoader));
         return response;
+    }
+
+    @NonNull
+    public static LogQuery toQuery(@NonNull LogPageRequest request) {
+        LogQuery query = new LogQuery();
+        query.setTitle(request.getTitle());
+        query.setRemoteAddr(request.getRemoteAddr());
+        query.setRequestUri(request.getRequestUri());
+        query.setUserLoginName(request.getUserLoginName());
+        query.setUserName(request.getUserName());
+        query.setBeginDate(request.getBeginDate());
+        query.setEndDate(request.getEndDate());
+        return query;
     }
 
     @NonNull

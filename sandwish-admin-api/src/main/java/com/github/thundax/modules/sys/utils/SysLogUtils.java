@@ -7,6 +7,7 @@ import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -97,11 +98,9 @@ public class SysLogUtils {
 
     @Scheduled(cron = "0 0 0/4 * * ?")
     void doTask() {
-        Log query = new Log();
-        Log.Query queryCondition = new Log.Query();
-        queryCondition.setBeginDate(DateUtils.addDays(new Date(), -9999));
-        queryCondition.setEndDate(DateUtils.addDays(new Date(), -properties.getAliveDays()));
-        query.setQuery(queryCondition);
+        LogQuery query = new LogQuery();
+        query.setBeginDate(DateUtils.addDays(new Date(), -9999));
+        query.setEndDate(DateUtils.addDays(new Date(), -properties.getAliveDays()));
         logService.batchDelete(query);
     }
 }

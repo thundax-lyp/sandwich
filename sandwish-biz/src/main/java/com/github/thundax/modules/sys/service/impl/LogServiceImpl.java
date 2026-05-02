@@ -9,6 +9,7 @@ import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public List<Log> list(Log log) {
-        Log.Query query = log == null ? null : log.getQuery();
+    public List<Log> list(LogQuery query) {
         return dao.list(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
@@ -50,9 +50,8 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Page<Log> page(Log log, Page<Log> page) {
+    public Page<Log> page(LogQuery query, Page<Log> page) {
         Page<Log> normalizedPage = normalizePage(page);
-        Log.Query query = log == null ? null : log.getQuery();
         IPage<Log> dataPage = dao.page(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
@@ -123,8 +122,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDelete(Log log) {
-        Log.Query query = log == null ? null : log.getQuery();
+    public int batchDelete(LogQuery query) {
         return dao.batchDelete(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),

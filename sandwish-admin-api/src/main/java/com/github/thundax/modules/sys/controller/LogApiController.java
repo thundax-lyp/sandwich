@@ -15,6 +15,7 @@ import com.github.thundax.modules.sys.response.LogResponse;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.LogQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -52,19 +53,7 @@ public class LogApiController {
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageVo<LogResponse> page(@Valid @RequestBody LogPageRequest request) throws ApiException {
-        Log query = new Log();
-        Log.Query queryCondition = new Log.Query();
-
-        queryCondition.setTitle(request.getTitle());
-        queryCondition.setRemoteAddr(request.getRemoteAddr());
-        queryCondition.setRequestUri(request.getRequestUri());
-
-        queryCondition.setUserLoginName(request.getUserLoginName());
-        queryCondition.setUserName(request.getUserName());
-
-        queryCondition.setBeginDate(request.getBeginDate());
-        queryCondition.setEndDate(request.getEndDate());
-        query.setQuery(queryCondition);
+        LogQuery query = LogInterfaceAssembler.toQuery(request);
 
         return PageVoHelper.fromEntityPage(logService.page(query, readLogPage(request)), this::toResponse);
     }

@@ -5,7 +5,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.LogType;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -99,108 +98,5 @@ public class Log implements Signable {
 
     public void setType(LogType type) {
         this.type = type;
-    }
-
-    private Query query;
-
-    public Query getQuery() {
-        return this.query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
-    }
-
-    public static class Query implements Serializable {
-
-        public static final String PROP_TYPE = "type";
-        public static final String PROP_REMOTE_ADDR = "remoteAddr";
-        public static final String PROP_TITLE = "title";
-        public static final String PROP_REQUEST_URI = "requestUri";
-
-        public static final String PROP_USER_LOGIN_NAME = "userLoginName";
-        public static final String PROP_USER_NAME = "userName";
-
-        public static final String PROP_BEGIN_DATE = "beginDate";
-        public static final String PROP_END_DATE = "endDate";
-
-        private LogType type;
-        private String remoteAddr;
-        private String title;
-        private String requestUri;
-
-        private String userLoginName;
-        private String userName;
-
-        private Date beginDate;
-        private Date endDate;
-
-        public LogType getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = StringUtils.isBlank(type) ? null : LogType.from(type);
-        }
-
-        public void setType(LogType type) {
-            this.type = type;
-        }
-
-        public String getRemoteAddr() {
-            return remoteAddr;
-        }
-
-        public void setRemoteAddr(String remoteAddr) {
-            this.remoteAddr = remoteAddr;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getRequestUri() {
-            return requestUri;
-        }
-
-        public void setRequestUri(String requestUri) {
-            this.requestUri = requestUri;
-        }
-
-        public String getUserLoginName() {
-            return userLoginName;
-        }
-
-        public void setUserLoginName(String userLoginName) {
-            this.userLoginName = userLoginName;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public void setUserName(String userName) {
-            this.userName = userName;
-        }
-
-        public Date getBeginDate() {
-            return beginDate;
-        }
-
-        public void setBeginDate(Date beginDate) {
-            this.beginDate = beginDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
-        }
     }
 }

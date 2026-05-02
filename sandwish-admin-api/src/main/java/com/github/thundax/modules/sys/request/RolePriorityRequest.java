@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class RolePriorityRequest implements Serializable {
 
     @ApiModelProperty(name = "id", value = "角色ID")
     @JsonProperty("id")
+    @NotEmpty(message = "ID不能为空")
     @Size(max = 64, message = "ID长度不能超过64")
     private String id;
 

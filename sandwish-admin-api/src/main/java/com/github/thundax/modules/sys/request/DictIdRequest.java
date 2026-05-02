@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class DictIdRequest implements Serializable {
 
     @ApiModelProperty(name = "id", value = "字典ID")
     @JsonProperty("id")
+    @NotEmpty(message = "ID不能为空")
     @Size(max = 64, message = "ID长度不能超过64")
     private String id;
 }

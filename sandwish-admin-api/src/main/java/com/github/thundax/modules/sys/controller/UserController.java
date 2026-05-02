@@ -73,7 +73,7 @@ import org.springframework.web.multipart.MultipartFile;
 @SysLogger(module = {"系统", "用户"})
 @RequestMapping(value = "/api/sys/user")
 @RestController
-public class UserApiController {
+public class UserController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
 
@@ -84,7 +84,7 @@ public class UserApiController {
     private final PasswordService passwordService;
 
     @Autowired
-    public UserApiController(
+    public UserController(
             UserService userService,
             OfficeService officeService,
             RoleService roleService,

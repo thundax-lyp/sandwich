@@ -56,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "个人"})
 @RequestMapping(value = "/api/sys/personal")
 @RestController
-public class PersonalApiController {
+public class PersonalController {
 
     private final UserService userService;
     private final RoleService roleService;
@@ -64,7 +64,7 @@ public class PersonalApiController {
     private final PasswordService passwordService;
     private final KeypairService keypairService;
 
-    public PersonalApiController(
+    public PersonalController(
             UserService userService,
             RoleService roleService,
             MenuService menuService,

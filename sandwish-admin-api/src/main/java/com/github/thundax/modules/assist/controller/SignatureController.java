@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"辅助", "签名"})
 @RequestMapping(value = "/api/assist/signature")
 @RestController
-public class SignatureApiController {
+public class SignatureController {
 
     private final SignatureService signatureService;
     private final SignService signService;
@@ -55,7 +55,7 @@ public class SignatureApiController {
     private final RoleService roleService;
 
     @Autowired
-    public SignatureApiController(
+    public SignatureController(
             SignatureService signatureService,
             SignService signService,
             LogService logService,

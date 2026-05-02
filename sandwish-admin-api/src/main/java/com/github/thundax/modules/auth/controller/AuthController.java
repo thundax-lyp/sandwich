@@ -43,13 +43,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
 @RestController
-public class AuthApiController {
+public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
 
     @Autowired
-    public AuthApiController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService, UserService userService) {
 
         this.authService = authService;
         this.userService = userService;

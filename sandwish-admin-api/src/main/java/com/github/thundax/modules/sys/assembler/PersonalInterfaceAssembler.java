@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.controller.UserApiController;
+import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.request.PersonalInfoUpdateRequest;
@@ -82,6 +82,6 @@ public final class PersonalInterfaceAssembler {
         if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;
         }
-        return UserApiController.getAvatarUrl(id, UserAccessHolder.currentToken());
+        return UserController.getAvatarUrl(id, UserAccessHolder.currentToken());
     }
 }

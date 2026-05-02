@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"辅助", "公私钥对"})
 @RequestMapping(value = "/api/assist/keypair")
 @RestController
-public class KeypairApiController {
+public class KeypairController {
 
     private final AuthService authService;
     private final KeypairService keypairService;
 
     @Autowired
-    public KeypairApiController(AuthService authService, KeypairService keypairService) {
+    public KeypairController(AuthService authService, KeypairService keypairService) {
 
         this.authService = authService;
         this.keypairService = keypairService;

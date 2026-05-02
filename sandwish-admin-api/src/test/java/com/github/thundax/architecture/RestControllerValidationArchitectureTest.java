@@ -8,7 +8,7 @@ import javax.validation.Validator;
 import org.junit.Test;
 import org.springframework.web.bind.annotation.RestController;
 
-public class ApiControllerValidationArchitectureTest extends AbstractArchitectureTest {
+public class RestControllerValidationArchitectureTest extends AbstractArchitectureTest {
 
     @Test
     public void shouldUseSpringMethodValidationForApiRequests() {

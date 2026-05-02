@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "01-02. 鉴权-图形验证码")
 @RequestMapping(value = "/api/auth")
 @RestController
-public class CaptchaApiController {
+public class CaptchaController {
 
     private static final int DEFAULT_CAPTCHA_WIDTH = 200;
     private static final int DEFAULT_CAPTCHA_HEIGHT = 80;
@@ -44,7 +44,7 @@ public class CaptchaApiController {
     private final AuthService authService;
 
     @Autowired
-    public CaptchaApiController(AuthService authService) {
+    public CaptchaController(AuthService authService) {
 
         this.authService = authService;
     }

@@ -30,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "02-06.系统-日志")
 @RequestMapping(value = "/api/sys/log")
 @RestController
-public class LogApiController {
+public class LogController {
 
     private final LogService logService;
     private final UserService userService;
     private final OfficeService officeService;
 
     @Autowired
-    public LogApiController(LogService logService, UserService userService, OfficeService officeService) {
+    public LogController(LogService logService, UserService userService, OfficeService officeService) {
         this.logService = logService;
         this.userService = userService;
         this.officeService = officeService;

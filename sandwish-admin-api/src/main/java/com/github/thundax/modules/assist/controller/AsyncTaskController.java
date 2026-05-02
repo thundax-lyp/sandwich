@@ -25,12 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "03-01.辅助-异步任务")
 @RequestMapping(value = "/api/assist/async-task")
 @RestController
-public class AsyncTaskApiController {
+public class AsyncTaskController {
 
     private final AsyncTaskService asyncTaskService;
 
     @Autowired
-    public AsyncTaskApiController(AsyncTaskService asyncTaskService) {
+    public AsyncTaskController(AsyncTaskService asyncTaskService) {
 
         this.asyncTaskService = asyncTaskService;
     }

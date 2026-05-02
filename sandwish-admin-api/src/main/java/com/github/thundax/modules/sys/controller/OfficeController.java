@@ -41,12 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "组织机构"})
 @RequestMapping(value = "/api/sys/office")
 @RestController
-public class OfficeApiController {
+public class OfficeController {
 
     private final OfficeService officeService;
 
     @Autowired
-    public OfficeApiController(OfficeService officeService) {
+    public OfficeController(OfficeService officeService) {
         this.officeService = officeService;
     }
 

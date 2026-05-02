@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "权限"})
 @RequestMapping(value = "/api/sys/role")
 @RestController
-public class RoleApiController {
+public class RoleController {
 
     private static final String OFFICE_ID_PREFIX = "OFFICE_";
 
@@ -62,7 +62,7 @@ public class RoleApiController {
     private final UserService userService;
 
     @Autowired
-    public RoleApiController(
+    public RoleController(
             RoleService roleService, MenuService menuService, OfficeService officeService, UserService userService) {
 
         this.roleService = roleService;

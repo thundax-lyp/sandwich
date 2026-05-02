@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.controller.UserApiController;
+import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -44,7 +44,7 @@ public final class UserInterfaceAssembler {
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
         response.setAvatar(
-                UserApiController.getAvatarUrl(EntityIdCodec.toValue(entity.getId()), UserAccessHolder.currentToken()));
+                UserController.getAvatarUrl(EntityIdCodec.toValue(entity.getId()), UserAccessHolder.currentToken()));
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());

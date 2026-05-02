@@ -43,12 +43,12 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "菜单"})
 @RequestMapping(value = "/api/sys/menu")
 @RestController
-public class MenuApiController {
+public class MenuController {
 
     private final MenuService menuService;
 
     @Autowired
-    public MenuApiController(MenuService menuService) {
+    public MenuController(MenuService menuService) {
         this.menuService = menuService;
     }
 

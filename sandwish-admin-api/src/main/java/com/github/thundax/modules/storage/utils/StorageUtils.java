@@ -6,9 +6,7 @@ import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.vo.StorageVo;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,35 +82,6 @@ public class StorageUtils {
         }
     }
 
-    public static void saveFile(File file, Storage storage) {
-        try {
-            String originalFilename = file.getPath();
-
-            storage.setName(FilenameUtils.getBaseName(originalFilename));
-
-            String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
-
-            storage.setExtendName(extendName);
-
-            if (StringUtils.equalsIgnoreCase(extendName, PNG)) {
-                storage.setMimeType(MimeTypeUtils.IMAGE_PNG_VALUE);
-            } else if (StringUtils.equalsIgnoreCase(extendName, JPG)
-                    || StringUtils.equalsIgnoreCase(extendName, JPEG)) {
-                storage.setMimeType(MimeTypeUtils.IMAGE_JPEG_VALUE);
-            }
-
-            if (StringUtils.isBlank(EntityIdCodec.toValue(storage.getId()))) {
-                storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
-                storage.setCreateDate(new Date());
-            }
-
-            saveFile(new FileInputStream(file), storage);
-
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
     public static void saveFile(InputStream inputStream, Storage storage) {
         File localFile;
         FileOutputStream outputStream = null;
@@ -151,20 +119,5 @@ public class StorageUtils {
         }
 
         storageService.add(storage);
-    }
-
-    @NonNull
-    public static StorageVo entityToVo(Storage entity) {
-        if (entity == null) {
-            return new StorageVo();
-        }
-
-        StorageVo vo = new StorageVo();
-        vo.setId(EntityIdCodec.toValue(entity.getId()));
-        vo.setName(entity.getName() + "." + entity.getExtendName());
-        vo.setMimeType(entity.getMimeType());
-        vo.setUrl(getConverter().toPreviewUrl(entity));
-
-        return vo;
     }
 }

@@ -10,6 +10,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
@@ -37,7 +38,7 @@ public class StorageServiceImplTest {
         StorageQuery query = new StorageQuery();
         query.setMimeType("image/png");
         query.setOwnerId("owner-1");
-        query.setOwnerType("user");
+        query.setOwnerType(StorageOwnerType.USER);
         query.setStatus(StorageStatus.ENABLED);
         query.setVisibility(StorageVisibility.PUBLIC);
         query.setName("avatar");

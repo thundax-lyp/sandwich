@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @Setter
@@ -18,12 +17,4 @@ public class LogQuery implements Serializable {
     private String userName;
     private Date beginDate;
     private Date endDate;
-
-    public void setType(String type) {
-        this.type = StringUtils.isBlank(type) ? null : LogType.from(type);
-    }
-
-    public void setType(LogType type) {
-        this.type = type;
-    }
 }

@@ -2,8 +2,12 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.request.DictPageRequest;
+import com.github.thundax.modules.sys.request.DictQueryRequest;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
+import com.github.thundax.modules.sys.service.query.DictQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public final class DictInterfaceAssembler {
@@ -27,6 +31,24 @@ public final class DictInterfaceAssembler {
     }
 
     @NonNull
+    public static DictQuery toQuery(@NonNull DictQueryRequest request) {
+        DictQuery query = new DictQuery();
+        query.setLabel(emptyToNull(request.getLabel()));
+        query.setType(emptyToNull(request.getType()));
+        query.setRemarks(emptyToNull(request.getRemarks()));
+        return query;
+    }
+
+    @NonNull
+    public static DictQuery toQuery(@NonNull DictPageRequest request) {
+        DictQuery query = new DictQuery();
+        query.setLabel(emptyToNull(request.getLabel()));
+        query.setType(emptyToNull(request.getType()));
+        query.setRemarks(emptyToNull(request.getRemarks()));
+        return query;
+    }
+
+    @NonNull
     public static Dict toEntity(@NonNull Dict entity, @NonNull DictSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
@@ -38,5 +60,9 @@ public final class DictInterfaceAssembler {
         entity.setValue(request.getValue());
         entity.setRemarks(request.getRemarks());
         return entity;
+    }
+
+    private static String emptyToNull(String value) {
+        return StringUtils.isEmpty(value) ? null : value;
     }
 }

@@ -7,6 +7,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,10 +63,8 @@ public class DictServiceImpl implements DictService {
 
     public List<String> listLabels(String type) {
         List<String> result = new ArrayList<String>();
-        Dict query = new Dict();
-        Dict.Query queryCondition = new Dict.Query();
-        queryCondition.setType(type);
-        query.setQuery(queryCondition);
+        DictQuery query = new DictQuery();
+        query.setType(type);
         List<Dict> list = list(query);
         String s = "";
         for (Dict item : list) {
@@ -79,7 +78,11 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public List<Dict> list(Dict dict) {
-        Dict.Query query = dict == null ? null : dict.getQuery();
+        return list((DictQuery) null);
+    }
+
+    @Override
+    public List<Dict> list(DictQuery query) {
         return dao.list(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
@@ -94,8 +97,12 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public Page<Dict> page(Dict dict, Page<Dict> page) {
+        return page((DictQuery) null, page);
+    }
+
+    @Override
+    public Page<Dict> page(DictQuery query, Page<Dict> page) {
         Page<Dict> normalizedPage = normalizePage(page);
-        Dict.Query query = dict == null ? null : dict.getQuery();
         IPage<Dict> dataPage = dao.page(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),

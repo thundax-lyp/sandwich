@@ -17,13 +17,13 @@ import com.github.thundax.modules.sys.request.DictQueryRequest;
 import com.github.thundax.modules.sys.request.DictSaveRequest;
 import com.github.thundax.modules.sys.response.DictResponse;
 import com.github.thundax.modules.sys.service.DictService;
+import com.github.thundax.modules.sys.service.query.DictQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -66,7 +66,7 @@ public class DictController {
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public List<DictResponse> list(@RequestBody DictQueryRequest request) throws ApiException {
-        Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
+        DictQuery query = DictInterfaceAssembler.toQuery(request);
         return dictService.list(query).stream()
                 .map(dict -> DictInterfaceAssembler.toResponse(dict))
                 .collect(Collectors.toList());
@@ -83,7 +83,7 @@ public class DictController {
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
-        Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
+        DictQuery query = DictInterfaceAssembler.toQuery(request);
         Page<Dict> page = readDictPage(request);
         return PageVoHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
@@ -144,22 +144,6 @@ public class DictController {
         });
         dictService.batchDeleteById(beanList);
         return true;
-    }
-
-    private Dict readQuery(String label, String type, String remarks) {
-        Dict query = new Dict();
-        Dict.Query queryCondition = new Dict.Query();
-        if (StringUtils.isNotEmpty(label)) {
-            queryCondition.setLabel(label);
-        }
-        if (StringUtils.isNotEmpty(type)) {
-            queryCondition.setType(type);
-        }
-        if (StringUtils.isNotEmpty(remarks)) {
-            queryCondition.setRemarks(remarks);
-        }
-        query.setQuery(queryCondition);
-        return query;
     }
 
     private Page<Dict> readDictPage(DictPageRequest request) {

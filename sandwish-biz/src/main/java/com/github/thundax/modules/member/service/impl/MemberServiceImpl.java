@@ -8,6 +8,7 @@ import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
+import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -41,8 +42,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> list(Member member) {
-        Member.Query query = member == null ? null : member.getQuery();
+    public List<Member> list(MemberQuery query) {
         return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
@@ -56,9 +56,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> page(Member member, Page<Member> page) {
+    public Page<Member> page(MemberQuery query, Page<Member> page) {
         Page<Member> normalizedPage = normalizePage(page);
-        Member.Query query = member == null ? null : member.getQuery();
         IPage<Member> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
@@ -155,8 +154,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Member getByZjhm(Member member) {
-        Member.Query query = member == null ? null : member.getQuery();
+    public Member getByZjhm(MemberQuery query) {
         return dao.getByZjhm(query == null ? null : query.getZjhm());
     }
 

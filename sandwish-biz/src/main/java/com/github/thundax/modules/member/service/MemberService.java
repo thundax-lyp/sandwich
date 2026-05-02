@@ -3,6 +3,7 @@ package com.github.thundax.modules.member.service;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;
 
 /**
@@ -14,9 +15,9 @@ public interface MemberService {
 
     List<Member> batchGetByIds(List<String> ids);
 
-    List<Member> list(Member member);
+    List<Member> list(MemberQuery query);
 
-    Page<Member> page(Member member, Page<Member> page);
+    Page<Member> page(MemberQuery query, Page<Member> page);
 
     void add(Member member);
 
@@ -83,7 +84,7 @@ public interface MemberService {
      */
     int updateStatus(List<Member> list);
 
-    Member getByZjhm(Member member);
+    Member getByZjhm(MemberQuery query);
 
     Member getByYwtbId(String ywtbUserId);
 }

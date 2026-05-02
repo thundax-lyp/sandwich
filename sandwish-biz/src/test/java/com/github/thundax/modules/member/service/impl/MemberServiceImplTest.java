@@ -9,6 +9,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -40,18 +41,16 @@ public class MemberServiceImplTest {
     @Test
     public void shouldExpandFindListQuery() {
         RecordingMemberDao dao = new RecordingMemberDao();
-        Member query = new Member();
-        Member.Query condition = new Member.Query();
+        MemberQuery query = new MemberQuery();
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
-        condition.setStatus(MemberStatus.ENABLED);
-        condition.setEmail("a@example.com");
-        condition.setName("alice");
-        condition.setRemarks("remark");
-        condition.setBeginRegisterDate(begin);
-        condition.setEndRegisterDate(end);
-        condition.setMobile("13800000000");
-        query.setQuery(condition);
+        query.setStatus(MemberStatus.ENABLED);
+        query.setEmail("a@example.com");
+        query.setName("alice");
+        query.setRemarks("remark");
+        query.setBeginRegisterDate(begin);
+        query.setEndRegisterDate(end);
+        query.setMobile("13800000000");
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
         service.list(query);
@@ -60,8 +59,8 @@ public class MemberServiceImplTest {
         assertEquals("a@example.com", dao.email);
         assertEquals("alice", dao.name);
         assertEquals("remark", dao.remarks);
-        assertEquals(condition.getBeginRegisterDate(), dao.beginRegisterDate);
-        assertEquals(condition.getEndRegisterDate(), dao.endRegisterDate);
+        assertEquals(query.getBeginRegisterDate(), dao.beginRegisterDate);
+        assertEquals(query.getEndRegisterDate(), dao.endRegisterDate);
         assertEquals("13800000000", dao.mobile);
     }
 
@@ -93,10 +92,8 @@ public class MemberServiceImplTest {
     @Test
     public void shouldExpandYwtbAndZjhmQueries() {
         RecordingMemberDao dao = new RecordingMemberDao();
-        Member query = new Member();
-        Member.Query condition = new Member.Query();
-        condition.setZjhm("310000");
-        query.setQuery(condition);
+        MemberQuery query = new MemberQuery();
+        query.setZjhm("310000");
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
         service.getByZjhm(query);

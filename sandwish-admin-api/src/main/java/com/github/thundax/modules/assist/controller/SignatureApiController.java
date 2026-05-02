@@ -3,9 +3,11 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.Signature;
@@ -123,8 +125,13 @@ public class SignatureApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
-        List<Signature> beanList =
-                validateList(list, vo -> signatureService.getByBusiness(vo.getBusinessType(), vo.getBusinessId()));
+        List<Signature> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Signature bean = signatureService.getByBusiness(request.getBusinessType(), request.getBusinessId());
+            if (bean == null) {
+                throw new NullBeanException(Signature.BEAN_NAME, request.getBusinessId());
+            }
+            return bean;
+        });
 
         signatureService.batchDeleteByBusiness(beanList);
 

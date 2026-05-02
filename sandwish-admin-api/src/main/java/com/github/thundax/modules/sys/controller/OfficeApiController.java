@@ -8,7 +8,9 @@ import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.common.web.TreeNodeListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
@@ -167,8 +169,13 @@ public class OfficeApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:edit')")
     public Boolean delete(@RequestBody List<OfficeIdRequest> list) throws ApiException {
-        List<Office> beanList =
-                validateList(list, vo -> officeService.getById(EntityIdCodec.toDomain(vo.getId())), null, null);
+        List<Office> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Office bean = officeService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException(Office.BEAN_NAME, request.getId());
+            }
+            return bean;
+        });
 
         officeService.batchDeleteById(beanList);
 
@@ -195,9 +202,9 @@ public class OfficeApiController extends BaseApiController {
                         excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
 
-        removeTreeNode(
+        TreeNodeListHelper.remove(
                 beanList,
-                new RemoveTreeNodeSupport<Office>() {
+                new TreeNodeListHelper.TreeNodeSupport<Office>() {
 
                     @Override
                     public String getId(Office entity) {

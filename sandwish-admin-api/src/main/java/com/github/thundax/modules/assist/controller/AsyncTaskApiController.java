@@ -10,6 +10,7 @@ import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.request.AsyncTaskIdRequest;
 import com.github.thundax.modules.assist.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -51,7 +52,7 @@ public class AsyncTaskApiController extends BaseApiController {
             return new AsyncTaskResponse();
         }
 
-        if (bean.isPrivate() && !bean.isBelongTo(currentUser())) {
+        if (bean.isPrivate() && !bean.isBelongTo(UserAccessHolder.currentUser())) {
             throw new PermissionDeniedException();
         }
 

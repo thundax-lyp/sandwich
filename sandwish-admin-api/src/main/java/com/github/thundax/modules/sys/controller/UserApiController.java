@@ -10,9 +10,11 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Office;
@@ -227,13 +229,14 @@ public class UserApiController extends BaseApiController {
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
         }
+        User currentUser = UserAccessHolder.currentUser();
         // 非超管用户无权限开启/关闭管理员
-        if (!currentUser().isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
+        if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw new PermissionDeniedException();
         }
         // 无权限修改超管/等级高于自身的用户信息
-        if (!currentUser().isSuper()) {
-            if (bean.isSuper() || (bean.getRanks() >= currentUser().getRanks())) {
+        if (!currentUser.isSuper()) {
+            if (bean.isSuper() || (bean.getRanks() >= currentUser.getRanks())) {
                 throw new PermissionDeniedException();
             }
         }
@@ -310,19 +313,19 @@ public class UserApiController extends BaseApiController {
     @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean updateStatus(@RequestBody List<UserStatusRequest> list) throws ApiException {
-        User currentUser = currentUser();
+        User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = validateList(
-                list,
-                vo -> userService.getById(EntityIdCodec.toDomain(vo.getId())),
-                (bean, vo) -> {
-                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                        throw new PermissionDeniedException();
-                    }
-                    return true;
-                },
-                (bean, vo) ->
-                        bean.setStatus(Boolean.TRUE.equals(vo.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
+        List<User> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException(User.BEAN_NAME, request.getId());
+            }
+            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                throw new PermissionDeniedException();
+            }
+            bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
+            return bean;
+        });
 
         userService.updateStatus(beanList);
 
@@ -341,18 +344,18 @@ public class UserApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
-        User currentUser = currentUser();
+        User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = validateList(
-                list,
-                vo -> userService.getById(EntityIdCodec.toDomain(vo.getId())),
-                (bean, vo) -> {
-                    if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
-                        throw new PermissionDeniedException();
-                    }
-                    return true;
-                },
-                null);
+        List<User> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException(User.BEAN_NAME, request.getId());
+            }
+            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+                throw new PermissionDeniedException();
+            }
+            return bean;
+        });
 
         userService.batchDeleteById(beanList);
 

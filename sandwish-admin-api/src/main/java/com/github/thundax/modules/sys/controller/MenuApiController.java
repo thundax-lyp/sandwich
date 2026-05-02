@@ -8,7 +8,9 @@ import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.common.web.TreeNodeListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -170,12 +172,15 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "display", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
-        List<Menu> beanList = validateList(
-                list,
-                vo -> menuService.getById(EntityIdCodec.toDomain(vo.getId())),
-                null,
-                (bean, vo) -> bean.setVisibility(
-                        Boolean.TRUE.equals(vo.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
+        List<Menu> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException(Menu.BEAN_NAME, request.getId());
+            }
+            bean.setVisibility(
+                    Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
+            return bean;
+        });
 
         menuService.updateVisibility(beanList);
 
@@ -194,8 +199,13 @@ public class MenuApiController extends BaseApiController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
-        List<Menu> beanList =
-                validateList(list, vo -> menuService.getById(EntityIdCodec.toDomain(vo.getId())), null, null);
+        List<Menu> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException(Menu.BEAN_NAME, request.getId());
+            }
+            return bean;
+        });
 
         menuService.batchDeleteById(beanList);
 
@@ -222,9 +232,9 @@ public class MenuApiController extends BaseApiController {
                         excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
         beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
 
-        removeTreeNode(
+        TreeNodeListHelper.remove(
                 beanList,
-                new RemoveTreeNodeSupport<Menu>() {
+                new TreeNodeListHelper.TreeNodeSupport<Menu>() {
 
                     @Override
                     public String getId(Menu menu) {

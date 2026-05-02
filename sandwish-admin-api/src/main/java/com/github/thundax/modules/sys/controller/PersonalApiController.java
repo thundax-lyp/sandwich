@@ -208,7 +208,7 @@ public class PersonalApiController extends BaseApiController {
     @RequestMapping(value = "menus", method = RequestMethod.POST)
     public List<PersonalMenuResponse> menus() {
         // 获取可见菜单
-        List<Menu> allMenuList = findMenuList(currentUser());
+        List<Menu> allMenuList = findMenuList(UserAccessHolder.currentUser());
 
         Menu rootMenu = new Menu();
         List<Menu> menuList = Lists.newArrayList(rootMenu);

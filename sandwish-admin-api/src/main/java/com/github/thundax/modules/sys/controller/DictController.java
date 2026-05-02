@@ -2,9 +2,11 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
@@ -133,8 +135,13 @@ public class DictController extends BaseApiController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList =
-                validateList(list, vo -> dictService.getById(EntityIdCodec.toDomain(vo.getId())), null, null);
+        List<Dict> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Dict bean = dictService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (bean == null) {
+                throw new NullBeanException("Dict", request.getId());
+            }
+            return bean;
+        });
         dictService.batchDeleteById(beanList);
         return true;
     }

@@ -12,6 +12,7 @@ import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -33,16 +34,14 @@ public class StorageServiceImplTest {
     @Test
     public void shouldExpandFindPageQuery() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        Storage query = new Storage();
-        Storage.Query condition = new Storage.Query();
-        condition.setMimeType("image/png");
-        condition.setOwnerId("owner-1");
-        condition.setOwnerType("user");
-        condition.setStatus(StorageStatus.ENABLED);
-        condition.setVisibility(StorageVisibility.PUBLIC);
-        condition.setName("avatar");
-        condition.setRemarks("remark");
-        query.setQuery(condition);
+        StorageQuery query = new StorageQuery();
+        query.setMimeType("image/png");
+        query.setOwnerId("owner-1");
+        query.setOwnerType("user");
+        query.setStatus(StorageStatus.ENABLED);
+        query.setVisibility(StorageVisibility.PUBLIC);
+        query.setName("avatar");
+        query.setRemarks("remark");
         Page<Storage> page = new Page<>(2, 20);
 
         StorageServiceImpl service = new StorageServiceImpl(dao);

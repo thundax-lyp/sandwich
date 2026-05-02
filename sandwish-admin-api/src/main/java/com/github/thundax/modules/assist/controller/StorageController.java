@@ -19,6 +19,7 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.utils.StorageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -69,7 +70,7 @@ public class StorageController {
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageVo<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
-        Storage query = readQuery(request);
+        StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         Page<Storage> page = readStoragePage(request);
         return PageVoHelper.fromEntityPage(
                 storageService.page(query, page),
@@ -168,18 +169,6 @@ public class StorageController {
             return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
         }
         return new StorageUploadResponse();
-    }
-
-    private Storage readQuery(StoragePageRequest request) {
-        Storage query = new Storage();
-        Storage.Query queryCondition = new Storage.Query();
-        queryCondition.setMimeType(request.getMimeType());
-        queryCondition.setStatus(request.getStatus());
-        queryCondition.setVisibility(request.getVisibility());
-        queryCondition.setName(request.getName());
-        queryCondition.setRemarks(request.getRemarks());
-        query.setQuery(queryCondition);
-        return query;
     }
 
     private Page<Storage> readStoragePage(StoragePageRequest request) {

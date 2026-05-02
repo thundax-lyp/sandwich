@@ -11,6 +11,7 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -41,8 +42,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> list(Storage storage) {
-        Storage.Query query = storage == null ? null : storage.getQuery();
+    public List<Storage> list(StorageQuery query) {
         return dao.list(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
@@ -54,9 +54,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Page<Storage> page(Storage storage, Page<Storage> page) {
+    public Page<Storage> page(StorageQuery query, Page<Storage> page) {
         Page<Storage> normalizedPage = normalizePage(page);
-        Storage.Query query = storage == null ? null : storage.getQuery();
         IPage<Storage> dataPage = dao.page(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),

@@ -4,6 +4,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.List;
 
 public interface StorageService {
@@ -12,9 +13,9 @@ public interface StorageService {
 
     List<Storage> batchGetByIds(List<String> ids);
 
-    List<Storage> list(Storage storage);
+    List<Storage> list(StorageQuery query);
 
-    Page<Storage> page(Storage storage, Page<Storage> page);
+    Page<Storage> page(StorageQuery query, Page<Storage> page);
 
     void add(Storage storage);
 

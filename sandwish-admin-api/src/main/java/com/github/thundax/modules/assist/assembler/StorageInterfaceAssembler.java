@@ -1,11 +1,13 @@
 package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.assist.request.StoragePageRequest;
 import com.github.thundax.modules.assist.response.StorageResponse;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import org.springframework.lang.NonNull;
 
 public final class StorageInterfaceAssembler {
@@ -55,6 +57,17 @@ public final class StorageInterfaceAssembler {
         response.setUpdateDate(entity.getUpdateDate());
         response.setUrl(storageConverter.toPreviewUrl(entity));
         return response;
+    }
+
+    @NonNull
+    public static StorageQuery toQuery(@NonNull StoragePageRequest request) {
+        StorageQuery query = new StorageQuery();
+        query.setMimeType(request.getMimeType());
+        query.setStatus(request.getStatus());
+        query.setVisibility(request.getVisibility());
+        query.setName(request.getName());
+        query.setRemarks(request.getRemarks());
+        return query;
     }
 
     @NonNull

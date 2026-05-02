@@ -41,6 +41,24 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 violations.isEmpty());
     }
 
+    @Test
+    public void shouldPlaceServiceQueryObjectsUnderServiceQueryPackage() {
+        JavaClasses classes = importPackages("com.github.thundax.modules");
+        List<String> violations = new ArrayList<>();
+
+        for (JavaClass javaClass : classes) {
+            if (isServiceQueryObject(javaClass) && !isInServiceQueryPackage(javaClass)) {
+                violations.add(javaClass.getName());
+            }
+        }
+
+        assertTrue(
+                "Service query objects named XxxQuery must be placed under "
+                        + "com.github.thundax.modules.{module}.service.query: "
+                        + violations,
+                violations.isEmpty());
+    }
+
     private boolean isServiceInterface(JavaClass javaClass) {
         return javaClass.isInterface()
                 && javaClass.getSimpleName().endsWith("Service")
@@ -50,5 +68,13 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     private boolean isLegacyServiceMethod(JavaMethod method) {
         return LEGACY_SERVICE_METHOD_NAMES.contains(method.getName())
                 || method.getName().startsWith("find");
+    }
+
+    private boolean isServiceQueryObject(JavaClass javaClass) {
+        return javaClass.getSimpleName().endsWith("Query") && !"Query".equals(javaClass.getSimpleName());
+    }
+
+    private boolean isInServiceQueryPackage(JavaClass javaClass) {
+        return javaClass.getPackageName().contains(".service.query");
     }
 }

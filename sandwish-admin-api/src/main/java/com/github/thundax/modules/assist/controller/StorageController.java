@@ -98,7 +98,13 @@ public class StorageController {
             Storage storage = new Storage();
             storage.setOwnerType(StorageOwnerType.USER);
             storage.setOwnerId(UserAccessHolder.currentUserId());
-            StorageUtils.saveFile(file, storage);
+            StorageUtils.applyFileMetadata(file, storage);
+            try {
+                StorageUtils.saveFile(file.getInputStream(), storageConverter.toFile(storage));
+            } catch (IOException e) {
+                return StorageInterfaceAssembler.toUploadErrorResponse(e.getMessage());
+            }
+            storageService.add(storage);
             response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
         }
         return response;

@@ -30,63 +30,25 @@ public interface UserDao {
 
     int deleteById(EntityId id);
 
-    /**
-     * 根据loginName获取
-     *
-     * @param loginName 登录名
-     * @return 用户
-     */
     User getByLoginName(String loginName);
 
-    /**
-     * 根据loginName获取
-     *
-     * @param ssoLoginName 登录名
-     * @return 用户
-     */
     User getBySsoLoginName(String ssoLoginName);
 
     /**
      * 更新登录信息：lastLoginIp, lastLoginDate, loginCount
-     *
-     * @param user 用户
      */
     void updateLoginInfo(User user);
 
-    /**
-     * 更新状态
-     *
-     * @param user 用户
-     * @return 影响记录数
-     */
     int updateStatus(User user);
 
     /**
      * 更新密码, loginPass, updateDate, updateBy
-     *
-     * @param user 用户
      */
     void updateLoginPass(User user);
 
-    /**
-     * 获取用户权限列表
-     *
-     * @param user 用户
-     * @return 权限列表
-     */
     List<String> listUserRoles(String userId);
 
-    /**
-     * 删除用户权限列表
-     *
-     * @param user 用户
-     */
     void deleteUserRole(String userId);
 
-    /**
-     * 写入用户权限列表
-     *
-     * @param user 用户
-     */
     void insertUserRole(String userId, List<String> roleIdList);
 }

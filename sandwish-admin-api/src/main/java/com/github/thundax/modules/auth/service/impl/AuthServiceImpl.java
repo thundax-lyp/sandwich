@@ -287,12 +287,6 @@ public class AuthServiceImpl implements AuthService {
         return form.getPrivateKey();
     }
 
-    /**
-     * 创建验证码
-     *
-     * @param validateChars 许可的字符
-     * @param length 长度
-     */
     private String createCode(char[] validateChars, int length) {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();

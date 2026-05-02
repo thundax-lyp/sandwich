@@ -13,57 +13,20 @@ public interface UserService extends CrudService<User> {
 
     Page<User> page(UserQuery query, Page<User> page);
 
-    /**
-     * 根据loginName获取
-     *
-     * @param loginName 登录名
-     * @return 用户
-     */
     User getByLoginName(String loginName);
 
-    /**
-     * 根据ssoLoginName获取
-     *
-     * @param ssoLoginName 登录名
-     * @return 用户
-     */
     User getBySsoLoginName(String ssoLoginName);
 
-    /**
-     * 更新密码
-     *
-     * @param user 用户
-     */
     void updatePassword(User user);
 
     /**
      * 更新登录信息：lastLoginIp, lastLoginDate, loginCount
-     *
-     * @param user 用户
      */
     void updateLoginInfo(User user);
 
-    /**
-     * 启用/禁用
-     *
-     * @param user 用户
-     * @return 影响记录数
-     */
     int updateStatus(User user);
 
-    /**
-     * 启用/禁用
-     *
-     * @param list 列表
-     * @return 影响记录数
-     */
     int updateStatus(List<User> list);
 
-    /**
-     * 获取用户权限列表
-     *
-     * @param user 用户
-     * @return 权限列表
-     */
     List<Role> listUserRoles(User user);
 }

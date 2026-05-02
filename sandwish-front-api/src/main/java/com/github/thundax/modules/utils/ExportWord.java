@@ -24,26 +24,10 @@ public class ExportWord {
         configurer.setConfiguration(configuration);
     }
 
-    /**
-     * 获取模板
-     *
-     * @param name
-     * @return
-     * @throws Exception
-     */
     public Template getTemplate(String name) throws Exception {
         return configurer.getConfiguration().getTemplate(name);
     }
 
-    /**
-     * 导出word文档到客户端
-     *
-     * @param response
-     * @param fileName
-     * @param tplName
-     * @param data
-     * @throws Exception
-     */
     public void exportDoc(HttpServletResponse response, String fileName, String tplName, Map<String, Object> data)
             throws Exception {
         response.reset();

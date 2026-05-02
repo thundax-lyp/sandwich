@@ -23,12 +23,6 @@ public interface RoleDao {
 
     int deleteById(EntityId id);
 
-    /**
-     * 启用/禁用
-     *
-     * @param role 权限
-     * @return 影响记录数
-     */
     int updateStatus(Role role);
 
     List<String> listRoleMenus(String roleId);

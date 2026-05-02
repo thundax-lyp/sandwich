@@ -21,19 +21,12 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
 
     /**
      * 更新密码, loginPass, updateDate, updateBy
-     *
-     * @param userEncrypt 用户
      */
     @Override
     public void updateLoginPass(UserEncrypt userEncrypt) {
         // 默认不做任何处理
     }
 
-    /**
-     * 新增
-     *
-     * @param entity 对象
-     */
     @Override
     public void add(UserEncrypt entity) {
         // 默认不做任何处理

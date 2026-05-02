@@ -19,42 +19,13 @@ public interface SignatureService {
      */
     Signature getByBusiness(String businessType, String businessId);
 
-    /**
-     * 按业务分类分页查询签名结果。
-     *
-     * @param businessType 业务分类
-     * @param page 分页对象
-     * @return 分页结果
-     */
     Page<Signature> page(SignatureQuery query, Page<Signature> page);
 
-    /**
-     * 新增签名结果。
-     *
-     * @param entity 签名结果
-     */
     void add(Signature entity);
 
-    /**
-     * 更新签名结果。
-     *
-     * @param entity 签名结果
-     */
     void update(Signature entity);
 
-    /**
-     * 删除签名结果。
-     *
-     * @param entity 签名结果
-     * @return 变更数量
-     */
     int deleteByBusiness(Signature entity);
 
-    /**
-     * 批量删除签名结果。
-     *
-     * @param list 签名结果列表
-     * @return 变更数量
-     */
     int batchDeleteByBusiness(List<Signature> list);
 }

@@ -25,57 +25,17 @@ public interface StorageService {
 
     int batchDeleteById(List<EntityId> ids);
 
-    /**
-     * 获取MIME列表
-     *
-     * @return MIME列表
-     */
     List<String> listMimeTypes();
 
-    /**
-     * 获取业务类型列表
-     *
-     * @return 业务类型列表
-     */
     List<String> listBusinessTypes();
 
-    /**
-     * 更新状态
-     *
-     * @param storage 资源
-     * @return 影响记录数
-     */
     int updateStatus(Storage storage);
 
-    /**
-     * 更新可见性
-     *
-     * @param storage 资源
-     * @return 影响记录数
-     */
     int updateVisibility(Storage storage);
 
-    /**
-     * 按业务删除
-     *
-     * @param businessType 业务类型
-     * @param businessId 业务id
-     * @return 影响记录数
-     */
     int removeBusiness(String businessType, String businessId);
 
-    /**
-     * 插入关系
-     *
-     * @param list
-     */
     void insertBusiness(List<StorageBusiness> list);
 
-    /**
-     * 查找关系
-     *
-     * @param entity
-     * @return
-     */
     List<StorageBusiness> listBusiness(Storage entity);
 }

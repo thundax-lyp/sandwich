@@ -132,15 +132,6 @@ public class Sm4Util {
         return decryptStr;
     }
 
-    /**
-     * 解密
-     *
-     * @param key
-     * @param cipherText
-     * @return
-     * @throws Exception
-     * @explain
-     */
     public static byte[] decryptEcbPadding(byte[] key, byte[] cipherText) throws Exception {
         Cipher cipher = generateEcbCipher(ALGORITHM_NAME_ECB_PADDING, Cipher.DECRYPT_MODE, key);
         return cipher.doFinal(cipherText);

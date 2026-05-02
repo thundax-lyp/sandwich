@@ -12,13 +12,6 @@ import org.springframework.lang.NonNull;
 
 public interface AuthService {
 
-    /**
-     * 创建登录令牌
-     *
-     * @return 登录令牌
-     * @throws TooManyLoginRequestException 登录请求过多
-     * @throws TooManyOnlineUserException 在线用户过多
-     */
     LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException;
 
     /**
@@ -31,31 +24,10 @@ public interface AuthService {
      */
     LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException;
 
-    /**
-     * 删除登录令牌
-     *
-     * @param loginToken 登录令牌
-     * @throws InvalidTokenException 无效的token
-     */
     void deleteLoginForm(String loginToken) throws InvalidTokenException;
 
-    /**
-     * 创建验证码
-     *
-     * @param loginToken 登录令牌
-     * @return 验证码
-     * @throws InvalidTokenException token不正确
-     */
     String createCaptcha(String loginToken) throws InvalidTokenException;
 
-    /**
-     * 获取当前验证码
-     *
-     * @param loginToken 登录令牌
-     * @return captcha
-     * @throws InvalidTokenException token不正确
-     * @throws InvalidCaptchaException 验证码并未生成
-     */
     String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
 
     /**
@@ -69,24 +41,8 @@ public interface AuthService {
      */
     boolean validateCaptcha(String loginToken, String captcha) throws InvalidTokenException, InvalidCaptchaException;
 
-    /**
-     * 创建短信验证码
-     *
-     * @param loginToken 登录令牌
-     * @param mobile 手机号码
-     * @return 短信验证码
-     * @throws InvalidTokenException token不正确
-     */
     String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException;
 
-    /**
-     * 获取当前短信验证码
-     *
-     * @param loginToken 登录令牌
-     * @return captcha
-     * @throws InvalidTokenException token不正确
-     * @throws InvalidCaptchaException 验证码并未生成
-     */
     String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
 
     /**
@@ -102,51 +58,17 @@ public interface AuthService {
     boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
             throws InvalidTokenException, InvalidCaptchaException;
 
-    /**
-     * 创建JWToken
-     *
-     * @param userId userId
-     * @return 成功：JWToken对象；失败：null
-     */
     @NonNull
     AccessToken createAccessToken(String userId);
 
-    /**
-     * 获取 accessToken
-     *
-     * @param token token
-     * @return AccessToken
-     */
     AccessToken getAccessToken(String token);
 
-    /**
-     * 获取 accessToken
-     *
-     * @param userId userId
-     * @return AccessToken
-     */
     AccessToken getByUserId(String userId);
 
-    /**
-     * 校验 accessToken
-     *
-     * @param accessToken accessToken
-     * @return true if success
-     */
     boolean validateToken(AccessToken accessToken);
 
-    /**
-     * 登出
-     *
-     * @param accessToken accessToken
-     */
     void activeAccessToken(AccessToken accessToken);
 
-    /**
-     * 登出
-     *
-     * @param accessToken accessToken
-     */
     void deleteAccessToken(AccessToken accessToken);
 
     /**
@@ -158,12 +80,5 @@ public interface AuthService {
      */
     void validatePassword(User user, String plainPassword) throws ApiException;
 
-    /**
-     * 获取 PrivateKey
-     *
-     * @param loginToken 登录令牌
-     * @return PrivateKey
-     * @throws InvalidTokenException token不正确
-     */
     String getPrivateKey(String loginToken) throws InvalidTokenException;
 }

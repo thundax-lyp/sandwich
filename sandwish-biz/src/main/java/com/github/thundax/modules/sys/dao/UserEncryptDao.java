@@ -25,8 +25,6 @@ public interface UserEncryptDao {
 
     /**
      * 更新密码, loginPass, updateDate, updateBy
-     *
-     * @param userEncrypt 用户
      */
     void updateLoginPass(UserEncrypt userEncrypt);
 }

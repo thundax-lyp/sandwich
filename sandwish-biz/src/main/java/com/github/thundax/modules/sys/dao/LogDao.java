@@ -40,19 +40,7 @@ public interface LogDao {
 
     int deleteById(EntityId id);
 
-    /**
-     * 写入
-     *
-     * @param list 列表
-     * @return 写入后的主键列表
-     */
     List<String> batchInsert(List<Log> list);
 
-    /**
-     * 批量删除
-     *
-     * @param log 查询条件
-     * @return 影响记录数
-     */
     int batchDelete(String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate);
 }

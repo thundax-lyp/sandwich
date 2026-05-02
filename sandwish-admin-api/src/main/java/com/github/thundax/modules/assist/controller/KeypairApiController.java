@@ -40,13 +40,6 @@ public class KeypairApiController {
         this.keypairService = keypairService;
     }
 
-    /**
-     * 获取公钥
-     *
-     * @param request 公钥获取请求
-     * @return 公钥
-     * @throws ApiException API异常
-     */
     @ApiOperation(value = "获取公钥", notes = "")
     @ApiImplicitParams({
         @ApiImplicitParam(

@@ -28,18 +28,7 @@ public interface MenuDao {
 
     boolean isChildOf(String childId, String parentId);
 
-    /**
-     * 更新显示状态
-     *
-     * @param menu 菜单
-     * @return 影响记录数
-     */
     int updateVisibility(Menu menu);
 
-    /**
-     * 删除菜单权限关系
-     *
-     * @param menu 菜单
-     */
     void deleteMenuRole(String menuId);
 }

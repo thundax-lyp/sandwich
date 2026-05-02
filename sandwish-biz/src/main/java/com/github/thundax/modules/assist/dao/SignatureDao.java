@@ -37,38 +37,11 @@ public interface SignatureDao {
      */
     List<Signature> list(String businessType, String businessId, List<String> businessIdList, String isVerifySign);
 
-    /**
-     * 按业务分类分页查询签名。
-     *
-     * @param businessType 业务分类
-     * @param pageNo 页码
-     * @param pageSize 分页大小
-     * @return 分页结果
-     */
     Page<Signature> page(String businessType, int pageNo, int pageSize);
 
-    /**
-     * 插入签名。
-     *
-     * @param entity 签名数据
-     * @return 签名标识
-     */
     String insert(Signature entity);
 
-    /**
-     * 更新签名。
-     *
-     * @param entity 签名数据
-     * @return 变更数量
-     */
     int update(Signature entity);
 
-    /**
-     * 删除签名。
-     *
-     * @param businessType 业务分类
-     * @param businessId 业务主键
-     * @return 变更数量
-     */
     int deleteByBusiness(String businessType, String businessId);
 }

@@ -95,15 +95,6 @@ public class SM4Util {
         }
     }
 
-    /**
-     * 解密
-     *
-     * @explain
-     * @param key
-     * @param cipherText
-     * @return
-     * @throws Exception
-     */
     private static byte[] decryptEcbPadding(byte[] key, byte[] cipherText) throws Exception {
         Cipher cipher =
                 generateEcbCipher(ALGORITHM_NAME_ECB_PADDING, Cipher.DECRYPT_MODE, key); // 生成Ecb暗号,通过第二个参数判断加密还是解密

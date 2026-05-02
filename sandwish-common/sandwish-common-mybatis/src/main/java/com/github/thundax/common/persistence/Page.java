@@ -9,9 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.type.Alias;
 
-/**
- * 分页类
- */
 @Alias("Page")
 public class Page<T> {
 
@@ -30,35 +27,14 @@ public class Page<T> {
 
     public Page() {}
 
-    /**
-     * 构造方法
-     *
-     * @param pageNo 当前页码
-     * @param pageSize 分页大小
-     */
     public Page(int pageNo, int pageSize) {
         this(pageNo, pageSize, 0);
     }
 
-    /**
-     * 构造方法
-     *
-     * @param pageNo 当前页码
-     * @param pageSize 分页大小
-     * @param totalCount 数据条数
-     */
     public Page(int pageNo, int pageSize, long totalCount) {
         this(pageNo, pageSize, totalCount, new ArrayList<T>());
     }
 
-    /**
-     * 构造方法
-     *
-     * @param pageNo 当前页码
-     * @param pageSize 分页大小
-     * @param count 数据条数
-     * @param list 本页数据对象列表
-     */
     public Page(int pageNo, int pageSize, long count, List<T> list) {
         this.pageNo = pageNo;
         this.pageSize = pageSize;

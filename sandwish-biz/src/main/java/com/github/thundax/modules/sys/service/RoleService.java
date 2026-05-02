@@ -14,50 +14,15 @@ public interface RoleService extends CrudService<Role> {
 
     Page<Role> page(RoleQuery query, Page<Role> page);
 
-    /**
-     * 获取可用列表
-     *
-     * @return 可用列表
-     */
     List<Role> listEnabled();
 
-    /**
-     * 启用/禁用
-     *
-     * @param role 权限
-     * @return 影响记录数
-     */
     int updateStatus(Role role);
 
-    /**
-     * 启用/禁用
-     *
-     * @param list 列表
-     * @return 影响记录数
-     */
     int updateStatus(List<Role> list);
 
-    /**
-     * 更新用户列表
-     *
-     * @param role 权限
-     * @param userList 用户列表
-     */
     void updateUserList(Role role, List<User> userList);
 
-    /**
-     * 获取用户列表
-     *
-     * @param role 权限
-     * @return 用户列表
-     */
     List<User> listRoleUsers(Role role);
 
-    /**
-     * 获取菜单列表
-     *
-     * @param role 权限
-     * @return 菜单列表
-     */
     List<Menu> listRoleMenus(Role role);
 }

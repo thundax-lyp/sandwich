@@ -23,17 +23,7 @@ public interface DictDao {
 
     int deleteById(EntityId id);
 
-    /**
-     * 获取类型列表
-     *
-     * @return 类型列表
-     */
     List<String> listTypes();
 
-    /**
-     * 获取字典修订号。
-     *
-     * @return 字典修订号
-     */
     String getDictionaryRevision();
 }

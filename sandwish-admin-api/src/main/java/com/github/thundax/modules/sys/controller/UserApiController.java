@@ -11,7 +11,6 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
@@ -72,7 +71,7 @@ import org.springframework.web.multipart.MultipartFile;
 @SysLogger(module = {"系统", "用户"})
 @RequestMapping(value = "/api/sys/user")
 @RestController
-public class UserApiController extends BaseApiController {
+public class UserApiController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
 

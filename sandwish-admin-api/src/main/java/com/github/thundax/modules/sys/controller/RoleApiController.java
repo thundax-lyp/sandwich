@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -52,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "权限"})
 @RequestMapping(value = "/api/sys/role")
 @RestController
-public class RoleApiController extends BaseApiController {
+public class RoleApiController {
 
     private static final String OFFICE_ID_PREFIX = "OFFICE_";
 

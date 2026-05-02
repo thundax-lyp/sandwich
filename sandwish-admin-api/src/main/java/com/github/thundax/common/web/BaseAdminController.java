@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-public class BaseAdminController extends BaseController {
+public class BaseAdminController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 

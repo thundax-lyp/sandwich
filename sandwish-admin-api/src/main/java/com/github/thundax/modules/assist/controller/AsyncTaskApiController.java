@@ -4,7 +4,6 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.request.AsyncTaskIdRequest;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "03-01.辅助-异步任务")
 @RequestMapping(value = "/api/assist/async-task")
 @RestController
-public class AsyncTaskApiController extends BaseApiController {
+public class AsyncTaskApiController {
 
     private final AsyncTaskService asyncTaskService;
 

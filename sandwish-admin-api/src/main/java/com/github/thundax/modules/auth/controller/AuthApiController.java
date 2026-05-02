@@ -6,7 +6,6 @@ import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
@@ -44,7 +43,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
 @RestController
-public class AuthApiController extends BaseApiController {
+public class AuthApiController {
 
     private final AuthService authService;
     private final UserService userService;

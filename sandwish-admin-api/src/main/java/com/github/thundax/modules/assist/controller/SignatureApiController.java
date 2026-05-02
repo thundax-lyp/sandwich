@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.Signature;
@@ -45,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"辅助", "签名"})
 @RequestMapping(value = "/api/assist/signature")
 @RestController
-public class SignatureApiController extends BaseApiController {
+public class SignatureApiController {
 
     private final SignatureService signatureService;
     private final SignService signService;

@@ -3,10 +3,10 @@ package com.github.thundax.architecture;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
-import com.github.thundax.common.web.BaseApiController;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import javax.validation.Validator;
 import org.junit.Test;
+import org.springframework.web.bind.annotation.RestController;
 
 public class ApiControllerValidationArchitectureTest extends AbstractArchitectureTest {
 
@@ -18,7 +18,7 @@ public class ApiControllerValidationArchitectureTest extends AbstractArchitectur
                 .that()
                 .resideInAPackage("..controller..")
                 .and()
-                .areAssignableTo(BaseApiController.class)
+                .areAnnotatedWith(RestController.class)
                 .should()
                 .dependOnClassesThat()
                 .areAssignableTo(Validator.class)

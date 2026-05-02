@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "01-02. 鉴权-图形验证码")
 @RequestMapping(value = "/api/auth")
 @RestController
-public class CaptchaApiController extends BaseApiController {
+public class CaptchaApiController {
 
     private static final int DEFAULT_CAPTCHA_WIDTH = 200;
     private static final int DEFAULT_CAPTCHA_HEIGHT = 80;

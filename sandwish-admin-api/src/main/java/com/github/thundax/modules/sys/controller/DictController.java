@@ -7,7 +7,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
@@ -34,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "字典"})
 @RequestMapping(value = "/api/sys/dict")
 @RestController
-public class DictController extends BaseApiController {
+public class DictController {
 
     private final DictService dictService;
 

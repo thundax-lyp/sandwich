@@ -9,7 +9,6 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.TreeNodeListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
@@ -43,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "菜单"})
 @RequestMapping(value = "/api/sys/menu")
 @RestController
-public class MenuApiController extends BaseApiController {
+public class MenuApiController {
 
     private final MenuService menuService;
 

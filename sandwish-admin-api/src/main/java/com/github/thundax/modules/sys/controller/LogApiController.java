@@ -5,7 +5,6 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Log;
@@ -30,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "02-06.系统-日志")
 @RequestMapping(value = "/api/sys/log")
 @RestController
-public class LogApiController extends BaseApiController {
+public class LogApiController {
 
     private final LogService logService;
     private final UserService userService;

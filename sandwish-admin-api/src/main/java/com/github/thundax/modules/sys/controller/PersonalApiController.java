@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PasswordService;
@@ -57,7 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "个人"})
 @RequestMapping(value = "/api/sys/personal")
 @RestController
-public class PersonalApiController extends BaseApiController {
+public class PersonalApiController {
 
     private final UserService userService;
     private final RoleService roleService;

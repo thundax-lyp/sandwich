@@ -9,7 +9,6 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.BaseApiController;
 import com.github.thundax.common.web.TreeNodeListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
@@ -41,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SysLogger(module = {"系统", "组织机构"})
 @RequestMapping(value = "/api/sys/office")
 @RestController
-public class OfficeApiController extends BaseApiController {
+public class OfficeApiController {
 
     private final OfficeService officeService;
 

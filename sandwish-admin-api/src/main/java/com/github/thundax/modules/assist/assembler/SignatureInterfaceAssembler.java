@@ -2,10 +2,10 @@ package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.assist.controller.request.SignaturePageRequest;
+import com.github.thundax.modules.assist.controller.response.SignatureResponse;
+import com.github.thundax.modules.assist.controller.response.SignatureVerifyResponse;
 import com.github.thundax.modules.assist.entity.Signature;
-import com.github.thundax.modules.assist.request.SignaturePageRequest;
-import com.github.thundax.modules.assist.response.SignatureResponse;
-import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import org.springframework.lang.NonNull;
 

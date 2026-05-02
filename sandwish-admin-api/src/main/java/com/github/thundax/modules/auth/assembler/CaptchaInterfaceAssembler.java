@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.assembler;
 
-import com.github.thundax.modules.auth.response.CaptchaRefreshResponse;
+import com.github.thundax.modules.auth.controller.response.CaptchaRefreshResponse;
 import org.springframework.lang.NonNull;
 
 public final class CaptchaInterfaceAssembler {

@@ -2,7 +2,7 @@ package com.github.thundax.modules.member.controller;
 
 import com.github.thundax.common.web.BaseFrontController;
 import com.github.thundax.modules.member.assembler.MemberLoginInterfaceAssembler;
-import com.github.thundax.modules.member.response.MemberLoginStatusResponse;
+import com.github.thundax.modules.member.controller.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.member.security.MemberSecurityContext;
 import com.github.thundax.modules.member.security.MemberSpringPrincipal;
 import com.github.thundax.modules.member.utils.YwtbProperties;

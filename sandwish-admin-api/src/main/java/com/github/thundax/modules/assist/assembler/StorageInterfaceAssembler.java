@@ -1,10 +1,10 @@
 package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.assist.request.StoragePageRequest;
-import com.github.thundax.modules.assist.response.StorageResponse;
-import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
-import com.github.thundax.modules.assist.response.StorageUploadResponse;
+import com.github.thundax.modules.assist.controller.request.StoragePageRequest;
+import com.github.thundax.modules.assist.controller.response.StorageResponse;
+import com.github.thundax.modules.assist.controller.response.StorageTreeNodeResponse;
+import com.github.thundax.modules.assist.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;

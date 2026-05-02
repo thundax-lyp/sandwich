@@ -1,6 +1,6 @@
 package com.github.thundax.modules.member.assembler;
 
-import com.github.thundax.modules.member.response.MemberLoginStatusResponse;
+import com.github.thundax.modules.member.controller.response.MemberLoginStatusResponse;
 import org.springframework.lang.NonNull;
 
 public final class MemberLoginInterfaceAssembler {

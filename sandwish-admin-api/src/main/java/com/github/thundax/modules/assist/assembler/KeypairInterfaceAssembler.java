@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.assembler;
 
-import com.github.thundax.modules.assist.response.KeypairPublicKeyResponse;
+import com.github.thundax.modules.assist.controller.response.KeypairPublicKeyResponse;
 import org.springframework.lang.NonNull;
 
 public final class KeypairInterfaceAssembler {

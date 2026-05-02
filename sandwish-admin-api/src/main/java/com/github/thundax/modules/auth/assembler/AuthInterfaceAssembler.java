@@ -1,11 +1,11 @@
 package com.github.thundax.modules.auth.assembler;
 
 import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
+import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
+import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
-import com.github.thundax.modules.auth.request.AuthLoginRequest;
-import com.github.thundax.modules.auth.response.AuthAccessTokenResponse;
-import com.github.thundax.modules.auth.response.AuthLoginFormResponse;
 import org.springframework.lang.NonNull;
 
 public final class AuthInterfaceAssembler {

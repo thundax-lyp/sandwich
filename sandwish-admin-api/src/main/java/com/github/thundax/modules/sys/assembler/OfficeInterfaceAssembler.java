@@ -2,10 +2,10 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.sys.controller.request.OfficeQueryRequest;
+import com.github.thundax.modules.sys.controller.request.OfficeSaveRequest;
+import com.github.thundax.modules.sys.controller.response.OfficeResponse;
 import com.github.thundax.modules.sys.entity.Office;
-import com.github.thundax.modules.sys.request.OfficeQueryRequest;
-import com.github.thundax.modules.sys.request.OfficeSaveRequest;
-import com.github.thundax.modules.sys.response.OfficeResponse;
 import com.github.thundax.modules.sys.service.query.OfficeQuery;
 import java.util.ArrayList;
 import java.util.List;

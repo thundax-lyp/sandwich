@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.sys.controller.request.DictPageRequest;
+import com.github.thundax.modules.sys.controller.request.DictQueryRequest;
+import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
+import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
-import com.github.thundax.modules.sys.request.DictPageRequest;
-import com.github.thundax.modules.sys.request.DictQueryRequest;
-import com.github.thundax.modules.sys.request.DictSaveRequest;
-import com.github.thundax.modules.sys.response.DictResponse;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;

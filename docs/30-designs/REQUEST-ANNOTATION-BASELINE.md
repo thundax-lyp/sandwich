@@ -5,12 +5,14 @@
 Request 注解规约适用于同时满足以下条件的 Java 类：
 
 - 文件名以 `Request.java` 结尾
-- 文件路径位于 API 请求包下，当前为 `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/request/`
+- 文件路径位于 API 请求包下，当前为：
+  - `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/controller/request/`
+  - `sandwish-front-api/src/main/java/com/github/thundax/modules/*/controller/request/`
 
 当前扫描结果：
 
-- Request 类总数：43
-- Admin API Request 类：43
+- Request 类总数：45
+- Admin API Request 类：45
 - Front API Request 类：0
 - Shared、business、infra Request 类：0
 
@@ -34,7 +36,7 @@ Request 注解规约的测试支撑归属于 `sandwish-common/sandwish-common-te
 
 ## 当前缺口
 
-`sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/request/PersonalAvatarUploadRequest.java`
+`sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/PersonalAvatarUploadRequest.java`
 
 - 已有 `@Getter`
 - 已有 `@Setter`

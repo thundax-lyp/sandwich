@@ -54,14 +54,14 @@
 - `PATH_DATA_OBJECT_INFRA_ONLY`：生产代码中 `DO/DataObject` 只能在 `sandwish-infra` 定义和引用，其他模块不得定义、导入、作为字段、参数、返回值或泛型使用。
 - `PATH_COMMON_NO_BUSINESS`：无业务语义的通用能力才允许进入 `sandwish-common`
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
-- `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
+- `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，并下沉到对应业务模块的 `controller/request` 与 `controller/response` 包；不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
 - `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
 
 ### Layer
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
-- `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装，不把入口模型下沉到 Service
+- `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装；入口模型放在同业务模块的 `controller/request` 与 `controller/response` 包，不下沉到 Service
 - `LAYER_SERVICE_ENTITY_MODEL`：Service 固定使用 Entity 或稳定业务参数，不直接依赖 API `Request` / `Response`
 - `LAYER_SERVICE_QUERY_MODEL`：Service 读取条件使用 `XxxQuery` 表达时，`XxxQuery` 固定作为 Service 输入模型，只承载读取过滤条件，不承载 HTTP、Session、权限适配、分页状态、持久化实现类型或 request 字符串解析逻辑。
 - `LAYER_SERVICE_QUERY_NO_SETTER_LOGIC`：`XxxQuery` 源码不得声明 `setXxx` 方法；JDK8 下使用 class 承载字段定义，request 到 query 的枚举解析、日期归一化和字段装配固定放在对应 `InterfaceAssembler`。
@@ -90,7 +90,7 @@
 - `NAME_SERVICE_METHOD_SHAPE`：Service 方法优先表达业务能力；当方法只是通用读取、列表、分页、计数、按 ID 删除、批量操作时，使用 `getById/getByXxx/list/page/count/deleteById/batchXxx`。不得新增裸 `get`、`getMany`、`find`、`findXxx`、`findList`、`findPage`、`findOne`、`delete(EntityId id)` 等旧泛化口径；业务动作使用清晰动词短语
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾
 - `NAME_INTERFACE_ASSEMBLER`：API 模型装配器命名以 `InterfaceAssembler` 结尾
-- `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾
+- `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾，分别放在对应 API 模块的 `modules/{module}/controller/request` 与 `modules/{module}/controller/response` 包
 - `NAME_REQUEST_REQUIRED_ANNOTATIONS`：API `Request` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_RESPONSE_REQUIRED_ANNOTATIONS`：API `Response` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_VO_DTO`：VO / DTO 命名必须表达使用场景或业务对象
@@ -101,6 +101,7 @@
 ### Path
 
 - 同一业务对象的 Controller、Service、DAO interface、Entity 和 API 支撑资源应按固定层归属放置，并保持业务模块路径一致
+- 同一业务模块的 Controller 保持在 `controller` 包；不要再按 action 或资源名拆成 `controller/{action}` 子包
 - 后台专用入口不放到 `sandwish-front-api`
 - 前台专用入口不放到 `sandwish-admin-api`
 - 前后台复用业务不复制到两个 API 入口模块

@@ -6,13 +6,13 @@ Response 注解规约适用于同时满足以下条件的 Java 类：
 
 - 文件名以 `Response.java` 结尾
 - 文件路径位于 API 响应包下，当前为：
-  - `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/response/`
-  - `sandwish-front-api/src/main/java/com/github/thundax/modules/*/response/`
+  - `sandwish-admin-api/src/main/java/com/github/thundax/modules/*/controller/response/`
+  - `sandwish-front-api/src/main/java/com/github/thundax/modules/*/controller/response/`
 
 当前扫描结果：
 
 - Response 类总数：29
-- Admin API Response 类：27
+- Admin API Response 类：28
 - Front API Response 类：1
 - Shared、infra Response 类：0
 - Biz Response 类：1

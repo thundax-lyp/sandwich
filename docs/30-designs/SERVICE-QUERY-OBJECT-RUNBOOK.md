@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 服务层查询参数对象迁移的阶段性执行边界。
 
-目标是把 `service.list/page(Entity entity)` 中用于查询的 `Entity.Query` 临时条件，迁移为显式 `XxxQuery` 服务层查询对象。迁移后 Controller 负责把 API `Request` 转成业务查询对象，Service 接收稳定业务参数，Entity 不再承载只服务查询的临时状态。
+目标是把 `service.list/page(Entity entity)` 中用于查询的 `Entity.Query` 临时条件，迁移为显式 `XxxQuery` 服务层查询对象。迁移后 API 模块的 `InterfaceAssembler` 负责把 API `Request` 转成业务查询对象，Controller 只做入口编排并调用 Service，Service 接收稳定业务参数，Entity 不再承载只服务查询的临时状态。
 
 本文档是阶段性 RUNBOOK，迁移完成并完成现场清理后从 `docs/30-designs/` 删除。
 
@@ -13,7 +13,7 @@
 当前范围：
 
 - `sandwish-biz` 中 `list/page` 读取类 Service 方法的查询参数显式化。
-- `sandwish-admin-api` / `sandwish-front-api` 中 Controller 到 Service 的查询参数装配。
+- `sandwish-admin-api` / `sandwish-front-api` 中 `InterfaceAssembler` 对 `Request -> XxxQuery` 的查询参数装配。
 - `Dict`、`Menu`、`User`、`Role`、`Office`、`Log`、`Storage`、`Member`、`Signature` 相关读取链路。
 - `Entity.Query`、`getQuery()`、`setQuery()` 在对应 domain 内的逐步删除。
 - `TODO.md` 按 domain 拆解迁移任务。
@@ -35,7 +35,8 @@
 - 查询对象归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{domain}/service/query/`。
 - `XxxQuery` 只表达 Service 读取条件，不包含 HTTP、Session、权限适配或分页状态。
 - API `Request` 仍归属对应 API 模块。
-- Controller 负责 `Request -> XxxQuery` 的装配。
+- `InterfaceAssembler` 负责 `Request -> XxxQuery` 的装配。
+- Controller 接收 `Request`，调用 `InterfaceAssembler` 得到 `XxxQuery`，再调用 Service。
 - Service interface 的 `list/page` 接收 `XxxQuery` 或无查询参数，不接收只为查询创建的空 Entity。
 - ServiceImpl 从 `XxxQuery` 读取条件，并保持原 DAO 调用语义。
 - DAO interface 可以在本轮继续使用当前展开参数形态。
@@ -47,10 +48,11 @@
 
 - Controller 是 HTTP 入口，接收 `Request`，输出 `Response` / API 响应包装。
 - Service 是业务流程和事务边界，接收 Entity、稳定业务参数或 `XxxQuery`。
+- `InterfaceAssembler` 是 API 模型装配边界，负责 `Request -> XxxQuery`、业务结果到 `Response` / `VO` 的纯转换。
 - `XxxQuery` 是业务侧服务输入模型，不是 API 模型。
 - `XxxQuery` 不进入 `sandwish-common`，不进入 `sandwish-infra`。
 - `XxxQuery` 不继承 Entity，不持有 Entity 作为查询条件容器。
-- DAO 不感知 API `Request`，不感知 Controller 装配细节。
+- DAO 不感知 API `Request`，不感知 `InterfaceAssembler` 装配细节。
 - 分页仍使用现有 `com.github.thundax.common.persistence.Page` 对外模型；本轮只替换查询条件对象。
 
 ## 5. Task Shape
@@ -59,7 +61,7 @@
 
 一个 domain 闭环包含：
 
-`API Request -> Controller -> XxxQuery -> Service interface -> ServiceImpl -> DAO parameters -> Entity.Query cleanup -> tests -> TODO cleanup -> commit`
+`API Request -> Controller -> InterfaceAssembler -> XxxQuery -> Service interface -> ServiceImpl -> DAO parameters -> Entity.Query cleanup -> tests -> TODO cleanup -> commit`
 
 固定规则：
 
@@ -85,15 +87,37 @@
 
 - 禁止 `XxxQuery extends Xxx`。
 - 禁止把 `Request` 直接作为 Service 参数。
+- 禁止在 Controller 私有方法里长期保留 `Request -> XxxQuery` 字段搬运逻辑。
 - 禁止把 `XxxQuery` 放入 `entity` 包。
 - 禁止为 Query 迁移新增 `QueryService` 层。
 - 禁止把 DAO 展开参数回退为 `Entity`。
 
-## 7. Domain Execution Matrix
+## 7. Interface Assembler Rules
+
+`Request -> XxxQuery` 固定由对应 API 模块的 `InterfaceAssembler` 完成。
+
+固定规则：
+
+- 后台入口使用 `sandwish-admin-api` 对应 domain 的 `XxxInterfaceAssembler`。
+- 前台入口使用 `sandwish-front-api` 对应 domain 的 `XxxInterfaceAssembler`。
+- 没有现成 assembler 时，优先在对应 API 模块和业务包下新增 `XxxInterfaceAssembler`，不放入 `sandwish-biz`。
+- assembler 方法只做字段转换，不调用 Service、DAO、Mapper，不处理事务、权限或数据库查询。
+- Controller 可以处理登录态、权限适配和响应包装，但不长期承载字段搬运。
+- 分页参数仍由 Controller 读取为 `Page<T>`；`XxxQuery` 不承载 `pageNo/pageSize`。
+
+典型迁移形态：
+
+```java
+DictQuery query = DictInterfaceAssembler.toQuery(request);
+Page<Dict> page = readDictPage(request);
+Page<Dict> dataPage = dictService.page(query, page);
+```
+
+## 8. Domain Execution Matrix
 
 ### Dict
 
-迁移 `Dict.Query` 到 `DictQuery`，保持 `type`、`label`、`remarks` 等过滤语义。Controller 中 `DictQueryRequest` / `DictPageRequest` 只装配 `DictQuery`，Service 不再接收查询用 `Dict`。
+迁移 `Dict.Query` 到 `DictQuery`，保持 `type`、`label`、`remarks` 等过滤语义。`DictInterfaceAssembler` 负责 `DictQueryRequest` / `DictPageRequest` 到 `DictQuery` 的装配，Service 不再接收查询用 `Dict`。
 
 ### Menu
 
@@ -127,7 +151,7 @@
 
 迁移 `SignatureService.page(String businessType, Page<Signature> page)` 到 `SignatureQuery`，只承接读取条件。签名校验、删除、verifySign 等动作不纳入本轮。
 
-## 8. Verification
+## 9. Verification
 
 每个 domain 固定验证：
 
@@ -145,7 +169,7 @@ mvn -q -pl sandwish-front-api -am -DskipTests package
 
 验证失败时只修复当前 domain 相关问题，不扩大迁移范围。
 
-## 9. Cleanup Rule
+## 10. Cleanup Rule
 
 全部 domain 迁移完成后执行最终清理：
 
@@ -154,4 +178,3 @@ mvn -q -pl sandwish-front-api -am -DskipTests package
 - 确认 main 代码中不再使用已迁移 domain 的 `Entity.Query`。
 - 确认没有空的 `service/query` 临时类或未使用 import。
 - 单独提交清理现场。
-

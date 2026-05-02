@@ -2,6 +2,7 @@ package com.github.thundax.modules.assist.service;
 
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.entity.Signature;
+import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public interface SignatureService {
      * @param page 分页对象
      * @return 分页结果
      */
-    Page<Signature> page(String businessType, Page<Signature> page);
+    Page<Signature> page(SignatureQuery query, Page<Signature> page);
 
     /**
      * 新增签名结果。

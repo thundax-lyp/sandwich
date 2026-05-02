@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
+import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -43,8 +44,10 @@ public class SignatureServiceImplTest {
         dao.pageResult = page;
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
+        SignatureQuery query = new SignatureQuery();
+        query.setBusinessType("Log");
 
-        assertSame(page, service.page("Log", page));
+        assertSame(page, service.page(query, page));
         assertEquals("Log", dao.pageBusinessType);
         assertEquals(page.getPageNo(), dao.pageNo);
         assertEquals(page.getPageSize(), dao.pageSize);

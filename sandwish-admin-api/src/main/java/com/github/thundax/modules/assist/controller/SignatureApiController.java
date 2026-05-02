@@ -18,6 +18,7 @@ import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
+import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -82,8 +83,9 @@ public class SignatureApiController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
     public PageVo<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
+        SignatureQuery query = SignatureInterfaceAssembler.toQuery(request);
         return PageVoHelper.fromEntityPage(
-                signatureService.page(request.getBusinessType(), readSignaturePage(request)), this::entityToResponse);
+                signatureService.page(query, readSignaturePage(request)), this::entityToResponse);
     }
 
     @ApiOperation(value = "校验", notes = "assist:signature:view")

@@ -6,6 +6,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
+import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -35,9 +36,12 @@ public class SignatureServiceImpl implements SignatureService {
     }
 
     @Override
-    public Page<Signature> page(String businessType, Page<Signature> page) {
+    public Page<Signature> page(SignatureQuery query, Page<Signature> page) {
         Page<Signature> normalizedPage = normalizePage(page);
-        IPage<Signature> dataPage = dao.page(businessType, normalizedPage.getPageNo(), normalizedPage.getPageSize());
+        IPage<Signature> dataPage = dao.page(
+                query == null ? null : query.getBusinessType(),
+                normalizedPage.getPageNo(),
+                normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
         normalizedPage.setCount(dataPage.getTotal());

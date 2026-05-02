@@ -3,8 +3,10 @@ package com.github.thundax.modules.assist.assembler;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.entity.Signature;
+import com.github.thundax.modules.assist.request.SignaturePageRequest;
 import com.github.thundax.modules.assist.response.SignatureResponse;
 import com.github.thundax.modules.assist.response.SignatureVerifyResponse;
+import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import org.springframework.lang.NonNull;
 
 public final class SignatureInterfaceAssembler {
@@ -35,5 +37,12 @@ public final class SignatureInterfaceAssembler {
         SignatureVerifyResponse response = new SignatureVerifyResponse();
         response.setVerified(Boolean.TRUE.equals(verified));
         return response;
+    }
+
+    @NonNull
+    public static SignatureQuery toQuery(@NonNull SignaturePageRequest request) {
+        SignatureQuery query = new SignatureQuery();
+        query.setBusinessType(request.getBusinessType());
+        return query;
     }
 }

@@ -10,6 +10,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.service.query.OfficeQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -28,15 +29,13 @@ public class OfficeServiceImplTest {
     @Test
     public void shouldExpandFindListQuery() {
         RecordingOfficeDao dao = new RecordingOfficeDao();
-        Office office = new Office();
-        Office.Query query = new Office.Query();
+        OfficeQuery query = new OfficeQuery();
         query.setParentId("ROOT");
         query.setName("总部");
         query.setRemarks("备注");
-        office.setQuery(query);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.list(office);
+        service.list(query);
 
         assertEquals("ROOT", dao.parentId);
         assertEquals("总部", dao.name);

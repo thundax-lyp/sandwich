@@ -19,6 +19,7 @@ import com.github.thundax.modules.sys.request.OfficeQueryRequest;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
 import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.query.OfficeQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -80,13 +81,7 @@ public class OfficeApiController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:office:view')")
     public List<OfficeResponse> list(@Valid @RequestBody OfficeQueryRequest request) throws ApiException {
-        Office query = new Office();
-        Office.Query queryCondition = new Office.Query();
-
-        queryCondition.setParentId(request.getParentId());
-        queryCondition.setName(request.getName());
-        queryCondition.setRemarks(request.getRemarks());
-        query.setQuery(queryCondition);
+        OfficeQuery query = OfficeInterfaceAssembler.toQuery(request);
 
         return officeService.list(query).stream()
                 .map(office -> OfficeInterfaceAssembler.toResponse(office, officeService::getById))

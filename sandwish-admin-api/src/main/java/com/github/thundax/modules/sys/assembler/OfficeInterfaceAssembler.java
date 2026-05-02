@@ -3,8 +3,10 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.request.OfficeQueryRequest;
 import com.github.thundax.modules.sys.request.OfficeSaveRequest;
 import com.github.thundax.modules.sys.response.OfficeResponse;
+import com.github.thundax.modules.sys.service.query.OfficeQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -49,6 +51,15 @@ public final class OfficeInterfaceAssembler {
         response.setName(entity.getName());
         response.setShortName(entity.getShortName());
         return response;
+    }
+
+    @NonNull
+    public static OfficeQuery toQuery(@NonNull OfficeQueryRequest request) {
+        OfficeQuery query = new OfficeQuery();
+        query.setParentId(request.getParentId());
+        query.setName(request.getName());
+        query.setRemarks(request.getRemarks());
+        return query;
     }
 
     @NonNull

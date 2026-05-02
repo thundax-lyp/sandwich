@@ -7,6 +7,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.query.OfficeQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -55,7 +56,11 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public List<Office> list(Office office) {
-        Office.Query query = office == null ? null : office.getQuery();
+        return list((OfficeQuery) null);
+    }
+
+    @Override
+    public List<Office> list(OfficeQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
@@ -70,8 +75,12 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     public Page<Office> page(Office office, Page<Office> page) {
+        return page((OfficeQuery) null, page);
+    }
+
+    @Override
+    public Page<Office> page(OfficeQuery query, Page<Office> page) {
         Page<Office> normalizedPage = normalizePage(page);
-        Office.Query query = office == null ? null : office.getQuery();
         IPage<Office> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),

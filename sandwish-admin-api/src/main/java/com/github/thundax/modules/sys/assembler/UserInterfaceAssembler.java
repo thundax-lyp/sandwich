@@ -9,10 +9,12 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.request.UserQueryRequest;
 import com.github.thundax.modules.sys.request.UserSaveRequest;
 import com.github.thundax.modules.sys.response.UserOfficeResponse;
 import com.github.thundax.modules.sys.response.UserResponse;
 import com.github.thundax.modules.sys.response.UserRoleResponse;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -89,6 +91,19 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
+    public static UserQuery toQuery(@NonNull UserQueryRequest request) {
+        UserQuery query = new UserQuery();
+        query.setOfficeId(emptyToNull(request.getOfficeId()));
+        query.setLoginName(emptyToNull(request.getLoginName()));
+        query.setName(emptyToNull(request.getName()));
+        if (request.getEnable() != null) {
+            query.setStatus(request.getEnable() ? UserStatus.ENABLED : UserStatus.DISABLED);
+        }
+        query.setOrderBy(emptyToNull(request.getOrderBy()));
+        return query;
+    }
+
+    @NonNull
     public static User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
@@ -125,5 +140,9 @@ public final class UserInterfaceAssembler {
             }
         }
         return StringUtils.join(names, "/");
+    }
+
+    private static String emptyToNull(String value) {
+        return StringUtils.isEmpty(value) ? null : value;
     }
 }

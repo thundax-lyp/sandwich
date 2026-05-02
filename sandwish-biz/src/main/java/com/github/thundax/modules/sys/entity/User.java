@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -151,91 +150,5 @@ public class User implements Auditable, Signable, Sortable {
         map.put("lastLoginIp", this.getLastLoginIp());
 
         return JsonUtils.toJson(map);
-    }
-
-    private Query query;
-
-    public Query getQuery() {
-        return this.query;
-    }
-
-    public void setQuery(Query query) {
-        this.query = query;
-    }
-
-    public static class Query implements Serializable {
-
-        public static final String PROP_OFFICE_ID = "officeId";
-        public static final String PROP_LOGIN_NAME = "loginName";
-        public static final String PROP_NAME = "name";
-        public static final String PROP_STATUS = "status";
-        public static final String PROP_PRIVILEGE = "privilege";
-        public static final String PROP_ORDER_BY = "orderBy";
-
-        private String officeId; // 按照机构查询
-        private String loginName; // 按照登录名查询
-        private String name; // 按照姓名名查询
-        private UserStatus status;
-        private UserPrivilege privilege;
-
-        private String orderBy;
-
-        public String getOfficeId() {
-            return this.officeId;
-        }
-
-        public void setOfficeId(String officeId) {
-            this.officeId = officeId;
-        }
-
-        // a.login_name LIKE '%'+#{query.loginName}+'%'
-        public String getLoginName() {
-            return this.loginName;
-        }
-
-        public void setLoginName(String loginName) {
-            this.loginName = loginName;
-        }
-
-        // a.name LIKE '%'+#{query.name}+'%'
-        public String getName() {
-            return this.name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public UserStatus getStatus() {
-            return status;
-        }
-
-        public void setStatus(UserStatus status) {
-            this.status = status;
-        }
-
-        public void setStatus(String status) {
-            this.status = StringUtils.isBlank(status) ? null : UserStatus.from(status);
-        }
-
-        public UserPrivilege getPrivilege() {
-            return privilege;
-        }
-
-        public void setPrivilege(UserPrivilege privilege) {
-            this.privilege = privilege;
-        }
-
-        public void setPrivilege(String privilege) {
-            this.privilege = StringUtils.isBlank(privilege) ? null : UserPrivilege.from(privilege);
-        }
-
-        public String getOrderBy() {
-            return orderBy;
-        }
-
-        public void setOrderBy(String orderBy) {
-            this.orderBy = orderBy;
-        }
     }
 }

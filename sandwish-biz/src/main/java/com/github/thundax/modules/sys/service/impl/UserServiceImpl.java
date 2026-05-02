@@ -14,6 +14,7 @@ import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -67,7 +68,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> list(User user) {
-        User.Query query = user == null ? null : user.getQuery();
+        return list((UserQuery) null);
+    }
+
+    @Override
+    public List<User> list(UserQuery query) {
         return dao.list(
                 query == null ? null : query.getOfficeId(),
                 query == null ? null : query.getLoginName(),
@@ -84,8 +89,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> page(User user, Page<User> page) {
+        return page((UserQuery) null, page);
+    }
+
+    @Override
+    public Page<User> page(UserQuery query, Page<User> page) {
         Page<User> normalizedPage = normalizePage(page);
-        User.Query query = user == null ? null : user.getQuery();
         IPage<User> dataPage = dao.page(
                 query == null ? null : query.getOfficeId(),
                 query == null ? null : query.getLoginName(),

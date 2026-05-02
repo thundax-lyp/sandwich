@@ -2,8 +2,6 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.web.BaseAdminController;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(value = "/admin/tag")
 public class TagController extends BaseAdminController {
-
-    @Autowired
-    public TagController(Validator validator) {
-        super(validator);
-    }
 
     @RequestMapping(value = "treeSelector")
     public String treeSelector(HttpServletRequest request, Model model) {

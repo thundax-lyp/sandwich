@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,9 +56,7 @@ public class StorageController extends BaseAdminController {
             VltavaProperties properties,
             StorageService storageService,
             StorageUtils storageUtils,
-            Validator validator,
             StorageConverter storageConverter) {
-        super(validator);
         this.properties = properties.getUpload();
         this.storageService = storageService;
         this.storageUtils = storageUtils;
@@ -146,7 +143,8 @@ public class StorageController extends BaseAdminController {
                     storage.setMimeType(file.getContentType());
 
                     storage.setOwnerType(StorageOwnerType.USER);
-                    storage.setOwnerId(EntityIdCodec.toValue(currentUser().getId()));
+                    storage.setOwnerId(
+                            EntityIdCodec.toValue(UserAccessHolder.currentUser().getId()));
 
                     //                    File localFile = new File(properties.getStoragePath() +
                     // storage.getFilename());

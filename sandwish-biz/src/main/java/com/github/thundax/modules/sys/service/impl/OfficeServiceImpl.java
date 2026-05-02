@@ -50,8 +50,8 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public List<Office> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Office> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -113,8 +113,8 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Office entity) {
-        Office bean = this.getById(entity.getId());
+    public int deleteById(EntityId id) {
+        Office bean = this.getById(id);
         if (bean == null) {
             return 0;
         }
@@ -126,8 +126,8 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Office> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -155,11 +155,11 @@ public class OfficeServiceImpl implements OfficeService {
                 && dao.isChildOf(EntityIdCodec.toValue(child.getId()), EntityIdCodec.toValue(parent.getId()));
     }
 
-    private int batchOperate(Collection<Office> collection, Function<Office, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Office office : collection) {
-                count += operator.apply(office);
+            for (T entity : collection) {
+                count += operator.apply(entity);
             }
         }
         return count;

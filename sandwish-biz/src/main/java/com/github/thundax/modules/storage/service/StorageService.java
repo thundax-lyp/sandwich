@@ -11,7 +11,7 @@ public interface StorageService {
 
     Storage getById(EntityId id);
 
-    List<Storage> batchGetByIds(List<String> ids);
+    List<Storage> batchGetByIds(List<EntityId> ids);
 
     List<Storage> list(StorageQuery query);
 
@@ -21,9 +21,9 @@ public interface StorageService {
 
     void update(Storage storage);
 
-    int deleteById(Storage storage);
+    int deleteById(EntityId id);
 
-    int batchDeleteById(List<Storage> list);
+    int batchDeleteById(List<EntityId> ids);
 
     /**
      * 获取MIME列表

@@ -79,9 +79,10 @@ public class RoleServiceImplTest {
     @Test
     public void shouldDeleteRoleRelationsBeforeRole() {
         RecordingRoleDao dao = new RecordingRoleDao();
+        dao.getResult = role("role-1");
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        int count = service.deleteById(role("role-1"));
+        int count = service.deleteById(EntityId.of("role-1"));
 
         assertEquals(1, count);
         assertEquals("role-1", dao.deletedRoleMenuId);
@@ -112,10 +113,11 @@ public class RoleServiceImplTest {
         private String deletedRoleId;
         private List<String> menuIdList;
         private List<String> userIdList;
+        private Role getResult;
 
         @Override
         public Role getById(EntityId id) {
-            return null;
+            return getResult;
         }
 
         @Override

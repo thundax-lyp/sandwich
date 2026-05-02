@@ -18,7 +18,7 @@ public interface LogService {
 
     void update(Log log);
 
-    int deleteById(Log log);
+    int deleteById(EntityId id);
 
     /**
      * 写入

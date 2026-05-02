@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<User> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -202,10 +202,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(User user) {
-        dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
+    public int deleteById(EntityId id) {
+        User user = getById(id);
+        if (user == null) {
+            return 0;
+        }
 
-        int result = dao.deleteById(user.getId());
+        dao.deleteUserRole(EntityIdCodec.toValue(id));
+
+        int result = dao.deleteById(id);
 
         signService.deleteSign(user.getSignName(), user.getSignId());
 
@@ -227,8 +232,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<User> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -243,11 +248,11 @@ public class UserServiceImpl implements UserService {
         return batchOperate(list, this::updatePriority);
     }
 
-    private int batchOperate(Collection<User> collection, Function<User, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (User user : collection) {
-                count += operator.apply(user);
+            for (T entity : collection) {
+                count += operator.apply(entity);
             }
         }
         return count;

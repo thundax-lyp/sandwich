@@ -52,8 +52,8 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<Dict> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Dict> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -136,14 +136,14 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Dict dict) {
-        return dict == null ? 0 : dao.deleteById(dict.getId());
+    public int deleteById(EntityId id) {
+        return id == null ? 0 : dao.deleteById(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Dict> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -163,11 +163,11 @@ public class DictServiceImpl implements DictService {
         return dao.getDictionaryRevision();
     }
 
-    private int batchOperate(Collection<Dict> collection, Function<Dict, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Dict dict : collection) {
-                count += operator.apply(dict);
+            for (T entity : collection) {
+                count += operator.apply(entity);
             }
         }
         return count;

@@ -171,7 +171,7 @@ public class OfficeApiController {
             return bean;
         });
 
-        officeService.batchDeleteById(beanList);
+        officeService.batchDeleteById(beanList.stream().map(Office::getId).collect(Collectors.toList()));
 
         return true;
     }

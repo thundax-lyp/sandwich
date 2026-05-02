@@ -142,7 +142,7 @@ public class DictController {
             }
             return bean;
         });
-        dictService.batchDeleteById(beanList);
+        dictService.batchDeleteById(beanList.stream().map(Dict::getId).collect(Collectors.toList()));
         return true;
     }
 

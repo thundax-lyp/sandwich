@@ -65,8 +65,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Role> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -177,10 +177,15 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Role role) {
-        dao.deleteRoleMenu(EntityIdCodec.toValue(role.getId()));
-        dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
-        int retVal = dao.deleteById(role.getId());
+    public int deleteById(EntityId id) {
+        Role role = getById(id);
+        if (role == null) {
+            return 0;
+        }
+
+        dao.deleteRoleMenu(EntityIdCodec.toValue(id));
+        dao.deleteRoleUser(EntityIdCodec.toValue(id));
+        int retVal = dao.deleteById(id);
 
         signService.deleteSign(role.getSignName(), role.getSignId());
         notifyCacheChanged();
@@ -242,8 +247,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Role> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -258,11 +263,11 @@ public class RoleServiceImpl implements RoleService {
         return batchOperate(list, this::updatePriority);
     }
 
-    private int batchOperate(Collection<Role> collection, Function<Role, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Role role : collection) {
-                count += operator.apply(role);
+            for (T entity : collection) {
+                count += operator.apply(entity);
             }
         }
         return count;

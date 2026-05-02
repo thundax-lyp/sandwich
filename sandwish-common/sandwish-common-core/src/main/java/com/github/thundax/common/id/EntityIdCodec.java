@@ -1,5 +1,8 @@
 package com.github.thundax.common.id;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public final class EntityIdCodec {
 
     private EntityIdCodec() {}
@@ -10,5 +13,17 @@ public final class EntityIdCodec {
 
     public static String toValue(EntityId entityId) {
         return entityId == null ? null : entityId.value();
+    }
+
+    public static List<EntityId> toDomains(List<String> values) {
+        return values == null
+                ? null
+                : values.stream().map(EntityIdCodec::toDomain).collect(Collectors.toList());
+    }
+
+    public static List<String> toValues(List<EntityId> entityIds) {
+        return entityIds == null
+                ? null
+                : entityIds.stream().map(EntityIdCodec::toValue).collect(Collectors.toList());
     }
 }

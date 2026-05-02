@@ -109,7 +109,7 @@ public class MenuServiceImplTest {
         RecordingSignService signService = new RecordingSignService();
         MenuServiceImpl service = new MenuServiceImpl(dao, signService);
 
-        int count = service.deleteById(menu("menu-1"));
+        int count = service.deleteById(EntityId.of("menu-1"));
 
         assertEquals(1, count);
         assertEquals("menu-1", dao.deletedMenuRoleId);

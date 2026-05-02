@@ -78,7 +78,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         StorageServiceImpl service = new StorageServiceImpl(dao);
 
-        int count = service.batchDeleteById(Arrays.asList(storage("s1"), storage("s2")));
+        int count = service.batchDeleteById(Arrays.asList(EntityId.of("s1"), EntityId.of("s2")));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList("s1", "s2"), dao.deletedIds);

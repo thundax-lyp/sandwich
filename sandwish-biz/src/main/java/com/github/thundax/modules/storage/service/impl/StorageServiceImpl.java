@@ -37,8 +37,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Storage> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -87,17 +87,14 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Storage storage) {
-        if (storage == null) {
-            return 0;
-        }
-        return dao.deleteById(storage.getId());
+    public int deleteById(EntityId id) {
+        return id == null ? 0 : dao.deleteById(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Storage> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -139,10 +136,10 @@ public class StorageServiceImpl implements StorageService {
         return dao.listBusiness(entity);
     }
 
-    private int batchOperate(Collection<Storage> collection, Function<Storage, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Storage entity : collection) {
+            for (T entity : collection) {
                 count += operator.apply(entity);
             }
         }

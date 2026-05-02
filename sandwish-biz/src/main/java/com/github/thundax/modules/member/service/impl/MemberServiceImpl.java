@@ -37,8 +37,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Member> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -139,17 +139,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Member member) {
-        if (member == null) {
-            return 0;
-        }
-        return dao.deleteById(member.getId());
+    public int deleteById(EntityId id) {
+        return id == null ? 0 : dao.deleteById(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Member> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -172,10 +169,10 @@ public class MemberServiceImpl implements MemberService {
         dao.updateLoginPass(member);
     }
 
-    private int batchOperate(Collection<Member> collection, Function<Member, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Member entity : collection) {
+            for (T entity : collection) {
                 count += operator.apply(entity);
             }
         }

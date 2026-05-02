@@ -88,11 +88,8 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Log log) {
-        if (log == null) {
-            return 0;
-        }
-        return dao.deleteById(log.getId());
+    public int deleteById(EntityId id) {
+        return id == null ? 0 : dao.deleteById(id);
     }
 
     @Override

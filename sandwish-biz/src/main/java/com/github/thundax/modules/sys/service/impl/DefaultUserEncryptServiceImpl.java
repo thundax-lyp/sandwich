@@ -72,7 +72,7 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public List<UserEncrypt> batchGetByIds(List<String> ids) {
+    public List<UserEncrypt> batchGetByIds(List<EntityId> ids) {
         return null;
     }
 
@@ -92,12 +92,12 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public int deleteById(UserEncrypt entity) {
+    public int deleteById(EntityId id) {
         return 0;
     }
 
     @Override
-    public int batchDeleteById(List<UserEncrypt> list) {
+    public int batchDeleteById(List<EntityId> ids) {
         return 0;
     }
 

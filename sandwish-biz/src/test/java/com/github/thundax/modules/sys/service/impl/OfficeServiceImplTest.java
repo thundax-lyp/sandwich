@@ -88,7 +88,7 @@ public class OfficeServiceImplTest {
         dao.getResult = office("office-1");
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        int count = service.deleteById(office("office-1"));
+        int count = service.deleteById(EntityId.of("office-1"));
 
         assertEquals(1, count);
         assertEquals("office-1", dao.deletedId);

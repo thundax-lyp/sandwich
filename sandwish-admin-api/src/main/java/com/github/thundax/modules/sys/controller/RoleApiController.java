@@ -232,7 +232,7 @@ public class RoleApiController {
             return bean;
         });
 
-        roleService.batchDeleteById(beanList);
+        roleService.batchDeleteById(beanList.stream().map(Role::getId).collect(Collectors.toList()));
 
         return true;
     }

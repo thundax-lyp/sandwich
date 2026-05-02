@@ -146,7 +146,7 @@ public class StorageController {
             return storage;
         });
 
-        storageService.batchDeleteById(storageList);
+        storageService.batchDeleteById(storageList.stream().map(Storage::getId).collect(Collectors.toList()));
         return true;
     }
 

@@ -57,8 +57,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<Menu> batchGetByIds(List<String> ids) {
-        return dao.batchGetByIds(ids);
+    public List<Menu> batchGetByIds(List<EntityId> ids) {
+        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -164,16 +164,16 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(Menu menu) {
-        dao.deleteMenuRole(EntityIdCodec.toValue(menu.getId()));
-        Menu bean = this.getById(menu.getId());
+    public int deleteById(EntityId id) {
+        dao.deleteMenuRole(EntityIdCodec.toValue(id));
+        Menu bean = this.getById(id);
         if (bean == null) {
             return 0;
         }
 
         int retVal = dao.deleteById(bean.getId());
 
-        signService.deleteSign(menu.getSignName(), menu.getSignId());
+        signService.deleteSign(bean.getSignName(), bean.getSignId());
         notifyCacheChanged();
 
         return retVal;
@@ -181,8 +181,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<Menu> list) {
-        return batchOperate(list, this::deleteById);
+    public int batchDeleteById(List<EntityId> ids) {
+        return batchOperate(ids, this::deleteById);
     }
 
     @Override
@@ -213,11 +213,11 @@ public class MenuServiceImpl implements MenuService {
         void onMenuCacheChanged();
     }
 
-    private int batchOperate(Collection<Menu> collection, Function<Menu, Integer> operator) {
+    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {
-            for (Menu menu : collection) {
-                count += operator.apply(menu);
+            for (T entity : collection) {
+                count += operator.apply(entity);
             }
         }
         return count;

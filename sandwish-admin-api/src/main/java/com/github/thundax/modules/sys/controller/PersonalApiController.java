@@ -261,7 +261,7 @@ public class PersonalApiController {
             }
         }
 
-        List<Menu> menuList = menuService.batchGetByIds(menuIdList);
+        List<Menu> menuList = menuService.batchGetByIds(EntityIdCodec.toDomains(menuIdList));
         menuList.sort(Menu::compareTo);
         return menuList;
     }

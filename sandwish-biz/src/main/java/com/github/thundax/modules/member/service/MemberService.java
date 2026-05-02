@@ -13,7 +13,7 @@ public interface MemberService {
 
     Member getById(EntityId id);
 
-    List<Member> batchGetByIds(List<String> ids);
+    List<Member> batchGetByIds(List<EntityId> ids);
 
     List<Member> list(MemberQuery query);
 
@@ -23,9 +23,9 @@ public interface MemberService {
 
     void update(Member member);
 
-    int deleteById(Member member);
+    int deleteById(EntityId id);
 
-    int batchDeleteById(List<Member> list);
+    int batchDeleteById(List<EntityId> ids);
 
     int updatePriority(Member member);
 

@@ -25,6 +25,9 @@ import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -197,12 +200,17 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public List<User> batchGetByIds(List<String> ids) {
+        public List<User> batchGetByIds(List<EntityId> ids) {
             return Collections.singletonList(user());
         }
 
         @Override
         public List<User> list(User entity) {
+            return Collections.singletonList(user());
+        }
+
+        @Override
+        public List<User> list(UserQuery query) {
             return Collections.singletonList(user());
         }
 
@@ -213,6 +221,11 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public Page<User> page(User entity, Page<User> page) {
+            return page;
+        }
+
+        @Override
+        public Page<User> page(UserQuery query, Page<User> page) {
             return page;
         }
 
@@ -228,13 +241,13 @@ public class AuthPermissionLifecycleTest {
         public void update(User entity) {}
 
         @Override
-        public int deleteById(User entity) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public int batchDeleteById(List<User> list) {
-            return list.size();
+        public int batchDeleteById(List<EntityId> ids) {
+            return ids.size();
         }
 
         @Override
@@ -312,12 +325,17 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public List<Menu> batchGetByIds(List<String> ids) {
+        public List<Menu> batchGetByIds(List<EntityId> ids) {
             return menus();
         }
 
         @Override
         public List<Menu> list(Menu entity) {
+            return menus();
+        }
+
+        @Override
+        public List<Menu> list(MenuQuery query) {
             return menus();
         }
 
@@ -328,6 +346,11 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public Page<Menu> page(Menu entity, Page<Menu> page) {
+            return page;
+        }
+
+        @Override
+        public Page<Menu> page(MenuQuery query, Page<Menu> page) {
             return page;
         }
 
@@ -343,13 +366,13 @@ public class AuthPermissionLifecycleTest {
         public void update(Menu entity) {}
 
         @Override
-        public int deleteById(Menu entity) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public int batchDeleteById(List<Menu> list) {
-            return list.size();
+        public int batchDeleteById(List<EntityId> ids) {
+            return ids.size();
         }
 
         @Override
@@ -425,13 +448,18 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> batchGetByIds(List<String> ids) {
+        public List<com.github.thundax.modules.sys.entity.Role> batchGetByIds(List<EntityId> ids) {
             return Collections.emptyList();
         }
 
         @Override
         public List<com.github.thundax.modules.sys.entity.Role> list(
                 com.github.thundax.modules.sys.entity.Role entity) {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<com.github.thundax.modules.sys.entity.Role> list(RoleQuery query) {
             return Collections.emptyList();
         }
 
@@ -448,6 +476,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
+        public Page<com.github.thundax.modules.sys.entity.Role> page(
+                RoleQuery query, Page<com.github.thundax.modules.sys.entity.Role> page) {
+            return page;
+        }
+
+        @Override
         public long count(com.github.thundax.modules.sys.entity.Role entity) {
             return 0;
         }
@@ -459,13 +493,13 @@ public class AuthPermissionLifecycleTest {
         public void update(com.github.thundax.modules.sys.entity.Role entity) {}
 
         @Override
-        public int deleteById(com.github.thundax.modules.sys.entity.Role entity) {
+        public int deleteById(EntityId id) {
             return 1;
         }
 
         @Override
-        public int batchDeleteById(List<com.github.thundax.modules.sys.entity.Role> list) {
-            return list.size();
+        public int batchDeleteById(List<EntityId> ids) {
+            return ids.size();
         }
 
         @Override

@@ -37,7 +37,7 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     }
 
     @Override
-    public void deleteById(AsyncTask asyncTask) {
-        asyncTaskDao.deleteById(asyncTask.getId());
+    public void deleteById(EntityId id) {
+        asyncTaskDao.deleteById(id);
     }
 }

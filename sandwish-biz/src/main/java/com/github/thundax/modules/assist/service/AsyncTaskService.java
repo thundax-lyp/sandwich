@@ -30,7 +30,7 @@ public interface AsyncTaskService {
     /**
      * 删除
      *
-     * @param asyncTask asyncTask
+     * @param id id
      */
-    void deleteById(AsyncTask asyncTask);
+    void deleteById(EntityId id);
 }

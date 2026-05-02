@@ -21,7 +21,7 @@ public interface CrudService<T> extends BaseService {
     /**
      * 新对象
      *
-     * @param id id
+     * @param entity 对象
      * @return 对象
      */
     T newEntity(String id);
@@ -29,7 +29,7 @@ public interface CrudService<T> extends BaseService {
     /**
      * 获取对象
      *
-     * @param entity 对象
+     * @param id id
      * @return 对象
      */
     T getById(T entity);
@@ -48,7 +48,7 @@ public interface CrudService<T> extends BaseService {
      * @param ids id list
      * @return 对象列表
      */
-    List<T> batchGetByIds(List<String> ids);
+    List<T> batchGetByIds(List<EntityId> ids);
 
     /**
      * 获取列表
@@ -103,15 +103,15 @@ public interface CrudService<T> extends BaseService {
      * @param entity 对象
      * @return 影响记录数
      */
-    int deleteById(T entity);
+    int deleteById(EntityId id);
 
     /**
      * 删除
      *
-     * @param list 列表
+     * @param ids id list
      * @return 影响记录数
      */
-    int batchDeleteById(List<T> list);
+    int batchDeleteById(List<EntityId> ids);
 
     /**
      * 排序

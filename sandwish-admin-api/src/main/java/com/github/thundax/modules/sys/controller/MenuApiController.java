@@ -200,7 +200,7 @@ public class MenuApiController {
             return bean;
         });
 
-        menuService.batchDeleteById(beanList);
+        menuService.batchDeleteById(beanList.stream().map(Menu::getId).collect(Collectors.toList()));
 
         return true;
     }

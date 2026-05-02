@@ -359,7 +359,7 @@ public class UserApiController {
             return bean;
         });
 
-        userService.batchDeleteById(beanList);
+        userService.batchDeleteById(beanList.stream().map(User::getId).collect(Collectors.toList()));
 
         return true;
     }

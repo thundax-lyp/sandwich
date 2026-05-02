@@ -1,6 +1,7 @@
 package com.github.thundax.modules.assist.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.assist.response.StorageResponse;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
@@ -28,6 +29,31 @@ public final class StorageInterfaceAssembler {
     public static StorageUploadResponse toUploadErrorResponse(String error) {
         StorageUploadResponse response = new StorageUploadResponse();
         response.setError(error);
+        return response;
+    }
+
+    @NonNull
+    public static StorageResponse toResponse(Storage entity, StorageConverter storageConverter) {
+        if (entity == null) {
+            return new StorageResponse();
+        }
+        StorageResponse response = new StorageResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setName(entity.getName());
+        response.setExtendName(entity.getExtendName());
+        response.setMimeType(entity.getMimeType());
+        response.setOwnerId(entity.getOwnerId());
+        response.setOwnerType(
+                entity.getOwnerType() == null ? null : entity.getOwnerType().value());
+        response.setStatus(
+                entity.getStatus() == null ? null : entity.getStatus().value());
+        response.setVisibility(
+                entity.getVisibility() == null ? null : entity.getVisibility().value());
+        response.setPriority(entity.getPriority());
+        response.setRemarks(entity.getRemarks());
+        response.setCreateDate(entity.getCreateDate());
+        response.setUpdateDate(entity.getUpdateDate());
+        response.setUrl(storageConverter.toPreviewUrl(entity));
         return response;
     }
 

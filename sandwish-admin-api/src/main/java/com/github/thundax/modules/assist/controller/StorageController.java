@@ -2,11 +2,16 @@ package com.github.thundax.modules.assist.controller;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.utils.IdGen;
-import com.github.thundax.common.web.BaseAdminController;
+import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.web.ApiRequestListHelper;
+import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
+import com.github.thundax.modules.assist.request.StorageIdRequest;
+import com.github.thundax.modules.assist.request.StoragePageRequest;
+import com.github.thundax.modules.assist.response.StorageResponse;
 import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -15,159 +20,91 @@ import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.StorageUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
+@Api(tags = "08-03.辅助-存储")
 @RequestMapping(value = "/api/assist/storage")
-public class StorageController extends BaseAdminController {
-
-    private static final String LIST_REDIRECT_URL = "redirect:/api/assist/storage/list?reload";
+@RestController
+public class StorageController {
 
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
-    private final StorageUtils storageUtils;
     private final StorageConverter storageConverter;
 
     @Autowired
     public StorageController(
-            VltavaProperties properties,
-            StorageService storageService,
-            StorageUtils storageUtils,
-            StorageConverter storageConverter) {
+            VltavaProperties properties, StorageService storageService, StorageConverter storageConverter) {
         this.properties = properties.getUpload();
         this.storageService = storageService;
-        this.storageUtils = storageUtils;
         this.storageConverter = storageConverter;
     }
 
-    @RequestMapping(value = {"", "index"})
-    public String index() {
-        return "modules/assist/storageIndex";
+    @ApiOperation(value = "分页查询存储资源", notes = "assist:storage:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "page", method = RequestMethod.POST)
+    public PageVo<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
+        Storage query = readQuery(request);
+        Page<Storage> page = readStoragePage(request);
+        return PageVoHelper.fromEntityPage(
+                storageService.page(query, page),
+                storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
     }
 
-    // 服务端页面入口保留旧查询适配，不作为本轮核心 API 模型隔离目标。
-    @RequestMapping(value = "list")
-    public String list(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Storage storage = readQuery(request, response);
-        Page<Storage> page = storageService.page(storage, new Page<>(request, response));
-
-        model.addAttribute("storage", storage);
-        model.addAttribute("page", page);
-        model.addAttribute("mimeTypeList", storageService.listMimeTypes());
-
-        return "modules/assist/storageList";
-    }
-
-    @RequestMapping(value = "upload")
-    public String uploadForm(
-            @RequestParam(required = false) String theme,
-            @RequestParam(required = false) String allowedFileSuffix,
-            @RequestParam(required = false) Integer maxFileCount,
-            Model model) {
-        if (StringUtils.isBlank(theme)) {
-            theme = StringUtils.EMPTY;
-        }
-        if (StringUtils.isBlank(allowedFileSuffix)) {
-            allowedFileSuffix = StringUtils.join(properties.getAllowSuffix(), ",");
-        }
-        if (maxFileCount == null || maxFileCount > properties.getMaxFileCount()) {
-            maxFileCount = properties.getMaxFileCount();
-        }
-
-        model.addAttribute("theme", theme);
-        model.addAttribute("allowedFileSuffix", allowedFileSuffix);
-        model.addAttribute("maxFileSize", properties.getMaxFileSize());
-        model.addAttribute("maxFileCount", maxFileCount);
-        return "modules/assist/storageUpload";
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "test-upload", method = RequestMethod.POST)
-    public StorageUploadResponse uploadTest(MultipartFile file) throws ApiException {
-        Storage storage = new Storage();
-
-        storage.setOwnerType(StorageOwnerType.USER);
-        storage.setOwnerId(UserAccessHolder.currentUserId());
-        storageUtils.saveFile(file, storage);
-
-        return StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
-    }
-
+    @ApiOperation(value = "上传存储资源", notes = "assist:storage:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
+    })
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    @ResponseBody
     public StorageUploadResponse upload(HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
             return StorageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
-
-        } else {
-            Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
-            StorageUploadResponse response = new StorageUploadResponse();
-            for (MultipartFile file : fileMap.values()) {
-                try {
-                    String originalFilename = file.getOriginalFilename();
-
-                    List<String> validExtNameList = properties.getAllowSuffix();
-                    String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
-                    if (!validExtNameList.contains(extendName)) {
-                        return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
-                    }
-
-                    Storage storage = new Storage();
-                    storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
-
-                    storage.setName(FilenameUtils.getBaseName(originalFilename));
-                    storage.setExtendName(extendName);
-                    storage.setMimeType(file.getContentType());
-
-                    storage.setOwnerType(StorageOwnerType.USER);
-                    storage.setOwnerId(
-                            EntityIdCodec.toValue(UserAccessHolder.currentUser().getId()));
-
-                    //                    File localFile = new File(properties.getStoragePath() +
-                    // storage.getFilename());
-                    //                    localFile.getParentFile().mkdirs();
-
-                    //                    file.transferTo(localFile);
-                    storageService.add(storage);
-
-                    response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return StorageInterfaceAssembler.toUploadErrorResponse("系统错误");
-                }
-            }
-            return response;
         }
+
+        Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
+        StorageUploadResponse response = new StorageUploadResponse();
+        for (MultipartFile file : fileMap.values()) {
+            StorageUploadResponse validatedResponse = validateUploadFile(file);
+            if (validatedResponse.getError() != null) {
+                return validatedResponse;
+            }
+
+            Storage storage = new Storage();
+            storage.setOwnerType(StorageOwnerType.USER);
+            storage.setOwnerId(UserAccessHolder.currentUserId());
+            StorageUtils.saveFile(file, storage);
+            response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
+        }
+        return response;
     }
 
-    // 文件预览是静态资源支撑入口，保持 HttpServletResponse 流式输出边界。
-    @RequestMapping(value = "file/{id}.{extendName}")
+    @ApiOperation(value = "预览存储资源", notes = "assist:storage:view")
+    @RequestMapping(value = "file/{id}.{extendName}", method = RequestMethod.GET)
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
@@ -177,102 +114,89 @@ public class StorageController extends BaseAdminController {
             return;
         }
 
-        File file = new File("");
+        File file = storageConverter.toFile(storage);
         if (!file.exists()) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
 
         response.setContentType(storage.getMimeType());
-        OutputStream outputStream = response.getOutputStream();
-
-        try (FileInputStream inputStream = new FileInputStream(file)) {
+        try (FileInputStream inputStream = new FileInputStream(file);
+                OutputStream outputStream = response.getOutputStream()) {
             byte[] buffer = new byte[4096];
             int readBytes;
             while ((readBytes = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, readBytes);
             }
         }
-        outputStream.close();
     }
 
-    // 服务端页面删除入口保留 RedirectAttributes 跳转反馈，不作为本轮核心 API 模型隔离目标。
-    @RequestMapping(value = "delete")
-    public String delete(String[] ids, RedirectAttributes redirectAttributes) {
-        if (!validateDelete(ids, redirectAttributes)) {
-            return LIST_REDIRECT_URL;
-        }
+    @ApiOperation(value = "删除存储资源", notes = "assist:storage:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
+        List<Storage> storageList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+            Storage storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
+            if (storage == null) {
+                throw new NullBeanException("Storage", request.getId());
+            }
+            return storage;
+        });
 
-        int count = storageService.batchDeleteById(new ArrayList<>(Arrays.asList(ids))
-                .stream().map(this::newStorage).collect(Collectors.toList()));
-        addSuccessMessage(redirectAttributes, "共删除" + count + "条记录");
-
-        return LIST_REDIRECT_URL;
+        storageService.batchDeleteById(storageList);
+        return true;
     }
 
-    private Storage newStorage(String id) {
-        Storage storage = new Storage();
-        storage.setId(EntityIdCodec.toDomain(id));
-        return storage;
-    }
-
-    @RequestMapping(value = "treeData")
-    @ResponseBody
+    @ApiOperation(value = "获取业务类型树", notes = "assist:storage:view")
+    @RequestMapping(value = "treeData", method = RequestMethod.POST)
     public List<StorageTreeNodeResponse> treeData() {
         return storageService.listBusinessTypes().stream()
-                .map(businessType -> StorageInterfaceAssembler.toBusinessTypeTreeNode(businessType))
+                .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)
                 .collect(Collectors.toList());
     }
 
-    @NotNull
-    private Storage readQuery(HttpServletRequest request, HttpServletResponse response) {
+    private StorageUploadResponse validateUploadFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return StorageInterfaceAssembler.toUploadErrorResponse("文件不能为空");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
+        if (!properties.getAllowSuffix().contains(extendName)) {
+            return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
+        }
+        return new StorageUploadResponse();
+    }
+
+    private Storage readQuery(StoragePageRequest request) {
         Storage query = new Storage();
         Storage.Query queryCondition = new Storage.Query();
-
-        queryCondition.setMimeType(readReloadString("query.mimeType", "storage.query.mimeType", request, response));
-
-        queryCondition.setBusinessType(
-                readReloadString("query.businessId", "storage.query.businessId", request, response));
-
-        queryCondition.setStatus(readReloadString("query.enableFlag", "storage.query.enableFlag", request, response));
-
-        queryCondition.setVisibility(
-                readReloadString("query.publicFlag", "storage.query.publicFlag", request, response));
-
-        queryCondition.setName(readReloadString("query.name", "storage.query.name", request, response));
-
-        queryCondition.setRemarks(readReloadString("query.remarks", "storage.query.remarks", request, response));
+        queryCondition.setMimeType(request.getMimeType());
+        queryCondition.setStatus(request.getStatus());
+        queryCondition.setVisibility(request.getVisibility());
+        queryCondition.setName(request.getName());
+        queryCondition.setRemarks(request.getRemarks());
         query.setQuery(queryCondition);
-
         return query;
     }
 
-    private boolean validateExists(String id, RedirectAttributes redirectAttributes) {
-        if (StringUtils.isBlank(id)) {
-            addWarningMessage(redirectAttributes, "无效的请求");
-            return false;
+    private Page<Storage> readStoragePage(StoragePageRequest request) {
+        Integer pageNo = request.getPageNo();
+        Integer pageSize = request.getPageSize();
+
+        if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
+            pageNo = Page.FIRST_PAGE_INDEX;
         }
 
-        Storage bean = storageService.getById(EntityIdCodec.toDomain(id));
-        if (bean == null) {
-            addWarningMessage(redirectAttributes, "无效的数据");
-            return false;
+        if (pageSize == null || pageSize <= 0) {
+            pageSize = Page.DEFAULT_PAGE_SIZE;
         }
 
-        return true;
-    }
-
-    private boolean validateDelete(String[] ids, RedirectAttributes redirectAttributes) {
-        if (ids == null || ids.length <= 0) {
-            addWarningMessage(redirectAttributes, "无效的请求");
-            return false;
-        }
-
-        for (String id : ids) {
-            if (!validateExists(id, redirectAttributes)) {
-                return false;
-            }
-        }
-        return true;
+        Page<Storage> page = new Page<>();
+        page.setPageNo(pageNo);
+        page.setPageSize(pageSize);
+        return page;
     }
 }

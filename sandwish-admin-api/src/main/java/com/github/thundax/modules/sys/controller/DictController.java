@@ -8,6 +8,7 @@ import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -85,7 +86,7 @@ public class DictController extends BaseApiController {
     public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         Dict query = readQuery(request.getLabel(), request.getType(), request.getRemarks());
         Page<Dict> page = readDictPage(request);
-        return entityPageToVo(dictService.page(query, page), DictInterfaceAssembler::toResponse);
+        return PageVoHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")

@@ -12,6 +12,7 @@ import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.ApiRequestListHelper;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -147,7 +148,7 @@ public class UserApiController extends BaseApiController {
         User query = readQuery(request);
         Page<User> page = readUserPage(request);
 
-        return entityPageToVo(userService.page(query, page), this::toResponse);
+        return PageVoHelper.fromEntityPage(userService.page(query, page), this::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")

@@ -6,6 +6,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.vo.PageVo;
 import com.github.thundax.common.web.BaseApiController;
+import com.github.thundax.common.web.PageVoHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.Office;
@@ -66,7 +67,7 @@ public class LogApiController extends BaseApiController {
         queryCondition.setEndDate(request.getEndDate());
         query.setQuery(queryCondition);
 
-        return entityPageToVo(logService.page(query, readLogPage(request)), this::toResponse);
+        return PageVoHelper.fromEntityPage(logService.page(query, readLogPage(request)), this::toResponse);
     }
 
     private LogResponse toResponse(Log log) {

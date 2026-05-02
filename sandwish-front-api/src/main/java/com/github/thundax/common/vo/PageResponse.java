@@ -3,15 +3,12 @@ package com.github.thundax.common.vo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.List;
 
-@ApiModel(value = "Page", description = "分页")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PageVo<T> implements Serializable {
+public class PageResponse<T> implements Serializable {
 
     private Integer pageNo;
     private Integer pageSize;
@@ -20,9 +17,8 @@ public class PageVo<T> implements Serializable {
     private String orderBy;
     private List<T> records;
 
-    public PageVo() {}
+    public PageResponse() {}
 
-    @ApiModelProperty(name = "pageNo", value = "页码，从 1 开始")
     @JsonProperty("pageNo")
     public Integer getPageNo() {
         return pageNo;
@@ -32,7 +28,6 @@ public class PageVo<T> implements Serializable {
         this.pageNo = pageNo;
     }
 
-    @ApiModelProperty(name = "pageSize", value = "每页数据条数")
     @JsonProperty("pageSize")
     public Integer getPageSize() {
         return pageSize;
@@ -42,7 +37,6 @@ public class PageVo<T> implements Serializable {
         this.pageSize = pageSize;
     }
 
-    @ApiModelProperty(name = "totalPage", value = "总页码")
     @JsonProperty("totalPage")
     public Integer getTotalPage() {
         return totalPage;
@@ -52,7 +46,6 @@ public class PageVo<T> implements Serializable {
         this.totalPage = totalPage;
     }
 
-    @ApiModelProperty(name = "orderBy", value = "排序规则")
     @JsonProperty("orderBy")
     public String getOrderBy() {
         return orderBy;
@@ -62,7 +55,6 @@ public class PageVo<T> implements Serializable {
         this.orderBy = orderBy;
     }
 
-    @ApiModelProperty(name = "totalCount", value = "总数据条数")
     @JsonProperty("totalCount")
     public Long getCount() {
         return count;
@@ -72,7 +64,6 @@ public class PageVo<T> implements Serializable {
         this.count = count;
     }
 
-    @ApiModelProperty(name = "records", value = "当前页的数据集")
     @JsonProperty("records")
     public List<T> getRecords() {
         return records;

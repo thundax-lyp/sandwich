@@ -2,7 +2,7 @@ package com.github.thundax.common.web;
 
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.CookieUtils;
-import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.vo.PageResponse;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -232,22 +232,22 @@ public class BaseFrontController {
         }
     }
 
-    public static <T, R> PageVo<R> entityPageToVo(Page<T> page, Function<T, R> mappingFunction) {
-        PageVo<R> pageVo = new PageVo<>();
+    public static <T, R> PageResponse<R> entityPageToResponse(Page<T> page, Function<T, R> mappingFunction) {
+        PageResponse<R> pageResponse = new PageResponse<>();
 
-        pageVo.setPageNo(page.getPageNo());
-        pageVo.setPageSize(page.getPageSize());
-        pageVo.setTotalPage(page.getTotalPage());
-        pageVo.setCount(page.getCount());
+        pageResponse.setPageNo(page.getPageNo());
+        pageResponse.setPageSize(page.getPageSize());
+        pageResponse.setTotalPage(page.getTotalPage());
+        pageResponse.setCount(page.getCount());
 
-        pageVo.setRecords(
+        pageResponse.setRecords(
                 page.getList() == null
                         ? new ArrayList<>()
                         : page.getList().stream()
                                 .map(item -> mappingFunction.apply(item))
                                 .collect(Collectors.toList()));
 
-        return pageVo;
+        return pageResponse;
     }
 
     public static <T> Page<T> readPage(Integer pageNo, Integer pageSize) {

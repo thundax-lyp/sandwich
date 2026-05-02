@@ -5,9 +5,9 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.vo.PageResponse;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageVoHelper;
+import com.github.thundax.common.web.PageResponseHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -82,10 +82,10 @@ public class DictController {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    public PageVo<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
+    public PageResponse<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         Page<Dict> page = readDictPage(request);
-        return PageVoHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
+        return PageResponseHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")

@@ -6,9 +6,9 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.vo.PageResponse;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageVoHelper;
+import com.github.thundax.common.web.PageResponseHelper;
 import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.request.SignatureDeleteRequest;
@@ -82,9 +82,9 @@ public class SignatureApiController {
     @SysLogger("列表")
     @RequestMapping(value = "page", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
-    public PageVo<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
+    public PageResponse<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
         SignatureQuery query = SignatureInterfaceAssembler.toQuery(request);
-        return PageVoHelper.fromEntityPage(
+        return PageResponseHelper.fromEntityPage(
                 signatureService.page(query, readSignaturePage(request)), this::entityToResponse);
     }
 

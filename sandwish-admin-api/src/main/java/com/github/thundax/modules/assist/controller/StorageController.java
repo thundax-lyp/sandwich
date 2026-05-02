@@ -5,9 +5,9 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageVo;
+import com.github.thundax.common.vo.PageResponse;
 import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageVoHelper;
+import com.github.thundax.common.web.PageResponseHelper;
 import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.assist.request.StorageIdRequest;
 import com.github.thundax.modules.assist.request.StoragePageRequest;
@@ -69,10 +69,10 @@ public class StorageController {
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    public PageVo<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
+    public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         Page<Storage> page = readStoragePage(request);
-        return PageVoHelper.fromEntityPage(
+        return PageResponseHelper.fromEntityPage(
                 storageService.page(query, page),
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
     }

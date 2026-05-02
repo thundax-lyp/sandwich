@@ -7,7 +7,9 @@ import com.github.thundax.modules.assist.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public final class StorageInterfaceAssembler {
@@ -64,7 +66,10 @@ public final class StorageInterfaceAssembler {
         StorageQuery query = new StorageQuery();
         query.setMimeType(request.getMimeType());
         query.setStatus(request.getStatus());
-        query.setVisibility(request.getVisibility());
+        query.setVisibility(
+                StringUtils.isBlank(request.getVisibility())
+                        ? null
+                        : StorageVisibility.from(request.getVisibility()));
         query.setName(request.getName());
         query.setRemarks(request.getRemarks());
         return query;

@@ -36,12 +36,4 @@ public class StorageQuery implements Serializable {
     public void setStatus(StorageStatus status) {
         this.status = status;
     }
-
-    public void setVisibility(String visibility) {
-        this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
-    }
-
-    public void setVisibility(StorageVisibility visibility) {
-        this.visibility = visibility;
-    }
 }

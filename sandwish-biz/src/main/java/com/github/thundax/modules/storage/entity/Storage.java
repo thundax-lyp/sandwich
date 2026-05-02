@@ -45,14 +45,6 @@ public class Storage implements Sortable {
         this.status = status;
     }
 
-    public void setVisibility(String visibility) {
-        this.visibility = StringUtils.isBlank(visibility) ? null : StorageVisibility.from(visibility);
-    }
-
-    public void setVisibility(StorageVisibility visibility) {
-        this.visibility = visibility;
-    }
-
     public void setOwnerType(String ownerType) {
         this.ownerType = StringUtils.isBlank(ownerType) ? null : StorageOwnerType.from(ownerType);
     }

@@ -35,7 +35,7 @@
 
 - `sandwish-common-security` 只承载 Spring Security 通用契约、权限匹配和不依赖业务数据的安全对象。
 - `sandwish-common-security` 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
-- 前台会员认证、第三方登录跳转、验证码、RSA 解密、cookie 和 session 适配固定归属 `sandwish-front-api`。
+- 前台会员认证、验证码、RSA 解密、cookie 和 session 适配固定归属 `sandwish-front-api`。
 - 会员信息读取和状态校验通过 `sandwish-biz` 的 `MemberService` 完成。
 - session/cache 持久化实现可以放在 `sandwish-front-api` 的安全适配层；若后续形成跨入口复用语义，接口放 `sandwish-biz`，实现放 `sandwish-infra`。
 - 前台 session/cache 内部使用 JetCache，JetCache 基线来自 `sandwish-common-cache`。
@@ -117,7 +117,8 @@
 
 - 新增 Spring Security `AuthenticationProvider` 或等价认证服务。
 - 将 `MemberAuthorizingRealm` 中会员装载、启用状态校验和默认密码兼容逻辑迁入 Spring Security 认证链路。
-- 保留 RSA 密码解密和第三方登录跳转语义。
+- 保留 RSA 密码解密。
+- 删除第三方登录跳转语义，前台登录入口固定返回 REST JSON 响应。
 - 登录成功后创建 Spring Security `Authentication`。
 
 验收：
@@ -132,8 +133,8 @@
 - 用 Spring Security principal 替代 `MemberPrincipal`。
 - 迁移期由 `MemberSecurityContext` 先读取 Spring Security 上下文，再兼容 Shiro 上下文。
 - `MemberAccessServiceImpl` 改为读取 `SecurityContextHolder`。
-- `LoginController` 改为通过 Spring Security 判断当前登录状态。
-- `LogoutController` 改为通过 Spring Security logout 或 session invalidation 完成登出。
+- `LoginController` 改为通过 Spring Security 判断当前登录状态，并只返回 REST JSON 响应。
+- `LogoutController` 改为通过 Spring Security logout 或 session invalidation 完成登出，并只返回 REST JSON 响应。
 - `testlogin` 改为 Spring Security 方式或删除。
 
 验收：

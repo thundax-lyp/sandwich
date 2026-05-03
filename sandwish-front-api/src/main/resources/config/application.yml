@@ -35,10 +35,6 @@ spring:
   profiles:
     active: vastbase-dev
 
-front:
-  security:
-    success-url: /user/index
-
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor

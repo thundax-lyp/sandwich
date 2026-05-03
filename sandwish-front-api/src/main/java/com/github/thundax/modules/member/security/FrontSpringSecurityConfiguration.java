@@ -1,7 +1,14 @@
 package com.github.thundax.modules.member.security;
 
+import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.member.assembler.MemberLoginInterfaceAssembler;
 import com.github.thundax.modules.member.utils.RsaSessionUtils;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -42,6 +49,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .and()
                 .logout()
                 .logoutUrl("/auth/logout")
+                .logoutSuccessHandler((request, response, authentication) -> writeLogoutResponse(response))
                 .and()
                 .addFilterAt(memberSpringAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -50,5 +58,13 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
         MemberSpringAuthenticationFilter filter = new MemberSpringAuthenticationFilter(rsaSessionUtils);
         filter.setAuthenticationManager(authenticationManager());
         return filter;
+    }
+
+    private void writeLogoutResponse(HttpServletResponse response) throws IOException {
+        String jsonString = JsonUtils.toJson(MemberLoginInterfaceAssembler.toLogoutResponse());
+        response.setStatus(HttpStatus.OK.value());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getOutputStream().write(jsonString.getBytes(StandardCharsets.UTF_8));
     }
 }

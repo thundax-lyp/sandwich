@@ -1,9 +1,16 @@
 package com.github.thundax.modules.member.security;
 
+import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.modules.member.assembler.MemberLoginInterfaceAssembler;
+import com.github.thundax.modules.member.controller.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.member.utils.RsaSessionUtils;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,6 +25,8 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
     public MemberSpringAuthenticationFilter(RsaSessionUtils rsaSessionUtils) {
         this.rsaSessionUtils = rsaSessionUtils;
         setFilterProcessesUrl("/auth/login");
+        setAuthenticationSuccessHandler(this::writeSuccess);
+        setAuthenticationFailureHandler(this::writeFailure);
     }
 
     @Override
@@ -44,5 +53,31 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
             return StringUtils.EMPTY;
         }
         return rsaSessionUtils.decryptRsaValue(request, encryptedValue);
+    }
+
+    private void writeSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+            throws IOException {
+        MemberSpringPrincipal principal = authentication.getPrincipal() instanceof MemberSpringPrincipal
+                ? (MemberSpringPrincipal) authentication.getPrincipal()
+                : null;
+        writeJson(response, HttpStatus.OK, MemberLoginInterfaceAssembler.toLoginStatusResponse(principal));
+    }
+
+    private void writeFailure(
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException)
+            throws IOException {
+        writeJson(
+                response,
+                HttpStatus.UNAUTHORIZED,
+                MemberLoginInterfaceAssembler.toLoginFailureResponse(authenticationException.getMessage()));
+    }
+
+    private void writeJson(HttpServletResponse response, HttpStatus status, MemberLoginStatusResponse body)
+            throws IOException {
+        String jsonString = JsonUtils.toJson(body);
+        response.setStatus(status.value());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getOutputStream().write(jsonString.getBytes(StandardCharsets.UTF_8));
     }
 }

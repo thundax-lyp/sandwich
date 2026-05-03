@@ -1,40 +1,23 @@
 package com.github.thundax.modules.member.controller;
 
-import com.github.thundax.modules.member.utils.YwtbProperties;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import com.github.thundax.modules.member.assembler.MemberLoginInterfaceAssembler;
+import com.github.thundax.modules.member.controller.response.MemberLoginStatusResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping(value = "/auth")
 public class LogoutController {
 
-    @Value("${front.security.success-url}")
-    private String successUrl;
-
-    private final YwtbProperties properties;
-
-    @Autowired
-    public LogoutController(YwtbProperties properties) {
-        this.properties = properties;
-    }
-
-    @RequestMapping("logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
-        try {
-            SecurityContextHolder.clearContext();
-            request.getSession().invalidate();
-        } catch (Exception e) {
-            e.printStackTrace();
+    @PostMapping("logout")
+    public MemberLoginStatusResponse logout(HttpServletRequest request) {
+        SecurityContextHolder.clearContext();
+        if (request.getSession(false) != null) {
+            request.getSession(false).invalidate();
         }
-        return "redirect:"
-                + properties.getLogoutUrl()
-                + URLEncoder.encode(properties.getLoginBackUrl() + successUrl, "UTF-8");
+        return MemberLoginInterfaceAssembler.toLogoutResponse();
     }
 }

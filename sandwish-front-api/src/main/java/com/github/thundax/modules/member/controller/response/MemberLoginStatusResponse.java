@@ -19,4 +19,12 @@ public class MemberLoginStatusResponse implements Serializable {
     @ApiModelProperty(name = "loggedIn", value = "是否已登录")
     @JsonProperty("loggedIn")
     private Boolean loggedIn;
+
+    @ApiModelProperty(name = "memberId", value = "当前会员ID")
+    @JsonProperty("memberId")
+    private String memberId;
+
+    @ApiModelProperty(name = "message", value = "响应消息")
+    @JsonProperty("message")
+    private String message;
 }

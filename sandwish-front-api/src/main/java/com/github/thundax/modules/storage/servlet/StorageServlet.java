@@ -1,7 +1,10 @@
 package com.github.thundax.modules.storage.servlet;
 
+import com.github.thundax.modules.member.security.MemberSecurityContext;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.service.StorageService;
 import java.io.File;
 import java.io.IOException;
 import javax.servlet.http.HttpServlet;
@@ -17,10 +20,12 @@ import org.springframework.lang.NonNull;
 public class StorageServlet extends HttpServlet {
 
     private final StorageConverter storageConverter;
+    private final StorageService storageService;
 
-    public StorageServlet(@NonNull StorageConverter storageConverter) {
+    public StorageServlet(@NonNull StorageConverter storageConverter, @NonNull StorageService storageService) {
         super();
         this.storageConverter = storageConverter;
+        this.storageService = storageService;
     }
 
     @Override
@@ -40,6 +45,10 @@ public class StorageServlet extends HttpServlet {
 
         if (storage == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+        if (!storageService.canAccess(storage, StorageOwnerType.MEMBER, MemberSecurityContext.getCurrentMemberId())) {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
         }
 

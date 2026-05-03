@@ -120,6 +120,10 @@ public class StorageController {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
+        if (!storageService.canAccess(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
+            response.sendError(HttpStatus.SC_FORBIDDEN);
+            return;
+        }
 
         File file = storageConverter.toFile(storage);
         if (!file.exists()) {

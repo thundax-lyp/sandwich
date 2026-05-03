@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-access`：补齐私有资源 owner 访问校验
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/servlet/StorageServlet.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/storage/servlet/StorageServlet.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java`
-  - 处理动作：在前后台文件访问链路中按 `StorageVisibility` 和 owner 信息补齐私有资源访问边界
-  - 验收点：公开资源可访问，私有资源仅 owner 可访问，资源不存在和无权限访问返回明确错误
-  - 重要度：9/10
-
 - [ ] `storage-query`：对齐存储查询条件与绑定关系过滤
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java`

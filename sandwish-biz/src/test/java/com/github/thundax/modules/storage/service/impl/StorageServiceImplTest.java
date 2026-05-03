@@ -1,8 +1,10 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -95,6 +97,40 @@ public class StorageServiceImplTest {
 
         assertSame(list, dao.businessList);
         assertEquals("User:u1", dao.deletedBusinessKey);
+    }
+
+    @Test
+    public void shouldAllowPublicStorageAccess() {
+        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        Storage storage = storage("s1");
+        storage.setVisibility(StorageVisibility.PUBLIC);
+
+        assertTrue(service.canAccess(storage, null, null));
+    }
+
+    @Test
+    public void shouldAllowPrivateStorageOwnerAccess() {
+        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        Storage storage = storage("s1");
+        storage.setVisibility(StorageVisibility.PRIVATE);
+        storage.setOwnerType(StorageOwnerType.USER);
+        storage.setOwnerId("u1");
+
+        assertTrue(service.canAccess(storage, StorageOwnerType.USER, "u1"));
+    }
+
+    @Test
+    public void shouldDenyPrivateStorageAccessForOtherOwner() {
+        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        Storage storage = storage("s1");
+        storage.setVisibility(StorageVisibility.PRIVATE);
+        storage.setOwnerType(StorageOwnerType.USER);
+        storage.setOwnerId("u1");
+
+        assertFalse(service.canAccess(storage, StorageOwnerType.USER, "u2"));
+        assertFalse(service.canAccess(storage, StorageOwnerType.MEMBER, "u1"));
+        assertFalse(service.canAccess(storage, StorageOwnerType.USER, null));
+        assertFalse(service.canAccess(null, StorageOwnerType.USER, "u1"));
     }
 
     private static Storage storage(String id) {

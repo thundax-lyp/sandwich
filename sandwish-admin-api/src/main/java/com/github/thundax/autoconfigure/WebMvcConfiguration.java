@@ -4,6 +4,7 @@ import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.auth.filter.ResponseWrapperFilter;
 import com.github.thundax.modules.storage.converter.StorageConverter;
+import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -20,9 +21,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(
-            VltavaProperties properties, StorageConverter converter) {
+            VltavaProperties properties, StorageConverter converter, StorageService storageService) {
         ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new StorageServlet(converter));
+        bean.setServlet(new StorageServlet(converter, storageService));
         VltavaProperties.UploadProperties upload = properties.getUpload();
         bean.addUrlMappings(upload.getServletPath() + "*");
         return bean;

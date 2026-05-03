@@ -15,6 +15,7 @@ import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,6 +135,20 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public List<StorageBusiness> listBusiness(Storage entity) {
         return dao.listBusiness(entity);
+    }
+
+    @Override
+    public boolean canAccess(Storage storage, StorageOwnerType ownerType, String ownerId) {
+        if (storage == null) {
+            return false;
+        }
+        if (StorageVisibility.PUBLIC == storage.getVisibility()) {
+            return true;
+        }
+        return StorageVisibility.PRIVATE == storage.getVisibility()
+                && storage.getOwnerType() == ownerType
+                && StringUtils.isNotBlank(ownerId)
+                && StringUtils.equals(storage.getOwnerId(), ownerId);
     }
 
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {

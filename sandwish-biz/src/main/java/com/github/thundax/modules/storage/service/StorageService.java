@@ -4,6 +4,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.List;
 
@@ -38,4 +39,6 @@ public interface StorageService {
     void insertBusiness(List<StorageBusiness> list);
 
     List<StorageBusiness> listBusiness(Storage entity);
+
+    boolean canAccess(Storage storage, StorageOwnerType ownerType, String ownerId);
 }

@@ -43,6 +43,8 @@ public class StorageServiceImplTest {
         query.setOwnerType(StorageOwnerType.USER);
         query.setStatus(StorageStatus.ENABLED);
         query.setVisibility(StorageVisibility.PUBLIC);
+        query.setBusinessId("business-1");
+        query.setBusinessType("Article");
         query.setName("avatar");
         query.setRemarks("remark");
         Page<Storage> page = new Page<>(2, 20);
@@ -55,6 +57,8 @@ public class StorageServiceImplTest {
         assertEquals("USER", dao.ownerType);
         assertEquals("ENABLED", dao.enableFlag);
         assertEquals("PUBLIC", dao.publicFlag);
+        assertEquals("business-1", dao.businessId);
+        assertEquals("Article", dao.businessType);
         assertEquals("avatar", dao.name);
         assertEquals("remark", dao.remarks);
         assertEquals(page.getPageNo(), dao.pageNo);
@@ -154,6 +158,8 @@ public class StorageServiceImplTest {
         private String ownerType;
         private String enableFlag;
         private String publicFlag;
+        private String businessId;
+        private String businessType;
         private String name;
         private String remarks;
         private int pageNo;
@@ -181,6 +187,8 @@ public class StorageServiceImplTest {
                 String ownerType,
                 String enableFlag,
                 String publicFlag,
+                String businessId,
+                String businessType,
                 String name,
                 String remarks) {
             return null;
@@ -193,6 +201,8 @@ public class StorageServiceImplTest {
                 String ownerType,
                 String enableFlag,
                 String publicFlag,
+                String businessId,
+                String businessType,
                 String name,
                 String remarks,
                 int pageNo,
@@ -202,6 +212,8 @@ public class StorageServiceImplTest {
             this.ownerType = ownerType;
             this.enableFlag = enableFlag;
             this.publicFlag = publicFlag;
+            this.businessId = businessId;
+            this.businessType = businessType;
             this.name = name;
             this.remarks = remarks;
             this.pageNo = pageNo;

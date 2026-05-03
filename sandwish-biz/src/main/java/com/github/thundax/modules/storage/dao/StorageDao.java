@@ -18,6 +18,8 @@ public interface StorageDao {
             String ownerType,
             String enableFlag,
             String publicFlag,
+            String businessId,
+            String businessType,
             String name,
             String remarks);
 
@@ -27,6 +29,8 @@ public interface StorageDao {
             String ownerType,
             String enableFlag,
             String publicFlag,
+            String businessId,
+            String businessType,
             String name,
             String remarks,
             int pageNo,

@@ -50,6 +50,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : visibilityValue(query.getVisibility()),
+                query == null ? null : query.getBusinessId(),
+                query == null ? null : query.getBusinessType(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
@@ -63,6 +65,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : visibilityValue(query.getVisibility()),
+                query == null ? null : query.getBusinessId(),
+                query == null ? null : query.getBusinessType(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),

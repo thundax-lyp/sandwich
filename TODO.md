@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-query`：对齐存储查询条件与绑定关系过滤
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageDaoImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：明确并实现 `StorageQuery.businessId`、`StorageQuery.businessType` 与 `listMimeTypes` 的数据库过滤语义
-  - 验收点：分页和列表查询的所有公开查询字段都有对应持久化行为和测试覆盖
-  - 重要度：8/10
-
 - [ ] `storage-delete`：固化存储删除语义
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java`

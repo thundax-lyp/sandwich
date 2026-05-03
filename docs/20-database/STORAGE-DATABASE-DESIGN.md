@@ -263,6 +263,8 @@
 - `ownerType`
 - `status` 转换为 `enable_flag`
 - `visibility` 转换为 `public_flag`
+- `businessId` 通过 `assist_storage_business.business_id` 过滤 `assist_storage.id`
+- `businessType` 通过 `assist_storage_business.business_type` 过滤 `assist_storage.id`
 - `name` 模糊匹配
 - `remarks` 模糊匹配
 - `del_flag = '0'`
@@ -272,10 +274,10 @@
 1. `create_date` 降序。
 2. `priority` 升序。
 
-当前差异：
+当前 DAO 列表类查询规则：
 
-- `businessId` 和 `businessType` 已存在于 `StorageQuery`，但当前 list/page 查询未 join `assist_storage_business`。
-- `listMimeTypes` 当前按 `mime_type` 分组排序，未追加 `del_flag = '0'` 条件。
+- `businessId` 和 `businessType` 存在任一条件时，先从 `assist_storage_business` 查询 `file_id`，再过滤 `assist_storage.id`。
+- `listMimeTypes` 固定追加 `del_flag = '0'` 条件。
 - `listBusinessTypes` 当前按 `business_type` 分组排序，绑定表没有逻辑删除字段。
 
 ## 10. Open Items
@@ -283,8 +285,6 @@
 - 补齐真实数据库 DDL，并与本文档字段、索引和约束逐项核对。
 - 明确 `assist_storage_business` 是否允许一个文件绑定多个业务对象；若允许，必须调整主键或增加联合唯一约束。
 - 明确 `assist_storage_business` 是否需要 `create_date`、`update_date` 和 `del_flag`。
-- 明确 `StorageQuery.businessId` 和 `StorageQuery.businessType` 是否必须落到 list/page 查询。
-- 明确 `listMimeTypes` 是否必须过滤 `del_flag = '0'`。
 - 明确删除语义是 MyBatis-Plus 物理删除、逻辑删除插件，还是状态删除。
 - 补齐 `StorageDO` 的 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint` 字段。
 - 补齐 `MultipartUploadSessionDO`、`MultipartUploadPartDO`、Mapper、DAO 和 assembler。

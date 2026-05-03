@@ -26,6 +26,7 @@ public class StorageDaoImpl implements StorageDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
+    private static final String NO_MATCH_ID = "__no_matching_storage__";
 
     private final StorageMapper mapper;
     private final StorageBusinessMapper businessMapper;
@@ -81,10 +82,12 @@ public class StorageDaoImpl implements StorageDao {
             String ownerType,
             String enableFlag,
             String publicFlag,
+            String businessId,
+            String businessType,
             String name,
             String remarks) {
-        return StoragePersistenceAssembler.toEntityList(mapper.selectList(
-                buildListWrapper(mimeType, ownerId, ownerType, enableFlag, publicFlag, name, remarks)));
+        return StoragePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(
+                mimeType, ownerId, ownerType, enableFlag, publicFlag, businessId, businessType, name, remarks)));
     }
 
     @Override
@@ -94,13 +97,16 @@ public class StorageDaoImpl implements StorageDao {
             String ownerType,
             String enableFlag,
             String publicFlag,
+            String businessId,
+            String businessType,
             String name,
             String remarks,
             int pageNo,
             int pageSize) {
         Page<StorageDO> dataObjectPage = mapper.selectPage(
                 new Page<>(pageNo, pageSize),
-                buildListWrapper(mimeType, ownerId, ownerType, enableFlag, publicFlag, name, remarks));
+                buildListWrapper(
+                        mimeType, ownerId, ownerType, enableFlag, publicFlag, businessId, businessType, name, remarks));
         Page<Storage> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -149,6 +155,7 @@ public class StorageDaoImpl implements StorageDao {
     public List<String> listMimeTypes() {
         return toStringList(mapper.selectObjs(new QueryWrapper<StorageDO>()
                 .select("mime_type")
+                .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                 .groupBy("mime_type")
                 .orderByAsc("mime_type")));
     }
@@ -222,10 +229,18 @@ public class StorageDaoImpl implements StorageDao {
             String ownerType,
             String enableFlag,
             String publicFlag,
+            String businessId,
+            String businessType,
             String name,
             String remarks) {
         LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+        List<String> storageIds = findStorageIdsByBusiness(businessId, businessType);
+        if (storageIds != null && storageIds.isEmpty()) {
+            wrapper.eq(StorageDO::getId, NO_MATCH_ID);
+        } else if (storageIds != null) {
+            wrapper.in(StorageDO::getId, storageIds);
+        }
         if (StringUtils.isNotBlank(mimeType)) {
             wrapper.eq(StorageDO::getMimeType, mimeType);
         }
@@ -250,6 +265,20 @@ public class StorageDaoImpl implements StorageDao {
         wrapper.orderByDesc(StorageDO::getCreateDate);
         wrapper.orderByAsc(StorageDO::getPriority);
         return wrapper;
+    }
+
+    private List<String> findStorageIdsByBusiness(String businessId, String businessType) {
+        if (StringUtils.isBlank(businessId) && StringUtils.isBlank(businessType)) {
+            return null;
+        }
+        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(businessId)) {
+            wrapper.eq(StorageBusinessDO::getBusinessId, businessId);
+        }
+        if (StringUtils.isNotBlank(businessType)) {
+            wrapper.eq(StorageBusinessDO::getBusinessType, businessType);
+        }
+        return toStringList(businessMapper.selectObjs(wrapper.select(StorageBusinessDO::getStorageId)));
     }
 
     private List<String> toStringList(List<Object> objects) {

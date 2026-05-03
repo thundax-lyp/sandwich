@@ -41,6 +41,7 @@
   再读 `40-readiness/`
 - TODO 协作、任务拆解、人机审阅、任务列表重写：
   读 `00-governance/TODO-RULES.md`
+  再读 `00-governance/how-to/HOW-TO-RUN-TODO-COLLABORATION.md`
 - 任务收口、测试检查、文档同步、小步提交：
   读 `00-governance/TODO-RULES.md`
   再读 `00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md`

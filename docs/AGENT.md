@@ -43,6 +43,7 @@
   读 `00-governance/TODO-RULES.md`
 - 任务收口、测试检查、文档同步、小步提交：
   读 `00-governance/TODO-RULES.md`
+  再读 `00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md`
 - 新增或修改 `HOW-TO` 操作手册：
   读 `00-governance/how-to/HOW-TO-HOW-TO.md`
 - 专项方案、路线图、跨模块设计：

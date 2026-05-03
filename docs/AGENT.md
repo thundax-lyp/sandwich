@@ -33,6 +33,7 @@
   再读对应 `20-database/*-DATABASE-DESIGN.md`
 - 静态资源、API 文档、前后台接口入口：
   先读 `ARCHITECTURE.md`
+  再读 `00-governance/API-ANNOTATION-MATRIX.md`
   再读对应业务需求文档和专项设计文档
 - 改文档：
   再读 `00-governance/DOCUMENT-RULES.md`

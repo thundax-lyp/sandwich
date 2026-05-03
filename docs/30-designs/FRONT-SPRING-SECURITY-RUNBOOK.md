@@ -17,7 +17,7 @@
 
 - `sandwish-front-api` 前台登录、登出、认证上下文和访问控制。
 - 前台 Shiro session/cache 到 JetCache-backed session/cache 的迁移。
-- `MemberAccessServiceImpl`、`LoginController`、`LogoutController`、`ShiroUtils` 等 Shiro 调用点替换。
+- `MemberAccessServiceImpl`、`LoginController`、`ShiroUtils` 等 Shiro 调用点替换。
 - `sandwish-common-security` 依赖接入。
 
 不在范围内：
@@ -54,7 +54,6 @@
 当前 Shiro 调用点：
 
 - `LoginController`
-- `LogoutController`
 - `MemberAccessServiceImpl`
 - `MemberAuthenticationFilter`
 - `MemberAuthorizingRealm`
@@ -134,12 +133,12 @@
 - 迁移期由 `MemberSecurityContext` 先读取 Spring Security 上下文，再兼容 Shiro 上下文。
 - `MemberAccessServiceImpl` 改为读取 `SecurityContextHolder`。
 - `LoginController` 改为通过 Spring Security 判断当前登录状态，并只返回 REST JSON 响应。
-- `LogoutController` 改为通过 Spring Security logout 或 session invalidation 完成登出，并只返回 REST JSON 响应。
+- `LoginController` 承载登录状态和登出 REST 接口；登出通过 Spring Security logout 或 session invalidation 完成，并只返回 REST JSON 响应。
 - `testlogin` 改为 Spring Security 方式或删除。
 
 验收：
 
-- `LoginController`、`LogoutController`、`MemberAccessServiceImpl` 不再 import Shiro。
+- `LoginController`、`MemberAccessServiceImpl` 不再 import Shiro。
 - `ShiroUtils` 不再被前台业务入口调用。
 
 ### Step 5: JetCache-backed Front Session/Cache

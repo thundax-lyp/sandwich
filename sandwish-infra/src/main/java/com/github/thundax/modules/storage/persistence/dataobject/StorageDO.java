@@ -29,6 +29,16 @@ public class StorageDO {
 
     private String ownerType;
 
+    private String storageType;
+
+    private String bucketName;
+
+    private String objectKey;
+
+    private Long size;
+
+    private String accessEndpoint;
+
     private String enableFlag;
 
     private String publicFlag;

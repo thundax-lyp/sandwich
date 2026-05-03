@@ -285,6 +285,5 @@
 ## 10. Open Items
 
 - 补齐真实数据库 DDL，并与本文档字段、索引和约束逐项核对。
-- 补齐 `StorageDO` 的 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint` 字段。
 - 补齐 `MultipartUploadSessionDO`、`MultipartUploadPartDO`、Mapper、DAO 和 assembler。
 - 明确 `OSS` 配置是否单独建表；当前数据库设计不新增对象存储供应商配置表。

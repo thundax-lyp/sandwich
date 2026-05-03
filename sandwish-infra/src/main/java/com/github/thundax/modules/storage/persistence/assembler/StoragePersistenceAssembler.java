@@ -3,6 +3,7 @@ package com.github.thundax.modules.storage.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
@@ -26,6 +27,11 @@ public final class StoragePersistenceAssembler {
         dataObject.setMimeType(entity.getMimeType());
         dataObject.setOwnerId(entity.getOwnerId());
         dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
+        dataObject.setStorageType(storageTypeValue(entity.getStorageType()));
+        dataObject.setBucketName(entity.getBucketName());
+        dataObject.setObjectKey(entity.getObjectKey());
+        dataObject.setSize(entity.getSize());
+        dataObject.setAccessEndpoint(entity.getAccessEndpoint());
         dataObject.setEnableFlag(statusValue(entity.getStatus()));
         dataObject.setPublicFlag(visibilityValue(entity.getVisibility()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
@@ -46,6 +52,11 @@ public final class StoragePersistenceAssembler {
         entity.setMimeType(dataObject.getMimeType());
         entity.setOwnerId(dataObject.getOwnerId());
         entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
+        entity.setStorageType(storageTypeFrom(dataObject.getStorageType()));
+        entity.setBucketName(dataObject.getBucketName());
+        entity.setObjectKey(dataObject.getObjectKey());
+        entity.setSize(dataObject.getSize());
+        entity.setAccessEndpoint(dataObject.getAccessEndpoint());
         entity.setStatus(statusFrom(dataObject.getEnableFlag()));
         entity.setVisibility(visibilityFrom(dataObject.getPublicFlag()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
@@ -76,6 +87,14 @@ public final class StoragePersistenceAssembler {
 
     private static StorageOwnerType ownerTypeFrom(String ownerType) {
         return ownerType == null ? null : StorageOwnerType.from(ownerType);
+    }
+
+    private static String storageTypeValue(StorageBackendType storageType) {
+        return storageType == null ? null : storageType.value();
+    }
+
+    private static StorageBackendType storageTypeFrom(String storageType) {
+        return storageType == null ? null : StorageBackendType.from(storageType);
     }
 
     private static String statusValue(StorageStatus status) {

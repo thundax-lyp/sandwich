@@ -3,6 +3,7 @@ package com.github.thundax.modules.storage.entity;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
@@ -26,6 +27,11 @@ public class Storage implements Sortable {
     private String mimeType;
     private String ownerId;
     private StorageOwnerType ownerType;
+    private StorageBackendType storageType = StorageBackendType.LOCAL_FILE;
+    private String bucketName;
+    private String objectKey;
+    private Long size;
+    private String accessEndpoint;
     private StorageStatus status = StorageStatus.ENABLED;
     private StorageVisibility visibility = StorageVisibility.PRIVATE;
     private int priority;
@@ -51,6 +57,14 @@ public class Storage implements Sortable {
 
     public void setOwnerType(StorageOwnerType ownerType) {
         this.ownerType = ownerType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = StringUtils.isBlank(storageType) ? null : StorageBackendType.from(storageType);
+    }
+
+    public void setStorageType(StorageBackendType storageType) {
+        this.storageType = storageType;
     }
 
     public boolean isEnable() {

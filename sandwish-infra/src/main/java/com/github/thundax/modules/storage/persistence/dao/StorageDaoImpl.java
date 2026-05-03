@@ -142,6 +142,11 @@ public class StorageDaoImpl implements StorageDao {
                         .set(StorageDO::getMimeType, dataObject.getMimeType())
                         .set(StorageDO::getOwnerId, dataObject.getOwnerId())
                         .set(StorageDO::getOwnerType, dataObject.getOwnerType())
+                        .set(StorageDO::getStorageType, dataObject.getStorageType())
+                        .set(StorageDO::getBucketName, dataObject.getBucketName())
+                        .set(StorageDO::getObjectKey, dataObject.getObjectKey())
+                        .set(StorageDO::getSize, dataObject.getSize())
+                        .set(StorageDO::getAccessEndpoint, dataObject.getAccessEndpoint())
                         .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(StorageDO::getPriority, dataObject.getPriority())
                         .set(StorageDO::getRemarks, dataObject.getRemarks()));

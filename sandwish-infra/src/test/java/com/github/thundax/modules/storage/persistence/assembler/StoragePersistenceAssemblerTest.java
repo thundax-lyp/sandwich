@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
@@ -19,20 +20,32 @@ public class StoragePersistenceAssemblerTest {
     public void shouldReadLegacyLowerCaseOwnerType() {
         StorageDO dataObject = new StorageDO();
         dataObject.setOwnerType("user");
+        dataObject.setStorageType("local_file");
 
         Storage entity = StoragePersistenceAssembler.toEntity(dataObject);
 
         assertSame(StorageOwnerType.USER, entity.getOwnerType());
+        assertSame(StorageBackendType.LOCAL_FILE, entity.getStorageType());
     }
 
     @Test
     public void shouldWriteEnumOwnerTypeValue() {
         Storage entity = new Storage();
         entity.setOwnerType(StorageOwnerType.MEMBER);
+        entity.setStorageType(StorageBackendType.LOCAL_FILE);
+        entity.setBucketName("/tmp/storage/");
+        entity.setObjectKey("202605/s1.png");
+        entity.setSize(10L);
+        entity.setAccessEndpoint("/servlet/storage/s1.png");
 
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
         assertEquals("MEMBER", dataObject.getOwnerType());
+        assertEquals("LOCAL_FILE", dataObject.getStorageType());
+        assertEquals("/tmp/storage/", dataObject.getBucketName());
+        assertEquals("202605/s1.png", dataObject.getObjectKey());
+        assertEquals(Long.valueOf(10L), dataObject.getSize());
+        assertEquals("/servlet/storage/s1.png", dataObject.getAccessEndpoint());
     }
 
     @Test

@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-backend`：引入 LOCAL_FILE / OSS 底层存储后端抽象
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/storage`
-    - `docs/10-requirements/STORAGE-REQUIREMENTS.md`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：抽象统一存储后端接口，并让普通上传和文件访问通过 LOCAL_FILE 后端适配当前行为，预留 OSS 后端装配点
-  - 验收点：当前本地上传和访问行为不回退，Storage 元数据能记录 storageType、bucketName、objectKey、size 和 accessEndpoint
-  - 重要度：9/10
-
 - [ ] `storage-multipart-schema`：增加分片上传会话和分片持久化模型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`

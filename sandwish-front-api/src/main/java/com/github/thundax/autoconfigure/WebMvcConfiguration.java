@@ -3,6 +3,8 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.filter.xss.XssFilter;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
+import com.github.thundax.modules.storage.backend.LocalFileStorageBackend;
+import com.github.thundax.modules.storage.backend.StorageBackend;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
@@ -48,12 +50,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(
-            VltavaProperties properties, StorageConverter converter, StorageService storageService) {
+            VltavaProperties properties,
+            StorageConverter converter,
+            StorageService storageService,
+            StorageBackend storageBackend) {
         ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new StorageServlet(converter, storageService));
+        bean.setServlet(new StorageServlet(converter, storageService, storageBackend));
         VltavaProperties.UploadProperties upload = properties.getUpload();
         bean.addUrlMappings(upload.getServletPath() + "*");
         return bean;
+    }
+
+    @Bean
+    public StorageBackend storageBackend(VltavaProperties properties) {
+        VltavaProperties.UploadProperties upload = properties.getUpload();
+        return new LocalFileStorageBackend(upload.getStoragePath(), upload.getServletPath());
     }
 
     @Bean

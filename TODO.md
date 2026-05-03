@@ -53,19 +53,40 @@
   - 验收点：绑定关系的数据库约束、DO 主键来源、DAO 写入行为和 assembler 测试一致
   - 重要度：7/10
 
+- [ ] `storage-backend`：引入 LOCAL_FILE / OSS 底层存储后端抽象
+  - 范围文件：
+    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
+    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage`
+    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage`
+    - `sandwish-front-api/src/main/java/com/github/thundax/modules/storage`
+    - `docs/10-requirements/STORAGE-REQUIREMENTS.md`
+    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
+  - 处理动作：抽象统一存储后端接口，并让普通上传和文件访问通过 LOCAL_FILE 后端适配当前行为，预留 OSS 后端装配点
+  - 验收点：当前本地上传和访问行为不回退，Storage 元数据能记录 storageType、bucketName、objectKey、size 和 accessEndpoint
+  - 重要度：9/10
+
+- [ ] `storage-multipart-schema`：增加分片上传会话和分片持久化模型
+  - 范围文件：
+    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
+    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject`
+    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper`
+    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler`
+    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler`
+    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
+  - 处理动作：新增 MultipartUploadSession、MultipartUploadPart 及其 DO、Mapper、assembler 和字段转换测试
+  - 验收点：分片上传会话和分片记录的字段、枚举、唯一约束设计与数据库设计文档一致
+  - 重要度：8/10
+
+- [ ] `storage-multipart-service`：实现分片上传业务流程
+  - 范围文件：
+    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service`
+    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl`
+    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao`
+    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao`
+    - `sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl`
+    - `docs/10-requirements/STORAGE-REQUIREMENTS.md`
+  - 处理动作：实现初始化分片上传、上传分片、完成分片上传和取消分片上传的 Service 与 DAO 编排
+  - 验收点：初始化、上传分片、完成、取消、重复 partNumber 和非法状态都有测试覆盖
+  - 重要度：8/10
+
 ## 待讨论项
-
-- [ ] 是否引入分片上传
-  - 关联任务：`storage-multipart`
-  - 决策要求：确认 Sandwich 是否需要分片上传、断点续传、分片会话和分片 part 表
-  - 重要度：6/10
-
-- [ ] 是否引入对象存储供应商抽象
-  - 关联任务：`storage-backend`
-  - 决策要求：确认当前本地文件存储是否需要演进为 local / OSS 可切换后端
-  - 重要度：6/10
-
-- [ ] 是否引入存储审计日志和 outbox
-  - 关联任务：`storage-audit`
-  - 决策要求：确认上传、删除、访问和业务绑定变化是否需要追加审计日志与 outbox
-  - 重要度：5/10

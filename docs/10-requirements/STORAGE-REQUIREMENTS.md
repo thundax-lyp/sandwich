@@ -4,26 +4,25 @@
 
 本文档定义 Sandwich `Storage` 模块的业务需求边界。
 
-`Storage` 负责统一管理文件元数据、文件访问路径、业务绑定关系和资源生命周期。文件二进制内容当前固定落在本地存储路径，数据库只保存元数据和绑定关系。
+`Storage` 负责统一管理文件元数据、文件访问路径、业务绑定关系、分片上传会话、底层存储后端和资源生命周期。文件二进制内容不入库，必须通过 `LOCAL_FILE` 或 `OSS` 后端保存。
 
 ## 2. Scope
 
 当前覆盖范围：
 
 - 后台普通文件上传
+- 大文件分片上传
 - 后台存储资源分页查询
 - 后台存储资源预览
 - 后台存储资源删除
 - 前后台文件访问 Servlet
 - 文件元数据管理
 - 文件与业务对象绑定
+- `LOCAL_FILE` 和 `OSS` 双存储后端适配
 - 存储资源状态和可见性维护
 
 当前不覆盖范围：
 
-- 分片上传
-- 断点续传
-- 对象存储供应商抽象
 - CDN 分发
 - 图片裁剪、压缩和水印
 - 视频转码
@@ -98,6 +97,65 @@
 
 `StorageOwnerType` 固定表达资源所有者类型。后台上传当前以用户作为 owner。
 
+### 5.6 StorageBackendType
+
+`StorageBackendType` 固定表达底层存储后端类型。
+
+固定值：
+
+- `LOCAL_FILE`
+- `OSS`
+
+### 5.7 MultipartUploadSession
+
+`MultipartUploadSession` 是分片上传会话对象。
+
+核心字段：
+
+- `id`：会话数据库主键。
+- `uploadId`：分片上传会话业务键。
+- `ownerId`：上传发起人 ID。
+- `ownerType`：上传发起人类型。
+- `businessType`：业务对象类型。
+- `originalFilename`：原始文件名。
+- `mimeType`：文件 MIME type。
+- `storageType`：底层存储后端类型。
+- `bucketName`：存储桶或本地逻辑目录。
+- `objectKey`：底层对象键。
+- `providerUploadId`：底层存储供应商分片会话标识。
+- `totalSize`：文件总大小。
+- `partSize`：固定分片大小。
+- `uploadedPartCount`：已上传分片数。
+- `uploadStatus`：分片上传状态。
+- `createDate`：创建时间。
+- `updateDate`：更新时间。
+- `completedDate`：完成时间。
+- `abortedDate`：取消时间。
+
+### 5.8 MultipartUploadPart
+
+`MultipartUploadPart` 是分片上传的单片记录。
+
+核心字段：
+
+- `id`：分片记录数据库主键。
+- `uploadId`：分片上传会话业务键。
+- `partNumber`：分片序号。
+- `etag`：分片校验标识。
+- `size`：分片大小。
+- `createDate`：创建时间。
+
+### 5.9 MultipartUploadStatus
+
+`MultipartUploadStatus` 固定表达分片上传会话状态。
+
+固定值：
+
+- `INITIATED`
+- `UPLOADING`
+- `COMPLETED`
+- `ABORTED`
+
 ## 6. Global Constraints
 
 - `StorageService` 是业务流程入口，Controller 不直接访问 DAO / Mapper。
@@ -108,6 +166,12 @@
 - 文件实际 MIME type 使用上传文件的 `contentType` 记录。
 - 文件访问 URL 固定使用 `servletPath + storage.getFileName()` 生成。
 - 文件本地路径固定使用 `storagePath + storage.getPathName()` 定位。
+- 底层存储后端必须通过统一接口适配，业务 Service 不直接依赖本地文件或 OSS SDK。
+- `LOCAL_FILE` 后端负责本地路径写入、读取、删除和分片合并。
+- `OSS` 后端负责对象上传、读取、删除和供应商分片会话适配。
+- 分片上传会话必须由 `uploadId` 唯一标识。
+- 分片记录必须按 `uploadId + partNumber` 唯一约束。
+- 审计日志和 outbox 固定不纳入 Sandwich `Storage` 当前实现。
 - 前后台入口不得复制业务规则；共享规则必须进入 `sandwish-biz`。
 
 ## 7. Functional Requirements
@@ -164,6 +228,26 @@
 - 前后台访问私有资源时必须能区分当前访问者与 `Storage.ownerId`。
 - 当前代码未完整固化私有资源 owner 校验，必须作为上线前差异项补齐。
 
+### 7.8 存储后端抽象
+
+- 普通上传和分片上传必须通过统一底层存储接口写入对象。
+- `Storage` 元数据必须记录 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint`。
+- `LOCAL_FILE` 后端必须兼容当前 `storagePath` 和 `servletPath` 配置。
+- `OSS` 后端必须隐藏供应商 SDK 细节，不把 SDK 对象暴露给 Service 或 Controller。
+- 访问 URL 必须由后端适配或统一访问端点生成，不由业务模块拼接底层路径。
+
+### 7.9 分片上传
+
+- 初始化分片上传时必须创建 `MultipartUploadSession`。
+- 一个分片上传会话必须由 `uploadId` 唯一标识。
+- 上传分片时必须校验会话存在且未完成、未取消。
+- 每个分片必须记录 `uploadId`、`partNumber`、`etag` 和 `size`。
+- 同一会话内 `partNumber` 不得重复。
+- 完成分片上传时必须校验已上传分片满足合并条件。
+- 完成分片上传后必须生成 `Storage` 元数据。
+- 完成分片上传后必须把会话状态改为 `COMPLETED`。
+- 取消分片上传后必须把会话状态改为 `ABORTED`，并释放底层后端临时资源。
+
 ## 8. Key Flows
 
 ### 8.1 后台上传流程
@@ -199,6 +283,25 @@
 3. 业务模块通过 `StorageService.insertBusiness` 写入新绑定关系。
 4. 后续查询通过 `StorageService.listBusiness` 或 `StorageQuery` 装载绑定关系。
 
+### 8.5 后端适配上传流程
+
+1. Controller 接收上传请求并完成入口参数校验。
+2. Service 根据配置选择 `LOCAL_FILE` 或 `OSS` 后端。
+3. Service 调用统一后端接口写入对象内容。
+4. 后端返回 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint`。
+5. Service 写入 `Storage` 元数据。
+6. Controller 组装上传响应。
+
+### 8.6 分片上传流程
+
+1. Controller 接收初始化分片上传请求。
+2. Service 创建 `MultipartUploadSession` 并初始化底层后端分片会话。
+3. Controller 按 `uploadId` 接收分片上传请求。
+4. Service 写入底层分片并记录 `MultipartUploadPart`。
+5. Controller 接收完成分片上传请求。
+6. Service 校验分片完整性并调用后端完成合并。
+7. Service 创建 `Storage` 元数据并将会话状态改为 `COMPLETED`。
+
 ## 9. Non-Functional Requirements
 
 - 普通上传、查询、删除和业务绑定必须有 Service 层测试覆盖。
@@ -207,6 +310,8 @@
 - 缓存失效必须覆盖新增、更新、删除和业务绑定变化。
 - 上传后缀白名单和 MIME type 输出行为必须在上线前人工确认。
 - 数据库字段、枚举持久化值和 `StorageResponse` 对外字段必须保持一致。
+- 分片上传必须覆盖初始化、上传分片、完成、取消和重复分片校验测试。
+- 后端抽象必须覆盖 `LOCAL_FILE` 后端测试；`OSS` 后端至少保留可替换接口和配置装配测试。
 
 ## 10. Open Items
 
@@ -214,6 +319,4 @@
 - 明确删除是逻辑删除还是物理删除，并同步数据库设计和 Service 测试。
 - 明确 `StorageBusiness` 是否需要独立创建时间、更新时间和唯一约束。
 - 明确前台是否需要普通上传接口。
-- 明确是否引入分片上传。
-- 明确是否引入对象存储供应商抽象。
-- 明确是否引入存储审计日志和 outbox。
+- 明确 `OSS` 供应商配置来源、必填字段和本地测试替身。

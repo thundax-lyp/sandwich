@@ -39,8 +39,9 @@
 - `StorageDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `StorageBusinessDO.storageId` 映射数据库列 `file_id`，是共享主键，使用 `IdType.INPUT`。
 - `assist_storage.del_flag` 是逻辑删除字段，`StorageDO` 不声明 `delFlag`。
-- DAO list/page 查询必须追加 `del_flag = '0'` 条件。
+- DAO get/list/page 查询必须追加 `del_flag = '0'` 条件。
 - DAO insert 后必须写入 `del_flag = '0'`。
+- DAO delete 固定更新 `del_flag = '1'`，不物理删除 `assist_storage` 记录。
 - 枚举字段使用 `varchar` 存储。
 - `storage_type` 固定使用 `LOCAL_FILE` 或 `OSS`。
 - `upload_status` 固定使用 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
@@ -237,7 +238,7 @@
 - `StoragePersistenceAssembler` 不调用 Service、DAO 或 Mapper。
 - `StorageDaoImpl.insert` 写入 `StorageDO` 后必须回填 `del_flag = '0'` 并清理缓存。
 - `StorageDaoImpl.update` 必须清理对应资源缓存。
-- `StorageDaoImpl.deleteById` 必须清理对应资源缓存。
+- `StorageDaoImpl.deleteById` 必须通过 `del_flag = '1'` 逻辑删除并清理对应资源缓存。
 - `StorageDaoImpl.updateStatus` 和 `StorageDaoImpl.updateVisibility` 必须清理对应资源缓存。
 - 分片上传会话和分片记录的持久化实现必须放在 `sandwish-infra`。
 - 底层存储后端适配不得直接暴露给 Controller。
@@ -285,7 +286,6 @@
 - 补齐真实数据库 DDL，并与本文档字段、索引和约束逐项核对。
 - 明确 `assist_storage_business` 是否允许一个文件绑定多个业务对象；若允许，必须调整主键或增加联合唯一约束。
 - 明确 `assist_storage_business` 是否需要 `create_date`、`update_date` 和 `del_flag`。
-- 明确删除语义是 MyBatis-Plus 物理删除、逻辑删除插件，还是状态删除。
 - 补齐 `StorageDO` 的 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint` 字段。
 - 补齐 `MultipartUploadSessionDO`、`MultipartUploadPartDO`、Mapper、DAO 和 assembler。
 - 明确 `OSS` 配置是否单独建表；当前数据库设计不新增对象存储供应商配置表。

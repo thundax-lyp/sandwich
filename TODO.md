@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-delete`：固化存储删除语义
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageDaoImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java`
-    - `docs/10-requirements/STORAGE-REQUIREMENTS.md`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：明确删除是物理删除、逻辑删除还是状态删除，并让 Service、DAO、测试和文档一致
-  - 验收点：删除后的资源不会继续作为可用资源查询、预览或绑定，缓存失效行为有测试覆盖
-  - 重要度：8/10
-
 - [ ] `storage-business-binding`：确认并收敛业务绑定表约束
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StorageBusiness.java`

@@ -46,7 +46,10 @@ public class StorageDaoImpl implements StorageDao {
             return storage;
         }
 
-        storage = StoragePersistenceAssembler.toEntity(mapper.selectById(id.value()));
+        LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StorageDO::getId, id.value());
+        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+        storage = StoragePersistenceAssembler.toEntity(mapper.selectOne(wrapper));
         cacheSupport.putById(storage);
         return storage;
     }
@@ -65,8 +68,10 @@ public class StorageDaoImpl implements StorageDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Storage> uncachedStorageList =
-                    StoragePersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(StorageDO::getId, uncachedIdList);
+            wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+            List<Storage> uncachedStorageList = StoragePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
             for (Storage storage : uncachedStorageList) {
                 cacheSupport.putById(storage);
                 storageList.add(storage);
@@ -146,7 +151,12 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public int deleteById(EntityId id) {
-        int count = mapper.deleteById(id.value());
+        int count = mapper.update(
+                null,
+                new UpdateWrapper<StorageDO>()
+                        .set(DEL_FLAG_COLUMN, "1")
+                        .eq("id", id.value())
+                        .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG));
         cacheSupport.removeById(id.value());
         return count;
     }

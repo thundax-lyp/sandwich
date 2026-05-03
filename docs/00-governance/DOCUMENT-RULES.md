@@ -32,6 +32,7 @@
 - 架构、模块边界、三层职责：[`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - 命名、目录、类归属：[`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
 - 数据库、DAO、Mapper、SQL、持久化对象：[`DATABASE-RULES.md`](./DATABASE-RULES.md)
+- 领域标识、数据库主键和业务编号边界：[`UNIFIED-ID-DESIGN.md`](./UNIFIED-ID-DESIGN.md)
 - HTTP API 注解矩阵：[`API-ANNOTATION-MATRIX.md`](./API-ANNOTATION-MATRIX.md)
 - 当前用户、会员和线程上下文透传：[`CONTEXT-PROPAGATION-RULES.md`](./CONTEXT-PROPAGATION-RULES.md)
 - TODO 格式、协作、删除、测试检查和提交收口规则：[`TODO-RULES.md`](./TODO-RULES.md)

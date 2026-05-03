@@ -8,6 +8,7 @@
 - 新增类、改类名、改目录、判断模块归属见 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
 - 领域值对象、领域枚举和状态枚举固定形状见 [`DOMAIN-VALUE-RULES.md`](./DOMAIN-VALUE-RULES.md)
 - 数据库、实体、DAO、Mapper 和持久化查询见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
+- 领域标识、数据库主键和业务编号边界见 [`UNIFIED-ID-DESIGN.md`](./UNIFIED-ID-DESIGN.md)
 - HTTP API 注解矩阵见 [`API-ANNOTATION-MATRIX.md`](./API-ANNOTATION-MATRIX.md)
 - 当前用户、会员和线程上下文透传见 [`CONTEXT-PROPAGATION-RULES.md`](./CONTEXT-PROPAGATION-RULES.md)
 - 文档写作与维护见 [`DOCUMENT-RULES.md`](./DOCUMENT-RULES.md)

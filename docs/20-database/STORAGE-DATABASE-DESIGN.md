@@ -37,7 +37,7 @@
 - 存储引擎优先使用 `InnoDB`。
 - 字符集优先使用 `utf8mb4`。
 - `StorageDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `StorageBusinessDO.storageId` 映射数据库列 `file_id`，是共享主键，使用 `IdType.INPUT`。
+- `StorageBusinessDO.fileId` 映射数据库列 `file_id`。
 - `assist_storage.del_flag` 是逻辑删除字段，`StorageDO` 不声明 `delFlag`。
 - DAO get/list/page 查询必须追加 `del_flag = '0'` 条件。
 - DAO insert 后必须写入 `del_flag = '0'`。
@@ -129,7 +129,7 @@
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
-| `file_id` | `storageId` | `id` | 是 | 存储资源 ID |
+| `file_id` | `fileId` | `id` | 是 | 存储资源 ID |
 | `business_id` | `businessId` | `businessId` | 是 | 业务对象 ID |
 | `business_type` | `businessType` | `businessType` | 是 | 业务对象类型 |
 | `business_params` | `businessParams` | `businessParams` | 否 | 业务扩展参数 |
@@ -137,14 +137,15 @@
 
 字段规则：
 
-- `file_id` 使用 `IdType.INPUT`，主键来源是 `Storage.id`。
-- `file_id` 不生成新 UUID。
+- `file_id` 来源是 `Storage.id`，不生成新 UUID。
+- `assist_storage_business` 允许一个文件绑定多个业务对象。
+- 绑定关系唯一性固定由 `file_id + business_type + business_id` 表达。
 - `public_flag` 通过 `StorageVisibility.value()` 写入。
-- 当前 `StorageBusinessDO` 不包含创建时间、更新时间和逻辑删除字段。
+- `StorageBusinessDO` 固定不包含创建时间、更新时间和逻辑删除字段。
 
 建议索引：
 
-- 主键：`pk_assist_storage_business(file_id)`
+- 联合唯一索引：`uk_assist_storage_business_file_biz(file_id, business_type, business_id)`
 - 普通索引：`idx_assist_storage_business_biz(business_type, business_id)`
 - 普通索引：`idx_assist_storage_business_public(public_flag)`
 
@@ -222,7 +223,7 @@
 - 业务绑定关系一致性由 Service 编排和数据库约束共同保证。
 - `StorageService.insertBusiness` 写入绑定关系前必须确保对应 `Storage` 已存在。
 - `StorageService.removeBusiness` 固定按 `business_type` 和 `business_id` 清理绑定关系。
-- 当前绑定表以 `file_id` 作为主键，同一个存储资源同一时间只能保留一条绑定关系。
+- 当前绑定表允许同一个存储资源同时保留多条业务绑定关系。
 - 分片上传完成后，Service 必须创建 `assist_storage` 记录，并将对应会话状态更新为 `COMPLETED`。
 - 分片上传取消后，Service 必须将对应会话状态更新为 `ABORTED`。
 
@@ -284,8 +285,6 @@
 ## 10. Open Items
 
 - 补齐真实数据库 DDL，并与本文档字段、索引和约束逐项核对。
-- 明确 `assist_storage_business` 是否允许一个文件绑定多个业务对象；若允许，必须调整主键或增加联合唯一约束。
-- 明确 `assist_storage_business` 是否需要 `create_date`、`update_date` 和 `del_flag`。
 - 补齐 `StorageDO` 的 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint` 字段。
 - 补齐 `MultipartUploadSessionDO`、`MultipartUploadPartDO`、Mapper、DAO 和 assembler。
 - 明确 `OSS` 配置是否单独建表；当前数据库设计不新增对象存储供应商配置表。

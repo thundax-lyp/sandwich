@@ -71,7 +71,14 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         assertFalse(
                 storageBusinessDO.getFullName() + " must not declare id field",
                 storageBusinessDO.tryGetField("id").isPresent());
-        assertTableId(storageBusinessDO, "storageId", "file_id", IdType.INPUT);
+        JavaField fileIdField = storageBusinessDO.getField("fileId");
+        assertEquals(
+                storageBusinessDO.getFullName() + ".fileId must be String",
+                String.class.getName(),
+                fileIdField.getRawType().getFullName());
+        assertFalse(
+                storageBusinessDO.getFullName() + ".fileId must not be single-column TableId",
+                fileIdField.isAnnotatedWith(TableId.class));
     }
 
     @Test

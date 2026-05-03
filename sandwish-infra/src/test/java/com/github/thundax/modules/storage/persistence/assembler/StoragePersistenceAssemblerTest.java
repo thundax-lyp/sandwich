@@ -62,11 +62,15 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldMapBusinessVisibility() {
         StorageBusinessDO dataObject = new StorageBusinessDO();
+        dataObject.setFileId("s1");
         dataObject.setPublicFlag(Global.YES);
 
         StorageBusiness entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
+        assertEquals("s1", entity.getId().value());
         assertSame(StorageVisibility.PUBLIC, entity.getVisibility());
+        assertEquals(
+                "s1", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
         assertEquals(
                 "PUBLIC",
                 StoragePersistenceAssembler.toBusinessDataObject(entity).getPublicFlag());

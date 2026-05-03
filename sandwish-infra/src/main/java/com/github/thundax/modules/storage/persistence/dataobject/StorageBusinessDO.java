@@ -1,7 +1,5 @@
 package com.github.thundax.modules.storage.persistence.dataobject;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +13,7 @@ import lombok.Setter;
 @TableName("assist_storage_business")
 public class StorageBusinessDO {
 
-    @TableId(value = "file_id", type = IdType.INPUT)
-    private String storageId;
+    private String fileId;
 
     private String businessId;
 

@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-business-binding`：确认并收敛业务绑定表约束
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StorageBusiness.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageBusinessDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssemblerTest.java`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：确认一个文件是否允许绑定多个业务对象，并按结论调整主键、唯一约束或绑定写入规则
-  - 验收点：绑定关系的数据库约束、DO 主键来源、DAO 写入行为和 assembler 测试一致
-  - 重要度：7/10
-
 - [ ] `storage-backend`：引入 LOCAL_FILE / OSS 底层存储后端抽象
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`

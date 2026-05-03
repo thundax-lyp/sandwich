@@ -199,7 +199,7 @@ public class StorageDaoImpl implements StorageDao {
     @Override
     public List<StorageBusiness> listBusiness(Storage entity) {
         LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getStorageId, EntityIdCodec.toValue(entity.getId()));
+        wrapper.eq(StorageBusinessDO::getFileId, EntityIdCodec.toValue(entity.getId()));
         return StoragePersistenceAssembler.toBusinessEntityList(businessMapper.selectList(wrapper));
     }
 
@@ -216,7 +216,9 @@ public class StorageDaoImpl implements StorageDao {
 
     @Override
     public void deleteBusiness(String id) {
-        businessMapper.deleteById(id);
+        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StorageBusinessDO::getFileId, id);
+        businessMapper.delete(wrapper);
     }
 
     @Override
@@ -288,7 +290,7 @@ public class StorageDaoImpl implements StorageDao {
         if (StringUtils.isNotBlank(businessType)) {
             wrapper.eq(StorageBusinessDO::getBusinessType, businessType);
         }
-        return toStringList(businessMapper.selectObjs(wrapper.select(StorageBusinessDO::getStorageId)));
+        return toStringList(businessMapper.selectObjs(wrapper.select(StorageBusinessDO::getFileId)));
     }
 
     private List<String> toStringList(List<Object> objects) {

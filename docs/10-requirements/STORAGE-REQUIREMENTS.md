@@ -245,6 +245,7 @@
 - 每个分片必须记录 `uploadId`、`partNumber`、`etag` 和 `size`。
 - 同一会话内 `partNumber` 不得重复。
 - 完成分片上传时必须校验已上传分片满足合并条件。
+- 完成分片上传时必须接收后端合并结果，并把 `storageType`、`bucketName`、`objectKey`、`size` 和 `accessEndpoint` 写入最终资源。
 - 完成分片上传后必须生成 `Storage` 元数据。
 - 完成分片上传后必须把会话状态改为 `COMPLETED`。
 - 取消分片上传后必须把会话状态改为 `ABORTED`，并释放底层后端临时资源。
@@ -300,7 +301,7 @@
 3. Controller 按 `uploadId` 接收分片上传请求。
 4. Service 写入底层分片并记录 `MultipartUploadPart`。
 5. Controller 接收完成分片上传请求。
-6. Service 校验分片完整性并调用后端完成合并。
+6. Controller 或应用适配层调用后端完成合并，并将合并结果传入 Service。
 7. Service 创建 `Storage` 元数据并将会话状态改为 `COMPLETED`。
 
 ## 9. Non-Functional Requirements
@@ -311,7 +312,7 @@
 - 缓存失效必须覆盖新增、更新、删除和业务绑定变化。
 - 上传后缀白名单和 MIME type 输出行为必须在上线前人工确认。
 - 数据库字段、枚举持久化值和 `StorageResponse` 对外字段必须保持一致。
-- 分片上传必须覆盖初始化、上传分片、完成、取消和重复分片校验测试。
+- 分片上传必须覆盖初始化、上传分片、完成、取消、重复分片和非法状态校验测试。
 - 后端抽象必须覆盖 `LOCAL_FILE` 后端测试；`OSS` 后端至少保留可替换接口和配置装配测试。
 
 ## 10. Open Items

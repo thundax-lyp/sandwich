@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-multipart-service`：实现分片上传业务流程
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl`
-    - `docs/10-requirements/STORAGE-REQUIREMENTS.md`
-  - 处理动作：实现初始化分片上传、上传分片、完成分片上传和取消分片上传的 Service 与 DAO 编排
-  - 验收点：初始化、上传分片、完成、取消、重复 partNumber 和非法状态都有测试覆盖
-  - 重要度：8/10
-
 ## 待审阅任务项
 
 ## 待讨论项

@@ -6,16 +6,23 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.entity.MultipartUploadPart;
+import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
+import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
@@ -137,6 +144,110 @@ public class StorageServiceImplTest {
         assertFalse(service.canAccess(null, StorageOwnerType.USER, "u1"));
     }
 
+    @Test
+    public void shouldInitMultipartUploadSession() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        StorageServiceImpl service = new StorageServiceImpl(dao);
+        MultipartUploadSession session = multipartSession();
+
+        MultipartUploadSession saved = service.initMultipartUpload(session);
+
+        assertSame(session, saved);
+        assertNotNull(saved.getId());
+        assertNotNull(saved.getUploadId());
+        assertEquals(Integer.valueOf(0), saved.getUploadedPartCount());
+        assertSame(MultipartUploadStatus.INITIATED, saved.getUploadStatus());
+        assertNotNull(saved.getCreateDate());
+        assertNotNull(saved.getUpdateDate());
+        assertSame(session, dao.insertedMultipartSession);
+    }
+
+    @Test
+    public void shouldUploadMultipartPartAndRefreshSessionCount() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+        dao.multipartPartCount = 1;
+        StorageServiceImpl service = new StorageServiceImpl(dao);
+        MultipartUploadPart part = multipartPart(1);
+
+        MultipartUploadPart saved = service.uploadMultipartPart(part);
+
+        assertSame(part, saved);
+        assertNotNull(saved.getId());
+        assertNotNull(saved.getCreateDate());
+        assertSame(part, dao.insertedMultipartPart);
+        assertSame(MultipartUploadStatus.UPLOADING, dao.updatedMultipartSession.getUploadStatus());
+        assertEquals(Integer.valueOf(1), dao.updatedMultipartSession.getUploadedPartCount());
+    }
+
+    @Test(expected = BizException.class)
+    public void shouldRejectDuplicateMultipartPartNumber() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+        dao.multipartPartResult = multipartPart(1);
+
+        new StorageServiceImpl(dao).uploadMultipartPart(multipartPart(1));
+    }
+
+    @Test(expected = BizException.class)
+    public void shouldRejectClosedMultipartSessionWhenUploadingPart() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+        dao.multipartSessionResult.setUploadStatus(MultipartUploadStatus.COMPLETED);
+
+        new StorageServiceImpl(dao).uploadMultipartPart(multipartPart(1));
+    }
+
+    @Test
+    public void shouldCompleteMultipartUploadAndCreateStorage() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+        dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
+        StorageBackendObject object = new StorageBackendObject();
+        object.setStorageType(StorageBackendType.LOCAL_FILE);
+        object.setBucketName("/tmp/storage/");
+        object.setObjectKey("202605/demo.png");
+        object.setSize(300L);
+        object.setAccessEndpoint("/servlet/storage/demo.png");
+
+        Storage storage = new StorageServiceImpl(dao).completeMultipartUpload("upload-1", object);
+
+        assertNotNull(storage.getId());
+        assertEquals("demo", storage.getName());
+        assertEquals("png", storage.getExtendName());
+        assertEquals("image/png", storage.getMimeType());
+        assertEquals("owner-1", storage.getOwnerId());
+        assertSame(StorageOwnerType.USER, storage.getOwnerType());
+        assertSame(StorageBackendType.LOCAL_FILE, storage.getStorageType());
+        assertEquals("202605/demo.png", storage.getObjectKey());
+        assertEquals(Long.valueOf(300L), storage.getSize());
+        assertSame(storage, dao.inserted);
+        assertSame(MultipartUploadStatus.COMPLETED, dao.updatedMultipartSession.getUploadStatus());
+        assertEquals(Integer.valueOf(3), dao.updatedMultipartSession.getUploadedPartCount());
+        assertNotNull(dao.updatedMultipartSession.getCompletedDate());
+    }
+
+    @Test(expected = BizException.class)
+    public void shouldRejectCompletingMultipartUploadWhenPartIsMissing() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+        dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(3));
+
+        new StorageServiceImpl(dao).completeMultipartUpload("upload-1", null);
+    }
+
+    @Test
+    public void shouldAbortMultipartUpload() {
+        RecordingStorageDao dao = new RecordingStorageDao();
+        dao.multipartSessionResult = multipartSession();
+
+        int count = new StorageServiceImpl(dao).abortMultipartUpload("upload-1");
+
+        assertEquals(1, count);
+        assertSame(MultipartUploadStatus.ABORTED, dao.updatedMultipartSession.getUploadStatus());
+        assertNotNull(dao.updatedMultipartSession.getAbortedDate());
+    }
+
     private static Storage storage(String id) {
         Storage storage = new Storage();
         storage.setId(EntityIdCodec.toDomain(id));
@@ -147,6 +258,29 @@ public class StorageServiceImplTest {
         StorageBusiness storageBusiness = new StorageBusiness();
         storageBusiness.setId(EntityIdCodec.toDomain(id));
         return storageBusiness;
+    }
+
+    private static MultipartUploadSession multipartSession() {
+        MultipartUploadSession session = new MultipartUploadSession();
+        session.setUploadId("upload-1");
+        session.setOwnerId("owner-1");
+        session.setOwnerType(StorageOwnerType.USER);
+        session.setOriginalFilename("demo.png");
+        session.setMimeType("image/png");
+        session.setStorageType(StorageBackendType.LOCAL_FILE);
+        session.setTotalSize(300L);
+        session.setPartSize(100L);
+        session.setUploadStatus(MultipartUploadStatus.INITIATED);
+        return session;
+    }
+
+    private static MultipartUploadPart multipartPart(int partNumber) {
+        MultipartUploadPart part = new MultipartUploadPart();
+        part.setUploadId("upload-1");
+        part.setPartNumber(partNumber);
+        part.setEtag("etag-" + partNumber);
+        part.setSize(100L);
+        return part;
     }
 
     private static class RecordingStorageDao implements StorageDao {
@@ -168,6 +302,13 @@ public class StorageServiceImplTest {
         private List<String> deletedIds = new java.util.ArrayList<>();
         private List<StorageBusiness> businessList;
         private String deletedBusinessKey;
+        private MultipartUploadSession insertedMultipartSession;
+        private MultipartUploadSession multipartSessionResult;
+        private MultipartUploadSession updatedMultipartSession;
+        private MultipartUploadPart insertedMultipartPart;
+        private MultipartUploadPart multipartPartResult;
+        private List<MultipartUploadPart> multipartParts = new ArrayList<>();
+        private int multipartPartCount;
 
         @Override
         public Storage getById(EntityId id) {
@@ -275,6 +416,44 @@ public class StorageServiceImplTest {
         public int deleteBusinessByBusiness(String businessType, String businessId) {
             this.deletedBusinessKey = businessType + ":" + businessId;
             return 1;
+        }
+
+        @Override
+        public String insertMultipartSession(MultipartUploadSession session) {
+            this.insertedMultipartSession = session;
+            return "generated-session-id";
+        }
+
+        @Override
+        public MultipartUploadSession getMultipartSessionByUploadId(String uploadId) {
+            return multipartSessionResult;
+        }
+
+        @Override
+        public int updateMultipartSession(MultipartUploadSession session) {
+            this.updatedMultipartSession = session;
+            return 1;
+        }
+
+        @Override
+        public String insertMultipartPart(MultipartUploadPart part) {
+            this.insertedMultipartPart = part;
+            return "generated-part-id";
+        }
+
+        @Override
+        public MultipartUploadPart getMultipartPart(String uploadId, Integer partNumber) {
+            return multipartPartResult;
+        }
+
+        @Override
+        public List<MultipartUploadPart> listMultipartParts(String uploadId) {
+            return multipartParts;
+        }
+
+        @Override
+        public int countMultipartParts(String uploadId) {
+            return multipartPartCount;
         }
     }
 }

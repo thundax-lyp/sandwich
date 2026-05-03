@@ -59,7 +59,3 @@ logging:
   config: classpath:config/logback-spring.xml
   level:
     com.wdit: INFO
-
-wdit:
-  interface:
-    authCode: 77dddd6a15444710a0a51defe66545f7

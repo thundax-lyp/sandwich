@@ -35,6 +35,9 @@
   先读 `ARCHITECTURE.md`
   再读 `00-governance/API-ANNOTATION-MATRIX.md`
   再读对应业务需求文档和专项设计文档
+- 登录态、当前用户、当前会员、线程上下文、异步身份透传：
+  先读 `ARCHITECTURE.md`
+  再读 `00-governance/CONTEXT-PROPAGATION-RULES.md`
 - 改文档：
   再读 `00-governance/DOCUMENT-RULES.md`
 - 上线准备、运维、发布、jar 打包：

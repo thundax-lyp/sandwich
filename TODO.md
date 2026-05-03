@@ -9,8 +9,6 @@
 
 ## 当前任务项
 
-## 待审阅任务项
-
 - [ ] `storage-access`：补齐私有资源 owner 访问校验
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java`
@@ -88,5 +86,7 @@
   - 处理动作：实现初始化分片上传、上传分片、完成分片上传和取消分片上传的 Service 与 DAO 编排
   - 验收点：初始化、上传分片、完成、取消、重复 partNumber 和非法状态都有测试覆盖
   - 重要度：8/10
+
+## 待审阅任务项
 
 ## 待讨论项

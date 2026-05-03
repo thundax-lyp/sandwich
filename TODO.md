@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-multipart-schema`：增加分片上传会话和分片持久化模型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：新增 MultipartUploadSession、MultipartUploadPart 及其 DO、Mapper、assembler 和字段转换测试
-  - 验收点：分片上传会话和分片记录的字段、枚举、唯一约束设计与数据库设计文档一致
-  - 重要度：8/10
-
 - [ ] `storage-multipart-service`：实现分片上传业务流程
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service`

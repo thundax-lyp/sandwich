@@ -1,12 +1,17 @@
 package com.github.thundax.modules.storage.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.storage.entity.MultipartUploadPart;
+import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.Storage;
 import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
+import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
 import java.util.ArrayList;
@@ -159,5 +164,99 @@ public final class StoragePersistenceAssembler {
             entities.add(toBusinessEntity(dataObject));
         }
         return entities;
+    }
+
+    public static MultipartUploadSessionDO toMultipartSessionDataObject(MultipartUploadSession entity) {
+        if (entity == null) {
+            return null;
+        }
+        MultipartUploadSessionDO dataObject = new MultipartUploadSessionDO();
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setUploadId(entity.getUploadId());
+        dataObject.setOwnerId(entity.getOwnerId());
+        dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
+        dataObject.setBusinessType(entity.getBusinessType());
+        dataObject.setOriginalFilename(entity.getOriginalFilename());
+        dataObject.setMimeType(entity.getMimeType());
+        dataObject.setStorageType(storageTypeValue(entity.getStorageType()));
+        dataObject.setBucketName(entity.getBucketName());
+        dataObject.setObjectKey(entity.getObjectKey());
+        dataObject.setProviderUploadId(entity.getProviderUploadId());
+        dataObject.setTotalSize(entity.getTotalSize());
+        dataObject.setPartSize(entity.getPartSize());
+        dataObject.setUploadedPartCount(uploadedPartCountOrDefault(entity.getUploadedPartCount()));
+        dataObject.setUploadStatus(uploadStatusValue(entity.getUploadStatus()));
+        dataObject.setCreateDate(entity.getCreateDate());
+        dataObject.setUpdateDate(entity.getUpdateDate());
+        dataObject.setCompletedDate(entity.getCompletedDate());
+        dataObject.setAbortedDate(entity.getAbortedDate());
+        return dataObject;
+    }
+
+    public static MultipartUploadSession toMultipartSessionEntity(MultipartUploadSessionDO dataObject) {
+        if (dataObject == null) {
+            return null;
+        }
+        MultipartUploadSession entity = new MultipartUploadSession();
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setUploadId(dataObject.getUploadId());
+        entity.setOwnerId(dataObject.getOwnerId());
+        entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
+        entity.setBusinessType(dataObject.getBusinessType());
+        entity.setOriginalFilename(dataObject.getOriginalFilename());
+        entity.setMimeType(dataObject.getMimeType());
+        entity.setStorageType(storageTypeFrom(dataObject.getStorageType()));
+        entity.setBucketName(dataObject.getBucketName());
+        entity.setObjectKey(dataObject.getObjectKey());
+        entity.setProviderUploadId(dataObject.getProviderUploadId());
+        entity.setTotalSize(dataObject.getTotalSize());
+        entity.setPartSize(dataObject.getPartSize());
+        entity.setUploadedPartCount(uploadedPartCountOrDefault(dataObject.getUploadedPartCount()));
+        entity.setUploadStatus(uploadStatusFrom(dataObject.getUploadStatus()));
+        entity.setCreateDate(dataObject.getCreateDate());
+        entity.setUpdateDate(dataObject.getUpdateDate());
+        entity.setCompletedDate(dataObject.getCompletedDate());
+        entity.setAbortedDate(dataObject.getAbortedDate());
+        return entity;
+    }
+
+    public static MultipartUploadPartDO toMultipartPartDataObject(MultipartUploadPart entity) {
+        if (entity == null) {
+            return null;
+        }
+        MultipartUploadPartDO dataObject = new MultipartUploadPartDO();
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setUploadId(entity.getUploadId());
+        dataObject.setPartNumber(entity.getPartNumber());
+        dataObject.setEtag(entity.getEtag());
+        dataObject.setSize(entity.getSize());
+        dataObject.setCreateDate(entity.getCreateDate());
+        return dataObject;
+    }
+
+    public static MultipartUploadPart toMultipartPartEntity(MultipartUploadPartDO dataObject) {
+        if (dataObject == null) {
+            return null;
+        }
+        MultipartUploadPart entity = new MultipartUploadPart();
+        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setUploadId(dataObject.getUploadId());
+        entity.setPartNumber(dataObject.getPartNumber());
+        entity.setEtag(dataObject.getEtag());
+        entity.setSize(dataObject.getSize());
+        entity.setCreateDate(dataObject.getCreateDate());
+        return entity;
+    }
+
+    private static Integer uploadedPartCountOrDefault(Integer uploadedPartCount) {
+        return uploadedPartCount == null || uploadedPartCount < 0 ? 0 : uploadedPartCount;
+    }
+
+    private static String uploadStatusValue(MultipartUploadStatus uploadStatus) {
+        return uploadStatus == null ? null : uploadStatus.value();
+    }
+
+    private static MultipartUploadStatus uploadStatusFrom(String uploadStatus) {
+        return uploadStatus == null ? null : MultipartUploadStatus.from(uploadStatus);
     }
 }

@@ -710,7 +710,7 @@ public class AuthServiceImpl implements AuthService {
         OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
         Set<String> requestedScopes = toScopeSet(scopes);
         if (client == null || !client.supportsRedirectUri(redirectUri) || !client.supportsScopes(requestedScopes)) {
-            throw new InvalidTokenException();
+            throw new ApiException("OAuth2 client request invalid");
         }
         return client;
     }

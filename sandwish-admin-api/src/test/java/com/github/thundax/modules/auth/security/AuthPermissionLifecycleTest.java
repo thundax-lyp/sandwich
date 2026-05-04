@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.security;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
@@ -11,12 +12,15 @@ import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
+import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
+import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.UserCredential;
@@ -34,8 +38,12 @@ import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.impl.AuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
+import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
+import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
@@ -53,6 +61,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
@@ -69,6 +78,7 @@ public class AuthPermissionLifecycleTest {
     private InMemoryPermissionDaoImpl permissionDao;
     private TestAuthSessionDao authSessionDao;
     private TestAuthSessionRuntimeDao authSessionRuntimeDao;
+    private InMemoryLoginFormDaoImpl loginFormDao;
     private AuthService authService;
     private PermissionService permissionService;
 
@@ -76,6 +86,7 @@ public class AuthPermissionLifecycleTest {
     public void setUp() {
         accessTokenDao = new InMemoryAccessTokenDaoImpl();
         permissionDao = new InMemoryPermissionDaoImpl();
+        loginFormDao = new InMemoryLoginFormDaoImpl();
         authSessionDao = new TestAuthSessionDao();
         authSessionRuntimeDao = new TestAuthSessionRuntimeDao();
 
@@ -87,7 +98,7 @@ public class AuthPermissionLifecycleTest {
         authService = new AuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
-                new InMemoryLoginFormDaoImpl(),
+                loginFormDao,
                 accessTokenDao,
                 authSessionDao,
                 authSessionRuntimeDao,
@@ -194,6 +205,79 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
+    public void shouldAuthorizeApproveExchangeAndRevokeAuthorizationCode() throws Exception {
+        TestOAuthAuthorizationDao authorizationDao = new TestOAuthAuthorizationDao();
+        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
+        inject(authService, "oauthAuthorizationDao", authorizationDao);
+        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        inject(authService, "oauthClientDao", new TestOAuthClientDao());
+
+        OAuth2AuthorizationViewResult view = authService.authorizeOAuth2(
+                "admin-web", "http://127.0.0.1/callback", Arrays.asList("openid", "profile"), "state-1");
+
+        Assert.assertEquals("admin-web", view.getClientId());
+        Assert.assertEquals("Admin Web", view.getClientName());
+        Assert.assertTrue(view.getScopes().contains("openid"));
+
+        OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(
+                "admin-web",
+                "http://127.0.0.1/callback",
+                Arrays.asList("openid", "profile"),
+                "state-1",
+                "challenge-1",
+                "S256",
+                "u1",
+                true);
+
+        Assert.assertTrue(decision.isApproved());
+        Assert.assertNotNull(decision.getAuthorizationCode());
+        Assert.assertEquals("state-1", decision.getState());
+        Assert.assertFalse(authorizationDao.current.isUsed());
+
+        AuthTokenRefreshResult token =
+                authService.exchangeAuthorizationCode("admin-web", decision.getAuthorizationCode());
+
+        Assert.assertNotNull(token.getAccessToken().getToken());
+        Assert.assertNotNull(token.getRefreshToken());
+        Assert.assertTrue(authorizationDao.current.isUsed());
+        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+        Assert.assertTrue(authService.revokeAuthorizationCode(decision.getAuthorizationCode()));
+    }
+
+    @Test
+    public void shouldRejectAuthorizationWhenClientScopeIsInvalid() throws Exception {
+        inject(authService, "oauthClientDao", new TestOAuthClientDao());
+
+        try {
+            authService.authorizeOAuth2(
+                    "admin-web", "http://127.0.0.1/callback", Collections.singletonList("admin.write"), "state-1");
+            Assert.fail("invalid scope must be rejected");
+        } catch (ApiException expected) {
+            Assert.assertNotNull(expected);
+        }
+    }
+
+    @Test
+    public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
+        LoginForm form = authService.createLoginForm();
+        String smsCode = authService.createSmsValidateCode(form.getLoginToken(), "13800000000");
+
+        Assert.assertEquals(
+                "tester",
+                authService
+                        .authenticateSms(form.getLoginToken(), "13800000000", smsCode)
+                        .getLoginName());
+
+        inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");
+        inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
+
+        Assert.assertEquals(
+                "tester", authService.authenticateWecom("wecom-code").getLoginName());
+        Assert.assertEquals(
+                "tester", authService.authenticateGithub("github-code").getLoginName());
+    }
+
+    @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
@@ -287,9 +371,49 @@ public class AuthPermissionLifecycleTest {
             OAuthClient client = new OAuthClient();
             client.setId(EntityIdCodec.toDomain("oauth-client-1"));
             client.setClientId("admin-web");
+            client.setClientName("Admin Web");
             client.setStatus(OAuthClientStatus.ENABLED);
+            client.setRedirectUris(new LinkedHashSet<>(Collections.singletonList("http://127.0.0.1/callback")));
+            client.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
             client.setRefreshTokenTtlSeconds(600L);
             return client;
+        }
+    }
+
+    private static class TestOAuthAuthorizationDao implements OAuthAuthorizationDao {
+
+        private OAuthAuthorization current;
+
+        @Override
+        public OAuthAuthorization getById(EntityId id) {
+            return current;
+        }
+
+        @Override
+        public OAuthAuthorization getByAuthorizationCode(String authorizationCode) {
+            return current != null && current.getAuthorizationCode().equals(authorizationCode) ? current : null;
+        }
+
+        @Override
+        public String insert(OAuthAuthorization authorization) {
+            authorization.setId(EntityIdCodec.toDomain("authorization-db-1"));
+            this.current = authorization;
+            return "authorization-db-1";
+        }
+
+        @Override
+        public int updateUsed(OAuthAuthorization authorization) {
+            this.current = authorization;
+            return 1;
+        }
+
+        @Override
+        public int deleteByAuthorizationCode(String authorizationCode) {
+            if (current != null && current.getAuthorizationCode().equals(authorizationCode)) {
+                current = null;
+                return 1;
+            }
+            return 0;
         }
     }
 

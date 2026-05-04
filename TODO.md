@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-oauth-client`：搬运 OAuth client 模型和持久化端口
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth
-    sandwish-infra/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：新增 OAuthClient Entity/DAO/DO/Mapper/Assembler/DAO implementation 和基础测试
-  - 验收点：Service 可按 clientId/clientSecret 获取并校验启用客户端
-  - 重要度：10/10
-
 - [ ] `auth-oauth-authorization`：搬运 OAuth authorization 和授权码运行态
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
     sandwish-infra/src/main/java/com/github/thundax/modules/auth

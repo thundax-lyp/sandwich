@@ -1,0 +1,80 @@
+package com.github.thundax.modules.auth.persistence.dao;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.auth.dao.OAuthClientDao;
+import com.github.thundax.modules.auth.entity.OAuthClient;
+import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
+import com.github.thundax.modules.auth.persistence.assembler.OAuthClientPersistenceAssembler;
+import com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO;
+import com.github.thundax.modules.auth.persistence.mapper.OAuthClientMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class OAuthClientDaoImpl implements OAuthClientDao {
+
+    private final OAuthClientMapper mapper;
+
+    public OAuthClientDaoImpl(OAuthClientMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    @Override
+    public OAuthClient getById(EntityId id) {
+        return OAuthClientPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    }
+
+    @Override
+    public OAuthClient getByClientId(String clientId) {
+        LambdaQueryWrapper<OAuthClientDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OAuthClientDO::getClientId, clientId);
+        return OAuthClientPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
+    }
+
+    @Override
+    public OAuthClient getByClientIdAndStatus(String clientId, OAuthClientStatus status) {
+        LambdaQueryWrapper<OAuthClientDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OAuthClientDO::getClientId, clientId);
+        if (status != null) {
+            wrapper.eq(OAuthClientDO::getStatus, status.value());
+        }
+        return OAuthClientPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
+    }
+
+    @Override
+    public String insert(OAuthClient client) {
+        OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(client);
+        mapper.insert(dataObject);
+        return dataObject.getId();
+    }
+
+    @Override
+    public int update(OAuthClient client) {
+        OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(client);
+        return mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(OAuthClientDO::getClientId, dataObject.getClientId())
+                        .set(OAuthClientDO::getClientSecretHash, dataObject.getClientSecretHash())
+                        .set(OAuthClientDO::getClientName, dataObject.getClientName())
+                        .set(OAuthClientDO::getClientType, dataObject.getClientType())
+                        .set(OAuthClientDO::getGrantTypes, dataObject.getGrantTypes())
+                        .set(OAuthClientDO::getScopes, dataObject.getScopes())
+                        .set(OAuthClientDO::getRedirectUris, dataObject.getRedirectUris())
+                        .set(OAuthClientDO::getAccessTokenTtlSeconds, dataObject.getAccessTokenTtlSeconds())
+                        .set(OAuthClientDO::getRefreshTokenTtlSeconds, dataObject.getRefreshTokenTtlSeconds())
+                        .set(OAuthClientDO::getStatus, dataObject.getStatus())
+                        .set(OAuthClientDO::getContact, dataObject.getContact())
+                        .set(OAuthClientDO::getRemark, dataObject.getRemark())
+                        .set(OAuthClientDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(OAuthClientDO::getUpdateBy, dataObject.getUpdateBy()));
+    }
+
+    private LambdaUpdateWrapper<OAuthClientDO> buildIdUpdateWrapper(OAuthClientDO dataObject) {
+        LambdaUpdateWrapper<OAuthClientDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(OAuthClientDO::getId, dataObject.getId());
+        return wrapper;
+    }
+}

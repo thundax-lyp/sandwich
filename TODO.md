@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-credential-infra`：实现认证凭据持久化
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/UserCredentialDO.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/UserCredentialMapper.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/UserCredentialPersistenceAssembler.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/UserCredentialDaoImpl.java
-  - 处理动作：新增 `UserCredential` DO、Mapper、assembler 和 DAO 实现
-  - 验收点：infra 可按 `identityId + credentialType` 查询并写回凭据失败和锁定状态
-  - 重要度：9/10
-
 - [ ] `auth-session-infra`：实现认证会话持久化
   - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/AuthSessionDO.java
     sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/AuthSessionMapper.java

@@ -13,6 +13,7 @@ Sandwich 的目标是在现有 Java 8、Spring Boot 2、jar 应用和三层 API 
 - 为什么业务语义和持久化机制要分离
 - 为什么控制抽象新增
 - 为什么收敛 common 工具层级
+- 为什么文档和测试只表达当前系统形态
 - 为什么区分 formatter 和 rule gate
 - 为什么采用小步提交
 - 为什么 `commit message` 是工程记忆
@@ -54,7 +55,19 @@ Sandwich 的持久化演进不是为了追逐某个工具或单纯减少文件�
 
 删除或展开 `common` 能力时，不能把复杂逻辑散落到 Controller 或业务流程里。收敛层级的判断标准是“让真实行为更直接可见”，不是把共享复杂性复制到各处。
 
-## 5. Quality Tool Intent
+## 5. Current Shape Intent
+
+Sandwich 的治理文档和 ArchUnit 测试应该描述当前系统应该长什么样，而不是记录旧系统如何迁移到现在。
+
+历史迁移说明在执行过程中有价值，但迁移完成后会变成噪音。AI 读取这类说明时，容易把已经结束的兼容、清理或过渡方案误判为仍然有效的设计空间，从而重新引入旧口径、旧命名或旧边界。因此，正式规则应该保留稳定形态和判断理由，删除已经完成的改造叙事。
+
+文档表达应该尽量使用正向意图：说明当前代码应该如何命名、如何放置、如何分层、如何选择边界。少用“禁止某旧写法”来替代“应该采用什么形态”。正向表达能让 AI 优先构造目标形态，而不是围绕历史违规项做局部规避。
+
+ArchUnit 测试同样应该守住当前形态。测试可以阻断不符合形态的代码，但规则本身应该从当前设计推导，而不是维护旧方法名、旧类名或旧迁移清单。完成迁移后，测试应该校验“按 ID 批量读取应该是 `listByIds`”这类稳定意图，而不是长期保留“曾经有 `batchGetByIds`”这类历史记忆。
+
+如果某个规则只能通过列举旧系统遗留项来表达，通常说明它还没有沉淀成设计意图。此时应该先补足正向命名、分层或边界规则，再决定是否需要 hard rule。
+
+## 6. Quality Tool Intent
 
 质量工具的目标是降低协作摩擦，而不是把格式化、规约和架构判断混成一个黑盒。
 
@@ -66,7 +79,7 @@ Sandwich 的持久化演进不是为了追逐某个工具或单纯减少文件�
 
 Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以参考其他项目的用法，但版本必须服从本项目运行约束；如果上游项目使用更高 JDK 的插件或 formatter，应在 Sandwich 中降级到 Java 8 可运行版本。代码必须主动适配质量规则，不通过放松规则、长期 suppression 或长期 baseline 回避违规。
 
-## 6. Small Step Commit Intent
+## 7. Small Step Commit Intent
 
 小步提交不是单纯的 Git 使用习惯，而是本项目控制复杂度的一部分。
 
@@ -80,7 +93,7 @@ Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以�
 
 因此，AI 和开发者都不应把不相关修改堆叠到同一个提交里，也不应使用失去语义的 `commit message`。提交历史在本项目中承担的是“可回放的决策轨迹”，而不只是代码快照存档。
 
-## 7. Commit Message Shape
+## 8. Commit Message Shape
 
 本项目固定提交格式：
 
@@ -92,6 +105,6 @@ Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以�
 - `domain` 表达业务域、模块或治理域，例如 `admin`、`front`、`biz`、`common`、`storage`、`sys`、`governance`
 - 中文说明表达具体能力变化，不写空泛的“调整”“优化”“修改”
 
-## 8. Open Items
+## 9. Open Items
 
 无

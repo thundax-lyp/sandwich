@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-runtime-tests`：补齐认证会话 Redis 运行态测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java
-    sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImplTest.java
-  - 处理动作：覆盖登录写运行态、请求 touch 运行态、登出落库收口和 TTL 刷新
-  - 验收点：认证会话运行态和数据库审计态的生命周期都有测试断言
-  - 重要度：9/10
-
 - [ ] `auth-session-runtime-cleanup`：清理认证会话 Redis 迁移现场
   - 范围文件：TODO.md
     docs/30-designs/AUTH-IDENTITY-CREDENTIAL-RUNBOOK.md

@@ -41,6 +41,7 @@ import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
@@ -102,17 +103,28 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "user"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "admin"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "super"));
+        Date databaseLastAccessTime =
+                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime();
 
         authService.activeAccessToken(accessToken);
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertEquals(0, authSessionDao.getTouchCount());
         Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
+        Assert.assertEquals(
+                databaseLastAccessTime,
+                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime());
 
+        Date runtimeLastAccessTime =
+                authSessionRuntimeDao.getByToken(accessToken.getToken()).getLastAccessTime();
         authService.deleteAccessToken(accessToken);
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
         Assert.assertEquals(
                 AuthSessionStatus.LOGGED_OUT,
                 authSessionDao.getByToken(accessToken.getToken()).getStatus());
+        Assert.assertEquals(
+                runtimeLastAccessTime,
+                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime());
     }
 
     @Test
@@ -249,11 +261,11 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public void insert(AuthSession authSession, int expiredSeconds) {
-            this.session = authSession;
+            this.session = copy(authSession);
         }
 
         @Override
-        public void touch(String token, java.util.Date accessTime, int expiredSeconds) {
+        public void touch(String token, Date accessTime, int expiredSeconds) {
             if (session != null && session.getToken().equals(token)) {
                 session.touch(accessTime);
                 touchCount++;
@@ -269,6 +281,24 @@ public class AuthPermissionLifecycleTest {
 
         private int getTouchCount() {
             return touchCount;
+        }
+
+        private AuthSession copy(AuthSession source) {
+            AuthSession target = new AuthSession();
+            target.setId(source.getId());
+            target.setSessionId(source.getSessionId());
+            target.setToken(source.getToken());
+            target.setUserId(source.getUserId());
+            target.setIdentityId(source.getIdentityId());
+            target.setIdentityType(source.getIdentityType());
+            target.setLoginType(source.getLoginType());
+            target.setStatus(source.getStatus());
+            target.setIssuedAt(source.getIssuedAt());
+            target.setLastAccessTime(source.getLastAccessTime());
+            target.setExpireAt(source.getExpireAt());
+            target.setLogoutAt(source.getLogoutAt());
+            target.setInvalidateReason(source.getInvalidateReason());
+            return target;
         }
     }
 

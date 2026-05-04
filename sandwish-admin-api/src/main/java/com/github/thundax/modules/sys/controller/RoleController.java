@@ -6,7 +6,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.web.ApiRequestListHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.RoleAssignUserRequest;
@@ -172,14 +172,18 @@ public class RoleController {
     @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updateStatus(@RequestBody List<RoleStatusRequest> list) throws ApiException {
-        List<Role> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Role> beanList = new ArrayList<>();
+        for (RoleStatusRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Role.BEAN_NAME, request.getId());
             }
             bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         roleService.updateStatus(beanList);
 
@@ -198,14 +202,18 @@ public class RoleController {
     @RequestMapping(value = "priority", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updatePriority(@RequestBody List<RolePriorityRequest> list) throws ApiException {
-        List<Role> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Role> beanList = new ArrayList<>();
+        for (RolePriorityRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Role.BEAN_NAME, request.getId());
             }
             bean.setPriority(request.getPriority() == null ? 0 : request.getPriority());
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         roleService.updatePriority(beanList);
 
@@ -224,13 +232,17 @@ public class RoleController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean delete(@RequestBody List<RoleIdRequest> list) throws ApiException {
-        List<Role> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Role> beanList = new ArrayList<>();
+        for (RoleIdRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Role.BEAN_NAME, request.getId());
             }
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         roleService.batchDeleteById(beanList.stream().map(Role::getId).collect(Collectors.toList()));
 

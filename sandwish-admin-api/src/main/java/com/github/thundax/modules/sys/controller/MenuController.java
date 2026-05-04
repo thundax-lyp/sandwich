@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.collection.TreeNodeListHelper;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
@@ -8,8 +9,7 @@ import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.service.TreeService;
-import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.TreeNodeListHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.MenuDisplayRequest;
@@ -26,6 +26,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -165,15 +166,19 @@ public class MenuController {
     @RequestMapping(value = "display", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
-        List<Menu> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Menu> beanList = new ArrayList<>();
+        for (MenuDisplayRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Menu.BEAN_NAME, request.getId());
             }
             bean.setVisibility(
                     Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         menuService.updateVisibility(beanList);
 
@@ -192,13 +197,17 @@ public class MenuController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
-        List<Menu> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Menu> beanList = new ArrayList<>();
+        for (MenuIdRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Menu.BEAN_NAME, request.getId());
             }
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         menuService.batchDeleteById(beanList.stream().map(Menu::getId).collect(Collectors.toList()));
 
@@ -219,10 +228,7 @@ public class MenuController {
     public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.list(new Menu());
 
-        Set<String> excludeIds = excludeList == null
-                ? new HashSet<>()
-                : new HashSet<>(
-                        excludeList.stream().map(request -> request.getId()).collect(Collectors.toList()));
+        Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, MenuIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
 
         TreeNodeListHelper.remove(

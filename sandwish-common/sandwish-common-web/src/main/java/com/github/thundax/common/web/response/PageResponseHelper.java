@@ -1,10 +1,11 @@
-package com.github.thundax.common.web;
+package com.github.thundax.common.web.response;
 
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageResponse;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class PageResponseHelper {
 
@@ -18,12 +19,11 @@ public final class PageResponseHelper {
         pageResponse.setTotalPage(page.getTotalPage());
         pageResponse.setCount(page.getCount());
 
-        pageResponse.setRecords(
-                page.getList() == null
-                        ? new ArrayList<>()
-                        : page.getList().stream()
-                                .map(item -> mappingFunction.apply(item))
-                                .collect(Collectors.toList()));
+        pageResponse.setRecords(Optional.ofNullable(page.getList())
+                .map(Collection::stream)
+                .orElseGet(Stream::empty)
+                .map(mappingFunction)
+                .collect(Collectors.toList()));
 
         return pageResponse;
     }

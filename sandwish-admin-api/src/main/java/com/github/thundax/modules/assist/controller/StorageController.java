@@ -2,12 +2,13 @@ package com.github.thundax.modules.assist.controller;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageResponse;
-import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageResponseHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.StorageIdRequest;
 import com.github.thundax.modules.assist.controller.request.StoragePageRequest;
@@ -30,6 +31,7 @@ import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -153,13 +155,17 @@ public class StorageController {
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
-        List<Storage> storageList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Storage> storageList = new ArrayList<>();
+        for (StorageIdRequest request : RequestListHelper.present(list)) {
             Storage storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
             if (storage == null) {
                 throw new NullBeanException("Storage", request.getId());
             }
-            return storage;
-        });
+            storageList.add(storage);
+        }
+        if (storageList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         storageService.batchDeleteById(storageList.stream().map(Storage::getId).collect(Collectors.toList()));
         return true;

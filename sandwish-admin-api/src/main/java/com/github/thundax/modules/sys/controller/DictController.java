@@ -2,12 +2,13 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageResponse;
-import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageResponseHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.DictInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
@@ -22,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -135,13 +137,17 @@ public class DictController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Dict> beanList = new ArrayList<>();
+        for (DictIdRequest request : RequestListHelper.present(list)) {
             Dict bean = dictService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException("Dict", request.getId());
             }
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
         dictService.batchDeleteById(beanList.stream().map(Dict::getId).collect(Collectors.toList()));
         return true;
     }

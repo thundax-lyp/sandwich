@@ -22,6 +22,7 @@
 - packaging:
   - `sandwish-common`: pom
   - `sandwish-common-core`: jar
+  - `sandwish-common-web`: jar
   - `sandwish-common-cache`: jar
   - `sandwish-common-mybatis`: jar
   - `sandwish-common-security`: jar
@@ -74,7 +75,7 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - Common 聚合模块
-- 管理 `sandwish-common-core` 与 `sandwish-common-mybatis`
+- 管理 `sandwish-common-core`、`sandwish-common-web` 与 `sandwish-common-mybatis`
 
 边界：
 
@@ -86,7 +87,6 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - 通用工具类
-- 基础 Web 支撑
 - 通用编码、加密、集合、日期、文件工具
 - i18n 支撑
 - 存储、线程等通用技术能力
@@ -96,6 +96,22 @@ Sandwich 固定采用三层 API 架构。
 - 不承载具体业务流程。
 - 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 - 新增通用能力前，必须确认不是某个业务模块的专用逻辑。
+
+### `sandwish-common-web`
+
+职责：
+
+- 通用 Web 响应模型
+- 通用请求列表辅助
+- 入口无关的 Web 支撑能力
+
+边界：
+
+- 可以依赖 `sandwish-common-core` 和 `sandwish-common-mybatis`。
+- 不承载 Controller、Filter、Interceptor 或具体入口配置。
+- 不承载业务请求 / 响应对象。
+- Helper 只返回数据，不抛入口层业务异常。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-cache`
 
@@ -233,6 +249,12 @@ Sandwich 固定采用三层 API 架构。
 `sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
 `sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
+
+通用 Web 支撑链路允许入口模块依赖：
+
+`sandwish-admin-api -> sandwish-common-web -> sandwish-common-mybatis -> sandwish-common-core`
+
+`sandwish-front-api -> sandwish-common-web -> sandwish-common-mybatis -> sandwish-common-core`
 
 Spring Security 迁移链路允许入口模块依赖：
 

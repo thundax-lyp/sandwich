@@ -90,6 +90,8 @@
 - `NAME_SERVICE_METHOD_SHAPE`：Service 方法优先表达业务能力；当方法只是通用读取、列表、分页、计数、按 ID 删除、批量操作时，使用 `getById/getByXxx/list/page/count/deleteById/batchXxx`。不得新增裸 `get`、`getMany`、`find`、`findXxx`、`findList`、`findPage`、`findOne`、`delete(EntityId id)` 等旧泛化口径；业务动作使用清晰动词短语
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾
 - `NAME_INTERFACE_ASSEMBLER`：API 模型装配器命名以 `InterfaceAssembler` 结尾
+- `NAME_HELPER_NO_ARCH_SUFFIX`：通用工具类或 Helper 不得使用 `Mapper`、`Converter`、`Assembler`、`DAO`、`Service`、`Controller`、`Repository`、`Facade`、`Gateway`、`Adapter`、`Client`、`Handler`、`Processor`、`Manager`、`Factory` 等架构角色后缀；这些后缀只能用于对应分层或明确架构职责的类型。
+- `NAME_HELPER_BOUNDARY_REQUIRED`：Helper 命名必须绑定明确对象、容器或入口场景，例如 `RequestListHelper`、`TreeNodeListHelper`、`PageResponseHelper`；不得新增 `ListHelper`、`ObjectHelper`、`DataHelper`、`CommonHelper`、`BaseHelper`、`GenericHelper` 等无边界通用 Helper。
 - `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾，分别放在对应 API 模块的 `modules/{module}/controller/request` 与 `modules/{module}/controller/response` 包
 - `NAME_REQUEST_REQUIRED_ANNOTATIONS`：API `Request` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_RESPONSE_REQUIRED_ANNOTATIONS`：API `Response` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`

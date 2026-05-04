@@ -9,9 +9,9 @@ import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.common.utils.encrypt.Sm2;
-import com.github.thundax.common.vo.PageResponse;
-import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageResponseHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -46,6 +46,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -317,7 +318,8 @@ public class UserController {
     public Boolean updateStatus(@RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<User> beanList = new ArrayList<>();
+        for (UserStatusRequest request : RequestListHelper.present(list)) {
             User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, request.getId());
@@ -326,8 +328,11 @@ public class UserController {
                 throw new PermissionDeniedException();
             }
             bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         userService.updateStatus(beanList);
 
@@ -348,7 +353,8 @@ public class UserController {
     public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<User> beanList = new ArrayList<>();
+        for (UserIdRequest request : RequestListHelper.present(list)) {
             User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, request.getId());
@@ -356,8 +362,11 @@ public class UserController {
             if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
                 throw new PermissionDeniedException();
             }
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         userService.batchDeleteById(beanList.stream().map(User::getId).collect(Collectors.toList()));
 

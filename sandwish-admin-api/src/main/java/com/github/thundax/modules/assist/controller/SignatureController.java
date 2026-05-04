@@ -3,12 +3,13 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.vo.PageResponse;
-import com.github.thundax.common.web.ApiRequestListHelper;
-import com.github.thundax.common.web.PageResponseHelper;
+import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.assist.assembler.SignatureInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.SignatureDeleteRequest;
 import com.github.thundax.modules.assist.controller.request.SignaturePageRequest;
@@ -32,6 +33,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,13 +129,17 @@ public class SignatureController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
-        List<Signature> beanList = ApiRequestListHelper.mapNotEmpty(list, request -> {
+        List<Signature> beanList = new ArrayList<>();
+        for (SignatureDeleteRequest request : RequestListHelper.present(list)) {
             Signature bean = signatureService.getByBusiness(request.getBusinessType(), request.getBusinessId());
             if (bean == null) {
                 throw new NullBeanException(Signature.BEAN_NAME, request.getBusinessId());
             }
-            return bean;
-        });
+            beanList.add(bean);
+        }
+        if (beanList.isEmpty()) {
+            throw new InvalidParameterException("list");
+        }
 
         signatureService.batchDeleteByBusiness(beanList);
 

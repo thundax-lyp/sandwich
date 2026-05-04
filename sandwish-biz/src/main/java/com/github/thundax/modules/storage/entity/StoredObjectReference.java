@@ -31,16 +31,16 @@ public class StoredObjectReference {
         return ownerId;
     }
 
-    public void setBusinessId(String businessId) {
-        this.ownerId = businessId;
+    public void setBusinessId(String referenceOwnerId) {
+        this.ownerId = referenceOwnerId;
     }
 
     public String getBusinessType() {
         return ownerType == null ? null : ownerType.value();
     }
 
-    public void setBusinessType(String businessType) {
-        this.ownerType = businessType == null ? null : StorageOwnerType.from(businessType);
+    public void setBusinessType(String referenceOwnerType) {
+        this.ownerType = referenceOwnerType == null ? null : StorageOwnerType.from(referenceOwnerType);
     }
 
     public String getBusinessParams() {

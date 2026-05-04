@@ -8,7 +8,7 @@ import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
-import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -34,12 +34,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class StorageServiceImpl implements StorageService {
 
-    private final StorageDao dao;
+    private final StoredObjectDao dao;
     private final StoredObjectReferenceDao businessDao;
     private final MultipartUploadDao multipartUploadDao;
 
     public StorageServiceImpl(
-            StorageDao dao, StoredObjectReferenceDao businessDao, MultipartUploadDao multipartUploadDao) {
+            StoredObjectDao dao, StoredObjectReferenceDao businessDao, MultipartUploadDao multipartUploadDao) {
         this.dao = dao;
         this.businessDao = businessDao;
         this.multipartUploadDao = multipartUploadDao;
@@ -66,8 +66,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getObjectStatus()),
                 query == null ? null : referenceStatusValue(query.getReferenceStatus()),
-                query == null ? null : query.getBusinessId(),
-                query == null ? null : query.getBusinessType(),
+                query == null ? null : query.getReferenceOwnerId(),
+                query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
@@ -81,8 +81,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getObjectStatus()),
                 query == null ? null : referenceStatusValue(query.getReferenceStatus()),
-                query == null ? null : query.getBusinessId(),
-                query == null ? null : query.getBusinessType(),
+                query == null ? null : query.getReferenceOwnerId(),
+                query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
@@ -125,36 +125,36 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<String> listReferenceOwnerTypes() {
-        return businessDao.listBusinessTypes();
+        return businessDao.listReferenceOwnerTypes();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateObjectStatus(StoredObject storage) {
-        return dao.updateStatus(storage);
+        return dao.updateObjectStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateReferenceStatus(StoredObject storage) {
-        return dao.updateVisibility(storage);
+        return dao.updateReferenceStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int removeReferences(StorageOwnerType ownerType, String ownerId) {
-        return businessDao.deleteBusinessByBusiness(ownerTypeValue(ownerType), ownerId);
+        return businessDao.deleteByOwner(ownerTypeValue(ownerType), ownerId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addReferences(List<StoredObjectReference> list) {
-        businessDao.insertBusiness(list);
+        businessDao.insertReferences(list);
     }
 
     @Override
     public List<StoredObjectReference> listReferences(StoredObject entity) {
-        return businessDao.listBusiness(entity);
+        return businessDao.listReferences(entity);
     }
 
     @Override

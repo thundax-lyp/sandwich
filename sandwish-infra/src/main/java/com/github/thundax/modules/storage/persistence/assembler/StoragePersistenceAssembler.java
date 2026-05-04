@@ -37,8 +37,8 @@ public final class StoragePersistenceAssembler {
         dataObject.setObjectKey(entity.getObjectKey());
         dataObject.setSize(entity.getSize());
         dataObject.setAccessEndpoint(entity.getAccessEndpoint());
-        dataObject.setEnableFlag(statusValue(entity.getStatus()));
-        dataObject.setPublicFlag(visibilityValue(entity.getVisibility()));
+        dataObject.setObjectStatus(statusValue(entity.getStatus()));
+        dataObject.setReferenceStatus(visibilityValue(entity.getVisibility()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -62,8 +62,8 @@ public final class StoragePersistenceAssembler {
         entity.setObjectKey(dataObject.getObjectKey());
         entity.setSize(dataObject.getSize());
         entity.setAccessEndpoint(dataObject.getAccessEndpoint());
-        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
-        entity.setVisibility(visibilityFrom(dataObject.getPublicFlag()));
+        entity.setStatus(statusFrom(dataObject.getObjectStatus()));
+        entity.setVisibility(visibilityFrom(dataObject.getReferenceStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -124,10 +124,10 @@ public final class StoragePersistenceAssembler {
         }
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setBusinessId(entity.getBusinessId());
-        dataObject.setBusinessType(entity.getBusinessType());
+        dataObject.setReferenceOwnerId(entity.getBusinessId());
+        dataObject.setReferenceOwnerType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
-        dataObject.setPublicFlag(visibilityValue(entity.getVisibility()));
+        dataObject.setReferenceStatus(visibilityValue(entity.getVisibility()));
         return dataObject;
     }
 
@@ -137,10 +137,10 @@ public final class StoragePersistenceAssembler {
         }
         StoredObjectReference entity = new StoredObjectReference();
         entity.setId(EntityIdCodec.toDomain(dataObject.getFileId()));
-        entity.setBusinessId(dataObject.getBusinessId());
-        entity.setBusinessType(dataObject.getBusinessType());
+        entity.setBusinessId(dataObject.getReferenceOwnerId());
+        entity.setBusinessType(dataObject.getReferenceOwnerType());
         entity.setBusinessParams(dataObject.getBusinessParams());
-        entity.setVisibility(visibilityFrom(dataObject.getPublicFlag()));
+        entity.setVisibility(visibilityFrom(dataObject.getReferenceStatus()));
         return entity;
     }
 

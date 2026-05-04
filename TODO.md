@@ -9,17 +9,8 @@
 
 ## 当前任务项
 
-- [ ] `storage-dao`：调整 DAO 端口语义
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StorageDao.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectReferenceDao.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/MultipartUploadDao.java
-  - 处理动作：将主对象 DAO interface 收敛为 `StoredObjectDao`，并将引用端口方法名改为当前引用语义
-  - 验收点：DAO 端口按存储对象主数据、引用关系、分片上传运行态分离，方法命名不再出现 legacy business/visibility 口径
-  - 重要度：9/10
-
 - [ ] `storage-infra`：调整持久化实现和 DO 命名
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageDaoImpl.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageDO.java
+  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageDO.java
     sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StorageMapper.java
     sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java
   - 处理动作：将主对象持久化对象、Mapper、Assembler 和 DAO implementation 对齐 `StoredObject`

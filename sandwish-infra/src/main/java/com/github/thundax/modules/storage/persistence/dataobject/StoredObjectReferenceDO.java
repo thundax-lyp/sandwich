@@ -15,11 +15,11 @@ public class StoredObjectReferenceDO {
 
     private String fileId;
 
-    private String businessId;
+    private String referenceOwnerId;
 
-    private String businessType;
+    private String referenceOwnerType;
 
     private String businessParams;
 
-    private String publicFlag;
+    private String referenceStatus;
 }

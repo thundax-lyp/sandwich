@@ -23,7 +23,7 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     }
 
     @Override
-    public List<String> listBusinessTypes() {
+    public List<String> listReferenceOwnerTypes() {
         return toStringList(mapper.selectObjs(new QueryWrapper<StoredObjectReferenceDO>()
                 .select("business_type")
                 .groupBy("business_type")
@@ -31,14 +31,14 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     }
 
     @Override
-    public List<StoredObjectReference> listBusiness(StoredObject entity) {
+    public List<StoredObjectReference> listReferences(StoredObject entity) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StoredObjectReferenceDO::getFileId, EntityIdCodec.toValue(entity.getId()));
         return StoragePersistenceAssembler.toBusinessEntityList(mapper.selectList(wrapper));
     }
 
     @Override
-    public void insertBusiness(List<StoredObjectReference> list) {
+    public void insertReferences(List<StoredObjectReference> list) {
         List<StoredObjectReferenceDO> dataObjects = StoragePersistenceAssembler.toBusinessDataObjectList(list);
         if (dataObjects == null) {
             return;
@@ -49,17 +49,17 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     }
 
     @Override
-    public void deleteBusiness(String id) {
+    public void deleteByObjectId(String id) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StoredObjectReferenceDO::getFileId, id);
         mapper.delete(wrapper);
     }
 
     @Override
-    public int deleteBusinessByBusiness(String businessType, String businessId) {
+    public int deleteByOwner(String referenceOwnerType, String referenceOwnerId) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StoredObjectReferenceDO::getBusinessType, businessType);
-        wrapper.eq(StoredObjectReferenceDO::getBusinessId, businessId);
+        wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerType, referenceOwnerType);
+        wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerId, referenceOwnerId);
         return mapper.delete(wrapper);
     }
 

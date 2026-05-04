@@ -39,9 +39,9 @@ public class StorageDO {
 
     private String accessEndpoint;
 
-    private String enableFlag;
+    private String objectStatus;
 
-    private String publicFlag;
+    private String referenceStatus;
 
     private Integer priority;
     private String remarks;

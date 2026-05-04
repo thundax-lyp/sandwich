@@ -5,7 +5,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import java.util.List;
 
-public interface StorageDao {
+public interface StoredObjectDao {
 
     StoredObject getById(EntityId id);
 
@@ -15,10 +15,10 @@ public interface StorageDao {
             String mimeType,
             String ownerId,
             String ownerType,
-            String enableFlag,
-            String publicFlag,
-            String businessId,
-            String businessType,
+            String objectStatus,
+            String referenceStatus,
+            String referenceOwnerId,
+            String referenceOwnerType,
             String name,
             String remarks);
 
@@ -26,10 +26,10 @@ public interface StorageDao {
             String mimeType,
             String ownerId,
             String ownerType,
-            String enableFlag,
-            String publicFlag,
-            String businessId,
-            String businessType,
+            String objectStatus,
+            String referenceStatus,
+            String referenceOwnerId,
+            String referenceOwnerType,
             String name,
             String remarks,
             int pageNo,
@@ -43,7 +43,7 @@ public interface StorageDao {
 
     List<String> listMimeTypes();
 
-    int updateStatus(StoredObject storage);
+    int updateObjectStatus(StoredObject storage);
 
-    int updateVisibility(StoredObject storage);
+    int updateReferenceStatus(StoredObject storage);
 }

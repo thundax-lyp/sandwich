@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class StorageDaoImpl implements StorageDao {
+public class StoredObjectDaoImpl implements StoredObjectDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
@@ -31,7 +31,7 @@ public class StorageDaoImpl implements StorageDao {
     private final StoredObjectReferenceMapper businessMapper;
     private final StorageCacheSupport cacheSupport;
 
-    public StorageDaoImpl(
+    public StoredObjectDaoImpl(
             StorageMapper mapper, StoredObjectReferenceMapper businessMapper, StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.businessMapper = businessMapper;
@@ -85,14 +85,22 @@ public class StorageDaoImpl implements StorageDao {
             String mimeType,
             String ownerId,
             String ownerType,
-            String enableFlag,
-            String publicFlag,
-            String businessId,
-            String businessType,
+            String objectStatus,
+            String referenceStatus,
+            String referenceOwnerId,
+            String referenceOwnerType,
             String name,
             String remarks) {
         return StoragePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(
-                mimeType, ownerId, ownerType, enableFlag, publicFlag, businessId, businessType, name, remarks)));
+                mimeType,
+                ownerId,
+                ownerType,
+                objectStatus,
+                referenceStatus,
+                referenceOwnerId,
+                referenceOwnerType,
+                name,
+                remarks)));
     }
 
     @Override
@@ -100,10 +108,10 @@ public class StorageDaoImpl implements StorageDao {
             String mimeType,
             String ownerId,
             String ownerType,
-            String enableFlag,
-            String publicFlag,
-            String businessId,
-            String businessType,
+            String objectStatus,
+            String referenceStatus,
+            String referenceOwnerId,
+            String referenceOwnerType,
             String name,
             String remarks,
             int pageNo,
@@ -111,7 +119,15 @@ public class StorageDaoImpl implements StorageDao {
         Page<StorageDO> dataObjectPage = mapper.selectPage(
                 new Page<>(pageNo, pageSize),
                 buildListWrapper(
-                        mimeType, ownerId, ownerType, enableFlag, publicFlag, businessId, businessType, name, remarks));
+                        mimeType,
+                        ownerId,
+                        ownerType,
+                        objectStatus,
+                        referenceStatus,
+                        referenceOwnerId,
+                        referenceOwnerType,
+                        name,
+                        remarks));
         Page<StoredObject> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -147,7 +163,7 @@ public class StorageDaoImpl implements StorageDao {
                         .set(StorageDO::getObjectKey, dataObject.getObjectKey())
                         .set(StorageDO::getSize, dataObject.getSize())
                         .set(StorageDO::getAccessEndpoint, dataObject.getAccessEndpoint())
-                        .set(StorageDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(StorageDO::getObjectStatus, dataObject.getObjectStatus())
                         .set(StorageDO::getPriority, dataObject.getPriority())
                         .set(StorageDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
@@ -176,19 +192,20 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int updateStatus(StoredObject storage) {
+    public int updateObjectStatus(StoredObject storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getEnableFlag, dataObject.getEnableFlag()));
+                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getObjectStatus, dataObject.getObjectStatus()));
         cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
 
     @Override
-    public int updateVisibility(StoredObject storage) {
+    public int updateReferenceStatus(StoredObject storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));
+                null,
+                buildIdUpdateWrapper(dataObject).set(StorageDO::getReferenceStatus, dataObject.getReferenceStatus()));
         cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
@@ -203,15 +220,15 @@ public class StorageDaoImpl implements StorageDao {
             String mimeType,
             String ownerId,
             String ownerType,
-            String enableFlag,
-            String publicFlag,
-            String businessId,
-            String businessType,
+            String objectStatus,
+            String referenceStatus,
+            String referenceOwnerId,
+            String referenceOwnerType,
             String name,
             String remarks) {
         LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-        List<String> storageIds = findStorageIdsByBusiness(businessId, businessType);
+        List<String> storageIds = findStorageIdsByBusiness(referenceOwnerId, referenceOwnerType);
         if (storageIds != null && storageIds.isEmpty()) {
             wrapper.eq(StorageDO::getId, NO_MATCH_ID);
         } else if (storageIds != null) {
@@ -226,11 +243,11 @@ public class StorageDaoImpl implements StorageDao {
         if (StringUtils.isNotBlank(ownerType)) {
             wrapper.eq(StorageDO::getOwnerType, ownerType);
         }
-        if (StringUtils.isNotBlank(enableFlag)) {
-            wrapper.eq(StorageDO::getEnableFlag, enableFlag);
+        if (StringUtils.isNotBlank(objectStatus)) {
+            wrapper.eq(StorageDO::getObjectStatus, objectStatus);
         }
-        if (StringUtils.isNotBlank(publicFlag)) {
-            wrapper.eq(StorageDO::getPublicFlag, publicFlag);
+        if (StringUtils.isNotBlank(referenceStatus)) {
+            wrapper.eq(StorageDO::getReferenceStatus, referenceStatus);
         }
         if (StringUtils.isNotBlank(name)) {
             wrapper.like(StorageDO::getName, name);
@@ -243,16 +260,16 @@ public class StorageDaoImpl implements StorageDao {
         return wrapper;
     }
 
-    private List<String> findStorageIdsByBusiness(String businessId, String businessType) {
-        if (StringUtils.isBlank(businessId) && StringUtils.isBlank(businessType)) {
+    private List<String> findStorageIdsByBusiness(String referenceOwnerId, String referenceOwnerType) {
+        if (StringUtils.isBlank(referenceOwnerId) && StringUtils.isBlank(referenceOwnerType)) {
             return null;
         }
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(businessId)) {
-            wrapper.eq(StoredObjectReferenceDO::getBusinessId, businessId);
+        if (StringUtils.isNotBlank(referenceOwnerId)) {
+            wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerId, referenceOwnerId);
         }
-        if (StringUtils.isNotBlank(businessType)) {
-            wrapper.eq(StoredObjectReferenceDO::getBusinessType, businessType);
+        if (StringUtils.isNotBlank(referenceOwnerType)) {
+            wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerType, referenceOwnerType);
         }
         return toStringList(businessMapper.selectObjs(wrapper.select(StoredObjectReferenceDO::getFileId)));
     }

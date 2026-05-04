@@ -12,7 +12,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
-import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -33,7 +33,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldGetStorageById() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StoredObject expected = storage("s1");
         dao.getResult = expected;
 
@@ -45,15 +45,15 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldExpandFindPageQuery() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageQuery query = new StorageQuery();
         query.setMimeType("image/png");
         query.setOwnerId("owner-1");
         query.setOwnerType(StorageOwnerType.USER);
         query.setObjectStatus(StoredObjectStatus.ACTIVE);
         query.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
-        query.setBusinessId("business-1");
-        query.setBusinessType("Article");
+        query.setReferenceOwnerId("business-1");
+        query.setReferenceOwnerType("Article");
         query.setName("avatar");
         query.setRemarks("remark");
         PageDTO<StoredObject> page = new PageDTO<>(2, 20);
@@ -64,10 +64,10 @@ public class StorageServiceImplTest {
         assertEquals("image/png", dao.mimeType);
         assertEquals("owner-1", dao.ownerId);
         assertEquals("USER", dao.ownerType);
-        assertEquals("ACTIVE", dao.enableFlag);
-        assertEquals("REFERENCED", dao.publicFlag);
-        assertEquals("business-1", dao.businessId);
-        assertEquals("Article", dao.businessType);
+        assertEquals("ACTIVE", dao.objectStatus);
+        assertEquals("REFERENCED", dao.referenceStatus);
+        assertEquals("business-1", dao.referenceOwnerId);
+        assertEquals("Article", dao.referenceOwnerType);
         assertEquals("avatar", dao.name);
         assertEquals("remark", dao.remarks);
         assertEquals(page.getPageNo(), dao.pageNo);
@@ -76,7 +76,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldPrepareEntityBeforeSave() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StoredObject storage = new StoredObject();
 
         StorageServiceImpl service = storageService(dao);
@@ -90,7 +90,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldBatchDeleteById() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
 
         int count = service.batchDeleteById(Arrays.asList(EntityId.of("s1"), EntityId.of("s2")));
@@ -101,7 +101,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldDelegateBusinessOperations() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
         List<StoredObjectReference> list = Arrays.asList(storageBusiness("s1"));
 
@@ -114,7 +114,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAllowPublicStorageAccess() {
-        StorageServiceImpl service = storageService(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
         storage.setVisibility(StoredObjectReferenceStatus.REFERENCED);
 
@@ -123,7 +123,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAllowPrivateStorageOwnerAccess() {
-        StorageServiceImpl service = storageService(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
         storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
@@ -134,7 +134,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
-        StorageServiceImpl service = storageService(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
         storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
@@ -148,7 +148,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldInitMultipartUploadSession() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
         MultipartUploadSession session = multipartSession();
 
@@ -166,7 +166,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldUploadMultipartPartAndRefreshSessionCount() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartPartCount = 1;
         StorageServiceImpl service = storageService(dao);
@@ -184,7 +184,7 @@ public class StorageServiceImplTest {
 
     @Test(expected = BizException.class)
     public void shouldRejectDuplicateMultipartPartNumber() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartPartResult = multipartPart(1);
 
@@ -193,7 +193,7 @@ public class StorageServiceImplTest {
 
     @Test(expected = BizException.class)
     public void shouldRejectClosedMultipartSessionWhenUploadingPart() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartSessionResult.setUploadStatus(MultipartUploadStatus.COMPLETED);
 
@@ -202,7 +202,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldCompleteMultipartUploadAndCreateStorage() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
         StorageBackendObject object = new StorageBackendObject();
@@ -231,7 +231,7 @@ public class StorageServiceImplTest {
 
     @Test(expected = BizException.class)
     public void shouldRejectCompletingMultipartUploadWhenPartIsMissing() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(3));
 
@@ -240,7 +240,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAbortMultipartUpload() {
-        RecordingStorageDao dao = new RecordingStorageDao();
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
 
         int count = storageService(dao).abortMultipartUpload("upload-1");
@@ -285,21 +285,22 @@ public class StorageServiceImplTest {
         return part;
     }
 
-    private static StorageServiceImpl storageService(RecordingStorageDao dao) {
+    private static StorageServiceImpl storageService(RecordingStoredObjectDao dao) {
         return new StorageServiceImpl(dao, dao, dao);
     }
 
-    private static class RecordingStorageDao implements StorageDao, StoredObjectReferenceDao, MultipartUploadDao {
+    private static class RecordingStoredObjectDao
+            implements StoredObjectDao, StoredObjectReferenceDao, MultipartUploadDao {
 
         private StoredObject getResult;
         private String id;
         private String mimeType;
         private String ownerId;
         private String ownerType;
-        private String enableFlag;
-        private String publicFlag;
-        private String businessId;
-        private String businessType;
+        private String objectStatus;
+        private String referenceStatus;
+        private String referenceOwnerId;
+        private String referenceOwnerType;
         private String name;
         private String remarks;
         private int pageNo;
@@ -332,10 +333,10 @@ public class StorageServiceImplTest {
                 String mimeType,
                 String ownerId,
                 String ownerType,
-                String enableFlag,
-                String publicFlag,
-                String businessId,
-                String businessType,
+                String objectStatus,
+                String referenceStatus,
+                String referenceOwnerId,
+                String referenceOwnerType,
                 String name,
                 String remarks) {
             return null;
@@ -346,10 +347,10 @@ public class StorageServiceImplTest {
                 String mimeType,
                 String ownerId,
                 String ownerType,
-                String enableFlag,
-                String publicFlag,
-                String businessId,
-                String businessType,
+                String objectStatus,
+                String referenceStatus,
+                String referenceOwnerId,
+                String referenceOwnerType,
                 String name,
                 String remarks,
                 int pageNo,
@@ -357,10 +358,10 @@ public class StorageServiceImplTest {
             this.mimeType = mimeType;
             this.ownerId = ownerId;
             this.ownerType = ownerType;
-            this.enableFlag = enableFlag;
-            this.publicFlag = publicFlag;
-            this.businessId = businessId;
-            this.businessType = businessType;
+            this.objectStatus = objectStatus;
+            this.referenceStatus = referenceStatus;
+            this.referenceOwnerId = referenceOwnerId;
+            this.referenceOwnerType = referenceOwnerType;
             this.name = name;
             this.remarks = remarks;
             this.pageNo = pageNo;
@@ -391,36 +392,36 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public List<String> listBusinessTypes() {
+        public List<String> listReferenceOwnerTypes() {
             return null;
         }
 
         @Override
-        public int updateStatus(StoredObject storage) {
+        public int updateObjectStatus(StoredObject storage) {
             return 1;
         }
 
         @Override
-        public int updateVisibility(StoredObject storage) {
+        public int updateReferenceStatus(StoredObject storage) {
             return 1;
         }
 
         @Override
-        public List<StoredObjectReference> listBusiness(StoredObject entity) {
+        public List<StoredObjectReference> listReferences(StoredObject entity) {
             return null;
         }
 
         @Override
-        public void insertBusiness(List<StoredObjectReference> list) {
+        public void insertReferences(List<StoredObjectReference> list) {
             this.businessList = list;
         }
 
         @Override
-        public void deleteBusiness(String id) {}
+        public void deleteByObjectId(String id) {}
 
         @Override
-        public int deleteBusinessByBusiness(String businessType, String businessId) {
-            this.deletedBusinessKey = businessType + ":" + businessId;
+        public int deleteByOwner(String referenceOwnerType, String referenceOwnerId) {
+            this.deletedBusinessKey = referenceOwnerType + ":" + referenceOwnerId;
             return 1;
         }
 

@@ -58,8 +58,8 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldReadLegacyFlagsAsDomainValues() {
         StorageDO dataObject = new StorageDO();
-        dataObject.setEnableFlag(Global.ENABLE);
-        dataObject.setPublicFlag(Global.YES);
+        dataObject.setObjectStatus(Global.ENABLE);
+        dataObject.setReferenceStatus(Global.YES);
 
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
@@ -75,16 +75,16 @@ public class StoragePersistenceAssemblerTest {
 
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
-        assertEquals("DELETED", dataObject.getEnableFlag());
-        assertEquals("UNREFERENCED", dataObject.getPublicFlag());
+        assertEquals("DELETED", dataObject.getObjectStatus());
+        assertEquals("UNREFERENCED", dataObject.getReferenceStatus());
     }
 
     @Test
     public void shouldMapBusinessVisibility() {
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId("s1");
-        dataObject.setBusinessId("owner-1");
-        dataObject.setBusinessType("USER");
+        dataObject.setReferenceOwnerId("owner-1");
+        dataObject.setReferenceOwnerType("USER");
 
         StoredObjectReference entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
@@ -95,7 +95,7 @@ public class StoragePersistenceAssemblerTest {
                 "s1", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
         assertEquals(
                 "owner-1",
-                StoragePersistenceAssembler.toBusinessDataObject(entity).getBusinessId());
+                StoragePersistenceAssembler.toBusinessDataObject(entity).getReferenceOwnerId());
     }
 
     @Test

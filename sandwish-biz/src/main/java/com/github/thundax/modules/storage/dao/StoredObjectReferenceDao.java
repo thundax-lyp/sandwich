@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface StoredObjectReferenceDao {
 
-    List<String> listBusinessTypes();
+    List<String> listReferenceOwnerTypes();
 
-    List<StoredObjectReference> listBusiness(StoredObject entity);
+    List<StoredObjectReference> listReferences(StoredObject entity);
 
-    void insertBusiness(List<StoredObjectReference> list);
+    void insertReferences(List<StoredObjectReference> list);
 
-    void deleteBusiness(String id);
+    void deleteByObjectId(String id);
 
-    int deleteBusinessByBusiness(String businessType, String businessId);
+    int deleteByOwner(String referenceOwnerType, String referenceOwnerId);
 }

@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class StorageQuery implements Serializable {
     private String mimeType;
-    private String businessId;
-    private String businessType;
+    private String referenceOwnerId;
+    private String referenceOwnerType;
     private String ownerId;
     private StorageOwnerType ownerType;
     private StoredObjectStatus objectStatus;

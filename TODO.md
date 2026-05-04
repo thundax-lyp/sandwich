@@ -10,13 +10,13 @@
 ## 当前任务项
 
 - [ ] `storage-rest-api`：用 REST content 入口替换业务 Servlet
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/servlet/StorageServlet.java
-    sandwish-front-api/src/main/java/com/github/thundax/modules/storage/servlet/StorageServlet.java
-    sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java
-    sandwish-front-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java
-  - 处理动作：新增 REST 对象内容读取接口并移除业务 Storage Servlet 注册
-  - 验收点：公开存储访问路径为 REST resource，代码和配置不再用 `servletPath` 表达业务访问路径
+  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/converter/StorageConverter.java
+    sandwish-front-api/src/main/java/com/github/thundax/modules/storage/converter/StorageConverter.java
+    sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/VltavaProperties.java
+    sandwish-front-api/src/main/java/com/github/thundax/autoconfigure/VltavaProperties.java
+    sandwish-infra/src/main/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStore.java
+  - 处理动作：将剩余访问路径字段从 `servletPath` 收敛为 REST content 资源路径
+  - 验收点：代码和配置不再用 `servletPath` 表达业务访问路径
   - 重要度：10/10
 
 - [ ] `storage-api-model`：调整接口请求响应模型

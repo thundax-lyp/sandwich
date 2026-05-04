@@ -3,9 +3,6 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.filter.xss.XssFilter;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
-import com.github.thundax.modules.storage.converter.StorageConverter;
-import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.servlet.StorageServlet;
 import com.github.thundax.modules.storage.store.LocalFileStoredObjectStore;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
@@ -45,19 +42,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         ServletRegistrationBean<SmsValidateCodeServlet> bean = new ServletRegistrationBean<>();
         bean.setServlet(new SmsValidateCodeServlet(smsValidateCodeDao));
         bean.addUrlMappings("/servlet/smsValidateCodeServlet");
-        return bean;
-    }
-
-    @Bean
-    public ServletRegistrationBean<StorageServlet> resourceFileServletServletRegistrationBean(
-            VltavaProperties properties,
-            StorageConverter converter,
-            StorageService storageService,
-            StoredObjectStore storedObjectStore) {
-        ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new StorageServlet(converter, storageService, storedObjectStore));
-        VltavaProperties.UploadProperties upload = properties.getUpload();
-        bean.addUrlMappings(upload.getServletPath() + "*");
         return bean;
     }
 

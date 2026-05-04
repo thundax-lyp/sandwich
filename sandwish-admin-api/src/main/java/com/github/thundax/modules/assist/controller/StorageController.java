@@ -118,13 +118,11 @@ public class StorageController {
         return response;
     }
 
-    @ApiOperation(value = "预览存储资源", notes = "assist:storage:view")
-    @RequestMapping(value = "file/{id}.{extendName}", method = RequestMethod.GET)
-    public void preview(
-            @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
-            throws IOException {
+    @ApiOperation(value = "读取存储对象内容", notes = "assist:storage:view")
+    @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
+    public void content(@PathVariable("id") String id, HttpServletResponse response) throws IOException {
         StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
-        if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
+        if (storage == null) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }

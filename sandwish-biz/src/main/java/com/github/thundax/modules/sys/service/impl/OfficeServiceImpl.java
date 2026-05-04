@@ -26,29 +26,11 @@ public class OfficeServiceImpl implements OfficeService {
         this.dao = dao;
     }
 
-    public Class<Office> getElementType() {
-        return Office.class;
-    }
-
-    public Office newEntity(String id) {
-        Office office = new Office();
-        office.setId(EntityIdCodec.toDomain(id));
-        return office;
-    }
-
-    public Office getById(Office entity) {
-        return entity == null ? null : getById(entity.getId());
-    }
-
     public Office getById(EntityId id) {
         if (id == null) {
             return null;
         }
         return dao.getById(id);
-    }
-
-    public List<Office> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     public List<Office> list(Office office) {
@@ -60,15 +42,6 @@ public class OfficeServiceImpl implements OfficeService {
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
-    }
-
-    public Office getOne(Office office) {
-        List<Office> offices = list(office);
-        return offices == null || offices.isEmpty() ? null : offices.get(0);
-    }
-
-    public PageDTO<Office> page(Office office, PageDTO<Office> page) {
-        return page((OfficeQuery) null, page);
     }
 
     public PageDTO<Office> page(OfficeQuery query, PageDTO<Office> page) {
@@ -84,10 +57,6 @@ public class OfficeServiceImpl implements OfficeService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    public long count(Office office) {
-        return list(office).size();
     }
 
     @Override
@@ -114,19 +83,10 @@ public class OfficeServiceImpl implements OfficeService {
         return count;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(Office office) {
-        return dao.updatePriority(office);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<Office> list) {
-        return batchOperate(list, this::updatePriority);
     }
 
     @Override

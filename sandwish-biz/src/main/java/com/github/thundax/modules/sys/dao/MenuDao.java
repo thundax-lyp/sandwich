@@ -10,7 +10,7 @@ public interface MenuDao {
 
     Menu getById(EntityId id);
 
-    List<Menu> batchGetByIds(List<String> idList);
+    List<Menu> listByIds(List<String> idList);
 
     List<Menu> list(String parentId, String displayFlag, Integer maxRank);
 

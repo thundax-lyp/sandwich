@@ -10,7 +10,7 @@ public interface OfficeDao {
 
     Office getById(EntityId id);
 
-    List<Office> batchGetByIds(List<String> idList);
+    List<Office> listByIds(List<String> idList);
 
     List<Office> list(String parentId, String name, String remarks);
 

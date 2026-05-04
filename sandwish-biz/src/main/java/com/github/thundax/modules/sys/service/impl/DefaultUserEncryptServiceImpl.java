@@ -1,12 +1,9 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,55 +36,5 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
 
     public UserEncrypt getById(EntityId id) {
         return null;
-    }
-
-    public UserEncrypt getById(UserEncrypt query) {
-        return null;
-    }
-
-    public UserEncrypt getOne(UserEncrypt query) {
-        return null;
-    }
-
-    public Class<UserEncrypt> getElementType() {
-        return UserEncrypt.class;
-    }
-
-    public UserEncrypt newEntity(String id) {
-        UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(EntityIdCodec.toDomain(id));
-        return userEncrypt;
-    }
-
-    public List<UserEncrypt> batchGetByIds(List<EntityId> ids) {
-        return null;
-    }
-
-    public List<UserEncrypt> list(UserEncrypt entity) {
-        return null;
-    }
-
-    public PageDTO<UserEncrypt> page(UserEncrypt entity, PageDTO<UserEncrypt> page) {
-        return page;
-    }
-
-    public long count(UserEncrypt entity) {
-        return 0;
-    }
-
-    public int deleteById(EntityId id) {
-        return 0;
-    }
-
-    public int batchDeleteById(List<EntityId> ids) {
-        return 0;
-    }
-
-    public int updatePriority(UserEncrypt entity) {
-        return 0;
-    }
-
-    public int updatePriority(List<UserEncrypt> list) {
-        return 0;
     }
 }

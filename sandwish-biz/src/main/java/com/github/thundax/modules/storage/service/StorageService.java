@@ -15,7 +15,7 @@ public interface StorageService {
 
     Storage getById(EntityId id);
 
-    List<Storage> batchGetByIds(List<EntityId> ids);
+    List<Storage> listByIds(List<EntityId> ids);
 
     List<Storage> list(StorageQuery query);
 

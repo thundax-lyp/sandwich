@@ -12,7 +12,6 @@ import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.query.OfficeQuery;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
@@ -51,7 +50,7 @@ public class OfficeServiceImplTest {
         page.setPageSize(0);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);
 
-        service.page(new Office(), page);
+        service.page(new OfficeQuery(), page);
 
         assertEquals(PageRules.firstPageIndex(), dao.pageNo);
         assertEquals(PageRules.defaultPageSize(), dao.pageSize);
@@ -95,17 +94,6 @@ public class OfficeServiceImplTest {
         assertEquals("office-1", dao.deletedId);
     }
 
-    @Test
-    public void shouldBatchUpdatePriority() {
-        RecordingOfficeDao dao = new RecordingOfficeDao();
-        OfficeServiceImpl service = new OfficeServiceImpl(dao);
-
-        int count = service.updatePriority(Arrays.asList(office("o1"), office("o2")));
-
-        assertEquals(2, count);
-        assertEquals(2, dao.priorityCalls);
-    }
-
     private static Office office(String id) {
         Office office = new Office();
         office.setId(EntityIdCodec.toDomain(id));
@@ -133,7 +121,7 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public List<Office> batchGetByIds(List<String> idList) {
+        public List<Office> listByIds(List<String> idList) {
             return null;
         }
 

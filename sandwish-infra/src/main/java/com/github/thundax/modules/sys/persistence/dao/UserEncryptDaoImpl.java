@@ -27,7 +27,7 @@ public class UserEncryptDaoImpl implements UserEncryptDao {
     }
 
     @Override
-    public List<UserEncrypt> batchGetByIds(List<String> idList) {
+    public List<UserEncrypt> listByIds(List<String> idList) {
         return UserEncryptPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 

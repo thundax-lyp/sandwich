@@ -69,7 +69,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<Storage> batchGetByIds(List<String> idList) {
+    public List<Storage> listByIds(List<String> idList) {
         List<Storage> storageList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

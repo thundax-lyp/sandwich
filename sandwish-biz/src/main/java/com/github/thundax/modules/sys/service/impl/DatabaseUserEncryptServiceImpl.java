@@ -2,18 +2,11 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,16 +38,6 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         this.amqpTemplate = amqpTemplate;
     }
 
-    public Class<UserEncrypt> getElementType() {
-        return UserEncrypt.class;
-    }
-
-    public UserEncrypt newEntity(String id) {
-        UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(EntityIdCodec.toDomain(id));
-        return userEncrypt;
-    }
-
     /**
      * 迁移兼容：更新旧用户加密表密码镜像, loginPass, updateDate, updateBy
      */
@@ -81,14 +64,9 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     public UserEncrypt getById(EntityId id) {
         if (id != null) {
-            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(newEntity(EntityIdCodec.toValue(id))));
-        }
-        return null;
-    }
-
-    public UserEncrypt getById(UserEncrypt query) {
-        if (query != null) {
-            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(query));
+            UserEncrypt userEncrypt = new UserEncrypt();
+            userEncrypt.setId(id);
+            amqpTemplate.convertAndSend(QUEUE_ENCRYPT_QUERY, JsonUtils.toJson(userEncrypt));
         }
         return null;
     }
@@ -169,80 +147,11 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         }
     }
 
-    public List<UserEncrypt> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
-    }
-
-    public List<UserEncrypt> list(UserEncrypt entity) {
-        return dao.list();
-    }
-
-    public UserEncrypt getOne(UserEncrypt query) {
-        List<UserEncrypt> list = list(query);
-        return list == null || list.isEmpty() ? null : list.get(0);
-    }
-
-    public PageDTO<UserEncrypt> page(UserEncrypt entity, PageDTO<UserEncrypt> page) {
-        PageDTO<UserEncrypt> normalizedPage = normalizePage(page);
-        IPage<UserEncrypt> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
-    }
-
-    public long count(UserEncrypt entity) {
-        List<UserEncrypt> list = list(entity);
-        return list == null ? 0 : list.size();
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        return id == null ? 0 : dao.deleteById(id);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(UserEncrypt entity) {
-        return dao.updatePriority(entity);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<UserEncrypt> list) {
-        return batchOperate(list, this::updatePriority);
-    }
-
     private void addDirect(UserEncrypt entity) {
         dao.insert(entity);
     }
 
     private void updateDirect(UserEncrypt entity) {
         dao.update(entity);
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
-    }
-
-    private PageDTO<UserEncrypt> normalizePage(PageDTO<UserEncrypt> page) {
-        PageDTO<UserEncrypt> normalizedPage = page == null ? new PageDTO<>() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
     }
 }

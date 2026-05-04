@@ -60,7 +60,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> batchGetByIds(List<String> idList) {
+    public List<Role> listByIds(List<String> idList) {
         List<Role> roleList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

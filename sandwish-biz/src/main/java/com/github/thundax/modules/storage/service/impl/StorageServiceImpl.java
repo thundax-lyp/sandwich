@@ -47,8 +47,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
+    public List<Storage> listByIds(List<EntityId> ids) {
+        return dao.listByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override

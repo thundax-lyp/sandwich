@@ -27,29 +27,11 @@ public class DictServiceImpl implements DictService {
         this.dao = dao;
     }
 
-    public Class<Dict> getElementType() {
-        return Dict.class;
-    }
-
-    public Dict newEntity(String id) {
-        Dict dict = new Dict();
-        dict.setId(EntityIdCodec.toDomain(id));
-        return dict;
-    }
-
-    public Dict getById(Dict entity) {
-        return entity == null ? null : getById(entity.getId());
-    }
-
     public Dict getById(EntityId id) {
         if (id == null) {
             return null;
         }
         return dao.getById(id);
-    }
-
-    public List<Dict> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -72,24 +54,11 @@ public class DictServiceImpl implements DictService {
         return result;
     }
 
-    public List<Dict> list(Dict dict) {
-        return list((DictQuery) null);
-    }
-
     public List<Dict> list(DictQuery query) {
         return dao.list(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
                 query == null ? null : query.getRemarks());
-    }
-
-    public Dict getOne(Dict dict) {
-        List<Dict> dicts = list(dict);
-        return dicts == null || dicts.isEmpty() ? null : dicts.get(0);
-    }
-
-    public PageDTO<Dict> page(Dict dict, PageDTO<Dict> page) {
-        return page((DictQuery) null, page);
     }
 
     public PageDTO<Dict> page(DictQuery query, PageDTO<Dict> page) {
@@ -105,11 +74,6 @@ public class DictServiceImpl implements DictService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    public long count(Dict dict) {
-        List<Dict> dicts = list(dict);
-        return dicts == null ? 0 : dicts.size();
     }
 
     @Override
@@ -129,19 +93,10 @@ public class DictServiceImpl implements DictService {
         return id == null ? 0 : dao.deleteById(id);
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(Dict dict) {
-        return dao.updatePriority(dict);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<Dict> list) {
-        return batchOperate(list, this::updatePriority);
     }
 
     @Override

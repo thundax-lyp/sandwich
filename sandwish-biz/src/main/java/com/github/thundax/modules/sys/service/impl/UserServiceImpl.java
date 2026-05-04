@@ -58,29 +58,11 @@ public class UserServiceImpl implements UserService {
         this.userCredentialDao = userCredentialDao;
     }
 
-    public Class<User> getElementType() {
-        return User.class;
-    }
-
-    public User newEntity(String id) {
-        User user = new User();
-        user.setId(EntityIdCodec.toDomain(id));
-        return user;
-    }
-
-    public User getById(User entity) {
-        return entity == null ? null : getById(entity.getId());
-    }
-
     public User getById(EntityId id) {
         if (id == null) {
             return null;
         }
         return dao.getById(id);
-    }
-
-    public List<User> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
     public List<User> list(User user) {
@@ -94,15 +76,6 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : query.getName(),
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : superFlagValue(query.getPrivilege()));
-    }
-
-    public User getOne(User user) {
-        List<User> users = list(user);
-        return users == null || users.isEmpty() ? null : users.get(0);
-    }
-
-    public PageDTO<User> page(User user, PageDTO<User> page) {
-        return page((UserQuery) null, page);
     }
 
     public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
@@ -120,11 +93,6 @@ public class UserServiceImpl implements UserService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    public long count(User user) {
-        List<User> users = list(user);
-        return users == null ? 0 : users.size();
     }
 
     @Override
@@ -245,19 +213,10 @@ public class UserServiceImpl implements UserService {
         return role;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(User user) {
-        return dao.updatePriority(user);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<User> list) {
-        return batchOperate(list, this::updatePriority);
     }
 
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {

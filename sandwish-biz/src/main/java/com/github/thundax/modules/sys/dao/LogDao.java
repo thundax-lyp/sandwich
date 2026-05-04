@@ -10,7 +10,7 @@ public interface LogDao {
 
     Log getById(EntityId id);
 
-    List<Log> batchGetByIds(List<String> idList);
+    List<Log> listByIds(List<String> idList);
 
     List<Log> list(
             String type,

@@ -34,7 +34,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> batchGetByIds(List<String> idList) {
+    public List<Member> listByIds(List<String> idList) {
         return MemberPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 

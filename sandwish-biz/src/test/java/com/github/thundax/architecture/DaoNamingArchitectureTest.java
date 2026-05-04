@@ -16,7 +16,7 @@ import org.junit.Test;
 public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
 
     private static final Set<String> LEGACY_DAO_METHOD_NAMES =
-            new HashSet<>(Arrays.asList("get", "getMany", "find", "findList", "findPage", "delete"));
+            new HashSet<>(Arrays.asList("get", "getMany", "find", "findList", "findPage", "delete", "batchGetByIds"));
 
     @Test
     public void shouldUseDaoPortMethodShape() {
@@ -35,7 +35,8 @@ public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
         }
 
         assertTrue(
-                "DAO interface methods must use getById/getByXxx/list/page/count/deleteById/batchXxx naming: "
+                "DAO interface methods must use getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx "
+                        + "naming: "
                         + violations,
                 violations.isEmpty());
     }

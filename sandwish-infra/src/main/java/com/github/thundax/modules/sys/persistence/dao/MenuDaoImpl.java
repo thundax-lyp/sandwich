@@ -52,7 +52,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> batchGetByIds(List<String> idList) {
+    public List<Menu> listByIds(List<String> idList) {
         List<Menu> menuList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

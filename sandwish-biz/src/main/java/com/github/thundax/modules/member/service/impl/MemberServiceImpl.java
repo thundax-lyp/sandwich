@@ -37,8 +37,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
+    public List<Member> listByIds(List<EntityId> ids) {
+        return dao.listByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
@@ -123,18 +123,6 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(rollbackFor = Exception.class)
     public int updateStatus(List<Member> list) {
         return batchOperate(list, this::updateStatus);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(Member member) {
-        return dao.updatePriority(member);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<Member> list) {
-        return batchOperate(list, this::updatePriority);
     }
 
     @Override

@@ -9,7 +9,7 @@ public interface DictDao {
 
     Dict getById(EntityId id);
 
-    List<Dict> batchGetByIds(List<String> idList);
+    List<Dict> listByIds(List<String> idList);
 
     List<Dict> list(String type, String label, String remarks);
 

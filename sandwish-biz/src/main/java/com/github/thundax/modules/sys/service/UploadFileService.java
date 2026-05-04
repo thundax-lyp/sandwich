@@ -8,7 +8,7 @@ public interface UploadFileService {
 
     UploadFile getById(EntityId id);
 
-    List<UploadFile> batchGetByIds(List<EntityId> ids);
+    List<UploadFile> listByIds(List<EntityId> ids);
 
     void add(UploadFile uploadFile);
 

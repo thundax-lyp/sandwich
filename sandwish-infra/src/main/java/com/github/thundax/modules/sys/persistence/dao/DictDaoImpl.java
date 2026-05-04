@@ -44,7 +44,7 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public List<Dict> batchGetByIds(List<String> idList) {
+    public List<Dict> listByIds(List<String> idList) {
         List<Dict> dictList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

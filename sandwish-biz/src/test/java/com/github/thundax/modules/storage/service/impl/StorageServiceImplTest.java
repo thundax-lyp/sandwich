@@ -317,7 +317,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public List<Storage> batchGetByIds(List<String> idList) {
+        public List<Storage> listByIds(List<String> idList) {
             return null;
         }
 

@@ -168,7 +168,7 @@ public class PermissionServiceImpl implements PermissionService {
             }
         }
 
-        List<Menu> menuList = menuService.batchGetByIds(EntityIdCodec.toDomains(menuIdList));
+        List<Menu> menuList = menuService.listByIds(EntityIdCodec.toDomains(menuIdList));
         menuList.sort(Menu::compareTo);
         return menuList;
     }

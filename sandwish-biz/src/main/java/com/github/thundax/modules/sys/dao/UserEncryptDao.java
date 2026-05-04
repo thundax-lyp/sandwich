@@ -9,7 +9,7 @@ public interface UserEncryptDao {
 
     UserEncrypt getById(EntityId id);
 
-    List<UserEncrypt> batchGetByIds(List<String> idList);
+    List<UserEncrypt> listByIds(List<String> idList);
 
     List<UserEncrypt> list();
 

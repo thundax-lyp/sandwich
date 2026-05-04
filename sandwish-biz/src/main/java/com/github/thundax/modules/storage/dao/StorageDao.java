@@ -12,7 +12,7 @@ public interface StorageDao {
 
     Storage getById(EntityId id);
 
-    List<Storage> batchGetByIds(List<String> idList);
+    List<Storage> listByIds(List<String> idList);
 
     List<Storage> list(
             String mimeType,

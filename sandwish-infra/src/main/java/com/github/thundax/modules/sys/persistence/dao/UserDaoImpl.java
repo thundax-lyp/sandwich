@@ -59,7 +59,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> batchGetByIds(List<String> idList) {
+    public List<User> listByIds(List<String> idList) {
         List<User> userList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

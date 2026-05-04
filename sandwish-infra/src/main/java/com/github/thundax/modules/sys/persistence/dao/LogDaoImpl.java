@@ -30,7 +30,7 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public List<Log> batchGetByIds(List<String> idList) {
+    public List<Log> listByIds(List<String> idList) {
         return LogPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 

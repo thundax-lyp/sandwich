@@ -65,7 +65,7 @@ public class MenuServiceImplTest {
         page.setPageSize(0);
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.page(new Menu(), page);
+        service.page(new MenuQuery(), page);
 
         assertEquals(PageRules.firstPageIndex(), dao.pageNo);
         assertEquals(PageRules.defaultPageSize(), dao.pageSize);
@@ -157,7 +157,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public List<Menu> batchGetByIds(List<String> idList) {
+        public List<Menu> listByIds(List<String> idList) {
             return null;
         }
 

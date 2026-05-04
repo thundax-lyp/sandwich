@@ -27,7 +27,7 @@ public class UploadFileDaoImpl implements UploadFileDao {
     }
 
     @Override
-    public List<UploadFile> batchGetByIds(List<String> idList) {
+    public List<UploadFile> listByIds(List<String> idList) {
         return UploadFilePersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 

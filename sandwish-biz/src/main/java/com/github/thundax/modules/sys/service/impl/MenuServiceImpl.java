@@ -33,20 +33,6 @@ public class MenuServiceImpl implements MenuService {
         this.signService = signService;
     }
 
-    public Class<Menu> getElementType() {
-        return Menu.class;
-    }
-
-    public Menu newEntity(String id) {
-        Menu menu = new Menu();
-        menu.setId(EntityIdCodec.toDomain(id));
-        return menu;
-    }
-
-    public Menu getById(Menu entity) {
-        return entity == null ? null : getById(entity.getId());
-    }
-
     public Menu getById(EntityId id) {
         if (id == null) {
             return null;
@@ -54,8 +40,8 @@ public class MenuServiceImpl implements MenuService {
         return dao.getById(id);
     }
 
-    public List<Menu> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
+    public List<Menu> listByIds(List<EntityId> ids) {
+        return dao.listByIds(EntityIdCodec.toValues(ids));
     }
 
     public List<Menu> list(Menu menu) {
@@ -67,15 +53,6 @@ public class MenuServiceImpl implements MenuService {
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : query.getMaxRank());
-    }
-
-    public Menu getOne(Menu menu) {
-        List<Menu> menus = list(menu);
-        return menus == null || menus.isEmpty() ? null : menus.get(0);
-    }
-
-    public PageDTO<Menu> page(Menu menu, PageDTO<Menu> page) {
-        return page((MenuQuery) null, page);
     }
 
     public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
@@ -91,10 +68,6 @@ public class MenuServiceImpl implements MenuService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    public long count(Menu menu) {
-        return list(menu).size();
     }
 
     public List<Menu> list(Integer maxRank) {
@@ -141,16 +114,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(Menu menu) {
-        return dao.updatePriority(menu);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<Menu> list) {
-        return batchOperate(list, this::updatePriority);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         dao.deleteMenuRole(EntityIdCodec.toValue(id));
         Menu bean = this.getById(id);
@@ -166,6 +129,7 @@ public class MenuServiceImpl implements MenuService {
         return retVal;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);

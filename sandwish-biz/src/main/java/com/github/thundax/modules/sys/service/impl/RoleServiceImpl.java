@@ -40,20 +40,6 @@ public class RoleServiceImpl implements RoleService {
         this.signService = signService;
     }
 
-    public Class<Role> getElementType() {
-        return Role.class;
-    }
-
-    public Role newEntity(String id) {
-        Role role = new Role();
-        role.setId(EntityIdCodec.toDomain(id));
-        return role;
-    }
-
-    public Role getById(Role entity) {
-        return entity == null ? null : getById(entity.getId());
-    }
-
     public Role getById(EntityId id) {
         if (id == null) {
             return null;
@@ -61,25 +47,8 @@ public class RoleServiceImpl implements RoleService {
         return dao.getById(id);
     }
 
-    public List<Role> batchGetByIds(List<EntityId> ids) {
-        return dao.batchGetByIds(EntityIdCodec.toValues(ids));
-    }
-
-    public List<Role> list(Role role) {
-        return list((RoleQuery) null);
-    }
-
     public List<Role> list(RoleQuery query) {
         return dao.list(query == null ? null : statusValue(query.getStatus()));
-    }
-
-    public Role getOne(Role role) {
-        List<Role> roles = list(role);
-        return roles == null || roles.isEmpty() ? null : roles.get(0);
-    }
-
-    public PageDTO<Role> page(Role role, PageDTO<Role> page) {
-        return page((RoleQuery) null, page);
     }
 
     public PageDTO<Role> page(RoleQuery query, PageDTO<Role> page) {
@@ -93,11 +62,6 @@ public class RoleServiceImpl implements RoleService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    public long count(Role role) {
-        List<Role> roles = list(role);
-        return roles == null ? 0 : roles.size();
     }
 
     @Override
@@ -234,19 +198,19 @@ public class RoleServiceImpl implements RoleService {
         return status == null ? null : status.value();
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(Role role) {
-        return dao.updatePriority(role);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<Role> list) {
         return batchOperate(list, this::updatePriority);
+    }
+
+    private int updatePriority(Role role) {
+        return dao.updatePriority(role);
     }
 
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {

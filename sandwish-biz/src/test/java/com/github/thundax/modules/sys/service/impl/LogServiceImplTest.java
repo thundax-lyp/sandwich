@@ -189,7 +189,7 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public List<Log> batchGetByIds(List<String> idList) {
+        public List<Log> listByIds(List<String> idList) {
             return null;
         }
 

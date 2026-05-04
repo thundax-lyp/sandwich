@@ -40,7 +40,7 @@ public class RoleServiceImplTest {
         page.setPageSize(0);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
 
-        service.page(new Role(), page);
+        service.page(new RoleQuery(), page);
 
         assertEquals(PageRules.firstPageIndex(), dao.pageNo);
         assertEquals(PageRules.defaultPageSize(), dao.pageSize);
@@ -122,7 +122,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<Role> batchGetByIds(List<String> idList) {
+        public List<Role> listByIds(List<String> idList) {
             return null;
         }
 

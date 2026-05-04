@@ -10,7 +10,7 @@ public interface MemberDao {
 
     Member getById(EntityId id);
 
-    List<Member> batchGetByIds(List<String> idList);
+    List<Member> listByIds(List<String> idList);
 
     List<Member> list(
             String enableFlag,

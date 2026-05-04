@@ -9,7 +9,7 @@ public interface UserDao {
 
     User getById(EntityId id);
 
-    List<User> batchGetByIds(List<String> idList);
+    List<User> listByIds(List<String> idList);
 
     List<User> list(String officeId, String loginName, String name, String enableFlag, String superFlag);
 

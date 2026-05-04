@@ -11,7 +11,7 @@ public interface MenuService {
 
     Menu getById(EntityId id);
 
-    List<Menu> batchGetByIds(List<EntityId> ids);
+    List<Menu> listByIds(List<EntityId> ids);
 
     List<Menu> list(Menu menu);
 

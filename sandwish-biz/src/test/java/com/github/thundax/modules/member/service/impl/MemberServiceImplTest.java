@@ -134,7 +134,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public List<Member> batchGetByIds(List<String> idList) {
+        public List<Member> listByIds(List<String> idList) {
             return null;
         }
 

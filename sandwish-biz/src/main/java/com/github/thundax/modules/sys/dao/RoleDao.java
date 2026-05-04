@@ -9,7 +9,7 @@ public interface RoleDao {
 
     Role getById(EntityId id);
 
-    List<Role> batchGetByIds(List<String> idList);
+    List<Role> listByIds(List<String> idList);
 
     List<Role> list(String enableFlag);
 

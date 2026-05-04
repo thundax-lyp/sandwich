@@ -88,8 +88,8 @@
 - `NAME_DATA_OBJECT`：持久化对象命名以 `DO` 或 `DataObject` 结尾
 - `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS`：`DO/DataObject` 固定使用 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor` 和 `@TableName`；这些注解属于持久化实现对象的允许注解
 - `NAME_DATA_OBJECT_QUERY_FIELD`：`DO/DataObject` 中用于持久化查询的字段必须显式命名，不使用通用 `query`
-- `NAME_DAO_METHOD_SHAPE`：DAO interface 方法名固定使用持久化端口口径：按 ID 读取使用 `getById`，按业务唯一键读取使用 `getByXxx`，列表查询使用 `list(...)`，分页查询使用 `page(..., pageNo, pageSize)`，计数使用 `count(...)`，按 ID 删除使用 `deleteById`，批量动作使用 `batchXxx`；不得新增裸 `get`、`getMany`、`find`、`findList`、`findPage`、`delete(EntityId id)` 等泛化旧口径
-- `NAME_SERVICE_METHOD_SHAPE`：Service 方法优先表达业务能力；当方法只是通用读取、列表、分页、计数、按 ID 删除、批量操作时，使用 `getById/getByXxx/list/page/count/deleteById/batchXxx`。不得新增裸 `get`、`getMany`、`find`、`findXxx`、`findList`、`findPage`、`findOne`、`delete(EntityId id)` 等旧泛化口径；业务动作使用清晰动词短语
+- `NAME_DAO_METHOD_SHAPE`：DAO interface 方法名固定使用持久化端口口径：按 ID 读取使用 `getById`，按 ID 批量读取使用 `listByIds`，按业务唯一键读取使用 `getByXxx`，列表查询使用 `list(...)`，分页查询使用 `page(..., pageNo, pageSize)`，计数使用 `count(...)`，按 ID 删除使用 `deleteById`，批量动作使用 `batchXxx`；不得新增裸 `get`、`getMany`、`find`、`findList`、`findPage`、`delete(EntityId id)`、`batchGetByIds` 等泛化旧口径
+- `NAME_SERVICE_METHOD_SHAPE`：Service 方法优先表达业务能力；当方法只是通用读取、列表、分页、计数、按 ID 删除、批量操作时，使用 `getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx`。不得新增裸 `get`、`getMany`、`find`、`findXxx`、`findList`、`findPage`、`findOne`、`delete(EntityId id)`、`batchGetByIds` 等旧泛化口径；业务动作使用清晰动词短语
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾
 - `NAME_INTERFACE_ASSEMBLER`：API 模型装配器命名以 `InterfaceAssembler` 结尾
 - `NAME_HELPER_NO_ARCH_SUFFIX`：通用工具类或 Helper 不得使用 `Mapper`、`Converter`、`Assembler`、`DAO`、`Service`、`Controller`、`Repository`、`Facade`、`Gateway`、`Adapter`、`Client`、`Handler`、`Processor`、`Manager`、`Factory` 等架构角色后缀；这些后缀只能用于对应分层或明确架构职责的类型。
@@ -127,7 +127,7 @@
 - 新增目录前先确认现有目录无法承载
 - 历史包名与现有模块风格冲突时，优先保持当前模块内部一致
 - `DO/DataObject` 显式查询字段按对应业务字段命名，必要时使用 `query` 前缀区分非表字段
-- DAO interface 命名应保持“DAO 端口”而非 Service 流程语义；优先用 `getById/getByXxx/list/page/count/deleteById/batchXxx` 表达持久化访问形状
+- DAO interface 命名应保持“DAO 端口”而非 Service 流程语义；优先用 `getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx` 表达持久化访问形状
 - DAO interface 的 `list/page/count` 条件参数顺序必须一致，`pageNo/pageSize` 固定放在分页方法参数末尾
 - DAO interface 参数名不使用 `xxxFlag` 新增旧数据库口径，优先使用 `status`、`visibility`、`privilege`、`ownerType` 等业务名
 - Service 的通用 CRUD 方法与 DAO 形状保持一致，业务流程方法不为贴合 CRUD 而弱化业务语义；例如 `verifySign/removeBusiness/updateStatus` 优先保留业务动词

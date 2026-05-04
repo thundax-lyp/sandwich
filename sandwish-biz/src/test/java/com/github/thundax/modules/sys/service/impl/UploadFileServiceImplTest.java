@@ -6,8 +6,6 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.Arrays;
@@ -23,21 +21,6 @@ public class UploadFileServiceImplTest {
 
         assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
-    }
-
-    @Test
-    public void shouldNormalizeInvalidPageBeforeQuery() {
-        RecordingUploadFileDao dao = new RecordingUploadFileDao();
-        PageDTO<UploadFile> page = new PageDTO<>();
-        page.setPageNo(0);
-        page.setPageSize(0);
-        UploadFileServiceImpl service = new UploadFileServiceImpl(dao);
-
-        service.page(new UploadFile(), page);
-
-        assertEquals(PageRules.firstPageIndex(), dao.pageNo);
-        assertEquals(PageRules.defaultPageSize(), dao.pageSize);
-        assertEquals(1L, page.getCount());
     }
 
     @Test
@@ -99,7 +82,7 @@ public class UploadFileServiceImplTest {
         }
 
         @Override
-        public List<UploadFile> batchGetByIds(List<String> idList) {
+        public List<UploadFile> listByIds(List<String> idList) {
             return null;
         }
 

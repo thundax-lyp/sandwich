@@ -48,7 +48,7 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public List<Office> batchGetByIds(List<String> idList) {
+    public List<Office> listByIds(List<String> idList) {
         List<Office> officeList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {

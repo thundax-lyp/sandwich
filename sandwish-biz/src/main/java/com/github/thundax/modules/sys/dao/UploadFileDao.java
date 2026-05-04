@@ -9,7 +9,7 @@ public interface UploadFileDao {
 
     UploadFile getById(EntityId id);
 
-    List<UploadFile> batchGetByIds(List<String> idList);
+    List<UploadFile> listByIds(List<String> idList);
 
     List<UploadFile> list();
 

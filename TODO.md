@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-docs`：扩展 Auth 需求和数据库设计
-  - 范围文件：docs/10-requirements/AUTH-REQUIREMENTS.md
-    docs/20-database/AUTH-DATABASE-DESIGN.md
-    docs/30-designs/AUTH-OAUTH-MIGRATION-RUNBOOK.md
-  - 处理动作：同步 OAuth2、多登录方式、refresh token、token verify 和 session invalidate 的正式口径
-  - 验收点：文档不再声明 OAuth2、多登录方式不覆盖，并明确新增对象、表和执行边界
-  - 重要度：10/10
-
 - [ ] `auth-oauth-client`：搬运 OAuth client 模型和持久化端口
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
     sandwish-infra/src/main/java/com/github/thundax/modules/auth

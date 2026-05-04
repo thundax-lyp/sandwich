@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证模型的数据库表、字段映射、关系约束和持久化规则。
+本文档定义 Sandwich 后台认证、OAuth2 授权和 refresh token 模型的数据库表、字段映射、关系约束和持久化规则。
 
 本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 `UserIdentity`、`UserCredential` 和 `AuthSession` 的目标持久化设计。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
 
@@ -13,23 +13,37 @@
 - `auth_user_identity`
 - `auth_user_credential`
 - `auth_session`
+- `auth_oauth_client`
+- `auth_oauth_authorization`
+- `auth_oauth_refresh_token`
 - `UserIdentityDO`
 - `UserCredentialDO`
 - `AuthSessionDO`
+- `OAuthClientDO`
+- `OAuthAuthorizationDO`
+- `OAuthRefreshTokenDO`
 - `UserIdentityMapper`
 - `UserCredentialMapper`
 - `AuthSessionMapper`
+- `OAuthClientMapper`
+- `OAuthAuthorizationMapper`
+- `OAuthRefreshTokenMapper`
 - `UserIdentityDaoImpl`
 - `UserCredentialDaoImpl`
 - `AuthSessionDaoImpl`
+- `OAuthClientDaoImpl`
+- `OAuthAuthorizationDaoImpl`
+- `OAuthRefreshTokenDaoImpl`
 - `UserIdentityPersistenceAssembler`
 - `UserCredentialPersistenceAssembler`
 - `AuthSessionPersistenceAssembler`
+- `OAuthClientPersistenceAssembler`
+- `OAuthAuthorizationPersistenceAssembler`
+- `OAuthRefreshTokenPersistenceAssembler`
 
 当前不覆盖范围：
 
 - 前台会员登录表。
-- 第三方登录绑定表。
 - MFA 凭据表。
 - 认证审计日志表。
 - 生产数据迁移脚本。
@@ -42,11 +56,17 @@
 - `UserIdentityDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `UserCredentialDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `AuthSessionDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- `OAuthClientDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- `OAuthAuthorizationDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- `OAuthRefreshTokenDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `user_id` 固定引用 `sys_user.id`。
 - `identity_id` 固定引用 `auth_user_identity.id`。
 - 枚举字段使用 `varchar` 存储。
+- 集合字段优先使用 JSON 字符串表达，由持久化装配器负责转换。
 - 敏感字段不得明文落库。
 - `credential_value` 固定保存密码哈希，不保存密码明文。
+- `client_secret_hash` 固定保存客户端密钥哈希，不保存客户端密钥明文。
+- `token_hash` 固定保存 refresh token 哈希，不保存 refresh token 明文。
 - 新增表不声明 `del_flag`，禁用、锁定、登出和失效通过状态字段表达。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
@@ -55,6 +75,9 @@
 - 登录标识表固定为 `auth_user_identity`。
 - 认证凭据表固定为 `auth_user_credential`。
 - 认证会话表固定为 `auth_session`。
+- OAuth 客户端表固定为 `auth_oauth_client`。
+- OAuth 授权表固定为 `auth_oauth_authorization`。
+- OAuth refresh token 表固定为 `auth_oauth_refresh_token`。
 - 主键字段固定为 `id`。
 - 后台用户主键字段固定为 `user_id`。
 - 登录标识主键字段固定为 `identity_id`。
@@ -74,6 +97,9 @@
 | `auth_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
 | `auth_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
+| `auth_oauth_client` | `OAuthClientDO` | `OAuthClientMapper` | `OAuthClient` |
+| `auth_oauth_authorization` | `OAuthAuthorizationDO` | `OAuthAuthorizationMapper` | `OAuthAuthorization` |
+| `auth_oauth_refresh_token` | `OAuthRefreshTokenDO` | `OAuthRefreshTokenMapper` | `OAuthRefreshToken` |
 
 ## 6. Table Design
 
@@ -207,6 +233,87 @@
 - 普通索引：`idx_auth_session_identity(identity_id, identity_type)`
 - 普通索引：`idx_auth_session_expire(status, expire_at)`
 
+### 6.4 auth_oauth_client
+
+`auth_oauth_client` 保存 OAuth2 客户端配置。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | 客户端主键 |
+| `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
+| `client_secret_hash` | `clientSecretHash` | `clientSecretHash` | 是 | 客户端密钥哈希 |
+| `client_name` | `clientName` | `clientName` | 是 | 客户端名称 |
+| `client_type` | `clientType` | `clientType` | 是 | 客户端类型 |
+| `grant_types` | `grantTypes` | `grantTypes` | 是 | 授权类型集合 |
+| `scopes` | `scopes` | `scopes` | 是 | scope 集合 |
+| `redirect_uris` | `redirectUris` | `redirectUris` | 是 | 回调地址集合 |
+| `access_token_ttl_seconds` | `accessTokenTtlSeconds` | `accessTokenTtlSeconds` | 是 | access token TTL |
+| `refresh_token_ttl_seconds` | `refreshTokenTtlSeconds` | `refreshTokenTtlSeconds` | 是 | refresh token TTL |
+| `enabled` | `enabled` | `enabled` | 是 | 启用标记 |
+| `contact` | `contact` | `contact` | 否 | 联系方式 |
+| `remark` | `remark` | `remark` | 否 | 备注 |
+| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+
+索引：
+
+- 主键：`pk_auth_oauth_client(id)`
+- 唯一索引：`uk_auth_oauth_client_client_id(client_id)`
+
+### 6.5 auth_oauth_authorization
+
+`auth_oauth_authorization` 保存 OAuth2 授权请求和授权码事实。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | 授权主键 |
+| `authorization_code` | `authorizationCode` | `authorizationCode` | 是 | 授权码 |
+| `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
+| `tenant_id` | `tenantId` | `tenantId` | 否 | 租户标识 |
+| `user_id` | `userId` | `userId` | 是 | 用户标识 |
+| `redirect_uri` | `redirectUri` | `redirectUri` | 是 | 回调地址 |
+| `scopes` | `scopes` | `scopes` | 是 | 授权范围集合 |
+| `state` | `state` | `state` | 否 | OAuth2 state |
+| `code_challenge` | `codeChallenge` | `codeChallenge` | 否 | PKCE challenge |
+| `code_challenge_method` | `codeChallengeMethod` | `codeChallengeMethod` | 否 | PKCE challenge method |
+| `issued_at` | `issuedAt` | `issuedAt` | 是 | 签发时间 |
+| `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
+| `used` | `used` | `used` | 是 | 是否已消费 |
+| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+
+索引：
+
+- 主键：`pk_auth_oauth_authorization(id)`
+- 唯一索引：`uk_auth_oauth_authorization_code(authorization_code)`
+- 普通索引：`idx_auth_oauth_authorization_client_user(client_id, user_id, expire_at)`
+
+### 6.6 auth_oauth_refresh_token
+
+`auth_oauth_refresh_token` 保存 refresh token 事实。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | refresh token 主键 |
+| `token_id` | `tokenId` | `tokenId` | 是 | token 标识 |
+| `token_hash` | `tokenHash` | `tokenHash` | 是 | token 哈希 |
+| `access_token_id` | `accessTokenId` | `accessTokenId` | 是 | 关联 access token 标识 |
+| `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
+| `tenant_id` | `tenantId` | `tenantId` | 否 | 租户标识 |
+| `user_id` | `userId` | `userId` | 是 | 用户标识 |
+| `issued_at` | `issuedAt` | `issuedAt` | 是 | 签发时间 |
+| `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
+| `status` | `status` | `status` | 是 | token 状态 |
+| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+
+索引：
+
+- 主键：`pk_auth_oauth_refresh_token(id)`
+- 唯一索引：`uk_auth_oauth_refresh_token_id(token_id)`
+- 唯一索引：`uk_auth_oauth_refresh_token_hash(token_hash)`
+- 普通索引：`idx_auth_oauth_refresh_token_client_user(client_id, user_id, status)`
+
 ## 7. Relationship Rules
 
 - `auth_user_identity.user_id` 引用 `sys_user.id`。
@@ -215,6 +322,10 @@
 - `auth_session.user_id` 引用 `sys_user.id`。
 - `auth_session.identity_id` 引用 `auth_user_identity.id`。
 - `auth_session.token` 引用访问 token 存储中的 token 值。
+- `auth_oauth_authorization.client_id` 引用 `auth_oauth_client.client_id`。
+- `auth_oauth_authorization.user_id` 引用 `sys_user.id`。
+- `auth_oauth_refresh_token.client_id` 引用 `auth_oauth_client.client_id`。
+- `auth_oauth_refresh_token.user_id` 引用 `sys_user.id`。
 - 当前项目不强制数据库外键。
 - 用户创建时，Service 必须先保存 `sys_user`，再保存 `auth_user_identity` 和 `auth_user_credential`。
 - 修改登录名时，Service 必须更新 `ACCOUNT` 类型 `auth_user_identity`。
@@ -226,13 +337,22 @@
 - `UserIdentityMapper` 固定继承 `BaseMapper<UserIdentityDO>`。
 - `UserCredentialMapper` 固定继承 `BaseMapper<UserCredentialDO>`。
 - `AuthSessionMapper` 固定继承 `BaseMapper<AuthSessionDO>`。
+- `OAuthClientMapper` 固定继承 `BaseMapper<OAuthClientDO>`。
+- `OAuthAuthorizationMapper` 固定继承 `BaseMapper<OAuthAuthorizationDO>`。
+- `OAuthRefreshTokenMapper` 固定继承 `BaseMapper<OAuthRefreshTokenDO>`。
 - Mapper interface 不新增注解 SQL、Mapper XML 或 SQL Provider。
 - `UserIdentityDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `UserCredentialDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `AuthSessionDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `OAuthClientDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `OAuthAuthorizationDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `OAuthRefreshTokenDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `UserIdentityPersistenceAssembler` 只负责 `UserIdentity <-> UserIdentityDO` 转换。
 - `UserCredentialPersistenceAssembler` 只负责 `UserCredential <-> UserCredentialDO` 转换。
 - `AuthSessionPersistenceAssembler` 只负责 `AuthSession <-> AuthSessionDO` 转换。
+- `OAuthClientPersistenceAssembler` 只负责 `OAuthClient <-> OAuthClientDO` 转换。
+- `OAuthAuthorizationPersistenceAssembler` 只负责 `OAuthAuthorization <-> OAuthAuthorizationDO` 转换。
+- `OAuthRefreshTokenPersistenceAssembler` 只负责 `OAuthRefreshToken <-> OAuthRefreshTokenDO` 转换。
 - `PersistenceAssembler` 不调用 Service、DAO 或 Mapper。
 - DAO insert 后必须返回持久化主键。
 - Service 负责把 DAO insert 返回主键回填到业务 Entity。
@@ -266,6 +386,27 @@
 - 写回登出状态。
 - 写回失效状态。
 - 写回过期状态。
+- 按 `userId + status` 批量失效。
+- 按 `tenantId + status` 批量失效。
+
+`OAuthClientDao` 固定支持以下查询：
+
+- 按 `id` 查询。
+- 按 `clientId` 查询。
+- 按 `clientId + enabled` 查询。
+
+`OAuthAuthorizationDao` 固定支持以下查询：
+
+- 按 `authorizationCode` 查询。
+- 写回授权码已使用状态。
+- 删除或撤销授权请求。
+
+`OAuthRefreshTokenDao` 固定支持以下查询：
+
+- 按 `tokenId` 查询。
+- 按 `tokenHash` 查询。
+- 按 `clientId + userId + status` 查询。
+- 写回 `USED`、`REVOKED` 和 `EXPIRED` 状态。
 
 分页规则：
 

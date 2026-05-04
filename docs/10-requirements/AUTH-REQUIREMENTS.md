@@ -2,30 +2,36 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证模型的业务需求边界。
+本文档定义 Sandwich 后台认证、OAuth2 授权和多登录方式的业务需求边界。
 
-`Auth` 负责后台登录表单、验证码、密码认证、登录标识解析、认证凭据状态流转、访问 token 生命周期和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据和登录会话。
+`Auth` 负责后台登录表单、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
 
 ## 2. Scope
 
 当前覆盖范围：
 
 - 后台账号密码登录。
+- 后台短信登录。
+- 后台企业微信登录。
+- 后台 GitHub 登录。
 - 后台登录表单和验证码。
 - 后台访问 token 创建、校验、续期和删除。
+- 后台 refresh token 创建、校验、轮换和失效。
 - 后台权限会话创建、touch 和释放。
 - 后台用户登录标识管理。
 - 后台用户密码凭据管理。
 - 后台认证会话创建、touch、登出、失效和过期。
+- 后台认证会话按 token、用户和租户失效。
+- OAuth2 client 查询和密钥校验。
+- OAuth2 authorization code 授权、决策、撤销和换 token。
+- OAuth2 token verify、introspection 和 userinfo。
 - 后台用户创建、修改登录名、重置密码时的认证前置数据维护。
 
 当前不覆盖范围：
 
 - 前台会员登录体系。
-- 第三方登录接入。
 - MFA 二次认证。
-- 短信验证码登录。
-- OAuth2 / OIDC 协议接入。
+- 完整 OIDC discovery、JWKS 和动态客户端注册。
 - Spring Security 权限整改。
 - 用户、角色、菜单授权模型重做。
 - 生产数据迁移执行。
@@ -44,9 +50,15 @@
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
-`AccessToken` 继续承载请求访问 token。`AuthSession` 固定不替代 `AccessToken` 的传输职责。
+`AccessToken` 继续承载请求访问 token。`OAuthRefreshToken` 承载 refresh token 事实。`AuthSession` 固定不替代 `AccessToken` 和 `OAuthRefreshToken` 的传输职责。
 
 `PermissionSession` 继续承载权限集合缓存。`AuthSession` 固定不承载权限集合。
+
+`OAuthClient` 归属 `auth` 认证模型，承载 OAuth2 客户端配置、密钥哈希、授权类型、scope、redirect uri 和 token TTL 策略。
+
+`OAuthAuthorization` 归属 `auth` 认证模型，承载 OAuth2 授权请求、授权码、PKCE 参数、授权范围、决策状态和一次性消费状态。
+
+`OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、租户、过期和失效状态。
 
 ## 4. Module Mapping
 
@@ -59,7 +71,7 @@
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现后台用户主体 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
-  - 提供后台登录、刷新、验证码、登出和 token 认证入口适配。
+  - 提供后台登录、刷新、验证码、登出、session command、OAuth2 和 token 认证入口适配。
 
 ## 5. Core Business Objects
 
@@ -242,10 +254,98 @@
 - 登出或 token 删除时必须释放 `PermissionSession`。
 - `PermissionSession` 不替代 `AuthSession` 的审计职责。
 
+### 5.8 OAuthClient
+
+`OAuthClient` 是 OAuth2 客户端配置。
+
+核心字段：
+
+- `id`：客户端主键。
+- `clientId`：客户端标识。
+- `clientSecretHash`：客户端密钥哈希。
+- `clientName`：客户端名称。
+- `clientType`：客户端类型。
+- `grantTypes`：允许的授权类型集合。
+- `scopes`：允许的授权范围集合。
+- `redirectUris`：允许的回调地址集合。
+- `accessTokenTtlSeconds`：访问 token 有效期。
+- `refreshTokenTtlSeconds`：refresh token 有效期。
+- `enabled`：启用标记。
+- `contact`：联系人。
+- `remark`：备注。
+
+固定约束：
+
+- `clientId` 必须唯一定位一个 `OAuthClient`。
+- `clientSecretHash` 只保存哈希，不保存明文。
+- 禁用客户端不得发起授权、换 token 或刷新 token。
+- 请求的 `grantType`、`scope` 和 `redirectUri` 必须在客户端配置范围内。
+
+### 5.9 OAuthAuthorization
+
+`OAuthAuthorization` 是 OAuth2 授权请求和授权码事实。
+
+核心字段：
+
+- `id`：授权记录主键。
+- `authorizationCode`：授权码。
+- `clientId`：客户端标识。
+- `tenantId`：租户标识。
+- `userId`：授权用户。
+- `redirectUri`：回调地址。
+- `scopes`：授权范围集合。
+- `state`：OAuth2 state。
+- `codeChallenge`：PKCE challenge。
+- `codeChallengeMethod`：PKCE challenge method。
+- `issuedAt`：签发时间。
+- `expireAt`：过期时间。
+- `used`：是否已消费。
+
+固定约束：
+
+- 授权码只能消费一次。
+- 授权码过期后不得换 token。
+- `redirectUri` 必须来自对应 `OAuthClient.redirectUris`。
+- 授权范围必须是 `OAuthClient.scopes` 的子集。
+
+### 5.10 OAuthRefreshToken
+
+`OAuthRefreshToken` 是 refresh token 事实。
+
+核心字段：
+
+- `id`：refresh token 主键。
+- `tokenId`：token 标识。
+- `tokenHash`：token 哈希。
+- `accessTokenId`：关联访问 token 标识。
+- `clientId`：客户端标识。
+- `tenantId`：租户标识。
+- `userId`：用户标识。
+- `issuedAt`：签发时间。
+- `expireAt`：过期时间。
+- `status`：token 状态。
+
+固定状态：
+
+- `ACTIVE`：可用。
+- `USED`：已轮换使用。
+- `REVOKED`：已撤销。
+- `EXPIRED`：已过期。
+
+固定约束：
+
+- refresh token 只保存哈希，不保存明文。
+- refresh token refresh 成功后必须轮换或标记旧 token 已使用。
+- refresh token 失效必须同步阻断后续访问 token 刷新。
+
 ## 6. Global Constraints
 
 - 后台认证固定以 `UserIdentity + UserCredential` 完成登录校验。
 - 后台账号密码登录固定先解析 `UserIdentity`，再校验 `UserCredential`。
+- 短信、企业微信和 GitHub 登录固定通过独立 provider 解析外部身份，再映射到 `UserIdentity`。
+- OAuth2 客户端密钥校验固定通过 Service 完成。
+- OAuth2 authorization code 和 refresh token 必须一次性消费或状态流转，避免重放。
+- token verify、introspection 和 userinfo 固定只返回可公开的 token/session/user 信息。
 - Controller 不直接访问 DAO / Mapper。
 - Controller 不直接写回凭据失败次数。
 - Service 固定承接认证流程、状态校验、失败次数写回、锁定和会话创建。
@@ -321,10 +421,50 @@
 - 有效请求刷新访问态时必须 touch Redis 运行态 `AuthSession`。
 - 登出时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `LOGGED_OUT`。
 - token 安全失效时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `INVALIDATED`。
+- 按 token 失效会话时必须释放对应 `PermissionSession`。
+- 按用户失效会话时必须失效该用户全部活跃 `AuthSession`。
+- 按租户失效会话时必须失效该租户全部活跃 `AuthSession`。
 - 会话自然过期时必须将数据库 `AuthSession` 标记为 `EXPIRED`。
 - Redis 运行态过期不替代数据库最终状态收口。
 
-### 7.8 用户保存联动
+### 7.8 OAuth2 client
+
+- OAuth2 授权和换 token 前必须校验 `OAuthClient` 存在。
+- 禁用客户端必须拒绝授权和换 token。
+- 客户端密钥必须通过 `PasswordService` 或等价哈希校验服务校验。
+- 请求的授权类型、scope 和 redirect uri 必须落在客户端配置范围内。
+
+### 7.9 OAuth2 authorization
+
+- authorize 请求必须生成授权视图或授权请求记录。
+- 用户同意授权后必须生成授权码。
+- 用户拒绝授权后必须返回拒绝结果。
+- 授权码换 token 成功后必须标记已使用。
+- 授权码撤销后不得继续换 token。
+
+### 7.10 refresh token
+
+- OAuth2 token 响应需要按客户端策略生成 refresh token。
+- refresh token 必须能定位 client、user、tenant 和 access token。
+- refresh token 过期、撤销或已使用时必须拒绝刷新。
+- refresh token 刷新成功后必须生成新的 access token。
+
+### 7.11 token verify / introspection / userinfo
+
+- token verify 必须返回 token 是否有效。
+- introspection 必须返回 OAuth2 `active` 语义。
+- userinfo 必须根据有效 token 返回当前用户公开信息。
+- 无效 token 不得抛出复杂业务异常，应返回明确非活跃结果。
+
+### 7.12 多登录方式
+
+- 短信登录必须校验手机号和短信验证码。
+- 企业微信登录必须通过 provider 校验外部身份。
+- GitHub 登录必须通过 provider 校验外部身份。
+- 外部身份映射不到后台用户时必须拒绝登录。
+- 多登录方式登录成功后必须复用统一 `AccessToken`、`PermissionSession` 和 `AuthSession` 创建流程。
+
+### 7.13 用户保存联动
 
 - 新增后台用户时必须创建 `ACCOUNT` 类型 `UserIdentity`。
 - 新增后台用户并设置初始密码时必须创建 `PASSWORD` 类型 `UserCredential`。
@@ -334,7 +474,7 @@
 - 禁用某个登录标识时不禁用 `User`。
 - 禁用某个认证凭据时不禁用 `User`。
 
-### 7.9 迁移兼容
+### 7.14 迁移兼容
 
 - 迁移期间允许从 `User.loginName` 初始化 `ACCOUNT` 类型 `UserIdentity`。
 - 迁移期间允许从 `User.loginPass` 或 `UserEncrypt.loginPass` 初始化 `PASSWORD` 类型 `UserCredential`。
@@ -396,6 +536,41 @@
 3. 用户 Service 更新或创建 `PASSWORD` 类型 `UserCredential`。
 4. 用户 Service 将失败次数和锁定状态清零。
 5. 用户 Service 按策略设置 `needChangePassword`。
+
+### 8.6 OAuth2 authorization code 流程
+
+1. `OAuth2Controller.authorize` 接收授权请求。
+2. Controller 调用认证 Service 校验 client、redirect uri、scope 和当前会话。
+3. Service 创建授权请求视图。
+4. `OAuth2Controller.decision` 接收用户授权决策。
+5. 用户同意时 Service 创建授权码。
+6. 用户拒绝时 Service 返回拒绝结果。
+7. `OAuth2Controller.token` 使用授权码换取 access token 和 refresh token。
+8. Service 标记授权码已使用。
+
+### 8.7 refresh token 流程
+
+1. `OAuth2Controller.token` 接收 refresh token 请求。
+2. Controller 调用认证 Service 校验 client 和 refresh token。
+3. Service 判断 refresh token 状态和过期时间。
+4. Service 标记旧 refresh token 已使用或失效。
+5. Service 创建新的 access token。
+6. Service 按策略创建新的 refresh token。
+
+### 8.8 token introspection / userinfo 流程
+
+1. OAuth2 token 查询入口接收 token。
+2. Service 校验 token 是否存在、有效且未过期。
+3. introspection 返回 `active` 和 token 元数据。
+4. userinfo 返回当前用户公开信息。
+
+### 8.9 多登录方式流程
+
+1. Controller 接收短信、企业微信或 GitHub 登录请求。
+2. Service 调用对应 provider 校验外部身份。
+3. Service 将外部身份映射到 `UserIdentity`。
+4. Service 校验 `User` 状态。
+5. 登录成功后复用统一 token 和 session 创建流程。
 
 ## 9. Non-Functional Requirements
 

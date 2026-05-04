@@ -114,7 +114,7 @@
 - `priority` 为空或小于 0 时，`StoragePersistenceAssembler` 固定转换为 `0`。
 - `del_flag` 默认值固定为 `0`。
 
-建议索引：
+索引设计：
 
 - 主键：`pk_assist_storage(id)`
 - 普通索引：`idx_assist_storage_del_create(del_flag, create_date)`
@@ -143,7 +143,7 @@
 - `public_flag` 通过 `StorageVisibility.value()` 写入。
 - `StorageBusinessDO` 固定不包含创建时间、更新时间和逻辑删除字段。
 
-建议索引：
+索引设计：
 
 - 联合唯一索引：`uk_assist_storage_business_file_biz(file_id, business_type, business_id)`
 - 普通索引：`idx_assist_storage_business_biz(business_type, business_id)`
@@ -183,7 +183,7 @@
 - `upload_status` 只能写入 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
 - `uploaded_part_count` 默认值固定为 `0`。
 
-建议索引：
+索引设计：
 
 - 主键：`pk_assist_storage_multipart_upload(id)`
 - 唯一索引：`uk_assist_storage_multipart_upload_upload_id(upload_id)`
@@ -209,7 +209,7 @@
 - `part_number` 从 `1` 开始。
 - 同一 `upload_id` 内 `part_number` 不得重复。
 
-建议索引：
+索引设计：
 
 - 主键：`pk_assist_storage_multipart_upload_part(id)`
 - 唯一索引：`uk_assist_storage_multipart_upload_part(upload_id, part_number)`

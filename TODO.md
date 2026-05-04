@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-docs`：固定 StoredObject 目标模型文档
-  - 范围文件：docs/10-requirements/STORAGE-REQUIREMENTS.md
-    docs/20-database/STORAGE-DATABASE-DESIGN.md
-    docs/30-designs/STORAGE-STORED-OBJECT-RUNBOOK.md
-  - 处理动作：同步 Storage 需求、数据库设计和 runbook 的 `StoredObject / StoredObjectReference` 目标口径
-  - 验收点：文档只描述当前目标模型和 REST 入口，不再把 `/servlet/storage/...` 作为公开接口形态
-  - 重要度：9/10
-
 - [ ] `storage-entity`：重命名存储主对象和引用对象
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/Storage.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StorageBusiness.java

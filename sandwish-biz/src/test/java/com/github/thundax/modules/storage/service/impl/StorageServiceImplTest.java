@@ -10,7 +10,6 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
-import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
@@ -205,7 +204,7 @@ public class StorageServiceImplTest {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
-        StorageBackendObject object = new StorageBackendObject();
+        StoredObject object = new StoredObject();
         object.setStorageType(StorageType.LOCAL_FILE);
         object.setBucketName("/tmp/storage/");
         object.setObjectKey("202605/demo.png");

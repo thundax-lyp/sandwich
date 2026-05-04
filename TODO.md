@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-store`：下沉底层存储端口
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/backend/StorageBackend.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/backend/StorageBackendObject.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/backend/LocalFileStorageBackend.java
-    sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java
-    sandwish-front-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java
-  - 处理动作：把 `StorageBackend` 从业务模型迁移为 infra 内部 `StoredObjectStore` 或等价底层存储端口
-  - 验收点：Controller、Service 接口、Response 和业务模块不再依赖 `StorageBackend` 类型或命名
-  - 重要度：9/10
-
 - [ ] `storage-rest-api`：用 REST content 入口替换业务 Servlet
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java
     sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/servlet/StorageServlet.java
@@ -42,7 +32,7 @@
 
 - [ ] `storage-tests`：补齐 Storage 模型迁移测试
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java
-    sandwish-biz/src/test/java/com/github/thundax/modules/storage/backend/LocalFileStorageBackendTest.java
+    sandwish-infra/src/test/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStoreTest.java
     sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssemblerTest.java
   - 处理动作：更新上传、引用、分片完成、内容读取和删除流程测试
   - 验收点：Storage 相关单测覆盖 `StoredObject` 生成、引用状态变化、REST content 读取和旧 Servlet 路径消失

@@ -6,7 +6,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.page.PageDTO;
-import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
@@ -215,7 +214,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StoredObject completeMultipartUpload(String uploadId, StorageBackendObject object) {
+    public StoredObject completeMultipartUpload(String uploadId, StoredObject object) {
         MultipartUploadSession session = requireActiveMultipartSession(uploadId);
         List<MultipartUploadPart> parts = multipartUploadDao.listMultipartParts(uploadId);
         validateMultipartParts(session, parts);
@@ -315,7 +314,7 @@ public class StorageServiceImpl implements StorageService {
         return (int) ((totalSize + partSize - 1) / partSize);
     }
 
-    private StoredObject toCompletedStorage(MultipartUploadSession session, StorageBackendObject object) {
+    private StoredObject toCompletedStorage(MultipartUploadSession session, StoredObject object) {
         StoredObject storage = new StoredObject();
         storage.setName(baseName(session.getOriginalFilename()));
         storage.setExtendName(extension(session.getOriginalFilename()));

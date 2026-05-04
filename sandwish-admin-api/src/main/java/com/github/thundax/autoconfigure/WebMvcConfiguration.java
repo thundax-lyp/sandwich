@@ -3,11 +3,11 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.auth.filter.ResponseWrapperFilter;
-import com.github.thundax.modules.storage.backend.LocalFileStorageBackend;
-import com.github.thundax.modules.storage.backend.StorageBackend;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.servlet.StorageServlet;
+import com.github.thundax.modules.storage.store.LocalFileStoredObjectStore;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -26,18 +26,18 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
             VltavaProperties properties,
             StorageConverter converter,
             StorageService storageService,
-            StorageBackend storageBackend) {
+            StoredObjectStore storedObjectStore) {
         ServletRegistrationBean<StorageServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new StorageServlet(converter, storageService, storageBackend));
+        bean.setServlet(new StorageServlet(converter, storageService, storedObjectStore));
         VltavaProperties.UploadProperties upload = properties.getUpload();
         bean.addUrlMappings(upload.getServletPath() + "*");
         return bean;
     }
 
     @Bean
-    public StorageBackend storageBackend(VltavaProperties properties) {
+    public StoredObjectStore storedObjectStore(VltavaProperties properties) {
         VltavaProperties.UploadProperties upload = properties.getUpload();
-        return new LocalFileStorageBackend(upload.getStoragePath(), upload.getServletPath());
+        return new LocalFileStoredObjectStore(upload.getStoragePath(), upload.getServletPath());
     }
 
     @Bean

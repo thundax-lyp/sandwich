@@ -7,16 +7,13 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 
 public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> LEGACY_SERVICE_BOUNDARY_DIRTY_TYPES =
-            new LinkedHashSet<>(Arrays.asList("com.github.thundax.modules.storage.backend.StorageBackendObject"));
+    private static final Set<String> LEGACY_SERVICE_BOUNDARY_DIRTY_TYPES = java.util.Collections.emptySet();
 
     @Test
     public void shouldKeepServiceBoundaryTypesCleanExceptKnownDirtyTypes() {

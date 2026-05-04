@@ -1,4 +1,4 @@
-package com.github.thundax.modules.storage.backend;
+package com.github.thundax.modules.storage.store;
 
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
@@ -8,14 +8,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class LocalFileStorageBackend implements StorageBackend {
+public class LocalFileStoredObjectStore implements StoredObjectStore {
 
     private static final int BUFFER_SIZE = 4096;
 
     private final String storagePath;
     private final String servletPath;
 
-    public LocalFileStorageBackend(String storagePath, String servletPath) {
+    public LocalFileStoredObjectStore(String storagePath, String servletPath) {
         this.storagePath = storagePath;
         this.servletPath = servletPath;
     }
@@ -26,7 +26,7 @@ public class LocalFileStorageBackend implements StorageBackend {
     }
 
     @Override
-    public StorageBackendObject save(StoredObject storage, InputStream inputStream) throws IOException {
+    public StoredObject save(StoredObject storage, InputStream inputStream) throws IOException {
         File file = toFile(storage);
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -42,13 +42,13 @@ public class LocalFileStorageBackend implements StorageBackend {
             target.flush();
         }
 
-        StorageBackendObject object = new StorageBackendObject();
-        object.setStorageType(type());
-        object.setBucketName(storagePath);
-        object.setObjectKey(storage.getPathName());
-        object.setSize(file.length());
-        object.setAccessEndpoint(servletPath + storage.getFileName());
-        return object;
+        StoredObject storedObject = new StoredObject();
+        storedObject.setStorageType(type());
+        storedObject.setBucketName(storagePath);
+        storedObject.setObjectKey(storage.getPathName());
+        storedObject.setSize(file.length());
+        storedObject.setAccessEndpoint(servletPath + storage.getFileName());
+        return storedObject;
     }
 
     @Override

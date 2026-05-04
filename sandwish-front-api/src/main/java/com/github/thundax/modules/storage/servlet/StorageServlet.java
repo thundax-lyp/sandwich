@@ -1,11 +1,11 @@
 package com.github.thundax.modules.storage.servlet;
 
 import com.github.thundax.modules.member.security.MemberSecurityContext;
-import com.github.thundax.modules.storage.backend.StorageBackend;
 import com.github.thundax.modules.storage.converter.StorageConverter;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.servlet.http.HttpServlet;
@@ -23,16 +23,16 @@ public class StorageServlet extends HttpServlet {
 
     private final StorageConverter storageConverter;
     private final StorageService storageService;
-    private final StorageBackend storageBackend;
+    private final StoredObjectStore storedObjectStore;
 
     public StorageServlet(
             @NonNull StorageConverter storageConverter,
             @NonNull StorageService storageService,
-            @NonNull StorageBackend storageBackend) {
+            @NonNull StoredObjectStore storedObjectStore) {
         super();
         this.storageConverter = storageConverter;
         this.storageService = storageService;
-        this.storageBackend = storageBackend;
+        this.storedObjectStore = storedObjectStore;
     }
 
     @Override
@@ -48,18 +48,19 @@ public class StorageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        Storage storage = storageConverter.toEntity(request.getRequestURI());
+        StoredObject storage = storageConverter.toEntity(request.getRequestURI());
 
         if (storage == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        if (!storageService.canAccess(storage, StorageOwnerType.MEMBER, MemberSecurityContext.getCurrentMemberId())) {
+        if (!storageService.canReadContent(
+                storage, StorageOwnerType.MEMBER, MemberSecurityContext.getCurrentMemberId())) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
         }
 
-        if (!storageBackend.exists(storage)) {
+        if (!storedObjectStore.exists(storage)) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
@@ -69,7 +70,7 @@ public class StorageServlet extends HttpServlet {
         response.setDateHeader("Expires", 0);
         response.setContentType(storage.getMimeType());
 
-        try (InputStream inputStream = storageBackend.open(storage)) {
+        try (InputStream inputStream = storedObjectStore.open(storage)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             int readBytes;
             while ((readBytes = inputStream.read(buffer)) > -1) {

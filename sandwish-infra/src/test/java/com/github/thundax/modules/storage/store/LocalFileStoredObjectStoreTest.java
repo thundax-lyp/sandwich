@@ -1,4 +1,4 @@
-package com.github.thundax.modules.storage.backend;
+package com.github.thundax.modules.storage.store;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.Date;
 import org.junit.Test;
 
-public class LocalFileStorageBackendTest {
+public class LocalFileStoredObjectStoreTest {
 
     @Test
     public void shouldSaveAndOpenLocalStorageObject() throws Exception {
@@ -23,10 +23,10 @@ public class LocalFileStorageBackendTest {
         storage.setId(EntityIdCodec.toDomain("s1"));
         storage.setExtendName("txt");
         storage.setCreateDate(new Date());
-        LocalFileStorageBackend backend = new LocalFileStorageBackend(directory.toString() + "/", "/servlet/storage/");
+        LocalFileStoredObjectStore backend =
+                new LocalFileStoredObjectStore(directory.toString() + "/", "/servlet/storage/");
 
-        StorageBackendObject object =
-                backend.save(storage, new ByteArrayInputStream("hello".getBytes(StandardCharsets.UTF_8)));
+        StoredObject object = backend.save(storage, new ByteArrayInputStream("hello".getBytes(StandardCharsets.UTF_8)));
 
         storage.setObjectKey(object.getObjectKey());
 

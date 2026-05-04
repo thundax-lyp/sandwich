@@ -17,13 +17,12 @@ import com.github.thundax.modules.assist.controller.response.StorageResponse;
 import com.github.thundax.modules.assist.controller.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.assist.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.storage.backend.StorageBackend;
-import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.storage.utils.StorageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -59,18 +58,18 @@ public class StorageController {
     private final VltavaProperties.UploadProperties properties;
     private final StorageService storageService;
     private final StorageConverter storageConverter;
-    private final StorageBackend storageBackend;
+    private final StoredObjectStore storedObjectStore;
 
     @Autowired
     public StorageController(
             VltavaProperties properties,
             StorageService storageService,
             StorageConverter storageConverter,
-            StorageBackend storageBackend) {
+            StoredObjectStore storedObjectStore) {
         this.properties = properties.getUpload();
         this.storageService = storageService;
         this.storageConverter = storageConverter;
-        this.storageBackend = storageBackend;
+        this.storedObjectStore = storedObjectStore;
     }
 
     @ApiOperation(value = "分页查询存储资源", notes = "assist:storage:view")
@@ -109,7 +108,7 @@ public class StorageController {
             storage.setOwnerId(UserAccessHolder.currentUserId());
             StorageUtils.applyFileMetadata(file, storage);
             try {
-                applyBackendObject(storage, storageBackend.save(storage, file.getInputStream()));
+                applyStoredObject(storage, storedObjectStore.save(storage, file.getInputStream()));
             } catch (IOException e) {
                 return StorageInterfaceAssembler.toUploadErrorResponse(e.getMessage());
             }
@@ -134,13 +133,13 @@ public class StorageController {
             return;
         }
 
-        if (!storageBackend.exists(storage)) {
+        if (!storedObjectStore.exists(storage)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
 
         response.setContentType(storage.getMimeType());
-        try (InputStream inputStream = storageBackend.open(storage);
+        try (InputStream inputStream = storedObjectStore.open(storage);
                 OutputStream outputStream = response.getOutputStream()) {
             byte[] buffer = new byte[4096];
             int readBytes;
@@ -212,7 +211,7 @@ public class StorageController {
         return page;
     }
 
-    private void applyBackendObject(StoredObject storage, StorageBackendObject object) {
+    private void applyStoredObject(StoredObject storage, StoredObject object) {
         storage.setStorageType(object.getStorageType());
         storage.setBucketName(object.getBucketName());
         storage.setObjectKey(object.getObjectKey());

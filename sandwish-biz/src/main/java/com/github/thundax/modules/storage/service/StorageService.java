@@ -2,7 +2,6 @@ package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
-import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -49,7 +48,7 @@ public interface StorageService {
 
     MultipartUploadPart uploadMultipartPart(MultipartUploadPart part);
 
-    StoredObject completeMultipartUpload(String uploadId, StorageBackendObject object);
+    StoredObject completeMultipartUpload(String uploadId, StoredObject object);
 
     int abortMultipartUpload(String uploadId);
 }

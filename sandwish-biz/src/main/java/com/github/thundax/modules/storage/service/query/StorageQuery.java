@@ -10,13 +10,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StorageQuery implements Serializable {
-    private String mimeType;
+    private String contentType;
     private String referenceOwnerId;
     private String referenceOwnerType;
     private String ownerId;
     private StorageOwnerType ownerType;
     private StoredObjectStatus objectStatus;
     private StoredObjectReferenceStatus referenceStatus;
-    private String name;
+    private String originalFilename;
     private String remarks;
 }

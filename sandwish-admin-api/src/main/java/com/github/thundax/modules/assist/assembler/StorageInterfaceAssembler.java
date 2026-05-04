@@ -23,10 +23,10 @@ public final class StorageInterfaceAssembler {
         }
         StorageUploadResponse response = new StorageUploadResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getOriginalFileName());
+        response.setOriginalFilename(entity.getOriginalFileName());
         response.setExtendName(entity.getExtendName());
-        response.setMimeType(entity.getMimeType());
-        response.setUrl(storageConverter.toPreviewUrl(entity));
+        response.setContentType(entity.getContentType());
+        response.setContentUrl(storageConverter.toPreviewUrl(entity));
         return response;
     }
 
@@ -44,35 +44,41 @@ public final class StorageInterfaceAssembler {
         }
         StorageResponse response = new StorageResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
+        response.setOriginalFilename(entity.getOriginalFilename());
         response.setExtendName(entity.getExtendName());
-        response.setMimeType(entity.getMimeType());
+        response.setContentType(entity.getContentType());
         response.setOwnerId(entity.getOwnerId());
         response.setOwnerType(
                 entity.getOwnerType() == null ? null : entity.getOwnerType().value());
-        response.setStatus(
-                entity.getStatus() == null ? null : entity.getStatus().value());
-        response.setVisibility(
-                entity.getVisibility() == null ? null : entity.getVisibility().value());
+        response.setObjectStatus(
+                entity.getObjectStatus() == null
+                        ? null
+                        : entity.getObjectStatus().value());
+        response.setReferenceStatus(
+                entity.getReferenceStatus() == null
+                        ? null
+                        : entity.getReferenceStatus().value());
         response.setPriority(entity.getPriority());
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
-        response.setUrl(storageConverter.toPreviewUrl(entity));
+        response.setContentUrl(storageConverter.toPreviewUrl(entity));
         return response;
     }
 
     @NonNull
     public static StorageQuery toQuery(@NonNull StoragePageRequest request) {
         StorageQuery query = new StorageQuery();
-        query.setMimeType(request.getMimeType());
+        query.setContentType(request.getContentType());
         query.setObjectStatus(
-                StringUtils.isBlank(request.getStatus()) ? null : StoredObjectStatus.from(request.getStatus()));
-        query.setReferenceStatus(
-                StringUtils.isBlank(request.getVisibility())
+                StringUtils.isBlank(request.getObjectStatus())
                         ? null
-                        : StoredObjectReferenceStatus.from(request.getVisibility()));
-        query.setName(request.getName());
+                        : StoredObjectStatus.from(request.getObjectStatus()));
+        query.setReferenceStatus(
+                StringUtils.isBlank(request.getReferenceStatus())
+                        ? null
+                        : StoredObjectReferenceStatus.from(request.getReferenceStatus()));
+        query.setOriginalFilename(request.getOriginalFilename());
         query.setRemarks(request.getRemarks());
         return query;
     }

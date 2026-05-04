@@ -30,25 +30,25 @@ public class StoragePageRequest implements Serializable {
     @Max(value = 500, message = "单页记录数不能超过500")
     private Integer pageSize = 10;
 
-    @ApiModelProperty(name = "mimeType", value = "MIME-TYPE")
-    @JsonProperty("mimeType")
+    @ApiModelProperty(name = "contentType", value = "MIME-TYPE")
+    @JsonProperty("contentType")
     @Size(max = 128, message = "MIME-TYPE长度不能超过128")
-    private String mimeType;
+    private String contentType;
 
-    @ApiModelProperty(name = "status", value = "状态")
-    @JsonProperty("status")
+    @ApiModelProperty(name = "objectStatus", value = "状态")
+    @JsonProperty("objectStatus")
     @Size(max = 32, message = "状态长度不能超过32")
-    private String status;
+    private String objectStatus;
 
-    @ApiModelProperty(name = "visibility", value = "可见性")
-    @JsonProperty("visibility")
+    @ApiModelProperty(name = "referenceStatus", value = "可见性")
+    @JsonProperty("referenceStatus")
     @Size(max = 32, message = "可见性长度不能超过32")
-    private String visibility;
+    private String referenceStatus;
 
-    @ApiModelProperty(name = "name", value = "文件名称")
-    @JsonProperty("name")
+    @ApiModelProperty(name = "originalFilename", value = "文件名称")
+    @JsonProperty("originalFilename")
     @Size(max = 255, message = "文件名称长度不能超过255")
-    private String name;
+    private String originalFilename;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

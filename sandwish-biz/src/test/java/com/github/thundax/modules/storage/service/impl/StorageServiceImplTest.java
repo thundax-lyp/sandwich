@@ -46,14 +46,14 @@ public class StorageServiceImplTest {
     public void shouldExpandFindPageQuery() {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageQuery query = new StorageQuery();
-        query.setMimeType("image/png");
+        query.setContentType("image/png");
         query.setOwnerId("owner-1");
         query.setOwnerType(StorageOwnerType.USER);
         query.setObjectStatus(StoredObjectStatus.ACTIVE);
         query.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
         query.setReferenceOwnerId("business-1");
         query.setReferenceOwnerType("Article");
-        query.setName("avatar");
+        query.setOriginalFilename("avatar");
         query.setRemarks("remark");
         PageDTO<StoredObject> page = new PageDTO<>(2, 20);
 

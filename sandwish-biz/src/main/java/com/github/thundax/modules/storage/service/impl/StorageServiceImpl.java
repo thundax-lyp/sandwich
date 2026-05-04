@@ -60,14 +60,14 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public List<StoredObject> list(StorageQuery query) {
         return dao.list(
-                query == null ? null : query.getMimeType(),
+                query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getObjectStatus()),
                 query == null ? null : referenceStatusValue(query.getReferenceStatus()),
                 query == null ? null : query.getReferenceOwnerId(),
                 query == null ? null : query.getReferenceOwnerType(),
-                query == null ? null : query.getName(),
+                query == null ? null : query.getOriginalFilename(),
                 query == null ? null : query.getRemarks());
     }
 
@@ -75,14 +75,14 @@ public class StorageServiceImpl implements StorageService {
     public PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page) {
         PageDTO<StoredObject> normalizedPage = normalizePage(page);
         IPage<StoredObject> dataPage = dao.page(
-                query == null ? null : query.getMimeType(),
+                query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
                 query == null ? null : statusValue(query.getObjectStatus()),
                 query == null ? null : referenceStatusValue(query.getReferenceStatus()),
                 query == null ? null : query.getReferenceOwnerId(),
                 query == null ? null : query.getReferenceOwnerType(),
-                query == null ? null : query.getName(),
+                query == null ? null : query.getOriginalFilename(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());

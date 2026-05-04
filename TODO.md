@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-api-model`：调整接口请求响应模型
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/StorageIdRequest.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/StoragePageRequest.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/StorageResponse.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/StorageTreeNodeResponse.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/StorageUploadResponse.java
-  - 处理动作：将上传、查询、引用和内容读取的 Request / Response 对齐 `StoredObject` 语义
-  - 验收点：接口响应不包含 `/servlet/storage/...`，对象访问信息以 REST content 资源或派生访问字段表达
-  - 重要度：9/10
-
 - [ ] `storage-tests`：补齐 Storage 模型迁移测试
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java
     sandwish-infra/src/test/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStoreTest.java

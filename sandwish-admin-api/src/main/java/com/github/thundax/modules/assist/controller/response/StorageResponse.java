@@ -22,17 +22,17 @@ public class StorageResponse implements Serializable {
     @JsonProperty("id")
     private String id;
 
-    @ApiModelProperty(name = "name", value = "文件名称")
-    @JsonProperty("name")
-    private String name;
+    @ApiModelProperty(name = "originalFilename", value = "文件名称")
+    @JsonProperty("originalFilename")
+    private String originalFilename;
 
     @ApiModelProperty(name = "extendName", value = "扩展名")
     @JsonProperty("extendName")
     private String extendName;
 
-    @ApiModelProperty(name = "mimeType", value = "MIME-TYPE")
-    @JsonProperty("mimeType")
-    private String mimeType;
+    @ApiModelProperty(name = "contentType", value = "MIME-TYPE")
+    @JsonProperty("contentType")
+    private String contentType;
 
     @ApiModelProperty(name = "ownerId", value = "所有者ID")
     @JsonProperty("ownerId")
@@ -42,13 +42,13 @@ public class StorageResponse implements Serializable {
     @JsonProperty("ownerType")
     private String ownerType;
 
-    @ApiModelProperty(name = "status", value = "状态")
-    @JsonProperty("status")
-    private String status;
+    @ApiModelProperty(name = "objectStatus", value = "状态")
+    @JsonProperty("objectStatus")
+    private String objectStatus;
 
-    @ApiModelProperty(name = "visibility", value = "可见性")
-    @JsonProperty("visibility")
-    private String visibility;
+    @ApiModelProperty(name = "referenceStatus", value = "可见性")
+    @JsonProperty("referenceStatus")
+    private String referenceStatus;
 
     @ApiModelProperty(name = "priority", value = "排序数")
     @JsonProperty("priority")
@@ -68,7 +68,7 @@ public class StorageResponse implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateDate;
 
-    @ApiModelProperty(name = "url", value = "预览URL")
-    @JsonProperty("url")
-    private String url;
+    @ApiModelProperty(name = "contentUrl", value = "预览URL")
+    @JsonProperty("contentUrl")
+    private String contentUrl;
 }

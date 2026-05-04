@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-auth-login-credential`：后台登录切换到身份凭据认证
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/LoginLockDao.java
-  - 处理动作：登录校验改为先解析 `UserIdentity`，再校验 `UserCredential`
-  - 验收点：登录成功、密码失败、凭据锁定和身份禁用路径均由新模型驱动
-  - 重要度：10/10
-
 - [ ] `admin-auth-session-lifecycle`：后台登录登出写入认证会话
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
     sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/filter/AccessTokenAuthenticationFilter.java

@@ -13,7 +13,6 @@ import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AuthService;
@@ -89,32 +88,22 @@ public class AuthController {
         // 刷新验证码
         authService.createCaptcha(request.getLoginToken());
 
-        User user = userService.getByLoginName(request.getUsername());
-        if (user == null) {
-            writeLog(currentRequest, "用户失败", request);
-            throw new InvalidUsernamePasswordException();
-        }
-
-        if (!user.isEnable()) {
-            writeLog(currentRequest, "用户失败", request);
-            throw new BannedAccountException();
-        }
-
         String privateKey = authService.getPrivateKey(request.getLoginToken());
         // 解密密码（数据需要加密传输）
         String password = Sm2.decrypt(request.getPassword(), privateKey);
 
+        User user;
         try {
-            authService.validatePassword(user, password);
+            user = authService.authenticatePassword(request.getUsername(), password);
         } catch (ApiException e) {
-            if (!(e instanceof InvalidUsernamePasswordException)
-                    && user != null
-                    && StringUtils.isNotBlank(user.getLoginName())) {
-                if (e.getMessage() != null && e.getMessage().contains("锁定")) {
-                    writeLog(currentRequest, "用户锁定", request);
-                } else {
-                    writeLog(currentRequest, "密码输入错误", request);
-                }
+            if (e.getMessage() != null && e.getMessage().contains("锁定")) {
+                writeLog(currentRequest, "用户锁定", request);
+            } else if (e.getMessage() != null && e.getMessage().contains("密码输入错误")) {
+                writeLog(currentRequest, "密码输入错误", request);
+            } else if (!(e instanceof InvalidUsernamePasswordException)) {
+                writeLog(currentRequest, "认证失败", request);
+            } else {
+                writeLog(currentRequest, "用户失败", request);
             }
             throw e;
         }

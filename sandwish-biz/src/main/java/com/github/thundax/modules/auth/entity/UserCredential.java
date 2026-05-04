@@ -41,7 +41,7 @@ public class UserCredential implements Auditable {
 
     public boolean isLocked(Date now) {
         if (UserCredentialStatus.LOCKED == status) {
-            return true;
+            return lockedUntil == null || now == null || lockedUntil.after(now);
         }
         return lockedUntil != null && now != null && lockedUntil.after(now);
     }

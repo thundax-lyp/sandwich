@@ -1,5 +1,9 @@
 package com.github.thundax.modules.auth.dao;
 
+/**
+ * 迁移兼容：旧账号维度登录锁定端口。
+ */
+@Deprecated
 public interface LoginLockDao {
 
     Integer getFailCount(String loginName);

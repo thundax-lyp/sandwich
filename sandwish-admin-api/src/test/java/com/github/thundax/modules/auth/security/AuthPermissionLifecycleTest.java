@@ -7,7 +7,15 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.dao.UserCredentialDao;
+import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
+import com.github.thundax.modules.auth.entity.UserCredential;
+import com.github.thundax.modules.auth.entity.UserIdentity;
+import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
+import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
@@ -16,7 +24,6 @@ import com.github.thundax.modules.auth.service.impl.AuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
-import com.github.thundax.modules.auth.testsupport.InMemoryLoginLockDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
@@ -62,9 +69,11 @@ public class AuthPermissionLifecycleTest {
                 new LoginProperties(),
                 new InMemoryLoginFormDaoImpl(),
                 accessTokenDao,
-                new InMemoryLoginLockDaoImpl(),
+                new TestUserIdentityDao(),
+                new TestUserCredentialDao(),
                 new PlainPasswordService(),
-                permissionService);
+                permissionService,
+                new TestUserService());
     }
 
     @After
@@ -141,6 +150,109 @@ public class AuthPermissionLifecycleTest {
         @Override
         public boolean validate(String plainPassword, String encryptedPassword) {
             return plainPassword != null && plainPassword.equals(encryptedPassword);
+        }
+    }
+
+    private static class TestUserIdentityDao implements UserIdentityDao {
+
+        @Override
+        public UserIdentity getById(EntityId id) {
+            return identity();
+        }
+
+        @Override
+        public UserIdentity getByIdentity(UserIdentityType identityType, String identityValue) {
+            return identity();
+        }
+
+        @Override
+        public UserIdentity getByUserIdAndType(EntityId userId, UserIdentityType identityType) {
+            return identity();
+        }
+
+        @Override
+        public List<UserIdentity> listByUserIdAndStatus(EntityId userId, UserIdentityStatus status) {
+            return Collections.singletonList(identity());
+        }
+
+        @Override
+        public String insert(UserIdentity userIdentity) {
+            return "identity-1";
+        }
+
+        @Override
+        public int update(UserIdentity userIdentity) {
+            return 1;
+        }
+
+        @Override
+        public int updateStatus(UserIdentity userIdentity) {
+            return 1;
+        }
+
+        private UserIdentity identity() {
+            UserIdentity identity = new UserIdentity();
+            identity.setId(EntityId.of("identity-1"));
+            identity.setUserId(EntityId.of("u1"));
+            identity.setIdentityType(UserIdentityType.ACCOUNT);
+            identity.setIdentityValue("tester");
+            identity.setStatus(UserIdentityStatus.ENABLED);
+            return identity;
+        }
+    }
+
+    private static class TestUserCredentialDao implements UserCredentialDao {
+
+        @Override
+        public UserCredential getById(EntityId id) {
+            return credential();
+        }
+
+        @Override
+        public UserCredential getByIdentityIdAndType(EntityId identityId, UserCredentialType credentialType) {
+            return credential();
+        }
+
+        @Override
+        public UserCredential getByUserIdAndType(EntityId userId, UserCredentialType credentialType) {
+            return credential();
+        }
+
+        @Override
+        public List<UserCredential> listByUserIdAndStatus(EntityId userId, UserCredentialStatus status) {
+            return Collections.singletonList(credential());
+        }
+
+        @Override
+        public String insert(UserCredential userCredential) {
+            return "credential-1";
+        }
+
+        @Override
+        public int update(UserCredential userCredential) {
+            return 1;
+        }
+
+        @Override
+        public int updateStatus(UserCredential userCredential) {
+            return 1;
+        }
+
+        @Override
+        public int updateVerifyState(UserCredential userCredential) {
+            return 1;
+        }
+
+        private UserCredential credential() {
+            UserCredential credential = new UserCredential();
+            credential.setId(EntityId.of("credential-1"));
+            credential.setUserId(EntityId.of("u1"));
+            credential.setIdentityId(EntityId.of("identity-1"));
+            credential.setCredentialType(UserCredentialType.PASSWORD);
+            credential.setCredentialValue("secret");
+            credential.setStatus(UserCredentialStatus.ACTIVE);
+            credential.setFailedLimit(3);
+            return credential;
         }
     }
 

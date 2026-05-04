@@ -72,6 +72,16 @@ public interface AuthService {
     void deleteAccessToken(AccessToken accessToken);
 
     /**
+     * 账号密码认证。
+     *
+     * @param loginName 登录名
+     * @param plainPassword 明文密码
+     * @return 认证通过的用户
+     * @throws ApiException 业务异常
+     */
+    User authenticatePassword(String loginName, String plainPassword) throws ApiException;
+
+    /**
      * 校验登录密码并处理失败锁定。
      *
      * @param user 用户

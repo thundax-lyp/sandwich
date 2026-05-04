@@ -23,7 +23,6 @@ public class OAuthAccessToken implements Auditable {
     private String tokenId;
     private String tokenHash;
     private String clientId;
-    private String tenantId;
     private EntityId userId;
     private Set<String> scopes = new LinkedHashSet<>();
     private Date issuedAt;

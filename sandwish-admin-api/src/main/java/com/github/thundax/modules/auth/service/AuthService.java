@@ -116,8 +116,6 @@ public interface AuthService {
 
     int invalidateSessionsByUserId(EntityId userId, String reason);
 
-    int invalidateSessionsByTenantId(String tenantId, String reason);
-
     /**
      * 账号密码认证。
      *

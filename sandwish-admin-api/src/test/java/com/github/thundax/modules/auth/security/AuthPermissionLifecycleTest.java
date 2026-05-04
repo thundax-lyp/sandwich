@@ -568,17 +568,6 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public List<AuthSession> listByTenantIdAndStatus(String tenantId, AuthSessionStatus status) {
-            if (session == null || (status != null && session.getStatus() != status)) {
-                return Collections.emptyList();
-            }
-            if (tenantId != null && !tenantId.equals(session.getTenantId())) {
-                return Collections.emptyList();
-            }
-            return Collections.singletonList(session);
-        }
-
-        @Override
         public String insert(AuthSession authSession) {
             authSession.setId(EntityId.of("session-1"));
             this.session = authSession;
@@ -654,7 +643,6 @@ public class AuthPermissionLifecycleTest {
             target.setId(source.getId());
             target.setSessionId(source.getSessionId());
             target.setToken(source.getToken());
-            target.setTenantId(source.getTenantId());
             target.setUserId(source.getUserId());
             target.setIdentityId(source.getIdentityId());
             target.setIdentityType(source.getIdentityType());

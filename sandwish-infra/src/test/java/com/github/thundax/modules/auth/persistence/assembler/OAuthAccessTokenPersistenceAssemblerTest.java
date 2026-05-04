@@ -25,7 +25,6 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
         entity.setTokenId("token-id-1");
         entity.setTokenHash("hash-1");
         entity.setClientId("admin-web");
-        entity.setTenantId("tenant-1");
         entity.setUserId(EntityIdCodec.toDomain("user-1"));
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
         entity.setIssuedAt(issuedAt);
@@ -38,7 +37,6 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
         assertEquals("token-id-1", dataObject.getTokenId());
         assertEquals("hash-1", dataObject.getTokenHash());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("tenant-1", dataObject.getTenantId());
         assertEquals("user-1", dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals(issuedAt, dataObject.getIssuedAt());
@@ -53,7 +51,6 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
         dataObject.setTokenId("token-id-1");
         dataObject.setTokenHash("hash-1");
         dataObject.setClientId("admin-web");
-        dataObject.setTenantId("tenant-1");
         dataObject.setUserId("user-1");
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setIssuedAt(new Date(1000L));

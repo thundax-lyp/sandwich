@@ -27,8 +27,6 @@ public class OAuthRefreshTokenDO {
 
     private String clientId;
 
-    private String tenantId;
-
     private String userId;
 
     private Date issuedAt;

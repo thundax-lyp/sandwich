@@ -23,8 +23,6 @@ public class OAuthAuthorizationDO {
 
     private String clientId;
 
-    private String tenantId;
-
     private String userId;
 
     private String redirectUri;

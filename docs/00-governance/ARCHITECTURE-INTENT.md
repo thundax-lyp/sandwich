@@ -14,6 +14,7 @@ Sandwich 的目标是在现有 Java 8、Spring Boot 2、jar 应用和三层 API 
 - 为什么控制抽象新增
 - 为什么收敛 common 工具层级
 - 为什么文档和测试只表达当前系统形态
+- 为什么按单业务域应用建模
 - 为什么区分 formatter 和 rule gate
 - 为什么采用小步提交
 - 为什么 `commit message` 是工程记忆
@@ -67,7 +68,13 @@ ArchUnit 测试同样应该守住当前形态。测试可以阻断不符合形�
 
 如果某个规则只能通过列举旧系统遗留项来表达，通常说明它还没有沉淀成设计意图。此时应该先补足正向命名、分层或边界规则，再决定是否需要 hard rule。
 
-## 6. Quality Tool Intent
+## 6. Single Domain Modeling Intent
+
+Sandwich 当前应该按单业务域应用建模。数据归属应该通过具体业务身份表达，例如 `userId`、`officeId`、`clientId` 或具体业务对象标识；只有产品明确进入多租户 SaaS 形态时，才引入租户模型和跨层租户隔离规则。
+
+提前把 `tenantId` 写入认证、授权、缓存或持久化模型，会让当前并不存在的多租户规则扩散到 Service、DAO、索引和测试中。AI 读取这些字段时也容易误判项目已经具备租户隔离语义，从而继续补齐无效的租户校验和批量失效能力。当前系统应让业务归属字段保持具体，避免用抽象租户替代真实业务边界。
+
+## 7. Quality Tool Intent
 
 质量工具的目标是降低协作摩擦，而不是把格式化、规约和架构判断混成一个黑盒。
 
@@ -79,7 +86,7 @@ ArchUnit 测试同样应该守住当前形态。测试可以阻断不符合形�
 
 Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以参考其他项目的用法，但版本必须服从本项目运行约束；如果上游项目使用更高 JDK 的插件或 formatter，应在 Sandwich 中降级到 Java 8 可运行版本。代码必须主动适配质量规则，不通过放松规则、长期 suppression 或长期 baseline 回避违规。
 
-## 7. Small Step Commit Intent
+## 8. Small Step Commit Intent
 
 小步提交不是单纯的 Git 使用习惯，而是本项目控制复杂度的一部分。
 
@@ -93,7 +100,7 @@ Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以�
 
 因此，AI 和开发者都不应把不相关修改堆叠到同一个提交里，也不应使用失去语义的 `commit message`。提交历史在本项目中承担的是“可回放的决策轨迹”，而不只是代码快照存档。
 
-## 8. Commit Message Shape
+## 9. Commit Message Shape
 
 本项目固定提交格式：
 
@@ -105,6 +112,6 @@ Sandwich 当前固定 Java 8 和 Spring Boot 2.0.5.RELEASE。质量工具可以�
 - `domain` 表达业务域、模块或治理域，例如 `admin`、`front`、`biz`、`common`、`storage`、`sys`、`governance`
 - 中文说明表达具体能力变化，不写空泛的“调整”“优化”“修改”
 
-## 9. Open Items
+## 10. Open Items
 
 无

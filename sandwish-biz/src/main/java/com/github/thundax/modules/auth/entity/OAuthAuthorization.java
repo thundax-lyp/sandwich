@@ -21,7 +21,6 @@ public class OAuthAuthorization implements Auditable {
     private EntityId id;
     private String authorizationCode;
     private String clientId;
-    private String tenantId;
     private EntityId userId;
     private String redirectUri;
     private Set<String> scopes = new LinkedHashSet<>();

@@ -22,7 +22,6 @@ public class OAuthRefreshToken implements Auditable {
     private String tokenHash;
     private String accessTokenId;
     private String clientId;
-    private String tenantId;
     private EntityId userId;
     private Date issuedAt;
     private Date expireAt;

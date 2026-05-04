@@ -290,7 +290,6 @@
 - `id`：授权记录主键。
 - `authorizationCode`：授权码。
 - `clientId`：客户端标识。
-- `tenantId`：租户标识。
 - `userId`：授权用户。
 - `redirectUri`：回调地址。
 - `scopes`：授权范围集合。
@@ -319,7 +318,6 @@
 - `tokenHash`：token 哈希。
 - `accessTokenId`：关联访问 token 标识。
 - `clientId`：客户端标识。
-- `tenantId`：租户标识。
 - `userId`：用户标识。
 - `issuedAt`：签发时间。
 - `expireAt`：过期时间。

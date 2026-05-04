@@ -386,7 +386,7 @@ public class AuthServiceImpl implements AuthService {
         oauthRefreshTokenDao.updateStatus(current);
 
         AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
-        String nextRefreshToken = createOAuthRefreshToken(accessToken, clientId, current.getTenantId(), now);
+        String nextRefreshToken = createOAuthRefreshToken(accessToken, clientId, now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken);
     }
 
@@ -484,9 +484,8 @@ public class AuthServiceImpl implements AuthService {
         oauthAuthorizationDao.updateUsed(authorization);
         AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(authorization.getUserId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, authorization, now);
-        String refreshToken = oauthRefreshTokenDao == null
-                ? null
-                : createOAuthRefreshToken(accessToken, client.getClientId(), authorization.getTenantId(), now);
+        String refreshToken =
+                oauthRefreshTokenDao == null ? null : createOAuthRefreshToken(accessToken, client.getClientId(), now);
         return new AuthTokenRefreshResult(accessToken, refreshToken, oauthAccessToken);
     }
 
@@ -506,8 +505,7 @@ public class AuthServiceImpl implements AuthService {
 
         AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, current, now);
-        String nextRefreshToken =
-                createOAuthRefreshToken(accessToken, client.getClientId(), current.getTenantId(), now);
+        String nextRefreshToken = createOAuthRefreshToken(accessToken, client.getClientId(), now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken, oauthAccessToken);
     }
 
@@ -551,12 +549,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public int invalidateSessionsByUserId(EntityId userId, String reason) {
         List<AuthSession> sessions = authSessionDao.listByUserIdAndStatus(userId, AuthSessionStatus.ACTIVE);
-        return invalidateAuthSessions(sessions, reason);
-    }
-
-    @Override
-    public int invalidateSessionsByTenantId(String tenantId, String reason) {
-        List<AuthSession> sessions = authSessionDao.listByTenantIdAndStatus(tenantId, AuthSessionStatus.ACTIVE);
         return invalidateAuthSessions(sessions, reason);
     }
 
@@ -770,14 +762,13 @@ public class AuthServiceImpl implements AuthService {
         return properties.getLoginExpiredSeconds() + SESSION_RUNTIME_SAFETY_SECONDS;
     }
 
-    private String createOAuthRefreshToken(AccessToken accessToken, String clientId, String tenantId, Date issuedAt) {
+    private String createOAuthRefreshToken(AccessToken accessToken, String clientId, Date issuedAt) {
         String refreshToken = UuidHelper.compact();
         OAuthRefreshToken entity = new OAuthRefreshToken();
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(refreshToken));
         entity.setAccessTokenId(accessToken.getToken());
         entity.setClientId(clientId);
-        entity.setTenantId(tenantId);
         entity.setUserId(EntityIdCodec.toDomain(accessToken.getUserId()));
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + refreshTokenTtlSeconds(clientId) * 1000L));
@@ -798,7 +789,6 @@ public class AuthServiceImpl implements AuthService {
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(token));
         entity.setClientId(client.getClientId());
-        entity.setTenantId(authorization.getTenantId());
         entity.setUserId(authorization.getUserId());
         entity.setScopes(authorization.getScopes());
         entity.setIssuedAt(issuedAt);
@@ -819,7 +809,6 @@ public class AuthServiceImpl implements AuthService {
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(token));
         entity.setClientId(client.getClientId());
-        entity.setTenantId(refreshToken.getTenantId());
         entity.setUserId(refreshToken.getUserId());
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));

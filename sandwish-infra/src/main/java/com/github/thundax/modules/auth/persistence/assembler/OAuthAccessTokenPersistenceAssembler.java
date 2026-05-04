@@ -28,7 +28,6 @@ public final class OAuthAccessTokenPersistenceAssembler {
         dataObject.setTokenId(entity.getTokenId());
         dataObject.setTokenHash(entity.getTokenHash());
         dataObject.setClientId(entity.getClientId());
-        dataObject.setTenantId(entity.getTenantId());
         dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
         dataObject.setScopes(writeStringSet(entity.getScopes()));
         dataObject.setIssuedAt(entity.getIssuedAt());
@@ -50,7 +49,6 @@ public final class OAuthAccessTokenPersistenceAssembler {
         entity.setTokenId(dataObject.getTokenId());
         entity.setTokenHash(dataObject.getTokenHash());
         entity.setClientId(dataObject.getClientId());
-        entity.setTenantId(dataObject.getTenantId());
         entity.setUserId(EntityIdCodec.toDomain(dataObject.getUserId()));
         entity.setScopes(readStringSet(dataObject.getScopes()));
         entity.setIssuedAt(dataObject.getIssuedAt());

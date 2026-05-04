@@ -24,7 +24,6 @@ public class OAuthRefreshTokenPersistenceAssemblerTest {
         entity.setTokenHash("hash-1");
         entity.setAccessTokenId("access-token-1");
         entity.setClientId("admin-web");
-        entity.setTenantId("tenant-1");
         entity.setUserId(EntityIdCodec.toDomain("user-1"));
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(expireAt);
@@ -37,7 +36,6 @@ public class OAuthRefreshTokenPersistenceAssemblerTest {
         assertEquals("hash-1", dataObject.getTokenHash());
         assertEquals("access-token-1", dataObject.getAccessTokenId());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("tenant-1", dataObject.getTenantId());
         assertEquals("user-1", dataObject.getUserId());
         assertEquals(issuedAt, dataObject.getIssuedAt());
         assertEquals(expireAt, dataObject.getExpireAt());
@@ -52,7 +50,6 @@ public class OAuthRefreshTokenPersistenceAssemblerTest {
         dataObject.setTokenHash("hash-1");
         dataObject.setAccessTokenId("access-token-1");
         dataObject.setClientId("admin-web");
-        dataObject.setTenantId("tenant-1");
         dataObject.setUserId("user-1");
         dataObject.setIssuedAt(new Date(1000L));
         dataObject.setExpireAt(new Date(2000L));

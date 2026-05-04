@@ -22,7 +22,6 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         entity.setId(EntityIdCodec.toDomain("authorization-1"));
         entity.setAuthorizationCode("code-1");
         entity.setClientId("admin-web");
-        entity.setTenantId("tenant-1");
         entity.setUserId(EntityIdCodec.toDomain("user-1"));
         entity.setRedirectUri("http://127.0.0.1/callback");
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
@@ -38,7 +37,6 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         assertEquals("authorization-1", dataObject.getId());
         assertEquals("code-1", dataObject.getAuthorizationCode());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("tenant-1", dataObject.getTenantId());
         assertEquals("user-1", dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals("state-1", dataObject.getState());
@@ -55,7 +53,6 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         dataObject.setId("authorization-1");
         dataObject.setAuthorizationCode("code-1");
         dataObject.setClientId("admin-web");
-        dataObject.setTenantId("tenant-1");
         dataObject.setUserId("user-1");
         dataObject.setRedirectUri("http://127.0.0.1/callback");
         dataObject.setScopes("[\"openid\",\"profile\"]");

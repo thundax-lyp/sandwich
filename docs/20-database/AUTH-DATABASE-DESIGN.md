@@ -269,7 +269,6 @@
 | `id` | `id` | `id` | 是 | 授权主键 |
 | `authorization_code` | `authorizationCode` | `authorizationCode` | 是 | 授权码 |
 | `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
-| `tenant_id` | `tenantId` | `tenantId` | 否 | 租户标识 |
 | `user_id` | `userId` | `userId` | 是 | 用户标识 |
 | `redirect_uri` | `redirectUri` | `redirectUri` | 是 | 回调地址 |
 | `scopes` | `scopes` | `scopes` | 是 | 授权范围集合 |
@@ -299,7 +298,6 @@
 | `token_hash` | `tokenHash` | `tokenHash` | 是 | token 哈希 |
 | `access_token_id` | `accessTokenId` | `accessTokenId` | 是 | 关联 access token 标识 |
 | `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
-| `tenant_id` | `tenantId` | `tenantId` | 否 | 租户标识 |
 | `user_id` | `userId` | `userId` | 是 | 用户标识 |
 | `issued_at` | `issuedAt` | `issuedAt` | 是 | 签发时间 |
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
@@ -387,7 +385,6 @@
 - 写回失效状态。
 - 写回过期状态。
 - 按 `userId + status` 批量失效。
-- 按 `tenantId + status` 批量失效。
 
 `OAuthClientDao` 固定支持以下查询：
 

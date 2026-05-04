@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-credential-biz`：新增认证凭据业务对象
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/UserCredential.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserCredentialType.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserCredentialStatus.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/UserCredentialDao.java
-  - 处理动作：新增 `UserCredential` 实体、枚举和 DAO 契约
-  - 验收点：业务层可表达密码凭据、失败次数、锁定、过期和强制改密状态
-  - 重要度：9/10
-
 - [ ] `auth-session-biz`：新增认证会话业务对象
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java
     sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/AuthSessionStatus.java

@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
+import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
@@ -55,6 +56,7 @@ public class AuthPermissionLifecycleTest {
     private InMemoryAccessTokenDaoImpl accessTokenDao;
     private InMemoryPermissionDaoImpl permissionDao;
     private TestAuthSessionDao authSessionDao;
+    private TestAuthSessionRuntimeDao authSessionRuntimeDao;
     private AuthService authService;
     private PermissionService permissionService;
 
@@ -63,6 +65,7 @@ public class AuthPermissionLifecycleTest {
         accessTokenDao = new InMemoryAccessTokenDaoImpl();
         permissionDao = new InMemoryPermissionDaoImpl();
         authSessionDao = new TestAuthSessionDao();
+        authSessionRuntimeDao = new TestAuthSessionRuntimeDao();
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
@@ -75,6 +78,7 @@ public class AuthPermissionLifecycleTest {
                 new InMemoryLoginFormDaoImpl(),
                 accessTokenDao,
                 authSessionDao,
+                authSessionRuntimeDao,
                 new TestUserIdentityDao(),
                 new TestUserCredentialDao(),
                 new PlainPasswordService(),
@@ -93,6 +97,7 @@ public class AuthPermissionLifecycleTest {
 
         Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
         Assert.assertNotNull(authSessionDao.getByToken(accessToken.getToken()));
+        Assert.assertNotNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "sys:role:view"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "user"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "admin"));
@@ -100,7 +105,8 @@ public class AuthPermissionLifecycleTest {
 
         authService.activeAccessToken(accessToken);
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
-        Assert.assertTrue(authSessionDao.getTouchCount() > 0);
+        Assert.assertEquals(0, authSessionDao.getTouchCount());
+        Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
 
         authService.deleteAccessToken(accessToken);
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
@@ -130,7 +136,8 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
-        Assert.assertTrue(authSessionDao.getTouchCount() > 0);
+        Assert.assertEquals(0, authSessionDao.getTouchCount());
+        Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
     }
 
     @Test
@@ -223,6 +230,41 @@ public class AuthPermissionLifecycleTest {
         public int updateExpire(AuthSession authSession) {
             this.session = authSession;
             return 1;
+        }
+
+        private int getTouchCount() {
+            return touchCount;
+        }
+    }
+
+    private static class TestAuthSessionRuntimeDao implements AuthSessionRuntimeDao {
+
+        private AuthSession session;
+        private int touchCount;
+
+        @Override
+        public AuthSession getByToken(String token) {
+            return session != null && session.getToken().equals(token) ? session : null;
+        }
+
+        @Override
+        public void insert(AuthSession authSession, int expiredSeconds) {
+            this.session = authSession;
+        }
+
+        @Override
+        public void touch(String token, java.util.Date accessTime, int expiredSeconds) {
+            if (session != null && session.getToken().equals(token)) {
+                session.touch(accessTime);
+                touchCount++;
+            }
+        }
+
+        @Override
+        public void deleteByToken(String token) {
+            if (session != null && session.getToken().equals(token)) {
+                session = null;
+            }
         }
 
         private int getTouchCount() {

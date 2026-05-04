@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-lifecycle-redis`：切换认证会话生命周期为 Redis 优先
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AuthService.java
-  - 处理动作：登录写 Redis 和数据库，活跃请求只 touch Redis，登出用 Redis 最后访问态收口数据库
-  - 验收点：正常请求不更新数据库 lastAccessTime，登出后数据库状态仍为 `LOGGED_OUT`
-  - 重要度：10/10
-
 - [ ] `auth-session-runtime-tests`：补齐认证会话 Redis 运行态测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java
     sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImplTest.java

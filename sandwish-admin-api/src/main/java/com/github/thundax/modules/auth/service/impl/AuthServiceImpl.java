@@ -9,6 +9,7 @@ import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
+import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
@@ -48,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
     private static final int CAPTCHA_LENGTH = 4;
     private static final int SMS_VALIDATE_CODE_LENGTH = 6;
+    private static final int SESSION_RUNTIME_SAFETY_SECONDS = 10;
 
     private static final char[] VALIDATE_CAPTCHA_CODE = {'2', '3', '4', '5', '6', '7', '8', '9'};
 
@@ -58,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginFormDao loginFormDao;
     private final AccessTokenDao accessTokenDao;
     private final AuthSessionDao authSessionDao;
+    private final AuthSessionRuntimeDao authSessionRuntimeDao;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
     private final PasswordService passwordService;
@@ -70,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
             LoginFormDao loginFormDao,
             AccessTokenDao accessTokenDao,
             AuthSessionDao authSessionDao,
+            AuthSessionRuntimeDao authSessionRuntimeDao,
             UserIdentityDao userIdentityDao,
             UserCredentialDao userCredentialDao,
             PasswordService passwordService,
@@ -80,6 +84,7 @@ public class AuthServiceImpl implements AuthService {
         this.loginFormDao = loginFormDao;
         this.accessTokenDao = accessTokenDao;
         this.authSessionDao = authSessionDao;
+        this.authSessionRuntimeDao = authSessionRuntimeDao;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
         this.passwordService = passwordService;
@@ -386,10 +391,11 @@ public class AuthServiceImpl implements AuthService {
         authSession.setCreateDate(now);
         authSession.setUpdateDate(now);
         authSession.setId(EntityIdCodec.toDomain(authSessionDao.insert(authSession)));
+        authSessionRuntimeDao.insert(authSession, runtimeExpiredSeconds());
     }
 
     private void touchAuthSession(String token) {
-        AuthSession authSession = authSessionDao.getByToken(token);
+        AuthSession authSession = authSessionRuntimeDao.getByToken(token);
         if (authSession == null) {
             return;
         }
@@ -398,22 +404,32 @@ public class AuthServiceImpl implements AuthService {
         if (authSession.isExpired(now)) {
             authSession.expire();
             authSessionDao.updateExpire(authSession);
+            authSessionRuntimeDao.deleteByToken(token);
             return;
         }
         if (authSession.isActive()) {
-            authSession.touch(now);
-            authSessionDao.updateAccessTime(authSession);
+            authSessionRuntimeDao.touch(token, now, runtimeExpiredSeconds());
         }
     }
 
     private void logoutAuthSession(String token) {
+        AuthSession runtimeSession = authSessionRuntimeDao.getByToken(token);
         AuthSession authSession = authSessionDao.getByToken(token);
         if (authSession == null || !authSession.isActive()) {
+            authSessionRuntimeDao.deleteByToken(token);
             return;
         }
 
+        if (runtimeSession != null && runtimeSession.getLastAccessTime() != null) {
+            authSession.touch(runtimeSession.getLastAccessTime());
+        }
         authSession.logout(new Date());
         authSessionDao.updateLogout(authSession);
+        authSessionRuntimeDao.deleteByToken(token);
+    }
+
+    private int runtimeExpiredSeconds() {
+        return properties.getLoginExpiredSeconds() + SESSION_RUNTIME_SAFETY_SECONDS;
     }
 
     private UserCredential getOrBootstrapPasswordCredential(User user, UserIdentity identity) {

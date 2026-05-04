@@ -74,6 +74,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(AuthSessionDO::getStatus, dataObject.getStatus())
+                        .set(AuthSessionDO::getLastAccessTime, dataObject.getLastAccessTime())
                         .set(AuthSessionDO::getLogoutAt, dataObject.getLogoutAt()));
     }
 

@@ -22,7 +22,7 @@ import org.junit.Test;
 
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> LEGACY_SERVICE_METHOD_NAMES = new LinkedHashSet<>(
+    private static final Set<String> NON_STANDARD_SERVICE_METHOD_NAMES = new LinkedHashSet<>(
             Arrays.asList("get", "getMany", "find", "findList", "findPage", "findOne", "delete", "batchGetByIds"));
     private static final Pattern SERVICE_QUERY_SETTER_DECLARATION_PATTERN =
             Pattern.compile("\\bpublic\\s+void\\s+set[A-Z][A-Za-z0-9_]*\\s*\\(");
@@ -44,7 +44,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
         }
 
         assertTrue(
-                "Service methods must use getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx "
+                "Service methods should use getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx "
                         + "for generic access and business verbs for workflows: "
                         + violations,
                 violations.isEmpty());
@@ -96,7 +96,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     }
 
     private boolean isLegacyServiceMethod(JavaMethod method) {
-        return LEGACY_SERVICE_METHOD_NAMES.contains(method.getName())
+        return NON_STANDARD_SERVICE_METHOD_NAMES.contains(method.getName())
                 || method.getName().startsWith("find");
     }
 

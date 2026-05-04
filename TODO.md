@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-infra`：实现认证会话持久化
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/AuthSessionDO.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/AuthSessionMapper.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthSessionPersistenceAssembler.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionDaoImpl.java
-  - 处理动作：新增 `AuthSession` DO、Mapper、assembler 和 DAO 实现
-  - 验收点：infra 可按 token 或 sessionId 查询并更新会话活跃、登出和失效状态
-  - 重要度：8/10
-
 - [ ] `sys-user-save-identity`：用户保存链路同步登录身份
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java
     sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserEncryptService.java

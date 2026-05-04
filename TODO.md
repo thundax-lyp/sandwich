@@ -9,12 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `sys-user-entity`：收窄后台用户主体职责
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java
-  - 处理动作：收窄 `User` 中登录标识和密码字段的业务职责
-  - 验收点：`User` 文档和代码语义不再把用户主体等同于登录凭据
-  - 重要度：8/10
-
 - [ ] `auth-identity-biz`：新增登录标识业务对象
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/UserIdentity.java
     sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserIdentityType.java

@@ -23,6 +23,11 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
+/**
+ * 后台用户主体。
+ *
+ * <p>登录标识和认证凭据迁移到 auth 模型后，当前类只保留用户资料、组织关系、权限等级和状态语义。
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,8 +37,18 @@ public class User implements Auditable, Signable, Sortable {
 
     private String officeId;
 
+    /**
+     * 迁移兼容字段，目标登录标识固定由 UserIdentity.identityValue 承载。
+     */
+    @Deprecated
     private String loginName;
+
+    /**
+     * 迁移兼容字段，目标密码凭据固定由 UserCredential.credentialValue 承载。
+     */
+    @Deprecated
     private String loginPass;
+
     private String email;
     private String mobile;
     private String tel;
@@ -135,6 +150,7 @@ public class User implements Auditable, Signable, Sortable {
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("officeId", this.getOfficeId());
+        // 迁移期仍保留旧字段签名输入，避免用户保存链路行为变化。
         map.put("loginName", this.getLoginName());
         map.put("loginPass", this.getLoginPass());
         map.put("email", this.getEmail());

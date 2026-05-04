@@ -1,0 +1,65 @@
+package com.github.thundax.modules.auth.persistence.dao;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
+import com.github.thundax.modules.auth.entity.OAuthAuthorization;
+import com.github.thundax.modules.auth.persistence.assembler.OAuthAuthorizationPersistenceAssembler;
+import com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO;
+import com.github.thundax.modules.auth.persistence.mapper.OAuthAuthorizationMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
+
+    private final OAuthAuthorizationMapper mapper;
+
+    public OAuthAuthorizationDaoImpl(OAuthAuthorizationMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    @Override
+    public OAuthAuthorization getById(EntityId id) {
+        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    }
+
+    @Override
+    public OAuthAuthorization getByAuthorizationCode(String authorizationCode) {
+        LambdaQueryWrapper<OAuthAuthorizationDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OAuthAuthorizationDO::getAuthorizationCode, authorizationCode);
+        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
+    }
+
+    @Override
+    public String insert(OAuthAuthorization authorization) {
+        OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(authorization);
+        mapper.insert(dataObject);
+        return dataObject.getId();
+    }
+
+    @Override
+    public int updateUsed(OAuthAuthorization authorization) {
+        OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(authorization);
+        return mapper.update(
+                null,
+                buildIdUpdateWrapper(dataObject)
+                        .set(OAuthAuthorizationDO::isUsed, dataObject.isUsed())
+                        .set(OAuthAuthorizationDO::getUpdateDate, dataObject.getUpdateDate())
+                        .set(OAuthAuthorizationDO::getUpdateBy, dataObject.getUpdateBy()));
+    }
+
+    @Override
+    public int deleteByAuthorizationCode(String authorizationCode) {
+        LambdaQueryWrapper<OAuthAuthorizationDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OAuthAuthorizationDO::getAuthorizationCode, authorizationCode);
+        return mapper.delete(wrapper);
+    }
+
+    private LambdaUpdateWrapper<OAuthAuthorizationDO> buildIdUpdateWrapper(OAuthAuthorizationDO dataObject) {
+        LambdaUpdateWrapper<OAuthAuthorizationDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(OAuthAuthorizationDO::getId, dataObject.getId());
+        return wrapper;
+    }
+}

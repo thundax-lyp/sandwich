@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-redis-docs`：固定认证会话运行态 Redis 方案
-  - 范围文件：docs/10-requirements/AUTH-REQUIREMENTS.md
-    docs/20-database/AUTH-DATABASE-DESIGN.md
-    docs/30-designs/AUTH-IDENTITY-CREDENTIAL-RUNBOOK.md
-  - 处理动作：补充 `AuthSession` 运行态放 Redis、审计态落数据库的职责边界
-  - 验收点：文档明确 Redis 只承载活跃态，数据库承载登录事实和最终状态
-  - 重要度：10/10
-
 - [ ] `auth-session-runtime-model`：新增认证会话运行态端口
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/AuthSessionRuntimeDao.java
     sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java

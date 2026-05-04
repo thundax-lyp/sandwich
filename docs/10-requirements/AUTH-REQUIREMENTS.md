@@ -169,7 +169,7 @@
 
 ### 5.4 AuthSession
 
-`AuthSession` 是后台认证会话事实。
+`AuthSession` 是后台认证会话事实，分为 Redis 运行态和数据库审计态。
 
 核心字段：
 
@@ -200,8 +200,12 @@
 
 固定约束：
 
-- 每次后台登录成功必须创建新的 `AuthSession`。
-- 请求 token 有效且刷新访问态时，必须 touch 对应 `AuthSession.lastAccessTime`。
+- 每次后台登录成功必须创建新的 `AuthSession` 数据库审计记录。
+- 每次后台登录成功必须写入对应 `AuthSession` Redis 运行态快照。
+- Redis 运行态固定承载活跃会话快照、最近访问时间和 TTL。
+- 数据库审计态固定承载登录事实、最终最近访问时间、登出、失效和过期状态。
+- 请求 token 有效且刷新访问态时，必须 touch 对应 Redis 运行态 `AuthSession.lastAccessTime`。
+- 正常请求不得逐次更新数据库 `auth_session.last_access_time`。
 - 主动登出固定将 `AuthSession.status` 更新为 `LOGGED_OUT`。
 - 安全策略失效固定将 `AuthSession.status` 更新为 `INVALIDATED`。
 - 自然过期固定将 `AuthSession.status` 更新为 `EXPIRED`。
@@ -314,10 +318,11 @@
 
 - 登录成功后必须创建 `AuthSession`。
 - `AuthSession` 必须绑定 token、`userId`、`identityId`、`identityType` 和 `loginType`。
-- 有效请求刷新访问态时必须 touch `AuthSession`。
-- 登出时必须将当前 `AuthSession` 标记为 `LOGGED_OUT`。
-- token 安全失效时必须将当前 `AuthSession` 标记为 `INVALIDATED`。
-- 会话自然过期时必须将当前 `AuthSession` 标记为 `EXPIRED`。
+- 有效请求刷新访问态时必须 touch Redis 运行态 `AuthSession`。
+- 登出时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `LOGGED_OUT`。
+- token 安全失效时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `INVALIDATED`。
+- 会话自然过期时必须将数据库 `AuthSession` 标记为 `EXPIRED`。
+- Redis 运行态过期不替代数据库最终状态收口。
 
 ### 7.8 用户保存联动
 
@@ -353,8 +358,9 @@
 11. 密码正确时清零凭据失败状态。
 12. 登录成功后创建 `AccessToken`。
 13. 登录成功后创建 `PermissionSession`。
-14. 登录成功后创建 `AuthSession`。
-15. `AuthController` 返回 token 响应。
+14. 登录成功后创建数据库审计态 `AuthSession`。
+15. 登录成功后写入 Redis 运行态 `AuthSession`。
+16. `AuthController` 返回 token 响应。
 
 ### 8.2 后台请求认证流程
 
@@ -363,7 +369,7 @@
 3. token filter 校验 token check code。
 4. token filter touch `AccessToken`。
 5. token filter touch `PermissionSession`。
-6. token filter touch `AuthSession`。
+6. token filter touch Redis 运行态 `AuthSession`。
 7. token filter 恢复当前用户上下文。
 
 ### 8.3 后台登出流程
@@ -372,7 +378,9 @@
 2. Controller 按 token 定位 `AccessToken`。
 3. Service 删除 `AccessToken`。
 4. Service 释放 `PermissionSession`。
-5. Service 将当前 `AuthSession` 标记为 `LOGGED_OUT`。
+5. Service 读取 Redis 运行态 `AuthSession` 的最后访问时间。
+6. Service 删除 Redis 运行态 `AuthSession`。
+7. Service 将数据库 `AuthSession` 标记为 `LOGGED_OUT`。
 
 ### 8.4 后台用户创建流程
 

@@ -160,7 +160,7 @@
 
 ### 6.3 auth_session
 
-`auth_session` 保存后台认证会话事实。
+`auth_session` 保存后台认证会话审计事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -193,6 +193,7 @@
 - `login_type` 固定写入 `PASSWORD`。
 - `status` 固定写入 `ACTIVE`、`LOGGED_OUT`、`INVALIDATED` 或 `EXPIRED`。
 - `issued_at` 和 `last_access_time` 创建时固定相同。
+- `last_access_time` 不随每次有效请求直接更新，登出、失效或过期收口时从 Redis 运行态回写最终最近访问时间。
 - `expire_at` 来源是 token 或认证会话有效期策略。
 - `logout_at` 只在主动登出时写入。
 - `invalidate_reason` 只在安全策略失效时写入。

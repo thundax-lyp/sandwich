@@ -43,6 +43,7 @@
 - `UserIdentity` 是登录标识，承载 `userId`、`identityType`、`identityValue` 和 `status`。
 - `UserCredential` 是认证凭据，承载 `userId`、`identityId`、`credentialType`、`credentialValue`、失败次数、锁定、过期和强制改密状态。
 - `AuthSession` 是登录会话事实，承载 token/sessionId、`userId`、`identityId`、登录方式、签发时间、最后访问时间、过期时间、登出时间和失效原因。
+- `AuthSession` 固定分为 Redis 运行态和数据库审计态：Redis 保存活跃快照和 TTL，数据库保存登录事实和最终状态。
 
 固定约束：
 
@@ -51,6 +52,8 @@
 - 密码哈希固定保存到 `UserCredential.credentialValue`。
 - 登录失败次数固定保存到 `UserCredential.failedCount`。
 - `AuthSession` 不承载权限集合；权限集合仍由权限会话链路负责。
+- 正常请求只 touch Redis 运行态 `AuthSession`，不逐请求更新数据库 `auth_session.last_access_time`。
+- 登出、失效和过期收口时，数据库 `AuthSession` 固定写入最终状态和最后访问时间。
 - 迁移期间保留兼容读取，最终删除 `User.loginPass` 直接认证语义。
 
 ## 4. Module Mapping
@@ -61,7 +64,7 @@
 
 - 定义 `UserIdentity`、`UserCredential`、`AuthSession` 业务实体。
 - 定义对应状态和类型枚举。
-- 定义 `UserIdentityDao`、`UserCredentialDao`、`AuthSessionDao`。
+- 定义 `UserIdentityDao`、`UserCredentialDao`、`AuthSessionDao` 和 `AuthSessionRuntimeDao`。
 - 定义身份、凭据和会话 Service 编排。
 - 在登录流程中承接业务校验、状态流转和跨 DAO 编排。
 
@@ -79,6 +82,7 @@
 - 定义 `UserIdentityDO`、`UserCredentialDO`、`AuthSessionDO`。
 - 定义 Mapper、DAO implementation 和 PersistenceAssembler。
 - 承接数据库字段映射、唯一约束查询和分页查询。
+- 承接认证会话 Redis 运行态存储实现。
 - 保留迁移期从旧字段到新表的装载兼容。
 
 边界：
@@ -92,8 +96,8 @@
 
 - 登录入口按 `identityType + identityValue + credentialType` 调用认证 Service。
 - Controller 只做请求绑定、验证码校验、密钥解密和响应组装。
-- 登录成功后创建 token、权限会话和 `AuthSession`。
-- 登出时释放 token、权限会话并更新 `AuthSession`。
+- 登录成功后创建 token、权限会话、数据库审计态 `AuthSession` 和 Redis 运行态 `AuthSession`。
+- 登出时释放 token、权限会话和 Redis 运行态，并更新数据库审计态 `AuthSession`。
 
 边界：
 
@@ -179,14 +183,14 @@
 执行项：
 
 - 登录成功后创建 `AuthSession`。
-- 请求活跃时 touch 会话最后访问时间。
+- 请求活跃时 touch Redis 运行态会话最后访问时间。
 - 登出时标记 `LOGGED_OUT`。
 - token 失效、安全策略失效时标记 `INVALIDATED`。
 
 验收点：
 
 - token 和 `AuthSession` 能稳定关联。
-- 登出后 token、权限会话和认证会话状态一致。
+- 登出后 token、权限会话、Redis 运行态和数据库认证会话状态一致。
 - 会话状态不替代权限集合。
 
 ### 5.7 收口旧字段语义

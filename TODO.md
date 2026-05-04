@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-migration-tests`：补齐认证模型迁移测试
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/AuthCredentialServiceTest.java
-    sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/assembler/UserIdentityPersistenceAssemblerTest.java
-    sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/assembler/UserCredentialPersistenceAssemblerTest.java
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java
-  - 处理动作：补齐身份解析、凭据状态流转、持久化转换和后台登录生命周期测试
-  - 验收点：新增模型的核心状态流转和现有登录权限生命周期都有测试覆盖
-  - 重要度：9/10
-
 - [ ] `auth-migration-cleanup`：清理认证模型迁移现场
   - 范围文件：TODO.md
     docs/30-designs/AUTH-IDENTITY-CREDENTIAL-RUNBOOK.md

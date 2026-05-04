@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
@@ -75,13 +75,13 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
-    public Page<Office> page(Office office, Page<Office> page) {
+    public PageDTO<Office> page(Office office, PageDTO<Office> page) {
         return page((OfficeQuery) null, page);
     }
 
     @Override
-    public Page<Office> page(OfficeQuery query, Page<Office> page) {
-        Page<Office> normalizedPage = normalizePage(page);
+    public PageDTO<Office> page(OfficeQuery query, PageDTO<Office> page) {
+        PageDTO<Office> normalizedPage = normalizePage(page);
         IPage<Office> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
@@ -166,8 +166,8 @@ public class OfficeServiceImpl implements OfficeService {
         return count;
     }
 
-    private Page<Office> normalizePage(Page<Office> page) {
-        Page<Office> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Office> normalizePage(PageDTO<Office> page) {
+        PageDTO<Office> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

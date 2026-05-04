@@ -102,8 +102,7 @@
 - MyBatis-Plus 链路固定以达梦行为为标准，分页插件固定使用 `DbType.DM`。
 - PageHelper 已下线，禁止新增依赖、调用或兼容支撑。
 - 旧 `CrudDao` / `CrudServiceImpl` / 空 `BaseService` / 空 `BaseServiceImpl` 基类已下线，禁止业务 DAO / Service 继承回流。
-- DAO 分页方法直接返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`。
-- DAO interface 和 DAO implementation 不返回 `com.github.thundax.common.page.Page`，该类型只作为业务分页数据模型使用。
+- DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service / Controller 分页业务数据应该使用 `com.github.thundax.common.page.PageDTO`。
 - `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。
 
 ## Index And Uniqueness

@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
@@ -54,7 +54,7 @@ public class StorageServiceImplTest {
         query.setBusinessType("Article");
         query.setName("avatar");
         query.setRemarks("remark");
-        Page<Storage> page = new Page<>(2, 20);
+        PageDTO<Storage> page = new PageDTO<>(2, 20);
 
         StorageServiceImpl service = new StorageServiceImpl(dao);
         service.page(query, page);

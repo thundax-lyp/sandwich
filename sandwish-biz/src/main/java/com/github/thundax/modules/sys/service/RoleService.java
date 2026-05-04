@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -12,7 +12,7 @@ public interface RoleService extends CrudService<Role> {
 
     List<Role> list(RoleQuery query);
 
-    Page<Role> page(RoleQuery query, Page<Role> page);
+    PageDTO<Role> page(RoleQuery query, PageDTO<Role> page);
 
     List<Role> listEnabled();
 

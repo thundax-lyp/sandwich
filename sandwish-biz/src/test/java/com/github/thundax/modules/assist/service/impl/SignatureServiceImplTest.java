@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
@@ -40,7 +40,7 @@ public class SignatureServiceImplTest {
     @Test
     public void shouldPageByExpandedBusinessType() {
         RecordingSignatureDao dao = new RecordingSignatureDao();
-        Page<Signature> page = new Page<>(2, 20);
+        PageDTO<Signature> page = new PageDTO<>(2, 20);
         dao.pageResult = page;
 
         SignatureServiceImpl service = new SignatureServiceImpl(dao);
@@ -99,7 +99,7 @@ public class SignatureServiceImplTest {
     private static class RecordingSignatureDao implements SignatureDao {
 
         private Signature findResult;
-        private Page<Signature> pageResult;
+        private PageDTO<Signature> pageResult;
         private String businessType;
         private String businessId;
         private int findCalls;

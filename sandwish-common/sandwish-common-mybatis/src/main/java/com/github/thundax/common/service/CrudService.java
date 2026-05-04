@@ -1,7 +1,7 @@
 package com.github.thundax.common.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import java.util.List;
 
 /**
@@ -25,7 +25,7 @@ public interface CrudService<T> {
 
     T getOne(T entity);
 
-    Page<T> page(T entity, Page<T> page);
+    PageDTO<T> page(T entity, PageDTO<T> page);
 
     long count(T entity);
 

@@ -5,7 +5,7 @@ import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
@@ -481,12 +481,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public Page<User> page(User entity, Page<User> page) {
+        public PageDTO<User> page(User entity, PageDTO<User> page) {
             return page;
         }
 
         @Override
-        public Page<User> page(UserQuery query, Page<User> page) {
+        public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
             return page;
         }
 
@@ -606,12 +606,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public Page<Menu> page(Menu entity, Page<Menu> page) {
+        public PageDTO<Menu> page(Menu entity, PageDTO<Menu> page) {
             return page;
         }
 
         @Override
-        public Page<Menu> page(MenuQuery query, Page<Menu> page) {
+        public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
             return page;
         }
 
@@ -730,15 +730,15 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public Page<com.github.thundax.modules.sys.entity.Role> page(
+        public PageDTO<com.github.thundax.modules.sys.entity.Role> page(
                 com.github.thundax.modules.sys.entity.Role entity,
-                Page<com.github.thundax.modules.sys.entity.Role> page) {
+                PageDTO<com.github.thundax.modules.sys.entity.Role> page) {
             return page;
         }
 
         @Override
-        public Page<com.github.thundax.modules.sys.entity.Role> page(
-                RoleQuery query, Page<com.github.thundax.modules.sys.entity.Role> page) {
+        public PageDTO<com.github.thundax.modules.sys.entity.Role> page(
+                RoleQuery query, PageDTO<com.github.thundax.modules.sys.entity.Role> page) {
             return page;
         }
 

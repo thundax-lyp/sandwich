@@ -7,7 +7,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.request.RequestListHelper;
@@ -149,7 +149,7 @@ public class UserController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         UserQuery query = readQuery(request);
-        Page<User> page = readUserPage(request);
+        PageDTO<User> page = readUserPage(request);
 
         return PageResponseHelper.fromEntityPage(userService.page(query, page), this::toResponse);
     }
@@ -506,7 +506,7 @@ public class UserController {
         }
     }
 
-    private Page<User> readUserPage(UserQueryRequest request) {
+    private PageDTO<User> readUserPage(UserQueryRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -518,7 +518,7 @@ public class UserController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<User> page = new Page<>();
+        PageDTO<User> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

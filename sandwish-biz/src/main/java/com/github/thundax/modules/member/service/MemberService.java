@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;
@@ -17,7 +17,7 @@ public interface MemberService {
 
     List<Member> list(MemberQuery query);
 
-    Page<Member> page(MemberQuery query, Page<Member> page);
+    PageDTO<Member> page(MemberQuery query, PageDTO<Member> page);
 
     void add(Member member);
 

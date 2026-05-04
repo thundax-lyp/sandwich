@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
@@ -87,13 +87,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<Role> page(Role role, Page<Role> page) {
+    public PageDTO<Role> page(Role role, PageDTO<Role> page) {
         return page((RoleQuery) null, page);
     }
 
     @Override
-    public Page<Role> page(RoleQuery query, Page<Role> page) {
-        Page<Role> normalizedPage = normalizePage(page);
+    public PageDTO<Role> page(RoleQuery query, PageDTO<Role> page) {
+        PageDTO<Role> normalizedPage = normalizePage(page);
         IPage<Role> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 normalizedPage.getPageNo(),
@@ -274,8 +274,8 @@ public class RoleServiceImpl implements RoleService {
         return count;
     }
 
-    private Page<Role> normalizePage(Page<Role> page) {
-        Page<Role> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Role> normalizePage(PageDTO<Role> page) {
+        PageDTO<Role> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

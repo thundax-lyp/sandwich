@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -97,13 +97,13 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public Page<Dict> page(Dict dict, Page<Dict> page) {
+    public PageDTO<Dict> page(Dict dict, PageDTO<Dict> page) {
         return page((DictQuery) null, page);
     }
 
     @Override
-    public Page<Dict> page(DictQuery query, Page<Dict> page) {
-        Page<Dict> normalizedPage = normalizePage(page);
+    public PageDTO<Dict> page(DictQuery query, PageDTO<Dict> page) {
+        PageDTO<Dict> normalizedPage = normalizePage(page);
         IPage<Dict> dataPage = dao.page(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
@@ -174,8 +174,8 @@ public class DictServiceImpl implements DictService {
         return count;
     }
 
-    private Page<Dict> normalizePage(Page<Dict> page) {
-        Page<Dict> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Dict> normalizePage(PageDTO<Dict> page) {
+        PageDTO<Dict> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

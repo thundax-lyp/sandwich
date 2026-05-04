@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -11,7 +11,7 @@ public interface UserService extends CrudService<User> {
 
     List<User> list(UserQuery query);
 
-    Page<User> page(UserQuery query, Page<User> page);
+    PageDTO<User> page(UserQuery query, PageDTO<User> page);
 
     User getByLoginName(String loginName);
 

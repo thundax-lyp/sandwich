@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
@@ -110,13 +110,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> page(User user, Page<User> page) {
+    public PageDTO<User> page(User user, PageDTO<User> page) {
         return page((UserQuery) null, page);
     }
 
     @Override
-    public Page<User> page(UserQuery query, Page<User> page) {
-        Page<User> normalizedPage = normalizePage(page);
+    public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
+        PageDTO<User> normalizedPage = normalizePage(page);
         IPage<User> dataPage = dao.page(
                 query == null ? null : query.getOfficeId(),
                 query == null ? null : query.getLoginName(),
@@ -285,8 +285,8 @@ public class UserServiceImpl implements UserService {
         return count;
     }
 
-    private Page<User> normalizePage(Page<User> page) {
-        Page<User> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<User> normalizePage(PageDTO<User> page) {
+        PageDTO<User> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

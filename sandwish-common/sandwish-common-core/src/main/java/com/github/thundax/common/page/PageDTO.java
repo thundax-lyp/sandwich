@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class Page<T> {
+public class PageDTO<T> {
 
     @Setter
     private int pageNo = PageRules.firstPageIndex();
@@ -20,17 +20,17 @@ public class Page<T> {
 
     private List<T> list = new ArrayList<>();
 
-    public Page() {}
+    public PageDTO() {}
 
-    public Page(int pageNo, int pageSize) {
+    public PageDTO(int pageNo, int pageSize) {
         this(pageNo, pageSize, 0);
     }
 
-    public Page(int pageNo, int pageSize, long totalCount) {
+    public PageDTO(int pageNo, int pageSize, long totalCount) {
         this(pageNo, pageSize, totalCount, new ArrayList<>());
     }
 
-    public Page(int pageNo, int pageSize, long count, List<T> list) {
+    public PageDTO(int pageNo, int pageSize, long count, List<T> list) {
         this.pageNo = pageNo;
         this.pageSize = pageSize;
         this.count = count;
@@ -62,7 +62,7 @@ public class Page<T> {
         return -1;
     }
 
-    public Page<T> setList(List<T> list) {
+    public PageDTO<T> setList(List<T> list) {
         this.list = list;
         initialize();
         return this;

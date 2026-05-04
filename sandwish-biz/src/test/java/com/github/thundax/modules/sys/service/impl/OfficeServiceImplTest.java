@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.dao.OfficeDao;
@@ -46,7 +46,7 @@ public class OfficeServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingOfficeDao dao = new RecordingOfficeDao();
-        Page<Office> page = new Page<>();
+        PageDTO<Office> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
         OfficeServiceImpl service = new OfficeServiceImpl(dao);

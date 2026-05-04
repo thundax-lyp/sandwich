@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -55,7 +55,7 @@ public class LogServiceImplTest {
         query.setRequestUri("/login");
         query.setBeginDate(begin);
         query.setEndDate(end);
-        Page<Log> page = new Page<>(2, 20, 100);
+        PageDTO<Log> page = new PageDTO<>(2, 20, 100);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
 
         service.page(query, page);
@@ -76,7 +76,7 @@ public class LogServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingLogDao dao = new RecordingLogDao();
-        Page<Log> page = new Page<>();
+        PageDTO<Log> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
         LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());

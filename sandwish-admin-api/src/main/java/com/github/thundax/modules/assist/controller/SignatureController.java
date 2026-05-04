@@ -6,7 +6,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -166,7 +166,7 @@ public class SignatureController {
         return SignatureInterfaceAssembler.toResponse(entity, findSignable(entity));
     }
 
-    private Page<Signature> readSignaturePage(SignaturePageRequest request) {
+    private PageDTO<Signature> readSignaturePage(SignaturePageRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -178,7 +178,7 @@ public class SignatureController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<Signature> page = new Page<>();
+        PageDTO<Signature> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

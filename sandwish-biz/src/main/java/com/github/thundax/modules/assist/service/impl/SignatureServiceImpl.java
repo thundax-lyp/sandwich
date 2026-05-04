@@ -2,7 +2,7 @@ package com.github.thundax.modules.assist.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.assist.dao.SignatureDao;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.SignatureService;
@@ -36,8 +36,8 @@ public class SignatureServiceImpl implements SignatureService {
     }
 
     @Override
-    public Page<Signature> page(SignatureQuery query, Page<Signature> page) {
-        Page<Signature> normalizedPage = normalizePage(page);
+    public PageDTO<Signature> page(SignatureQuery query, PageDTO<Signature> page) {
+        PageDTO<Signature> normalizedPage = normalizePage(page);
         IPage<Signature> dataPage = dao.page(
                 query == null ? null : query.getBusinessType(),
                 normalizedPage.getPageNo(),
@@ -86,8 +86,8 @@ public class SignatureServiceImpl implements SignatureService {
         return count;
     }
 
-    private Page<Signature> normalizePage(Page<Signature> page) {
-        Page<Signature> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Signature> normalizePage(PageDTO<Signature> page) {
+        PageDTO<Signature> normalizedPage = page == null ? new PageDTO<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }

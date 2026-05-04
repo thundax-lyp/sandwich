@@ -15,8 +15,8 @@ import org.junit.Test;
 
 public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> LEGACY_SERVICE_BOUNDARY_DIRTY_TYPES = new LinkedHashSet<>(Arrays.asList(
-            "com.github.thundax.common.page.Page", "com.github.thundax.modules.storage.backend.StorageBackendObject"));
+    private static final Set<String> LEGACY_SERVICE_BOUNDARY_DIRTY_TYPES =
+            new LinkedHashSet<>(Arrays.asList("com.github.thundax.modules.storage.backend.StorageBackendObject"));
 
     @Test
     public void shouldKeepServiceBoundaryTypesCleanExceptKnownDirtyTypes() {

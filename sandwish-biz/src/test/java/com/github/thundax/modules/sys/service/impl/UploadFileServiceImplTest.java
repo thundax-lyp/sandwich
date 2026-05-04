@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
@@ -28,7 +28,7 @@ public class UploadFileServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingUploadFileDao dao = new RecordingUploadFileDao();
-        Page<UploadFile> page = new Page<>();
+        PageDTO<UploadFile> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
         UploadFileServiceImpl service = new UploadFileServiceImpl(dao);

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.service;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import java.util.List;
@@ -19,7 +19,7 @@ public interface SignatureService {
      */
     Signature getByBusiness(String businessType, String businessId);
 
-    Page<Signature> page(SignatureQuery query, Page<Signature> page);
+    PageDTO<Signature> page(SignatureQuery query, PageDTO<Signature> page);
 
     void add(Signature entity);
 

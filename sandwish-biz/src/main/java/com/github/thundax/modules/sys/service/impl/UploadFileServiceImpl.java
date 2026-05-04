@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
@@ -67,8 +67,8 @@ public class UploadFileServiceImpl implements UploadFileService {
     }
 
     @Override
-    public Page<UploadFile> page(UploadFile entity, Page<UploadFile> page) {
-        Page<UploadFile> normalizedPage = normalizePage(page);
+    public PageDTO<UploadFile> page(UploadFile entity, PageDTO<UploadFile> page) {
+        PageDTO<UploadFile> normalizedPage = normalizePage(page);
         IPage<UploadFile> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
@@ -139,8 +139,8 @@ public class UploadFileServiceImpl implements UploadFileService {
         return count;
     }
 
-    private Page<UploadFile> normalizePage(Page<UploadFile> page) {
-        Page<UploadFile> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<UploadFile> normalizePage(PageDTO<UploadFile> page) {
+        PageDTO<UploadFile> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

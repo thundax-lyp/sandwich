@@ -3,7 +3,7 @@ package com.github.thundax.modules.member.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -56,8 +56,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<Member> page(MemberQuery query, Page<Member> page) {
-        Page<Member> normalizedPage = normalizePage(page);
+    public PageDTO<Member> page(MemberQuery query, PageDTO<Member> page) {
+        PageDTO<Member> normalizedPage = normalizePage(page);
         IPage<Member> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getEmail(),
@@ -179,8 +179,8 @@ public class MemberServiceImpl implements MemberService {
         return count;
     }
 
-    private Page<Member> normalizePage(Page<Member> page) {
-        Page<Member> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Member> normalizePage(PageDTO<Member> page) {
+        PageDTO<Member> normalizedPage = page == null ? new PageDTO<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }

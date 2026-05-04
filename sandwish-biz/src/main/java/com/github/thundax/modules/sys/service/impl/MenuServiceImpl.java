@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
@@ -82,13 +82,13 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Page<Menu> page(Menu menu, Page<Menu> page) {
+    public PageDTO<Menu> page(Menu menu, PageDTO<Menu> page) {
         return page((MenuQuery) null, page);
     }
 
     @Override
-    public Page<Menu> page(MenuQuery query, Page<Menu> page) {
-        Page<Menu> normalizedPage = normalizePage(page);
+    public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
+        PageDTO<Menu> normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
@@ -224,8 +224,8 @@ public class MenuServiceImpl implements MenuService {
         return count;
     }
 
-    private Page<Menu> normalizePage(Page<Menu> page) {
-        Page<Menu> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Menu> normalizePage(PageDTO<Menu> page) {
+        PageDTO<Menu> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

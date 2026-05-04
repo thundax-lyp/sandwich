@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -80,7 +80,7 @@ public class StorageController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
-        Page<Storage> page = readStoragePage(request);
+        PageDTO<Storage> page = readStoragePage(request);
         return PageResponseHelper.fromEntityPage(
                 storageService.page(query, page),
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
@@ -193,7 +193,7 @@ public class StorageController {
         return new StorageUploadResponse();
     }
 
-    private Page<Storage> readStoragePage(StoragePageRequest request) {
+    private PageDTO<Storage> readStoragePage(StoragePageRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -205,7 +205,7 @@ public class StorageController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<Storage> page = new Page<>();
+        PageDTO<Storage> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

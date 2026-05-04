@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
@@ -66,8 +66,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Page<Storage> page(StorageQuery query, Page<Storage> page) {
-        Page<Storage> normalizedPage = normalizePage(page);
+    public PageDTO<Storage> page(StorageQuery query, PageDTO<Storage> page) {
+        PageDTO<Storage> normalizedPage = normalizePage(page);
         IPage<Storage> dataPage = dao.page(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
@@ -246,8 +246,8 @@ public class StorageServiceImpl implements StorageService {
         return count;
     }
 
-    private Page<Storage> normalizePage(Page<Storage> page) {
-        Page<Storage> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Storage> normalizePage(PageDTO<Storage> page) {
+        PageDTO<Storage> normalizedPage = page == null ? new PageDTO<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }

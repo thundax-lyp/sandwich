@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -10,7 +10,7 @@ public interface MenuService extends TreeService<Menu> {
 
     List<Menu> list(MenuQuery query);
 
-    Page<Menu> page(MenuQuery query, Page<Menu> page);
+    PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page);
 
     List<Menu> list(Integer maxRank);
 

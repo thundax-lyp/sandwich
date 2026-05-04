@@ -1,6 +1,6 @@
 package com.github.thundax.common.web.response;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
@@ -11,7 +11,7 @@ public final class PageResponseHelper {
 
     private PageResponseHelper() {}
 
-    public static <T, R> PageResponse<R> fromEntityPage(Page<T> page, Function<T, R> mappingFunction) {
+    public static <T, R> PageResponse<R> fromEntityPage(PageDTO<T> page, Function<T, R> mappingFunction) {
         PageResponse<R> pageResponse = new PageResponse<>();
 
         pageResponse.setPageNo(page.getPageNo());

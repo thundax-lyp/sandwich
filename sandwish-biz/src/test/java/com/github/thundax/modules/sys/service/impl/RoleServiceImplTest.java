@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
@@ -35,7 +35,7 @@ public class RoleServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        Page<Role> page = new Page<>();
+        PageDTO<Role> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
         RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());

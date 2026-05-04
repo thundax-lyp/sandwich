@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -65,7 +65,7 @@ public class LogController {
         return LogInterfaceAssembler.toResponse(log, user, office, officeService::getById);
     }
 
-    private Page<Log> readLogPage(LogPageRequest request) {
+    private PageDTO<Log> readLogPage(LogPageRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -77,7 +77,7 @@ public class LogController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<Log> page = new Page<>();
+        PageDTO<Log> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

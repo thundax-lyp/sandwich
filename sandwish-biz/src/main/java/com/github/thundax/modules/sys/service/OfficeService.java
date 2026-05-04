@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.query.OfficeQuery;
@@ -10,5 +10,5 @@ public interface OfficeService extends TreeService<Office> {
 
     List<Office> list(OfficeQuery query);
 
-    Page<Office> page(OfficeQuery query, Page<Office> page);
+    PageDTO<Office> page(OfficeQuery query, PageDTO<Office> page);
 }

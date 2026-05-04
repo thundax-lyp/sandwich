@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -87,7 +87,7 @@ public class DictController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageResponse<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
-        Page<Dict> page = readDictPage(request);
+        PageDTO<Dict> page = readDictPage(request);
         return PageResponseHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
 
@@ -153,7 +153,7 @@ public class DictController {
         return true;
     }
 
-    private Page<Dict> readDictPage(DictPageRequest request) {
+    private PageDTO<Dict> readDictPage(DictPageRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -165,7 +165,7 @@ public class DictController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<Dict> page = new Page<>();
+        PageDTO<Dict> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

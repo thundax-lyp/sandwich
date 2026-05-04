@@ -1,6 +1,6 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import java.util.Set;
 import javax.annotation.PostConstruct;
@@ -127,7 +127,7 @@ public class BaseFrontController {
         }
     }
 
-    public static <T> Page<T> readPage(Integer pageNo, Integer pageSize) {
+    public static <T> PageDTO<T> readPage(Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
             pageNo = PageRules.firstPageIndex();
         }
@@ -136,7 +136,7 @@ public class BaseFrontController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        Page<T> page = new Page<>();
+        PageDTO<T> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;

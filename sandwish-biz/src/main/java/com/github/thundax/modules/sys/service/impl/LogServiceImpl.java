@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
@@ -51,8 +51,8 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Page<Log> page(LogQuery query, Page<Log> page) {
-        Page<Log> normalizedPage = normalizePage(page);
+    public PageDTO<Log> page(LogQuery query, PageDTO<Log> page) {
+        PageDTO<Log> normalizedPage = normalizePage(page);
         IPage<Log> dataPage = dao.page(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
@@ -130,8 +130,8 @@ public class LogServiceImpl implements LogService {
                 query == null ? null : query.getEndDate());
     }
 
-    private Page<Log> normalizePage(Page<Log> page) {
-        Page<Log> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<Log> normalizePage(PageDTO<Log> page) {
+        PageDTO<Log> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

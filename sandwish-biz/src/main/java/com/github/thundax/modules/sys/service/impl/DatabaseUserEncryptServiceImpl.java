@@ -5,7 +5,7 @@ import static com.github.thundax.common.Constants.QUEUE_PREFIX;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
@@ -190,8 +190,8 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     @Override
-    public Page<UserEncrypt> page(UserEncrypt entity, Page<UserEncrypt> page) {
-        Page<UserEncrypt> normalizedPage = normalizePage(page);
+    public PageDTO<UserEncrypt> page(UserEncrypt entity, PageDTO<UserEncrypt> page) {
+        PageDTO<UserEncrypt> normalizedPage = normalizePage(page);
         IPage<UserEncrypt> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
         normalizedPage.setPageSize((int) dataPage.getSize());
@@ -248,8 +248,8 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         return count;
     }
 
-    private Page<UserEncrypt> normalizePage(Page<UserEncrypt> page) {
-        Page<UserEncrypt> normalizedPage = page == null ? new Page<>() : page;
+    private PageDTO<UserEncrypt> normalizePage(PageDTO<UserEncrypt> page) {
+        PageDTO<UserEncrypt> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

@@ -32,6 +32,7 @@ import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
@@ -290,6 +291,26 @@ public class AuthServiceImpl implements AuthService {
         accessTokenDao.deleteByToken(accessToken.getToken());
         permissionService.release(accessToken.getToken());
         logoutAuthSession(accessToken.getToken());
+    }
+
+    @Override
+    public AuthTokenQueryResult queryToken(String token) {
+        AccessToken accessToken = getAccessToken(token);
+        if (accessToken == null || !validateToken(accessToken)) {
+            return AuthTokenQueryResult.inactive(token);
+        }
+        AuthSession session = authSessionRuntimeDao.getByToken(token);
+        if (session == null) {
+            session = authSessionDao.getByToken(token);
+        }
+        if (session == null || !session.isActive() || session.isExpired(new Date())) {
+            return AuthTokenQueryResult.inactive(token);
+        }
+        User user = userService.getById(session.getUserId());
+        if (user == null || !user.isEnable()) {
+            return AuthTokenQueryResult.inactive(token);
+        }
+        return AuthTokenQueryResult.active(token, session, user);
     }
 
     @Override

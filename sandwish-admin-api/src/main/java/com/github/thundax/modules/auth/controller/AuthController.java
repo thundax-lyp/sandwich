@@ -10,8 +10,12 @@ import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;
+import com.github.thundax.modules.auth.controller.request.AuthTokenRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
+import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
@@ -144,6 +148,24 @@ public class AuthController {
         authService.deleteAccessToken(accessToken);
 
         return true;
+    }
+
+    @ApiOperation(value = "校验 token", notes = "ignore")
+    @PostMapping(value = "token/verify")
+    public TokenVerifyResponse verifyToken(@Valid @RequestBody AuthTokenRequest request) {
+        return AuthInterfaceAssembler.toTokenVerifyResponse(authService.queryToken(request.getToken()));
+    }
+
+    @ApiOperation(value = "OAuth2 token introspection", notes = "ignore")
+    @PostMapping(value = "oauth2/introspect")
+    public OAuth2IntrospectionResponse introspect(@Valid @RequestBody AuthTokenRequest request) {
+        return AuthInterfaceAssembler.toIntrospectionResponse(authService.queryToken(request.getToken()));
+    }
+
+    @ApiOperation(value = "OAuth2 userinfo", notes = "ignore")
+    @PostMapping(value = "oauth2/userinfo")
+    public OAuth2UserinfoResponse userinfo(@Valid @RequestBody AuthTokenRequest request) {
+        return AuthInterfaceAssembler.toUserinfoResponse(authService.queryToken(request.getToken()));
     }
 
     private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {

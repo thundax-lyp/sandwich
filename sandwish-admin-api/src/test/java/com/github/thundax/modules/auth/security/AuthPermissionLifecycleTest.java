@@ -27,6 +27,7 @@ import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.impl.AuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
+import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
@@ -143,6 +144,18 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals(
                 "PASSWORD_RESET",
                 authSessionDao.getByToken(accessToken.getToken()).getInvalidateReason());
+    }
+
+    @Test
+    public void shouldQueryTokenActiveStateAndUserinfo() {
+        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+
+        AuthTokenQueryResult result = authService.queryToken(accessToken.getToken());
+
+        Assert.assertTrue(result.isActive());
+        Assert.assertEquals(accessToken.getToken(), result.getSession().getToken());
+        Assert.assertEquals("tester", result.getUser().getLoginName());
+        Assert.assertFalse(authService.queryToken("missing").isActive());
     }
 
     @Test

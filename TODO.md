@@ -36,14 +36,6 @@
   - 验收点：失效动作同步清理运行态、释放权限会话并写回审计状态
   - 重要度：9/10
 
-- [ ] `auth-token-query`：搬运 token verify、OAuth2 introspection 和 userinfo
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：新增 token 校验、introspection 和 userinfo Service/API 响应模型
-  - 验收点：有效 token 返回 active/session/user 信息，无效 token 返回明确非活跃结果
-  - 重要度：9/10
-
 - [ ] `auth-login-methods`：搬运短信、企业微信和 GitHub 多登录方式端口
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
     sandwish-admin-api/src/main/java/com/github/thundax/modules/auth

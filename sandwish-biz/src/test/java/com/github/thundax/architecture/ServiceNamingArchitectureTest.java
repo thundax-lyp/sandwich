@@ -12,18 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.Test;
 
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> NON_STANDARD_SERVICE_METHOD_NAMES = new LinkedHashSet<>(
-            Arrays.asList("get", "getMany", "find", "findList", "findPage", "findOne", "delete", "batchGetByIds"));
     private static final Pattern SERVICE_QUERY_SETTER_DECLARATION_PATTERN =
             Pattern.compile("\\bpublic\\s+void\\s+set[A-Z][A-Za-z0-9_]*\\s*\\(");
 
@@ -37,7 +32,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 continue;
             }
             for (JavaMethod method : javaClass.getMethods()) {
-                if (isLegacyServiceMethod(method)) {
+                if (!isServiceMethodShape(method)) {
                     violations.add(method.getFullName());
                 }
             }
@@ -95,9 +90,55 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 && javaClass.getPackageName().contains(".service");
     }
 
-    private boolean isLegacyServiceMethod(JavaMethod method) {
-        return NON_STANDARD_SERVICE_METHOD_NAMES.contains(method.getName())
-                || method.getName().startsWith("find");
+    private boolean isServiceMethodShape(JavaMethod method) {
+        String name = method.getName();
+        if (isNonStandardIdsListName(name) || name.startsWith("find")) {
+            return false;
+        }
+        return name.equals("add")
+                || name.equals("count")
+                || name.equals("list")
+                || name.equals("page")
+                || name.equals("update")
+                || name.startsWith("add")
+                || name.startsWith("getBy")
+                || name.startsWith("list")
+                || name.startsWith("count")
+                || name.startsWith("deleteBy")
+                || name.startsWith("batch")
+                || name.startsWith("insert")
+                || name.startsWith("update")
+                || isServiceBusinessActionName(name);
+    }
+
+    private boolean isNonStandardIdsListName(String name) {
+        return name.endsWith("ByIds") && !name.equals("listByIds");
+    }
+
+    private boolean isServiceBusinessActionName(String name) {
+        return name.equals("abortMultipartUpload")
+                || name.equals("canAccess")
+                || name.equals("completeMultipartUpload")
+                || name.equals("createPublicKey")
+                || name.equals("createSession")
+                || name.equals("decrypt")
+                || name.equals("deleteSign")
+                || name.equals("encrypt")
+                || name.equals("getContent")
+                || name.equals("getDictionaryRevision")
+                || name.equals("getPrivateKey")
+                || name.equals("getSession")
+                || name.equals("initMultipartUpload")
+                || name.equals("isChildOf")
+                || name.equals("isPermitted")
+                || name.equals("moveTreeNode")
+                || name.equals("release")
+                || name.equals("reloadAll")
+                || name.equals("removeBusiness")
+                || name.equals("sign")
+                || name.equals("touch")
+                || name.equals("uploadMultipartPart")
+                || name.equals("verifySign");
     }
 
     private boolean isServiceQueryObject(JavaClass javaClass) {

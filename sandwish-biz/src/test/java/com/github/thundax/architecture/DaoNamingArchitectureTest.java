@@ -7,16 +7,10 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.junit.Test;
 
 public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
-
-    private static final Set<String> NON_STANDARD_DAO_METHOD_NAMES =
-            new HashSet<>(Arrays.asList("get", "getMany", "find", "findList", "findPage", "delete", "batchGetByIds"));
 
     @Test
     public void shouldUseDaoPortMethodShape() {
@@ -28,7 +22,7 @@ public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
                 continue;
             }
             for (JavaMethod method : javaClass.getMethods()) {
-                if (NON_STANDARD_DAO_METHOD_NAMES.contains(method.getName())) {
+                if (!isDaoPortMethodShape(method)) {
                     violations.add(method.getFullName());
                 }
             }
@@ -45,5 +39,49 @@ public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
         return javaClass.isInterface()
                 && javaClass.getSimpleName().endsWith("Dao")
                 && javaClass.getPackageName().contains(".dao");
+    }
+
+    private boolean isDaoPortMethodShape(JavaMethod method) {
+        String name = method.getName();
+        if (isNonStandardIdsListName(name) || name.startsWith("find")) {
+            return false;
+        }
+        return name.equals("count")
+                || name.equals("list")
+                || name.equals("page")
+                || name.equals("deleteAll")
+                || name.startsWith("getBy")
+                || name.startsWith("list")
+                || name.startsWith("count")
+                || name.startsWith("insert")
+                || name.startsWith("update")
+                || name.startsWith("deleteBy")
+                || name.startsWith("batch")
+                || isDaoBusinessActionName(name);
+    }
+
+    private boolean isNonStandardIdsListName(String name) {
+        return name.endsWith("ByIds") && !name.equals("listByIds");
+    }
+
+    private boolean isDaoBusinessActionName(String name) {
+        return name.equals("active")
+                || name.equals("canSend")
+                || name.equals("deleteBusiness")
+                || name.equals("deleteBusinessByBusiness")
+                || name.equals("deleteMenuRole")
+                || name.equals("deleteRoleMenu")
+                || name.equals("deleteRoleUser")
+                || name.equals("deleteUserRole")
+                || name.equals("getContentById")
+                || name.equals("getDictionaryRevision")
+                || name.equals("getMultipartPart")
+                || name.equals("getMultipartSessionByUploadId")
+                || name.equals("getUidByToken")
+                || name.equals("isChildOf")
+                || name.equals("markSent")
+                || name.equals("moveTreeNode")
+                || name.equals("tokenExists")
+                || name.equals("touch");
     }
 }

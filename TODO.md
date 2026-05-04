@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-identity-infra`：实现登录标识持久化
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/UserIdentityDO.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/UserIdentityMapper.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/UserIdentityPersistenceAssembler.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/UserIdentityDaoImpl.java
-  - 处理动作：新增 `UserIdentity` DO、Mapper、assembler 和 DAO 实现
-  - 验收点：infra 可按 `identityType + identityValue` 唯一查询并维护身份状态
-  - 重要度：9/10
-
 - [ ] `auth-credential-infra`：实现认证凭据持久化
   - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/UserCredentialDO.java
     sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/UserCredentialMapper.java

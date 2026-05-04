@@ -9,12 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-docs`：固化后台认证模型需求口径
-  - 范围文件：docs/10-requirements/AUTH-REQUIREMENTS.md
-  - 处理动作：新增后台 `UserIdentity`、`UserCredential`、`AuthSession` 需求文档
-  - 验收点：文档明确用户主体、登录标识、认证凭据和认证会话边界
-  - 重要度：9/10
-
 - [ ] `auth-database-docs`：固化后台认证数据库设计
   - 范围文件：docs/20-database/AUTH-DATABASE-DESIGN.md
   - 处理动作：新增 `UserIdentity`、`UserCredential`、`AuthSession` 表设计和索引约束

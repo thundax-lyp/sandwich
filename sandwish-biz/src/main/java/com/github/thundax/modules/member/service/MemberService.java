@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;

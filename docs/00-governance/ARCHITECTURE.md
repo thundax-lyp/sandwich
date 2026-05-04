@@ -87,12 +87,14 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - 通用工具类
+- 通用分页数据模型
 - 通用编码、加密、集合、日期、文件工具
 - i18n 支撑
 - 存储、线程等通用技术能力
 
 边界：
 
+- 通用分页模型只承载分页数据，不读取 HTTP、Cookie、Session，也不输出 HTML。
 - 不承载具体业务流程。
 - 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 - 新增通用能力前，必须确认不是某个业务模块的专用逻辑。
@@ -107,7 +109,7 @@ Sandwich 固定采用三层 API 架构。
 
 边界：
 
-- 可以依赖 `sandwish-common-core` 和 `sandwish-common-mybatis`。
+- 可以依赖 `sandwish-common-core`。
 - 不承载 Controller、Filter、Interceptor 或具体入口配置。
 - 不承载业务请求 / 响应对象。
 - Helper 只返回数据，不抛入口层业务异常。
@@ -143,7 +145,7 @@ Sandwich 固定采用三层 API 架构。
 - 可以依赖 `sandwish-common-core`。
 - MyBatis-Plus 分页插件固定使用 `DbType.DM`。
 - 不承载 PageHelper、旧 CRUD 基类或 MyBatis 扫描标记。
-- 通用分页模型只承载分页数据，不读取 HTTP、Cookie、Session，也不输出 HTML。
+- 不承载通用分页数据模型。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
@@ -253,9 +255,9 @@ Sandwich 固定采用三层 API 架构。
 
 通用 Web 支撑链路允许入口模块依赖：
 
-`sandwish-admin-api -> sandwish-common-web -> sandwish-common-mybatis -> sandwish-common-core`
+`sandwish-admin-api -> sandwish-common-web -> sandwish-common-core`
 
-`sandwish-front-api -> sandwish-common-web -> sandwish-common-mybatis -> sandwish-common-core`
+`sandwish-front-api -> sandwish-common-web -> sandwish-common-core`
 
 Spring Security 迁移链路允许入口模块依赖：
 

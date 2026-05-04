@@ -1,7 +1,7 @@
 package com.github.thundax.common.web;
 
-import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.persistence.PageRules;
+import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageRules;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolation;

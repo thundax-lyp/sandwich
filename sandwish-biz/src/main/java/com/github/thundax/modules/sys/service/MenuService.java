@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.common.service.TreeService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.service.query.MenuQuery;

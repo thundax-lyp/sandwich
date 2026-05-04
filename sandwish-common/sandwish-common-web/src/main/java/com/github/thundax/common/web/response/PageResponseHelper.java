@@ -1,6 +1,6 @@
 package com.github.thundax.common.web.response;
 
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;

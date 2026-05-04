@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.common.service.CrudService;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;

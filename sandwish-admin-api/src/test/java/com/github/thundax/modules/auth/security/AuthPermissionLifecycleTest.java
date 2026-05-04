@@ -5,7 +5,7 @@ import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;

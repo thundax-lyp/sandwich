@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.service.UserEncryptService;

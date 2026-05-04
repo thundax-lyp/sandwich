@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;

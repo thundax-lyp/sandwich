@@ -6,8 +6,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.persistence.PageRules;
+import com.github.thundax.common.page.Page;
+import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.Arrays;

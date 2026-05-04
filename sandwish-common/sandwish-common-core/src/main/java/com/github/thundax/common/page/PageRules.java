@@ -1,4 +1,4 @@
-package com.github.thundax.common.persistence;
+package com.github.thundax.common.page;
 
 public final class PageRules {
 

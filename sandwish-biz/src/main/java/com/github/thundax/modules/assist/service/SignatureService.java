@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.service;
 
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import java.util.List;

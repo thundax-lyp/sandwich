@@ -1,7 +1,7 @@
 package com.github.thundax.common.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.page.Page;
 import java.util.List;
 
 /**

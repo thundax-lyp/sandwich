@@ -9,6 +9,7 @@ import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
+import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 
@@ -77,6 +78,8 @@ public interface AuthService {
     void deleteAccessToken(AccessToken accessToken);
 
     AuthTokenQueryResult queryToken(String token);
+
+    AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException;
 
     void invalidateSessionByToken(String token, String reason);
 

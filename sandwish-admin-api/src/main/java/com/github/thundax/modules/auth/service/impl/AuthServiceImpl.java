@@ -6,20 +6,27 @@ import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
+import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
+import com.github.thundax.modules.auth.dao.OAuthClientDao;
+import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.OAuthClient;
+import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.UserCredential;
 import com.github.thundax.modules.auth.entity.UserIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
+import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
+import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
 import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
@@ -35,6 +42,7 @@ import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
+import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
@@ -77,6 +85,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired(required = false)
     private GithubLoginProvider githubLoginProvider;
+
+    @Autowired(required = false)
+    private OAuthClientDao oauthClientDao;
+
+    @Autowired(required = false)
+    private OAuthRefreshTokenDao oauthRefreshTokenDao;
 
     public AuthServiceImpl(
             AuthProperties properties,
@@ -323,6 +337,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
+        if (oauthRefreshTokenDao == null) {
+            throw new ApiException("refresh token 未配置");
+        }
+        OAuthRefreshToken current = oauthRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
+        Date now = new Date();
+        if (current == null || !current.canRefresh(now) || !StringUtils.equals(clientId, current.getClientId())) {
+            throw new InvalidTokenException();
+        }
+        current.markUsed(now);
+        oauthRefreshTokenDao.updateStatus(current);
+
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
+        String nextRefreshToken = createOAuthRefreshToken(accessToken, clientId, current.getTenantId(), now);
+        return new AuthTokenRefreshResult(accessToken, nextRefreshToken);
+    }
+
+    @Override
     public void invalidateSessionByToken(String token, String reason) {
         invalidateAuthSession(token, reason);
     }
@@ -547,6 +579,39 @@ public class AuthServiceImpl implements AuthService {
 
     private int runtimeExpiredSeconds() {
         return properties.getLoginExpiredSeconds() + SESSION_RUNTIME_SAFETY_SECONDS;
+    }
+
+    private String createOAuthRefreshToken(AccessToken accessToken, String clientId, String tenantId, Date issuedAt) {
+        String refreshToken = UuidHelper.compact();
+        OAuthRefreshToken entity = new OAuthRefreshToken();
+        entity.setTokenId(UuidHelper.compact());
+        entity.setTokenHash(tokenHash(refreshToken));
+        entity.setAccessTokenId(accessToken.getToken());
+        entity.setClientId(clientId);
+        entity.setTenantId(tenantId);
+        entity.setUserId(EntityIdCodec.toDomain(accessToken.getUserId()));
+        entity.setIssuedAt(issuedAt);
+        entity.setExpireAt(new Date(issuedAt.getTime() + refreshTokenTtlSeconds(clientId) * 1000L));
+        entity.setStatus(OAuthRefreshTokenStatus.ACTIVE);
+        entity.setCreateDate(issuedAt);
+        entity.setUpdateDate(issuedAt);
+        entity.setId(EntityIdCodec.toDomain(oauthRefreshTokenDao.insert(entity)));
+        return refreshToken;
+    }
+
+    private long refreshTokenTtlSeconds(String clientId) {
+        if (oauthClientDao == null) {
+            return 2592000L;
+        }
+        OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
+        if (client == null || client.getRefreshTokenTtlSeconds() <= 0L) {
+            return 2592000L;
+        }
+        return client.getRefreshTokenTtlSeconds();
+    }
+
+    private String tokenHash(String token) {
+        return Md5Helper.encrypt(token);
     }
 
     private UserCredential getOrBootstrapPasswordCredential(User user, UserIdentity identity) {

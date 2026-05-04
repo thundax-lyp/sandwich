@@ -7,16 +7,23 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
+import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
+import com.github.thundax.modules.auth.dao.OAuthClientDao;
+import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
+import com.github.thundax.modules.auth.entity.OAuthClient;
+import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.UserCredential;
 import com.github.thundax.modules.auth.entity.UserIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
+import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
+import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
 import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
@@ -28,6 +35,7 @@ import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.impl.AuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
+import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
@@ -41,6 +49,7 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -159,6 +168,32 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
+    public void shouldRefreshAccessTokenAndRotateRefreshToken() throws Exception {
+        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
+        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        inject(authService, "oauthClientDao", new TestOAuthClientDao());
+
+        OAuthRefreshToken refreshToken = new OAuthRefreshToken();
+        refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
+        refreshToken.setTokenId("refresh-token-1");
+        refreshToken.setTokenHash(Md5Helper.encrypt("plain-refresh-token"));
+        refreshToken.setAccessTokenId("old-access-token");
+        refreshToken.setClientId("admin-web");
+        refreshToken.setUserId(EntityIdCodec.toDomain("u1"));
+        refreshToken.setIssuedAt(new Date(1000L));
+        refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
+        refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
+        refreshTokenDao.current = refreshToken;
+
+        AuthTokenRefreshResult result = authService.refreshAccessToken("admin-web", "plain-refresh-token");
+
+        Assert.assertNotNull(result.getAccessToken().getToken());
+        Assert.assertNotNull(result.getRefreshToken());
+        Assert.assertEquals(OAuthRefreshTokenStatus.USED, refreshToken.getStatus());
+        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+    }
+
+    @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
@@ -212,6 +247,89 @@ public class AuthPermissionLifecycleTest {
         @Override
         public boolean validate(String plainPassword, String encryptedPassword) {
             return plainPassword != null && plainPassword.equals(encryptedPassword);
+        }
+    }
+
+    private void inject(AuthService target, String fieldName, Object value) throws Exception {
+        Field field = AuthServiceImpl.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private static class TestOAuthClientDao implements OAuthClientDao {
+
+        @Override
+        public OAuthClient getById(EntityId id) {
+            return client();
+        }
+
+        @Override
+        public OAuthClient getByClientId(String clientId) {
+            return client();
+        }
+
+        @Override
+        public OAuthClient getByClientIdAndStatus(String clientId, OAuthClientStatus status) {
+            return client();
+        }
+
+        @Override
+        public String insert(OAuthClient client) {
+            return "oauth-client-1";
+        }
+
+        @Override
+        public int update(OAuthClient client) {
+            return 1;
+        }
+
+        private OAuthClient client() {
+            OAuthClient client = new OAuthClient();
+            client.setId(EntityIdCodec.toDomain("oauth-client-1"));
+            client.setClientId("admin-web");
+            client.setStatus(OAuthClientStatus.ENABLED);
+            client.setRefreshTokenTtlSeconds(600L);
+            return client;
+        }
+    }
+
+    private static class TestOAuthRefreshTokenDao implements OAuthRefreshTokenDao {
+
+        private OAuthRefreshToken current;
+        private OAuthRefreshToken inserted;
+
+        @Override
+        public OAuthRefreshToken getById(EntityId id) {
+            return current;
+        }
+
+        @Override
+        public OAuthRefreshToken getByTokenId(String tokenId) {
+            return current;
+        }
+
+        @Override
+        public OAuthRefreshToken getByTokenHash(String tokenHash) {
+            return current != null && current.getTokenHash().equals(tokenHash) ? current : null;
+        }
+
+        @Override
+        public List<OAuthRefreshToken> listByClientIdAndUserIdAndStatus(
+                String clientId, EntityId userId, OAuthRefreshTokenStatus status) {
+            return current == null ? Collections.emptyList() : Collections.singletonList(current);
+        }
+
+        @Override
+        public String insert(OAuthRefreshToken refreshToken) {
+            refreshToken.setId(EntityIdCodec.toDomain("refresh-db-2"));
+            this.inserted = refreshToken;
+            return "refresh-db-2";
+        }
+
+        @Override
+        public int updateStatus(OAuthRefreshToken refreshToken) {
+            this.current = refreshToken;
+            return 1;
         }
     }
 

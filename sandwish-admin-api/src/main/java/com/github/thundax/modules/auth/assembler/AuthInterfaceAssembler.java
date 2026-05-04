@@ -10,6 +10,7 @@ import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
+import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 
@@ -34,6 +35,16 @@ public final class AuthInterfaceAssembler {
         AuthAccessTokenResponse response = new AuthAccessTokenResponse();
         if (entity != null) {
             response.setToken(entity.getToken());
+        }
+        return response;
+    }
+
+    @NonNull
+    public static AuthAccessTokenResponse toAccessTokenResponse(AuthTokenRefreshResult result) {
+        AuthAccessTokenResponse response = new AuthAccessTokenResponse();
+        if (result != null && result.getAccessToken() != null) {
+            response.setToken(result.getAccessToken().getToken());
+            response.setRefreshToken(result.getRefreshToken());
         }
         return response;
     }

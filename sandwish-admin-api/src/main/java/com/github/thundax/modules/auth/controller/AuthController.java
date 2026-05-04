@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;
 import com.github.thundax.modules.auth.controller.request.AuthTokenRequest;
 import com.github.thundax.modules.auth.controller.request.GithubLoginRequest;
 import com.github.thundax.modules.auth.controller.request.SmsLoginRequest;
+import com.github.thundax.modules.auth.controller.request.TokenRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.WecomLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
@@ -191,6 +192,13 @@ public class AuthController {
     @PostMapping(value = "oauth2/userinfo")
     public OAuth2UserinfoResponse userinfo(@Valid @RequestBody AuthTokenRequest request) {
         return AuthInterfaceAssembler.toUserinfoResponse(authService.queryToken(request.getToken()));
+    }
+
+    @ApiOperation(value = "刷新 token", notes = "ignore")
+    @PostMapping(value = "token/refresh")
+    public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
+        return AuthInterfaceAssembler.toAccessTokenResponse(
+                authService.refreshAccessToken(request.getClientId(), request.getRefreshToken()));
     }
 
     private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {

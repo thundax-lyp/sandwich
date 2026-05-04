@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.controller.response;
+package com.github.thundax.modules.auth.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,16 +11,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "AuthAccessTokenResponse", description = "访问令牌响应")
+@ApiModel(value = "TokenRefreshRequest", description = "Token 刷新请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthAccessTokenResponse implements Serializable {
+public class TokenRefreshRequest implements Serializable {
 
-    @ApiModelProperty(name = "token", value = "令牌")
-    @JsonProperty("token")
-    private String token;
+    @ApiModelProperty(name = "clientId", value = "客户端标识")
+    @JsonProperty("clientId")
+    private String clientId;
 
-    @ApiModelProperty(name = "refreshToken", value = "刷新令牌")
+    @ApiModelProperty(name = "refreshToken", value = "refresh token")
     @JsonProperty("refreshToken")
     private String refreshToken;
 }

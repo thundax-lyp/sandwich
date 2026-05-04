@@ -110,6 +110,8 @@ public interface AuthService {
 
     boolean revokeAuthorizationCode(String authorizationCode) throws ApiException;
 
+    boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException;
+
     void invalidateSessionByToken(String token, String reason);
 
     int invalidateSessionsByUserId(EntityId userId, String reason);

@@ -34,4 +34,7 @@ public class OAuth2TokenRequest implements Serializable {
 
     @JsonProperty("refreshToken")
     private String refreshToken;
+
+    @JsonProperty("token")
+    private String token;
 }

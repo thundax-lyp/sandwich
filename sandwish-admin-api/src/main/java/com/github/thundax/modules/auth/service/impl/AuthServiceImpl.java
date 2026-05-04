@@ -332,6 +332,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthTokenQueryResult queryToken(String token) {
+        AuthTokenQueryResult oauthResult = queryOAuthAccessToken(token);
+        if (oauthResult != null) {
+            return oauthResult;
+        }
         AccessToken accessToken = getAccessToken(token);
         if (accessToken == null || !validateToken(accessToken)) {
             return AuthTokenQueryResult.inactive(token);
@@ -348,6 +352,24 @@ public class AuthServiceImpl implements AuthService {
             return AuthTokenQueryResult.inactive(token);
         }
         return AuthTokenQueryResult.active(token, session, user);
+    }
+
+    private AuthTokenQueryResult queryOAuthAccessToken(String token) {
+        if (oauthAccessTokenDao == null) {
+            return null;
+        }
+        OAuthAccessToken accessToken = oauthAccessTokenDao.getByTokenHash(tokenHash(token));
+        if (accessToken == null) {
+            return null;
+        }
+        if (!accessToken.isIntrospectionActive(new Date())) {
+            return AuthTokenQueryResult.inactive(token);
+        }
+        User user = userService.getById(accessToken.getUserId());
+        if (user == null || !user.isEnable()) {
+            return AuthTokenQueryResult.inactive(token);
+        }
+        return AuthTokenQueryResult.active(token, accessToken, user);
     }
 
     @Override
@@ -495,6 +517,30 @@ public class AuthServiceImpl implements AuthService {
             throw new ApiException("OAuth2 authorization 未配置");
         }
         return oauthAuthorizationDao.deleteByAuthorizationCode(authorizationCode) > 0;
+    }
+
+    @Override
+    public boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException {
+        validateOAuthClientSecret(clientId, clientSecret);
+        Date now = new Date();
+        boolean revoked = false;
+        if (oauthAccessTokenDao != null) {
+            OAuthAccessToken accessToken = oauthAccessTokenDao.getByTokenHash(tokenHash(token));
+            if (accessToken != null && accessToken.isActive()) {
+                accessToken.revoke(now);
+                oauthAccessTokenDao.updateStatus(accessToken);
+                revoked = true;
+            }
+        }
+        if (oauthRefreshTokenDao != null) {
+            OAuthRefreshToken refreshToken = oauthRefreshTokenDao.getByTokenHash(tokenHash(token));
+            if (refreshToken != null && refreshToken.isActive()) {
+                refreshToken.revoke(now);
+                oauthRefreshTokenDao.updateStatus(refreshToken);
+                revoked = true;
+            }
+        }
+        return revoked;
     }
 
     @Override
@@ -843,6 +889,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String tokenHash(String token) {
+        if (StringUtils.isBlank(token)) {
+            return StringUtils.EMPTY;
+        }
         return Md5Helper.encrypt(token);
     }
 

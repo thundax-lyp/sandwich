@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.service.result;
 
 import com.github.thundax.modules.auth.entity.AuthSession;
+import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.sys.entity.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ public class AuthTokenQueryResult {
     private boolean active;
     private String token;
     private AuthSession session;
+    private OAuthAccessToken oauthAccessToken;
     private User user;
 
     public static AuthTokenQueryResult inactive(String token) {
@@ -24,6 +26,15 @@ public class AuthTokenQueryResult {
         result.setActive(true);
         result.setToken(token);
         result.setSession(session);
+        result.setUser(user);
+        return result;
+    }
+
+    public static AuthTokenQueryResult active(String token, OAuthAccessToken oauthAccessToken, User user) {
+        AuthTokenQueryResult result = new AuthTokenQueryResult();
+        result.setActive(true);
+        result.setToken(token);
+        result.setOauthAccessToken(oauthAccessToken);
         result.setUser(user);
         return result;
     }

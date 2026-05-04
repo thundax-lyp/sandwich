@@ -254,7 +254,39 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(authorizationDao.current.isUsed());
         Assert.assertEquals(OAuthAccessTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
         Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+        Assert.assertTrue(authService.queryToken(token.getOauthAccessToken()).isActive());
+        Assert.assertTrue(authService.revokeOAuth2Token("admin-web", "secret", token.getOauthAccessToken()));
+        Assert.assertFalse(authService.queryToken(token.getOauthAccessToken()).isActive());
         Assert.assertTrue(authService.revokeAuthorizationCode(decision.getAuthorizationCode()));
+    }
+
+    @Test
+    public void shouldExchangeRefreshTokenGrantAndRotateOAuthTokens() throws Exception {
+        TestOAuthAccessTokenDao accessTokenDao = new TestOAuthAccessTokenDao();
+        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
+        inject(authService, "oauthAccessTokenDao", accessTokenDao);
+        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        inject(authService, "oauthClientDao", new TestOAuthClientDao());
+
+        OAuthRefreshToken refreshToken = new OAuthRefreshToken();
+        refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
+        refreshToken.setTokenId("refresh-token-1");
+        refreshToken.setTokenHash(Md5Helper.encrypt("plain-refresh-token"));
+        refreshToken.setAccessTokenId("old-access-token");
+        refreshToken.setClientId("admin-web");
+        refreshToken.setUserId(EntityIdCodec.toDomain("u1"));
+        refreshToken.setIssuedAt(new Date(1000L));
+        refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
+        refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
+        refreshTokenDao.current = refreshToken;
+
+        AuthTokenRefreshResult result = authService.exchangeOAuth2Token(
+                "admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token");
+
+        Assert.assertEquals(OAuthRefreshTokenStatus.USED, refreshToken.getStatus());
+        Assert.assertNotNull(result.getOauthAccessToken());
+        Assert.assertEquals(OAuthAccessTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
+        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
     }
 
     @Test

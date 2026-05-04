@@ -242,10 +242,10 @@ public class AuthController {
                 request.getRefreshToken()));
     }
 
-    @ApiOperation(value = "OAuth2 撤销授权码", notes = "ignore")
+    @ApiOperation(value = "OAuth2 撤销令牌", notes = "ignore")
     @PostMapping(value = "oauth2/revoke")
     public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
-        return authService.revokeAuthorizationCode(request.getAuthorizationCode());
+        return authService.revokeOAuth2Token(request.getClientId(), request.getClientSecret(), request.getToken());
     }
 
     private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {

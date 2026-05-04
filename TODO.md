@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-oauth-token-revoke-introspection`：补 OAuth token revoke 和 introspection 状态
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：revoke access/refresh token 状态，introspection 按 OAuth access token 状态返回 active
-  - 验收点：revoke 后 token introspection 返回 active=false
-  - 重要度：9/10
-
 - [ ] `auth-oauth-token-cleanup`：清理 OAuth token 正规化现场
   - 范围文件：TODO.md
     docs/30-designs/AUTH-OAUTH-TOKEN-RUNBOOK.md

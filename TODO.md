@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-runtime-model`：新增认证会话运行态端口
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/AuthSessionRuntimeDao.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java
-  - 处理动作：定义按 token 读写、touch、delete 和 TTL 刷新的运行态会话契约
-  - 验收点：业务层不直接依赖 Redis API，运行态会话字段可覆盖 token 请求链路
-  - 重要度：10/10
-
 - [ ] `auth-session-runtime-infra`：实现 Redis 认证会话运行态存储
   - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImpl.java
     sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthSessionPersistenceAssembler.java

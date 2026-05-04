@@ -44,6 +44,17 @@ public class AuthSession implements Auditable {
         return expireAt != null && now != null && !expireAt.after(now);
     }
 
+    public int remainingSeconds(Date now) {
+        if (expireAt == null || now == null) {
+            return 0;
+        }
+        long remainingMillis = expireAt.getTime() - now.getTime();
+        if (remainingMillis <= 0L) {
+            return 0;
+        }
+        return (int) Math.max(1L, remainingMillis / 1000L);
+    }
+
     public void touch(Date accessTime) {
         this.lastAccessTime = accessTime;
     }

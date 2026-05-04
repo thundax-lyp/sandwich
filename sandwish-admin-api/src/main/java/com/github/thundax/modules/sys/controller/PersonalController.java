@@ -6,7 +6,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
-import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PasswordService;
@@ -129,8 +129,8 @@ public class PersonalController {
 
         // 解密密码（数据需要加密传输）
         String privateKey = keypairService.getPrivateKey(request.getToken());
-        String password = Sm2.decrypt(request.getPassword(), privateKey);
-        String oldPassword = Sm2.decrypt(request.getOldPassword(), privateKey);
+        String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
+        String oldPassword = Sm2Helper.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);
         request.setOldPassword(oldPassword);
         if (StringUtils.isBlank(password)) {

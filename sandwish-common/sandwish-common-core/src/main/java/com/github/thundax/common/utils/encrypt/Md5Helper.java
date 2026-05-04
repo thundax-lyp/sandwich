@@ -9,9 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-public class Md5 {
+public final class Md5Helper {
 
     private static final String ALGORITHM_MD5 = "MD5";
+
+    private Md5Helper() {}
 
     public static String encrypt(InputStream inputStream) {
         try {

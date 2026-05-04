@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.utils;
 
-import com.github.thundax.common.utils.encrypt.Md5;
+import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.utils.IPUtils;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ public class AuthUtils {
             return null;
         }
 
-        return Md5.encrypt16(remoteAddr + userAgent);
+        return Md5Helper.encrypt16(remoteAddr + userAgent);
     }
 
     public static boolean validateCheckCode(String checkCode) {

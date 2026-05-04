@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
         form.setCheckCode(AuthUtils.currentCheckCode());
         form.setCaptcha(createCode(VALIDATE_CAPTCHA_CODE, CAPTCHA_LENGTH));
 
-        Sm2.StringKeyPair keyPair = Sm2.generateKeyPair();
+        Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
         if (keyPair != null) {
             form.setPublicKey(keyPair.getPublicKey());
             form.setPrivateKey(keyPair.getPrivateKey());

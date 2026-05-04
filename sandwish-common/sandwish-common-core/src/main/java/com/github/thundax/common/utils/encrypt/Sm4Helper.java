@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
-public class SM4Util {
+public final class Sm4Helper {
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -20,6 +20,8 @@ public class SM4Util {
     // PKCS5Padding-以8个字节为一组进行分组加密
     // 定义分组加密模式使用：PKCS5Padding
     private static final String ALGORITHM_NAME_ECB_PADDING = "SM4/ECB/PKCS5Padding";
+
+    private Sm4Helper() {}
 
     /**
      * sm4加密

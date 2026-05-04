@@ -1,6 +1,6 @@
 package com.github.thundax.common.jasypt;
 
-import com.github.thundax.common.utils.encrypt.Des;
+import com.github.thundax.common.utils.encrypt.DesHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.encryption.StringEncryptor;
 
@@ -30,7 +30,7 @@ public class JasyptStringEncryptor implements StringEncryptor {
         if (StringUtils.isEmpty(message)) {
             return message;
         }
-        return prefix + Des.encrypt(message, password);
+        return prefix + DesHelper.encrypt(message, password);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class JasyptStringEncryptor implements StringEncryptor {
         if (!StringUtils.startsWith(encryptedMessage, prefix)) {
             return encryptedMessage;
         }
-        return Des.decrypt(encryptedMessage.substring(prefix.length()), password);
+        return DesHelper.decrypt(encryptedMessage.substring(prefix.length()), password);
     }
 }

@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 /**
  * 仅适配前端 sm-crypto
  */
-public class Sm2 {
+public final class Sm2Helper {
 
-    private static final Logger logger = LoggerFactory.getLogger(Sm2.class);
+    private static final Logger logger = LoggerFactory.getLogger(Sm2Helper.class);
 
     private static final String SM2_CURVE_NAME = "sm2p256v1";
 
@@ -45,6 +45,8 @@ public class Sm2 {
     private static final X9ECParameters X9EC_PARAMETERS = GMNamedCurves.getByName(SM2_CURVE_NAME);
     private static final ECDomainParameters DOMAIN_PARAMETERS = new ECDomainParameters(
             X9EC_PARAMETERS.getCurve(), X9EC_PARAMETERS.getG(), X9EC_PARAMETERS.getN(), X9EC_PARAMETERS.getH());
+
+    private Sm2Helper() {}
 
     public static StringKeyPair generateKeyPair() {
         try {

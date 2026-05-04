@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.security;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.encrypt.Md5;
+import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class MemberSpringAuthenticationProvider implements AuthenticationProvide
         if (!member.isEnable()) {
             throw new DisabledException("用户已禁用，请联系管理员。");
         }
-        if (!Md5.encrypt(defaultPassword).equals(Md5.encrypt(password))) {
+        if (!Md5Helper.encrypt(defaultPassword).equals(Md5Helper.encrypt(password))) {
             throw new BadCredentialsException("用户名或密码错误。");
         }
 

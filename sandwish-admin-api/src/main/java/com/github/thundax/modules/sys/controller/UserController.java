@@ -8,7 +8,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
-import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -166,7 +166,7 @@ public class UserController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
     public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
+        String password = Sm2Helper.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validateOffice(request.getOffice());
         validateRoles(request.getRoleList());
@@ -213,7 +213,8 @@ public class UserController {
     public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password = Sm2.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
+            String password =
+                    Sm2Helper.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.service.impl;
 
-import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -23,7 +23,7 @@ public class KeypairServiceImpl implements KeypairService {
 
     @Override
     public String createPublicKey(String token) {
-        Sm2.StringKeyPair keyPair = Sm2.generateKeyPair();
+        Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
         keypairPrivateKeyDao.insert(
                 token, keyPair.getPrivateKey(), properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2);
         return keyPair.getPublicKey();

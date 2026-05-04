@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.encrypt.Sm2;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
@@ -90,7 +90,7 @@ public class AuthController {
 
         String privateKey = authService.getPrivateKey(request.getLoginToken());
         // 解密密码（数据需要加密传输）
-        String password = Sm2.decrypt(request.getPassword(), privateKey);
+        String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
 
         User user;
         try {

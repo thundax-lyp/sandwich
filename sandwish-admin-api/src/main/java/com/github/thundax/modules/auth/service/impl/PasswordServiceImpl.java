@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.utils.encrypt.Md5;
+import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.auth.service.PasswordService;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +11,7 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public String encrypt(String plainPassword) {
-        return Md5.encrypt(plainPassword.getBytes(StandardCharsets.UTF_8));
+        return Md5Helper.encrypt(plainPassword.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override

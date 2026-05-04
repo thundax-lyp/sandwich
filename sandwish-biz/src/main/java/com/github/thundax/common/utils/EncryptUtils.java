@@ -1,6 +1,6 @@
 package com.github.thundax.common.utils;
 
-import com.github.thundax.common.utils.encrypt.SM4Util;
+import com.github.thundax.common.utils.encrypt.Sm4Helper;
 import org.apache.commons.lang3.StringUtils;
 
 public class EncryptUtils {
@@ -16,7 +16,7 @@ public class EncryptUtils {
             return value;
         }
         try {
-            String encryptedValue = SM4Util.encryptEcb(NativePropertyPlaceConfigurer.SALT, value);
+            String encryptedValue = Sm4Helper.encryptEcb(NativePropertyPlaceConfigurer.SALT, value);
             return encryptedValue == null ? value : NativePropertyPlaceConfigurer.PREFIX + encryptedValue;
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,7 +35,7 @@ public class EncryptUtils {
             return value;
         }
         try {
-            String decryptValue = SM4Util.decryptEcb(
+            String decryptValue = Sm4Helper.decryptEcb(
                     NativePropertyPlaceConfigurer.SALT,
                     StringUtils.substring(value, NativePropertyPlaceConfigurer.PREFIX.length()));
             return decryptValue == null ? value : decryptValue;

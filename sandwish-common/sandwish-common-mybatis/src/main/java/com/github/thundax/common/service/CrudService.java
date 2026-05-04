@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @param <T> 实体类型
  */
-public interface CrudService<T> extends BaseService {
+public interface CrudService<T> {
 
     Class<T> getElementType();
 

@@ -36,7 +36,6 @@
 - 持久化实现对象：`DO` / `DataObject`
 - API 请求对象：`Request`
 - API 响应对象：`Response`
-- 页面展示对象：`VO`
 - 接口传输对象：`DTO`
 - Service 查询对象：`XxxQuery`
 - API 模型装配器：`InterfaceAssembler`
@@ -62,9 +61,12 @@
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_SERVICE_TRANSACTION`：事务边界默认放在 Service
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装；入口模型放在同业务模块的 `controller/request` 与 `controller/response` 包，不下沉到 Service
-- `LAYER_SERVICE_ENTITY_MODEL`：Service 固定使用 Entity 或稳定业务参数，不直接依赖 API `Request` / `Response`
+- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定使用 `*DTO`、`*Query`、业务 `Entity` 或 Java-Type；返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper` 或其他持久化实现类型。
+- `LAYER_SERVICE_PAGE_DTO`：Service 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
+- `LAYER_SERVICE_NO_EMPTY_BASE`：不得新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`；Service 共性能力必须有明确方法契约或具体业务价值。
+- `LAYER_DAO_BOUNDARY_TYPES`：DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型；返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`；不得接收或返回 `*DTO`、API `Request` / `Response`、`DO/DataObject` 或 common `PageDTO`。
 - `LAYER_SERVICE_QUERY_MODEL`：Service 读取条件使用 `XxxQuery` 表达时，`XxxQuery` 固定作为 Service 输入模型，只承载读取过滤条件，不承载 HTTP、Session、权限适配、分页状态、持久化实现类型或 request 字符串解析逻辑。
-- `LAYER_SERVICE_QUERY_NO_SETTER_LOGIC`：`XxxQuery` 源码不得声明 `setXxx` 方法；JDK8 下使用 class 承载字段定义，request 到 query 的枚举解析、日期归一化和字段装配固定放在对应 `InterfaceAssembler`。
+- `LAYER_SERVICE_QUERY_NO_SETTER_LOGIC`：`XxxQuery` 源码不得声明手写 `setXxx` 方法；JDK8 下使用 class 承载字段定义，request 到 query 的枚举解析、日期归一化和字段装配固定放在对应 `InterfaceAssembler`。
 - `LAYER_ENTITY_NO_API_RESPONSE`：业务 Entity 不作为公开 HTTP 响应模型直接暴露
 - `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
 - `LAYER_INTERFACE_ASSEMBLER_NO_DO`：`InterfaceAssembler` 不转换 `DO` / `DataObject`
@@ -95,8 +97,8 @@
 - `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾，分别放在对应 API 模块的 `modules/{module}/controller/request` 与 `modules/{module}/controller/response` 包
 - `NAME_REQUEST_REQUIRED_ANNOTATIONS`：API `Request` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_RESPONSE_REQUIRED_ANNOTATIONS`：API `Response` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
-- `NAME_VO_DTO`：VO / DTO 命名必须表达使用场景或业务对象
-- `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 `Entity.Query` 内部类、`Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
+- `NAME_DTO`：DTO 命名必须表达使用场景或业务对象；Service 边界传输对象必须以 `DTO` 结尾。
+- `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 API `Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
 
 ## Review Rules（AI/人工审阅，暂不强门禁）
 
@@ -116,8 +118,8 @@
 - Service 优先表达业务动作，避免让 Controller 感知过多持久化细节
 - `InterfaceAssembler` 按对应 API 入口模块的现有包结构放置，优先使用 `assembler` 包
 - DAO / Mapper 查询、分页、过滤、排序优先下推到数据库
-- VO / DTO 不写复杂业务流程
-- `PersistenceAssembler` 只做 `Entity <-> DO/DataObject` 字段转换，查询条件从业务 `Entity.Query` 到持久化参数的拆解不回填到 `DO`
+- DTO 不写复杂业务流程
+- `PersistenceAssembler` 只做 `Entity <-> DO/DataObject` 字段转换，查询条件从 Service DTO 到持久化参数的拆解不回填到 `DO`
 
 ### Naming & Placement
 

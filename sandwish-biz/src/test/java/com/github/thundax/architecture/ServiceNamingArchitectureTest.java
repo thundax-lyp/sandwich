@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,7 +23,7 @@ import org.junit.Test;
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
     private static final Set<String> LEGACY_SERVICE_METHOD_NAMES =
-            new HashSet<>(Arrays.asList("get", "getMany", "find", "findList", "findPage", "findOne", "delete"));
+            new LinkedHashSet<>(Arrays.asList("get", "getMany", "find", "findList", "findPage", "findOne", "delete"));
     private static final Pattern SERVICE_QUERY_SETTER_DECLARATION_PATTERN =
             Pattern.compile("\\bpublic\\s+void\\s+set[A-Z][A-Za-z0-9_]*\\s*\\(");
 
@@ -62,7 +62,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
         }
 
         assertTrue(
-                "Service query objects named XxxQuery must be placed under "
+                "Service query objects must be placed under "
                         + "com.github.thundax.modules.{module}.service.query: "
                         + violations,
                 violations.isEmpty());
@@ -76,7 +76,6 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
         try (Stream<Path> paths = Files.walk(sourceRoot)) {
             paths.filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith("Query.java"))
                     .filter(this::isServiceQuerySource)
                     .filter(path -> containsPattern(path, SERVICE_QUERY_SETTER_DECLARATION_PATTERN))
                     .map(path -> toRepositoryPath(root, path))
@@ -85,7 +84,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
         assertTrue(
                 "Service query objects must only define query fields; request-to-query conversion belongs in "
-                        + "InterfaceAssembler, so XxxQuery source must not declare setXxx methods: "
+                        + "InterfaceAssembler, so service query source must not declare setXxx methods: "
                         + violations,
                 violations.isEmpty());
     }
@@ -102,7 +101,8 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     }
 
     private boolean isServiceQueryObject(JavaClass javaClass) {
-        return javaClass.getSimpleName().endsWith("Query") && !"Query".equals(javaClass.getSimpleName());
+        String simpleName = javaClass.getSimpleName();
+        return simpleName.endsWith("Query") && !"Query".equals(simpleName);
     }
 
     private boolean isInServiceQueryPackage(JavaClass javaClass) {

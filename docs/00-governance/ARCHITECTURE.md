@@ -218,7 +218,7 @@ Sandwich 固定采用三层 API 架构。
 - 后台配置
 - 后台安全、日志、Swagger、任务等入口适配
 - 后台静态 API 支撑资源
-- 后台专用工具与 VO
+- 后台专用工具、Request 和 Response
 
 边界：
 
@@ -236,7 +236,7 @@ Sandwich 固定采用三层 API 架构。
 - 前台配置
 - 前台安全、Shiro、过滤器、拦截器等入口适配
 - 前台静态 API 支撑资源
-- 前台专用工具与 VO
+- 前台专用工具、Request 和 Response
 
 边界：
 
@@ -286,6 +286,7 @@ Spring Security 迁移链路允许入口模块依赖：
 - 固定接收 API `Request` 或基础请求参数，固定输出 API `Response` 或统一 API 响应包装。
 - 不直接暴露业务 `Entity` 作为公开 HTTP 响应模型。
 - 不把 API `Request` / `Response` 下沉到 Service。
+- 分页入口固定接收 `PageRequest` 或基础分页参数，分页出口固定输出 `PageResponse` 或统一响应包装。
 
 ### Service
 
@@ -294,8 +295,14 @@ Spring Security 迁移链路允许入口模块依赖：
 - 可以依赖 `sandwish-common` 的通用工具和基础服务。
 - 对外提供稳定业务方法，避免让 Controller 感知过多持久化细节。
 - 跨模块业务复用优先放在 `sandwish-biz` 的 Service。
-- 固定使用业务 `Entity` 或稳定业务参数作为方法入参和返回结果。
+- 方法入参固定使用 `*DTO`、`*Query`、业务 `Entity` 或 Java-Type。
+- 方法返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type。
+- Java-Type 包含 primitive / boxed primitive、`String`、`BigDecimal`、`Date`、`Enum`、数组、`java.*` 集合容器和项目统一标识值类型。
+- 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
+- 不新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`。
 - 不直接依赖 API `Request` / `Response`。
+- 不直接依赖 `DO` / `DataObject`。
+- 不直接暴露 MyBatis-Plus `Page`、`IPage`、`Wrapper` 或其他持久化实现类型。
 - 不负责 API 响应字段裁剪、HTTP 状态语义或入口展示模型组装。
 
 ### DAO / Mapper
@@ -310,17 +317,21 @@ Spring Security 迁移链路允许入口模块依赖：
 - `PersistenceAssembler` 固定归属 `sandwish-infra`，只负责 `Entity <-> DO/DataObject` 转换。
 - DAO / Mapper 方法优先使用显式业务语义命名，不以通用 `findList(T entity)` 或无条件语义方法承载新增查询。
 - Mapper interface 保持最小 `BaseMapper<DO>` 定义，业务查询逻辑固定在 DAO implementation 中。
+- DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型。
+- DAO interface 方法返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`。
+- DAO 分页入参固定使用 `int pageNo, int pageSize`，分页返回固定使用 MyBatis-Plus `Page<Entity>`。
+- DAO interface 不接收或返回 `*DTO`、API `Request` / `Response`、`DO` / `DataObject` 或 common `PageDTO`。
 - Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper。
 - 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 当测试为生产 DAO implementation 提供 InMemory implementation 时，InMemory implementation 固定放在 `src/test/java` 并标记 `@Profile("test")`；对应生产 DAO implementation 必须标记 `@Profile("!test")`，防止测试上下文误加载生产实现。
 
-### Entity / VO / DTO
+### Entity / DTO
 
 - Entity 优先表达持久化对象或业务数据对象。
-- VO / DTO 用于入口响应、页面展示或跨层传输。
-- 不在 VO / DTO 中写复杂业务流程。
+- DTO 用于 Service 边界的数据传输。
+- 不在 DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
-- 业务 `Entity` 可以保留 Service 可理解的业务查询模型。
+- `*Query` 固定作为 Service 入参读取条件模型。
 - `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。
 - `PersistenceAssembler` 不回填查询对象；查询条件从 Service 到 DAO / Mapper 时必须显式拆解或转换为 infra 内部 persistence 参数对象。
 - 树业务 `Entity` 只表达 `parentId` 等业务关系字段，不暴露 `lft` / `rgt` 或 nested-set 区间计算方法。

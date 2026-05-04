@@ -11,12 +11,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "UserOfficeResponse", description = "用户机构响应")
+@ApiModel(value = "UserDepartmentResponse", description = "用户部门响应")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserOfficeResponse implements Serializable {
+public class UserDepartmentResponse implements Serializable {
 
-    @ApiModelProperty(name = "id", value = "机构ID")
+    @ApiModelProperty(name = "id", value = "部门ID")
     @JsonProperty("id")
     private String id;
 

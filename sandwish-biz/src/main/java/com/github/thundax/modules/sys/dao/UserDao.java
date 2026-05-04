@@ -11,10 +11,10 @@ public interface UserDao {
 
     List<User> listByIds(List<String> idList);
 
-    List<User> list(String officeId, String loginName, String name, String enableFlag, String superFlag);
+    List<User> list(String departmentId, String loginName, String name, String enableFlag, String superFlag);
 
     Page<User> page(
-            String officeId,
+            String departmentId,
             String loginName,
             String name,
             String enableFlag,

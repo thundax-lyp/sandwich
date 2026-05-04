@@ -21,7 +21,7 @@ public class UserDO {
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 
-    private String officeId;
+    private String departmentId;
 
     private String loginName;
 

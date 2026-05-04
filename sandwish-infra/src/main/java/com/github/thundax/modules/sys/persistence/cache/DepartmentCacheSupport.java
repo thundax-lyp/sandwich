@@ -6,7 +6,7 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.entity.Department;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -14,11 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OfficeCacheSupport {
+public class DepartmentCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
     private static final int VERSION_EXPIRE_SECONDS = OBJECT_EXPIRE_SECONDS + 5;
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "SYS_OFFICE_";
+    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "SYS_DEPARTMENT_";
     private static final String ID_PREFIX = "id_";
     private static final String VERSION_KEY = "version";
     private static final String KEY_INDEX = "keys";
@@ -37,14 +37,14 @@ public class OfficeCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public Office getById(String id) {
-        return (Office) cache.get(objectKey(id));
+    public Department getById(String id) {
+        return (Department) cache.get(objectKey(id));
     }
 
-    public void putById(Office office) {
-        if (office != null && StringUtils.isNotBlank(EntityIdCodec.toValue(office.getId()))) {
-            String key = objectKey(EntityIdCodec.toValue(office.getId()));
-            cache.put(key, office, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+    public void putById(Department department) {
+        if (department != null && StringUtils.isNotBlank(EntityIdCodec.toValue(department.getId()))) {
+            String key = objectKey(EntityIdCodec.toValue(department.getId()));
+            cache.put(key, department, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }

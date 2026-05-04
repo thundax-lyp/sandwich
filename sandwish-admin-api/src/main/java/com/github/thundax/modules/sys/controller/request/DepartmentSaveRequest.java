@@ -1,58 +1,52 @@
-package com.github.thundax.modules.sys.controller.response;
+package com.github.thundax.modules.sys.controller.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "OfficeResponse", description = "机构响应")
+@ApiModel(value = "DepartmentSaveRequest", description = "部门保存请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OfficeResponse implements Serializable {
+public class DepartmentSaveRequest implements Serializable {
 
-    @ApiModelProperty(name = "id", value = "机构ID")
+    @ApiModelProperty(name = "id", value = "部门ID")
     @JsonProperty("id")
+    @Size(max = 64, message = "ID长度不能超过64")
     private String id;
 
-    @ApiModelProperty(name = "priority", value = "排序数")
+    @ApiModelProperty(name = "priority", value = "排序数", example = "0")
     @JsonProperty("priority")
+    @Min(value = 0, message = "\"排序数\"必须不能小于 0")
     private Integer priority;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
+    @Size(max = 200, message = "\"备注\"长度不能超过 200")
     private String remarks;
-
-    @ApiModelProperty(name = "createDate", value = "创建时间")
-    @JsonProperty("createDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createDate;
-
-    @ApiModelProperty(name = "updateDate", value = "修改时间")
-    @JsonProperty("updateDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateDate;
 
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")
+    @Size(max = 64, message = "父节点ID长度不能超过64")
     private String parentId;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")
+    @NotEmpty(message = "\"名称\"不能为空")
+    @Size(max = 50, message = "\"名称\"长度不能超过 50")
     private String name;
 
     @ApiModelProperty(name = "shortName", value = "简称")
     @JsonProperty("shortName")
+    @Size(max = 50, message = "\"简称\"长度不能超过 50")
     private String shortName;
-
-    @ApiModelProperty(name = "namePath", value = "全名称")
-    @JsonProperty("namePath")
-    private String namePath;
 }

@@ -85,7 +85,7 @@
 核心字段：
 
 - `id`：后台用户 ID，使用 `EntityId`。
-- `officeId`：所属机构 ID。
+- `departmentId`：所属部门 ID。
 - `name`：用户名称。
 - `email`：联系邮箱。
 - `mobile`：联系手机号。

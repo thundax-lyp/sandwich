@@ -12,10 +12,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "OfficeMoveRequest", description = "机构树节点移动请求")
+@ApiModel(value = "DepartmentMoveRequest", description = "部门树节点移动请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OfficeMoveRequest implements Serializable {
+public class DepartmentMoveRequest implements Serializable {
 
     public static final String TYPE_BEFORE = "before";
     public static final String TYPE_AFTER = "after";

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserQuery implements Serializable {
-    private String officeId;
+    private String departmentId;
     private String loginName;
     private String name;
     private UserStatus status;

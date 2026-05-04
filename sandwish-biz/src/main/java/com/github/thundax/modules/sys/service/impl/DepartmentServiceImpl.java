@@ -6,10 +6,10 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
-import com.github.thundax.modules.sys.dao.OfficeDao;
-import com.github.thundax.modules.sys.entity.Office;
-import com.github.thundax.modules.sys.service.OfficeService;
-import com.github.thundax.modules.sys.service.query.OfficeQuery;
+import com.github.thundax.modules.sys.dao.DepartmentDao;
+import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -18,35 +18,35 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class OfficeServiceImpl implements OfficeService {
+public class DepartmentServiceImpl implements DepartmentService {
 
-    private final OfficeDao dao;
+    private final DepartmentDao dao;
 
-    public OfficeServiceImpl(OfficeDao dao) {
+    public DepartmentServiceImpl(DepartmentDao dao) {
         this.dao = dao;
     }
 
-    public Office getById(EntityId id) {
+    public Department getById(EntityId id) {
         if (id == null) {
             return null;
         }
         return dao.getById(id);
     }
 
-    public List<Office> list(Office office) {
-        return list((OfficeQuery) null);
+    public List<Department> list(Department department) {
+        return list((DepartmentQuery) null);
     }
 
-    public List<Office> list(OfficeQuery query) {
+    public List<Department> list(DepartmentQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
 
-    public PageDTO<Office> page(OfficeQuery query, PageDTO<Office> page) {
-        PageDTO<Office> normalizedPage = normalizePage(page);
-        IPage<Office> dataPage = dao.page(
+    public PageDTO<Department> page(DepartmentQuery query, PageDTO<Department> page) {
+        PageDTO<Department> normalizedPage = normalizePage(page);
+        IPage<Department> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
@@ -61,19 +61,19 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Office entity) {
+    public void add(Department entity) {
         entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Office entity) {
+    public void update(Department entity) {
         dao.update(entity);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
-        Office bean = this.getById(id);
+        Department bean = this.getById(id);
         if (bean == null) {
             return 0;
         }
@@ -91,12 +91,12 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void moveTreeNode(Office from, Office to, TreeNodeMoveType moveType) {
+    public void moveTreeNode(Department from, Department to, TreeNodeMoveType moveType) {
         dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
     }
 
     @Override
-    public boolean isChildOf(Office child, Office parent) {
+    public boolean isChildOf(Department child, Department parent) {
         return child != null
                 && parent != null
                 && dao.isChildOf(EntityIdCodec.toValue(child.getId()), EntityIdCodec.toValue(parent.getId()));
@@ -112,8 +112,8 @@ public class OfficeServiceImpl implements OfficeService {
         return count;
     }
 
-    private PageDTO<Office> normalizePage(PageDTO<Office> page) {
-        PageDTO<Office> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageDTO<Department> normalizePage(PageDTO<Department> page) {
+        PageDTO<Department> normalizedPage = page == null ? new PageDTO<>() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

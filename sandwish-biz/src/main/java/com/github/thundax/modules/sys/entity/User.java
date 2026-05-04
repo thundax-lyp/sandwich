@@ -35,7 +35,7 @@ import org.springframework.lang.NonNull;
 public class User implements Auditable, Signable, Sortable {
     private EntityId id;
 
-    private String officeId;
+    private String departmentId;
 
     /**
      * 迁移兼容字段，目标登录标识固定由 UserIdentity.identityValue 承载。
@@ -96,12 +96,12 @@ public class User implements Auditable, Signable, Sortable {
         }
     }
 
-    public void setOffice(Office office) {
-        this.setOfficeId(office == null ? null : EntityIdCodec.toValue(office.getId()));
+    public void setDepartment(Department department) {
+        this.setDepartmentId(department == null ? null : EntityIdCodec.toValue(department.getId()));
     }
 
-    public boolean isBelongTo(Office office) {
-        return office != null && Objects.equals(this.getOfficeId(), EntityIdCodec.toValue(office.getId()));
+    public boolean isBelongTo(Department department) {
+        return department != null && Objects.equals(this.getDepartmentId(), EntityIdCodec.toValue(department.getId()));
     }
 
     @NotNull
@@ -149,7 +149,7 @@ public class User implements Auditable, Signable, Sortable {
     @Override
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("officeId", this.getOfficeId());
+        map.put("departmentId", this.getDepartmentId());
         // 迁移期仍保留旧字段签名输入，避免用户保存链路行为变化。
         map.put("loginName", this.getLoginName());
         map.put("loginPass", this.getLoginPass());

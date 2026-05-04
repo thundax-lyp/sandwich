@@ -9,86 +9,87 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.tree.TreeNodeMoveType;
-import com.github.thundax.modules.sys.dao.OfficeDao;
-import com.github.thundax.modules.sys.entity.Office;
-import com.github.thundax.modules.sys.persistence.assembler.OfficePersistenceAssembler;
-import com.github.thundax.modules.sys.persistence.cache.OfficeCacheSupport;
-import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
-import com.github.thundax.modules.sys.persistence.mapper.OfficeMapper;
+import com.github.thundax.modules.sys.dao.DepartmentDao;
+import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.persistence.assembler.DepartmentPersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
+import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
+import com.github.thundax.modules.sys.persistence.mapper.DepartmentMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OfficeDaoImpl implements OfficeDao {
+public class DepartmentDaoImpl implements DepartmentDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
     private static final String ROOT_ID = "ROOT";
 
-    private final OfficeMapper mapper;
-    private final OfficeCacheSupport cacheSupport;
+    private final DepartmentMapper mapper;
+    private final DepartmentCacheSupport cacheSupport;
 
-    public OfficeDaoImpl(OfficeMapper mapper, OfficeCacheSupport cacheSupport) {
+    public DepartmentDaoImpl(DepartmentMapper mapper, DepartmentCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.cacheSupport = cacheSupport;
     }
 
     @Override
-    public Office getById(EntityId id) {
-        Office office = cacheSupport.getById(id.value());
-        if (office != null) {
-            return office;
+    public Department getById(EntityId id) {
+        Department department = cacheSupport.getById(id.value());
+        if (department != null) {
+            return department;
         }
 
-        office = OfficePersistenceAssembler.toEntity(mapper.selectById(id.value()));
-        cacheSupport.putById(office);
-        return office;
+        department = DepartmentPersistenceAssembler.toEntity(mapper.selectById(id.value()));
+        cacheSupport.putById(department);
+        return department;
     }
 
     @Override
-    public List<Office> listByIds(List<String> idList) {
-        List<Office> officeList = new ArrayList<>();
+    public List<Department> listByIds(List<String> idList) {
+        List<Department> departmentList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
-            Office office = cacheSupport.getById(id);
-            if (office == null) {
+            Department department = cacheSupport.getById(id);
+            if (department == null) {
                 uncachedIdList.add(id);
             } else {
-                officeList.add(office);
+                departmentList.add(department);
             }
         }
 
         if (!uncachedIdList.isEmpty()) {
-            List<Office> uncachedOfficeList =
-                    OfficePersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
-            for (Office office : uncachedOfficeList) {
-                cacheSupport.putById(office);
-                officeList.add(office);
+            List<Department> uncachedDepartmentList =
+                    DepartmentPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
+            for (Department department : uncachedDepartmentList) {
+                cacheSupport.putById(department);
+                departmentList.add(department);
             }
         }
-        return officeList;
+        return departmentList;
     }
 
     @Override
-    public List<Office> list(String parentId, String name, String remarks) {
-        return OfficePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(parentId, name, remarks)));
+    public List<Department> list(String parentId, String name, String remarks) {
+        return DepartmentPersistenceAssembler.toEntityList(
+                mapper.selectList(buildListWrapper(parentId, name, remarks)));
     }
 
     @Override
-    public Page<Office> page(String parentId, String name, String remarks, int pageNo, int pageSize) {
-        IPage<OfficeDO> dataObjectPage =
+    public Page<Department> page(String parentId, String name, String remarks, int pageNo, int pageSize) {
+        IPage<DepartmentDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, name, remarks));
-        Page<Office> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<Department> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
-        entityPage.setRecords(OfficePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
+        entityPage.setRecords(DepartmentPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
     @Override
-    public String insert(Office entity) {
-        OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
+    public String insert(Department entity) {
+        DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         Integer newPosition = allocateInsertPosition(dataObject);
         entity.setParentId(dataObject.getParentId());
         dataObject.setLft(newPosition);
@@ -98,7 +99,7 @@ public class OfficeDaoImpl implements OfficeDao {
         mapper.insert(dataObject);
         mapper.update(
                 null,
-                new UpdateWrapper<OfficeDO>()
+                new UpdateWrapper<DepartmentDO>()
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
@@ -106,9 +107,9 @@ public class OfficeDaoImpl implements OfficeDao {
     }
 
     @Override
-    public int update(Office entity) {
-        OfficeDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
-        OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
+    public int update(Department entity) {
+        DepartmentDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
+        DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
         if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
@@ -117,27 +118,27 @@ public class OfficeDaoImpl implements OfficeDao {
         int count = mapper.update(
                 null,
                 buildIdUpdateWrapper(dataObject)
-                        .set(OfficeDO::getParentId, dataObject.getParentId())
-                        .set(OfficeDO::getName, dataObject.getName())
-                        .set(OfficeDO::getShortName, dataObject.getShortName())
-                        .set(OfficeDO::getPriority, dataObject.getPriority())
-                        .set(OfficeDO::getRemarks, dataObject.getRemarks()));
+                        .set(DepartmentDO::getParentId, dataObject.getParentId())
+                        .set(DepartmentDO::getName, dataObject.getName())
+                        .set(DepartmentDO::getShortName, dataObject.getShortName())
+                        .set(DepartmentDO::getPriority, dataObject.getPriority())
+                        .set(DepartmentDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
         return count;
     }
 
     @Override
-    public int updatePriority(Office entity) {
-        OfficeDO dataObject = OfficePersistenceAssembler.toDataObject(entity);
+    public int updatePriority(Department entity) {
+        DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(OfficeDO::getPriority, dataObject.getPriority()));
+                null, buildIdUpdateWrapper(dataObject).set(DepartmentDO::getPriority, dataObject.getPriority()));
         cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
 
     @Override
     public int deleteById(EntityId id) {
-        OfficeDO node = getTreeNode(id.value());
+        DepartmentDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;
         }
@@ -150,8 +151,8 @@ public class OfficeDaoImpl implements OfficeDao {
 
     @Override
     public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {
-        OfficeDO fromNode = getTreeNode(fromId);
-        OfficeDO toNode = getTreeNode(toId);
+        DepartmentDO fromNode = getTreeNode(fromId);
+        DepartmentDO toNode = getTreeNode(toId);
 
         int newPosition;
         String newParentId;
@@ -179,21 +180,21 @@ public class OfficeDaoImpl implements OfficeDao {
         moveTreeLfts(fromNode.getLft(), -treeSpan(fromNode));
         moveTreeRgts(fromNode.getLft(), -treeSpan(fromNode));
 
-        updateParent(OfficePersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
+        updateParent(DepartmentPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
         cacheSupport.removeAll();
     }
 
     @Override
     public boolean isChildOf(String childId, String parentId) {
-        OfficeDO child = getTreeNode(childId);
-        OfficeDO parent = getTreeNode(parentId);
+        DepartmentDO child = getTreeNode(childId);
+        DepartmentDO parent = getTreeNode(parentId);
         return child != null && parent != null && child.getLft() > parent.getLft() && child.getRgt() < parent.getRgt();
     }
 
-    private Integer allocateInsertPosition(OfficeDO node) {
+    private Integer allocateInsertPosition(DepartmentDO node) {
         normalizeParentId(node);
         if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), ROOT_ID)) {
-            OfficeDO parent = getTreeNode(node.getParentId());
+            DepartmentDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
 
@@ -204,7 +205,7 @@ public class OfficeDaoImpl implements OfficeDao {
         return maxRgt + 1;
     }
 
-    private void moveNodeToParent(OfficeDO oldNode, String parentId) {
+    private void moveNodeToParent(DepartmentDO oldNode, String parentId) {
         Integer newPosition = getInsertPosition(parentId);
         moveTreeRgts(newPosition, treeSpan(oldNode));
         moveTreeLfts(newPosition, treeSpan(oldNode));
@@ -219,7 +220,7 @@ public class OfficeDaoImpl implements OfficeDao {
 
     private Integer getInsertPosition(String parentId) {
         if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, ROOT_ID)) {
-            OfficeDO parent = getTreeNode(parentId);
+            DepartmentDO parent = getTreeNode(parentId);
             return parent.getRgt();
         }
         Integer maxRgt = getMaxPosition();
@@ -229,76 +230,76 @@ public class OfficeDaoImpl implements OfficeDao {
         return maxRgt + 1;
     }
 
-    private OfficeDO getTreeNode(String id) {
+    private DepartmentDO getTreeNode(String id) {
         return mapper.selectById(id);
     }
 
     private Integer getMaxPosition() {
-        List<Object> maxValues = mapper.selectObjs(new QueryWrapper<OfficeDO>().select("MAX(rgt)"));
+        List<Object> maxValues = mapper.selectObjs(new QueryWrapper<DepartmentDO>().select("MAX(rgt)"));
         if (maxValues == null || maxValues.isEmpty() || maxValues.get(0) == null) {
             return null;
         }
         return ((Number) maxValues.get(0)).intValue();
     }
 
-    private void updateParent(OfficeDO node) {
-        mapper.update(null, buildIdUpdateWrapper(node).set(OfficeDO::getParentId, node.getParentId()));
+    private void updateParent(DepartmentDO node) {
+        mapper.update(null, buildIdUpdateWrapper(node).set(DepartmentDO::getParentId, node.getParentId()));
     }
 
     private void moveTreeRgts(Integer from, Integer offset) {
-        LambdaUpdateWrapper<OfficeDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.ge(OfficeDO::getRgt, from).setSql("rgt = rgt + " + offset);
+        LambdaUpdateWrapper<DepartmentDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.ge(DepartmentDO::getRgt, from).setSql("rgt = rgt + " + offset);
         mapper.update(null, wrapper);
     }
 
     private void moveTreeLfts(Integer from, Integer offset) {
-        LambdaUpdateWrapper<OfficeDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.ge(OfficeDO::getLft, from).setSql("lft = lft + " + offset);
+        LambdaUpdateWrapper<DepartmentDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.ge(DepartmentDO::getLft, from).setSql("lft = lft + " + offset);
         mapper.update(null, wrapper);
     }
 
     private void moveTreeNodes(Integer from, Integer to, Integer offset) {
-        LambdaUpdateWrapper<OfficeDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.between(OfficeDO::getLft, from, to)
+        LambdaUpdateWrapper<DepartmentDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.between(DepartmentDO::getLft, from, to)
                 .setSql("lft = lft + " + offset)
                 .setSql("rgt = rgt + " + offset);
         mapper.update(null, wrapper);
     }
 
-    private LambdaUpdateWrapper<OfficeDO> buildIdUpdateWrapper(OfficeDO dataObject) {
-        LambdaUpdateWrapper<OfficeDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(OfficeDO::getId, dataObject.getId());
+    private LambdaUpdateWrapper<DepartmentDO> buildIdUpdateWrapper(DepartmentDO dataObject) {
+        LambdaUpdateWrapper<DepartmentDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(DepartmentDO::getId, dataObject.getId());
         return wrapper;
     }
 
-    private LambdaQueryWrapper<OfficeDO> buildListWrapper(String parentId, String name, String remarks) {
-        LambdaQueryWrapper<OfficeDO> wrapper = new LambdaQueryWrapper<>();
+    private LambdaQueryWrapper<DepartmentDO> buildListWrapper(String parentId, String name, String remarks) {
+        LambdaQueryWrapper<DepartmentDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(parentId)) {
             if (StringUtils.equals(parentId, ROOT_ID)) {
-                wrapper.isNull(OfficeDO::getParentId);
+                wrapper.isNull(DepartmentDO::getParentId);
             } else {
-                wrapper.eq(OfficeDO::getParentId, parentId);
+                wrapper.eq(DepartmentDO::getParentId, parentId);
             }
         }
         if (StringUtils.isNotBlank(name)) {
-            wrapper.and(nested -> nested.like(OfficeDO::getName, name).or().like(OfficeDO::getShortName, name));
+            wrapper.and(nested -> nested.like(DepartmentDO::getName, name).or().like(DepartmentDO::getShortName, name));
         }
         if (StringUtils.isNotBlank(remarks)) {
-            wrapper.like(OfficeDO::getRemarks, remarks);
+            wrapper.like(DepartmentDO::getRemarks, remarks);
         }
-        wrapper.orderByAsc(OfficeDO::getLft);
+        wrapper.orderByAsc(DepartmentDO::getLft);
         return wrapper;
     }
 
-    private static void normalizeParentId(OfficeDO node) {
+    private static void normalizeParentId(DepartmentDO node) {
         if (node != null
                 && (StringUtils.isBlank(node.getParentId()) || StringUtils.equals(node.getParentId(), ROOT_ID))) {
             node.setParentId(null);
         }
     }
 
-    private static int treeSpan(OfficeDO node) {
+    private static int treeSpan(DepartmentDO node) {
         return node.getRgt() - node.getLft() + 1;
     }
 }

@@ -13,14 +13,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "UserOfficeRequest", description = "用户机构请求")
+@ApiModel(value = "UserDepartmentRequest", description = "用户部门请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserOfficeRequest implements Serializable {
+public class UserDepartmentRequest implements Serializable {
 
-    @ApiModelProperty(name = "id", value = "机构ID")
+    @ApiModelProperty(name = "id", value = "部门ID")
     @JsonProperty("id")
-    @NotEmpty(message = "机构ID不能为空")
-    @Size(max = 64, message = "机构ID长度不能超过64")
+    @NotEmpty(message = "部门ID不能为空")
+    @Size(max = 64, message = "部门ID长度不能超过64")
     private String id;
 }

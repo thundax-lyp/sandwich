@@ -3,11 +3,11 @@ package com.github.thundax.modules.sys.assembler;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.controller.request.LogPageRequest;
-import com.github.thundax.modules.sys.controller.response.LogOfficeResponse;
+import com.github.thundax.modules.sys.controller.response.LogDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.LogResponse;
 import com.github.thundax.modules.sys.controller.response.LogUserResponse;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public final class LogInterfaceAssembler {
 
     @NonNull
     public static LogResponse toResponse(
-            Log entity, User user, Office office, Function<EntityId, Office> officeLoader) {
+            Log entity, User user, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new LogResponse();
         }
@@ -38,7 +38,7 @@ public final class LogInterfaceAssembler {
         response.setRequestUri(entity.getRequestUri());
         response.setRequestParams(entity.getRequestParams());
         response.setCreateDate(entity.getLogDate());
-        response.setCreateUser(toUserResponse(user, office, officeLoader));
+        response.setCreateUser(toUserResponse(user, department, departmentLoader));
         return response;
     }
 
@@ -56,7 +56,8 @@ public final class LogInterfaceAssembler {
     }
 
     @NonNull
-    private static LogUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
+    private static LogUserResponse toUserResponse(
+            User entity, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new LogUserResponse();
         }
@@ -65,31 +66,32 @@ public final class LogInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(entity.getLoginName());
         response.setName(entity.getName());
-        response.setOffice(toOfficeResponse(office, officeLoader));
+        response.setDepartment(toDepartmentResponse(department, departmentLoader));
         return response;
     }
 
     @NonNull
-    private static LogOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    private static LogDepartmentResponse toDepartmentResponse(
+            Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new LogOfficeResponse();
+            return new LogDepartmentResponse();
         }
 
-        LogOfficeResponse response = new LogOfficeResponse();
+        LogDepartmentResponse response = new LogDepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity, officeLoader));
+        response.setNamePath(namePath(entity, departmentLoader));
         return response;
     }
 
-    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
-        Office node = office;
+        Department node = department;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeLoader.apply(node.getId());
+            node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

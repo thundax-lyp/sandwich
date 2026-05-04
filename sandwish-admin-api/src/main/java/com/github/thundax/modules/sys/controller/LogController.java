@@ -10,11 +10,11 @@ import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.LogPageRequest;
 import com.github.thundax.modules.sys.controller.response.LogResponse;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
-import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import io.swagger.annotations.Api;
@@ -35,13 +35,13 @@ public class LogController {
 
     private final LogService logService;
     private final UserService userService;
-    private final OfficeService officeService;
+    private final DepartmentService departmentService;
 
     @Autowired
-    public LogController(LogService logService, UserService userService, OfficeService officeService) {
+    public LogController(LogService logService, UserService userService, DepartmentService departmentService) {
         this.logService = logService;
         this.userService = userService;
-        this.officeService = officeService;
+        this.departmentService = departmentService;
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
@@ -61,8 +61,9 @@ public class LogController {
 
     private LogResponse toResponse(Log log) {
         User user = userService.getById(EntityIdCodec.toDomain(log.getUserId()));
-        Office office = user == null ? null : officeService.getById(EntityIdCodec.toDomain(user.getOfficeId()));
-        return LogInterfaceAssembler.toResponse(log, user, office, officeService::getById);
+        Department department =
+                user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
+        return LogInterfaceAssembler.toResponse(log, user, department, departmentService::getById);
     }
 
     private PageDTO<Log> readLogPage(LogPageRequest request) {

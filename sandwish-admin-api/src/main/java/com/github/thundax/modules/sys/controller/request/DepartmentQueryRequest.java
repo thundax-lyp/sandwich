@@ -12,10 +12,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "OfficeQueryRequest", description = "机构查询请求")
+@ApiModel(value = "DepartmentQueryRequest", description = "部门查询请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OfficeQueryRequest implements Serializable {
+public class DepartmentQueryRequest implements Serializable {
 
     @ApiModelProperty(name = "parentId", value = "父节点ID，为空则查询跟节点")
     @JsonProperty("parentId")

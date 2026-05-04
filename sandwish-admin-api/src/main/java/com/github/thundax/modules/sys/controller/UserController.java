@@ -20,21 +20,21 @@ import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.UserAvatarRequest;
 import com.github.thundax.modules.sys.controller.request.UserCheckRequest;
+import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
 import com.github.thundax.modules.sys.controller.request.UserIdRequest;
-import com.github.thundax.modules.sys.controller.request.UserOfficeRequest;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
 import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
-import com.github.thundax.modules.sys.controller.response.UserOfficeResponse;
+import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
 import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
-import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import com.github.thundax.modules.sys.service.OfficeService;
+import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -80,7 +80,7 @@ public class UserController {
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
 
     private final UserService userService;
-    private final OfficeService officeService;
+    private final DepartmentService departmentService;
     private final RoleService roleService;
     private final KeypairService keypairService;
     private final PasswordService passwordService;
@@ -88,13 +88,13 @@ public class UserController {
     @Autowired
     public UserController(
             UserService userService,
-            OfficeService officeService,
+            DepartmentService departmentService,
             RoleService roleService,
             KeypairService keypairService,
             PasswordService passwordService) {
 
         this.userService = userService;
-        this.officeService = officeService;
+        this.departmentService = departmentService;
         this.roleService = roleService;
         this.keypairService = keypairService;
         this.passwordService = passwordService;
@@ -169,7 +169,7 @@ public class UserController {
         // 解密密码（数据需要加密传输）
         String password = Sm2Helper.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
         request.setLoginPass(password);
-        validateOffice(request.getOffice());
+        validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
 
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
@@ -219,7 +219,7 @@ public class UserController {
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }
-        validateOffice(request.getOffice());
+        validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
 
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
@@ -411,11 +411,11 @@ public class UserController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "office/tree", method = RequestMethod.POST)
+    @RequestMapping(value = "department/tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public List<UserOfficeResponse> officeTree() {
-        return officeService.list(new Office()).stream()
-                .map(office -> UserInterfaceAssembler.toOfficeResponse(office, officeService::getById))
+    public List<UserDepartmentResponse> departmentTree() {
+        return departmentService.list(new Department()).stream()
+                .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, departmentService::getById))
                 .collect(Collectors.toList());
     }
 
@@ -465,26 +465,26 @@ public class UserController {
     private UserQuery readQuery(UserQueryRequest request) throws ApiException {
         UserQuery query = UserInterfaceAssembler.toQuery(request);
 
-        if (StringUtils.isNotBlank(request.getOfficeId())) {
-            Office office = officeService.getById(EntityIdCodec.toDomain(request.getOfficeId()));
-            if (office == null) {
-                throw new NullBeanException(Office.BEAN_NAME, request.getOfficeId());
+        if (StringUtils.isNotBlank(request.getDepartmentId())) {
+            Department department = departmentService.getById(EntityIdCodec.toDomain(request.getDepartmentId()));
+            if (department == null) {
+                throw new NullBeanException(Department.BEAN_NAME, request.getDepartmentId());
             }
 
-            query.setOfficeId(EntityIdCodec.toValue(office.getId()));
+            query.setDepartmentId(EntityIdCodec.toValue(department.getId()));
         }
 
         return query;
     }
 
-    private void validateOffice(UserOfficeRequest request) throws ApiException {
+    private void validateDepartment(UserDepartmentRequest request) throws ApiException {
         if (request == null || StringUtils.isBlank(request.getId())) {
-            throw new InvalidParameterException("office.id");
+            throw new InvalidParameterException("department.id");
 
         } else {
-            Office bean = officeService.getById(EntityIdCodec.toDomain(request.getId()));
+            Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Office.BEAN_NAME, request.getId());
+                throw new NullBeanException(Department.BEAN_NAME, request.getId());
             }
         }
     }
@@ -549,9 +549,9 @@ public class UserController {
     }
 
     private UserResponse toResponse(User user) {
-        Office office = officeService.getById(EntityIdCodec.toDomain(user.getOfficeId()));
+        Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         List<Role> roleList = userService.listUserRoles(user);
-        return UserInterfaceAssembler.toResponse(user, office, roleList, officeService::getById);
+        return UserInterfaceAssembler.toResponse(user, department, roleList, departmentService::getById);
     }
 
     public static String getAvatarUrl(String userId, String token) {

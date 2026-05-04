@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OfficeQuery implements Serializable {
+public class DepartmentQuery implements Serializable {
     private String parentId;
     private String name;
     private String remarks;

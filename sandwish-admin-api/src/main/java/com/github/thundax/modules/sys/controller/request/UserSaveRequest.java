@@ -88,9 +88,9 @@ public class UserSaveRequest implements Serializable {
     @NotEmpty(message = "\"token\"不能为空")
     private String token;
 
-    @ApiModelProperty(name = "office", value = "归属组织机构")
-    @JsonProperty("office")
-    private UserOfficeRequest office;
+    @ApiModelProperty(name = "department", value = "归属部门")
+    @JsonProperty("department")
+    private UserDepartmentRequest department;
 
     @ApiModelProperty(name = "roles", value = "权限")
     @JsonProperty("roles")

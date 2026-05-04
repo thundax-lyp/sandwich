@@ -24,7 +24,7 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 - `com.github.thundax.modules.sys.persistence.dataobject.DictDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.LogDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.MenuDO`
-- `com.github.thundax.modules.sys.persistence.dataobject.OfficeDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.RoleDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.UploadFileDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.UserDO`

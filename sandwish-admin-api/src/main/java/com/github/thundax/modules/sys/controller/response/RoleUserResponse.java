@@ -28,7 +28,7 @@ public class RoleUserResponse implements Serializable {
     @JsonProperty("loginName")
     private String loginName;
 
-    @ApiModelProperty(name = "office", value = "归属组织机构")
-    @JsonProperty("office")
-    private RoleOfficeResponse office;
+    @ApiModelProperty(name = "department", value = "归属部门")
+    @JsonProperty("department")
+    private RoleDepartmentResponse department;
 }

@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     public List<User> list(UserQuery query) {
         return dao.list(
-                query == null ? null : query.getOfficeId(),
+                query == null ? null : query.getDepartmentId(),
                 query == null ? null : query.getLoginName(),
                 query == null ? null : query.getName(),
                 query == null ? null : statusValue(query.getStatus()),
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
     public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
         PageDTO<User> normalizedPage = normalizePage(page);
         IPage<User> dataPage = dao.page(
-                query == null ? null : query.getOfficeId(),
+                query == null ? null : query.getDepartmentId(),
                 query == null ? null : query.getLoginName(),
                 query == null ? null : query.getName(),
                 query == null ? null : statusValue(query.getStatus()),

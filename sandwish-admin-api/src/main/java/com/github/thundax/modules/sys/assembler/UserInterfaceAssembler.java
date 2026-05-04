@@ -6,10 +6,10 @@ import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
-import com.github.thundax.modules.sys.controller.response.UserOfficeResponse;
+import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
 import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
-import com.github.thundax.modules.sys.entity.Office;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
@@ -27,7 +27,7 @@ public final class UserInterfaceAssembler {
 
     @NonNull
     public static UserResponse toResponse(
-            User entity, Office office, List<Role> roleList, Function<EntityId, Office> officeLoader) {
+            User entity, Department department, List<Role> roleList, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new UserResponse();
         }
@@ -52,7 +52,7 @@ public final class UserInterfaceAssembler {
         response.setRegisterIp(entity.getRegisterIp());
         response.setLastLoginDate(entity.getLastLoginDate());
         response.setLastLoginIp(entity.getLastLoginIp());
-        response.setOffice(toOfficeResponse(office, officeLoader));
+        response.setDepartment(toDepartmentResponse(department, departmentLoader));
         response.setRoleList(
                 roleList == null
                         ? new ArrayList<>()
@@ -63,18 +63,19 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
-    public static UserOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static UserDepartmentResponse toDepartmentResponse(
+            Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new UserOfficeResponse();
+            return new UserDepartmentResponse();
         }
 
-        UserOfficeResponse response = new UserOfficeResponse();
+        UserDepartmentResponse response = new UserDepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         if (StringUtils.isNotBlank(entity.getParentId())) {
             response.setParentId(entity.getParentId());
         }
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity, officeLoader));
+        response.setNamePath(namePath(entity, departmentLoader));
         return response;
     }
 
@@ -93,7 +94,7 @@ public final class UserInterfaceAssembler {
     @NonNull
     public static UserQuery toQuery(@NonNull UserQueryRequest request) {
         UserQuery query = new UserQuery();
-        query.setOfficeId(emptyToNull(request.getOfficeId()));
+        query.setDepartmentId(emptyToNull(request.getDepartmentId()));
         query.setLoginName(emptyToNull(request.getLoginName()));
         query.setName(emptyToNull(request.getName()));
         if (request.getEnable() != null) {
@@ -110,8 +111,8 @@ public final class UserInterfaceAssembler {
             entity.setPriority(request.getPriority());
         }
         entity.setRemarks(request.getRemarks());
-        if (request.getOffice() != null) {
-            entity.setOfficeId(request.getOffice().getId());
+        if (request.getDepartment() != null) {
+            entity.setDepartmentId(request.getDepartment().getId());
         }
         entity.setLoginName(request.getLoginName());
         entity.setRanks(request.getRanks());
@@ -129,14 +130,14 @@ public final class UserInterfaceAssembler {
         return entity;
     }
 
-    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
-        Office node = office;
+        Department node = department;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeLoader.apply(node.getId());
+            node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

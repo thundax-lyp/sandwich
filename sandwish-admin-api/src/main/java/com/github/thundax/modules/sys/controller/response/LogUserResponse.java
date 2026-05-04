@@ -28,7 +28,7 @@ public class LogUserResponse implements Serializable {
     @JsonProperty("name")
     private String name;
 
-    @ApiModelProperty(name = "office", value = "归属组织机构")
-    @JsonProperty("office")
-    private LogOfficeResponse office;
+    @ApiModelProperty(name = "department", value = "归属部门")
+    @JsonProperty("department")
+    private LogDepartmentResponse department;
 }

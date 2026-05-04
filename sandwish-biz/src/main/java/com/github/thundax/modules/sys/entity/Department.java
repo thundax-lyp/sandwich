@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Office implements Auditable, Sortable {
+public class Department implements Auditable, Sortable {
     private EntityId id;
 
     public static final String ROOT_ID = "ROOT";
@@ -31,9 +31,9 @@ public class Office implements Auditable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    public static final String BEAN_NAME = "Office";
+    public static final String BEAN_NAME = "department";
 
-    public void setParent(Office parent) {
+    public void setParent(Department parent) {
         this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
     }
 

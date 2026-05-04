@@ -30,10 +30,10 @@ public class UserQueryRequest implements Serializable {
     @Max(value = 500, message = "单页记录数不能超过500")
     private Integer pageSize = 10;
 
-    @ApiModelProperty(name = "officeId", value = "组织机构ID")
-    @JsonProperty("officeId")
-    @Size(max = 64, message = "\"组织机构ID\"长度不能超过64")
-    private String officeId;
+    @ApiModelProperty(name = "departmentId", value = "部门ID")
+    @JsonProperty("departmentId")
+    @Size(max = 64, message = "\"部门ID\"长度不能超过64")
+    private String departmentId;
 
     @ApiModelProperty(name = "loginName", value = "登录名，模糊查询")
     @JsonProperty("loginName")

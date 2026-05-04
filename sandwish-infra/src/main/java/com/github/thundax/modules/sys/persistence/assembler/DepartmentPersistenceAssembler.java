@@ -1,20 +1,20 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.entity.Office;
-import com.github.thundax.modules.sys.persistence.dataobject.OfficeDO;
+import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class OfficePersistenceAssembler {
+public final class DepartmentPersistenceAssembler {
 
-    private OfficePersistenceAssembler() {}
+    private DepartmentPersistenceAssembler() {}
 
-    public static OfficeDO toDataObject(Office entity) {
+    public static DepartmentDO toDataObject(Department entity) {
         if (entity == null) {
             return null;
         }
-        OfficeDO dataObject = new OfficeDO();
+        DepartmentDO dataObject = new DepartmentDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
@@ -28,11 +28,11 @@ public final class OfficePersistenceAssembler {
         return dataObject;
     }
 
-    public static Office toEntity(OfficeDO dataObject) {
+    public static Department toEntity(DepartmentDO dataObject) {
         if (dataObject == null) {
             return null;
         }
-        Office entity = new Office();
+        Department entity = new Department();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
@@ -46,19 +46,19 @@ public final class OfficePersistenceAssembler {
         return entity;
     }
 
-    public static List<Office> toEntityList(List<OfficeDO> dataObjects) {
+    public static List<Department> toEntityList(List<DepartmentDO> dataObjects) {
         if (dataObjects == null) {
             return null;
         }
-        List<Office> entities = new ArrayList<>();
-        for (OfficeDO dataObject : dataObjects) {
+        List<Department> entities = new ArrayList<>();
+        for (DepartmentDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
         return entities;
     }
 
-    public static OfficeDO toParentUpdateDataObject(String id, String parentId) {
-        OfficeDO dataObject = new OfficeDO();
+    public static DepartmentDO toParentUpdateDataObject(String id, String parentId) {
+        DepartmentDO dataObject = new DepartmentDO();
         dataObject.setId(id);
         dataObject.setParentId(parentId);
         return dataObject;

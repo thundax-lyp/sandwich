@@ -60,7 +60,7 @@ Sandwich 固定采用三层 API 架构。
 
 建模边界固定为单业务域应用形态：
 
-- 数据归属应该通过具体业务身份表达，例如 `userId`、`officeId`、`clientId` 或具体业务对象标识。
+- 数据归属应该通过具体业务身份表达，例如 `userId`、`departmentId`、`clientId` 或具体业务对象标识。
 - 当前系统不引入租户模型；只有产品明确进入多租户 SaaS 形态时，才引入租户模型和跨层租户隔离规则。
 
 以下目录语义不作为 Sandwich 默认业务架构：
@@ -391,7 +391,7 @@ Spring Security 迁移链路允许入口模块依赖：
 - Web 登录态、权限、过滤器、拦截器属于 API 入口模块。
 - 后台和前台安全语义分开维护。
 - Service 不直接依赖 Servlet 视图语义。
-- Service 如需当前用户、机构等上下文，应通过稳定上下文对象或现有 Holder 获取，避免散落读取 request。
+- Service 如需当前用户、部门等上下文，应通过稳定上下文对象或现有 Holder 获取，避免散落读取 request。
 - 密码、令牌、密钥、验证码等敏感信息不得写入日志或页面隐藏字段。
 
 ## Configuration Rules

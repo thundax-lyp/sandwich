@@ -13,8 +13,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("sys_office")
-public class OfficeDO {
+@TableName("sys_department")
+public class DepartmentDO {
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;

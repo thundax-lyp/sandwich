@@ -25,9 +25,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDaoImpl implements UserDao {
 
-    private static final String OFFICE_TREE_FILTER_SQL = "office_id IN (SELECT o.id FROM sys_office query_office "
-            + "JOIN sys_office o ON o.lft BETWEEN query_office.lft AND query_office.rgt "
-            + "WHERE query_office.id = {0})";
+    private static final String DEPARTMENT_TREE_FILTER_SQL =
+            "department_id IN (SELECT o.id FROM sys_department query_department "
+                    + "JOIN sys_department o ON o.lft BETWEEN query_department.lft AND query_department.rgt "
+                    + "WHERE query_department.id = {0})";
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
 
@@ -81,14 +82,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> list(String officeId, String loginName, String name, String enableFlag, String superFlag) {
+    public List<User> list(String departmentId, String loginName, String name, String enableFlag, String superFlag) {
         return UserPersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(officeId, loginName, name, enableFlag, superFlag)));
+                mapper.selectList(buildListWrapper(departmentId, loginName, name, enableFlag, superFlag)));
     }
 
     @Override
     public Page<User> page(
-            String officeId,
+            String departmentId,
             String loginName,
             String name,
             String enableFlag,
@@ -96,7 +97,7 @@ public class UserDaoImpl implements UserDao {
             int pageNo,
             int pageSize) {
         Page<UserDO> dataObjectPage = mapper.selectPage(
-                new Page<>(pageNo, pageSize), buildListWrapper(officeId, loginName, name, enableFlag, superFlag));
+                new Page<>(pageNo, pageSize), buildListWrapper(departmentId, loginName, name, enableFlag, superFlag));
         Page<User> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(UserPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -123,7 +124,7 @@ public class UserDaoImpl implements UserDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(UserDO::getName, dataObject.getName())
-                        .set(UserDO::getOfficeId, dataObject.getOfficeId())
+                        .set(UserDO::getDepartmentId, dataObject.getDepartmentId())
                         .set(UserDO::getLoginName, dataObject.getLoginName())
                         .set(UserDO::getEmail, dataObject.getEmail())
                         .set(UserDO::getMobile, dataObject.getMobile())
@@ -241,11 +242,11 @@ public class UserDaoImpl implements UserDao {
     }
 
     private QueryWrapper<UserDO> buildListWrapper(
-            String officeId, String loginName, String name, String enableFlag, String superFlag) {
+            String departmentId, String loginName, String name, String enableFlag, String superFlag) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
         wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
-        if (StringUtils.isNotBlank(officeId)) {
-            wrapper.apply(OFFICE_TREE_FILTER_SQL, officeId);
+        if (StringUtils.isNotBlank(departmentId)) {
+            wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
         }
         if (StringUtils.isNotBlank(loginName)) {
             wrapper.like("login_name", loginName);

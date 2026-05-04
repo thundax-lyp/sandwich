@@ -95,9 +95,9 @@ public class UserResponse implements Serializable {
     @JsonProperty("lastLoginIp")
     private String lastLoginIp;
 
-    @ApiModelProperty(name = "office", value = "归属组织机构")
-    @JsonProperty("office")
-    private UserOfficeResponse office;
+    @ApiModelProperty(name = "department", value = "归属部门")
+    @JsonProperty("department")
+    private UserDepartmentResponse department;
 
     @ApiModelProperty(name = "roles", value = "权限")
     @JsonProperty("roles")

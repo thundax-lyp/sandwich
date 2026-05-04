@@ -4,13 +4,13 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.controller.request.RoleQueryRequest;
 import com.github.thundax.modules.sys.controller.request.RoleSaveRequest;
+import com.github.thundax.modules.sys.controller.response.RoleDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
-import com.github.thundax.modules.sys.controller.response.RoleOfficeResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
@@ -67,7 +67,8 @@ public final class RoleInterfaceAssembler {
     }
 
     @NonNull
-    public static RoleUserResponse toUserResponse(User entity, Office office, Function<EntityId, Office> officeLoader) {
+    public static RoleUserResponse toUserResponse(
+            User entity, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new RoleUserResponse();
         }
@@ -76,12 +77,12 @@ public final class RoleInterfaceAssembler {
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
         response.setLoginName(entity.getLoginName());
-        response.setOffice(toOfficeResponse(office, officeLoader));
+        response.setDepartment(toDepartmentResponse(department, departmentLoader));
         return response;
     }
 
     @NonNull
-    public static RoleUserTreeNodeResponse toOfficeTreeNode(String id, Office entity) {
+    public static RoleUserTreeNodeResponse toDepartmentTreeNode(String id, Department entity) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(id);
         if (StringUtils.isNotBlank(entity.getParentId())) {
@@ -93,12 +94,15 @@ public final class RoleInterfaceAssembler {
 
     @NonNull
     public static RoleUserTreeNodeResponse toUserTreeNode(
-            String officeIdPrefix, User entity, Office office, Function<EntityId, Office> officeLoader) {
+            String departmentIdPrefix,
+            User entity,
+            Department department,
+            Function<EntityId, Department> departmentLoader) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setParentId(officeIdPrefix + entity.getOfficeId());
+        response.setParentId(departmentIdPrefix + entity.getDepartmentId());
         response.setName(entity.getName());
-        response.setUser(toUserResponse(entity, office, officeLoader));
+        response.setUser(toUserResponse(entity, department, departmentLoader));
         return response;
     }
 
@@ -131,30 +135,31 @@ public final class RoleInterfaceAssembler {
     }
 
     @NonNull
-    private static RoleOfficeResponse toOfficeResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    private static RoleDepartmentResponse toDepartmentResponse(
+            Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new RoleOfficeResponse();
+            return new RoleDepartmentResponse();
         }
 
-        RoleOfficeResponse response = new RoleOfficeResponse();
+        RoleDepartmentResponse response = new RoleDepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setNamePath(namePath(entity, officeLoader));
+        response.setNamePath(namePath(entity, departmentLoader));
         return response;
     }
 
     private static String idPrefix(String id) {
-        return "OFFICE_" + id;
+        return "DEPARTMENT_" + id;
     }
 
-    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
-        Office node = office;
+        Department node = department;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeLoader.apply(node.getId());
+            node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

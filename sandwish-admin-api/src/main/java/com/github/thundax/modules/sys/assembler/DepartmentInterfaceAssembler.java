@@ -2,27 +2,27 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.controller.request.OfficeQueryRequest;
-import com.github.thundax.modules.sys.controller.request.OfficeSaveRequest;
-import com.github.thundax.modules.sys.controller.response.OfficeResponse;
-import com.github.thundax.modules.sys.entity.Office;
-import com.github.thundax.modules.sys.service.query.OfficeQuery;
+import com.github.thundax.modules.sys.controller.request.DepartmentQueryRequest;
+import com.github.thundax.modules.sys.controller.request.DepartmentSaveRequest;
+import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
+import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
-public final class OfficeInterfaceAssembler {
-    private OfficeInterfaceAssembler() {}
+public final class DepartmentInterfaceAssembler {
+    private DepartmentInterfaceAssembler() {}
 
     @NonNull
-    public static OfficeResponse toResponse(Office entity, Function<EntityId, Office> officeLoader) {
+    public static DepartmentResponse toResponse(Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new OfficeResponse();
+            return new DepartmentResponse();
         }
 
-        OfficeResponse response = new OfficeResponse();
+        DepartmentResponse response = new DepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
         response.setCreateDate(entity.getCreateDate());
@@ -33,17 +33,17 @@ public final class OfficeInterfaceAssembler {
         }
         response.setName(entity.getName());
         response.setShortName(entity.getShortName());
-        response.setNamePath(namePath(entity, officeLoader));
+        response.setNamePath(namePath(entity, departmentLoader));
         return response;
     }
 
     @NonNull
-    public static OfficeResponse toTreeResponse(Office entity) {
+    public static DepartmentResponse toTreeResponse(Department entity) {
         if (entity == null) {
-            return new OfficeResponse();
+            return new DepartmentResponse();
         }
 
-        OfficeResponse response = new OfficeResponse();
+        DepartmentResponse response = new DepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         if (StringUtils.isNotBlank(entity.getParentId())) {
             response.setParentId(entity.getParentId());
@@ -54,8 +54,8 @@ public final class OfficeInterfaceAssembler {
     }
 
     @NonNull
-    public static OfficeQuery toQuery(@NonNull OfficeQueryRequest request) {
-        OfficeQuery query = new OfficeQuery();
+    public static DepartmentQuery toQuery(@NonNull DepartmentQueryRequest request) {
+        DepartmentQuery query = new DepartmentQuery();
         query.setParentId(request.getParentId());
         query.setName(request.getName());
         query.setRemarks(request.getRemarks());
@@ -63,7 +63,7 @@ public final class OfficeInterfaceAssembler {
     }
 
     @NonNull
-    public static Office toEntity(@NonNull Office entity, @NonNull OfficeSaveRequest request) {
+    public static Department toEntity(@NonNull Department entity, @NonNull DepartmentSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
@@ -77,14 +77,14 @@ public final class OfficeInterfaceAssembler {
         return entity;
     }
 
-    private static String namePath(Office office, Function<EntityId, Office> officeLoader) {
+    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
-        Office node = office;
+        Department node = department;
         while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
-            node = officeLoader.apply(node.getId());
+            node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = officeLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
             }
         }
         return StringUtils.join(names, "/");

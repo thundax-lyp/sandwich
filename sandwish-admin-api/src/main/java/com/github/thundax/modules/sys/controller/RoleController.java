@@ -21,13 +21,13 @@ import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.MenuService;
-import com.github.thundax.modules.sys.service.OfficeService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -54,20 +54,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RoleController {
 
-    private static final String OFFICE_ID_PREFIX = "OFFICE_";
+    private static final String DEPARTMENT_ID_PREFIX = "DEPARTMENT_";
 
     private final RoleService roleService;
     private final MenuService menuService;
-    private final OfficeService officeService;
+    private final DepartmentService departmentService;
     private final UserService userService;
 
     @Autowired
     public RoleController(
-            RoleService roleService, MenuService menuService, OfficeService officeService, UserService userService) {
+            RoleService roleService,
+            MenuService menuService,
+            DepartmentService departmentService,
+            UserService userService) {
 
         this.roleService = roleService;
         this.menuService = menuService;
-        this.officeService = officeService;
+        this.departmentService = departmentService;
         this.userService = userService;
     }
 
@@ -278,16 +281,17 @@ public class RoleController {
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
-        list.addAll(officeService.list(new Office()).stream()
-                .map(office -> RoleInterfaceAssembler.toOfficeTreeNode(OFFICE_ID_PREFIX + office.getId(), office))
+        list.addAll(departmentService.list(new Department()).stream()
+                .map(department -> RoleInterfaceAssembler.toDepartmentTreeNode(
+                        DEPARTMENT_ID_PREFIX + department.getId(), department))
                 .collect(Collectors.toList()));
 
         list.addAll(userService.list(new User()).stream()
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
-                        OFFICE_ID_PREFIX,
+                        DEPARTMENT_ID_PREFIX,
                         user,
-                        officeService.getById(EntityIdCodec.toDomain(user.getOfficeId())),
-                        officeService::getById))
+                        departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
+                        departmentService::getById))
                 .collect(Collectors.toList()));
 
         return list;
@@ -350,7 +354,9 @@ public class RoleController {
 
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
-                user, officeService.getById(EntityIdCodec.toDomain(user.getOfficeId())), officeService::getById);
+                user,
+                departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
+                departmentService::getById);
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {

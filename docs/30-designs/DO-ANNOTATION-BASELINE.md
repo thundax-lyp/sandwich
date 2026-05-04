@@ -19,8 +19,8 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 
 - `com.github.thundax.modules.assist.persistence.dataobject.SignatureDO`
 - `com.github.thundax.modules.member.persistence.dataobject.MemberDO`
-- `com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO`
-- `com.github.thundax.modules.storage.persistence.dataobject.StorageDO`
+- `com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO`
+- `com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.DictDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.LogDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.MenuDO`

@@ -18,6 +18,7 @@ public class StoredObjectReference {
     private String ownerId;
     private StorageOwnerType ownerType;
     private String ownerParams;
+    private StoredObjectReferenceStatus referenceStatus;
 
     public EntityId getId() {
         return objectId;
@@ -49,18 +50,5 @@ public class StoredObjectReference {
 
     public void setBusinessParams(String businessParams) {
         this.ownerParams = businessParams;
-    }
-
-    @Deprecated
-    public StoredObjectReferenceStatus getVisibility() {
-        return null;
-    }
-
-    @Deprecated
-    public void setVisibility(StoredObjectReferenceStatus visibility) {}
-
-    @Deprecated
-    public boolean isPublic() {
-        return false;
     }
 }

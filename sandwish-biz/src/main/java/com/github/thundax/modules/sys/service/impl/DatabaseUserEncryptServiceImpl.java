@@ -38,9 +38,6 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
         this.amqpTemplate = amqpTemplate;
     }
 
-    /**
-     * 迁移兼容：更新旧用户加密表密码镜像, loginPass, updateDate, updateBy
-     */
     @Override
     public void updateLoginPass(UserEncrypt entity) {
         if (entity != null) {

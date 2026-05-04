@@ -40,9 +40,9 @@ public class StoragePageRequest implements Serializable {
     @Size(max = 32, message = "状态长度不能超过32")
     private String objectStatus;
 
-    @ApiModelProperty(name = "referenceStatus", value = "可见性")
+    @ApiModelProperty(name = "referenceStatus", value = "引用状态")
     @JsonProperty("referenceStatus")
-    @Size(max = 32, message = "可见性长度不能超过32")
+    @Size(max = 32, message = "引用状态长度不能超过32")
     private String referenceStatus;
 
     @ApiModelProperty(name = "originalFilename", value = "文件名称")

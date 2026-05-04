@@ -38,7 +38,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setSize(entity.getSize());
         dataObject.setAccessEndpoint(entity.getAccessEndpoint());
         dataObject.setObjectStatus(statusValue(entity.getStatus()));
-        dataObject.setReferenceStatus(visibilityValue(entity.getVisibility()));
+        dataObject.setReferenceStatus(referenceStatusValue(entity.getReferenceStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -63,7 +63,7 @@ public final class StoragePersistenceAssembler {
         entity.setSize(dataObject.getSize());
         entity.setAccessEndpoint(dataObject.getAccessEndpoint());
         entity.setStatus(statusFrom(dataObject.getObjectStatus()));
-        entity.setVisibility(visibilityFrom(dataObject.getReferenceStatus()));
+        entity.setReferenceStatus(referenceStatusFrom(dataObject.getReferenceStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -110,12 +110,12 @@ public final class StoragePersistenceAssembler {
         return status == null ? null : StoredObjectStatus.from(status);
     }
 
-    private static String visibilityValue(StoredObjectReferenceStatus visibility) {
-        return visibility == null ? null : visibility.value();
+    private static String referenceStatusValue(StoredObjectReferenceStatus referenceStatus) {
+        return referenceStatus == null ? null : referenceStatus.value();
     }
 
-    private static StoredObjectReferenceStatus visibilityFrom(String visibility) {
-        return visibility == null ? null : StoredObjectReferenceStatus.from(visibility);
+    private static StoredObjectReferenceStatus referenceStatusFrom(String referenceStatus) {
+        return referenceStatus == null ? null : StoredObjectReferenceStatus.from(referenceStatus);
     }
 
     public static StoredObjectReferenceDO toBusinessDataObject(StoredObjectReference entity) {
@@ -127,7 +127,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setReferenceOwnerId(entity.getBusinessId());
         dataObject.setReferenceOwnerType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
-        dataObject.setReferenceStatus(visibilityValue(entity.getVisibility()));
+        dataObject.setReferenceStatus(referenceStatusValue(entity.getReferenceStatus()));
         return dataObject;
     }
 
@@ -140,7 +140,7 @@ public final class StoragePersistenceAssembler {
         entity.setBusinessId(dataObject.getReferenceOwnerId());
         entity.setBusinessType(dataObject.getReferenceOwnerType());
         entity.setBusinessParams(dataObject.getBusinessParams());
-        entity.setVisibility(visibilityFrom(dataObject.getReferenceStatus()));
+        entity.setReferenceStatus(referenceStatusFrom(dataObject.getReferenceStatus()));
         return entity;
     }
 

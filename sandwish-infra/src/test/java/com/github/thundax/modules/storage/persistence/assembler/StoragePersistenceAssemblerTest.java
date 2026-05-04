@@ -64,14 +64,14 @@ public class StoragePersistenceAssemblerTest {
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
         assertSame(StoredObjectStatus.ACTIVE, entity.getStatus());
-        assertSame(StoredObjectReferenceStatus.REFERENCED, entity.getVisibility());
+        assertSame(StoredObjectReferenceStatus.REFERENCED, entity.getReferenceStatus());
     }
 
     @Test
     public void shouldWriteDomainValuesToLegacyFlags() {
         StoredObject entity = new StoredObject();
         entity.setStatus(StoredObjectStatus.DELETED);
-        entity.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
+        entity.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
 
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
@@ -80,11 +80,12 @@ public class StoragePersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldMapBusinessVisibility() {
+    public void shouldMapBusinessReferenceStatus() {
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId("s1");
         dataObject.setReferenceOwnerId("owner-1");
         dataObject.setReferenceOwnerType("USER");
+        dataObject.setReferenceStatus("REFERENCED");
 
         StoredObjectReference entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
@@ -96,6 +97,10 @@ public class StoragePersistenceAssemblerTest {
         assertEquals(
                 "owner-1",
                 StoragePersistenceAssembler.toBusinessDataObject(entity).getReferenceOwnerId());
+        assertSame(StoredObjectReferenceStatus.REFERENCED, entity.getReferenceStatus());
+        assertEquals(
+                "REFERENCED",
+                StoragePersistenceAssembler.toBusinessDataObject(entity).getReferenceStatus());
     }
 
     @Test

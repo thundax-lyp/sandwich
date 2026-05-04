@@ -115,7 +115,7 @@ public class StorageServiceImplTest {
     public void shouldAllowPublicStorageAccess() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
-        storage.setVisibility(StoredObjectReferenceStatus.REFERENCED);
+        storage.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
 
         assertTrue(service.canReadContent(storage, null, null));
     }
@@ -124,7 +124,7 @@ public class StorageServiceImplTest {
     public void shouldAllowPrivateStorageOwnerAccess() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
-        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
+        storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 
@@ -135,7 +135,7 @@ public class StorageServiceImplTest {
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage("s1");
-        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
+        storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 

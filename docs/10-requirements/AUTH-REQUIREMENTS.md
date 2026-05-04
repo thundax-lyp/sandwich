@@ -106,8 +106,8 @@
 - `User` 不等于登录标识。
 - `User` 不等于认证凭据。
 - `User.status` 禁用时，该用户全部后台登录方式不可用。
-- `User.loginName` 仅作为迁移期兼容字段，最终认证语义固定迁移到 `UserIdentity.identityValue`。
-- `User.loginPass` 仅作为迁移期兼容字段，最终密码认证语义固定迁移到 `UserCredential.credentialValue`。
+- `User.loginName` 可作为后台用户创建和账户身份初始化输入，认证语义固定由 `UserIdentity.identityValue` 承载。
+- `User.loginPass` 可作为后台用户创建和密码凭据初始化输入，认证语义固定由 `UserCredential.credentialValue` 承载。
 
 ### 5.2 UserIdentity
 
@@ -381,11 +381,11 @@
 - Controller 不直接写回凭据失败次数。
 - Service 固定承接认证流程、状态校验、失败次数写回、锁定和会话创建。
 - DAO 固定承接持久化访问，不承载认证业务流程。
-- `User.loginName` 和 `User.loginPass` 仅允许作为迁移期兼容来源。
+- `User.loginName` 和 `User.loginPass` 仅允许作为用户创建、资料维护和认证模型初始化来源。
 - 新增用户时必须创建默认 `ACCOUNT` 类型 `UserIdentity`。
 - 设置或重置密码时必须创建或更新 `PASSWORD` 类型 `UserCredential`。
-- 旧账号维度锁定语义迁移完成后必须收敛到凭据维度锁定。
-- 后台认证迁移不得改变前台会员登录语义。
+- 后台用户锁定语义应该收敛到凭据维度锁定。
+- 后台认证模型不得改变前台会员登录语义。
 
 ## 7. Functional Requirements
 
@@ -506,12 +506,12 @@
 - 禁用某个登录标识时不禁用 `User`。
 - 禁用某个认证凭据时不禁用 `User`。
 
-### 7.14 迁移兼容
+### 7.14 认证模型初始化
 
-- 迁移期间允许从 `User.loginName` 初始化 `ACCOUNT` 类型 `UserIdentity`。
-- 迁移期间允许从 `User.loginPass` 或 `UserEncrypt.loginPass` 初始化 `PASSWORD` 类型 `UserCredential`。
-- 登录链路切换完成后不得继续直接使用 `User.loginPass` 做密码认证。
-- 旧账号维度登录锁定迁移完成后不得继续作为后台认证主锁定语义。
+- 新增后台用户时应该从 `User.loginName` 初始化 `ACCOUNT` 类型 `UserIdentity`。
+- 新增或重置后台用户密码时应该从加密后的密码初始化 `PASSWORD` 类型 `UserCredential`。
+- 密码认证应该读取 `UserCredential.credentialValue`。
+- 后台认证主锁定语义应该落在凭据维度。
 
 ## 8. Key Flows
 

@@ -82,14 +82,6 @@ public class StoredObject implements Sortable {
         this.objectStatus = objectStatus;
     }
 
-    public StoredObjectReferenceStatus getVisibility() {
-        return referenceStatus;
-    }
-
-    public void setVisibility(StoredObjectReferenceStatus visibility) {
-        this.referenceStatus = visibility;
-    }
-
     public void setReferenceStatus(String referenceStatus) {
         this.referenceStatus =
                 StringUtils.isBlank(referenceStatus) ? null : StoredObjectReferenceStatus.from(referenceStatus);

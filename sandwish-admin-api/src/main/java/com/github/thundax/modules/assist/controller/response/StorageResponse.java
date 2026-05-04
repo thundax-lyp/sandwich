@@ -46,7 +46,7 @@ public class StorageResponse implements Serializable {
     @JsonProperty("objectStatus")
     private String objectStatus;
 
-    @ApiModelProperty(name = "referenceStatus", value = "可见性")
+    @ApiModelProperty(name = "referenceStatus", value = "引用状态")
     @JsonProperty("referenceStatus")
     private String referenceStatus;
 

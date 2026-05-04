@@ -14,8 +14,5 @@ public interface UserEncryptService {
 
     void update(UserEncrypt userEncrypt);
 
-    /**
-     * 迁移兼容：更新旧用户加密表密码镜像, loginPass, updateDate, updateBy
-     */
     void updateLoginPass(UserEncrypt userEncrypt);
 }

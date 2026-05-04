@@ -17,7 +17,7 @@ public enum StoredObjectReferenceStatus {
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown storage visibility: " + value));
+                .orElseThrow(() -> new BizException("Unknown storage reference status: " + value));
     }
 
     private String legacyValue() {

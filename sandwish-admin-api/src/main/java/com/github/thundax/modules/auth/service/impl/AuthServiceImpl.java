@@ -890,7 +890,6 @@ public class AuthServiceImpl implements AuthService {
         if (credential != null) {
             return credential;
         }
-        // 迁移兼容：老用户首次登录时用 User.loginPass 初始化独立凭据，后续认证只读 UserCredential。
         if (StringUtils.isBlank(user.getLoginPass())) {
             return null;
         }

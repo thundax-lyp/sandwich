@@ -6,6 +6,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
@@ -189,7 +190,6 @@ public class AuthPermissionLifecycleTest {
         private AuthSession session;
         private int touchCount;
 
-        @Override
         public AuthSession getById(EntityId id) {
             return session;
         }
@@ -304,7 +304,6 @@ public class AuthPermissionLifecycleTest {
 
     private static class TestUserIdentityDao implements UserIdentityDao {
 
-        @Override
         public UserIdentity getById(EntityId id) {
             return identity();
         }
@@ -352,7 +351,6 @@ public class AuthPermissionLifecycleTest {
 
     private static class TestUserCredentialDao implements UserCredentialDao {
 
-        @Override
         public UserCredential getById(EntityId id) {
             return credential();
         }
@@ -438,59 +436,48 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        @Override
         public Class<User> getElementType() {
             return User.class;
         }
 
-        @Override
         public User newEntity(String id) {
             User user = new User();
             user.setId(EntityIdCodec.toDomain(id));
             return user;
         }
 
-        @Override
         public User getById(User entity) {
             return user();
         }
 
-        @Override
         public User getById(EntityId id) {
             return user();
         }
 
-        @Override
         public List<User> batchGetByIds(List<EntityId> ids) {
             return Collections.singletonList(user());
         }
 
-        @Override
         public List<User> list(User entity) {
             return Collections.singletonList(user());
         }
 
-        @Override
         public List<User> list(UserQuery query) {
             return Collections.singletonList(user());
         }
 
-        @Override
         public User getOne(User entity) {
             return user();
         }
 
-        @Override
         public PageDTO<User> page(User entity, PageDTO<User> page) {
             return page;
         }
 
-        @Override
         public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
             return page;
         }
 
-        @Override
         public long count(User entity) {
             return 1;
         }
@@ -501,22 +488,18 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void update(User entity) {}
 
-        @Override
         public int deleteById(EntityId id) {
             return 1;
         }
 
-        @Override
         public int batchDeleteById(List<EntityId> ids) {
             return ids.size();
         }
 
-        @Override
         public int updatePriority(User entity) {
             return 1;
         }
 
-        @Override
         public int updatePriority(List<User> list) {
             return list.size();
         }
@@ -535,7 +518,6 @@ public class AuthPermissionLifecycleTest {
 
     private static class TestMenuService implements MenuService {
 
-        @Override
         public List<Menu> list(Integer maxRank) {
             return menus();
         }
@@ -556,66 +538,55 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void moveTreeNode(Menu fromBean, Menu toBean, MoveTreeNodeType moveType) {}
+        public void moveTreeNode(Menu fromBean, Menu toBean, TreeNodeMoveType moveType) {}
 
         @Override
         public boolean isChildOf(Menu child, Menu parent) {
             return false;
         }
 
-        @Override
         public Class<Menu> getElementType() {
             return Menu.class;
         }
 
-        @Override
         public Menu newEntity(String id) {
             Menu menu = new Menu();
             menu.setId(EntityIdCodec.toDomain(id));
             return menu;
         }
 
-        @Override
         public Menu getById(Menu entity) {
             return menus().get(0);
         }
 
-        @Override
         public Menu getById(EntityId id) {
             return menus().get(0);
         }
 
-        @Override
         public List<Menu> batchGetByIds(List<EntityId> ids) {
             return menus();
         }
 
-        @Override
         public List<Menu> list(Menu entity) {
             return menus();
         }
 
-        @Override
         public List<Menu> list(MenuQuery query) {
             return menus();
         }
 
-        @Override
         public Menu getOne(Menu entity) {
             return menus().get(0);
         }
 
-        @Override
         public PageDTO<Menu> page(Menu entity, PageDTO<Menu> page) {
             return page;
         }
 
-        @Override
         public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
             return page;
         }
 
-        @Override
         public long count(Menu entity) {
             return menus().size();
         }
@@ -626,22 +597,18 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void update(Menu entity) {}
 
-        @Override
         public int deleteById(EntityId id) {
             return 1;
         }
 
-        @Override
         public int batchDeleteById(List<EntityId> ids) {
             return ids.size();
         }
 
-        @Override
         public int updatePriority(Menu entity) {
             return 1;
         }
 
-        @Override
         public int updatePriority(List<Menu> list) {
             return list.size();
         }
@@ -686,63 +653,52 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        @Override
         public Class<com.github.thundax.modules.sys.entity.Role> getElementType() {
             return com.github.thundax.modules.sys.entity.Role.class;
         }
 
-        @Override
         public com.github.thundax.modules.sys.entity.Role newEntity(String id) {
             com.github.thundax.modules.sys.entity.Role role = new com.github.thundax.modules.sys.entity.Role();
             role.setId(EntityIdCodec.toDomain(id));
             return role;
         }
 
-        @Override
         public com.github.thundax.modules.sys.entity.Role getById(com.github.thundax.modules.sys.entity.Role entity) {
             return entity;
         }
 
-        @Override
         public com.github.thundax.modules.sys.entity.Role getById(EntityId id) {
             return newEntity(id.value());
         }
 
-        @Override
         public List<com.github.thundax.modules.sys.entity.Role> batchGetByIds(List<EntityId> ids) {
             return Collections.emptyList();
         }
 
-        @Override
         public List<com.github.thundax.modules.sys.entity.Role> list(
                 com.github.thundax.modules.sys.entity.Role entity) {
             return Collections.emptyList();
         }
 
-        @Override
         public List<com.github.thundax.modules.sys.entity.Role> list(RoleQuery query) {
             return Collections.emptyList();
         }
 
-        @Override
         public com.github.thundax.modules.sys.entity.Role getOne(com.github.thundax.modules.sys.entity.Role entity) {
             return entity;
         }
 
-        @Override
         public PageDTO<com.github.thundax.modules.sys.entity.Role> page(
                 com.github.thundax.modules.sys.entity.Role entity,
                 PageDTO<com.github.thundax.modules.sys.entity.Role> page) {
             return page;
         }
 
-        @Override
         public PageDTO<com.github.thundax.modules.sys.entity.Role> page(
                 RoleQuery query, PageDTO<com.github.thundax.modules.sys.entity.Role> page) {
             return page;
         }
 
-        @Override
         public long count(com.github.thundax.modules.sys.entity.Role entity) {
             return 0;
         }
@@ -753,22 +709,18 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void update(com.github.thundax.modules.sys.entity.Role entity) {}
 
-        @Override
         public int deleteById(EntityId id) {
             return 1;
         }
 
-        @Override
         public int batchDeleteById(List<EntityId> ids) {
             return ids.size();
         }
 
-        @Override
         public int updatePriority(com.github.thundax.modules.sys.entity.Role entity) {
             return 1;
         }
 
-        @Override
         public int updatePriority(List<com.github.thundax.modules.sys.entity.Role> list) {
             return list.size();
         }

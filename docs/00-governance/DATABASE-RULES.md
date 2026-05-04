@@ -101,7 +101,7 @@
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
 - MyBatis-Plus 链路固定以达梦行为为标准，分页插件固定使用 `DbType.DM`。
 - PageHelper 已下线，禁止新增依赖、调用或兼容支撑。
-- 旧 `CrudDao` / `CrudServiceImpl` / 空 `BaseService` / 空 `BaseServiceImpl` 基类已下线，禁止业务 DAO / Service 继承回流。
+- 旧 `CrudDao` / `CrudService` / `TreeService` / `CrudServiceImpl` / 空 `BaseService` / 空 `BaseServiceImpl` 基类已下线，业务 DAO / Service 应该显式声明当前业务需要暴露的方法。
 - DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service / Controller 分页业务数据应该使用 `com.github.thundax.common.page.PageDTO`。
 - `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。
 

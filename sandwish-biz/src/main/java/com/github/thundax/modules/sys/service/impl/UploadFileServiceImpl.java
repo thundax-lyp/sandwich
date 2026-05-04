@@ -25,24 +25,20 @@ public class UploadFileServiceImpl implements UploadFileService {
         this.dao = dao;
     }
 
-    @Override
     public Class<UploadFile> getElementType() {
         return UploadFile.class;
     }
 
-    @Override
     public UploadFile newEntity(String id) {
         UploadFile uploadFile = new UploadFile();
         uploadFile.setId(EntityIdCodec.toDomain(id));
         return uploadFile;
     }
 
-    @Override
     public UploadFile getById(UploadFile entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public UploadFile getById(EntityId id) {
         if (id == null) {
             return null;
@@ -50,23 +46,19 @@ public class UploadFileServiceImpl implements UploadFileService {
         return dao.getById(id);
     }
 
-    @Override
     public List<UploadFile> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
-    @Override
     public List<UploadFile> list(UploadFile entity) {
         return dao.list();
     }
 
-    @Override
     public UploadFile getOne(UploadFile entity) {
         List<UploadFile> files = list(entity);
         return files == null || files.isEmpty() ? null : files.get(0);
     }
 
-    @Override
     public PageDTO<UploadFile> page(UploadFile entity, PageDTO<UploadFile> page) {
         PageDTO<UploadFile> normalizedPage = normalizePage(page);
         IPage<UploadFile> dataPage = dao.page(normalizedPage.getPageNo(), normalizedPage.getPageSize());
@@ -77,7 +69,6 @@ public class UploadFileServiceImpl implements UploadFileService {
         return normalizedPage;
     }
 
-    @Override
     public long count(UploadFile entity) {
         List<UploadFile> files = list(entity);
         return files == null ? 0 : files.size();
@@ -95,25 +86,21 @@ public class UploadFileServiceImpl implements UploadFileService {
         dao.update(entity);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         return id == null ? 0 : dao.deleteById(id);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(UploadFile entity) {
         return dao.updatePriority(entity);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<UploadFile> list) {
         return batchOperate(list, this::updatePriority);

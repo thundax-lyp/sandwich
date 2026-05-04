@@ -58,24 +58,20 @@ public class UserServiceImpl implements UserService {
         this.userCredentialDao = userCredentialDao;
     }
 
-    @Override
     public Class<User> getElementType() {
         return User.class;
     }
 
-    @Override
     public User newEntity(String id) {
         User user = new User();
         user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 
-    @Override
     public User getById(User entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public User getById(EntityId id) {
         if (id == null) {
             return null;
@@ -83,17 +79,14 @@ public class UserServiceImpl implements UserService {
         return dao.getById(id);
     }
 
-    @Override
     public List<User> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
-    @Override
     public List<User> list(User user) {
         return list((UserQuery) null);
     }
 
-    @Override
     public List<User> list(UserQuery query) {
         return dao.list(
                 query == null ? null : query.getOfficeId(),
@@ -103,18 +96,15 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : superFlagValue(query.getPrivilege()));
     }
 
-    @Override
     public User getOne(User user) {
         List<User> users = list(user);
         return users == null || users.isEmpty() ? null : users.get(0);
     }
 
-    @Override
     public PageDTO<User> page(User user, PageDTO<User> page) {
         return page((UserQuery) null, page);
     }
 
-    @Override
     public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
         PageDTO<User> normalizedPage = normalizePage(page);
         IPage<User> dataPage = dao.page(
@@ -132,7 +122,6 @@ public class UserServiceImpl implements UserService {
         return normalizedPage;
     }
 
-    @Override
     public long count(User user) {
         List<User> users = list(user);
         return users == null ? 0 : users.size();
@@ -227,7 +216,6 @@ public class UserServiceImpl implements UserService {
         return batchOperate(list, this::updateStatus);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         User user = getById(id);
@@ -257,19 +245,16 @@ public class UserServiceImpl implements UserService {
         return role;
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(User user) {
         return dao.updatePriority(user);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<User> list) {
         return batchOperate(list, this::updatePriority);

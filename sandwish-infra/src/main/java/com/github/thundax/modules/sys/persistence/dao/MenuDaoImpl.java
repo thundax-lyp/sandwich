@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssembler;
@@ -157,19 +157,19 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType) {
+    public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {
         MenuDO fromNode = getTreeNode(fromId);
         MenuDO toNode = getTreeNode(toId);
 
         int newPosition;
         String newParentId;
-        if (moveType == TreeService.MoveTreeNodeType.AFTER) {
+        if (moveType == TreeNodeMoveType.AFTER) {
             newPosition = toNode.getRgt() + 1;
             newParentId = toNode.getParentId();
-        } else if (moveType == TreeService.MoveTreeNodeType.BEFORE) {
+        } else if (moveType == TreeNodeMoveType.BEFORE) {
             newPosition = toNode.getLft();
             newParentId = toNode.getParentId();
-        } else if (moveType == TreeService.MoveTreeNodeType.INSIDE) {
+        } else if (moveType == TreeNodeMoveType.INSIDE) {
             newPosition = toNode.getLft() + 1;
             newParentId = toId;
         } else {

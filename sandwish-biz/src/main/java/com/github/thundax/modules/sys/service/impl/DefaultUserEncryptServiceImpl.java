@@ -37,69 +37,56 @@ public class DefaultUserEncryptServiceImpl implements UserEncryptService {
         // 默认不做任何处理
     }
 
-    @Override
     public UserEncrypt getById(EntityId id) {
         return null;
     }
 
-    @Override
     public UserEncrypt getById(UserEncrypt query) {
         return null;
     }
 
-    @Override
     public UserEncrypt getOne(UserEncrypt query) {
         return null;
     }
 
-    @Override
     public Class<UserEncrypt> getElementType() {
         return UserEncrypt.class;
     }
 
-    @Override
     public UserEncrypt newEntity(String id) {
         UserEncrypt userEncrypt = new UserEncrypt();
         userEncrypt.setId(EntityIdCodec.toDomain(id));
         return userEncrypt;
     }
 
-    @Override
     public List<UserEncrypt> batchGetByIds(List<EntityId> ids) {
         return null;
     }
 
-    @Override
     public List<UserEncrypt> list(UserEncrypt entity) {
         return null;
     }
 
-    @Override
     public PageDTO<UserEncrypt> page(UserEncrypt entity, PageDTO<UserEncrypt> page) {
         return page;
     }
 
-    @Override
     public long count(UserEncrypt entity) {
         return 0;
     }
 
-    @Override
     public int deleteById(EntityId id) {
         return 0;
     }
 
-    @Override
     public int batchDeleteById(List<EntityId> ids) {
         return 0;
     }
 
-    @Override
     public int updatePriority(UserEncrypt entity) {
         return 0;
     }
 
-    @Override
     public int updatePriority(List<UserEncrypt> list) {
         return 0;
     }

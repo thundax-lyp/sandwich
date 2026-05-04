@@ -8,7 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.query.OfficeQuery;
@@ -184,7 +184,7 @@ public class OfficeServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
+        public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {}
 
         @Override
         public boolean isChildOf(String childId, String parentId) {

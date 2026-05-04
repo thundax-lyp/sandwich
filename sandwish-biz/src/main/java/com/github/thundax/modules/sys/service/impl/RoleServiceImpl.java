@@ -40,24 +40,20 @@ public class RoleServiceImpl implements RoleService {
         this.signService = signService;
     }
 
-    @Override
     public Class<Role> getElementType() {
         return Role.class;
     }
 
-    @Override
     public Role newEntity(String id) {
         Role role = new Role();
         role.setId(EntityIdCodec.toDomain(id));
         return role;
     }
 
-    @Override
     public Role getById(Role entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public Role getById(EntityId id) {
         if (id == null) {
             return null;
@@ -65,33 +61,27 @@ public class RoleServiceImpl implements RoleService {
         return dao.getById(id);
     }
 
-    @Override
     public List<Role> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
-    @Override
     public List<Role> list(Role role) {
         return list((RoleQuery) null);
     }
 
-    @Override
     public List<Role> list(RoleQuery query) {
         return dao.list(query == null ? null : statusValue(query.getStatus()));
     }
 
-    @Override
     public Role getOne(Role role) {
         List<Role> roles = list(role);
         return roles == null || roles.isEmpty() ? null : roles.get(0);
     }
 
-    @Override
     public PageDTO<Role> page(Role role, PageDTO<Role> page) {
         return page((RoleQuery) null, page);
     }
 
-    @Override
     public PageDTO<Role> page(RoleQuery query, PageDTO<Role> page) {
         PageDTO<Role> normalizedPage = normalizePage(page);
         IPage<Role> dataPage = dao.page(
@@ -105,7 +95,6 @@ public class RoleServiceImpl implements RoleService {
         return normalizedPage;
     }
 
-    @Override
     public long count(Role role) {
         List<Role> roles = list(role);
         return roles == null ? 0 : roles.size();
@@ -176,7 +165,6 @@ public class RoleServiceImpl implements RoleService {
         return batchOperate(list, this::updateStatus);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         Role role = getById(id);
@@ -246,19 +234,16 @@ public class RoleServiceImpl implements RoleService {
         return status == null ? null : status.value();
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Role role) {
         return dao.updatePriority(role);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<Role> list) {
         return batchOperate(list, this::updatePriority);

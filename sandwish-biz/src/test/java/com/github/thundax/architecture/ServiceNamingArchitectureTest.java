@@ -29,7 +29,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
     @Test
     public void shouldUseServiceMethodShape() {
-        JavaClasses classes = importPackages("com.github.thundax.common.service", "com.github.thundax.modules");
+        JavaClasses classes = importPackages("com.github.thundax.modules");
         List<String> violations = new ArrayList<>();
 
         for (JavaClass javaClass : classes) {

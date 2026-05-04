@@ -8,7 +8,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.OfficeInterfaceAssembler;
@@ -255,16 +255,16 @@ public class OfficeController {
         return true;
     }
 
-    private TreeService.MoveTreeNodeType readMoveTreeNodeType(OfficeMoveRequest request) {
+    private TreeNodeMoveType readMoveTreeNodeType(OfficeMoveRequest request) {
         switch (request.getType()) {
             case OfficeMoveRequest.TYPE_BEFORE:
-                return TreeService.MoveTreeNodeType.BEFORE;
+                return TreeNodeMoveType.BEFORE;
             case OfficeMoveRequest.TYPE_INSIDE:
-                return TreeService.MoveTreeNodeType.INSIDE;
+                return TreeNodeMoveType.INSIDE;
             case OfficeMoveRequest.TYPE_INSIDE_LAST:
-                return TreeService.MoveTreeNodeType.INSIDE_LAST;
+                return TreeNodeMoveType.INSIDE_LAST;
             default:
-                return TreeService.MoveTreeNodeType.AFTER;
+                return TreeNodeMoveType.AFTER;
         }
     }
 }

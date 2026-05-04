@@ -5,6 +5,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
@@ -32,24 +33,20 @@ public class MenuServiceImpl implements MenuService {
         this.signService = signService;
     }
 
-    @Override
     public Class<Menu> getElementType() {
         return Menu.class;
     }
 
-    @Override
     public Menu newEntity(String id) {
         Menu menu = new Menu();
         menu.setId(EntityIdCodec.toDomain(id));
         return menu;
     }
 
-    @Override
     public Menu getById(Menu entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public Menu getById(EntityId id) {
         if (id == null) {
             return null;
@@ -57,17 +54,14 @@ public class MenuServiceImpl implements MenuService {
         return dao.getById(id);
     }
 
-    @Override
     public List<Menu> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
-    @Override
     public List<Menu> list(Menu menu) {
         return list((MenuQuery) null);
     }
 
-    @Override
     public List<Menu> list(MenuQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
@@ -75,18 +69,15 @@ public class MenuServiceImpl implements MenuService {
                 query == null ? null : query.getMaxRank());
     }
 
-    @Override
     public Menu getOne(Menu menu) {
         List<Menu> menus = list(menu);
         return menus == null || menus.isEmpty() ? null : menus.get(0);
     }
 
-    @Override
     public PageDTO<Menu> page(Menu menu, PageDTO<Menu> page) {
         return page((MenuQuery) null, page);
     }
 
-    @Override
     public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
         PageDTO<Menu> normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
@@ -102,12 +93,10 @@ public class MenuServiceImpl implements MenuService {
         return normalizedPage;
     }
 
-    @Override
     public long count(Menu menu) {
         return list(menu).size();
     }
 
-    @Override
     public List<Menu> list(Integer maxRank) {
         return dao.list(null, null, maxRank);
     }
@@ -151,19 +140,16 @@ public class MenuServiceImpl implements MenuService {
         return batchOperate(list, this::updateVisibility);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Menu menu) {
         return dao.updatePriority(menu);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<Menu> list) {
         return batchOperate(list, this::updatePriority);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         dao.deleteMenuRole(EntityIdCodec.toValue(id));
@@ -180,7 +166,6 @@ public class MenuServiceImpl implements MenuService {
         return retVal;
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
@@ -188,7 +173,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void moveTreeNode(Menu from, Menu to, MoveTreeNodeType moveType) {
+    public void moveTreeNode(Menu from, Menu to, TreeNodeMoveType moveType) {
         dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
         notifyCacheChanged();
     }

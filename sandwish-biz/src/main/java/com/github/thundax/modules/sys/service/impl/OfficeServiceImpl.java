@@ -5,6 +5,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.OfficeDao;
 import com.github.thundax.modules.sys.entity.Office;
 import com.github.thundax.modules.sys.service.OfficeService;
@@ -25,24 +26,20 @@ public class OfficeServiceImpl implements OfficeService {
         this.dao = dao;
     }
 
-    @Override
     public Class<Office> getElementType() {
         return Office.class;
     }
 
-    @Override
     public Office newEntity(String id) {
         Office office = new Office();
         office.setId(EntityIdCodec.toDomain(id));
         return office;
     }
 
-    @Override
     public Office getById(Office entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public Office getById(EntityId id) {
         if (id == null) {
             return null;
@@ -50,17 +47,14 @@ public class OfficeServiceImpl implements OfficeService {
         return dao.getById(id);
     }
 
-    @Override
     public List<Office> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
 
-    @Override
     public List<Office> list(Office office) {
         return list((OfficeQuery) null);
     }
 
-    @Override
     public List<Office> list(OfficeQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
@@ -68,18 +62,15 @@ public class OfficeServiceImpl implements OfficeService {
                 query == null ? null : query.getRemarks());
     }
 
-    @Override
     public Office getOne(Office office) {
         List<Office> offices = list(office);
         return offices == null || offices.isEmpty() ? null : offices.get(0);
     }
 
-    @Override
     public PageDTO<Office> page(Office office, PageDTO<Office> page) {
         return page((OfficeQuery) null, page);
     }
 
-    @Override
     public PageDTO<Office> page(OfficeQuery query, PageDTO<Office> page) {
         PageDTO<Office> normalizedPage = normalizePage(page);
         IPage<Office> dataPage = dao.page(
@@ -95,7 +86,6 @@ public class OfficeServiceImpl implements OfficeService {
         return normalizedPage;
     }
 
-    @Override
     public long count(Office office) {
         return list(office).size();
     }
@@ -112,7 +102,6 @@ public class OfficeServiceImpl implements OfficeService {
         dao.update(entity);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         Office bean = this.getById(id);
@@ -125,19 +114,16 @@ public class OfficeServiceImpl implements OfficeService {
         return count;
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Office office) {
         return dao.updatePriority(office);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<Office> list) {
         return batchOperate(list, this::updatePriority);
@@ -145,7 +131,7 @@ public class OfficeServiceImpl implements OfficeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void moveTreeNode(Office from, Office to, MoveTreeNodeType moveType) {
+    public void moveTreeNode(Office from, Office to, TreeNodeMoveType moveType) {
         dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
     }
 

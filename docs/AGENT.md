@@ -67,7 +67,7 @@
 - `sandwish-common-cache`:
   通用 JetCache 基线配置和缓存基础设施，不承载业务 key、TTL、版本和失效语义。
 - `sandwish-common-mybatis`:
-  通用持久化对象、DAO / Service 基类、MyBatis-Plus 基础配置和数据库方言支撑，不承载通用分页数据模型。
+  通用持久化对象、MyBatis-Plus 基础配置和数据库方言支撑，不承载通用分页数据模型或泛型 Service 公共契约。
 - `sandwish-common-security`:
   通用 Spring Security 接入、权限匹配规则和不依赖业务数据的安全契约。
 - `sandwish-biz`:

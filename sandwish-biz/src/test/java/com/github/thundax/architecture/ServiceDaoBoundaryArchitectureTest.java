@@ -20,7 +20,7 @@ public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest
 
     @Test
     public void shouldKeepServiceBoundaryTypesCleanExceptKnownDirtyTypes() {
-        JavaClasses classes = importPackages("com.github.thundax.common.service", "com.github.thundax.modules");
+        JavaClasses classes = importPackages("com.github.thundax.modules");
         List<String> violations = new ArrayList<>();
 
         for (JavaClass javaClass : classes) {
@@ -71,7 +71,7 @@ public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest
 
     @Test
     public void shouldNotIntroduceEmptyServiceBaseTypes() {
-        JavaClasses classes = importPackages("com.github.thundax.common.service", "com.github.thundax.modules");
+        JavaClasses classes = importPackages("com.github.thundax.modules");
         List<String> violations = new ArrayList<>();
 
         for (JavaClass javaClass : classes) {

@@ -8,7 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.service.TreeService;
+import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -207,7 +207,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(String fromId, String toId, TreeService.MoveTreeNodeType moveType) {}
+        public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {}
 
         @Override
         public boolean isChildOf(String childId, String parentId) {

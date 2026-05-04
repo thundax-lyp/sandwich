@@ -27,24 +27,20 @@ public class DictServiceImpl implements DictService {
         this.dao = dao;
     }
 
-    @Override
     public Class<Dict> getElementType() {
         return Dict.class;
     }
 
-    @Override
     public Dict newEntity(String id) {
         Dict dict = new Dict();
         dict.setId(EntityIdCodec.toDomain(id));
         return dict;
     }
 
-    @Override
     public Dict getById(Dict entity) {
         return entity == null ? null : getById(entity.getId());
     }
 
-    @Override
     public Dict getById(EntityId id) {
         if (id == null) {
             return null;
@@ -52,7 +48,6 @@ public class DictServiceImpl implements DictService {
         return dao.getById(id);
     }
 
-    @Override
     public List<Dict> batchGetByIds(List<EntityId> ids) {
         return dao.batchGetByIds(EntityIdCodec.toValues(ids));
     }
@@ -77,12 +72,10 @@ public class DictServiceImpl implements DictService {
         return result;
     }
 
-    @Override
     public List<Dict> list(Dict dict) {
         return list((DictQuery) null);
     }
 
-    @Override
     public List<Dict> list(DictQuery query) {
         return dao.list(
                 query == null ? null : query.getType(),
@@ -90,18 +83,15 @@ public class DictServiceImpl implements DictService {
                 query == null ? null : query.getRemarks());
     }
 
-    @Override
     public Dict getOne(Dict dict) {
         List<Dict> dicts = list(dict);
         return dicts == null || dicts.isEmpty() ? null : dicts.get(0);
     }
 
-    @Override
     public PageDTO<Dict> page(Dict dict, PageDTO<Dict> page) {
         return page((DictQuery) null, page);
     }
 
-    @Override
     public PageDTO<Dict> page(DictQuery query, PageDTO<Dict> page) {
         PageDTO<Dict> normalizedPage = normalizePage(page);
         IPage<Dict> dataPage = dao.page(
@@ -117,7 +107,6 @@ public class DictServiceImpl implements DictService {
         return normalizedPage;
     }
 
-    @Override
     public long count(Dict dict) {
         List<Dict> dicts = list(dict);
         return dicts == null ? 0 : dicts.size();
@@ -135,25 +124,21 @@ public class DictServiceImpl implements DictService {
         dao.update(dict);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteById(EntityId id) {
         return id == null ? 0 : dao.deleteById(id);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(Dict dict) {
         return dao.updatePriority(dict);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public int updatePriority(List<Dict> list) {
         return batchOperate(list, this::updatePriority);

@@ -136,7 +136,6 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - 通用持久化基础设施
-- 通用 Service 基类
 - MyBatis-Plus 基础配置
 - 数据库方言类
 
@@ -144,7 +143,7 @@ Sandwich 固定采用三层 API 架构。
 
 - 可以依赖 `sandwish-common-core`。
 - MyBatis-Plus 分页插件固定使用 `DbType.DM`。
-- 不承载 PageHelper、旧 CRUD 基类或 MyBatis 扫描标记。
+- 不承载 PageHelper、旧 CRUD / Tree Service 公共契约、旧 CRUD 基类或 MyBatis 扫描标记。
 - 不承载通用分页数据模型。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
@@ -299,7 +298,8 @@ Spring Security 迁移链路允许入口模块依赖：
 - 方法返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type。
 - Java-Type 包含 primitive / boxed primitive、`String`、`BigDecimal`、`Date`、`Enum`、数组、`java.*` 集合容器和项目统一标识值类型。
 - 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
-- 不新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`。
+- Service 接口应该显式声明当前业务需要暴露的方法。
+- 不新增空 `BaseService`、空 marker Service、通用 `BaseServiceImpl` 或泛型 CRUD / Tree Service 公共契约。
 - 不直接依赖 API `Request` / `Response`。
 - 不直接依赖 `DO` / `DataObject`。
 - 不直接暴露 MyBatis-Plus `Page`、`IPage`、`Wrapper` 或其他持久化实现类型。

@@ -4,7 +4,7 @@ import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.IdGen;
+import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
@@ -105,8 +105,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         LoginForm form = new LoginForm();
-        form.setLoginToken(IdGen.uuid());
-        form.setRefreshTokenList(new ArrayList<>(Collections.singletonList(IdGen.uuid())));
+        form.setLoginToken(UuidHelper.compact());
+        form.setRefreshTokenList(new ArrayList<>(Collections.singletonList(UuidHelper.compact())));
         form.setExpiredSeconds(properties.getLoginExpiredSeconds());
         form.setCheckCode(AuthUtils.currentCheckCode());
         form.setCaptcha(createCode(VALIDATE_CAPTCHA_CODE, CAPTCHA_LENGTH));
@@ -131,9 +131,9 @@ public class AuthServiceImpl implements AuthService {
         }
 
         List<String> refreshTokenList = new ArrayList<>(form.getRefreshTokenList());
-        refreshTokenList.add(0, IdGen.uuid());
+        refreshTokenList.add(0, UuidHelper.compact());
 
-        form.setLoginToken(IdGen.uuid());
+        form.setLoginToken(UuidHelper.compact());
         form.setRefreshTokenList(refreshTokenList);
         form.setExpiredSeconds(properties.getLoginExpiredSeconds());
         form.setCheckCode(AuthUtils.currentCheckCode());
@@ -378,7 +378,7 @@ public class AuthServiceImpl implements AuthService {
 
         Date now = new Date();
         AuthSession authSession = new AuthSession();
-        authSession.setSessionId(IdGen.uuid());
+        authSession.setSessionId(UuidHelper.compact());
         authSession.setToken(accessToken.getToken());
         authSession.setUserId(identity.getUserId());
         authSession.setIdentityId(identity.getId());

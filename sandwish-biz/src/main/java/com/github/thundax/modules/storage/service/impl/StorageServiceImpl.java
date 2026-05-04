@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.IdGen;
+import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.StorageDao;
@@ -172,7 +172,7 @@ public class StorageServiceImpl implements StorageService {
         }
         Date now = new Date();
         if (StringUtils.isBlank(session.getUploadId())) {
-            session.setUploadId(IdGen.uuid());
+            session.setUploadId(UuidHelper.compact());
         }
         session.setUploadStatus(MultipartUploadStatus.INITIATED);
         session.setUploadedPartCount(0);

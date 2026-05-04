@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.IdGen;
+import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +46,7 @@ public final class StorageUtils {
         }
 
         if (StringUtils.isBlank(EntityIdCodec.toValue(storage.getId()))) {
-            storage.setId(EntityIdCodec.toDomain(IdGen.uuid()));
+            storage.setId(EntityIdCodec.toDomain(UuidHelper.compact()));
             storage.setCreateDate(new Date());
         }
 

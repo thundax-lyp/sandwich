@@ -5,7 +5,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.IdGen;
+import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.sys.entity.Dict;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,14 +68,14 @@ public class DictCacheSupport {
     public String currentVersion() {
         String version = (String) cache.get(versionKey());
         if (StringUtils.isBlank(version)) {
-            version = IdGen.uuid();
+            version = UuidHelper.compact();
             cache.put(versionKey(), version);
         }
         return version;
     }
 
     public void touchVersion() {
-        cache.put(versionKey(), IdGen.uuid(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(String id) {

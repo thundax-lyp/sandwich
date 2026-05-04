@@ -5,11 +5,11 @@ import java.util.UUID;
 /**
  * 封装各种生成唯一性ID算法的工具类.
  */
-public final class IdGen {
+public final class UuidHelper {
 
-    private IdGen() {}
+    private UuidHelper() {}
 
-    public static String uuid() {
+    public static String compact() {
         return UUID.randomUUID().toString().replace("-", "");
     }
 }

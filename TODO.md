@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-tests`：补齐 Storage 模型迁移测试
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java
-    sandwish-infra/src/test/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStoreTest.java
-    sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssemblerTest.java
-  - 处理动作：更新上传、引用、分片完成、内容读取和删除流程测试
-  - 验收点：Storage 相关单测覆盖 `StoredObject` 生成、引用状态变化、REST content 读取和旧 Servlet 路径消失
-  - 重要度：10/10
-
 - [ ] `storage-cleanup`：清理 Storage 迁移现场
   - 范围文件：TODO.md
     docs/30-designs/STORAGE-STORED-OBJECT-RUNBOOK.md

@@ -209,7 +209,7 @@ public class StorageServiceImplTest {
         object.setBucketName("/tmp/storage/");
         object.setObjectKey("202605/demo.png");
         object.setSize(300L);
-        object.setAccessEndpoint("/servlet/storage/demo.png");
+        object.setAccessEndpoint("/api/assist/storage/objects/s1/content");
 
         StoredObject storage = storageService(dao).completeMultipartUpload("upload-1", object);
 
@@ -222,6 +222,9 @@ public class StorageServiceImplTest {
         assertSame(StorageType.LOCAL_FILE, storage.getStorageType());
         assertEquals("202605/demo.png", storage.getObjectKey());
         assertEquals(Long.valueOf(300L), storage.getSize());
+        assertEquals("/api/assist/storage/objects/s1/content", storage.getAccessEndpoint());
+        assertSame(StoredObjectStatus.ACTIVE, storage.getObjectStatus());
+        assertSame(StoredObjectReferenceStatus.UNREFERENCED, storage.getReferenceStatus());
         assertSame(storage, dao.inserted);
         assertSame(MultipartUploadStatus.COMPLETED, dao.updatedMultipartSession.getUploadStatus());
         assertEquals(Integer.valueOf(3), dao.updatedMultipartSession.getUploadedPartCount());

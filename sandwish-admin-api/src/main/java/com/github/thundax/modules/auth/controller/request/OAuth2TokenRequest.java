@@ -17,6 +17,21 @@ public class OAuth2TokenRequest implements Serializable {
     @JsonProperty("clientId")
     private String clientId;
 
+    @JsonProperty("clientSecret")
+    private String clientSecret;
+
+    @JsonProperty("grantType")
+    private String grantType;
+
+    @JsonProperty("redirectUri")
+    private String redirectUri;
+
     @JsonProperty("authorizationCode")
     private String authorizationCode;
+
+    @JsonProperty("codeVerifier")
+    private String codeVerifier;
+
+    @JsonProperty("refreshToken")
+    private String refreshToken;
 }

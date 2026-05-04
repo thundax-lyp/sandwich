@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-oauth-token-grant`：正规化 OAuth2 token grant 流程
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：扩展 token 请求字段，补 clientSecret、grantType、redirectUri、PKCE 和 refresh token grant 校验
-  - 验收点：authorization_code 和 refresh_token grant 均走标准 token 入口并生成 OAuth token 状态
-  - 重要度：10/10
-
 - [ ] `auth-oauth-token-revoke-introspection`：补 OAuth token revoke 和 introspection 状态
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
     sandwish-admin-api/src/test/java/com/github/thundax/modules/auth

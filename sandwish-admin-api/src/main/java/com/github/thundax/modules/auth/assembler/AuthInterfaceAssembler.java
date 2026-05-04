@@ -47,7 +47,10 @@ public final class AuthInterfaceAssembler {
     public static AuthAccessTokenResponse toAccessTokenResponse(AuthTokenRefreshResult result) {
         AuthAccessTokenResponse response = new AuthAccessTokenResponse();
         if (result != null && result.getAccessToken() != null) {
-            response.setToken(result.getAccessToken().getToken());
+            response.setToken(
+                    result.getOauthAccessToken() == null
+                            ? result.getAccessToken().getToken()
+                            : result.getOauthAccessToken());
             response.setRefreshToken(result.getRefreshToken());
         }
         return response;

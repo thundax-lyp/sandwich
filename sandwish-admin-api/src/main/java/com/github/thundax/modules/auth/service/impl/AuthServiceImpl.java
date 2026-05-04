@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
+import com.github.thundax.modules.auth.dao.OAuthAccessTokenDao;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
@@ -21,6 +22,7 @@ import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
@@ -94,6 +96,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired(required = false)
     private OAuthAuthorizationDao oauthAuthorizationDao;
+
+    @Autowired(required = false)
+    private OAuthAccessTokenDao oauthAccessTokenDao;
 
     @Autowired(required = false)
     private OAuthClientDao oauthClientDao;
@@ -417,8 +422,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthTokenRefreshResult exchangeAuthorizationCode(String clientId, String authorizationCode)
+    public AuthTokenRefreshResult exchangeOAuth2Token(
+            String clientId,
+            String clientSecret,
+            String grantType,
+            String redirectUri,
+            String authorizationCode,
+            String codeVerifier,
+            String refreshToken)
             throws ApiException {
+        OAuthClient client = validateOAuthClientSecret(clientId, clientSecret);
+        if (!client.supportsGrantType(grantType)) {
+            throw new ApiException("OAuth2 grant type unsupported");
+        }
+        if ("authorization_code".equals(grantType)) {
+            return exchangeAuthorizationCode(client, redirectUri, authorizationCode, codeVerifier);
+        }
+        if ("refresh_token".equals(grantType)) {
+            return refreshOAuth2Token(client, refreshToken);
+        }
+        throw new ApiException("OAuth2 grant type unsupported");
+    }
+
+    private AuthTokenRefreshResult exchangeAuthorizationCode(
+            OAuthClient client, String redirectUri, String authorizationCode, String codeVerifier) throws ApiException {
         if (oauthAuthorizationDao == null) {
             throw new ApiException("OAuth2 authorization 未配置");
         }
@@ -426,16 +453,40 @@ public class AuthServiceImpl implements AuthService {
         Date now = new Date();
         if (authorization == null
                 || !authorization.canConsume(now)
-                || !StringUtils.equals(clientId, authorization.getClientId())) {
+                || !StringUtils.equals(client.getClientId(), authorization.getClientId())
+                || !StringUtils.equals(redirectUri, authorization.getRedirectUri())
+                || !verifyPkce(authorization, codeVerifier)) {
             throw new InvalidTokenException();
         }
         authorization.markUsed(now);
         oauthAuthorizationDao.updateUsed(authorization);
         AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(authorization.getUserId()));
+        String oauthAccessToken = createOAuthAccessToken(accessToken, client, authorization, now);
         String refreshToken = oauthRefreshTokenDao == null
                 ? null
-                : createOAuthRefreshToken(accessToken, clientId, authorization.getTenantId(), now);
-        return new AuthTokenRefreshResult(accessToken, refreshToken);
+                : createOAuthRefreshToken(accessToken, client.getClientId(), authorization.getTenantId(), now);
+        return new AuthTokenRefreshResult(accessToken, refreshToken, oauthAccessToken);
+    }
+
+    private AuthTokenRefreshResult refreshOAuth2Token(OAuthClient client, String refreshToken) throws ApiException {
+        if (oauthRefreshTokenDao == null) {
+            throw new ApiException("refresh token 未配置");
+        }
+        OAuthRefreshToken current = oauthRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
+        Date now = new Date();
+        if (current == null
+                || !current.canRefresh(now)
+                || !StringUtils.equals(client.getClientId(), current.getClientId())) {
+            throw new InvalidTokenException();
+        }
+        current.markUsed(now);
+        oauthRefreshTokenDao.updateStatus(current);
+
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
+        String oauthAccessToken = createOAuthAccessToken(accessToken, client, current, now);
+        String nextRefreshToken =
+                createOAuthRefreshToken(accessToken, client.getClientId(), current.getTenantId(), now);
+        return new AuthTokenRefreshResult(accessToken, nextRefreshToken, oauthAccessToken);
     }
 
     @Override
@@ -691,6 +742,47 @@ public class AuthServiceImpl implements AuthService {
         return refreshToken;
     }
 
+    private String createOAuthAccessToken(
+            AccessToken accessToken, OAuthClient client, OAuthAuthorization authorization, Date issuedAt) {
+        if (oauthAccessTokenDao == null) {
+            return accessToken.getToken();
+        }
+        String token = UuidHelper.compact();
+        OAuthAccessToken entity = new OAuthAccessToken();
+        entity.setTokenId(UuidHelper.compact());
+        entity.setTokenHash(tokenHash(token));
+        entity.setClientId(client.getClientId());
+        entity.setTenantId(authorization.getTenantId());
+        entity.setUserId(authorization.getUserId());
+        entity.setScopes(authorization.getScopes());
+        entity.setIssuedAt(issuedAt);
+        entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
+        entity.setCreateDate(issuedAt);
+        entity.setUpdateDate(issuedAt);
+        entity.setId(EntityIdCodec.toDomain(oauthAccessTokenDao.insert(entity)));
+        return token;
+    }
+
+    private String createOAuthAccessToken(
+            AccessToken accessToken, OAuthClient client, OAuthRefreshToken refreshToken, Date issuedAt) {
+        if (oauthAccessTokenDao == null) {
+            return accessToken.getToken();
+        }
+        String token = UuidHelper.compact();
+        OAuthAccessToken entity = new OAuthAccessToken();
+        entity.setTokenId(UuidHelper.compact());
+        entity.setTokenHash(tokenHash(token));
+        entity.setClientId(client.getClientId());
+        entity.setTenantId(refreshToken.getTenantId());
+        entity.setUserId(refreshToken.getUserId());
+        entity.setIssuedAt(issuedAt);
+        entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
+        entity.setCreateDate(issuedAt);
+        entity.setUpdateDate(issuedAt);
+        entity.setId(EntityIdCodec.toDomain(oauthAccessTokenDao.insert(entity)));
+        return token;
+    }
+
     private long refreshTokenTtlSeconds(String clientId) {
         if (oauthClientDao == null) {
             return 2592000L;
@@ -700,6 +792,24 @@ public class AuthServiceImpl implements AuthService {
             return 2592000L;
         }
         return client.getRefreshTokenTtlSeconds();
+    }
+
+    private long accessTokenTtlSeconds(OAuthClient client) {
+        if (client == null || client.getAccessTokenTtlSeconds() <= 0L) {
+            return properties.getLoginExpiredSeconds();
+        }
+        return client.getAccessTokenTtlSeconds();
+    }
+
+    private OAuthClient validateOAuthClientSecret(String clientId, String clientSecret) throws ApiException {
+        if (oauthClientDao == null) {
+            throw new ApiException("OAuth2 client 未配置");
+        }
+        OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
+        if (client == null || !passwordService.validate(clientSecret, client.getClientSecretHash())) {
+            throw new ApiException("OAuth2 client secret invalid");
+        }
+        return client;
     }
 
     private OAuthClient validateOAuthClient(String clientId, String redirectUri, List<String> scopes)
@@ -717,6 +827,19 @@ public class AuthServiceImpl implements AuthService {
 
     private Set<String> toScopeSet(List<String> scopes) {
         return scopes == null ? new LinkedHashSet<>() : new LinkedHashSet<>(scopes);
+    }
+
+    private boolean verifyPkce(OAuthAuthorization authorization, String codeVerifier) {
+        if (StringUtils.isBlank(authorization.getCodeChallenge())) {
+            return true;
+        }
+        if (StringUtils.isBlank(codeVerifier)) {
+            return false;
+        }
+        if ("S256".equalsIgnoreCase(authorization.getCodeChallengeMethod())) {
+            return StringUtils.equals(authorization.getCodeChallenge(), Md5Helper.encrypt(codeVerifier));
+        }
+        return StringUtils.equals(authorization.getCodeChallenge(), codeVerifier);
     }
 
     private String tokenHash(String token) {

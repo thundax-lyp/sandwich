@@ -98,7 +98,15 @@ public interface AuthService {
             boolean approved)
             throws ApiException;
 
-    AuthTokenRefreshResult exchangeAuthorizationCode(String clientId, String authorizationCode) throws ApiException;
+    AuthTokenRefreshResult exchangeOAuth2Token(
+            String clientId,
+            String clientSecret,
+            String grantType,
+            String redirectUri,
+            String authorizationCode,
+            String codeVerifier,
+            String refreshToken)
+            throws ApiException;
 
     boolean revokeAuthorizationCode(String authorizationCode) throws ApiException;
 

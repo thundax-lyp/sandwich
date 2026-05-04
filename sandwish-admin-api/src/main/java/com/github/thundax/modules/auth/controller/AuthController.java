@@ -232,8 +232,14 @@ public class AuthController {
     @ApiOperation(value = "OAuth2 授权码换 token", notes = "ignore")
     @PostMapping(value = "oauth2/token")
     public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
-        return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.exchangeAuthorizationCode(request.getClientId(), request.getAuthorizationCode()));
+        return AuthInterfaceAssembler.toAccessTokenResponse(authService.exchangeOAuth2Token(
+                request.getClientId(),
+                request.getClientSecret(),
+                request.getGrantType(),
+                request.getRedirectUri(),
+                request.getAuthorizationCode(),
+                request.getCodeVerifier(),
+                request.getRefreshToken()));
     }
 
     @ApiOperation(value = "OAuth2 撤销授权码", notes = "ignore")

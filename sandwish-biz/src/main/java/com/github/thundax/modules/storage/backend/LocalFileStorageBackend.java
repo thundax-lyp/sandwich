@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.backend;
 
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,12 +21,12 @@ public class LocalFileStorageBackend implements StorageBackend {
     }
 
     @Override
-    public StorageBackendType type() {
-        return StorageBackendType.LOCAL_FILE;
+    public StorageType type() {
+        return StorageType.LOCAL_FILE;
     }
 
     @Override
-    public StorageBackendObject save(Storage storage, InputStream inputStream) throws IOException {
+    public StorageBackendObject save(StoredObject storage, InputStream inputStream) throws IOException {
         File file = toFile(storage);
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
@@ -52,16 +52,16 @@ public class LocalFileStorageBackend implements StorageBackend {
     }
 
     @Override
-    public boolean exists(Storage storage) {
+    public boolean exists(StoredObject storage) {
         return toFile(storage).exists();
     }
 
     @Override
-    public InputStream open(Storage storage) throws IOException {
+    public InputStream open(StoredObject storage) throws IOException {
         return new FileInputStream(toFile(storage));
     }
 
-    private File toFile(Storage storage) {
+    private File toFile(StoredObject storage) {
         String objectKey = storage.getObjectKey() == null ? storage.getPathName() : storage.getObjectKey();
         return new File(storagePath + objectKey);
     }

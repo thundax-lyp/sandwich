@@ -5,25 +5,25 @@ import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.List;
 
 public interface StorageService {
 
-    Storage getById(EntityId id);
+    StoredObject getById(EntityId id);
 
-    List<Storage> listByIds(List<EntityId> ids);
+    List<StoredObject> listByIds(List<EntityId> ids);
 
-    List<Storage> list(StorageQuery query);
+    List<StoredObject> list(StorageQuery query);
 
-    PageDTO<Storage> page(StorageQuery query, PageDTO<Storage> page);
+    PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page);
 
-    void add(Storage storage);
+    void add(StoredObject storage);
 
-    void update(Storage storage);
+    void update(StoredObject storage);
 
     int deleteById(EntityId id);
 
@@ -33,23 +33,23 @@ public interface StorageService {
 
     List<String> listBusinessTypes();
 
-    int updateStatus(Storage storage);
+    int updateStatus(StoredObject storage);
 
-    int updateVisibility(Storage storage);
+    int updateVisibility(StoredObject storage);
 
     int removeBusiness(String businessType, String businessId);
 
-    void insertBusiness(List<StorageBusiness> list);
+    void insertBusiness(List<StoredObjectReference> list);
 
-    List<StorageBusiness> listBusiness(Storage entity);
+    List<StoredObjectReference> listBusiness(StoredObject entity);
 
-    boolean canAccess(Storage storage, StorageOwnerType ownerType, String ownerId);
+    boolean canAccess(StoredObject storage, StorageOwnerType ownerType, String ownerId);
 
     MultipartUploadSession initMultipartUpload(MultipartUploadSession session);
 
     MultipartUploadPart uploadMultipartPart(MultipartUploadPart part);
 
-    Storage completeMultipartUpload(String uploadId, StorageBackendObject object);
+    StoredObject completeMultipartUpload(String uploadId, StorageBackendObject object);
 
     int abortMultipartUpload(String uploadId);
 }

@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +19,7 @@ public class LocalFileStorageBackendTest {
     @Test
     public void shouldSaveAndOpenLocalStorageObject() throws Exception {
         Path directory = Files.createTempDirectory("sandwish-storage-");
-        Storage storage = new Storage();
+        StoredObject storage = new StoredObject();
         storage.setId(EntityIdCodec.toDomain("s1"));
         storage.setExtendName("txt");
         storage.setCreateDate(new Date());
@@ -30,7 +30,7 @@ public class LocalFileStorageBackendTest {
 
         storage.setObjectKey(object.getObjectKey());
 
-        assertEquals(StorageBackendType.LOCAL_FILE, object.getStorageType());
+        assertEquals(StorageType.LOCAL_FILE, object.getStorageType());
         assertEquals(directory.toString() + "/", object.getBucketName());
         assertEquals(Long.valueOf(5L), object.getSize());
         assertEquals("/servlet/storage/s1.txt", object.getAccessEndpoint());

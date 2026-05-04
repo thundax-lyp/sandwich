@@ -2,7 +2,7 @@ package com.github.thundax.modules.storage.converter;
 
 import com.github.thundax.autoconfigure.VltavaProperties;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import org.apache.commons.lang3.StringUtils;
@@ -19,13 +19,13 @@ public class StorageConverter {
         this.storageService = storageService;
     }
 
-    public String toPreviewUrl(Storage entity) {
+    public String toPreviewUrl(StoredObject entity) {
         return StringUtils.isBlank(entity.getAccessEndpoint())
                 ? this.servletPath + entity.getFileName()
                 : entity.getAccessEndpoint();
     }
 
-    public Storage toEntity(String previewUrl) {
+    public StoredObject toEntity(String previewUrl) {
         if (!StringUtils.contains(previewUrl, servletPath)) {
             return null;
         }

@@ -3,17 +3,17 @@ package com.github.thundax.modules.storage.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +21,7 @@ public final class StoragePersistenceAssembler {
 
     private StoragePersistenceAssembler() {}
 
-    public static StorageDO toDataObject(Storage entity) {
+    public static StorageDO toDataObject(StoredObject entity) {
         if (entity == null) {
             return null;
         }
@@ -46,11 +46,11 @@ public final class StoragePersistenceAssembler {
         return dataObject;
     }
 
-    public static Storage toEntity(StorageDO dataObject) {
+    public static StoredObject toEntity(StorageDO dataObject) {
         if (dataObject == null) {
             return null;
         }
-        Storage entity = new Storage();
+        StoredObject entity = new StoredObject();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
@@ -71,11 +71,11 @@ public final class StoragePersistenceAssembler {
         return entity;
     }
 
-    public static List<Storage> toEntityList(List<StorageDO> dataObjects) {
+    public static List<StoredObject> toEntityList(List<StorageDO> dataObjects) {
         if (dataObjects == null) {
             return null;
         }
-        List<Storage> entities = new ArrayList<>();
+        List<StoredObject> entities = new ArrayList<>();
         for (StorageDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
@@ -94,35 +94,35 @@ public final class StoragePersistenceAssembler {
         return ownerType == null ? null : StorageOwnerType.from(ownerType);
     }
 
-    private static String storageTypeValue(StorageBackendType storageType) {
+    private static String storageTypeValue(StorageType storageType) {
         return storageType == null ? null : storageType.value();
     }
 
-    private static StorageBackendType storageTypeFrom(String storageType) {
-        return storageType == null ? null : StorageBackendType.from(storageType);
+    private static StorageType storageTypeFrom(String storageType) {
+        return storageType == null ? null : StorageType.from(storageType);
     }
 
-    private static String statusValue(StorageStatus status) {
+    private static String statusValue(StoredObjectStatus status) {
         return status == null ? null : status.value();
     }
 
-    private static StorageStatus statusFrom(String status) {
-        return status == null ? null : StorageStatus.from(status);
+    private static StoredObjectStatus statusFrom(String status) {
+        return status == null ? null : StoredObjectStatus.from(status);
     }
 
-    private static String visibilityValue(StorageVisibility visibility) {
+    private static String visibilityValue(StoredObjectReferenceStatus visibility) {
         return visibility == null ? null : visibility.value();
     }
 
-    private static StorageVisibility visibilityFrom(String visibility) {
-        return visibility == null ? null : StorageVisibility.from(visibility);
+    private static StoredObjectReferenceStatus visibilityFrom(String visibility) {
+        return visibility == null ? null : StoredObjectReferenceStatus.from(visibility);
     }
 
-    public static StorageBusinessDO toBusinessDataObject(StorageBusiness entity) {
+    public static StoredObjectReferenceDO toBusinessDataObject(StoredObjectReference entity) {
         if (entity == null) {
             return null;
         }
-        StorageBusinessDO dataObject = new StorageBusinessDO();
+        StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setBusinessId(entity.getBusinessId());
         dataObject.setBusinessType(entity.getBusinessType());
@@ -131,11 +131,11 @@ public final class StoragePersistenceAssembler {
         return dataObject;
     }
 
-    public static StorageBusiness toBusinessEntity(StorageBusinessDO dataObject) {
+    public static StoredObjectReference toBusinessEntity(StoredObjectReferenceDO dataObject) {
         if (dataObject == null) {
             return null;
         }
-        StorageBusiness entity = new StorageBusiness();
+        StoredObjectReference entity = new StoredObjectReference();
         entity.setId(EntityIdCodec.toDomain(dataObject.getFileId()));
         entity.setBusinessId(dataObject.getBusinessId());
         entity.setBusinessType(dataObject.getBusinessType());
@@ -144,23 +144,23 @@ public final class StoragePersistenceAssembler {
         return entity;
     }
 
-    public static List<StorageBusinessDO> toBusinessDataObjectList(List<StorageBusiness> entities) {
+    public static List<StoredObjectReferenceDO> toBusinessDataObjectList(List<StoredObjectReference> entities) {
         if (entities == null) {
             return null;
         }
-        List<StorageBusinessDO> dataObjects = new ArrayList<>();
-        for (StorageBusiness entity : entities) {
+        List<StoredObjectReferenceDO> dataObjects = new ArrayList<>();
+        for (StoredObjectReference entity : entities) {
             dataObjects.add(toBusinessDataObject(entity));
         }
         return dataObjects;
     }
 
-    public static List<StorageBusiness> toBusinessEntityList(List<StorageBusinessDO> dataObjects) {
+    public static List<StoredObjectReference> toBusinessEntityList(List<StoredObjectReferenceDO> dataObjects) {
         if (dataObjects == null) {
             return null;
         }
-        List<StorageBusiness> entities = new ArrayList<>();
-        for (StorageBusinessDO dataObject : dataObjects) {
+        List<StoredObjectReference> entities = new ArrayList<>();
+        for (StoredObjectReferenceDO dataObject : dataObjects) {
             entities.add(toBusinessEntity(dataObject));
         }
         return entities;

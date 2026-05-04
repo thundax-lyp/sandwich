@@ -8,13 +8,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.dao.StorageDao;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
-import com.github.thundax.modules.storage.persistence.mapper.StorageBusinessMapper;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
+import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -28,19 +28,19 @@ public class StorageDaoImpl implements StorageDao {
     private static final String NO_MATCH_ID = "__no_matching_storage__";
 
     private final StorageMapper mapper;
-    private final StorageBusinessMapper businessMapper;
+    private final StoredObjectReferenceMapper businessMapper;
     private final StorageCacheSupport cacheSupport;
 
     public StorageDaoImpl(
-            StorageMapper mapper, StorageBusinessMapper businessMapper, StorageCacheSupport cacheSupport) {
+            StorageMapper mapper, StoredObjectReferenceMapper businessMapper, StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.businessMapper = businessMapper;
         this.cacheSupport = cacheSupport;
     }
 
     @Override
-    public Storage getById(EntityId id) {
-        Storage storage = cacheSupport.getById(id.value());
+    public StoredObject getById(EntityId id) {
+        StoredObject storage = cacheSupport.getById(id.value());
         if (storage != null) {
             return storage;
         }
@@ -54,11 +54,11 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<Storage> listByIds(List<String> idList) {
-        List<Storage> storageList = new ArrayList<>();
+    public List<StoredObject> listByIds(List<String> idList) {
+        List<StoredObject> storageList = new ArrayList<>();
         List<String> uncachedIdList = new ArrayList<>();
         for (String id : idList) {
-            Storage storage = cacheSupport.getById(id);
+            StoredObject storage = cacheSupport.getById(id);
             if (storage == null) {
                 uncachedIdList.add(id);
             } else {
@@ -70,8 +70,9 @@ public class StorageDaoImpl implements StorageDao {
             LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.in(StorageDO::getId, uncachedIdList);
             wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-            List<Storage> uncachedStorageList = StoragePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
-            for (Storage storage : uncachedStorageList) {
+            List<StoredObject> uncachedStorageList =
+                    StoragePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
+            for (StoredObject storage : uncachedStorageList) {
                 cacheSupport.putById(storage);
                 storageList.add(storage);
             }
@@ -80,7 +81,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<Storage> list(
+    public List<StoredObject> list(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -95,7 +96,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public Page<Storage> page(
+    public Page<StoredObject> page(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -111,14 +112,14 @@ public class StorageDaoImpl implements StorageDao {
                 new Page<>(pageNo, pageSize),
                 buildListWrapper(
                         mimeType, ownerId, ownerType, enableFlag, publicFlag, businessId, businessType, name, remarks));
-        Page<Storage> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
+        Page<StoredObject> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
     @Override
-    public String insert(Storage entity) {
+    public String insert(StoredObject entity) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
@@ -131,7 +132,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int update(Storage entity) {
+    public int update(StoredObject entity) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null,
@@ -175,7 +176,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int updateStatus(Storage storage) {
+    public int updateStatus(StoredObject storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getEnableFlag, dataObject.getEnableFlag()));
@@ -184,7 +185,7 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public int updateVisibility(Storage storage) {
+    public int updateVisibility(StoredObject storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));
@@ -246,14 +247,14 @@ public class StorageDaoImpl implements StorageDao {
         if (StringUtils.isBlank(businessId) && StringUtils.isBlank(businessType)) {
             return null;
         }
-        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isNotBlank(businessId)) {
-            wrapper.eq(StorageBusinessDO::getBusinessId, businessId);
+            wrapper.eq(StoredObjectReferenceDO::getBusinessId, businessId);
         }
         if (StringUtils.isNotBlank(businessType)) {
-            wrapper.eq(StorageBusinessDO::getBusinessType, businessType);
+            wrapper.eq(StoredObjectReferenceDO::getBusinessType, businessType);
         }
-        return toStringList(businessMapper.selectObjs(wrapper.select(StorageBusinessDO::getFileId)));
+        return toStringList(businessMapper.selectObjs(wrapper.select(StoredObjectReferenceDO::getFileId)));
     }
 
     private List<String> toStringList(List<Object> objects) {

@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("assist_storage_business")
-public class StorageBusinessDO {
+public class StoredObjectReferenceDO {
 
     private String fileId;
 

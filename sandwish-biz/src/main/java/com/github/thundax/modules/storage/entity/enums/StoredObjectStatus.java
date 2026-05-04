@@ -4,15 +4,16 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum StorageStatus {
-    ENABLED,
-    DISABLED;
+public enum StoredObjectStatus {
+    ACTIVE,
+    DELETING,
+    DELETED;
 
     public String value() {
         return name();
     }
 
-    public static StorageStatus from(String value) {
+    public static StoredObjectStatus from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
@@ -21,6 +22,6 @@ public enum StorageStatus {
     }
 
     private String legacyValue() {
-        return this == ENABLED ? Global.ENABLE : Global.DISABLE;
+        return this == ACTIVE ? Global.ENABLE : Global.DISABLE;
     }
 }

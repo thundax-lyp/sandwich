@@ -2,7 +2,7 @@ package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public final class StorageUtils {
 
     private StorageUtils() {}
 
-    public static void applyFileMetadata(MultipartFile file, Storage storage) {
+    public static void applyFileMetadata(MultipartFile file, StoredObject storage) {
         String originalFilename = file.getOriginalFilename();
 
         storage.setName(FilenameUtils.getBaseName(originalFilename));

@@ -20,7 +20,7 @@ import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.backend.StorageBackend;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.converter.StorageConverter;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
@@ -80,7 +80,7 @@ public class StorageController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
-        PageDTO<Storage> page = readStoragePage(request);
+        PageDTO<StoredObject> page = readStoragePage(request);
         return PageResponseHelper.fromEntityPage(
                 storageService.page(query, page),
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
@@ -104,7 +104,7 @@ public class StorageController {
                 return validatedResponse;
             }
 
-            Storage storage = new Storage();
+            StoredObject storage = new StoredObject();
             storage.setOwnerType(StorageOwnerType.USER);
             storage.setOwnerId(UserAccessHolder.currentUserId());
             StorageUtils.applyFileMetadata(file, storage);
@@ -124,7 +124,7 @@ public class StorageController {
     public void preview(
             @PathVariable("id") String id, @PathVariable("extendName") String extendName, HttpServletResponse response)
             throws IOException {
-        Storage storage = storageService.getById(EntityIdCodec.toDomain(id));
+        StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
         if (storage == null || !StringUtils.equalsAnyIgnoreCase(storage.getExtendName(), extendName)) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -156,11 +156,11 @@ public class StorageController {
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
-        List<Storage> storageList = new ArrayList<>();
+        List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
-            Storage storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
+            StoredObject storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
             if (storage == null) {
-                throw new NullBeanException("Storage", request.getId());
+                throw new NullBeanException("StoredObject", request.getId());
             }
             storageList.add(storage);
         }
@@ -168,7 +168,8 @@ public class StorageController {
             throw new InvalidParameterException("list");
         }
 
-        storageService.batchDeleteById(storageList.stream().map(Storage::getId).collect(Collectors.toList()));
+        storageService.batchDeleteById(
+                storageList.stream().map(StoredObject::getId).collect(Collectors.toList()));
         return true;
     }
 
@@ -193,7 +194,7 @@ public class StorageController {
         return new StorageUploadResponse();
     }
 
-    private PageDTO<Storage> readStoragePage(StoragePageRequest request) {
+    private PageDTO<StoredObject> readStoragePage(StoragePageRequest request) {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
@@ -205,13 +206,13 @@ public class StorageController {
             pageSize = PageRules.defaultPageSize();
         }
 
-        PageDTO<Storage> page = new PageDTO<>();
+        PageDTO<StoredObject> page = new PageDTO<>();
         page.setPageNo(pageNo);
         page.setPageSize(pageSize);
         return page;
     }
 
-    private void applyBackendObject(Storage storage, StorageBackendObject object) {
+    private void applyBackendObject(StoredObject storage, StorageBackendObject object) {
         storage.setStorageType(object.getStorageType());
         storage.setBucketName(object.getBucketName());
         storage.setObjectKey(object.getObjectKey());

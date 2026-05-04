@@ -3,7 +3,7 @@ package com.github.thundax.modules.storage.servlet;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.backend.StorageBackend;
 import com.github.thundax.modules.storage.converter.StorageConverter;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class StorageServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        Storage storage = storageConverter.toEntity(request.getRequestURI());
+        StoredObject storage = storageConverter.toEntity(request.getRequestURI());
 
         if (storage == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());

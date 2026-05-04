@@ -7,17 +7,17 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import java.util.Date;
 import org.junit.Test;
 
@@ -29,17 +29,17 @@ public class StoragePersistenceAssemblerTest {
         dataObject.setOwnerType("user");
         dataObject.setStorageType("local_file");
 
-        Storage entity = StoragePersistenceAssembler.toEntity(dataObject);
+        StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
         assertSame(StorageOwnerType.USER, entity.getOwnerType());
-        assertSame(StorageBackendType.LOCAL_FILE, entity.getStorageType());
+        assertSame(StorageType.LOCAL_FILE, entity.getStorageType());
     }
 
     @Test
     public void shouldWriteEnumOwnerTypeValue() {
-        Storage entity = new Storage();
+        StoredObject entity = new StoredObject();
         entity.setOwnerType(StorageOwnerType.MEMBER);
-        entity.setStorageType(StorageBackendType.LOCAL_FILE);
+        entity.setStorageType(StorageType.LOCAL_FILE);
         entity.setBucketName("/tmp/storage/");
         entity.setObjectKey("202605/s1.png");
         entity.setSize(10L);
@@ -61,44 +61,46 @@ public class StoragePersistenceAssemblerTest {
         dataObject.setEnableFlag(Global.ENABLE);
         dataObject.setPublicFlag(Global.YES);
 
-        Storage entity = StoragePersistenceAssembler.toEntity(dataObject);
+        StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
-        assertSame(StorageStatus.ENABLED, entity.getStatus());
-        assertSame(StorageVisibility.PUBLIC, entity.getVisibility());
+        assertSame(StoredObjectStatus.ACTIVE, entity.getStatus());
+        assertSame(StoredObjectReferenceStatus.REFERENCED, entity.getVisibility());
     }
 
     @Test
     public void shouldWriteDomainValuesToLegacyFlags() {
-        Storage entity = new Storage();
-        entity.setStatus(StorageStatus.DISABLED);
-        entity.setVisibility(StorageVisibility.PRIVATE);
+        StoredObject entity = new StoredObject();
+        entity.setStatus(StoredObjectStatus.DELETED);
+        entity.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
 
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
-        assertEquals("DISABLED", dataObject.getEnableFlag());
-        assertEquals("PRIVATE", dataObject.getPublicFlag());
+        assertEquals("DELETED", dataObject.getEnableFlag());
+        assertEquals("UNREFERENCED", dataObject.getPublicFlag());
     }
 
     @Test
     public void shouldMapBusinessVisibility() {
-        StorageBusinessDO dataObject = new StorageBusinessDO();
+        StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId("s1");
-        dataObject.setPublicFlag(Global.YES);
+        dataObject.setBusinessId("owner-1");
+        dataObject.setBusinessType("USER");
 
-        StorageBusiness entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
+        StoredObjectReference entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
         assertEquals("s1", entity.getId().value());
-        assertSame(StorageVisibility.PUBLIC, entity.getVisibility());
+        assertEquals("owner-1", entity.getOwnerId());
+        assertEquals("USER", entity.getOwnerType().value());
         assertEquals(
                 "s1", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
         assertEquals(
-                "PUBLIC",
-                StoragePersistenceAssembler.toBusinessDataObject(entity).getPublicFlag());
+                "owner-1",
+                StoragePersistenceAssembler.toBusinessDataObject(entity).getBusinessId());
     }
 
     @Test
     public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
-        Storage entity = new Storage();
+        StoredObject entity = new StoredObject();
         entity.setPriority(-1);
         StorageDO dataObject = new StorageDO();
         dataObject.setPriority(-1);
@@ -123,7 +125,7 @@ public class StoragePersistenceAssemblerTest {
         entity.setBusinessType("product");
         entity.setOriginalFilename("demo.png");
         entity.setMimeType("image/png");
-        entity.setStorageType(StorageBackendType.OSS);
+        entity.setStorageType(StorageType.OSS);
         entity.setBucketName("bucket-a");
         entity.setObjectKey("202605/demo.png");
         entity.setProviderUploadId("provider-1");
@@ -147,7 +149,7 @@ public class StoragePersistenceAssemblerTest {
         assertEquals(Integer.valueOf(2), dataObject.getUploadedPartCount());
         assertEquals("ms1", restored.getId().value());
         assertSame(StorageOwnerType.USER, restored.getOwnerType());
-        assertSame(StorageBackendType.OSS, restored.getStorageType());
+        assertSame(StorageType.OSS, restored.getStorageType());
         assertSame(MultipartUploadStatus.UPLOADING, restored.getUploadStatus());
         assertEquals("provider-1", restored.getProviderUploadId());
         assertEquals(completedDate, restored.getCompletedDate());
@@ -164,7 +166,7 @@ public class StoragePersistenceAssemblerTest {
         MultipartUploadSession entity = StoragePersistenceAssembler.toMultipartSessionEntity(dataObject);
 
         assertSame(StorageOwnerType.MEMBER, entity.getOwnerType());
-        assertSame(StorageBackendType.LOCAL_FILE, entity.getStorageType());
+        assertSame(StorageType.LOCAL_FILE, entity.getStorageType());
         assertSame(MultipartUploadStatus.INITIATED, entity.getUploadStatus());
         assertEquals(Integer.valueOf(0), entity.getUploadedPartCount());
     }

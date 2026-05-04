@@ -4,15 +4,15 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum StorageVisibility {
-    PUBLIC,
-    PRIVATE;
+public enum StoredObjectReferenceStatus {
+    UNREFERENCED,
+    REFERENCED;
 
     public String value() {
         return name();
     }
 
-    public static StorageVisibility from(String value) {
+    public static StoredObjectReferenceStatus from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value)
                         || item.legacyValue().equals(value))
@@ -21,6 +21,6 @@ public enum StorageVisibility {
     }
 
     private String legacyValue() {
-        return this == PUBLIC ? Global.YES : Global.NO;
+        return this == REFERENCED ? Global.YES : Global.NO;
     }
 }

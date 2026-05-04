@@ -12,17 +12,17 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
-import com.github.thundax.modules.storage.dao.StorageBusinessDao;
 import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldGetStorageById() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        Storage expected = storage("s1");
+        StoredObject expected = storage("s1");
         dao.getResult = expected;
 
         StorageServiceImpl service = storageService(dao);
@@ -50,13 +50,13 @@ public class StorageServiceImplTest {
         query.setMimeType("image/png");
         query.setOwnerId("owner-1");
         query.setOwnerType(StorageOwnerType.USER);
-        query.setStatus(StorageStatus.ENABLED);
-        query.setVisibility(StorageVisibility.PUBLIC);
+        query.setStatus(StoredObjectStatus.ACTIVE);
+        query.setVisibility(StoredObjectReferenceStatus.REFERENCED);
         query.setBusinessId("business-1");
         query.setBusinessType("Article");
         query.setName("avatar");
         query.setRemarks("remark");
-        PageDTO<Storage> page = new PageDTO<>(2, 20);
+        PageDTO<StoredObject> page = new PageDTO<>(2, 20);
 
         StorageServiceImpl service = storageService(dao);
         service.page(query, page);
@@ -64,8 +64,8 @@ public class StorageServiceImplTest {
         assertEquals("image/png", dao.mimeType);
         assertEquals("owner-1", dao.ownerId);
         assertEquals("USER", dao.ownerType);
-        assertEquals("ENABLED", dao.enableFlag);
-        assertEquals("PUBLIC", dao.publicFlag);
+        assertEquals("ACTIVE", dao.enableFlag);
+        assertEquals("REFERENCED", dao.publicFlag);
         assertEquals("business-1", dao.businessId);
         assertEquals("Article", dao.businessType);
         assertEquals("avatar", dao.name);
@@ -77,7 +77,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldPrepareEntityBeforeSave() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        Storage storage = new Storage();
+        StoredObject storage = new StoredObject();
 
         StorageServiceImpl service = storageService(dao);
         service.add(storage);
@@ -103,7 +103,7 @@ public class StorageServiceImplTest {
     public void shouldDelegateBusinessOperations() {
         RecordingStorageDao dao = new RecordingStorageDao();
         StorageServiceImpl service = storageService(dao);
-        List<StorageBusiness> list = Arrays.asList(storageBusiness("s1"));
+        List<StoredObjectReference> list = Arrays.asList(storageBusiness("s1"));
 
         service.insertBusiness(list);
         service.removeBusiness("User", "u1");
@@ -115,8 +115,8 @@ public class StorageServiceImplTest {
     @Test
     public void shouldAllowPublicStorageAccess() {
         StorageServiceImpl service = storageService(new RecordingStorageDao());
-        Storage storage = storage("s1");
-        storage.setVisibility(StorageVisibility.PUBLIC);
+        StoredObject storage = storage("s1");
+        storage.setVisibility(StoredObjectReferenceStatus.REFERENCED);
 
         assertTrue(service.canAccess(storage, null, null));
     }
@@ -124,8 +124,8 @@ public class StorageServiceImplTest {
     @Test
     public void shouldAllowPrivateStorageOwnerAccess() {
         StorageServiceImpl service = storageService(new RecordingStorageDao());
-        Storage storage = storage("s1");
-        storage.setVisibility(StorageVisibility.PRIVATE);
+        StoredObject storage = storage("s1");
+        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 
@@ -135,8 +135,8 @@ public class StorageServiceImplTest {
     @Test
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
         StorageServiceImpl service = storageService(new RecordingStorageDao());
-        Storage storage = storage("s1");
-        storage.setVisibility(StorageVisibility.PRIVATE);
+        StoredObject storage = storage("s1");
+        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 
@@ -206,13 +206,13 @@ public class StorageServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
         StorageBackendObject object = new StorageBackendObject();
-        object.setStorageType(StorageBackendType.LOCAL_FILE);
+        object.setStorageType(StorageType.LOCAL_FILE);
         object.setBucketName("/tmp/storage/");
         object.setObjectKey("202605/demo.png");
         object.setSize(300L);
         object.setAccessEndpoint("/servlet/storage/demo.png");
 
-        Storage storage = storageService(dao).completeMultipartUpload("upload-1", object);
+        StoredObject storage = storageService(dao).completeMultipartUpload("upload-1", object);
 
         assertNotNull(storage.getId());
         assertEquals("demo", storage.getName());
@@ -220,7 +220,7 @@ public class StorageServiceImplTest {
         assertEquals("image/png", storage.getMimeType());
         assertEquals("owner-1", storage.getOwnerId());
         assertSame(StorageOwnerType.USER, storage.getOwnerType());
-        assertSame(StorageBackendType.LOCAL_FILE, storage.getStorageType());
+        assertSame(StorageType.LOCAL_FILE, storage.getStorageType());
         assertEquals("202605/demo.png", storage.getObjectKey());
         assertEquals(Long.valueOf(300L), storage.getSize());
         assertSame(storage, dao.inserted);
@@ -250,14 +250,14 @@ public class StorageServiceImplTest {
         assertNotNull(dao.updatedMultipartSession.getAbortedDate());
     }
 
-    private static Storage storage(String id) {
-        Storage storage = new Storage();
+    private static StoredObject storage(String id) {
+        StoredObject storage = new StoredObject();
         storage.setId(EntityIdCodec.toDomain(id));
         return storage;
     }
 
-    private static StorageBusiness storageBusiness(String id) {
-        StorageBusiness storageBusiness = new StorageBusiness();
+    private static StoredObjectReference storageBusiness(String id) {
+        StoredObjectReference storageBusiness = new StoredObjectReference();
         storageBusiness.setId(EntityIdCodec.toDomain(id));
         return storageBusiness;
     }
@@ -269,7 +269,7 @@ public class StorageServiceImplTest {
         session.setOwnerType(StorageOwnerType.USER);
         session.setOriginalFilename("demo.png");
         session.setMimeType("image/png");
-        session.setStorageType(StorageBackendType.LOCAL_FILE);
+        session.setStorageType(StorageType.LOCAL_FILE);
         session.setTotalSize(300L);
         session.setPartSize(100L);
         session.setUploadStatus(MultipartUploadStatus.INITIATED);
@@ -289,9 +289,9 @@ public class StorageServiceImplTest {
         return new StorageServiceImpl(dao, dao, dao);
     }
 
-    private static class RecordingStorageDao implements StorageDao, StorageBusinessDao, MultipartUploadDao {
+    private static class RecordingStorageDao implements StorageDao, StoredObjectReferenceDao, MultipartUploadDao {
 
-        private Storage getResult;
+        private StoredObject getResult;
         private String id;
         private String mimeType;
         private String ownerId;
@@ -304,9 +304,9 @@ public class StorageServiceImplTest {
         private String remarks;
         private int pageNo;
         private int pageSize;
-        private Storage inserted;
+        private StoredObject inserted;
         private List<String> deletedIds = new java.util.ArrayList<>();
-        private List<StorageBusiness> businessList;
+        private List<StoredObjectReference> businessList;
         private String deletedBusinessKey;
         private MultipartUploadSession insertedMultipartSession;
         private MultipartUploadSession multipartSessionResult;
@@ -317,18 +317,18 @@ public class StorageServiceImplTest {
         private int multipartPartCount;
 
         @Override
-        public Storage getById(EntityId id) {
+        public StoredObject getById(EntityId id) {
             this.id = id.value();
             return getResult;
         }
 
         @Override
-        public List<Storage> listByIds(List<String> idList) {
+        public List<StoredObject> listByIds(List<String> idList) {
             return null;
         }
 
         @Override
-        public List<Storage> list(
+        public List<StoredObject> list(
                 String mimeType,
                 String ownerId,
                 String ownerType,
@@ -342,7 +342,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Storage> page(
+        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<StoredObject> page(
                 String mimeType,
                 String ownerId,
                 String ownerType,
@@ -369,13 +369,13 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public String insert(Storage entity) {
+        public String insert(StoredObject entity) {
             this.inserted = entity;
             return "generated-storage-id";
         }
 
         @Override
-        public int update(Storage entity) {
+        public int update(StoredObject entity) {
             return 1;
         }
 
@@ -396,22 +396,22 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int updateStatus(Storage storage) {
+        public int updateStatus(StoredObject storage) {
             return 1;
         }
 
         @Override
-        public int updateVisibility(Storage storage) {
+        public int updateVisibility(StoredObject storage) {
             return 1;
         }
 
         @Override
-        public List<StorageBusiness> listBusiness(Storage entity) {
+        public List<StoredObjectReference> listBusiness(StoredObject entity) {
             return null;
         }
 
         @Override
-        public void insertBusiness(List<StorageBusiness> list) {
+        public void insertBusiness(List<StoredObjectReference> list) {
             this.businessList = list;
         }
 

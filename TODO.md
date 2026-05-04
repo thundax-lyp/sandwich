@@ -9,43 +9,29 @@
 
 ## 当前任务项
 
-- [ ] `storage-entity`：重命名存储主对象和引用对象
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/Storage.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StorageBusiness.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageBackendType.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageOwnerType.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageStatus.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageVisibility.java
-  - 处理动作：将 `Storage` / `StorageBusiness` 收敛为 `StoredObject` / `StoredObjectReference` 语义
-  - 验收点：业务 Entity 使用 `StoredObject`、`StoredObjectReference`、`ownerType`、`ownerId`、`contentType` 和对象引用状态语义
-  - 重要度：10/10
-
 - [ ] `storage-service`：调整 Storage Service 对象语义
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/query/StorageQuery.java
-  - 处理动作：将 Service 入参、返回值和查询条件改为 `StoredObject` 语义并保留事务编排
-  - 验收点：Service 对外不再暴露 `StorageBusiness` 或 `StorageBackend` 业务语义，上传、引用、删除和内容读取以 `StoredObject` 表达
+  - 处理动作：将引用建立、引用清理、状态流转和查询字段改为 `StoredObject` 当前端口语义
+  - 验收点：Service 对外不再暴露 legacy business/visibility 方法，上传、引用、删除和内容读取以 `StoredObject` 表达
   - 重要度：10/10
 
 - [ ] `storage-dao`：调整 DAO 端口语义
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StorageDao.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StorageBusinessDao.java
+    sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectReferenceDao.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/MultipartUploadDao.java
-  - 处理动作：将 DAO interface 收敛为 `StoredObjectDao`、`StoredObjectReferenceDao` 和 `MultipartUploadDao`
-  - 验收点：DAO 端口按存储对象主数据、引用关系、分片上传运行态分离，命名不再出现 `StorageBusiness`
+  - 处理动作：将主对象 DAO interface 收敛为 `StoredObjectDao`，并将引用端口方法名改为当前引用语义
+  - 验收点：DAO 端口按存储对象主数据、引用关系、分片上传运行态分离，方法命名不再出现 legacy business/visibility 口径
   - 重要度：9/10
 
 - [ ] `storage-infra`：调整持久化实现和 DO 命名
   - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageDaoImpl.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StorageBusinessDaoImpl.java
     sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageDO.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageBusinessDO.java
     sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StorageMapper.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StorageBusinessMapper.java
     sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java
-  - 处理动作：将 infra 持久化对象、Mapper、Assembler 和 DAO implementation 对齐 `StoredObject` / `StoredObjectReference`
-  - 验收点：infra 不再使用 `StorageDO` / `StorageBusinessDO` 作为当前模型名，数据库字段映射与设计文档一致
+  - 处理动作：将主对象持久化对象、Mapper、Assembler 和 DAO implementation 对齐 `StoredObject`
+  - 验收点：infra 不再使用 `StorageDO` 作为当前模型名，数据库字段映射与设计文档一致
   - 重要度：10/10
 
 - [ ] `storage-store`：下沉底层存储端口

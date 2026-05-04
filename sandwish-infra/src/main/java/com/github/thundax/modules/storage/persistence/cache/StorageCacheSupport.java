@@ -6,7 +6,7 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.storage.entity.Storage;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -27,11 +27,11 @@ public class StorageCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Object> cache;
 
-    public Storage getById(String id) {
-        return (Storage) cache.get(objectKey(id));
+    public StoredObject getById(String id) {
+        return (StoredObject) cache.get(objectKey(id));
     }
 
-    public void putById(Storage storage) {
+    public void putById(StoredObject storage) {
         if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toValue(storage.getId()))) {
             cache.put(
                     objectKey(EntityIdCodec.toValue(storage.getId())),

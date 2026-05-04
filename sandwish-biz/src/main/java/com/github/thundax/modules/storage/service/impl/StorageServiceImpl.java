@@ -8,16 +8,16 @@ import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
-import com.github.thundax.modules.storage.dao.StorageBusinessDao;
 import com.github.thundax.modules.storage.dao.StorageDao;
+import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageVisibility;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.utils.MetaFile;
@@ -35,17 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class StorageServiceImpl implements StorageService {
 
     private final StorageDao dao;
-    private final StorageBusinessDao businessDao;
+    private final StoredObjectReferenceDao businessDao;
     private final MultipartUploadDao multipartUploadDao;
 
-    public StorageServiceImpl(StorageDao dao, StorageBusinessDao businessDao, MultipartUploadDao multipartUploadDao) {
+    public StorageServiceImpl(
+            StorageDao dao, StoredObjectReferenceDao businessDao, MultipartUploadDao multipartUploadDao) {
         this.dao = dao;
         this.businessDao = businessDao;
         this.multipartUploadDao = multipartUploadDao;
     }
 
     @Override
-    public Storage getById(EntityId id) {
+    public StoredObject getById(EntityId id) {
         if (id == null) {
             return null;
         }
@@ -53,12 +54,12 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<Storage> listByIds(List<EntityId> ids) {
+    public List<StoredObject> listByIds(List<EntityId> ids) {
         return dao.listByIds(EntityIdCodec.toValues(ids));
     }
 
     @Override
-    public List<Storage> list(StorageQuery query) {
+    public List<StoredObject> list(StorageQuery query) {
         return dao.list(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
@@ -72,9 +73,9 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public PageDTO<Storage> page(StorageQuery query, PageDTO<Storage> page) {
-        PageDTO<Storage> normalizedPage = normalizePage(page);
-        IPage<Storage> dataPage = dao.page(
+    public PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page) {
+        PageDTO<StoredObject> normalizedPage = normalizePage(page);
+        IPage<StoredObject> dataPage = dao.page(
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
@@ -95,13 +96,13 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Storage storage) {
+    public void add(StoredObject storage) {
         storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Storage storage) {
+    public void update(StoredObject storage) {
         dao.update(storage);
     }
 
@@ -129,13 +130,13 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(Storage storage) {
+    public int updateStatus(StoredObject storage) {
         return dao.updateStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateVisibility(Storage storage) {
+    public int updateVisibility(StoredObject storage) {
         return dao.updateVisibility(storage);
     }
 
@@ -147,24 +148,24 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertBusiness(List<StorageBusiness> list) {
+    public void insertBusiness(List<StoredObjectReference> list) {
         businessDao.insertBusiness(list);
     }
 
     @Override
-    public List<StorageBusiness> listBusiness(Storage entity) {
+    public List<StoredObjectReference> listBusiness(StoredObject entity) {
         return businessDao.listBusiness(entity);
     }
 
     @Override
-    public boolean canAccess(Storage storage, StorageOwnerType ownerType, String ownerId) {
+    public boolean canAccess(StoredObject storage, StorageOwnerType ownerType, String ownerId) {
         if (storage == null) {
             return false;
         }
-        if (StorageVisibility.PUBLIC == storage.getVisibility()) {
+        if (StoredObjectReferenceStatus.REFERENCED == storage.getVisibility()) {
             return true;
         }
-        return StorageVisibility.PRIVATE == storage.getVisibility()
+        return StoredObjectReferenceStatus.UNREFERENCED == storage.getVisibility()
                 && storage.getOwnerType() == ownerType
                 && StringUtils.isNotBlank(ownerId)
                 && StringUtils.equals(storage.getOwnerId(), ownerId);
@@ -214,12 +215,12 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Storage completeMultipartUpload(String uploadId, StorageBackendObject object) {
+    public StoredObject completeMultipartUpload(String uploadId, StorageBackendObject object) {
         MultipartUploadSession session = requireActiveMultipartSession(uploadId);
         List<MultipartUploadPart> parts = multipartUploadDao.listMultipartParts(uploadId);
         validateMultipartParts(session, parts);
 
-        Storage storage = toCompletedStorage(session, object);
+        StoredObject storage = toCompletedStorage(session, object);
         storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
 
         Date now = new Date();
@@ -252,8 +253,8 @@ public class StorageServiceImpl implements StorageService {
         return count;
     }
 
-    private PageDTO<Storage> normalizePage(PageDTO<Storage> page) {
-        PageDTO<Storage> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageDTO<StoredObject> normalizePage(PageDTO<StoredObject> page) {
+        PageDTO<StoredObject> normalizedPage = page == null ? new PageDTO<>() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }
@@ -262,11 +263,11 @@ public class StorageServiceImpl implements StorageService {
         return ownerType == null ? null : ownerType.value();
     }
 
-    private String statusValue(StorageStatus status) {
+    private String statusValue(StoredObjectStatus status) {
         return status == null ? null : status.value();
     }
 
-    private String visibilityValue(StorageVisibility visibility) {
+    private String visibilityValue(StoredObjectReferenceStatus visibility) {
         return visibility == null ? null : visibility.value();
     }
 
@@ -314,8 +315,8 @@ public class StorageServiceImpl implements StorageService {
         return (int) ((totalSize + partSize - 1) / partSize);
     }
 
-    private Storage toCompletedStorage(MultipartUploadSession session, StorageBackendObject object) {
-        Storage storage = new Storage();
+    private StoredObject toCompletedStorage(MultipartUploadSession session, StorageBackendObject object) {
+        StoredObject storage = new StoredObject();
         storage.setName(baseName(session.getOriginalFilename()));
         storage.setExtendName(extension(session.getOriginalFilename()));
         storage.setMimeType(session.getMimeType());
@@ -326,8 +327,8 @@ public class StorageServiceImpl implements StorageService {
         storage.setObjectKey(object == null ? session.getObjectKey() : object.getObjectKey());
         storage.setSize(object == null ? session.getTotalSize() : object.getSize());
         storage.setAccessEndpoint(object == null ? null : object.getAccessEndpoint());
-        storage.setStatus(StorageStatus.ENABLED);
-        storage.setVisibility(StorageVisibility.PRIVATE);
+        storage.setStatus(StoredObjectStatus.ACTIVE);
+        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setCreateDate(new Date());
         return storage;
     }

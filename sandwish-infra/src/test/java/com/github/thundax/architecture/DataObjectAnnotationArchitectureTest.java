@@ -25,7 +25,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO",
         "com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO",
-        "com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO",
+        "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
@@ -66,8 +66,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
                 userEncryptDO.tryGetField("id").isPresent());
         assertTableId(userEncryptDO, "userId", "id", IdType.INPUT);
 
-        JavaClass storageBusinessDO =
-                classByName(classes, "com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO");
+        JavaClass storageBusinessDO = classByName(
+                classes, "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO");
         assertFalse(
                 storageBusinessDO.getFullName() + " must not declare id field",
                 storageBusinessDO.tryGetField("id").isPresent());

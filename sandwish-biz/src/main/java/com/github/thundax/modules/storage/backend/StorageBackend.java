@@ -1,17 +1,17 @@
 package com.github.thundax.modules.storage.backend;
 
-import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.enums.StorageBackendType;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
 import java.io.IOException;
 import java.io.InputStream;
 
 public interface StorageBackend {
 
-    StorageBackendType type();
+    StorageType type();
 
-    StorageBackendObject save(Storage storage, InputStream inputStream) throws IOException;
+    StorageBackendObject save(StoredObject storage, InputStream inputStream) throws IOException;
 
-    boolean exists(Storage storage);
+    boolean exists(StoredObject storage);
 
-    InputStream open(Storage storage) throws IOException;
+    InputStream open(StoredObject storage) throws IOException;
 }

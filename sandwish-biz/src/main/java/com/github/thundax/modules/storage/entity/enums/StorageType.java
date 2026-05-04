@@ -3,7 +3,7 @@ package com.github.thundax.modules.storage.entity.enums;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
-public enum StorageBackendType {
+public enum StorageType {
     LOCAL_FILE,
     OSS;
 
@@ -11,7 +11,7 @@ public enum StorageBackendType {
         return name();
     }
 
-    public static StorageBackendType from(String value) {
+    public static StorageType from(String value) {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()

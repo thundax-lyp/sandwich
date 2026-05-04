@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.persistence.PageRules;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -196,12 +197,12 @@ public class StorageController {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
-        if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
-            pageNo = Page.FIRST_PAGE_INDEX;
+        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
+            pageNo = PageRules.firstPageIndex();
         }
 
         if (pageSize == null || pageSize <= 0) {
-            pageSize = Page.DEFAULT_PAGE_SIZE;
+            pageSize = PageRules.defaultPageSize();
         }
 
         Page<Storage> page = new Page<>();

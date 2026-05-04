@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.persistence.PageRules;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.dao.UserEncryptDao;
 import com.github.thundax.modules.sys.entity.UserEncrypt;
@@ -249,11 +250,11 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
     private Page<UserEncrypt> normalizePage(Page<UserEncrypt> page) {
         Page<UserEncrypt> normalizedPage = page == null ? new Page<>() : page;
-        if (normalizedPage.getPageNo() < Page.FIRST_PAGE_INDEX) {
-            normalizedPage.setPageNo(Page.FIRST_PAGE_INDEX);
+        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
+            normalizedPage.setPageNo(PageRules.firstPageIndex());
         }
         if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(Page.DEFAULT_PAGE_SIZE);
+            normalizedPage.setPageSize(PageRules.defaultPageSize());
         }
         return normalizedPage;
     }

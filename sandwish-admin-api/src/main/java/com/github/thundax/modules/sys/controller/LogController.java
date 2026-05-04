@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.persistence.PageRules;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
@@ -68,12 +69,12 @@ public class LogController {
         Integer pageNo = request.getPageNo();
         Integer pageSize = request.getPageSize();
 
-        if (pageNo == null || pageNo < Page.FIRST_PAGE_INDEX) {
-            pageNo = Page.FIRST_PAGE_INDEX;
+        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
+            pageNo = PageRules.firstPageIndex();
         }
 
         if (pageSize == null || pageSize <= 0) {
-            pageSize = Page.DEFAULT_PAGE_SIZE;
+            pageSize = PageRules.defaultPageSize();
         }
 
         Page<Log> page = new Page<>();

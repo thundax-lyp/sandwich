@@ -7,6 +7,7 @@ import static org.junit.Assert.assertSame;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
+import com.github.thundax.common.persistence.PageRules;
 import com.github.thundax.modules.sys.dao.UploadFileDao;
 import com.github.thundax.modules.sys.entity.UploadFile;
 import java.util.Arrays;
@@ -34,8 +35,8 @@ public class UploadFileServiceImplTest {
 
         service.page(new UploadFile(), page);
 
-        assertEquals(Page.FIRST_PAGE_INDEX, dao.pageNo);
-        assertEquals(Page.DEFAULT_PAGE_SIZE, dao.pageSize);
+        assertEquals(PageRules.firstPageIndex(), dao.pageNo);
+        assertEquals(PageRules.defaultPageSize(), dao.pageSize);
         assertEquals(1L, page.getCount());
     }
 

@@ -6,7 +6,7 @@ import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.common.utils.encrypt.Md5Helper;
+import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
@@ -872,7 +872,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         if ("S256".equalsIgnoreCase(authorization.getCodeChallengeMethod())) {
-            return StringUtils.equals(authorization.getCodeChallenge(), Md5Helper.encrypt(codeVerifier));
+            return StringUtils.equals(authorization.getCodeChallenge(), Sha256Helper.hashBase64Url(codeVerifier));
         }
         return StringUtils.equals(authorization.getCodeChallenge(), codeVerifier);
     }
@@ -881,7 +881,7 @@ public class AuthServiceImpl implements AuthService {
         if (StringUtils.isBlank(token)) {
             return StringUtils.EMPTY;
         }
-        return Md5Helper.encrypt(token);
+        return Sha256Helper.hashBase64Url(token);
     }
 
     private UserCredential getOrBootstrapPasswordCredential(User user, UserIdentity identity) {

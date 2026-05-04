@@ -8,8 +8,11 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
-import com.github.thundax.common.utils.encrypt.Md5Helper;
+import com.github.thundax.common.utils.encrypt.Sha256Helper;
+import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.OAuthAccessTokenDao;
@@ -190,7 +193,7 @@ public class AuthPermissionLifecycleTest {
         OAuthRefreshToken refreshToken = new OAuthRefreshToken();
         refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
         refreshToken.setTokenId("refresh-token-1");
-        refreshToken.setTokenHash(Md5Helper.encrypt("plain-refresh-token"));
+        refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
         refreshToken.setUserId(EntityIdCodec.toDomain("u1"));
@@ -224,13 +227,15 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals("Admin Web", view.getClientName());
         Assert.assertTrue(view.getScopes().contains("openid"));
 
+        String codeVerifier = "plain-verifier";
+        String codeChallenge = Sha256Helper.hashBase64Url(codeVerifier);
         OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(
                 "admin-web",
                 "http://127.0.0.1/callback",
                 Arrays.asList("openid", "profile"),
                 "state-1",
-                "plain-verifier",
-                "plain",
+                codeChallenge,
+                "S256",
                 "u1",
                 true);
 
@@ -245,7 +250,7 @@ public class AuthPermissionLifecycleTest {
                 "authorization_code",
                 "http://127.0.0.1/callback",
                 decision.getAuthorizationCode(),
-                "plain-verifier",
+                codeVerifier,
                 null);
 
         Assert.assertNotNull(token.getAccessToken().getToken());
@@ -254,7 +259,15 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(authorizationDao.current.isUsed());
         Assert.assertEquals(OAuthAccessTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
         Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
-        Assert.assertTrue(authService.queryToken(token.getOauthAccessToken()).isActive());
+        AuthTokenQueryResult queryResult = authService.queryToken(token.getOauthAccessToken());
+        Assert.assertTrue(queryResult.isActive());
+        OAuth2IntrospectionResponse introspection = AuthInterfaceAssembler.toIntrospectionResponse(queryResult);
+        Assert.assertEquals("admin-web", introspection.getClientId());
+        Assert.assertEquals("openid profile", introspection.getScope());
+        Assert.assertEquals("Bearer", introspection.getTokenType());
+        Assert.assertTrue(introspection.getExpiresAt() > 0L);
+        OAuth2UserinfoResponse userinfo = AuthInterfaceAssembler.toUserinfoResponse(queryResult);
+        Assert.assertEquals("tester", userinfo.getPreferredUsername());
         Assert.assertTrue(authService.revokeOAuth2Token("admin-web", "secret", token.getOauthAccessToken()));
         Assert.assertFalse(authService.queryToken(token.getOauthAccessToken()).isActive());
         Assert.assertTrue(authService.revokeAuthorizationCode(decision.getAuthorizationCode()));
@@ -271,7 +284,7 @@ public class AuthPermissionLifecycleTest {
         OAuthRefreshToken refreshToken = new OAuthRefreshToken();
         refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
         refreshToken.setTokenId("refresh-token-1");
-        refreshToken.setTokenHash(Md5Helper.encrypt("plain-refresh-token"));
+        refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
         refreshToken.setUserId(EntityIdCodec.toDomain("u1"));

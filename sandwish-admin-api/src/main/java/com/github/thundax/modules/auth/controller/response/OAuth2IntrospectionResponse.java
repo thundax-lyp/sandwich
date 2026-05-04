@@ -28,6 +28,22 @@ public class OAuth2IntrospectionResponse implements Serializable {
     @JsonProperty("username")
     private String username;
 
+    @ApiModelProperty(name = "client_id", value = "OAuth2 客户端标识")
+    @JsonProperty("client_id")
+    private String clientId;
+
+    @ApiModelProperty(name = "scope", value = "OAuth2 授权范围")
+    @JsonProperty("scope")
+    private String scope;
+
+    @ApiModelProperty(name = "exp", value = "OAuth2 token 过期时间戳")
+    @JsonProperty("exp")
+    private Long expiresAt;
+
+    @ApiModelProperty(name = "token_type", value = "OAuth2 token 类型")
+    @JsonProperty("token_type")
+    private String tokenType;
+
     @ApiModelProperty(name = "sessionId", value = "会话标识")
     @JsonProperty("sessionId")
     private String sessionId;

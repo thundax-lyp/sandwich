@@ -24,6 +24,10 @@ public class OAuth2UserinfoResponse implements Serializable {
     @JsonProperty("username")
     private String username;
 
+    @ApiModelProperty(name = "preferred_username", value = "首选用户名")
+    @JsonProperty("preferred_username")
+    private String preferredUsername;
+
     @ApiModelProperty(name = "name", value = "用户名称")
     @JsonProperty("name")
     private String name;

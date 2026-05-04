@@ -309,6 +309,7 @@
 - 授权码过期后不得换 token。
 - `redirectUri` 必须来自对应 `OAuthClient.redirectUris`。
 - 授权范围必须是 `OAuthClient.scopes` 的子集。
+- `S256` PKCE challenge 必须使用 code verifier 的 SHA-256 Base64Url 摘要。
 
 ### 5.10 OAuthAccessToken
 
@@ -335,6 +336,7 @@
 固定约束：
 
 - OAuth2 access token 只保存哈希，不保存明文。
+- OAuth2 access token 哈希必须使用 SHA-256 Base64Url 摘要。
 - introspection 必须同时校验 token 状态、过期时间和用户启用状态。
 - revoke access token 后 introspection 必须返回 `active=false`。
 
@@ -473,15 +475,17 @@
 ### 7.10 refresh token
 
 - OAuth2 token 响应需要按客户端策略生成 refresh token。
-- refresh token 必须能定位 client、user、tenant 和 access token。
+- refresh token 必须能定位 client、user 和 access token。
+- refresh token 只保存哈希，不保存明文。
+- refresh token 哈希必须使用 SHA-256 Base64Url 摘要。
 - refresh token 过期、撤销或已使用时必须拒绝刷新。
 - refresh token 刷新成功后必须生成新的 access token。
 
 ### 7.11 token verify / introspection / userinfo
 
 - token verify 必须返回 token 是否有效。
-- introspection 必须返回 OAuth2 `active` 语义。
-- userinfo 必须根据有效 token 返回当前用户公开信息。
+- introspection 必须返回 OAuth2 `active`、`sub`、`client_id`、`scope`、`exp` 和 `token_type` 语义。
+- userinfo 必须根据有效 token 返回当前用户公开信息，并提供 `sub`、`username`、`preferred_username` 和 `name`。
 - 无效 token 不得抛出复杂业务异常，应返回明确非活跃结果。
 
 ### 7.12 多登录方式

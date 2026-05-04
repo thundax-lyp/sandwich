@@ -11,11 +11,15 @@ import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoRespons
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.Date;
+import java.util.Set;
+import java.util.StringJoiner;
 import org.springframework.lang.NonNull;
 
 public final class AuthInterfaceAssembler {
@@ -85,6 +89,13 @@ public final class AuthInterfaceAssembler {
         response.setActive(true);
         response.setSubject(userId(result.getUser()));
         response.setUsername(username(result.getUser()));
+        OAuthAccessToken oauthAccessToken = result.getOauthAccessToken();
+        if (oauthAccessToken != null) {
+            response.setClientId(oauthAccessToken.getClientId());
+            response.setScope(scope(oauthAccessToken.getScopes()));
+            response.setExpiresAt(epochSeconds(oauthAccessToken.getExpireAt()));
+            response.setTokenType("Bearer");
+        }
         if (result.getSession() != null) {
             response.setSessionId(result.getSession().getSessionId());
         }
@@ -99,6 +110,7 @@ public final class AuthInterfaceAssembler {
         }
         response.setSubject(userId(result.getUser()));
         response.setUsername(username(result.getUser()));
+        response.setPreferredUsername(username(result.getUser()));
         response.setName(result.getUser() == null ? null : result.getUser().getName());
         return response;
     }
@@ -134,5 +146,20 @@ public final class AuthInterfaceAssembler {
 
     private static String username(User user) {
         return user == null ? null : user.getLoginName();
+    }
+
+    private static String scope(Set<String> scopes) {
+        if (scopes == null || scopes.isEmpty()) {
+            return null;
+        }
+        StringJoiner joiner = new StringJoiner(" ");
+        for (String scope : scopes) {
+            joiner.add(scope);
+        }
+        return joiner.toString();
+    }
+
+    private static Long epochSeconds(Date date) {
+        return date == null ? null : date.getTime() / 1000L;
     }
 }

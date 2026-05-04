@@ -88,6 +88,7 @@
 - `NAME_DATA_OBJECT`：持久化对象命名以 `DO` 或 `DataObject` 结尾
 - `NAME_DATA_OBJECT_REQUIRED_ANNOTATIONS`：`DO/DataObject` 固定使用 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor` 和 `@TableName`；这些注解属于持久化实现对象的允许注解
 - `NAME_DATA_OBJECT_QUERY_FIELD`：`DO/DataObject` 中用于持久化查询的字段必须显式命名，不使用通用 `query`
+- `NAME_SIMPLE_ENUM_CONVENTION`：业务枚举常量应该使用 `UPPER_SNAKE_CASE` 业务语义名，简单枚举统一实现 `value() -> name()` 和大小写不敏感的 `from(String value)`；解析失败统一抛 `BizException`，不返回 `null`，不静默 fallback 到默认值。
 - `NAME_DAO_METHOD_SHAPE`：DAO interface 方法名固定使用持久化端口口径：按 ID 读取应该使用 `getById`，按 ID 批量读取应该使用 `listByIds`，按业务唯一键读取应该使用 `getByXxx`，列表查询应该使用 `list(...)`，分页查询应该使用 `page(..., pageNo, pageSize)`，计数应该使用 `count(...)`，按 ID 删除应该使用 `deleteById`，批量动作应该使用 `batchXxx`
 - `NAME_SERVICE_METHOD_SHAPE`：Service 方法优先表达业务能力；当方法只是通用读取、列表、分页、计数、按 ID 删除、批量操作时，应该使用 `getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx`；业务动作使用清晰动词短语
 - `NAME_PERSISTENCE_ASSEMBLER`：持久化装配器命名以 `PersistenceAssembler` 结尾

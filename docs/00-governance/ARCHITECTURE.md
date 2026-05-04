@@ -6,7 +6,6 @@
 
 - 架构意图、小步提交和决策记忆见 [`ARCHITECTURE-INTENT.md`](./ARCHITECTURE-INTENT.md)
 - 新增类、改类名、改目录、判断模块归属见 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
-- 领域值对象、领域枚举和状态枚举固定形状见 [`DOMAIN-VALUE-RULES.md`](./DOMAIN-VALUE-RULES.md)
 - 数据库、实体、DAO、Mapper 和持久化查询见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
 - 领域标识、数据库主键和业务编号边界见 [`UNIFIED-ID-DESIGN.md`](./UNIFIED-ID-DESIGN.md)
 - HTTP API 注解矩阵见 [`API-ANNOTATION-MATRIX.md`](./API-ANNOTATION-MATRIX.md)
@@ -57,6 +56,7 @@ Sandwich 固定采用三层 API 架构。
 - Web 层：请求入口、登录态、权限、参数接收、API 响应组装。
 - Service 层：业务流程、事务边界、业务校验、跨 DAO 编排。
 - DAO/Mapper 层：持久化访问、SQL 映射、分页查询、数据装载。
+- Domain Entity / Service 使用领域枚举和值对象表达业务状态，不直接比较状态字符串。
 
 以下目录语义不作为 Sandwich 默认业务架构：
 

@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-oauth-access-token`：新增 OAuth access token 持久化端口
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth
-    sandwish-infra/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：新增 OAuthAccessToken Entity/DAO/DO/Mapper/Assembler/DAO implementation 和基础测试
-  - 验收点：OAuth access token 可按 tokenId/tokenHash 查询并写回状态
-  - 重要度：10/10
-
 - [ ] `auth-oauth-token-grant`：正规化 OAuth2 token grant 流程
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
     sandwish-admin-api/src/test/java/com/github/thundax/modules/auth

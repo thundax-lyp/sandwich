@@ -8,13 +8,16 @@ import com.github.thundax.common.utils.IdGen;
 import com.github.thundax.common.utils.encrypt.Sm2;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
+import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
+import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.entity.UserCredential;
 import com.github.thundax.modules.auth.entity.UserIdentity;
+import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
 import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
@@ -54,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginProperties loginProperties;
     private final LoginFormDao loginFormDao;
     private final AccessTokenDao accessTokenDao;
+    private final AuthSessionDao authSessionDao;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
     private final PasswordService passwordService;
@@ -65,6 +69,7 @@ public class AuthServiceImpl implements AuthService {
             LoginProperties loginProperties,
             LoginFormDao loginFormDao,
             AccessTokenDao accessTokenDao,
+            AuthSessionDao authSessionDao,
             UserIdentityDao userIdentityDao,
             UserCredentialDao userCredentialDao,
             PasswordService passwordService,
@@ -74,6 +79,7 @@ public class AuthServiceImpl implements AuthService {
         this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
         this.accessTokenDao = accessTokenDao;
+        this.authSessionDao = authSessionDao;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
         this.passwordService = passwordService;
@@ -226,6 +232,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @NonNull
     public AccessToken createAccessToken(String userId) {
+        return createAccessToken(userId, null);
+    }
+
+    @Override
+    @NonNull
+    public AccessToken createAccessToken(String userId, String loginName) {
         String token = UUID.randomUUID().toString();
 
         AccessToken accessToken = new AccessToken();
@@ -235,6 +247,7 @@ public class AuthServiceImpl implements AuthService {
 
         accessTokenDao.insert(accessToken);
         permissionService.createSession(token, userId);
+        createAuthSession(accessToken, loginName);
 
         return accessToken;
     }
@@ -263,12 +276,14 @@ public class AuthServiceImpl implements AuthService {
     public void activeAccessToken(AccessToken accessToken) {
         accessTokenDao.active(accessToken);
         permissionService.touch(accessToken.getToken());
+        touchAuthSession(accessToken.getToken());
     }
 
     @Override
     public void deleteAccessToken(AccessToken accessToken) {
         accessTokenDao.deleteByToken(accessToken.getToken());
         permissionService.release(accessToken.getToken());
+        logoutAuthSession(accessToken.getToken());
     }
 
     @Override
@@ -344,6 +359,61 @@ public class AuthServiceImpl implements AuthService {
         identity.setUpdateDate(identity.getCreateDate());
         identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
         return identity;
+    }
+
+    private void createAuthSession(AccessToken accessToken, String loginName) {
+        if (StringUtils.isBlank(loginName)) {
+            return;
+        }
+        UserIdentity identity = getOrBootstrapAccountIdentity(loginName);
+        if (identity == null
+                || !StringUtils.equals(accessToken.getUserId(), EntityIdCodec.toValue(identity.getUserId()))) {
+            return;
+        }
+
+        Date now = new Date();
+        AuthSession authSession = new AuthSession();
+        authSession.setSessionId(IdGen.uuid());
+        authSession.setToken(accessToken.getToken());
+        authSession.setUserId(identity.getUserId());
+        authSession.setIdentityId(identity.getId());
+        authSession.setIdentityType(identity.getIdentityType());
+        authSession.setLoginType(UserCredentialType.PASSWORD.value());
+        authSession.setStatus(AuthSessionStatus.ACTIVE);
+        authSession.setIssuedAt(now);
+        authSession.setLastAccessTime(now);
+        authSession.setExpireAt(new Date(now.getTime() + properties.getLoginExpiredSeconds() * 1000L));
+        authSession.setCreateDate(now);
+        authSession.setUpdateDate(now);
+        authSession.setId(EntityIdCodec.toDomain(authSessionDao.insert(authSession)));
+    }
+
+    private void touchAuthSession(String token) {
+        AuthSession authSession = authSessionDao.getByToken(token);
+        if (authSession == null) {
+            return;
+        }
+
+        Date now = new Date();
+        if (authSession.isExpired(now)) {
+            authSession.expire();
+            authSessionDao.updateExpire(authSession);
+            return;
+        }
+        if (authSession.isActive()) {
+            authSession.touch(now);
+            authSessionDao.updateAccessTime(authSession);
+        }
+    }
+
+    private void logoutAuthSession(String token) {
+        AuthSession authSession = authSessionDao.getByToken(token);
+        if (authSession == null || !authSession.isActive()) {
+            return;
+        }
+
+        authSession.logout(new Date());
+        authSessionDao.updateLogout(authSession);
     }
 
     private UserCredential getOrBootstrapPasswordCredential(User user, UserIdentity identity) {

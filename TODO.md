@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-auth-session-lifecycle`：后台登录登出写入认证会话
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/filter/AccessTokenAuthenticationFilter.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PermissionService.java
-  - 处理动作：登录成功创建 `AuthSession`，请求活跃 touch，会话登出或失效时更新状态
-  - 验收点：token、权限会话和认证会话生命周期一致且可审计
-  - 重要度：8/10
-
 - [ ] `auth-migration-tests`：补齐认证模型迁移测试
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/AuthCredentialServiceTest.java
     sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/assembler/UserIdentityPersistenceAssemblerTest.java

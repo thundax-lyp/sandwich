@@ -121,7 +121,7 @@ public class AuthController {
         userService.updateLoginInfo(user);
 
         return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.createAccessToken(EntityIdCodec.toValue(user.getId())));
+                authService.createAccessToken(EntityIdCodec.toValue(user.getId()), request.getUsername()));
     }
 
     @ApiOperation(value = "登出", notes = "ignore")

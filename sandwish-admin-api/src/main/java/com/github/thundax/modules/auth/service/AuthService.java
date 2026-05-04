@@ -61,6 +61,9 @@ public interface AuthService {
     @NonNull
     AccessToken createAccessToken(String userId);
 
+    @NonNull
+    AccessToken createAccessToken(String userId, String loginName);
+
     AccessToken getAccessToken(String token);
 
     AccessToken getByUserId(String userId);

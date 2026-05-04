@@ -7,11 +7,14 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
 import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
+import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.UserCredential;
 import com.github.thundax.modules.auth.entity.UserIdentity;
+import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
 import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
@@ -51,6 +54,7 @@ public class AuthPermissionLifecycleTest {
 
     private InMemoryAccessTokenDaoImpl accessTokenDao;
     private InMemoryPermissionDaoImpl permissionDao;
+    private TestAuthSessionDao authSessionDao;
     private AuthService authService;
     private PermissionService permissionService;
 
@@ -58,6 +62,7 @@ public class AuthPermissionLifecycleTest {
     public void setUp() {
         accessTokenDao = new InMemoryAccessTokenDaoImpl();
         permissionDao = new InMemoryPermissionDaoImpl();
+        authSessionDao = new TestAuthSessionDao();
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
@@ -69,6 +74,7 @@ public class AuthPermissionLifecycleTest {
                 new LoginProperties(),
                 new InMemoryLoginFormDaoImpl(),
                 accessTokenDao,
+                authSessionDao,
                 new TestUserIdentityDao(),
                 new TestUserCredentialDao(),
                 new PlainPasswordService(),
@@ -83,9 +89,10 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldCreateTouchAndReleasePermissionSessionWithAccessToken() {
-        AccessToken accessToken = authService.createAccessToken("u1");
+        AccessToken accessToken = authService.createAccessToken("u1", "tester");
 
         Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertNotNull(authSessionDao.getByToken(accessToken.getToken()));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "sys:role:view"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "user"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "admin"));
@@ -93,14 +100,18 @@ public class AuthPermissionLifecycleTest {
 
         authService.activeAccessToken(accessToken);
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
+        Assert.assertTrue(authSessionDao.getTouchCount() > 0);
 
         authService.deleteAccessToken(accessToken);
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertEquals(
+                AuthSessionStatus.LOGGED_OUT,
+                authSessionDao.getByToken(accessToken.getToken()).getStatus());
     }
 
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
-        AccessToken accessToken = authService.createAccessToken("u1");
+        AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new VltavaProperties.AccessTokenFilterProperties(),
                 authService,
@@ -119,6 +130,7 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
+        Assert.assertTrue(authSessionDao.getTouchCount() > 0);
     }
 
     @Test
@@ -150,6 +162,71 @@ public class AuthPermissionLifecycleTest {
         @Override
         public boolean validate(String plainPassword, String encryptedPassword) {
             return plainPassword != null && plainPassword.equals(encryptedPassword);
+        }
+    }
+
+    private static class TestAuthSessionDao implements AuthSessionDao {
+
+        private AuthSession session;
+        private int touchCount;
+
+        @Override
+        public AuthSession getById(EntityId id) {
+            return session;
+        }
+
+        @Override
+        public AuthSession getBySessionId(String sessionId) {
+            return session;
+        }
+
+        @Override
+        public AuthSession getByToken(String token) {
+            return session != null && session.getToken().equals(token) ? session : null;
+        }
+
+        @Override
+        public List<AuthSession> listByUserIdAndStatus(EntityId userId, AuthSessionStatus status) {
+            if (session == null || (status != null && session.getStatus() != status)) {
+                return Collections.emptyList();
+            }
+            return Collections.singletonList(session);
+        }
+
+        @Override
+        public String insert(AuthSession authSession) {
+            authSession.setId(EntityId.of("session-1"));
+            this.session = authSession;
+            return "session-1";
+        }
+
+        @Override
+        public int updateAccessTime(AuthSession authSession) {
+            this.session = authSession;
+            touchCount++;
+            return 1;
+        }
+
+        @Override
+        public int updateLogout(AuthSession authSession) {
+            this.session = authSession;
+            return 1;
+        }
+
+        @Override
+        public int updateInvalidate(AuthSession authSession) {
+            this.session = authSession;
+            return 1;
+        }
+
+        @Override
+        public int updateExpire(AuthSession authSession) {
+            this.session = authSession;
+            return 1;
+        }
+
+        private int getTouchCount() {
+            return touchCount;
         }
     }
 

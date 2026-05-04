@@ -140,7 +140,6 @@ public class User implements Auditable, Signable, Sortable {
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("departmentId", this.getDepartmentId());
-        // 迁移期仍保留旧字段签名输入，避免用户保存链路行为变化。
         map.put("loginName", this.getLoginName());
         map.put("loginPass", this.getLoginPass());
         map.put("email", this.getEmail());

@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.persistence.assembler;
+package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -6,10 +6,10 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.entity.UserCredential;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
-import com.github.thundax.modules.auth.persistence.dataobject.UserCredentialDO;
+import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
+import com.github.thundax.modules.sys.persistence.dataobject.UserCredentialDO;
 import java.util.Date;
 import org.junit.Test;
 

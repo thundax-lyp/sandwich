@@ -3,8 +3,8 @@ package com.github.thundax.modules.auth.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
 import com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import java.util.ArrayList;
 import java.util.List;
 

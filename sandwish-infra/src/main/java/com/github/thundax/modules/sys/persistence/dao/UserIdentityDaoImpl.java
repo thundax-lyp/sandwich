@@ -1,16 +1,16 @@
-package com.github.thundax.modules.auth.persistence.dao;
+package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.dao.UserIdentityDao;
-import com.github.thundax.modules.auth.entity.UserIdentity;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
-import com.github.thundax.modules.auth.persistence.assembler.UserIdentityPersistenceAssembler;
-import com.github.thundax.modules.auth.persistence.dataobject.UserIdentityDO;
-import com.github.thundax.modules.auth.persistence.mapper.UserIdentityMapper;
+import com.github.thundax.modules.sys.dao.UserIdentityDao;
+import com.github.thundax.modules.sys.entity.UserIdentity;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.sys.persistence.assembler.UserIdentityPersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.dataobject.UserIdentityDO;
+import com.github.thundax.modules.sys.persistence.mapper.UserIdentityMapper;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

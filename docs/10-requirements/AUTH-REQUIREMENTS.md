@@ -45,9 +45,9 @@
 
 `User` 归属 `sys` 用户主体，承载后台用户资料、组织关系、权限等级、启停状态和审计字段。
 
-`UserIdentity` 归属 `auth` 认证模型，承载后台登录标识。一个 `User` 可以绑定多个 `UserIdentity`。
+`UserIdentity` 归属 `sys` 用户模型，承载后台登录标识。一个 `User` 可以绑定多个 `UserIdentity`。
 
-`UserCredential` 归属 `auth` 认证模型，承载后台认证凭据。一个 `User` 可以绑定多个 `UserCredential`。
+`UserCredential` 归属 `sys` 用户模型，承载后台认证凭据。一个 `User` 可以绑定多个 `UserCredential`。
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
@@ -66,13 +66,13 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `UserIdentity`、`UserCredential`、`AuthSession`、枚举、DAO 契约和认证 Service 编排。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、认证枚举、DAO 契约和认证 Service 编排。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
-  - 定义后台 `User` 主体、用户保存流程和用户资料维护。
+  - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
-  - 实现认证模型 DAO，维护 DO、Mapper 和持久化转换。
+  - 实现认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
-  - 实现后台用户主体 DAO，维护用户资料持久化。
+  - 实现后台用户主体、登录标识和认证凭据 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
   - 提供后台登录、刷新、验证码、登出、session command、OAuth2 和 token 认证入口适配。
 

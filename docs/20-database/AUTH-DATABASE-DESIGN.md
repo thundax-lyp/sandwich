@@ -2,16 +2,16 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
+本文档定义 Sandwich 后台认证、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 `UserIdentity`、`UserCredential` 和 `AuthSession` 的目标持久化设计。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
+本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
 
 ## 2. Scope
 
 当前覆盖范围：
 
-- `auth_user_identity`
-- `auth_user_credential`
+- `sys_user_identity`
+- `sys_user_credential`
 - `auth_session`
 - `auth_oauth_client`
 - `auth_oauth_authorization`
@@ -66,7 +66,7 @@
 - `OAuthAccessTokenDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `OAuthRefreshTokenDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - `user_id` 固定引用 `sys_user.id`。
-- `identity_id` 固定引用 `auth_user_identity.id`。
+- `identity_id` 固定引用 `sys_user_identity.id`。
 - 枚举字段使用 `varchar` 存储。
 - 集合字段优先使用 JSON 字符串表达，由持久化装配器负责转换。
 - 敏感字段不得明文落库。
@@ -78,8 +78,8 @@
 
 ## 4. Naming Rules
 
-- 登录标识表固定为 `auth_user_identity`。
-- 认证凭据表固定为 `auth_user_credential`。
+- 登录标识表固定为 `sys_user_identity`。
+- 认证凭据表固定为 `sys_user_credential`。
 - 认证会话表固定为 `auth_session`。
 - OAuth 客户端表固定为 `auth_oauth_client`。
 - OAuth 授权表固定为 `auth_oauth_authorization`。
@@ -101,8 +101,8 @@
 
 | Table | DO | Mapper | Entity |
 | --- | --- | --- | --- |
-| `auth_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
-| `auth_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
+| `sys_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
+| `sys_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
 | `auth_oauth_client` | `OAuthClientDO` | `OAuthClientMapper` | `OAuthClient` |
 | `auth_oauth_authorization` | `OAuthAuthorizationDO` | `OAuthAuthorizationMapper` | `OAuthAuthorization` |
@@ -111,9 +111,9 @@
 
 ## 6. Table Design
 
-### 6.1 auth_user_identity
+### 6.1 sys_user_identity
 
-`auth_user_identity` 保存后台用户登录标识。
+`sys_user_identity` 保存后台用户登录标识。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -134,20 +134,20 @@
 - `identity_type` 固定写入 `ACCOUNT`、`MOBILE` 或 `EMAIL`。
 - `status` 固定写入 `ENABLED` 或 `DISABLED`。
 - `identity_value` 必须保存规范化后的登录标识值。
-- `ACCOUNT` 类型 `identity_value` 迁移期来源是 `sys_user.login_name`。
-- `MOBILE` 类型 `identity_value` 迁移期来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
-- `EMAIL` 类型 `identity_value` 迁移期来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
+- `ACCOUNT` 类型 `identity_value` 初始化来源是 `sys_user.login_name`。
+- `MOBILE` 类型 `identity_value` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
+- `EMAIL` 类型 `identity_value` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
 
 索引：
 
-- 主键：`pk_auth_user_identity(id)`
-- 联合唯一索引：`uk_auth_user_identity_type_value(identity_type, identity_value)`
-- 普通索引：`idx_auth_user_identity_user(user_id, status)`
-- 普通索引：`idx_auth_user_identity_user_type(user_id, identity_type)`
+- 主键：`pk_sys_user_identity(id)`
+- 联合唯一索引：`uk_sys_user_identity_type_value(identity_type, identity_value)`
+- 普通索引：`idx_sys_user_identity_user(user_id, status)`
+- 普通索引：`idx_sys_user_identity_user_type(user_id, identity_type)`
 
-### 6.2 auth_user_credential
+### 6.2 sys_user_credential
 
-`auth_user_credential` 保存后台用户认证凭据。
+`sys_user_credential` 保存后台用户认证凭据。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -172,7 +172,7 @@
 
 - `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
 - `user_id` 来源是 `sys_user.id`。
-- `identity_id` 来源是 `auth_user_identity.id`。
+- `identity_id` 来源是 `sys_user_identity.id`。
 - `credential_type` 固定写入 `PASSWORD`。
 - `credential_value` 固定保存密码哈希。
 - `credential_value` 不保存密码明文。
@@ -182,15 +182,15 @@
 - `failed_limit` 默认值固定来自后台登录配置。
 - `locked_until` 为空时，非锁定状态不受时间锁限制。
 - `expires_at` 为空时，凭据不过期。
-- `PASSWORD` 类型凭据迁移期来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
+- `PASSWORD` 类型凭据初始化来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
 
 索引：
 
-- 主键：`pk_auth_user_credential(id)`
-- 联合唯一索引：`uk_auth_user_credential_identity_type(identity_id, credential_type)`
-- 普通索引：`idx_auth_user_credential_user(user_id, status)`
-- 普通索引：`idx_auth_user_credential_identity_status(identity_id, status)`
-- 普通索引：`idx_auth_user_credential_locked(locked_until)`
+- 主键：`pk_sys_user_credential(id)`
+- 联合唯一索引：`uk_sys_user_credential_identity_type(identity_id, credential_type)`
+- 普通索引：`idx_sys_user_credential_user(user_id, status)`
+- 普通索引：`idx_sys_user_credential_identity_status(identity_id, status)`
+- 普通索引：`idx_sys_user_credential_locked(locked_until)`
 
 ### 6.3 auth_session
 
@@ -222,7 +222,7 @@
 - `session_id` 由 Service 生成，作为认证会话业务标识。
 - `token` 来源是 `AccessToken.token`。
 - `user_id` 来源是 `sys_user.id`。
-- `identity_id` 来源是 `auth_user_identity.id`。
+- `identity_id` 来源是 `sys_user_identity.id`。
 - `identity_type` 固定写入登录时使用的标识类型。
 - `login_type` 固定写入 `PASSWORD`。
 - `status` 固定写入 `ACTIVE`、`LOGGED_OUT`、`INVALIDATED` 或 `EXPIRED`。
@@ -347,11 +347,11 @@
 
 ## 7. Relationship Rules
 
-- `auth_user_identity.user_id` 引用 `sys_user.id`。
-- `auth_user_credential.user_id` 引用 `sys_user.id`。
-- `auth_user_credential.identity_id` 引用 `auth_user_identity.id`。
+- `sys_user_identity.user_id` 引用 `sys_user.id`。
+- `sys_user_credential.user_id` 引用 `sys_user.id`。
+- `sys_user_credential.identity_id` 引用 `sys_user_identity.id`。
 - `auth_session.user_id` 引用 `sys_user.id`。
-- `auth_session.identity_id` 引用 `auth_user_identity.id`。
+- `auth_session.identity_id` 引用 `sys_user_identity.id`。
 - `auth_session.token` 引用访问 token 存储中的 token 值。
 - `auth_oauth_authorization.client_id` 引用 `auth_oauth_client.client_id`。
 - `auth_oauth_authorization.user_id` 引用 `sys_user.id`。
@@ -360,9 +360,9 @@
 - `auth_oauth_refresh_token.client_id` 引用 `auth_oauth_client.client_id`。
 - `auth_oauth_refresh_token.user_id` 引用 `sys_user.id`。
 - 当前项目不强制数据库外键。
-- 用户创建时，Service 必须先保存 `sys_user`，再保存 `auth_user_identity` 和 `auth_user_credential`。
-- 修改登录名时，Service 必须更新 `ACCOUNT` 类型 `auth_user_identity`。
-- 重置密码时，Service 必须更新 `PASSWORD` 类型 `auth_user_credential`。
+- 用户创建时，Service 必须先保存 `sys_user`，再保存 `sys_user_identity` 和 `sys_user_credential`。
+- 修改登录名时，Service 必须更新 `ACCOUNT` 类型 `sys_user_identity`。
+- 重置密码时，Service 必须更新 `PASSWORD` 类型 `sys_user_credential`。
 - 删除 token 或登出时，Service 必须更新对应 `auth_session` 状态。
 
 ## 8. Persistence Rules
@@ -457,16 +457,16 @@
 - 分页参数有效性由 Service 校验。
 - DAO implementation 只按已校验参数执行持久化分页。
 
-## 10. Migration Rules
+## 10. Initialization Rules
 
-- `auth_user_identity(ACCOUNT)` 初始化来源是 `sys_user.login_name`。
-- `auth_user_identity(MOBILE)` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
-- `auth_user_identity(EMAIL)` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
-- `auth_user_credential(PASSWORD)` 初始化来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
-- 迁移期必须保证一个可登录后台用户至少拥有一个 `ACCOUNT` 类型 `UserIdentity`。
-- 迁移期必须保证一个可登录后台用户至少拥有一个 `PASSWORD` 类型 `UserCredential`。
-- 登录链路切换完成后，不得继续直接读取 `sys_user.login_pass` 执行密码认证。
-- 旧账号维度锁定状态迁移完成后，不得继续作为后台认证主锁定语义。
+- `sys_user_identity(ACCOUNT)` 初始化来源是 `sys_user.login_name`。
+- `sys_user_identity(MOBILE)` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
+- `sys_user_identity(EMAIL)` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
+- `sys_user_credential(PASSWORD)` 初始化来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
+- 必须保证一个可登录后台用户至少拥有一个 `ACCOUNT` 类型 `UserIdentity`。
+- 必须保证一个可登录后台用户至少拥有一个 `PASSWORD` 类型 `UserCredential`。
+- 密码认证应该读取 `sys_user_credential.credential_value`。
+- 后台认证主锁定语义应该落在 `UserCredential` 维度。
 
 ## 11. Open Items
 

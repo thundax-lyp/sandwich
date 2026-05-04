@@ -1,9 +1,9 @@
-package com.github.thundax.modules.auth.dao;
+package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.entity.UserIdentity;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
+import com.github.thundax.modules.sys.entity.UserIdentity;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import java.util.List;
 
 public interface UserIdentityDao {

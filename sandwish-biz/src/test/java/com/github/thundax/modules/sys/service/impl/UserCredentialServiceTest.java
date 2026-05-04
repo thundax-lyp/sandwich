@@ -1,15 +1,15 @@
-package com.github.thundax.modules.auth.service.impl;
+package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.modules.auth.entity.UserCredential;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import java.util.Date;
 import org.junit.Test;
 
-public class AuthCredentialServiceTest {
+public class UserCredentialServiceTest {
 
     @Test
     public void shouldMarkCredentialFailedAndLockedWhenLimitReached() {

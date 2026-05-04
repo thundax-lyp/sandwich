@@ -1,9 +1,9 @@
-package com.github.thundax.modules.auth.entity;
+package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

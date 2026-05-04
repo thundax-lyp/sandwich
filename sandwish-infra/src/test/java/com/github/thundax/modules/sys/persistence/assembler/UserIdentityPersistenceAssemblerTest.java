@@ -1,13 +1,13 @@
-package com.github.thundax.modules.auth.persistence.assembler;
+package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.entity.UserIdentity;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
-import com.github.thundax.modules.auth.persistence.dataobject.UserIdentityDO;
+import com.github.thundax.modules.sys.entity.UserIdentity;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.sys.persistence.dataobject.UserIdentityDO;
 import java.util.Date;
 import org.junit.Test;
 

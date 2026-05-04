@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.persistence.dataobject;
+package com.github.thundax.modules.sys.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("auth_user_identity")
+@TableName("sys_user_identity")
 public class UserIdentityDO {
 
     @TableId(type = IdType.ASSIGN_UUID)

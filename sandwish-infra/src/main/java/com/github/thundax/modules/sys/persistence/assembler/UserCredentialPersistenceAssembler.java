@@ -1,10 +1,10 @@
-package com.github.thundax.modules.auth.persistence.assembler;
+package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.entity.UserCredential;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
-import com.github.thundax.modules.auth.persistence.dataobject.UserCredentialDO;
+import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
+import com.github.thundax.modules.sys.persistence.dataobject.UserCredentialDO;
 import java.util.ArrayList;
 import java.util.List;
 

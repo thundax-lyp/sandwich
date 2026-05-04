@@ -1,9 +1,9 @@
-package com.github.thundax.modules.auth.dao;
+package com.github.thundax.modules.sys.dao;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.entity.UserCredential;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
+import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
 import java.util.List;
 
 public interface UserCredentialDao {

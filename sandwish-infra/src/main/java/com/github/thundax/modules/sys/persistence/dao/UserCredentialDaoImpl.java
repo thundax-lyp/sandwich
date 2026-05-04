@@ -1,16 +1,16 @@
-package com.github.thundax.modules.auth.persistence.dao;
+package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.dao.UserCredentialDao;
-import com.github.thundax.modules.auth.entity.UserCredential;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
-import com.github.thundax.modules.auth.persistence.assembler.UserCredentialPersistenceAssembler;
-import com.github.thundax.modules.auth.persistence.dataobject.UserCredentialDO;
-import com.github.thundax.modules.auth.persistence.mapper.UserCredentialMapper;
+import com.github.thundax.modules.sys.dao.UserCredentialDao;
+import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
+import com.github.thundax.modules.sys.persistence.assembler.UserCredentialPersistenceAssembler;
+import com.github.thundax.modules.sys.persistence.dataobject.UserCredentialDO;
+import com.github.thundax.modules.sys.persistence.mapper.UserCredentialMapper;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 

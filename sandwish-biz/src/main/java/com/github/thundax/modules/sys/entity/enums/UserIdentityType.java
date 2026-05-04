@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.entity.enums;
+package com.github.thundax.modules.sys.entity.enums;
 
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;

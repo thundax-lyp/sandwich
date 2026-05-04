@@ -54,7 +54,7 @@ public class StorageServlet extends HttpServlet {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return;
         }
-        if (!storageService.canAccess(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
+        if (!storageService.canReadContent(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return;
         }

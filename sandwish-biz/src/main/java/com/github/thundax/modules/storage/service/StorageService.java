@@ -31,19 +31,19 @@ public interface StorageService {
 
     List<String> listMimeTypes();
 
-    List<String> listBusinessTypes();
+    List<String> listReferenceOwnerTypes();
 
-    int updateStatus(StoredObject storage);
+    int updateObjectStatus(StoredObject storage);
 
-    int updateVisibility(StoredObject storage);
+    int updateReferenceStatus(StoredObject storage);
 
-    int removeBusiness(String businessType, String businessId);
+    int removeReferences(StorageOwnerType ownerType, String ownerId);
 
-    void insertBusiness(List<StoredObjectReference> list);
+    void addReferences(List<StoredObjectReference> list);
 
-    List<StoredObjectReference> listBusiness(StoredObject entity);
+    List<StoredObjectReference> listReferences(StoredObject entity);
 
-    boolean canAccess(StoredObject storage, StorageOwnerType ownerType, String ownerId);
+    boolean canReadContent(StoredObject storage, StorageOwnerType ownerType, String ownerId);
 
     MultipartUploadSession initMultipartUpload(MultipartUploadSession session);
 

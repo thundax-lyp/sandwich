@@ -129,7 +129,7 @@ public class StorageController {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
-        if (!storageService.canAccess(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
+        if (!storageService.canReadContent(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
             response.sendError(HttpStatus.SC_FORBIDDEN);
             return;
         }
@@ -176,7 +176,7 @@ public class StorageController {
     @ApiOperation(value = "获取业务类型树", notes = "assist:storage:view")
     @RequestMapping(value = "treeData", method = RequestMethod.POST)
     public List<StorageTreeNodeResponse> treeData() {
-        return storageService.listBusinessTypes().stream()
+        return storageService.listReferenceOwnerTypes().stream()
                 .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)
                 .collect(Collectors.toList());
     }

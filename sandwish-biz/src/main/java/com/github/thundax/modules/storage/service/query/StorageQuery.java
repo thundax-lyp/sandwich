@@ -15,8 +15,8 @@ public class StorageQuery implements Serializable {
     private String businessType;
     private String ownerId;
     private StorageOwnerType ownerType;
-    private StoredObjectStatus status;
-    private StoredObjectReferenceStatus visibility;
+    private StoredObjectStatus objectStatus;
+    private StoredObjectReferenceStatus referenceStatus;
     private String name;
     private String remarks;
 }

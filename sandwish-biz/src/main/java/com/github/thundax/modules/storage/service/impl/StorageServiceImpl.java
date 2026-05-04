@@ -64,8 +64,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : statusValue(query.getStatus()),
-                query == null ? null : visibilityValue(query.getVisibility()),
+                query == null ? null : statusValue(query.getObjectStatus()),
+                query == null ? null : referenceStatusValue(query.getReferenceStatus()),
                 query == null ? null : query.getBusinessId(),
                 query == null ? null : query.getBusinessType(),
                 query == null ? null : query.getName(),
@@ -79,8 +79,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getMimeType(),
                 query == null ? null : query.getOwnerId(),
                 query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : statusValue(query.getStatus()),
-                query == null ? null : visibilityValue(query.getVisibility()),
+                query == null ? null : statusValue(query.getObjectStatus()),
+                query == null ? null : referenceStatusValue(query.getReferenceStatus()),
                 query == null ? null : query.getBusinessId(),
                 query == null ? null : query.getBusinessType(),
                 query == null ? null : query.getName(),
@@ -124,48 +124,48 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public List<String> listBusinessTypes() {
+    public List<String> listReferenceOwnerTypes() {
         return businessDao.listBusinessTypes();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(StoredObject storage) {
+    public int updateObjectStatus(StoredObject storage) {
         return dao.updateStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateVisibility(StoredObject storage) {
+    public int updateReferenceStatus(StoredObject storage) {
         return dao.updateVisibility(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int removeBusiness(String businessType, String businessId) {
-        return businessDao.deleteBusinessByBusiness(businessType, businessId);
+    public int removeReferences(StorageOwnerType ownerType, String ownerId) {
+        return businessDao.deleteBusinessByBusiness(ownerTypeValue(ownerType), ownerId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void insertBusiness(List<StoredObjectReference> list) {
+    public void addReferences(List<StoredObjectReference> list) {
         businessDao.insertBusiness(list);
     }
 
     @Override
-    public List<StoredObjectReference> listBusiness(StoredObject entity) {
+    public List<StoredObjectReference> listReferences(StoredObject entity) {
         return businessDao.listBusiness(entity);
     }
 
     @Override
-    public boolean canAccess(StoredObject storage, StorageOwnerType ownerType, String ownerId) {
+    public boolean canReadContent(StoredObject storage, StorageOwnerType ownerType, String ownerId) {
         if (storage == null) {
             return false;
         }
-        if (StoredObjectReferenceStatus.REFERENCED == storage.getVisibility()) {
+        if (StoredObjectReferenceStatus.REFERENCED == storage.getReferenceStatus()) {
             return true;
         }
-        return StoredObjectReferenceStatus.UNREFERENCED == storage.getVisibility()
+        return StoredObjectReferenceStatus.UNREFERENCED == storage.getReferenceStatus()
                 && storage.getOwnerType() == ownerType
                 && StringUtils.isNotBlank(ownerId)
                 && StringUtils.equals(storage.getOwnerId(), ownerId);
@@ -267,8 +267,8 @@ public class StorageServiceImpl implements StorageService {
         return status == null ? null : status.value();
     }
 
-    private String visibilityValue(StoredObjectReferenceStatus visibility) {
-        return visibility == null ? null : visibility.value();
+    private String referenceStatusValue(StoredObjectReferenceStatus referenceStatus) {
+        return referenceStatus == null ? null : referenceStatus.value();
     }
 
     private MultipartUploadSession requireActiveMultipartSession(String uploadId) {
@@ -327,8 +327,8 @@ public class StorageServiceImpl implements StorageService {
         storage.setObjectKey(object == null ? session.getObjectKey() : object.getObjectKey());
         storage.setSize(object == null ? session.getTotalSize() : object.getSize());
         storage.setAccessEndpoint(object == null ? null : object.getAccessEndpoint());
-        storage.setStatus(StoredObjectStatus.ACTIVE);
-        storage.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
+        storage.setObjectStatus(StoredObjectStatus.ACTIVE);
+        storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setCreateDate(new Date());
         return storage;
     }

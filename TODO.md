@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-service`：调整 Storage Service 对象语义
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/query/StorageQuery.java
-  - 处理动作：将引用建立、引用清理、状态流转和查询字段改为 `StoredObject` 当前端口语义
-  - 验收点：Service 对外不再暴露 legacy business/visibility 方法，上传、引用、删除和内容读取以 `StoredObject` 表达
-  - 重要度：10/10
-
 - [ ] `storage-dao`：调整 DAO 端口语义
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StorageDao.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectReferenceDao.java

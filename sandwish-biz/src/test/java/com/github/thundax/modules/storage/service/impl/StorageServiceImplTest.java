@@ -50,8 +50,8 @@ public class StorageServiceImplTest {
         query.setMimeType("image/png");
         query.setOwnerId("owner-1");
         query.setOwnerType(StorageOwnerType.USER);
-        query.setStatus(StoredObjectStatus.ACTIVE);
-        query.setVisibility(StoredObjectReferenceStatus.REFERENCED);
+        query.setObjectStatus(StoredObjectStatus.ACTIVE);
+        query.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
         query.setBusinessId("business-1");
         query.setBusinessType("Article");
         query.setName("avatar");
@@ -105,11 +105,11 @@ public class StorageServiceImplTest {
         StorageServiceImpl service = storageService(dao);
         List<StoredObjectReference> list = Arrays.asList(storageBusiness("s1"));
 
-        service.insertBusiness(list);
-        service.removeBusiness("User", "u1");
+        service.addReferences(list);
+        service.removeReferences(StorageOwnerType.USER, "u1");
 
         assertSame(list, dao.businessList);
-        assertEquals("User:u1", dao.deletedBusinessKey);
+        assertEquals("USER:u1", dao.deletedBusinessKey);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class StorageServiceImplTest {
         StoredObject storage = storage("s1");
         storage.setVisibility(StoredObjectReferenceStatus.REFERENCED);
 
-        assertTrue(service.canAccess(storage, null, null));
+        assertTrue(service.canReadContent(storage, null, null));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class StorageServiceImplTest {
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 
-        assertTrue(service.canAccess(storage, StorageOwnerType.USER, "u1"));
+        assertTrue(service.canReadContent(storage, StorageOwnerType.USER, "u1"));
     }
 
     @Test
@@ -140,10 +140,10 @@ public class StorageServiceImplTest {
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
 
-        assertFalse(service.canAccess(storage, StorageOwnerType.USER, "u2"));
-        assertFalse(service.canAccess(storage, StorageOwnerType.MEMBER, "u1"));
-        assertFalse(service.canAccess(storage, StorageOwnerType.USER, null));
-        assertFalse(service.canAccess(null, StorageOwnerType.USER, "u1"));
+        assertFalse(service.canReadContent(storage, StorageOwnerType.USER, "u2"));
+        assertFalse(service.canReadContent(storage, StorageOwnerType.MEMBER, "u1"));
+        assertFalse(service.canReadContent(storage, StorageOwnerType.USER, null));
+        assertFalse(service.canReadContent(null, StorageOwnerType.USER, "u1"));
     }
 
     @Test

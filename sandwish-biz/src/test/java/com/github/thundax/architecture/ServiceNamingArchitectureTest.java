@@ -117,7 +117,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
     private boolean isServiceBusinessActionName(String name) {
         return name.equals("abortMultipartUpload")
-                || name.equals("canAccess")
+                || name.equals("canReadContent")
                 || name.equals("completeMultipartUpload")
                 || name.equals("createPublicKey")
                 || name.equals("createSession")
@@ -134,7 +134,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 || name.equals("moveTreeNode")
                 || name.equals("release")
                 || name.equals("reloadAll")
-                || name.equals("removeBusiness")
+                || name.equals("removeReferences")
                 || name.equals("sign")
                 || name.equals("touch")
                 || name.equals("uploadMultipartPart")

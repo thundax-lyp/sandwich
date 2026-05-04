@@ -66,8 +66,9 @@ public final class StorageInterfaceAssembler {
     public static StorageQuery toQuery(@NonNull StoragePageRequest request) {
         StorageQuery query = new StorageQuery();
         query.setMimeType(request.getMimeType());
-        query.setStatus(StringUtils.isBlank(request.getStatus()) ? null : StoredObjectStatus.from(request.getStatus()));
-        query.setVisibility(
+        query.setObjectStatus(
+                StringUtils.isBlank(request.getStatus()) ? null : StoredObjectStatus.from(request.getStatus()));
+        query.setReferenceStatus(
                 StringUtils.isBlank(request.getVisibility())
                         ? null
                         : StoredObjectReferenceStatus.from(request.getVisibility()));

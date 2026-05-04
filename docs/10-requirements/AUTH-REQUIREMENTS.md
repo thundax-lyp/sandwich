@@ -21,9 +21,10 @@
 - 后台用户登录标识管理。
 - 后台用户密码凭据管理。
 - 后台认证会话创建、touch、登出、失效和过期。
-- 后台认证会话按 token、用户和租户失效。
+- 后台认证会话按 token 和用户失效。
 - OAuth2 client 查询和密钥校验。
 - OAuth2 authorization code 授权、决策、撤销和换 token。
+- OAuth2 access token 签发、状态流转、撤销和 introspection。
 - OAuth2 token verify、introspection 和 userinfo。
 - 后台用户创建、修改登录名、重置密码时的认证前置数据维护。
 
@@ -50,7 +51,7 @@
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
-`AccessToken` 继续承载请求访问 token。`OAuthRefreshToken` 承载 refresh token 事实。`AuthSession` 固定不替代 `AccessToken` 和 `OAuthRefreshToken` 的传输职责。
+`AccessToken` 继续承载后台访问 token。`OAuthAccessToken` 承载 OAuth2 access token 事实。`OAuthRefreshToken` 承载 refresh token 事实。`AuthSession` 固定不替代 token 的传输职责。
 
 `PermissionSession` 继续承载权限集合缓存。`AuthSession` 固定不承载权限集合。
 
@@ -58,7 +59,9 @@
 
 `OAuthAuthorization` 归属 `auth` 认证模型，承载 OAuth2 授权请求、授权码、PKCE 参数、授权范围、决策状态和一次性消费状态。
 
-`OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、租户、过期和失效状态。
+`OAuthAccessToken` 归属 `auth` 认证模型，承载 OAuth2 access token、客户端、用户、授权范围、过期和失效状态。
+
+`OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、过期和失效状态。
 
 ## 4. Module Mapping
 
@@ -307,7 +310,35 @@
 - `redirectUri` 必须来自对应 `OAuthClient.redirectUris`。
 - 授权范围必须是 `OAuthClient.scopes` 的子集。
 
-### 5.10 OAuthRefreshToken
+### 5.10 OAuthAccessToken
+
+`OAuthAccessToken` 是 OAuth2 access token 事实。
+
+核心字段：
+
+- `id`：access token 主键。
+- `tokenId`：token 标识。
+- `tokenHash`：token 哈希。
+- `clientId`：客户端标识。
+- `userId`：用户标识。
+- `scopes`：授权范围集合。
+- `issuedAt`：签发时间。
+- `expireAt`：过期时间。
+- `status`：token 状态。
+
+固定状态：
+
+- `ACTIVE`：可用。
+- `REVOKED`：已撤销。
+- `EXPIRED`：已过期。
+
+固定约束：
+
+- OAuth2 access token 只保存哈希，不保存明文。
+- introspection 必须同时校验 token 状态、过期时间和用户启用状态。
+- revoke access token 后 introspection 必须返回 `active=false`。
+
+### 5.11 OAuthRefreshToken
 
 `OAuthRefreshToken` 是 refresh token 事实。
 
@@ -421,7 +452,6 @@
 - token 安全失效时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `INVALIDATED`。
 - 按 token 失效会话时必须释放对应 `PermissionSession`。
 - 按用户失效会话时必须失效该用户全部活跃 `AuthSession`。
-- 按租户失效会话时必须失效该租户全部活跃 `AuthSession`。
 - 会话自然过期时必须将数据库 `AuthSession` 标记为 `EXPIRED`。
 - Redis 运行态过期不替代数据库最终状态收口。
 

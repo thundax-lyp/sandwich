@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `sys-user-save-identity`：用户保存链路同步登录身份
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserEncryptService.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DatabaseUserEncryptServiceImpl.java
-  - 处理动作：用户创建、修改登录名和重置密码时同步维护默认身份和密码凭据
-  - 验收点：新增或修改后台用户后可通过 `UserIdentity + UserCredential` 完成认证前置数据装载
-  - 重要度：9/10
-
 - [ ] `admin-auth-login-credential`：后台登录切换到身份凭据认证
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
     sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java

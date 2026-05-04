@@ -6,6 +6,14 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.persistence.Page;
 import com.github.thundax.modules.assist.service.SignService;
+import com.github.thundax.modules.auth.dao.UserCredentialDao;
+import com.github.thundax.modules.auth.dao.UserIdentityDao;
+import com.github.thundax.modules.auth.entity.UserCredential;
+import com.github.thundax.modules.auth.entity.UserIdentity;
+import com.github.thundax.modules.auth.entity.enums.UserCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.UserCredentialType;
+import com.github.thundax.modules.auth.entity.enums.UserIdentityStatus;
+import com.github.thundax.modules.auth.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -16,9 +24,11 @@ import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,14 +36,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
+    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+
     private final UserDao dao;
     private final SignService signService;
     private final UserEncryptService userEncryptService;
+    private final UserIdentityDao userIdentityDao;
+    private final UserCredentialDao userCredentialDao;
 
-    public UserServiceImpl(UserDao dao, SignService signService, UserEncryptService userEncryptService) {
+    public UserServiceImpl(
+            UserDao dao,
+            SignService signService,
+            UserEncryptService userEncryptService,
+            UserIdentityDao userIdentityDao,
+            UserCredentialDao userCredentialDao) {
         this.dao = dao;
         this.signService = signService;
         this.userEncryptService = userEncryptService;
+        this.userIdentityDao = userIdentityDao;
+        this.userCredentialDao = userCredentialDao;
     }
 
     @Override
@@ -164,6 +185,10 @@ public class UserServiceImpl implements UserService {
         } else {
             userEncryptService.update(userEncrypt);
         }
+        UserIdentity accountIdentity = upsertAccountIdentity(user);
+        if (added) {
+            upsertPasswordCredential(user, accountIdentity);
+        }
     }
 
     @Override
@@ -175,6 +200,7 @@ public class UserServiceImpl implements UserService {
         userEncrypt.setId(user.getId());
         userEncrypt.setLoginPass(user.getLoginPass());
         userEncryptService.updateLoginPass(userEncrypt);
+        upsertPasswordCredential(user, upsertAccountIdentity(user));
     }
 
     @Override
@@ -275,5 +301,69 @@ public class UserServiceImpl implements UserService {
 
     private String superFlagValue(UserPrivilege privilege) {
         return UserPrivilege.SUPER == privilege ? Global.YES : null;
+    }
+
+    private UserIdentity upsertAccountIdentity(User user) {
+        if (user == null || user.getId() == null || StringUtils.isBlank(user.getLoginName())) {
+            return null;
+        }
+        UserIdentity identity = userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT);
+        Date now = new Date();
+        if (identity == null) {
+            identity = new UserIdentity();
+            identity.setUserId(user.getId());
+            identity.setIdentityType(UserIdentityType.ACCOUNT);
+            identity.setIdentityValue(user.getLoginName());
+            identity.setStatus(UserIdentityStatus.ENABLED);
+            identity.setCreateDate(now);
+            identity.setUpdateDate(now);
+            identity.setCreateUserId(user.getCreateUserId());
+            identity.setUpdateUserId(user.getUpdateUserId());
+            identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
+            return identity;
+        }
+
+        identity.setIdentityValue(user.getLoginName());
+        identity.setStatus(UserIdentityStatus.ENABLED);
+        identity.setUpdateDate(now);
+        identity.setUpdateUserId(user.getUpdateUserId());
+        userIdentityDao.update(identity);
+        return identity;
+    }
+
+    private void upsertPasswordCredential(User user, UserIdentity accountIdentity) {
+        if (user == null || accountIdentity == null || StringUtils.isBlank(user.getLoginPass())) {
+            return;
+        }
+        UserCredential credential =
+                userCredentialDao.getByIdentityIdAndType(accountIdentity.getId(), UserCredentialType.PASSWORD);
+        Date now = new Date();
+        if (credential == null) {
+            credential = new UserCredential();
+            credential.setUserId(user.getId());
+            credential.setIdentityId(accountIdentity.getId());
+            credential.setCredentialType(UserCredentialType.PASSWORD);
+            credential.setCredentialValue(user.getLoginPass());
+            credential.setStatus(UserCredentialStatus.ACTIVE);
+            credential.setNeedChangePassword(false);
+            credential.setFailedCount(0);
+            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
+            credential.setCreateDate(now);
+            credential.setUpdateDate(now);
+            credential.setCreateUserId(user.getCreateUserId());
+            credential.setUpdateUserId(user.getUpdateUserId());
+            credential.setId(EntityIdCodec.toDomain(userCredentialDao.insert(credential)));
+            return;
+        }
+
+        credential.setCredentialValue(user.getLoginPass());
+        credential.setStatus(UserCredentialStatus.ACTIVE);
+        credential.setNeedChangePassword(false);
+        credential.setFailedCount(0);
+        credential.setLockedUntil(null);
+        credential.setLastVerifiedAt(null);
+        credential.setUpdateDate(now);
+        credential.setUpdateUserId(user.getUpdateUserId());
+        userCredentialDao.update(credential);
     }
 }

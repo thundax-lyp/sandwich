@@ -57,7 +57,7 @@ public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
     }
 
     /**
-     * 更新密码, loginPass, updateDate, updateBy
+     * 迁移兼容：更新旧用户加密表密码镜像, loginPass, updateDate, updateBy
      */
     @Override
     public void updateLoginPass(UserEncrypt entity) {

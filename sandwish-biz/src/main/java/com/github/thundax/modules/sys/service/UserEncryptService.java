@@ -9,7 +9,7 @@ import com.github.thundax.modules.sys.entity.UserEncrypt;
 public interface UserEncryptService extends CrudService<UserEncrypt> {
 
     /**
-     * 更新密码, loginPass, updateDate, updateBy
+     * 迁移兼容：更新旧用户加密表密码镜像, loginPass, updateDate, updateBy
      */
     void updateLoginPass(UserEncrypt userEncrypt);
 }

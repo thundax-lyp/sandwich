@@ -11,6 +11,8 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
+import com.github.thundax.modules.storage.dao.MultipartUploadDao;
+import com.github.thundax.modules.storage.dao.StorageBusinessDao;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -35,7 +37,7 @@ public class StorageServiceImplTest {
         Storage expected = storage("s1");
         dao.getResult = expected;
 
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
 
         assertSame(expected, service.getById(EntityId.of("s1")));
         assertEquals("s1", dao.id);
@@ -56,7 +58,7 @@ public class StorageServiceImplTest {
         query.setRemarks("remark");
         PageDTO<Storage> page = new PageDTO<>(2, 20);
 
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
         service.page(query, page);
 
         assertEquals("image/png", dao.mimeType);
@@ -77,7 +79,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         Storage storage = new Storage();
 
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
         service.add(storage);
 
         assertNotNull(storage.getId());
@@ -89,7 +91,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldBatchDeleteById() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
 
         int count = service.batchDeleteById(Arrays.asList(EntityId.of("s1"), EntityId.of("s2")));
 
@@ -100,7 +102,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldDelegateBusinessOperations() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
         List<StorageBusiness> list = Arrays.asList(storageBusiness("s1"));
 
         service.insertBusiness(list);
@@ -112,7 +114,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAllowPublicStorageAccess() {
-        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStorageDao());
         Storage storage = storage("s1");
         storage.setVisibility(StorageVisibility.PUBLIC);
 
@@ -121,7 +123,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAllowPrivateStorageOwnerAccess() {
-        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStorageDao());
         Storage storage = storage("s1");
         storage.setVisibility(StorageVisibility.PRIVATE);
         storage.setOwnerType(StorageOwnerType.USER);
@@ -132,7 +134,7 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
-        StorageServiceImpl service = new StorageServiceImpl(new RecordingStorageDao());
+        StorageServiceImpl service = storageService(new RecordingStorageDao());
         Storage storage = storage("s1");
         storage.setVisibility(StorageVisibility.PRIVATE);
         storage.setOwnerType(StorageOwnerType.USER);
@@ -147,7 +149,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldInitMultipartUploadSession() {
         RecordingStorageDao dao = new RecordingStorageDao();
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
         MultipartUploadSession session = multipartSession();
 
         MultipartUploadSession saved = service.initMultipartUpload(session);
@@ -167,7 +169,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartPartCount = 1;
-        StorageServiceImpl service = new StorageServiceImpl(dao);
+        StorageServiceImpl service = storageService(dao);
         MultipartUploadPart part = multipartPart(1);
 
         MultipartUploadPart saved = service.uploadMultipartPart(part);
@@ -186,7 +188,7 @@ public class StorageServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartPartResult = multipartPart(1);
 
-        new StorageServiceImpl(dao).uploadMultipartPart(multipartPart(1));
+        storageService(dao).uploadMultipartPart(multipartPart(1));
     }
 
     @Test(expected = BizException.class)
@@ -195,7 +197,7 @@ public class StorageServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartSessionResult.setUploadStatus(MultipartUploadStatus.COMPLETED);
 
-        new StorageServiceImpl(dao).uploadMultipartPart(multipartPart(1));
+        storageService(dao).uploadMultipartPart(multipartPart(1));
     }
 
     @Test
@@ -210,7 +212,7 @@ public class StorageServiceImplTest {
         object.setSize(300L);
         object.setAccessEndpoint("/servlet/storage/demo.png");
 
-        Storage storage = new StorageServiceImpl(dao).completeMultipartUpload("upload-1", object);
+        Storage storage = storageService(dao).completeMultipartUpload("upload-1", object);
 
         assertNotNull(storage.getId());
         assertEquals("demo", storage.getName());
@@ -233,7 +235,7 @@ public class StorageServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(3));
 
-        new StorageServiceImpl(dao).completeMultipartUpload("upload-1", null);
+        storageService(dao).completeMultipartUpload("upload-1", null);
     }
 
     @Test
@@ -241,7 +243,7 @@ public class StorageServiceImplTest {
         RecordingStorageDao dao = new RecordingStorageDao();
         dao.multipartSessionResult = multipartSession();
 
-        int count = new StorageServiceImpl(dao).abortMultipartUpload("upload-1");
+        int count = storageService(dao).abortMultipartUpload("upload-1");
 
         assertEquals(1, count);
         assertSame(MultipartUploadStatus.ABORTED, dao.updatedMultipartSession.getUploadStatus());
@@ -283,7 +285,11 @@ public class StorageServiceImplTest {
         return part;
     }
 
-    private static class RecordingStorageDao implements StorageDao {
+    private static StorageServiceImpl storageService(RecordingStorageDao dao) {
+        return new StorageServiceImpl(dao, dao, dao);
+    }
+
+    private static class RecordingStorageDao implements StorageDao, StorageBusinessDao, MultipartUploadDao {
 
         private Storage getResult;
         private String id;

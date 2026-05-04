@@ -7,6 +7,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.storage.backend.StorageBackendObject;
+import com.github.thundax.modules.storage.dao.MultipartUploadDao;
+import com.github.thundax.modules.storage.dao.StorageBusinessDao;
 import com.github.thundax.modules.storage.dao.StorageDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -33,9 +35,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class StorageServiceImpl implements StorageService {
 
     private final StorageDao dao;
+    private final StorageBusinessDao businessDao;
+    private final MultipartUploadDao multipartUploadDao;
 
-    public StorageServiceImpl(StorageDao dao) {
+    public StorageServiceImpl(StorageDao dao, StorageBusinessDao businessDao, MultipartUploadDao multipartUploadDao) {
         this.dao = dao;
+        this.businessDao = businessDao;
+        this.multipartUploadDao = multipartUploadDao;
     }
 
     @Override
@@ -118,7 +124,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public List<String> listBusinessTypes() {
-        return dao.listBusinessTypes();
+        return businessDao.listBusinessTypes();
     }
 
     @Override
@@ -136,18 +142,18 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int removeBusiness(String businessType, String businessId) {
-        return dao.deleteBusinessByBusiness(businessType, businessId);
+        return businessDao.deleteBusinessByBusiness(businessType, businessId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void insertBusiness(List<StorageBusiness> list) {
-        dao.insertBusiness(list);
+        businessDao.insertBusiness(list);
     }
 
     @Override
     public List<StorageBusiness> listBusiness(Storage entity) {
-        return dao.listBusiness(entity);
+        return businessDao.listBusiness(entity);
     }
 
     @Override
@@ -178,7 +184,7 @@ public class StorageServiceImpl implements StorageService {
         session.setUploadedPartCount(0);
         session.setCreateDate(now);
         session.setUpdateDate(now);
-        session.setId(EntityIdCodec.toDomain(dao.insertMultipartSession(session)));
+        session.setId(EntityIdCodec.toDomain(multipartUploadDao.insertMultipartSession(session)));
         return session;
     }
 
@@ -192,17 +198,17 @@ public class StorageServiceImpl implements StorageService {
             throw new BizException("Multipart upload part number must start from 1");
         }
         MultipartUploadSession session = requireActiveMultipartSession(part.getUploadId());
-        if (dao.getMultipartPart(part.getUploadId(), part.getPartNumber()) != null) {
+        if (multipartUploadDao.getMultipartPart(part.getUploadId(), part.getPartNumber()) != null) {
             throw new BizException("Multipart upload part already exists: " + part.getPartNumber());
         }
 
         part.setCreateDate(new Date());
-        part.setId(EntityIdCodec.toDomain(dao.insertMultipartPart(part)));
+        part.setId(EntityIdCodec.toDomain(multipartUploadDao.insertMultipartPart(part)));
 
         session.setUploadStatus(MultipartUploadStatus.UPLOADING);
-        session.setUploadedPartCount(dao.countMultipartParts(session.getUploadId()));
+        session.setUploadedPartCount(multipartUploadDao.countMultipartParts(session.getUploadId()));
         session.setUpdateDate(new Date());
-        dao.updateMultipartSession(session);
+        multipartUploadDao.updateMultipartSession(session);
         return part;
     }
 
@@ -210,7 +216,7 @@ public class StorageServiceImpl implements StorageService {
     @Transactional(rollbackFor = Exception.class)
     public Storage completeMultipartUpload(String uploadId, StorageBackendObject object) {
         MultipartUploadSession session = requireActiveMultipartSession(uploadId);
-        List<MultipartUploadPart> parts = dao.listMultipartParts(uploadId);
+        List<MultipartUploadPart> parts = multipartUploadDao.listMultipartParts(uploadId);
         validateMultipartParts(session, parts);
 
         Storage storage = toCompletedStorage(session, object);
@@ -221,7 +227,7 @@ public class StorageServiceImpl implements StorageService {
         session.setUploadedPartCount(parts.size());
         session.setCompletedDate(now);
         session.setUpdateDate(now);
-        dao.updateMultipartSession(session);
+        multipartUploadDao.updateMultipartSession(session);
         return storage;
     }
 
@@ -233,7 +239,7 @@ public class StorageServiceImpl implements StorageService {
         session.setUploadStatus(MultipartUploadStatus.ABORTED);
         session.setAbortedDate(now);
         session.setUpdateDate(now);
-        return dao.updateMultipartSession(session);
+        return multipartUploadDao.updateMultipartSession(session);
     }
 
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
@@ -268,7 +274,7 @@ public class StorageServiceImpl implements StorageService {
         if (StringUtils.isBlank(uploadId)) {
             throw new BizException("Multipart upload id can not be empty");
         }
-        MultipartUploadSession session = dao.getMultipartSessionByUploadId(uploadId);
+        MultipartUploadSession session = multipartUploadDao.getMultipartSessionByUploadId(uploadId);
         if (session == null) {
             throw new BizException("Multipart upload session not found: " + uploadId);
         }

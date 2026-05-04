@@ -2,10 +2,7 @@ package com.github.thundax.modules.storage.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.storage.entity.MultipartUploadPart;
-import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
 import java.util.List;
 
 public interface StorageDao {
@@ -46,31 +43,7 @@ public interface StorageDao {
 
     List<String> listMimeTypes();
 
-    List<String> listBusinessTypes();
-
     int updateStatus(Storage storage);
 
     int updateVisibility(Storage storage);
-
-    List<StorageBusiness> listBusiness(Storage entity);
-
-    void insertBusiness(List<StorageBusiness> list);
-
-    void deleteBusiness(String id);
-
-    int deleteBusinessByBusiness(String businessType, String businessId);
-
-    String insertMultipartSession(MultipartUploadSession session);
-
-    MultipartUploadSession getMultipartSessionByUploadId(String uploadId);
-
-    int updateMultipartSession(MultipartUploadSession session);
-
-    String insertMultipartPart(MultipartUploadPart part);
-
-    MultipartUploadPart getMultipartPart(String uploadId, Integer partNumber);
-
-    List<MultipartUploadPart> listMultipartParts(String uploadId);
-
-    int countMultipartParts(String uploadId);
 }

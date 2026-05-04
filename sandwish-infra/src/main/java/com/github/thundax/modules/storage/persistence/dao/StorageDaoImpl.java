@@ -8,18 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.dao.StorageDao;
-import com.github.thundax.modules.storage.entity.MultipartUploadPart;
-import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.Storage;
-import com.github.thundax.modules.storage.entity.StorageBusiness;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
-import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
-import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageBusinessDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
-import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadPartMapper;
-import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadSessionMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StorageBusinessMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
 import java.util.ArrayList;
@@ -36,20 +29,12 @@ public class StorageDaoImpl implements StorageDao {
 
     private final StorageMapper mapper;
     private final StorageBusinessMapper businessMapper;
-    private final MultipartUploadSessionMapper multipartUploadSessionMapper;
-    private final MultipartUploadPartMapper multipartUploadPartMapper;
     private final StorageCacheSupport cacheSupport;
 
     public StorageDaoImpl(
-            StorageMapper mapper,
-            StorageBusinessMapper businessMapper,
-            MultipartUploadSessionMapper multipartUploadSessionMapper,
-            MultipartUploadPartMapper multipartUploadPartMapper,
-            StorageCacheSupport cacheSupport) {
+            StorageMapper mapper, StorageBusinessMapper businessMapper, StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.businessMapper = businessMapper;
-        this.multipartUploadSessionMapper = multipartUploadSessionMapper;
-        this.multipartUploadPartMapper = multipartUploadPartMapper;
         this.cacheSupport = cacheSupport;
     }
 
@@ -190,14 +175,6 @@ public class StorageDaoImpl implements StorageDao {
     }
 
     @Override
-    public List<String> listBusinessTypes() {
-        return toStringList(businessMapper.selectObjs(new QueryWrapper<StorageBusinessDO>()
-                .select("business_type")
-                .groupBy("business_type")
-                .orderByAsc("business_type")));
-    }
-
-    @Override
     public int updateStatus(Storage storage) {
         StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
@@ -213,113 +190,6 @@ public class StorageDaoImpl implements StorageDao {
                 null, buildIdUpdateWrapper(dataObject).set(StorageDO::getPublicFlag, dataObject.getPublicFlag()));
         cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
-    }
-
-    @Override
-    public List<StorageBusiness> listBusiness(Storage entity) {
-        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getFileId, EntityIdCodec.toValue(entity.getId()));
-        return StoragePersistenceAssembler.toBusinessEntityList(businessMapper.selectList(wrapper));
-    }
-
-    @Override
-    public void insertBusiness(List<StorageBusiness> list) {
-        List<StorageBusinessDO> dataObjects = StoragePersistenceAssembler.toBusinessDataObjectList(list);
-        if (dataObjects == null) {
-            return;
-        }
-        for (StorageBusinessDO dataObject : dataObjects) {
-            businessMapper.insert(dataObject);
-        }
-    }
-
-    @Override
-    public void deleteBusiness(String id) {
-        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getFileId, id);
-        businessMapper.delete(wrapper);
-    }
-
-    @Override
-    public int deleteBusinessByBusiness(String businessType, String businessId) {
-        LambdaQueryWrapper<StorageBusinessDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageBusinessDO::getBusinessType, businessType);
-        wrapper.eq(StorageBusinessDO::getBusinessId, businessId);
-        return businessMapper.delete(wrapper);
-    }
-
-    @Override
-    public String insertMultipartSession(MultipartUploadSession session) {
-        MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(session);
-        multipartUploadSessionMapper.insert(dataObject);
-        return dataObject.getId();
-    }
-
-    @Override
-    public MultipartUploadSession getMultipartSessionByUploadId(String uploadId) {
-        LambdaQueryWrapper<MultipartUploadSessionDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MultipartUploadSessionDO::getUploadId, uploadId);
-        return StoragePersistenceAssembler.toMultipartSessionEntity(multipartUploadSessionMapper.selectOne(wrapper));
-    }
-
-    @Override
-    public int updateMultipartSession(MultipartUploadSession session) {
-        MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(session);
-        return multipartUploadSessionMapper.update(
-                null,
-                new LambdaUpdateWrapper<MultipartUploadSessionDO>()
-                        .eq(MultipartUploadSessionDO::getUploadId, dataObject.getUploadId())
-                        .set(MultipartUploadSessionDO::getOwnerId, dataObject.getOwnerId())
-                        .set(MultipartUploadSessionDO::getOwnerType, dataObject.getOwnerType())
-                        .set(MultipartUploadSessionDO::getBusinessType, dataObject.getBusinessType())
-                        .set(MultipartUploadSessionDO::getOriginalFilename, dataObject.getOriginalFilename())
-                        .set(MultipartUploadSessionDO::getMimeType, dataObject.getMimeType())
-                        .set(MultipartUploadSessionDO::getStorageType, dataObject.getStorageType())
-                        .set(MultipartUploadSessionDO::getBucketName, dataObject.getBucketName())
-                        .set(MultipartUploadSessionDO::getObjectKey, dataObject.getObjectKey())
-                        .set(MultipartUploadSessionDO::getProviderUploadId, dataObject.getProviderUploadId())
-                        .set(MultipartUploadSessionDO::getTotalSize, dataObject.getTotalSize())
-                        .set(MultipartUploadSessionDO::getPartSize, dataObject.getPartSize())
-                        .set(MultipartUploadSessionDO::getUploadedPartCount, dataObject.getUploadedPartCount())
-                        .set(MultipartUploadSessionDO::getUploadStatus, dataObject.getUploadStatus())
-                        .set(MultipartUploadSessionDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MultipartUploadSessionDO::getCompletedDate, dataObject.getCompletedDate())
-                        .set(MultipartUploadSessionDO::getAbortedDate, dataObject.getAbortedDate()));
-    }
-
-    @Override
-    public String insertMultipartPart(MultipartUploadPart part) {
-        MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(part);
-        multipartUploadPartMapper.insert(dataObject);
-        return dataObject.getId();
-    }
-
-    @Override
-    public MultipartUploadPart getMultipartPart(String uploadId, Integer partNumber) {
-        LambdaQueryWrapper<MultipartUploadPartDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MultipartUploadPartDO::getUploadId, uploadId);
-        wrapper.eq(MultipartUploadPartDO::getPartNumber, partNumber);
-        return StoragePersistenceAssembler.toMultipartPartEntity(multipartUploadPartMapper.selectOne(wrapper));
-    }
-
-    @Override
-    public List<MultipartUploadPart> listMultipartParts(String uploadId) {
-        LambdaQueryWrapper<MultipartUploadPartDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MultipartUploadPartDO::getUploadId, uploadId);
-        wrapper.orderByAsc(MultipartUploadPartDO::getPartNumber);
-        List<MultipartUploadPartDO> dataObjects = multipartUploadPartMapper.selectList(wrapper);
-        List<MultipartUploadPart> parts = new ArrayList<>();
-        for (MultipartUploadPartDO dataObject : dataObjects) {
-            parts.add(StoragePersistenceAssembler.toMultipartPartEntity(dataObject));
-        }
-        return parts;
-    }
-
-    @Override
-    public int countMultipartParts(String uploadId) {
-        LambdaQueryWrapper<MultipartUploadPartDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MultipartUploadPartDO::getUploadId, uploadId);
-        return multipartUploadPartMapper.selectCount(wrapper).intValue();
     }
 
     private LambdaUpdateWrapper<StorageDO> buildIdUpdateWrapper(StorageDO dataObject) {

@@ -10,22 +10,20 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * JSON工具类，使用jackson库
  */
-public class JsonUtils {
+public final class JsonUtils {
 
-    private static ObjectMapper mapper = null;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static ObjectMapper getMapper() {
-        if (mapper == null) {
-            mapper = new ObjectMapper();
-            // 忽略目标对象没有的属性
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        }
-        return mapper;
+    static {
+        // 忽略目标对象没有的属性
+        MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
+    private JsonUtils() {}
 
     public static <T> T fromJson(String jsonString, Class<T> type) {
         try {
-            return getMapper().readValue(jsonString, type);
+            return MAPPER.readValue(jsonString, type);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -34,7 +32,7 @@ public class JsonUtils {
 
     public static <T> T fromJson(String jsonString, TypeReference<T> valueTypeRef) {
         try {
-            return getMapper().readValue(jsonString, valueTypeRef);
+            return MAPPER.readValue(jsonString, valueTypeRef);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -43,7 +41,7 @@ public class JsonUtils {
 
     public static String toJson(Object bean) {
         try {
-            return getMapper().writeValueAsString(bean);
+            return MAPPER.writeValueAsString(bean);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return StringUtils.EMPTY;

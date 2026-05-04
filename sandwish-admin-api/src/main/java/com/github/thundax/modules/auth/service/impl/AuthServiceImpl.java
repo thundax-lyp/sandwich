@@ -47,9 +47,7 @@ import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.UserIdentity;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
@@ -351,7 +349,7 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, session, user);
+        return AuthTokenQueryResult.active(token, session, user, userService.getAccountLoginName(user.getId()));
     }
 
     private AuthTokenQueryResult queryOAuthAccessToken(String token) {
@@ -369,7 +367,7 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, accessToken, user);
+        return AuthTokenQueryResult.active(token, accessToken, user, userService.getAccountLoginName(user.getId()));
     }
 
     @Override
@@ -554,7 +552,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User authenticatePassword(String loginName, String plainPassword) throws ApiException {
-        UserIdentity identity = getOrBootstrapAccountIdentity(loginName);
+        UserIdentity identity = getAccountIdentity(loginName);
         if (identity == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -570,7 +568,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BannedAccountException();
         }
 
-        UserCredential credential = getOrBootstrapPasswordCredential(user, identity);
+        UserCredential credential =
+                userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD);
         if (credential == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -607,7 +606,11 @@ public class AuthServiceImpl implements AuthService {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
-        authenticatePassword(user.getLoginName(), plainPassword);
+        String loginName = userService.getAccountLoginName(user.getId());
+        if (StringUtils.isBlank(loginName)) {
+            throw new InvalidUsernamePasswordException();
+        }
+        authenticatePassword(loginName, plainPassword);
     }
 
     @Override
@@ -629,26 +632,8 @@ public class AuthServiceImpl implements AuthService {
         return sb.toString();
     }
 
-    private UserIdentity getOrBootstrapAccountIdentity(String loginName) {
-        UserIdentity identity = userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
-        if (identity != null) {
-            return identity;
-        }
-
-        User user = userService.getByLoginName(loginName);
-        if (user == null || user.getId() == null || StringUtils.isBlank(user.getLoginName())) {
-            return null;
-        }
-
-        identity = new UserIdentity();
-        identity.setUserId(user.getId());
-        identity.setIdentityType(UserIdentityType.ACCOUNT);
-        identity.setIdentityValue(user.getLoginName());
-        identity.setStatus(UserIdentityStatus.ENABLED);
-        identity.setCreateDate(new Date());
-        identity.setUpdateDate(identity.getCreateDate());
-        identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
-        return identity;
+    private UserIdentity getAccountIdentity(String loginName) {
+        return userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
     }
 
     private User authenticateIdentity(UserIdentityType identityType, String identityValue) throws ApiException {
@@ -670,7 +655,7 @@ public class AuthServiceImpl implements AuthService {
         if (StringUtils.isBlank(loginName)) {
             return;
         }
-        UserIdentity identity = getOrBootstrapAccountIdentity(loginName);
+        UserIdentity identity = getAccountIdentity(loginName);
         if (identity == null
                 || !StringUtils.equals(accessToken.getUserId(), EntityIdCodec.toValue(identity.getUserId()))) {
             return;
@@ -882,30 +867,6 @@ public class AuthServiceImpl implements AuthService {
             return StringUtils.EMPTY;
         }
         return Sha256Helper.hashBase64Url(token);
-    }
-
-    private UserCredential getOrBootstrapPasswordCredential(User user, UserIdentity identity) {
-        UserCredential credential =
-                userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD);
-        if (credential != null) {
-            return credential;
-        }
-        if (StringUtils.isBlank(user.getLoginPass())) {
-            return null;
-        }
-
-        credential = new UserCredential();
-        credential.setUserId(user.getId());
-        credential.setIdentityId(identity.getId());
-        credential.setCredentialType(UserCredentialType.PASSWORD);
-        credential.setCredentialValue(user.getLoginPass());
-        credential.setStatus(UserCredentialStatus.ACTIVE);
-        credential.setFailedCount(0);
-        credential.setFailedLimit(loginProperties.getMaxFailCount());
-        credential.setCreateDate(new Date());
-        credential.setUpdateDate(credential.getCreateDate());
-        credential.setId(EntityIdCodec.toDomain(userCredentialDao.insert(credential)));
-        return credential;
     }
 
     private void validateCredential(UserCredential credential, String plainPassword) throws ApiException {

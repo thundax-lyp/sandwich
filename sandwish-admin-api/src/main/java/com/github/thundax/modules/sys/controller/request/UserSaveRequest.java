@@ -79,10 +79,6 @@ public class UserSaveRequest implements Serializable {
     @JsonProperty("enable")
     private Boolean enable;
 
-    @ApiModelProperty(name = "ssoLoginName", value = "sso登录名")
-    @JsonProperty("ssoLoginName")
-    private String ssoLoginName;
-
     @ApiModelProperty(name = "token", value = "令牌")
     @JsonProperty("token")
     @NotEmpty(message = "\"token\"不能为空")

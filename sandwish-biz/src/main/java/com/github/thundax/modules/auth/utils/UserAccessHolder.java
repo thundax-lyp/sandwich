@@ -38,8 +38,4 @@ public class UserAccessHolder {
             TOKEN_HOLDER.remove();
         }
     }
-
-    public static String getLoginName() {
-        return currentUser().getLoginName();
-    }
 }

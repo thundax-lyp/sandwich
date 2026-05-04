@@ -290,6 +290,7 @@ public class RoleController {
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         DEPARTMENT_ID_PREFIX,
                         user,
+                        userService.getAccountLoginName(user.getId()),
                         departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                         departmentService::getById))
                 .collect(Collectors.toList()));
@@ -355,6 +356,7 @@ public class RoleController {
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
                 user,
+                userService.getAccountLoginName(user.getId()),
                 departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                 departmentService::getById);
     }

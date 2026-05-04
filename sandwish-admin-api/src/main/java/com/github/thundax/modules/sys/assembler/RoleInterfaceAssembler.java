@@ -68,7 +68,7 @@ public final class RoleInterfaceAssembler {
 
     @NonNull
     public static RoleUserResponse toUserResponse(
-            User entity, Department department, Function<EntityId, Department> departmentLoader) {
+            User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new RoleUserResponse();
         }
@@ -76,7 +76,7 @@ public final class RoleInterfaceAssembler {
         RoleUserResponse response = new RoleUserResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setName(entity.getName());
-        response.setLoginName(entity.getLoginName());
+        response.setLoginName(loginName);
         response.setDepartment(toDepartmentResponse(department, departmentLoader));
         return response;
     }
@@ -96,13 +96,14 @@ public final class RoleInterfaceAssembler {
     public static RoleUserTreeNodeResponse toUserTreeNode(
             String departmentIdPrefix,
             User entity,
+            String loginName,
             Department department,
             Function<EntityId, Department> departmentLoader) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setParentId(departmentIdPrefix + entity.getDepartmentId());
         response.setName(entity.getName());
-        response.setUser(toUserResponse(entity, department, departmentLoader));
+        response.setUser(toUserResponse(entity, loginName, department, departmentLoader));
         return response;
     }
 

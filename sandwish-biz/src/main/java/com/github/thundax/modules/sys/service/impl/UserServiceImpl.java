@@ -97,37 +97,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByLoginName(String loginName) {
-        User user = dao.getByLoginName(loginName);
-        if (user != null) {
-            userEncryptService.getById(user.getId());
-        }
-        return user;
+        UserIdentity identity = userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
+        return identity == null ? null : getById(identity.getUserId());
     }
 
     @Override
-    public User getBySsoLoginName(String ssoLoginName) {
-        User user = dao.getBySsoLoginName(ssoLoginName);
-        if (user != null) {
-            userEncryptService.getById(user.getId());
-        }
-        return user;
+    public String getAccountLoginName(EntityId userId) {
+        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
+    }
+
+    @Override
+    public UserCredential getPasswordCredential(EntityId userId) {
+        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
+        return identity == null
+                ? null
+                : userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(User user) {
+    public void add(User user, String loginName, String encryptedPassword) {
         user.setId(EntityIdCodec.toDomain(dao.insert(user)));
-        afterWrite(user, true);
+        afterWrite(user, true, loginName, encryptedPassword);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(User user) {
+    public void update(User user, String loginName) {
         dao.update(user);
-        afterWrite(user, false);
+        afterWrite(user, false, loginName, null);
     }
 
-    private void afterWrite(User user, boolean added) {
+    private void afterWrite(User user, boolean added, String loginName, String encryptedPassword) {
         dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
         if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
             dao.insertUserRole(EntityIdCodec.toValue(user.getId()), user.getRoleIdList());
@@ -143,22 +145,27 @@ public class UserServiceImpl implements UserService {
         } else {
             userEncryptService.update(userEncrypt);
         }
-        UserIdentity accountIdentity = upsertAccountIdentity(user);
+        UserIdentity accountIdentity = upsertAccountIdentity(user, loginName);
         if (added) {
-            upsertPasswordCredential(user, accountIdentity);
+            upsertPasswordCredential(user, accountIdentity, encryptedPassword);
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePassword(User user) {
-        dao.updateLoginPass(user);
+    public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {
+        User user = getById(userId);
+        if (user == null) {
+            return;
+        }
+        user.setUpdateUserId(updateUserId);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();
         userEncrypt.setId(user.getId());
-        userEncrypt.setLoginPass(user.getLoginPass());
+        userEncrypt.setLoginPass(encryptedPassword);
         userEncryptService.updateLoginPass(userEncrypt);
-        upsertPasswordCredential(user, upsertAccountIdentity(user));
+        upsertPasswordCredential(
+                user, upsertAccountIdentity(user, getAccountLoginName(user.getId())), encryptedPassword);
     }
 
     @Override
@@ -248,8 +255,8 @@ public class UserServiceImpl implements UserService {
         return UserPrivilege.SUPER == privilege ? Global.YES : null;
     }
 
-    private UserIdentity upsertAccountIdentity(User user) {
-        if (user == null || user.getId() == null || StringUtils.isBlank(user.getLoginName())) {
+    private UserIdentity upsertAccountIdentity(User user, String loginName) {
+        if (user == null || user.getId() == null || StringUtils.isBlank(loginName)) {
             return null;
         }
         UserIdentity identity = userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT);
@@ -258,7 +265,7 @@ public class UserServiceImpl implements UserService {
             identity = new UserIdentity();
             identity.setUserId(user.getId());
             identity.setIdentityType(UserIdentityType.ACCOUNT);
-            identity.setIdentityValue(user.getLoginName());
+            identity.setIdentityValue(loginName);
             identity.setStatus(UserIdentityStatus.ENABLED);
             identity.setCreateDate(now);
             identity.setUpdateDate(now);
@@ -268,7 +275,7 @@ public class UserServiceImpl implements UserService {
             return identity;
         }
 
-        identity.setIdentityValue(user.getLoginName());
+        identity.setIdentityValue(loginName);
         identity.setStatus(UserIdentityStatus.ENABLED);
         identity.setUpdateDate(now);
         identity.setUpdateUserId(user.getUpdateUserId());
@@ -276,8 +283,8 @@ public class UserServiceImpl implements UserService {
         return identity;
     }
 
-    private void upsertPasswordCredential(User user, UserIdentity accountIdentity) {
-        if (user == null || accountIdentity == null || StringUtils.isBlank(user.getLoginPass())) {
+    private void upsertPasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
+        if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
         UserCredential credential =
@@ -288,7 +295,7 @@ public class UserServiceImpl implements UserService {
             credential.setUserId(user.getId());
             credential.setIdentityId(accountIdentity.getId());
             credential.setCredentialType(UserCredentialType.PASSWORD);
-            credential.setCredentialValue(user.getLoginPass());
+            credential.setCredentialValue(encryptedPassword);
             credential.setStatus(UserCredentialStatus.ACTIVE);
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
@@ -301,7 +308,7 @@ public class UserServiceImpl implements UserService {
             return;
         }
 
-        credential.setCredentialValue(user.getLoginPass());
+        credential.setCredentialValue(encryptedPassword);
         credential.setStatus(UserCredentialStatus.ACTIVE);
         credential.setNeedChangePassword(false);
         credential.setFailedCount(0);

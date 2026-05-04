@@ -24,6 +24,7 @@ import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -93,7 +94,8 @@ public class PersonalController {
             throw new InvalidTokenException();
         }
 
-        return PersonalInterfaceAssembler.toInfoResponse(currentUser);
+        return PersonalInterfaceAssembler.toInfoResponse(
+                currentUser, userService.getAccountLoginName(currentUser.getId()));
     }
 
     @ApiOperation(value = "更新用户信息，包括：name, email, mobile", notes = "user")
@@ -110,9 +112,10 @@ public class PersonalController {
         User currentUser = UserAccessHolder.currentUser();
 
         PersonalInterfaceAssembler.toEntity(currentUser, request);
-        userService.update(currentUser);
+        userService.update(currentUser, userService.getAccountLoginName(currentUser.getId()));
 
-        return PersonalInterfaceAssembler.toInfoResponse(currentUser);
+        return PersonalInterfaceAssembler.toInfoResponse(
+                currentUser, userService.getAccountLoginName(currentUser.getId()));
     }
 
     @ApiOperation(value = "更新用户密码", notes = "user")
@@ -141,12 +144,13 @@ public class PersonalController {
 
         User currentUser = UserAccessHolder.currentUser();
 
-        if (!passwordService.validate(oldPassword, currentUser.getLoginPass())) {
+        UserCredential credential = userService.getPasswordCredential(currentUser.getId());
+        if (credential == null || !passwordService.validate(oldPassword, credential.getCredentialValue())) {
             throw new InvalidPasswordException();
         }
 
-        currentUser.setLoginPass(passwordService.encrypt(password));
-        userService.updatePassword(currentUser);
+        userService.updatePassword(
+                currentUser.getId(), passwordService.encrypt(password), EntityIdCodec.toValue(currentUser.getId()));
 
         return true;
     }

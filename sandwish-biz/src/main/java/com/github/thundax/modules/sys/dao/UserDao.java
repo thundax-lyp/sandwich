@@ -30,21 +30,12 @@ public interface UserDao {
 
     int deleteById(EntityId id);
 
-    User getByLoginName(String loginName);
-
-    User getBySsoLoginName(String ssoLoginName);
-
     /**
      * 更新登录信息：lastLoginIp, lastLoginDate, loginCount
      */
     void updateLoginInfo(User user);
 
     int updateStatus(User user);
-
-    /**
-     * 更新密码, loginPass, updateDate, updateBy
-     */
-    void updateLoginPass(User user);
 
     List<String> listUserRoles(String userId);
 

@@ -88,7 +88,7 @@ public final class AuthInterfaceAssembler {
         }
         response.setActive(true);
         response.setSubject(userId(result.getUser()));
-        response.setUsername(username(result.getUser()));
+        response.setUsername(result.getUsername());
         OAuthAccessToken oauthAccessToken = result.getOauthAccessToken();
         if (oauthAccessToken != null) {
             response.setClientId(oauthAccessToken.getClientId());
@@ -109,8 +109,8 @@ public final class AuthInterfaceAssembler {
             return response;
         }
         response.setSubject(userId(result.getUser()));
-        response.setUsername(username(result.getUser()));
-        response.setPreferredUsername(username(result.getUser()));
+        response.setUsername(result.getUsername());
+        response.setPreferredUsername(result.getUsername());
         response.setName(result.getUser() == null ? null : result.getUser().getName());
         return response;
     }
@@ -142,10 +142,6 @@ public final class AuthInterfaceAssembler {
 
     private static String userId(User user) {
         return user == null || user.getId() == null ? null : user.getId().value();
-    }
-
-    private static String username(User user) {
-        return user == null ? null : user.getLoginName();
     }
 
     private static String scope(Set<String> scopes) {

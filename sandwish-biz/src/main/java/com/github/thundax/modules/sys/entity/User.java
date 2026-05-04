@@ -35,10 +35,6 @@ public class User implements Auditable, Signable, Sortable {
 
     private String departmentId;
 
-    private String loginName;
-
-    private String loginPass;
-
     private String email;
     private String mobile;
     private String tel;
@@ -54,8 +50,6 @@ public class User implements Auditable, Signable, Sortable {
 
     private UserPrivilege privilege = UserPrivilege.NORMAL;
     private UserStatus status;
-    private String ssoLoginName;
-
     private int priority;
     private String remarks;
     private Date createDate;
@@ -140,8 +134,6 @@ public class User implements Auditable, Signable, Sortable {
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("departmentId", this.getDepartmentId());
-        map.put("loginName", this.getLoginName());
-        map.put("loginPass", this.getLoginPass());
         map.put("email", this.getEmail());
         map.put("mobile", this.getMobile());
         map.put("name", this.getName());

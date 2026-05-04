@@ -115,7 +115,9 @@ public class LogDaoImpl implements LogDao {
         QueryWrapper<LogDO> wrapper = buildBatchDeleteWrapper(type, remoteAddr, title, requestUri, beginDate, endDate);
         if (StringUtils.isNotBlank(userLoginName)) {
             wrapper.apply(
-                    "user_id IN (SELECT id FROM sys_user WHERE login_name LIKE CONCAT('%', {0}, '%'))", userLoginName);
+                    "user_id IN (SELECT user_id FROM sys_user_identity "
+                            + "WHERE identity_type = 'ACCOUNT' AND identity_value LIKE CONCAT('%', {0}, '%'))",
+                    userLoginName);
         }
         if (StringUtils.isNotBlank(userName)) {
             wrapper.apply("user_id IN (SELECT id FROM sys_user WHERE name LIKE CONCAT('%', {0}, '%'))", userName);

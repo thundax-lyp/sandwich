@@ -21,8 +21,6 @@ public final class UserPersistenceAssembler {
         UserDO dataObject = new UserDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setDepartmentId(entity.getDepartmentId());
-        dataObject.setLoginName(entity.getLoginName());
-        dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());
         dataObject.setMobile(entity.getMobile());
         dataObject.setTel(entity.getTel());
@@ -36,7 +34,6 @@ public final class UserPersistenceAssembler {
         dataObject.setSuperFlag(superFlag(entity.getPrivilege()));
         dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
         dataObject.setEnableFlag(statusValue(entity.getStatus()));
-        dataObject.setSsoLoginName(entity.getSsoLoginName());
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -53,8 +50,6 @@ public final class UserPersistenceAssembler {
         User entity = new User();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setDepartmentId(dataObject.getDepartmentId());
-        entity.setLoginName(dataObject.getLoginName());
-        entity.setLoginPass(dataObject.getLoginPass());
         entity.setEmail(dataObject.getEmail());
         entity.setMobile(dataObject.getMobile());
         entity.setTel(dataObject.getTel());
@@ -67,7 +62,6 @@ public final class UserPersistenceAssembler {
         entity.setLoginCount(dataObject.getLoginCount());
         entity.setPrivilege(privilegeFrom(dataObject.getSuperFlag(), dataObject.getAdminFlag()));
         entity.setStatus(statusFrom(dataObject.getEnableFlag()));
-        entity.setSsoLoginName(dataObject.getSsoLoginName());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());

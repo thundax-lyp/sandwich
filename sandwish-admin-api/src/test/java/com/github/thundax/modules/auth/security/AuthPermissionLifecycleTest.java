@@ -180,7 +180,7 @@ public class AuthPermissionLifecycleTest {
 
         Assert.assertTrue(result.isActive());
         Assert.assertEquals(accessToken.getToken(), result.getSession().getToken());
-        Assert.assertEquals("tester", result.getUser().getLoginName());
+        Assert.assertEquals("tester", result.getUsername());
         Assert.assertFalse(authService.queryToken("missing").isActive());
     }
 
@@ -321,18 +321,22 @@ public class AuthPermissionLifecycleTest {
         String smsCode = authService.createSmsValidateCode(form.getLoginToken(), "13800000000");
 
         Assert.assertEquals(
-                "tester",
-                authService
+                "u1",
+                EntityIdCodec.toValue(authService
                         .authenticateSms(form.getLoginToken(), "13800000000", smsCode)
-                        .getLoginName());
+                        .getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");
         inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
 
         Assert.assertEquals(
-                "tester", authService.authenticateWecom("wecom-code").getLoginName());
+                "u1",
+                EntityIdCodec.toValue(
+                        authService.authenticateWecom("wecom-code").getId()));
         Assert.assertEquals(
-                "tester", authService.authenticateGithub("github-code").getLoginName());
+                "u1",
+                EntityIdCodec.toValue(
+                        authService.authenticateGithub("github-code").getId()));
     }
 
     @Test
@@ -779,12 +783,17 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public User getBySsoLoginName(String ssoLoginName) {
-            return user();
+        public String getAccountLoginName(EntityId userId) {
+            return "tester";
         }
 
         @Override
-        public void updatePassword(User user) {}
+        public UserCredential getPasswordCredential(EntityId userId) {
+            return new TestUserCredentialDao().credential();
+        }
+
+        @Override
+        public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {}
 
         @Override
         public void updateLoginInfo(User user) {}
@@ -825,10 +834,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void add(User entity) {}
+        public void add(User entity, String loginName, String encryptedPassword) {}
 
         @Override
-        public void update(User entity) {}
+        public void update(User entity, String loginName) {}
 
         public int deleteById(EntityId id) {
             return 1;
@@ -841,8 +850,6 @@ public class AuthPermissionLifecycleTest {
         private User user() {
             User user = new User();
             user.setId(EntityIdCodec.toDomain("u1"));
-            user.setLoginName("tester");
-            user.setLoginPass("secret");
             user.setStatus(UserStatus.ENABLED);
             user.setPrivilege(UserPrivilege.SUPER);
             user.setRanks(0);

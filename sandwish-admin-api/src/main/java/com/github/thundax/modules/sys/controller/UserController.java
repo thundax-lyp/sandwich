@@ -181,7 +181,7 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
-        entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
+        String encryptedPassword = passwordService.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
             User bean = userService.getById(entity.getId());
@@ -195,7 +195,7 @@ public class UserController {
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
-        userService.add(entity);
+        userService.add(entity, request.getLoginName(), encryptedPassword);
 
         return toResponse(entity);
     }
@@ -226,10 +226,6 @@ public class UserController {
             throw new InvalidParameterException("loginName");
         }
 
-        if (!isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId())) {
-            throw new InvalidParameterException("ssoLoginName");
-        }
-
         User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, request.getId());
@@ -248,11 +244,11 @@ public class UserController {
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
 
-        userService.update(entity);
+        userService.update(entity, request.getLoginName());
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            entity.setLoginPass(passwordService.encrypt(request.getLoginPass()));
-            userService.updatePassword(entity);
+            userService.updatePassword(
+                    entity.getId(), passwordService.encrypt(request.getLoginPass()), entity.getUpdateUserId());
         }
 
         return toResponse(entity);
@@ -389,20 +385,6 @@ public class UserController {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
 
-    @ApiOperation(value = "检查 [ssoLoginName]是否存在", notes = "sys:user:view")
-    @ApiImplicitParams({
-        @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
-                value = "令牌",
-                paramType = "header",
-                dataTypeClass = String.class),
-    })
-    @RequestMapping(value = "check-sso-loginName", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
-    public Boolean checkSsoLoginName(@Valid @RequestBody UserCheckRequest request) {
-        return isSsoLoginNameAvailable(request.getSsoLoginName(), request.getId());
-    }
-
     @ApiOperation(value = "获取部门树", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -536,22 +518,11 @@ public class UserController {
         return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
     }
 
-    private boolean isSsoLoginNameAvailable(String ssoLoginName, String id) {
-        if (StringUtils.isBlank(ssoLoginName)) {
-            return true;
-        }
-        User bean = userService.getBySsoLoginName(ssoLoginName);
-        if (bean == null) {
-            return true;
-        }
-
-        return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
-    }
-
     private UserResponse toResponse(User user) {
         Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         List<Role> roleList = userService.listUserRoles(user);
-        return UserInterfaceAssembler.toResponse(user, department, roleList, departmentService::getById);
+        return UserInterfaceAssembler.toResponse(
+                user, userService.getAccountLoginName(user.getId()), department, roleList, departmentService::getById);
     }
 
     public static String getAvatarUrl(String userId, String token) {

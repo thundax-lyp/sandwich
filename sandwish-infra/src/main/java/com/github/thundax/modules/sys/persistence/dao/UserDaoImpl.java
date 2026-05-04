@@ -29,6 +29,8 @@ public class UserDaoImpl implements UserDao {
             "department_id IN (SELECT o.id FROM sys_department query_department "
                     + "JOIN sys_department o ON o.lft BETWEEN query_department.lft AND query_department.rgt "
                     + "WHERE query_department.id = {0})";
+    private static final String ACCOUNT_LOGIN_NAME_FILTER_SQL = "id IN (SELECT user_id FROM sys_user_identity "
+            + "WHERE identity_type = 'ACCOUNT' AND identity_value LIKE CONCAT('%',{0},'%'))";
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
 
@@ -125,7 +127,6 @@ public class UserDaoImpl implements UserDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(UserDO::getName, dataObject.getName())
                         .set(UserDO::getDepartmentId, dataObject.getDepartmentId())
-                        .set(UserDO::getLoginName, dataObject.getLoginName())
                         .set(UserDO::getEmail, dataObject.getEmail())
                         .set(UserDO::getMobile, dataObject.getMobile())
                         .set(UserDO::getTel, dataObject.getTel())
@@ -133,8 +134,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getAdminFlag, dataObject.getAdminFlag())
                         .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
                         .set(UserDO::getPriority, dataObject.getPriority())
-                        .set(UserDO::getRemarks, dataObject.getRemarks())
-                        .set(UserDO::getSsoLoginName, dataObject.getSsoLoginName()));
+                        .set(UserDO::getRemarks, dataObject.getRemarks()));
         removeUserCaches(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
@@ -154,24 +154,6 @@ public class UserDaoImpl implements UserDao {
         removeUserCaches(id.value());
         roleCacheSupport.removeAll();
         return count;
-    }
-
-    @Override
-    public User getByLoginName(String loginName) {
-        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(UserDO::getLoginName, loginName);
-        User user = UserPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
-        cacheSupport.putById(user);
-        return user;
-    }
-
-    @Override
-    public User getBySsoLoginName(String ssoLoginName) {
-        LambdaQueryWrapper<UserDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(UserDO::getSsoLoginName, ssoLoginName);
-        User user = UserPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
-        cacheSupport.putById(user);
-        return user;
     }
 
     @Override
@@ -196,13 +178,6 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getLoginCount, 0));
         removeUserCaches(EntityIdCodec.toValue(user.getId()));
         return count;
-    }
-
-    @Override
-    public void updateLoginPass(User user) {
-        UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
-        mapper.update(null, buildIdUpdateWrapper(dataObject).set(UserDO::getLoginPass, dataObject.getLoginPass()));
-        removeUserCaches(EntityIdCodec.toValue(user.getId()));
     }
 
     @Override
@@ -249,7 +224,7 @@ public class UserDaoImpl implements UserDao {
             wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
         }
         if (StringUtils.isNotBlank(loginName)) {
-            wrapper.like("login_name", loginName);
+            wrapper.apply(ACCOUNT_LOGIN_NAME_FILTER_SQL, loginName);
         }
         if (StringUtils.isNotBlank(name)) {
             wrapper.like("name", name);

@@ -26,8 +26,4 @@ public class UserCheckRequest implements Serializable {
     @JsonProperty("loginName")
     @Size(max = 30, message = "\"登录名\"长度不能超过 30")
     private String loginName;
-
-    @ApiModelProperty(name = "ssoLoginName", value = "sso登录名")
-    @JsonProperty("ssoLoginName")
-    private String ssoLoginName;
 }

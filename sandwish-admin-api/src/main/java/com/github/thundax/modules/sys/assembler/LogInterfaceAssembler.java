@@ -21,7 +21,11 @@ public final class LogInterfaceAssembler {
 
     @NonNull
     public static LogResponse toResponse(
-            Log entity, User user, Department department, Function<EntityId, Department> departmentLoader) {
+            Log entity,
+            User user,
+            String loginName,
+            Department department,
+            Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new LogResponse();
         }
@@ -38,7 +42,7 @@ public final class LogInterfaceAssembler {
         response.setRequestUri(entity.getRequestUri());
         response.setRequestParams(entity.getRequestParams());
         response.setCreateDate(entity.getLogDate());
-        response.setCreateUser(toUserResponse(user, department, departmentLoader));
+        response.setCreateUser(toUserResponse(user, loginName, department, departmentLoader));
         return response;
     }
 
@@ -57,14 +61,14 @@ public final class LogInterfaceAssembler {
 
     @NonNull
     private static LogUserResponse toUserResponse(
-            User entity, Department department, Function<EntityId, Department> departmentLoader) {
+            User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new LogUserResponse();
         }
 
         LogUserResponse response = new LogUserResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setLoginName(entity.getLoginName());
+        response.setLoginName(loginName);
         response.setName(entity.getName());
         response.setDepartment(toDepartmentResponse(department, departmentLoader));
         return response;

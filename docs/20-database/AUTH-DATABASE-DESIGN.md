@@ -134,7 +134,7 @@
 - `identity_type` 固定写入 `ACCOUNT`、`MOBILE` 或 `EMAIL`。
 - `status` 固定写入 `ENABLED` 或 `DISABLED`。
 - `identity_value` 必须保存规范化后的登录标识值。
-- `ACCOUNT` 类型 `identity_value` 初始化来源是 `sys_user.login_name`。
+- `ACCOUNT` 类型 `identity_value` 初始化来源是后台用户保存请求中的 `loginName`。
 - `MOBILE` 类型 `identity_value` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
 - `EMAIL` 类型 `identity_value` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
 
@@ -182,7 +182,7 @@
 - `failed_limit` 默认值固定来自后台登录配置。
 - `locked_until` 为空时，非锁定状态不受时间锁限制。
 - `expires_at` 为空时，凭据不过期。
-- `PASSWORD` 类型凭据初始化来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
+- `PASSWORD` 类型凭据初始化来源是后台用户保存请求中的加密后密码。
 
 索引：
 
@@ -459,10 +459,10 @@
 
 ## 10. Initialization Rules
 
-- `sys_user_identity(ACCOUNT)` 初始化来源是 `sys_user.login_name`。
+- `sys_user_identity(ACCOUNT)` 初始化来源是后台用户保存请求中的 `loginName`。
 - `sys_user_identity(MOBILE)` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
 - `sys_user_identity(EMAIL)` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
-- `sys_user_credential(PASSWORD)` 初始化来源是 `sys_user.login_pass` 或 `sys_user_encrypt.login_pass`。
+- `sys_user_credential(PASSWORD)` 初始化来源是后台用户保存请求中的加密后密码。
 - 必须保证一个可登录后台用户至少拥有一个 `ACCOUNT` 类型 `UserIdentity`。
 - 必须保证一个可登录后台用户至少拥有一个 `PASSWORD` 类型 `UserCredential`。
 - 密码认证应该读取 `sys_user_credential.credential_value`。

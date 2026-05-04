@@ -27,7 +27,11 @@ public final class UserInterfaceAssembler {
 
     @NonNull
     public static UserResponse toResponse(
-            User entity, Department department, List<Role> roleList, Function<EntityId, Department> departmentLoader) {
+            User entity,
+            String loginName,
+            Department department,
+            List<Role> roleList,
+            Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
             return new UserResponse();
         }
@@ -38,7 +42,7 @@ public final class UserInterfaceAssembler {
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
-        response.setLoginName(entity.getLoginName());
+        response.setLoginName(loginName);
         response.setRanks(entity.getRanks());
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
@@ -114,7 +118,6 @@ public final class UserInterfaceAssembler {
         if (request.getDepartment() != null) {
             entity.setDepartmentId(request.getDepartment().getId());
         }
-        entity.setLoginName(request.getLoginName());
         entity.setRanks(request.getRanks());
         entity.setName(request.getName());
         entity.setEmail(request.getEmail());

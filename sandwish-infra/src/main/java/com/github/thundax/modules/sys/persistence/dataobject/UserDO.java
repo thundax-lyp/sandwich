@@ -23,10 +23,6 @@ public class UserDO {
 
     private String departmentId;
 
-    private String loginName;
-
-    private String loginPass;
-
     @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String email;
 
@@ -52,8 +48,6 @@ public class UserDO {
     private String adminFlag;
 
     private String enableFlag;
-
-    private String ssoLoginName;
 
     private Integer priority;
     private String remarks;

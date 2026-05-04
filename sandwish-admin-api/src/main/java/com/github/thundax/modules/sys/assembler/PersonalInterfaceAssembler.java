@@ -19,13 +19,13 @@ public final class PersonalInterfaceAssembler {
     private PersonalInterfaceAssembler() {}
 
     @NonNull
-    public static PersonalInfoResponse toInfoResponse(User entity) {
+    public static PersonalInfoResponse toInfoResponse(User entity, String loginName) {
         if (entity == null) {
             return new PersonalInfoResponse();
         }
         PersonalInfoResponse response = new PersonalInfoResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setLoginName(entity.getLoginName());
+        response.setLoginName(loginName);
         response.setRanks(entity.getRanks());
         response.setName(entity.getName());
         response.setMobile(entity.getMobile());

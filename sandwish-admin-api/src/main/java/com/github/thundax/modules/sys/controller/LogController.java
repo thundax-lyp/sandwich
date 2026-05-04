@@ -63,7 +63,12 @@ public class LogController {
         User user = userService.getById(EntityIdCodec.toDomain(log.getUserId()));
         Department department =
                 user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
-        return LogInterfaceAssembler.toResponse(log, user, department, departmentService::getById);
+        return LogInterfaceAssembler.toResponse(
+                log,
+                user,
+                user == null ? null : userService.getAccountLoginName(user.getId()),
+                department,
+                departmentService::getById);
     }
 
     private PageDTO<Log> readLogPage(LogPageRequest request) {

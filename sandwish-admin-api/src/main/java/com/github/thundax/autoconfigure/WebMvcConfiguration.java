@@ -21,7 +21,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Bean
     public StoredObjectStore storedObjectStore(VltavaProperties properties) {
         VltavaProperties.UploadProperties upload = properties.getUpload();
-        return new LocalFileStoredObjectStore(upload.getStoragePath(), upload.getServletPath());
+        return new LocalFileStoredObjectStore(upload.getStoragePath(), upload.getContentPath());
     }
 
     @Bean

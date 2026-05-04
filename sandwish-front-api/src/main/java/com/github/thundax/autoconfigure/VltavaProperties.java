@@ -116,7 +116,7 @@ public class VltavaProperties {
     public static class UploadProperties {
 
         // 本地存储目录
-        private String servletPath;
+        private String contentPath;
         // 本地存储目录
         private String storagePath;
         // 可上传的图片文件名后缀
@@ -130,16 +130,16 @@ public class VltavaProperties {
         // 图片压缩质量
         private Float imageQuality;
 
-        public String getServletPath() {
-            if (StringUtils.isEmpty(servletPath)) {
-                return "/servlet/storage/";
+        public String getContentPath() {
+            if (StringUtils.isEmpty(contentPath)) {
+                return "/api/assist/storage/objects/";
             }
 
-            return servletPath.endsWith("/") ? servletPath : servletPath + "/";
+            return contentPath.endsWith("/") ? contentPath : contentPath + "/";
         }
 
-        public void setServletPath(String servletPath) {
-            this.servletPath = servletPath;
+        public void setContentPath(String contentPath) {
+            this.contentPath = contentPath;
         }
 
         @NonNull

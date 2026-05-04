@@ -1,5 +1,6 @@
 package com.github.thundax.modules.storage.store;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import java.io.File;
@@ -13,11 +14,11 @@ public class LocalFileStoredObjectStore implements StoredObjectStore {
     private static final int BUFFER_SIZE = 4096;
 
     private final String storagePath;
-    private final String servletPath;
+    private final String contentPath;
 
-    public LocalFileStoredObjectStore(String storagePath, String servletPath) {
+    public LocalFileStoredObjectStore(String storagePath, String contentPath) {
         this.storagePath = storagePath;
-        this.servletPath = servletPath;
+        this.contentPath = contentPath;
     }
 
     @Override
@@ -47,7 +48,7 @@ public class LocalFileStoredObjectStore implements StoredObjectStore {
         storedObject.setBucketName(storagePath);
         storedObject.setObjectKey(storage.getPathName());
         storedObject.setSize(file.length());
-        storedObject.setAccessEndpoint(servletPath + storage.getFileName());
+        storedObject.setAccessEndpoint(contentPath + EntityIdCodec.toValue(storage.getId()) + "/content");
         return storedObject;
     }
 

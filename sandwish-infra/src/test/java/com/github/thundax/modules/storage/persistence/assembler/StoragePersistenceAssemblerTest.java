@@ -43,7 +43,7 @@ public class StoragePersistenceAssemblerTest {
         entity.setBucketName("/tmp/storage/");
         entity.setObjectKey("202605/s1.png");
         entity.setSize(10L);
-        entity.setAccessEndpoint("/servlet/storage/s1.png");
+        entity.setAccessEndpoint("/api/assist/storage/objects/s1/content");
 
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
@@ -52,7 +52,7 @@ public class StoragePersistenceAssemblerTest {
         assertEquals("/tmp/storage/", dataObject.getBucketName());
         assertEquals("202605/s1.png", dataObject.getObjectKey());
         assertEquals(Long.valueOf(10L), dataObject.getSize());
-        assertEquals("/servlet/storage/s1.png", dataObject.getAccessEndpoint());
+        assertEquals("/api/assist/storage/objects/s1/content", dataObject.getAccessEndpoint());
     }
 
     @Test

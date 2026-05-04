@@ -24,7 +24,7 @@ public class LocalFileStoredObjectStoreTest {
         storage.setExtendName("txt");
         storage.setCreateDate(new Date());
         LocalFileStoredObjectStore backend =
-                new LocalFileStoredObjectStore(directory.toString() + "/", "/servlet/storage/");
+                new LocalFileStoredObjectStore(directory.toString() + "/", "/api/assist/storage/objects/");
 
         StoredObject object = backend.save(storage, new ByteArrayInputStream("hello".getBytes(StandardCharsets.UTF_8)));
 
@@ -33,7 +33,7 @@ public class LocalFileStoredObjectStoreTest {
         assertEquals(StorageType.LOCAL_FILE, object.getStorageType());
         assertEquals(directory.toString() + "/", object.getBucketName());
         assertEquals(Long.valueOf(5L), object.getSize());
-        assertEquals("/servlet/storage/s1.txt", object.getAccessEndpoint());
+        assertEquals("/api/assist/storage/objects/s1/content", object.getAccessEndpoint());
         assertTrue(backend.exists(storage));
         try (InputStream inputStream = backend.open(storage)) {
             assertEquals(5, inputStream.available());

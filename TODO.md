@@ -9,12 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-database-docs`：固化后台认证数据库设计
-  - 范围文件：docs/20-database/AUTH-DATABASE-DESIGN.md
-  - 处理动作：新增 `UserIdentity`、`UserCredential`、`AuthSession` 表设计和索引约束
-  - 验收点：每张表的字段、唯一约束、状态枚举和迁移关系可检查
-  - 重要度：9/10
-
 - [ ] `sys-user-entity`：收窄后台用户主体职责
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java
   - 处理动作：收窄 `User` 中登录标识和密码字段的业务职责

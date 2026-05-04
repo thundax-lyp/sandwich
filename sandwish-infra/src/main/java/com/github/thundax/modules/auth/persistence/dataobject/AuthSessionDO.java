@@ -23,6 +23,8 @@ public class AuthSessionDO {
 
     private String token;
 
+    private String tenantId;
+
     private String userId;
 
     private String identityId;

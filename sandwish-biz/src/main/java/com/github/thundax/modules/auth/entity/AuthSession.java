@@ -21,6 +21,7 @@ public class AuthSession implements Auditable {
     private EntityId id;
     private String sessionId;
     private String token;
+    private String tenantId;
     private EntityId userId;
     private EntityId identityId;
     private UserIdentityType identityType;

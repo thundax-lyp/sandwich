@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
@@ -73,6 +74,12 @@ public interface AuthService {
     void activeAccessToken(AccessToken accessToken);
 
     void deleteAccessToken(AccessToken accessToken);
+
+    void invalidateSessionByToken(String token, String reason);
+
+    int invalidateSessionsByUserId(EntityId userId, String reason);
+
+    int invalidateSessionsByTenantId(String tenantId, String reason);
 
     /**
      * 账号密码认证。

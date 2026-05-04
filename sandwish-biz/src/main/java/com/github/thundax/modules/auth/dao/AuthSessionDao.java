@@ -15,6 +15,8 @@ public interface AuthSessionDao {
 
     List<AuthSession> listByUserIdAndStatus(EntityId userId, AuthSessionStatus status);
 
+    List<AuthSession> listByTenantIdAndStatus(String tenantId, AuthSessionStatus status);
+
     String insert(AuthSession authSession);
 
     int updateAccessTime(AuthSession authSession);

@@ -20,6 +20,7 @@ public final class AuthSessionPersistenceAssembler {
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setSessionId(entity.getSessionId());
         dataObject.setToken(entity.getToken());
+        dataObject.setTenantId(entity.getTenantId());
         dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
         dataObject.setIdentityId(EntityIdCodec.toValue(entity.getIdentityId()));
         dataObject.setIdentityType(identityTypeValue(entity.getIdentityType()));
@@ -45,6 +46,7 @@ public final class AuthSessionPersistenceAssembler {
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setSessionId(dataObject.getSessionId());
         entity.setToken(dataObject.getToken());
+        entity.setTenantId(dataObject.getTenantId());
         entity.setUserId(EntityIdCodec.toDomain(dataObject.getUserId()));
         entity.setIdentityId(EntityIdCodec.toDomain(dataObject.getIdentityId()));
         entity.setIdentityType(identityTypeFrom(dataObject.getIdentityType()));

@@ -129,6 +129,23 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
+    public void shouldInvalidateSessionByUserId() {
+        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+
+        authService.invalidateSessionsByUserId(EntityIdCodec.toDomain("u1"), "PASSWORD_RESET");
+
+        Assert.assertNull(accessTokenDao.getByUserId("u1"));
+        Assert.assertNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
+        Assert.assertEquals(
+                AuthSessionStatus.INVALIDATED,
+                authSessionDao.getByToken(accessToken.getToken()).getStatus());
+        Assert.assertEquals(
+                "PASSWORD_RESET",
+                authSessionDao.getByToken(accessToken.getToken()).getInvalidateReason());
+    }
+
+    @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
@@ -213,6 +230,17 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
+        public List<AuthSession> listByTenantIdAndStatus(String tenantId, AuthSessionStatus status) {
+            if (session == null || (status != null && session.getStatus() != status)) {
+                return Collections.emptyList();
+            }
+            if (tenantId != null && !tenantId.equals(session.getTenantId())) {
+                return Collections.emptyList();
+            }
+            return Collections.singletonList(session);
+        }
+
+        @Override
         public String insert(AuthSession authSession) {
             authSession.setId(EntityId.of("session-1"));
             this.session = authSession;
@@ -288,6 +316,7 @@ public class AuthPermissionLifecycleTest {
             target.setId(source.getId());
             target.setSessionId(source.getSessionId());
             target.setToken(source.getToken());
+            target.setTenantId(source.getTenantId());
             target.setUserId(source.getUserId());
             target.setIdentityId(source.getIdentityId());
             target.setIdentityType(source.getIdentityType());

@@ -53,6 +53,17 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
     }
 
     @Override
+    public List<AuthSession> listByTenantIdAndStatus(String tenantId, AuthSessionStatus status) {
+        LambdaQueryWrapper<AuthSessionDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AuthSessionDO::getTenantId, tenantId);
+        if (status != null) {
+            wrapper.eq(AuthSessionDO::getStatus, status.value());
+        }
+        wrapper.orderByDesc(AuthSessionDO::getIssuedAt);
+        return AuthSessionPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
+    }
+
+    @Override
     public String insert(AuthSession authSession) {
         AuthSessionDO dataObject = AuthSessionPersistenceAssembler.toDataObject(authSession);
         mapper.insert(dataObject);
@@ -85,6 +96,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(AuthSessionDO::getStatus, dataObject.getStatus())
+                        .set(AuthSessionDO::getLastAccessTime, dataObject.getLastAccessTime())
                         .set(AuthSessionDO::getInvalidateReason, dataObject.getInvalidateReason()));
     }
 

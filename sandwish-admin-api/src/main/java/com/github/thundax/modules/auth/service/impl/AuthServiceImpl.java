@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
@@ -292,6 +293,23 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void invalidateSessionByToken(String token, String reason) {
+        invalidateAuthSession(token, reason);
+    }
+
+    @Override
+    public int invalidateSessionsByUserId(EntityId userId, String reason) {
+        List<AuthSession> sessions = authSessionDao.listByUserIdAndStatus(userId, AuthSessionStatus.ACTIVE);
+        return invalidateAuthSessions(sessions, reason);
+    }
+
+    @Override
+    public int invalidateSessionsByTenantId(String tenantId, String reason) {
+        List<AuthSession> sessions = authSessionDao.listByTenantIdAndStatus(tenantId, AuthSessionStatus.ACTIVE);
+        return invalidateAuthSessions(sessions, reason);
+    }
+
+    @Override
     public User authenticatePassword(String loginName, String plainPassword) throws ApiException {
         UserIdentity identity = getOrBootstrapAccountIdentity(loginName);
         if (identity == null) {
@@ -425,6 +443,36 @@ public class AuthServiceImpl implements AuthService {
         }
         authSession.logout(new Date());
         authSessionDao.updateLogout(authSession);
+        authSessionRuntimeDao.deleteByToken(token);
+    }
+
+    private int invalidateAuthSessions(List<AuthSession> sessions, String reason) {
+        if (sessions == null || sessions.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (AuthSession session : sessions) {
+            invalidateAuthSession(session.getToken(), reason);
+            count++;
+        }
+        return count;
+    }
+
+    private void invalidateAuthSession(String token, String reason) {
+        AuthSession runtimeSession = authSessionRuntimeDao.getByToken(token);
+        AuthSession authSession = authSessionDao.getByToken(token);
+        if (authSession == null || !authSession.isActive()) {
+            authSessionRuntimeDao.deleteByToken(token);
+            return;
+        }
+
+        if (runtimeSession != null && runtimeSession.getLastAccessTime() != null) {
+            authSession.touch(runtimeSession.getLastAccessTime());
+        }
+        authSession.invalidate(reason);
+        authSessionDao.updateInvalidate(authSession);
+        permissionService.release(token);
+        accessTokenDao.deleteByToken(token);
         authSessionRuntimeDao.deleteByToken(token);
     }
 

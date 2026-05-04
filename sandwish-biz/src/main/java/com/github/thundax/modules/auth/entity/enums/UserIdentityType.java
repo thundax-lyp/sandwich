@@ -6,7 +6,9 @@ import java.util.Arrays;
 public enum UserIdentityType {
     ACCOUNT,
     MOBILE,
-    EMAIL;
+    EMAIL,
+    WECOM,
+    GITHUB;
 
     public String value() {
         return name();

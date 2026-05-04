@@ -94,6 +94,12 @@ public interface AuthService {
      */
     User authenticatePassword(String loginName, String plainPassword) throws ApiException;
 
+    User authenticateSms(String loginToken, String mobile, String validateCode) throws ApiException;
+
+    User authenticateWecom(String code) throws ApiException;
+
+    User authenticateGithub(String code) throws ApiException;
+
     /**
      * 校验登录密码并处理失败锁定。
      *

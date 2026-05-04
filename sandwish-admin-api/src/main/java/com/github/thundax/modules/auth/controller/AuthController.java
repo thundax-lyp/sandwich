@@ -11,6 +11,9 @@ import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRe
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;
 import com.github.thundax.modules.auth.controller.request.AuthTokenRequest;
+import com.github.thundax.modules.auth.controller.request.GithubLoginRequest;
+import com.github.thundax.modules.auth.controller.request.SmsLoginRequest;
+import com.github.thundax.modules.auth.controller.request.WecomLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
@@ -128,6 +131,28 @@ public class AuthController {
                 authService.createAccessToken(EntityIdCodec.toValue(user.getId()), request.getUsername()));
     }
 
+    @ApiOperation(value = "短信登录", notes = "ignore")
+    @PostMapping(value = "login/sms")
+    public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
+        User user =
+                authService.authenticateSms(request.getLoginToken(), request.getMobile(), request.getValidateCode());
+        return loginSuccess(user, request.getMobile());
+    }
+
+    @ApiOperation(value = "企业微信登录", notes = "ignore")
+    @PostMapping(value = "login/wecom")
+    public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
+        User user = authService.authenticateWecom(request.getCode());
+        return loginSuccess(user, "wecom");
+    }
+
+    @ApiOperation(value = "GitHub 登录", notes = "ignore")
+    @PostMapping(value = "login/github")
+    public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
+        User user = authService.authenticateGithub(request.getCode());
+        return loginSuccess(user, "github");
+    }
+
     @ApiOperation(value = "登出", notes = "ignore")
     @PostMapping(value = "logout")
     @SysLogger("登出")
@@ -180,5 +205,17 @@ public class AuthController {
         log.setRequestParams(AuthInterfaceAssembler.toLogJson(request));
         log.setSignable(true);
         SysLogUtils.saveLog(log);
+    }
+
+    private AuthAccessTokenResponse loginSuccess(User user, String loginName) {
+        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toValue(user.getId()));
+        if (accessToken != null) {
+            authService.deleteAccessToken(accessToken);
+        }
+        user.setLastLoginDate(new Date());
+        user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
+        userService.updateLoginInfo(user);
+        return AuthInterfaceAssembler.toAccessTokenResponse(
+                authService.createAccessToken(EntityIdCodec.toValue(user.getId()), loginName));
     }
 }

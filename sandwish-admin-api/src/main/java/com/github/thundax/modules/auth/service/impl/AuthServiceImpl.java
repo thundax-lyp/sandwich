@@ -32,6 +32,8 @@ import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
+import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +71,12 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordService passwordService;
     private final PermissionService permissionService;
     private final UserService userService;
+
+    @Autowired(required = false)
+    private WecomLoginProvider wecomLoginProvider;
+
+    @Autowired(required = false)
+    private GithubLoginProvider githubLoginProvider;
 
     public AuthServiceImpl(
             AuthProperties properties,
@@ -357,6 +366,30 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public User authenticateSms(String loginToken, String mobile, String validateCode) throws ApiException {
+        if (!validateSmsValidateCode(loginToken, mobile, validateCode)) {
+            throw new InvalidCaptchaException();
+        }
+        return authenticateIdentity(UserIdentityType.MOBILE, mobile);
+    }
+
+    @Override
+    public User authenticateWecom(String code) throws ApiException {
+        if (wecomLoginProvider == null) {
+            throw new ApiException("企业微信登录未配置");
+        }
+        return authenticateIdentity(UserIdentityType.WECOM, wecomLoginProvider.resolveIdentity(code));
+    }
+
+    @Override
+    public User authenticateGithub(String code) throws ApiException {
+        if (githubLoginProvider == null) {
+            throw new ApiException("GitHub登录未配置");
+        }
+        return authenticateIdentity(UserIdentityType.GITHUB, githubLoginProvider.resolveIdentity(code));
+    }
+
+    @Override
     public void validatePassword(User user, String plainPassword) throws ApiException {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
@@ -403,6 +436,21 @@ public class AuthServiceImpl implements AuthService {
         identity.setUpdateDate(identity.getCreateDate());
         identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
         return identity;
+    }
+
+    private User authenticateIdentity(UserIdentityType identityType, String identityValue) throws ApiException {
+        UserIdentity identity = userIdentityDao.getByIdentity(identityType, identityValue);
+        if (identity == null || !identity.isEnabled()) {
+            throw new InvalidUsernamePasswordException();
+        }
+        User user = userService.getById(identity.getUserId());
+        if (user == null) {
+            throw new InvalidUsernamePasswordException();
+        }
+        if (!user.isEnable()) {
+            throw new BannedAccountException();
+        }
+        return user;
     }
 
     private void createAuthSession(AccessToken accessToken, String loginName) {

@@ -36,14 +36,6 @@
   - 验收点：失效动作同步清理运行态、释放权限会话并写回审计状态
   - 重要度：9/10
 
-- [ ] `auth-login-methods`：搬运短信、企业微信和 GitHub 多登录方式端口
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：新增 Sms/Wecom/GitHub 登录命令、provider 边界和 API 入口
-  - 验收点：每种登录方式有独立请求模型、Service 方法和可替换 provider 校验点
-  - 重要度：8/10
-
 - [ ] `auth-cleanup`：清理 OAuth/Auth 迁移现场
   - 范围文件：TODO.md
     docs/30-designs/AUTH-OAUTH-MIGRATION-RUNBOOK.md

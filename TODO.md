@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-identity-biz`：新增登录标识业务对象
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/UserIdentity.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserIdentityType.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserIdentityStatus.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/UserIdentityDao.java
-  - 处理动作：新增 `UserIdentity` 实体、枚举和 DAO 契约
-  - 验收点：业务层可按登录标识类型和值定位唯一用户身份
-  - 重要度：9/10
-
 - [ ] `auth-credential-biz`：新增认证凭据业务对象
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/UserCredential.java
     sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/UserCredentialType.java

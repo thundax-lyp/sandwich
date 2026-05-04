@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-runtime-infra`：实现 Redis 认证会话运行态存储
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImpl.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthSessionPersistenceAssembler.java
-  - 处理动作：用缓存存储活跃 `AuthSession` 快照并按 token 有效期设置 TTL
-  - 验收点：登录后可从 Redis 运行态读取会话，请求 touch 可刷新运行态过期时间
-  - 重要度：9/10
-
 - [ ] `auth-session-lifecycle-redis`：切换认证会话生命周期为 Redis 优先
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java
     sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AuthService.java

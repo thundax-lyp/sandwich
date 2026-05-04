@@ -5,7 +5,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.IdGen;
+import com.github.thundax.common.id.IdGen;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;

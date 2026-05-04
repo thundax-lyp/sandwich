@@ -1,7 +1,7 @@
 package com.github.thundax.modules.storage.utils;
 
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.IdGen;
+import com.github.thundax.common.id.IdGen;
 import com.github.thundax.modules.storage.entity.Storage;
 import java.io.File;
 import java.io.FileOutputStream;

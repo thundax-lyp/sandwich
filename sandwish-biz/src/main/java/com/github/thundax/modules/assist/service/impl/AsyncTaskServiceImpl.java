@@ -2,7 +2,7 @@ package com.github.thundax.modules.assist.service.impl;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.IdGen;
+import com.github.thundax.common.id.IdGen;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.service.AsyncTaskService;

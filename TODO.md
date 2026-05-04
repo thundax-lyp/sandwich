@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage-infra`：调整持久化实现和 DO 命名
-  - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StorageDO.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StorageMapper.java
-    sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java
-  - 处理动作：将主对象持久化对象、Mapper、Assembler 和 DAO implementation 对齐 `StoredObject`
-  - 验收点：infra 不再使用 `StorageDO` 作为当前模型名，数据库字段映射与设计文档一致
-  - 重要度：10/10
-
 - [ ] `storage-store`：下沉底层存储端口
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/backend/StorageBackend.java
     sandwish-biz/src/main/java/com/github/thundax/modules/storage/backend/StorageBackendObject.java

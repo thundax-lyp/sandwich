@@ -11,9 +11,9 @@ import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
-import com.github.thundax.modules.storage.persistence.mapper.StorageMapper;
+import com.github.thundax.modules.storage.persistence.mapper.StoredObjectMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     private static final String NORMAL_DEL_FLAG = "0";
     private static final String NO_MATCH_ID = "__no_matching_storage__";
 
-    private final StorageMapper mapper;
+    private final StoredObjectMapper mapper;
     private final StoredObjectReferenceMapper businessMapper;
     private final StorageCacheSupport cacheSupport;
 
     public StoredObjectDaoImpl(
-            StorageMapper mapper, StoredObjectReferenceMapper businessMapper, StorageCacheSupport cacheSupport) {
+            StoredObjectMapper mapper, StoredObjectReferenceMapper businessMapper, StorageCacheSupport cacheSupport) {
         this.mapper = mapper;
         this.businessMapper = businessMapper;
         this.cacheSupport = cacheSupport;
@@ -45,8 +45,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             return storage;
         }
 
-        LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StorageDO::getId, id.value());
+        LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StoredObjectDO::getId, id.value());
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         storage = StoragePersistenceAssembler.toEntity(mapper.selectOne(wrapper));
         cacheSupport.putById(storage);
@@ -67,8 +67,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         }
 
         if (!uncachedIdList.isEmpty()) {
-            LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
-            wrapper.in(StorageDO::getId, uncachedIdList);
+            LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(StoredObjectDO::getId, uncachedIdList);
             wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
             List<StoredObject> uncachedStorageList =
                     StoragePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
@@ -116,7 +116,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String remarks,
             int pageNo,
             int pageSize) {
-        Page<StorageDO> dataObjectPage = mapper.selectPage(
+        Page<StoredObjectDO> dataObjectPage = mapper.selectPage(
                 new Page<>(pageNo, pageSize),
                 buildListWrapper(
                         mimeType,
@@ -136,11 +136,11 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public String insert(StoredObject entity) {
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
                 null,
-                new UpdateWrapper<StorageDO>()
+                new UpdateWrapper<StoredObjectDO>()
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
@@ -149,23 +149,23 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public int update(StoredObject entity) {
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null,
                 buildIdUpdateWrapper(dataObject)
-                        .set(StorageDO::getName, dataObject.getName())
-                        .set(StorageDO::getExtendName, dataObject.getExtendName())
-                        .set(StorageDO::getMimeType, dataObject.getMimeType())
-                        .set(StorageDO::getOwnerId, dataObject.getOwnerId())
-                        .set(StorageDO::getOwnerType, dataObject.getOwnerType())
-                        .set(StorageDO::getStorageType, dataObject.getStorageType())
-                        .set(StorageDO::getBucketName, dataObject.getBucketName())
-                        .set(StorageDO::getObjectKey, dataObject.getObjectKey())
-                        .set(StorageDO::getSize, dataObject.getSize())
-                        .set(StorageDO::getAccessEndpoint, dataObject.getAccessEndpoint())
-                        .set(StorageDO::getObjectStatus, dataObject.getObjectStatus())
-                        .set(StorageDO::getPriority, dataObject.getPriority())
-                        .set(StorageDO::getRemarks, dataObject.getRemarks()));
+                        .set(StoredObjectDO::getName, dataObject.getName())
+                        .set(StoredObjectDO::getExtendName, dataObject.getExtendName())
+                        .set(StoredObjectDO::getMimeType, dataObject.getMimeType())
+                        .set(StoredObjectDO::getOwnerId, dataObject.getOwnerId())
+                        .set(StoredObjectDO::getOwnerType, dataObject.getOwnerType())
+                        .set(StoredObjectDO::getStorageType, dataObject.getStorageType())
+                        .set(StoredObjectDO::getBucketName, dataObject.getBucketName())
+                        .set(StoredObjectDO::getObjectKey, dataObject.getObjectKey())
+                        .set(StoredObjectDO::getSize, dataObject.getSize())
+                        .set(StoredObjectDO::getAccessEndpoint, dataObject.getAccessEndpoint())
+                        .set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus())
+                        .set(StoredObjectDO::getPriority, dataObject.getPriority())
+                        .set(StoredObjectDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
         return count;
     }
@@ -174,7 +174,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     public int deleteById(EntityId id) {
         int count = mapper.update(
                 null,
-                new UpdateWrapper<StorageDO>()
+                new UpdateWrapper<StoredObjectDO>()
                         .set(DEL_FLAG_COLUMN, "1")
                         .eq("id", id.value())
                         .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG));
@@ -184,7 +184,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public List<String> listMimeTypes() {
-        return toStringList(mapper.selectObjs(new QueryWrapper<StorageDO>()
+        return toStringList(mapper.selectObjs(new QueryWrapper<StoredObjectDO>()
                 .select("mime_type")
                 .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                 .groupBy("mime_type")
@@ -193,30 +193,32 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public int updateObjectStatus(StoredObject storage) {
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(StorageDO::getObjectStatus, dataObject.getObjectStatus()));
+                null,
+                buildIdUpdateWrapper(dataObject).set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus()));
         cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
 
     @Override
     public int updateReferenceStatus(StoredObject storage) {
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(storage);
         int count = mapper.update(
                 null,
-                buildIdUpdateWrapper(dataObject).set(StorageDO::getReferenceStatus, dataObject.getReferenceStatus()));
+                buildIdUpdateWrapper(dataObject)
+                        .set(StoredObjectDO::getReferenceStatus, dataObject.getReferenceStatus()));
         cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
         return count;
     }
 
-    private LambdaUpdateWrapper<StorageDO> buildIdUpdateWrapper(StorageDO dataObject) {
-        LambdaUpdateWrapper<StorageDO> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(StorageDO::getId, dataObject.getId());
+    private LambdaUpdateWrapper<StoredObjectDO> buildIdUpdateWrapper(StoredObjectDO dataObject) {
+        LambdaUpdateWrapper<StoredObjectDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(StoredObjectDO::getId, dataObject.getId());
         return wrapper;
     }
 
-    private LambdaQueryWrapper<StorageDO> buildListWrapper(
+    private LambdaQueryWrapper<StoredObjectDO> buildListWrapper(
             String mimeType,
             String ownerId,
             String ownerType,
@@ -226,37 +228,37 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String referenceOwnerType,
             String name,
             String remarks) {
-        LambdaQueryWrapper<StorageDO> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         List<String> storageIds = findStorageIdsByBusiness(referenceOwnerId, referenceOwnerType);
         if (storageIds != null && storageIds.isEmpty()) {
-            wrapper.eq(StorageDO::getId, NO_MATCH_ID);
+            wrapper.eq(StoredObjectDO::getId, NO_MATCH_ID);
         } else if (storageIds != null) {
-            wrapper.in(StorageDO::getId, storageIds);
+            wrapper.in(StoredObjectDO::getId, storageIds);
         }
         if (StringUtils.isNotBlank(mimeType)) {
-            wrapper.eq(StorageDO::getMimeType, mimeType);
+            wrapper.eq(StoredObjectDO::getMimeType, mimeType);
         }
         if (StringUtils.isNotBlank(ownerId)) {
-            wrapper.eq(StorageDO::getOwnerId, ownerId);
+            wrapper.eq(StoredObjectDO::getOwnerId, ownerId);
         }
         if (StringUtils.isNotBlank(ownerType)) {
-            wrapper.eq(StorageDO::getOwnerType, ownerType);
+            wrapper.eq(StoredObjectDO::getOwnerType, ownerType);
         }
         if (StringUtils.isNotBlank(objectStatus)) {
-            wrapper.eq(StorageDO::getObjectStatus, objectStatus);
+            wrapper.eq(StoredObjectDO::getObjectStatus, objectStatus);
         }
         if (StringUtils.isNotBlank(referenceStatus)) {
-            wrapper.eq(StorageDO::getReferenceStatus, referenceStatus);
+            wrapper.eq(StoredObjectDO::getReferenceStatus, referenceStatus);
         }
         if (StringUtils.isNotBlank(name)) {
-            wrapper.like(StorageDO::getName, name);
+            wrapper.like(StoredObjectDO::getName, name);
         }
         if (StringUtils.isNotBlank(remarks)) {
-            wrapper.like(StorageDO::getRemarks, remarks);
+            wrapper.like(StoredObjectDO::getRemarks, remarks);
         }
-        wrapper.orderByDesc(StorageDO::getCreateDate);
-        wrapper.orderByAsc(StorageDO::getPriority);
+        wrapper.orderByDesc(StoredObjectDO::getCreateDate);
+        wrapper.orderByAsc(StoredObjectDO::getPriority);
         return wrapper;
     }
 

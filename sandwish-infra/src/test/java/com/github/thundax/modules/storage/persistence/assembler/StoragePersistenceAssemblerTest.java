@@ -16,7 +16,7 @@ import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStat
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import java.util.Date;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class StoragePersistenceAssemblerTest {
 
     @Test
     public void shouldReadLegacyLowerCaseOwnerType() {
-        StorageDO dataObject = new StorageDO();
+        StoredObjectDO dataObject = new StoredObjectDO();
         dataObject.setOwnerType("user");
         dataObject.setStorageType("local_file");
 
@@ -45,7 +45,7 @@ public class StoragePersistenceAssemblerTest {
         entity.setSize(10L);
         entity.setAccessEndpoint("/servlet/storage/s1.png");
 
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
         assertEquals("MEMBER", dataObject.getOwnerType());
         assertEquals("LOCAL_FILE", dataObject.getStorageType());
@@ -57,7 +57,7 @@ public class StoragePersistenceAssemblerTest {
 
     @Test
     public void shouldReadLegacyFlagsAsDomainValues() {
-        StorageDO dataObject = new StorageDO();
+        StoredObjectDO dataObject = new StoredObjectDO();
         dataObject.setObjectStatus(Global.ENABLE);
         dataObject.setReferenceStatus(Global.YES);
 
@@ -73,7 +73,7 @@ public class StoragePersistenceAssemblerTest {
         entity.setStatus(StoredObjectStatus.DELETED);
         entity.setVisibility(StoredObjectReferenceStatus.UNREFERENCED);
 
-        StorageDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
         assertEquals("DELETED", dataObject.getObjectStatus());
         assertEquals("UNREFERENCED", dataObject.getReferenceStatus());
@@ -102,7 +102,7 @@ public class StoragePersistenceAssemblerTest {
     public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
         StoredObject entity = new StoredObject();
         entity.setPriority(-1);
-        StorageDO dataObject = new StorageDO();
+        StoredObjectDO dataObject = new StoredObjectDO();
         dataObject.setPriority(-1);
 
         assertEquals(

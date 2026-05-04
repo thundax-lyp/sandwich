@@ -12,7 +12,7 @@ import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStat
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
-import com.github.thundax.modules.storage.persistence.dataobject.StorageDO;
+import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,11 @@ public final class StoragePersistenceAssembler {
 
     private StoragePersistenceAssembler() {}
 
-    public static StorageDO toDataObject(StoredObject entity) {
+    public static StoredObjectDO toDataObject(StoredObject entity) {
         if (entity == null) {
             return null;
         }
-        StorageDO dataObject = new StorageDO();
+        StoredObjectDO dataObject = new StoredObjectDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
@@ -46,7 +46,7 @@ public final class StoragePersistenceAssembler {
         return dataObject;
     }
 
-    public static StoredObject toEntity(StorageDO dataObject) {
+    public static StoredObject toEntity(StoredObjectDO dataObject) {
         if (dataObject == null) {
             return null;
         }
@@ -71,12 +71,12 @@ public final class StoragePersistenceAssembler {
         return entity;
     }
 
-    public static List<StoredObject> toEntityList(List<StorageDO> dataObjects) {
+    public static List<StoredObject> toEntityList(List<StoredObjectDO> dataObjects) {
         if (dataObjects == null) {
             return null;
         }
         List<StoredObject> entities = new ArrayList<>();
-        for (StorageDO dataObject : dataObjects) {
+        for (StoredObjectDO dataObject : dataObjects) {
             entities.add(toEntity(dataObject));
         }
         return entities;

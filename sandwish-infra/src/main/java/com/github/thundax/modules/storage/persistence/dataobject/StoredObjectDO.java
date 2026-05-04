@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("assist_storage")
-public class StorageDO {
+public class StoredObjectDO {
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;

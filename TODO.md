@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-session-biz`：新增认证会话业务对象
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/AuthSessionStatus.java
-    sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/AuthSessionDao.java
-  - 处理动作：新增 `AuthSession` 实体、状态枚举和 DAO 契约
-  - 验收点：业务层可表达会话签发、活跃、登出、失效和过期状态
-  - 重要度：8/10
-
 - [ ] `auth-identity-infra`：实现登录标识持久化
   - 范围文件：sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/UserIdentityDO.java
     sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/UserIdentityMapper.java

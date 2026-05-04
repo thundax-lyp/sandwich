@@ -193,10 +193,10 @@
 
 执行项：
 
-- 删除登录流程中对 `User.loginPass` 的直接认证依赖。
-- 收窄或删除 `LoginLockDao` 的账号维度锁定语义。
-- 收敛 `UserEncrypt` 中密码字段的职责。
-- 更新测试和文档。
+- 已删除登录流程中对 `User.loginPass` 的直接认证依赖；老用户首次登录仅允许用该字段初始化 `UserCredential`。
+- 已删除 `LoginLockDao` 的账号维度锁定接口和实现，失败次数、锁定和解锁状态由 `UserCredential` 承载。
+- `UserEncrypt.loginPass` 仅保留为旧用户加密表兼容镜像，不承载认证判定。
+- 测试和文档随对应实现提交同步更新。
 
 验收点：
 

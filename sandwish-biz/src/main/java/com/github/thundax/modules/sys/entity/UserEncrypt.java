@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 用户重要信息加密
+ * 用户重要信息加密。
+ *
+ * <p>密码字段仅作为旧用户加密表兼容镜像，认证凭据以 auth 模型 UserCredential 为准。
  */
 @Getter
 @Setter
@@ -18,7 +20,12 @@ import lombok.Setter;
 public class UserEncrypt implements Auditable {
     private EntityId id;
 
+    /**
+     * 迁移兼容字段，目标密码凭据固定由 UserCredential.credentialValue 承载。
+     */
+    @Deprecated
     private String loginPass;
+
     private String email;
     private String mobile;
     private String tel;

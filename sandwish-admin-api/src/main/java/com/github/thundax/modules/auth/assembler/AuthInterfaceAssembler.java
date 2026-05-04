@@ -4,6 +4,8 @@ import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationDecisionResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationViewResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
@@ -11,6 +13,8 @@ import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
 import org.springframework.lang.NonNull;
 
@@ -93,6 +97,31 @@ public final class AuthInterfaceAssembler {
         response.setSubject(userId(result.getUser()));
         response.setUsername(username(result.getUser()));
         response.setName(result.getUser() == null ? null : result.getUser().getName());
+        return response;
+    }
+
+    @NonNull
+    public static OAuth2AuthorizationViewResponse toAuthorizationViewResponse(OAuth2AuthorizationViewResult result) {
+        OAuth2AuthorizationViewResponse response = new OAuth2AuthorizationViewResponse();
+        if (result != null) {
+            response.setClientId(result.getClientId());
+            response.setClientName(result.getClientName());
+            response.setRedirectUri(result.getRedirectUri());
+            response.setScopes(result.getScopes());
+            response.setState(result.getState());
+        }
+        return response;
+    }
+
+    @NonNull
+    public static OAuth2AuthorizationDecisionResponse toAuthorizationDecisionResponse(
+            OAuth2AuthorizationDecisionResult result) {
+        OAuth2AuthorizationDecisionResponse response = new OAuth2AuthorizationDecisionResponse();
+        if (result != null) {
+            response.setApproved(result.isApproved());
+            response.setAuthorizationCode(result.getAuthorizationCode());
+            response.setState(result.getState());
+        }
         return response;
     }
 

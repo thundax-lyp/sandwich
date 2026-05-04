@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
+import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.dao.UserCredentialDao;
@@ -20,6 +21,7 @@ import com.github.thundax.modules.auth.dao.UserIdentityDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.UserCredential;
@@ -43,14 +45,18 @@ import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +91,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired(required = false)
     private GithubLoginProvider githubLoginProvider;
+
+    @Autowired(required = false)
+    private OAuthAuthorizationDao oauthAuthorizationDao;
 
     @Autowired(required = false)
     private OAuthClientDao oauthClientDao;
@@ -355,6 +364,89 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public OAuth2AuthorizationViewResult authorizeOAuth2(
+            String clientId, String redirectUri, List<String> scopes, String state) throws ApiException {
+        OAuthClient client = validateOAuthClient(clientId, redirectUri, scopes);
+        OAuth2AuthorizationViewResult result = new OAuth2AuthorizationViewResult();
+        result.setClientId(client.getClientId());
+        result.setClientName(client.getClientName());
+        result.setRedirectUri(redirectUri);
+        result.setScopes(toScopeSet(scopes));
+        result.setState(state);
+        return result;
+    }
+
+    @Override
+    public OAuth2AuthorizationDecisionResult decideOAuth2(
+            String clientId,
+            String redirectUri,
+            List<String> scopes,
+            String state,
+            String codeChallenge,
+            String codeChallengeMethod,
+            String userId,
+            boolean approved)
+            throws ApiException {
+        validateOAuthClient(clientId, redirectUri, scopes);
+        OAuth2AuthorizationDecisionResult result = new OAuth2AuthorizationDecisionResult();
+        result.setApproved(approved);
+        result.setState(state);
+        if (!approved) {
+            return result;
+        }
+        if (oauthAuthorizationDao == null) {
+            throw new ApiException("OAuth2 authorization 未配置");
+        }
+        Date now = new Date();
+        OAuthAuthorization authorization = new OAuthAuthorization();
+        authorization.setAuthorizationCode(UuidHelper.compact());
+        authorization.setClientId(clientId);
+        authorization.setUserId(EntityIdCodec.toDomain(userId));
+        authorization.setRedirectUri(redirectUri);
+        authorization.setScopes(toScopeSet(scopes));
+        authorization.setState(state);
+        authorization.setCodeChallenge(codeChallenge);
+        authorization.setCodeChallengeMethod(codeChallengeMethod);
+        authorization.setIssuedAt(now);
+        authorization.setExpireAt(new Date(now.getTime() + 300000L));
+        authorization.setCreateDate(now);
+        authorization.setUpdateDate(now);
+        authorization.setId(EntityIdCodec.toDomain(oauthAuthorizationDao.insert(authorization)));
+        result.setAuthorizationCode(authorization.getAuthorizationCode());
+        return result;
+    }
+
+    @Override
+    public AuthTokenRefreshResult exchangeAuthorizationCode(String clientId, String authorizationCode)
+            throws ApiException {
+        if (oauthAuthorizationDao == null) {
+            throw new ApiException("OAuth2 authorization 未配置");
+        }
+        OAuthAuthorization authorization = oauthAuthorizationDao.getByAuthorizationCode(authorizationCode);
+        Date now = new Date();
+        if (authorization == null
+                || !authorization.canConsume(now)
+                || !StringUtils.equals(clientId, authorization.getClientId())) {
+            throw new InvalidTokenException();
+        }
+        authorization.markUsed(now);
+        oauthAuthorizationDao.updateUsed(authorization);
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(authorization.getUserId()));
+        String refreshToken = oauthRefreshTokenDao == null
+                ? null
+                : createOAuthRefreshToken(accessToken, clientId, authorization.getTenantId(), now);
+        return new AuthTokenRefreshResult(accessToken, refreshToken);
+    }
+
+    @Override
+    public boolean revokeAuthorizationCode(String authorizationCode) throws ApiException {
+        if (oauthAuthorizationDao == null) {
+            throw new ApiException("OAuth2 authorization 未配置");
+        }
+        return oauthAuthorizationDao.deleteByAuthorizationCode(authorizationCode) > 0;
+    }
+
+    @Override
     public void invalidateSessionByToken(String token, String reason) {
         invalidateAuthSession(token, reason);
     }
@@ -608,6 +700,23 @@ public class AuthServiceImpl implements AuthService {
             return 2592000L;
         }
         return client.getRefreshTokenTtlSeconds();
+    }
+
+    private OAuthClient validateOAuthClient(String clientId, String redirectUri, List<String> scopes)
+            throws ApiException {
+        if (oauthClientDao == null) {
+            throw new ApiException("OAuth2 client 未配置");
+        }
+        OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
+        Set<String> requestedScopes = toScopeSet(scopes);
+        if (client == null || !client.supportsRedirectUri(redirectUri) || !client.supportsScopes(requestedScopes)) {
+            throw new InvalidTokenException();
+        }
+        return client;
+    }
+
+    private Set<String> toScopeSet(List<String> scopes) {
+        return scopes == null ? new LinkedHashSet<>() : new LinkedHashSet<>(scopes);
     }
 
     private String tokenHash(String token) {

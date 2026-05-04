@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `auth-oauth-authorization`：搬运 OAuth authorization 和授权码运行态
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth
-    sandwish-infra/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/main/java/com/github/thundax/modules/auth
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth
-  - 处理动作：新增 OAuthAuthorization 模型、Redis/DAO 端口、authorize/decision/revoke/token 主流程
-  - 验收点：授权请求可生成授权视图，用户决策后可换取 token 或被撤销
-  - 重要度：10/10
-
 - [ ] `auth-cleanup`：清理 OAuth/Auth 迁移现场
   - 范围文件：TODO.md
     docs/30-designs/AUTH-OAUTH-MIGRATION-RUNBOOK.md

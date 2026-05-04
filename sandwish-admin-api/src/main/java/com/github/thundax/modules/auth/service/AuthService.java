@@ -10,7 +10,10 @@ import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
+import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
+import java.util.List;
 import org.springframework.lang.NonNull;
 
 public interface AuthService {
@@ -80,6 +83,24 @@ public interface AuthService {
     AuthTokenQueryResult queryToken(String token);
 
     AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException;
+
+    OAuth2AuthorizationViewResult authorizeOAuth2(
+            String clientId, String redirectUri, List<String> scopes, String state) throws ApiException;
+
+    OAuth2AuthorizationDecisionResult decideOAuth2(
+            String clientId,
+            String redirectUri,
+            List<String> scopes,
+            String state,
+            String codeChallenge,
+            String codeChallengeMethod,
+            String userId,
+            boolean approved)
+            throws ApiException;
+
+    AuthTokenRefreshResult exchangeAuthorizationCode(String clientId, String authorizationCode) throws ApiException;
+
+    boolean revokeAuthorizationCode(String authorizationCode) throws ApiException;
 
     void invalidateSessionByToken(String token, String reason);
 

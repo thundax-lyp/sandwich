@@ -12,11 +12,16 @@ import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;
 import com.github.thundax.modules.auth.controller.request.AuthTokenRequest;
 import com.github.thundax.modules.auth.controller.request.GithubLoginRequest;
+import com.github.thundax.modules.auth.controller.request.OAuth2AuthorizeRequest;
+import com.github.thundax.modules.auth.controller.request.OAuth2DecisionRequest;
+import com.github.thundax.modules.auth.controller.request.OAuth2TokenRequest;
 import com.github.thundax.modules.auth.controller.request.SmsLoginRequest;
 import com.github.thundax.modules.auth.controller.request.TokenRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.WecomLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationDecisionResponse;
+import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationViewResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
@@ -199,6 +204,42 @@ public class AuthController {
     public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
         return AuthInterfaceAssembler.toAccessTokenResponse(
                 authService.refreshAccessToken(request.getClientId(), request.getRefreshToken()));
+    }
+
+    @ApiOperation(value = "OAuth2 授权视图", notes = "ignore")
+    @PostMapping(value = "oauth2/authorize")
+    public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request)
+            throws ApiException {
+        return AuthInterfaceAssembler.toAuthorizationViewResponse(authService.authorizeOAuth2(
+                request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState()));
+    }
+
+    @ApiOperation(value = "OAuth2 授权决策", notes = "ignore")
+    @PostMapping(value = "oauth2/decision")
+    public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request)
+            throws ApiException {
+        return AuthInterfaceAssembler.toAuthorizationDecisionResponse(authService.decideOAuth2(
+                request.getClientId(),
+                request.getRedirectUri(),
+                request.getScopes(),
+                request.getState(),
+                request.getCodeChallenge(),
+                request.getCodeChallengeMethod(),
+                request.getUserId(),
+                request.isApproved()));
+    }
+
+    @ApiOperation(value = "OAuth2 授权码换 token", notes = "ignore")
+    @PostMapping(value = "oauth2/token")
+    public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
+        return AuthInterfaceAssembler.toAccessTokenResponse(
+                authService.exchangeAuthorizationCode(request.getClientId(), request.getAuthorizationCode()));
+    }
+
+    @ApiOperation(value = "OAuth2 撤销授权码", notes = "ignore")
+    @PostMapping(value = "oauth2/revoke")
+    public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
+        return authService.revokeAuthorizationCode(request.getAuthorizationCode());
     }
 
     private void writeLog(HttpServletRequest currentRequest, String title, AuthLoginRequest request) {

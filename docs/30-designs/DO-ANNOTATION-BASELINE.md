@@ -27,7 +27,6 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 - `com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.RoleDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.UserDO`
-- `com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO`
 
 Redis-only DO 当前为：
 

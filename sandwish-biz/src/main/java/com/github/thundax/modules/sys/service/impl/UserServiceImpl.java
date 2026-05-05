@@ -13,7 +13,6 @@ import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
-import com.github.thundax.modules.sys.entity.UserEncrypt;
 import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
@@ -21,7 +20,6 @@ import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
@@ -40,19 +38,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserDao dao;
     private final SignService signService;
-    private final UserEncryptService userEncryptService;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
 
     public UserServiceImpl(
             UserDao dao,
             SignService signService,
-            UserEncryptService userEncryptService,
             UserIdentityDao userIdentityDao,
             UserCredentialDao userCredentialDao) {
         this.dao = dao;
         this.signService = signService;
-        this.userEncryptService = userEncryptService;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
     }
@@ -137,16 +132,6 @@ public class UserServiceImpl implements UserService {
             }
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(user.getId());
-        userEncrypt.setEmail(user.getEmail());
-        userEncrypt.setMobile(user.getMobile());
-        userEncrypt.setTel(user.getTel());
-        if (added) {
-            userEncryptService.add(userEncrypt);
-        } else {
-            userEncryptService.update(userEncrypt);
-        }
         UserIdentity accountIdentity = upsertAccountIdentity(user, loginName);
         if (added) {
             upsertPasswordCredential(user, accountIdentity, encryptedPassword);
@@ -162,10 +147,6 @@ public class UserServiceImpl implements UserService {
         }
         user.setUpdateUserId(updateUserId);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        UserEncrypt userEncrypt = new UserEncrypt();
-        userEncrypt.setId(user.getId());
-        userEncrypt.setLoginPass(encryptedPassword);
-        userEncryptService.updateLoginPass(userEncrypt);
         upsertPasswordCredential(
                 user, upsertAccountIdentity(user, getAccountLoginName(user.getId())), encryptedPassword);
     }

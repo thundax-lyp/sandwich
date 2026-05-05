@@ -27,7 +27,6 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
-        "com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
     };
 
@@ -58,13 +57,6 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
     @Test
     public void shouldUseSourceNamedKeyForSharedPrimaryKeyDataObjects() {
         JavaClasses classes = importPackages(BASE_PACKAGE);
-
-        JavaClass userEncryptDO =
-                classByName(classes, "com.github.thundax.modules.sys.persistence.dataobject.UserEncryptDO");
-        assertFalse(
-                userEncryptDO.getFullName() + " must not declare id field",
-                userEncryptDO.tryGetField("id").isPresent());
-        assertTableId(userEncryptDO, "userId", "id", IdType.INPUT);
 
         JavaClass storageBusinessDO = classByName(
                 classes, "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO");

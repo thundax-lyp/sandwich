@@ -152,3 +152,4 @@
 - `40-readiness/`: 上线与运维
 - `50-prompts/`: 人工触发的固定格式提示词模板，AI 不默认加载
 - `60-human/`: 人类阅读材料与项目叙事，AI 不默认加载
+- `../deploy/`: Docker Compose 部署样例

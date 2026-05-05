@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-security`：增加当前用户基础契约
-  - 范围文件：
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/CurrentUser.java`
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/CurrentUserProvider.java`
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/AnonymousCurrentUserProvider.java`
-    - `sandwish-common/sandwish-common-security/src/test/java/com/github/thundax/common/security/user/CurrentUserTest.java`
-  - 处理动作：新增不依赖业务 `User` Entity 的当前用户读取契约。
-  - 验收点：当前用户模型只暴露稳定身份和权限字段，匿名 Provider 有测试覆盖。
-  - 重要度：8/10
-
 - [ ] `common-core`：增加统一标识值对象和编码器
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/EntityId.java`

@@ -85,24 +85,27 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         UserAccessHolder.currentUserId(accessToken.getUserId(), token);
+        try {
+            User currentUser = userService.getById(EntityIdCodec.toDomain(accessToken.getUserId()));
+            if (currentUser.getId() == null || !currentUser.isEnable()) {
+                writeError(response);
+                return;
+            }
 
-        User currentUser = userService.getById(EntityIdCodec.toDomain(accessToken.getUserId()));
-        if (currentUser.getId() == null || !currentUser.isEnable()) {
-            writeError(response);
-            return;
+            PermissionSession session = permissionService.getSession(token);
+            if (session == null) {
+                session = permissionService.createSession(token, accessToken.getUserId());
+            }
+
+            authService.activeAccessToken(accessToken);
+            SecurityContextHolder.getContext()
+                    .setAuthentication(new UsernamePasswordAuthenticationToken(
+                            accessToken.getUserId(), token, toAuthorities(session.getPermissions())));
+
+            filterChain.doFilter(request, response);
+        } finally {
+            UserAccessHolder.clear();
         }
-
-        PermissionSession session = permissionService.getSession(token);
-        if (session == null) {
-            session = permissionService.createSession(token, accessToken.getUserId());
-        }
-
-        authService.activeAccessToken(accessToken);
-        SecurityContextHolder.getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken(
-                        accessToken.getUserId(), token, toAuthorities(session.getPermissions())));
-
-        filterChain.doFilter(request, response);
     }
 
     private String findToken(HttpServletRequest request) {

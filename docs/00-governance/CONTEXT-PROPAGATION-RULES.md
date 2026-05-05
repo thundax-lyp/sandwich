@@ -45,7 +45,8 @@ Sandwich 当前存在两类运行时身份上下文：
 2. 后台认证过滤器校验 token。
 3. 校验通过后，把 `userId` 和 token 写入 `UserAccessHolder`。
 4. 后续后台链路通过 `UserAccessHolder.currentUserId()` 和 `UserAccessHolder.currentToken()` 读取。
-5. 请求完成后，通过 `PooledThreadLocalFilter` 清理线程上下文。
+5. 后台认证过滤器完成请求后必须调用 `UserAccessHolder.clear()` 清理后台身份上下文。
+6. 请求完成后，通过 `PooledThreadLocalFilter` 兜底清理线程上下文。
 
 ### 4.2 Front Member Context
 
@@ -96,7 +97,8 @@ Sandwich 当前存在两类运行时身份上下文：
 
 - access token 校验通过后才能写入 `UserAccessHolder`
 - token 校验失败不得进入业务 Controller
-- 请求完成后必须清理 `PooledThreadLocal`
+- 请求完成后必须显式清理 `UserAccessHolder`
+- 请求完成后必须通过 `PooledThreadLocalFilter` 兜底清理 `PooledThreadLocal`
 
 前台入口固定规则：
 
@@ -152,9 +154,11 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 固定规则：
 
+- 通用请求元数据透传使用 `sandwish-common-core` 中已有的 `ContextSnapshot`、`ContextAwareRunnable` 和 `ContextAwareCallable`
+- `ContextAwareRunnable` / `ContextAwareCallable` 只负责 `SandwishContextHolder` 中的通用请求元数据，不自动搬运后台 `UserAccessHolder` 或前台 Spring Security `Authentication`
 - 需要当前用户或会员身份的异步任务，必须显式传入稳定业务参数，或在进入业务前手工建立对应上下文
 - 不得假定 `PooledThreadLocal` 或 Spring Security 上下文会自动跨线程存在
-- 异步任务完成后必须清理手工建立的线程上下文
+- 异步任务完成后必须清理手工建立的线程上下文；后台身份上下文使用 `UserAccessHolder.clear()` 清理
 - 无法建立完整上下文的非标准入口，不得进入依赖当前身份的业务逻辑
 
 ### 6.7 Cache Rule
@@ -187,5 +191,4 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 ## 9. Open Items
 
-- 是否为异步任务建立统一上下文包装器。
-- 是否为后台 `UserAccessHolder` 增加专用清理方法，减少直接依赖 `PooledThreadLocalFilter` 的隐式清理。
+无

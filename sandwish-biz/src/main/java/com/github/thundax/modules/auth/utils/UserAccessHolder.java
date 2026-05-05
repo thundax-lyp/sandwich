@@ -34,8 +34,12 @@ public class UserAccessHolder {
             USER_ID_HOLDER.set(userId);
             TOKEN_HOLDER.set(token);
         } else {
-            USER_ID_HOLDER.remove();
-            TOKEN_HOLDER.remove();
+            clear();
         }
+    }
+
+    public static void clear() {
+        USER_ID_HOLDER.remove();
+        TOKEN_HOLDER.remove();
     }
 }

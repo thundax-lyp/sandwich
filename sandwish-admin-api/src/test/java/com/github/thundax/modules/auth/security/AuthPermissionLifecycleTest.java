@@ -45,6 +45,7 @@ import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewRes
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
+import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -118,6 +119,7 @@ public class AuthPermissionLifecycleTest {
 
     @After
     public void tearDown() {
+        UserAccessHolder.clear();
         SecurityContextHolder.clearContext();
     }
 
@@ -363,6 +365,28 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
         Assert.assertEquals(0, authSessionDao.getTouchCount());
         Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
+    }
+
+    @Test
+    public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
+        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
+                new VltavaProperties.AccessTokenFilterProperties(),
+                authService,
+                permissionService,
+                new TestUserService());
+
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
+        request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, (servletRequest, servletResponse) -> {
+            Assert.assertEquals("u1", UserAccessHolder.currentUserId());
+            Assert.assertEquals(accessToken.getToken(), UserAccessHolder.currentToken());
+        });
+
+        Assert.assertNull(UserAccessHolder.currentUserId());
+        Assert.assertNull(UserAccessHolder.currentToken());
     }
 
     @Test

@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-web`：增加可标记启用的统一响应包装 Advice
-  - 范围文件：
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/annotation/WrappedApiController.java`
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/advice/ApiResponseBodyAdvice.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/advice/ApiResponseBodyAdviceTest.java`
-    - `sandwish-common/sandwish-common-web/pom.xml`
-  - 处理动作：新增只对标记 Controller 生效的 `ResponseBodyAdvice`，统一包装普通 API 返回值。
-  - 验收点：标记 Controller 的普通对象会包装为 `ApiResponse`，`ApiResponse`、`String` 和未标记 Controller 会跳过包装，并有单元测试覆盖。
-  - 重要度：10/10
-
 - [ ] `common-security`：增加声明式权限注解
   - 范围文件：
     - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/annotation/HasPermission.java`

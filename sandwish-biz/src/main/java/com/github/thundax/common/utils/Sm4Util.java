@@ -13,13 +13,6 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
 public class Sm4Util {
 
-    private static final String KEY = "F7EFA739963909A0BEA56F8C2DE7CAC8";
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
-    private static final String ENCODING = "UTF-8";
     public static final String ALGORITHM_NAME = "SM4";
     // 加密算法/分组加密模式/分组填充方式
     // PKCS5Padding-以8个字节为一组进行分组加密
@@ -27,6 +20,13 @@ public class Sm4Util {
     public static final String ALGORITHM_NAME_ECB_PADDING = "SM4/ECB/PKCS5Padding";
     // 128-32位16进制；256-64位16进制
     public static final int DEFAULT_KEY_SIZE = 128;
+
+    private static final String KEY = "F7EFA739963909A0BEA56F8C2DE7CAC8";
+    private static final String ENCODING = "UTF-8";
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     /**
      * 自动生成密钥

@@ -14,6 +14,8 @@ public class VltavaProperties {
 
     private static final int DEFAULT_LOG_ALIVE_DAYS = 90;
 
+    private static VltavaProperties instance;
+
     private String whiteCaptcha;
 
     private ProductProperties product;
@@ -26,14 +28,12 @@ public class VltavaProperties {
     private ResponseWrapperFilterProperties responseWrapperFilter;
     private AccessTokenFilterProperties accessTokenFilter;
 
-    private static VltavaProperties instance;
+    public VltavaProperties() {
+        instance = this;
+    }
 
     public static VltavaProperties getInstance() {
         return instance;
-    }
-
-    public VltavaProperties() {
-        instance = this;
     }
 
     public String getWhiteCaptcha() {

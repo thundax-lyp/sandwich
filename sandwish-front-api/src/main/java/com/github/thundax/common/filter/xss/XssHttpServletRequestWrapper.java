@@ -21,15 +21,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
+    private static final String JSON_CONTENT_TYPE = "application/json";
+
+    private static final String CONTENT_TYPE = "Content-Type";
+
     private HttpServletRequest orgRequest;
 
     private String encoding;
 
     private HTMLFilter htmlFilter;
-
-    private static final String JSON_CONTENT_TYPE = "application/json";
-
-    private static final String CONTENT_TYPE = "Content-Type";
 
     /**
      * @param request HttpServletRequest

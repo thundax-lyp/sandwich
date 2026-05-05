@@ -23,15 +23,17 @@ import org.springframework.web.client.RestClientException;
 @Transactional(readOnly = true)
 public class DatabaseUserEncryptServiceImpl implements UserEncryptService {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public static final String QUEUE_ENCRYPT_ADD = QUEUE_PREFIX + "encrypt.db.add";
     public static final String QUEUE_ENCRYPT_UPDATE = QUEUE_PREFIX + "encrypt.db.update";
 
     public static final String QUEUE_ENCRYPT_UPDATE_LOGIN_PASS = QUEUE_PREFIX + "encrypt.db.update.login.pass";
     public static final String QUEUE_ENCRYPT_QUERY = QUEUE_PREFIX + "encrypt.db.query";
-    private final UserEncryptDao dao;
+
     protected final AmqpTemplate amqpTemplate;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final UserEncryptDao dao;
 
     public DatabaseUserEncryptServiceImpl(UserEncryptDao dao, AmqpTemplate amqpTemplate) {
         this.dao = dao;

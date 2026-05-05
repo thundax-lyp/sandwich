@@ -19,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Log implements Signable {
+    public static final String BEAN_NAME = "Log";
+
     private EntityId id;
 
     private String userId;
@@ -34,14 +36,12 @@ public class Log implements Signable {
     private String remarks;
     private Date createDate;
 
+    private boolean signable = false;
+
     @Override
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }
-
-    public static final String BEAN_NAME = "Log";
-
-    private boolean signable = false;
 
     public boolean isSignable() {
         return signable;

@@ -18,13 +18,13 @@ import org.apache.commons.lang3.StringUtils;
 
 public class XssFilter implements Filter {
 
+    public boolean enabled = false;
+
     private List<String> urlExcludes = new ArrayList<>();
 
     private List<String> excludeTags = new ArrayList<>();
 
     private List<String> includeTags = new ArrayList<>();
-
-    public boolean enabled = false;
 
     private String encoding = "UTF-8";
 

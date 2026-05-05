@@ -14,10 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +26,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Lazy(value = false)
+@Slf4j
 public class SysLogUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(SysLogUtils.class);
 
     public static final String QUEUE_SAVE_LOG = Constants.QUEUE_PREFIX + "save-log";
 
@@ -70,12 +68,12 @@ public class SysLogUtils {
     @RabbitListener(queues = QUEUE_SAVE_LOG, concurrency = "2")
     public void saveLogHandler(String paramString) {
         try {
-            Log log = JsonUtils.fromJson(paramString, Log.class);
-            if (log != null) {
-                logService.add(log);
+            Log sysLog = JsonUtils.fromJson(paramString, Log.class);
+            if (sysLog != null) {
+                logService.add(sysLog);
 
                 try {
-                    String filename = LOG_FILENAME_FORMAT.format(log.getLogDate()) + LOG_EXTEND_NAME;
+                    String filename = LOG_FILENAME_FORMAT.format(sysLog.getLogDate()) + LOG_EXTEND_NAME;
 
                     FileUtils.writeLines(
                             new File(getProperties().getStoragePath(), filename),
@@ -83,13 +81,13 @@ public class SysLogUtils {
                             true);
 
                 } catch (Exception e) {
-                    logger.warn("can not save sys-log");
+                    log.warn("can not save sys-log");
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
 
         } finally {
             PooledThreadLocal.reset();

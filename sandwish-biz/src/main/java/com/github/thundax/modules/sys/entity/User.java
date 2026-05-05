@@ -26,6 +26,8 @@ import org.springframework.lang.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Auditable, Signable, Sortable {
+    public static final String BEAN_NAME = "User";
+
     private EntityId id;
 
     private String departmentId;
@@ -56,8 +58,6 @@ public class User implements Auditable, Signable, Sortable {
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }
-
-    public static final String BEAN_NAME = "User";
 
     @NonNull
     public Integer getRanks() {

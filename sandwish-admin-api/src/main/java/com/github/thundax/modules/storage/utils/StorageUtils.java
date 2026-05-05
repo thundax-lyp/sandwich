@@ -9,17 +9,15 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 public final class StorageUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(StorageUtils.class);
 
     public static final String PNG = "png";
     public static final String JPG = "jpg";
@@ -70,7 +68,7 @@ public final class StorageUtils {
             }
             outputStream.flush();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
             try {
                 if (outputStream != null) {

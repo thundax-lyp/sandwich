@@ -16,6 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Signature {
+    public static final String BEAN_NAME = "Signature";
+
     private EntityId id;
 
     private String businessType;
@@ -29,8 +31,6 @@ public class Signature {
     private String remarks;
     private Date createDate;
     private Date updateDate;
-
-    public static final String BEAN_NAME = "Signature";
 
     public Signature(String id, String businessType, String businessId) {
         setId(EntityIdCodec.toDomain(id));

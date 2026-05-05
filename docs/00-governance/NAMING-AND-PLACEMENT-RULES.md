@@ -98,6 +98,7 @@
 - `NAME_REQUEST_RESPONSE`：API 请求和响应对象命名以 `Request`、`Response` 结尾，分别放在对应 API 模块的 `modules/{module}/controller/request` 与 `modules/{module}/controller/response` 包
 - `NAME_REQUEST_REQUIRED_ANNOTATIONS`：API `Request` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
 - `NAME_RESPONSE_REQUIRED_ANNOTATIONS`：API `Response` 类级注解有且仅有 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`
+- `NAME_DECLARATION_ORDER`：类成员固定按 Checkstyle `DeclarationOrder` 排列；类级静态常量和静态字段放在实例字段前，同类成员按可见性顺序排列。
 - `NAME_DTO`：DTO 命名必须表达使用场景或业务对象；Service 边界传输对象必须以 `DTO` 结尾。
 - `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 API `Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
 

@@ -21,6 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoredObject implements Sortable {
+    public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
+
+    private static final String PATH_FORMAT = "yyyyMM";
+
     private EntityId id;
     private String originalFilename;
     private String contentType;
@@ -40,10 +44,6 @@ public class StoredObject implements Sortable {
     private String remarks;
     private Date createDate;
     private Date updateDate;
-
-    public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
-
-    private static final String PATH_FORMAT = "yyyyMM";
 
     public String getOriginalFilename() {
         return StringUtils.isBlank(originalFilename) ? getOriginalFileName() : originalFilename;

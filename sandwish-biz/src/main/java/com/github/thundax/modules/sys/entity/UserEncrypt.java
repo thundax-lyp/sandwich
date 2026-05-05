@@ -16,6 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEncrypt implements Auditable {
+    public static final String BEAN_NAME = "UserEncrypt";
+
     private EntityId id;
 
     private String loginPass;
@@ -27,6 +29,4 @@ public class UserEncrypt implements Auditable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    public static final String BEAN_NAME = "UserEncrypt";
 }

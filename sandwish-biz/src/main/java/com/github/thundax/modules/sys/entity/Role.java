@@ -25,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role implements Auditable, Signable, Sortable {
+    public static final String BEAN_NAME = "Role";
+
     private EntityId id;
     private String name;
     private RolePrivilege privilege = RolePrivilege.NORMAL;
@@ -36,14 +38,12 @@ public class Role implements Auditable, Signable, Sortable {
     private String createUserId;
     private String updateUserId;
 
+    private List<String> menuIdList;
+
     @Override
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }
-
-    public static final String BEAN_NAME = "Role";
-
-    private List<String> menuIdList;
 
     public boolean isAdmin() {
         return RolePrivilege.ADMIN == getPrivilege();

@@ -25,6 +25,7 @@
         <module name="EmptyBlock"/>
         <module name="NeedBraces"/>
         <module name="ModifierOrder"/>
+        <module name="DeclarationOrder"/>
         <module name="RedundantModifier"/>
         <module name="AvoidStarImport"/>
         <module name="UnusedImports"/>

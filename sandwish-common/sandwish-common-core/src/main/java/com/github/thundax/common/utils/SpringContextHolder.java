@@ -1,28 +1,26 @@
 package com.github.thundax.common.utils;
 
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+@Slf4j
 public class SpringContextHolder {
-
-    private static final Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
 
     private static ApplicationContext applicationContext = null;
 
     public static void setApplicationContext(ApplicationContext context) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("设置SpringContextHolder中的ApplicationContext:" + context);
+        if (log.isDebugEnabled()) {
+            log.debug("设置SpringContextHolder中的ApplicationContext:" + context);
         }
         applicationContext = context;
     }
 
     public static void clearHolder() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("清除SpringContextHolder中的ApplicationContext:" + applicationContext);
+        if (log.isDebugEnabled()) {
+            log.debug("清除SpringContextHolder中的ApplicationContext:" + applicationContext);
         }
         applicationContext = null;
     }

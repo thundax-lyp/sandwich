@@ -16,9 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Department implements Auditable, Sortable {
-    private EntityId id;
-
     public static final String ROOT_ID = "ROOT";
+
+    public static final String BEAN_NAME = "department";
+
+    private EntityId id;
 
     private String parentId;
 
@@ -30,8 +32,6 @@ public class Department implements Auditable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    public static final String BEAN_NAME = "department";
 
     public void setParent(Department parent) {
         this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));

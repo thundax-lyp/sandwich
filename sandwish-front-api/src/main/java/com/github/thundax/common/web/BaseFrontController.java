@@ -15,13 +15,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 public class BaseFrontController {
 
-    protected Logger logger = LoggerFactory.getLogger(getClass());
-
     protected static final String ATTR_MESSAGE = "message";
 
     protected static final String MESSAGE_SUCCESS = "success";
     protected static final String MESSAGE_WARN = "warning";
     protected static final String MESSAGE_ERROR = "error";
+
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected String modulePath;
 

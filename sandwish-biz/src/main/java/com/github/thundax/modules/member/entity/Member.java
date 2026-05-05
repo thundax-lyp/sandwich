@@ -16,6 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member implements Auditable, Sortable {
+    public static final String BEAN_NAME = "Member";
+
+    public static final String MALE = "1";
+    public static final String FEMALE = "0";
+
     private EntityId id;
 
     private String loginName;
@@ -44,11 +49,6 @@ public class Member implements Auditable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    public static final String BEAN_NAME = "Member";
-
-    public static final String MALE = "1";
-    public static final String FEMALE = "0";
 
     public void setStatus(String status) {
         this.status = StringUtils.isBlank(status) ? null : MemberStatus.from(status);

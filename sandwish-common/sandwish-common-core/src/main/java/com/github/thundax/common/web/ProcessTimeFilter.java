@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ProcessTimeFilter implements Filter {
 
-    protected static final Logger log = LoggerFactory.getLogger(ProcessTimeFilter.class);
-
     public static final String START_TIME = "_start_time";
+
+    protected static final Logger log = LoggerFactory.getLogger(ProcessTimeFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

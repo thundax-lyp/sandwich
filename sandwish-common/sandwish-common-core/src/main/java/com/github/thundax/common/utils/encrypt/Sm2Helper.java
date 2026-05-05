@@ -10,6 +10,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
@@ -26,15 +27,12 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.BigIntegers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 仅适配前端 sm-crypto
  */
+@Slf4j
 public final class Sm2Helper {
-
-    private static final Logger logger = LoggerFactory.getLogger(Sm2Helper.class);
 
     private static final String SM2_CURVE_NAME = "sm2p256v1";
 
@@ -57,7 +55,7 @@ public final class Sm2Helper {
             return new StringKeyPair(generator.generateKeyPair());
 
         } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return null;
         }
     }
@@ -80,7 +78,7 @@ public final class Sm2Helper {
             return Hex.encodeHexString(encryptedBuffer);
 
         } catch (InvalidCipherTextException | DecoderException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return null;
         }
     }
@@ -107,7 +105,7 @@ public final class Sm2Helper {
             return new String(buffer, StandardCharsets.UTF_8);
 
         } catch (DecoderException | InvalidCipherTextException e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
             return null;
         }
     }
@@ -154,7 +152,7 @@ public final class Sm2Helper {
     public static void main(String[] argv) {
         StringKeyPair keyPair = generateKeyPair();
         if (keyPair == null) {
-            logger.error("null key pair");
+            log.error("null key pair");
             return;
         }
 

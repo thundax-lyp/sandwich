@@ -11,6 +11,8 @@ import org.springframework.lang.NonNull;
 @ConfigurationProperties(prefix = "vltava")
 public class VltavaProperties {
 
+    private static VltavaProperties instance;
+
     private String whiteCaptcha;
 
     private ProductProperties productProperties;
@@ -19,14 +21,12 @@ public class VltavaProperties {
 
     private XssFilterProperties xssFilter;
 
-    private static VltavaProperties instance;
+    public VltavaProperties() {
+        instance = this;
+    }
 
     public static VltavaProperties getInstance() {
         return instance;
-    }
-
-    public VltavaProperties() {
-        instance = this;
     }
 
     public String getWhiteCaptcha() {

@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UploadFile {
+    private static final String IMG_EXT = "png,jpg,jpeg";
+
     private EntityId id;
 
     private String name;
@@ -21,8 +23,6 @@ public class UploadFile {
     private String path;
     private byte[] content;
     private Date createDate;
-
-    private static final String IMG_EXT = "png,jpg,jpeg";
 
     public boolean isImage() {
         try {

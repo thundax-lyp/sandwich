@@ -25,9 +25,16 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
-    private EntityId id;
-
     public static final String ROOT_ID = "ROOT";
+
+    public static final String BEAN_NAME = "Menu";
+
+    public static final String PERM_SEPARATOR = ",";
+    public static final String PERM_USER = "user";
+    public static final String PERM_ADMIN = "admin";
+    public static final String PERM_SUPER = "super";
+
+    private EntityId id;
 
     private String parentId;
 
@@ -49,13 +56,6 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     public String getSignId() {
         return EntityIdCodec.toValue(getId());
     }
-
-    public static final String BEAN_NAME = "Menu";
-
-    public static final String PERM_SEPARATOR = ",";
-    public static final String PERM_USER = "user";
-    public static final String PERM_ADMIN = "admin";
-    public static final String PERM_SUPER = "super";
 
     public void setParentId(String parentId) {
         this.parentId = StringUtils.isBlank(parentId) ? null : parentId;

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
@@ -15,16 +16,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         basePackages = {"com.github.thundax.modules"},
         annotationClass = Mapper.class)
 @EnableConfigurationProperties(value = {SandwishProperties.class})
+@EnableAsync
 @EnableScheduling
-public class FrontApplication extends SpringBootServletInitializer {
+public class AdminApiApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(FrontApplication.class, args);
+        SpringApplication.run(AdminApiApplication.class, args);
     }
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
         this.setRegisterErrorPageFilter(false);
-        return builder.sources(FrontApplication.class);
+        return builder.sources(AdminApiApplication.class);
     }
 }

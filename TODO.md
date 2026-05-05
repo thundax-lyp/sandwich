@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-web`：增加统一 API 响应模型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/response/ApiResponse.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/response/ApiResponseTest.java`
-  - 处理动作：新增成功、失败和数据响应的统一响应对象。
-  - 验收点：`ApiResponse` 能表达成功响应、失败响应和携带数据的成功响应，并有单元测试覆盖。
-  - 重要度：10/10
-
 - [ ] `common-core`：增加统一异常模型
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ErrorCode.java`

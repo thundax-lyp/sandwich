@@ -9,14 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-security`：增加声明式权限注解
-  - 范围文件：
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/annotation/HasPermission.java`
-    - `sandwish-common/sandwish-common-security/src/test/java/com/github/thundax/common/security/annotation/HasPermissionTest.java`
-  - 处理动作：新增用于 Controller 或方法声明权限要求的 `@HasPermission` 注解。
-  - 验收点：注解能标记类型和方法，并能在运行期读取权限值。
-  - 重要度：8/10
-
 - [ ] `common-security`：增加 Spring Security 当前用户解析器
   - 范围文件：
     - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/CurrentUserResolver.java`

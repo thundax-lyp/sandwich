@@ -9,21 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-mq`：补充统一消息发送门面
-  - 范围文件：
-    - `pom.xml`
-    - `sandwish-common/pom.xml`
-    - `sandwish-common/sandwish-common-mq/pom.xml`
-    - `sandwish-common/sandwish-common-mq/src/main/java/com/github/thundax/common/mq/SandwishMqMessage.java`
-    - `sandwish-common/sandwish-common-mq/src/main/java/com/github/thundax/common/mq/SandwishMqSender.java`
-    - `sandwish-common/sandwish-common-mq/src/main/java/com/github/thundax/common/mq/SandwishMqProperties.java`
-    - `sandwish-common/sandwish-common-mq/src/main/java/com/github/thundax/common/mq/config/SandwishMqAutoConfiguration.java`
-    - `sandwish-common/sandwish-common-mq/src/main/java/com/github/thundax/common/mq/support/NoOpSandwishMqSender.java`
-    - `sandwish-common/sandwish-common-mq/src/test/java/com/github/thundax/common/mq/config/SandwishMqAutoConfigurationTest.java`
-  - 处理动作：新增 common-mq 模块，先提供消息模型、sender 契约、properties、自动配置和 NoOp 默认实现。
-  - 验收点：common-mq 不绑定具体 MQ 客户端，common-log 可选择依赖该门面发送日志。
-  - 重要度：8/10
-
 - [ ] `common-log`：接入 common-mq 日志生产者
   - 范围文件：
     - `sandwish-common/sandwish-common-log/pom.xml`

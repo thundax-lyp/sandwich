@@ -24,5 +24,6 @@
         <module>sandwish-common-cache</module>
         <module>sandwish-common-swagger</module>
         <module>sandwish-common-log</module>
+        <module>sandwish-common-mq</module>
     </modules>
 </project>

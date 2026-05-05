@@ -29,10 +29,6 @@ public final class UserCredentialPersistenceAssembler {
         dataObject.setLockedUntil(entity.getLockedUntil());
         dataObject.setExpiresAt(entity.getExpiresAt());
         dataObject.setLastVerifiedAt(entity.getLastVerifiedAt());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
         return dataObject;
     }
 
@@ -53,10 +49,6 @@ public final class UserCredentialPersistenceAssembler {
         entity.setLockedUntil(dataObject.getLockedUntil());
         entity.setExpiresAt(dataObject.getExpiresAt());
         entity.setLastVerifiedAt(dataObject.getLastVerifiedAt());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
         return entity;
     }
 

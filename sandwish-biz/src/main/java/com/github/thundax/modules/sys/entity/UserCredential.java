@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
@@ -17,7 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCredential implements Auditable {
+public class UserCredential {
     private EntityId id;
     private EntityId userId;
     private EntityId identityId;
@@ -30,10 +29,6 @@ public class UserCredential implements Auditable {
     private Date lockedUntil;
     private Date expiresAt;
     private Date lastVerifiedAt;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isActive() {
         return UserCredentialStatus.ACTIVE == status;

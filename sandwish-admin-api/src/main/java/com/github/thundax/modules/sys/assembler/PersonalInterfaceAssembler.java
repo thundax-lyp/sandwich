@@ -32,10 +32,6 @@ public final class PersonalInterfaceAssembler {
         response.setMobile(entity.getMobile());
         response.setEmail(entity.getEmail());
         response.setAvatar(readAvatarUrl(entity));
-        response.setLastLoginDate(entity.getLastLoginDate());
-        response.setLastLoginIp(entity.getLastLoginIp());
-        response.setRegisterDate(entity.getRegisterDate());
-        response.setRegisterIp(entity.getRegisterIp());
         response.setAdmin(entity.isAdmin());
         response.setSuperAdmin(entity.isSuper());
         return response;

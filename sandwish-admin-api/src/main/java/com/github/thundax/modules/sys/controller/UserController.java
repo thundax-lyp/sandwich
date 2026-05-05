@@ -40,7 +40,6 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
-import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -48,7 +47,6 @@ import io.swagger.annotations.ApiOperation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -67,8 +65,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = "02-05.系统-用户")
@@ -190,11 +186,6 @@ public class UserController {
                 throw new InsertBeanExistException(User.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
             }
         }
-
-        entity.setRegisterDate(new Date());
-        HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
         userService.add(entity, request.getLoginName(), encryptedPassword, roleIdList);
 

@@ -30,11 +30,6 @@ public interface UserDao {
 
     int deleteById(EntityId id);
 
-    /**
-     * 更新登录信息：lastLoginIp, lastLoginDate, loginCount
-     */
-    void updateLoginInfo(User user);
-
     int updateStatus(User user);
 
     List<String> listUserRoles(String userId);

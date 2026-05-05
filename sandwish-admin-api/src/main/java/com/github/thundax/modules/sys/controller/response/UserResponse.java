@@ -77,24 +77,6 @@ public class UserResponse implements Serializable {
     @JsonProperty("enable")
     private Boolean enable;
 
-    @ApiModelProperty(name = "registerDate", value = "注册时间")
-    @JsonProperty("registerDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date registerDate;
-
-    @ApiModelProperty(name = "registerIp", value = "注册IP")
-    @JsonProperty("registerIp")
-    private String registerIp;
-
-    @ApiModelProperty(name = "lastLoginDate", value = "最后登录时间")
-    @JsonProperty("lastLoginDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date lastLoginDate;
-
-    @ApiModelProperty(name = "lastLoginIp", value = "最后登录IP")
-    @JsonProperty("lastLoginIp")
-    private String lastLoginIp;
-
     @ApiModelProperty(name = "department", value = "归属部门")
     @JsonProperty("department")
     private UserDepartmentResponse department;

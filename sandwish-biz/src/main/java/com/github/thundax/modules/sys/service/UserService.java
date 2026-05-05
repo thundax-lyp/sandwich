@@ -36,11 +36,6 @@ public interface UserService {
 
     void updatePassword(EntityId userId, String encryptedPassword, String updateUserId);
 
-    /**
-     * 更新登录信息：lastLoginIp, lastLoginDate, loginCount
-     */
-    void updateLoginInfo(User user);
-
     int updateStatus(User user);
 
     int updateStatus(List<User> list);

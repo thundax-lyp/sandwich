@@ -40,12 +40,4 @@ public class UserCredentialDO {
     private Date expiresAt;
 
     private Date lastVerifiedAt;
-
-    private Date createDate;
-
-    private String createBy;
-
-    private Date updateDate;
-
-    private String updateBy;
 }

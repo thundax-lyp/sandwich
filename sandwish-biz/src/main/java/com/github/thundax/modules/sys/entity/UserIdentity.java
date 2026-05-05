@@ -1,10 +1,8 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,16 +16,12 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserIdentity implements Auditable {
+public class UserIdentity {
     private EntityId id;
     private EntityId userId;
     private UserIdentityType identityType;
     private String identityValue;
     private UserIdentityStatus status = UserIdentityStatus.ENABLED;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isEnabled() {
         return UserIdentityStatus.ENABLED == status;

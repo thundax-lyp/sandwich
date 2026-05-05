@@ -27,11 +27,6 @@ public final class UserPersistenceAssembler {
         dataObject.setTel(entity.getTel());
         dataObject.setName(entity.getName());
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        dataObject.setRegisterDate(entity.getRegisterDate());
-        dataObject.setRegisterIp(entity.getRegisterIp());
-        dataObject.setLastLoginDate(entity.getLastLoginDate());
-        dataObject.setLastLoginIp(entity.getLastLoginIp());
-        dataObject.setLoginCount(entity.getLoginCount());
         dataObject.setSuperFlag(superFlag(entity.getPrivilege()));
         dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
         dataObject.setEnableFlag(statusValue(entity.getStatus()));
@@ -56,11 +51,6 @@ public final class UserPersistenceAssembler {
         entity.setTel(dataObject.getTel());
         entity.setName(dataObject.getName());
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
-        entity.setRegisterDate(dataObject.getRegisterDate());
-        entity.setRegisterIp(dataObject.getRegisterIp());
-        entity.setLastLoginDate(dataObject.getLastLoginDate());
-        entity.setLastLoginIp(dataObject.getLastLoginIp());
-        entity.setLoginCount(dataObject.getLoginCount());
         entity.setPrivilege(privilegeFrom(dataObject.getSuperFlag(), dataObject.getAdminFlag()));
         entity.setStatus(statusFrom(dataObject.getEnableFlag()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));

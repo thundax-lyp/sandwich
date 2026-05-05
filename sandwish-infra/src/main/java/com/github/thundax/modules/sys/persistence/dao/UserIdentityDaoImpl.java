@@ -51,7 +51,7 @@ public class UserIdentityDaoImpl implements UserIdentityDao {
         if (status != null) {
             wrapper.eq(UserIdentityDO::getStatus, status.value());
         }
-        wrapper.orderByDesc(UserIdentityDO::getCreateDate);
+        wrapper.orderByDesc(UserIdentityDO::getId);
         return UserIdentityPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
     }
 

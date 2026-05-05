@@ -38,13 +38,6 @@ public class User implements Auditable, Signable, Sortable {
     private String name;
     private AccessRank rank = AccessRank.of(0);
 
-    private Date registerDate;
-    private String registerIp;
-
-    private Date lastLoginDate;
-    private String lastLoginIp;
-    private Integer loginCount = 0;
-
     private UserPrivilege privilege = UserPrivilege.NORMAL;
     private UserStatus status;
     private int priority;
@@ -97,9 +90,6 @@ public class User implements Auditable, Signable, Sortable {
         map.put("super", this.isSuper());
         map.put("admin", this.isAdmin());
         map.put("enable", this.isEnable());
-
-        map.put("lastLoginDate", this.getLastLoginDate());
-        map.put("lastLoginIp", this.getLastLoginIp());
 
         return JsonUtils.toJson(map);
     }

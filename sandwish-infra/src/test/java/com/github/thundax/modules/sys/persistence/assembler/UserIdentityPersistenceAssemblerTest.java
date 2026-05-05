@@ -8,25 +8,18 @@ import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.persistence.dataobject.UserIdentityDO;
-import java.util.Date;
 import org.junit.Test;
 
 public class UserIdentityPersistenceAssemblerTest {
 
     @Test
     public void shouldMapIdentityEntityToDataObject() {
-        Date createDate = new Date(1000L);
-        Date updateDate = new Date(2000L);
         UserIdentity entity = new UserIdentity();
         entity.setId(EntityIdCodec.toDomain("identity-1"));
         entity.setUserId(EntityIdCodec.toDomain("user-1"));
         entity.setIdentityType(UserIdentityType.ACCOUNT);
         entity.setIdentityValue("tester");
         entity.setStatus(UserIdentityStatus.ENABLED);
-        entity.setCreateDate(createDate);
-        entity.setCreateUserId("admin");
-        entity.setUpdateDate(updateDate);
-        entity.setUpdateUserId("operator");
 
         UserIdentityDO dataObject = UserIdentityPersistenceAssembler.toDataObject(entity);
 
@@ -35,10 +28,6 @@ public class UserIdentityPersistenceAssemblerTest {
         assertEquals("ACCOUNT", dataObject.getIdentityType());
         assertEquals("tester", dataObject.getIdentityValue());
         assertEquals("ENABLED", dataObject.getStatus());
-        assertEquals(createDate, dataObject.getCreateDate());
-        assertEquals("admin", dataObject.getCreateBy());
-        assertEquals(updateDate, dataObject.getUpdateDate());
-        assertEquals("operator", dataObject.getUpdateBy());
     }
 
     @Test

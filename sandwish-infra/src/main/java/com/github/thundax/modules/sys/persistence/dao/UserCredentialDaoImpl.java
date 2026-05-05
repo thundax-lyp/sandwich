@@ -51,7 +51,7 @@ public class UserCredentialDaoImpl implements UserCredentialDao {
         if (status != null) {
             wrapper.eq(UserCredentialDO::getStatus, status.value());
         }
-        wrapper.orderByDesc(UserCredentialDO::getCreateDate);
+        wrapper.orderByDesc(UserCredentialDO::getId);
         return UserCredentialPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
     }
 

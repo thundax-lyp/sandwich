@@ -797,9 +797,6 @@ public class AuthPermissionLifecycleTest {
         public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {}
 
         @Override
-        public void updateLoginInfo(User user) {}
-
-        @Override
         public int updateStatus(User user) {
             return 1;
         }

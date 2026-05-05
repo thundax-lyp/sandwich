@@ -22,10 +22,6 @@ public final class UserIdentityPersistenceAssembler {
         dataObject.setIdentityType(identityTypeValue(entity.getIdentityType()));
         dataObject.setIdentityValue(entity.getIdentityValue());
         dataObject.setStatus(statusValue(entity.getStatus()));
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
         return dataObject;
     }
 
@@ -39,10 +35,6 @@ public final class UserIdentityPersistenceAssembler {
         entity.setIdentityType(identityTypeFrom(dataObject.getIdentityType()));
         entity.setIdentityValue(dataObject.getIdentityValue());
         entity.setStatus(statusFrom(dataObject.getStatus()));
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
         return entity;
     }
 

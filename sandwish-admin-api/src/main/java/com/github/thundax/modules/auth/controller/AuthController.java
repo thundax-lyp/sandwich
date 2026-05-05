@@ -34,7 +34,6 @@ import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
-import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
@@ -58,13 +57,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService;
 
     @Autowired
-    public AuthController(AuthService authService, UserService userService) {
+    public AuthController(AuthService authService) {
 
         this.authService = authService;
-        this.userService = userService;
     }
 
     @ApiOperation(value = "请求登录令牌", notes = "ignore")
@@ -128,13 +125,7 @@ public class AuthController {
             authService.deleteAccessToken(accessToken);
         }
 
-        // 更新登录信息
-        user.setLastLoginDate(new Date());
-        user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
-        userService.updateLoginInfo(user);
-
-        return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.createAccessToken(EntityIdCodec.toValue(user.getId()), request.getUsername()));
+        return loginSuccess(user, request.getUsername(), "用户/密码登录成功");
     }
 
     @ApiOperation(value = "短信登录", notes = "ignore")
@@ -142,21 +133,21 @@ public class AuthController {
     public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
         User user =
                 authService.authenticateSms(request.getLoginToken(), request.getMobile(), request.getValidateCode());
-        return loginSuccess(user, request.getMobile());
+        return loginSuccess(user, request.getMobile(), "短信登录成功");
     }
 
     @ApiOperation(value = "企业微信登录", notes = "ignore")
     @PostMapping(value = "login/wecom")
     public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
         User user = authService.authenticateWecom(request.getCode());
-        return loginSuccess(user, "wecom");
+        return loginSuccess(user, "wecom", "企业微信登录成功");
     }
 
     @ApiOperation(value = "GitHub 登录", notes = "ignore")
     @PostMapping(value = "login/github")
     public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
         User user = authService.authenticateGithub(request.getCode());
-        return loginSuccess(user, "github");
+        return loginSuccess(user, "github", "GitHub登录成功");
     }
 
     @ApiOperation(value = "登出", notes = "ignore")
@@ -262,14 +253,29 @@ public class AuthController {
         SysLogUtils.saveLog(log);
     }
 
-    private AuthAccessTokenResponse loginSuccess(User user, String loginName) {
+    private void writeLog(HttpServletRequest currentRequest, String title, User user, String loginName) {
+        Log log = new Log();
+        log.setUserId(EntityIdCodec.toValue(user.getId()));
+        log.setTitle("系统-登录-" + title);
+        log.setLogDate(new Date());
+        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
+        log.setUserAgent(currentRequest.getHeader("user-agent"));
+        log.setRequestUri(currentRequest.getRequestURI());
+        log.setMethod(currentRequest.getMethod());
+        log.setType(LogType.ACCESS);
+        log.setRequestParams(AuthInterfaceAssembler.toLogJson(loginName));
+        log.setSignable(true);
+        SysLogUtils.saveLog(log);
+    }
+
+    private AuthAccessTokenResponse loginSuccess(User user, String loginName, String logTitle) {
         AccessToken accessToken = authService.getByUserId(EntityIdCodec.toValue(user.getId()));
         if (accessToken != null) {
             authService.deleteAccessToken(accessToken);
         }
-        user.setLastLoginDate(new Date());
-        user.setLoginCount(user.getLoginCount() == null ? 0 : user.getLoginCount() + 1);
-        userService.updateLoginInfo(user);
+        HttpServletRequest currentRequest =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        writeLog(currentRequest, logTitle, user, loginName);
         return AuthInterfaceAssembler.toAccessTokenResponse(
                 authService.createAccessToken(EntityIdCodec.toValue(user.getId()), loginName));
     }

@@ -122,10 +122,6 @@
 | `identity_type` | `identityType` | `identityType` | 是 | 登录标识类型 |
 | `identity_value` | `identityValue` | `identityValue` | 是 | 登录标识值 |
 | `status` | `status` | `status` | 是 | 登录标识状态 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -137,6 +133,7 @@
 - `ACCOUNT` 类型 `identity_value` 初始化来源是后台用户保存请求中的 `loginName`。
 - `MOBILE` 类型 `identity_value` 初始化来源是 `sys_user.mobile` 或 `sys_user_encrypt.mobile`。
 - `EMAIL` 类型 `identity_value` 初始化来源是 `sys_user.email` 或 `sys_user_encrypt.email`。
+- `sys_user_identity` 不保存通用审计字段。
 
 索引：
 
@@ -163,10 +160,6 @@
 | `locked_until` | `lockedUntil` | `lockedUntil` | 否 | 锁定截止时间 |
 | `expires_at` | `expiresAt` | `expiresAt` | 否 | 过期时间 |
 | `last_verified_at` | `lastVerifiedAt` | `lastVerifiedAt` | 否 | 最近验证时间 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -183,6 +176,7 @@
 - `locked_until` 为空时，非锁定状态不受时间锁限制。
 - `expires_at` 为空时，凭据不过期。
 - `PASSWORD` 类型凭据初始化来源是后台用户保存请求中的加密后密码。
+- `sys_user_credential` 不保存通用审计字段。
 
 索引：
 

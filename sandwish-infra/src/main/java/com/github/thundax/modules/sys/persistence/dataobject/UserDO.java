@@ -33,16 +33,6 @@ public class UserDO {
     private String name;
     private Integer ranks;
 
-    private Date registerDate;
-
-    private String registerIp;
-
-    private Date lastLoginDate;
-
-    private String lastLoginIp;
-
-    private Integer loginCount;
-
     private String superFlag;
 
     private String adminFlag;

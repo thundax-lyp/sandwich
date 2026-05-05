@@ -93,11 +93,6 @@
 - `ranks`：用户等级。
 - `privilege`：用户权限等级。
 - `status`：用户状态。
-- `registerDate`：注册时间。
-- `registerIp`：注册 IP。
-- `lastLoginDate`：最近登录时间。
-- `lastLoginIp`：最近登录 IP。
-- `loginCount`：登录次数。
 - `createDate`：创建时间。
 - `updateDate`：更新时间。
 
@@ -105,6 +100,7 @@
 
 - `User` 不等于登录标识。
 - `User` 不等于认证凭据。
+- `User` 不承载注册 IP、最近登录时间、最近登录 IP、登录次数等认证行为数据；认证行为通过认证会话与系统日志落地。
 - `User.status` 禁用时，该用户全部后台登录方式不可用。
 - `User.loginName` 可作为后台用户创建和账户身份初始化输入，认证语义固定由 `UserIdentity.identityValue` 承载。
 - `User.loginPass` 可作为后台用户创建和密码凭据初始化输入，认证语义固定由 `UserCredential.credentialValue` 承载。
@@ -120,8 +116,6 @@
 - `identityType`：登录标识类型。
 - `identityValue`：登录标识值。
 - `status`：登录标识状态。
-- `createDate`：创建时间。
-- `updateDate`：更新时间。
 
 固定标识类型：
 
@@ -140,6 +134,7 @@
 - 禁用 `UserIdentity` 只影响该登录方式，不等于禁用 `User`。
 - 修改后台账号固定更新 `ACCOUNT` 类型 `UserIdentity`。
 - `UserIdentity` 不保存密码哈希。
+- `UserIdentity` 不承载通用审计字段。
 
 ### 5.3 UserCredential
 
@@ -159,8 +154,6 @@
 - `lockedUntil`：锁定截止时间。
 - `expiresAt`：凭据过期时间。
 - `lastVerifiedAt`：最近验证时间。
-- `createDate`：创建时间。
-- `updateDate`：更新时间。
 
 固定凭据类型：
 
@@ -181,6 +174,7 @@
 - 密码过期固定使用 `UserCredential.expiresAt` 表达。
 - 首次登录或重置密码后的强制改密固定使用 `UserCredential.needChangePassword` 表达。
 - `identityId + credentialType` 必须唯一定位一个认证凭据。
+- `UserCredential` 不承载通用审计字段，只保存凭据认证策略所需状态。
 
 ### 5.4 AuthSession
 

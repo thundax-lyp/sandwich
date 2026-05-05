@@ -53,10 +53,6 @@ public final class UserInterfaceAssembler {
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
-        response.setRegisterDate(entity.getRegisterDate());
-        response.setRegisterIp(entity.getRegisterIp());
-        response.setLastLoginDate(entity.getLastLoginDate());
-        response.setLastLoginIp(entity.getLastLoginIp());
         response.setDepartment(toDepartmentResponse(department, departmentLoader));
         response.setRoleList(
                 roleList == null

@@ -18,6 +18,8 @@ import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisio
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import org.springframework.lang.NonNull;
@@ -70,6 +72,12 @@ public final class AuthInterfaceAssembler {
         maskedRequest.setPassword("******");
         maskedRequest.setCaptcha(request.getCaptcha());
         return JsonUtils.toJson(maskedRequest);
+    }
+
+    public static String toLogJson(String loginName) {
+        Map<String, Object> request = new LinkedHashMap<>();
+        request.put("loginName", loginName);
+        return JsonUtils.toJson(request);
     }
 
     @NonNull

@@ -157,25 +157,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void updateLoginInfo(User user) {
-        UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
-        mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(UserDO::getLastLoginDate, dataObject.getLastLoginDate())
-                        .set(UserDO::getLastLoginIp, dataObject.getLastLoginIp())
-                        .set(UserDO::getLoginCount, dataObject.getLoginCount()));
-        removeUserCaches(EntityIdCodec.toValue(user.getId()));
-    }
-
-    @Override
     public int updateStatus(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
         int count = mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
-                        .set(UserDO::getLoginCount, 0));
+                null, buildIdUpdateWrapper(dataObject).set(UserDO::getEnableFlag, dataObject.getEnableFlag()));
         removeUserCaches(EntityIdCodec.toValue(user.getId()));
         return count;
     }

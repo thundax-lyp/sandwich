@@ -25,7 +25,6 @@ import com.github.thundax.modules.sys.service.UserEncryptService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -173,13 +172,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateLoginInfo(User user) {
-        dao.updateLoginInfo(user);
-        signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public int updateStatus(User user) {
         int result = dao.updateStatus(user);
 
@@ -263,25 +255,18 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         UserIdentity identity = userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT);
-        Date now = new Date();
         if (identity == null) {
             identity = new UserIdentity();
             identity.setUserId(user.getId());
             identity.setIdentityType(UserIdentityType.ACCOUNT);
             identity.setIdentityValue(loginName);
             identity.setStatus(UserIdentityStatus.ENABLED);
-            identity.setCreateDate(now);
-            identity.setUpdateDate(now);
-            identity.setCreateUserId(user.getCreateUserId());
-            identity.setUpdateUserId(user.getUpdateUserId());
             identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
             return identity;
         }
 
         identity.setIdentityValue(loginName);
         identity.setStatus(UserIdentityStatus.ENABLED);
-        identity.setUpdateDate(now);
-        identity.setUpdateUserId(user.getUpdateUserId());
         userIdentityDao.update(identity);
         return identity;
     }
@@ -292,7 +277,6 @@ public class UserServiceImpl implements UserService {
         }
         UserCredential credential =
                 userCredentialDao.getByIdentityIdAndType(accountIdentity.getId(), UserCredentialType.PASSWORD);
-        Date now = new Date();
         if (credential == null) {
             credential = new UserCredential();
             credential.setUserId(user.getId());
@@ -303,10 +287,6 @@ public class UserServiceImpl implements UserService {
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
             credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            credential.setCreateDate(now);
-            credential.setUpdateDate(now);
-            credential.setCreateUserId(user.getCreateUserId());
-            credential.setUpdateUserId(user.getUpdateUserId());
             credential.setId(EntityIdCodec.toDomain(userCredentialDao.insert(credential)));
             return;
         }
@@ -317,8 +297,6 @@ public class UserServiceImpl implements UserService {
         credential.setFailedCount(0);
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
-        credential.setUpdateDate(now);
-        credential.setUpdateUserId(user.getUpdateUserId());
         userCredentialDao.update(credential);
     }
 }

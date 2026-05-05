@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,7 +57,7 @@ public class DictController {
     })
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    public DictResponse get(@RequestBody DictIdRequest request) throws ApiException {
+    public DictResponse get(@Valid @RequestBody DictIdRequest request) throws ApiException {
         return DictInterfaceAssembler.toResponse(dictService.getById(EntityIdCodec.toDomain(request.getId())));
     }
 
@@ -71,7 +72,7 @@ public class DictController {
     })
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public List<DictResponse> list(@RequestBody DictQueryRequest request) throws ApiException {
+    public List<DictResponse> list(@Valid @RequestBody DictQueryRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         return dictService.list(query).stream()
                 .map(dict -> DictInterfaceAssembler.toResponse(dict))
@@ -89,7 +90,7 @@ public class DictController {
     })
     @SysLogger("分页")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    public PageResponse<DictResponse> page(@RequestBody DictPageRequest request) throws ApiException {
+    public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         PageDTO<Dict> page = readDictPage(request);
         return PageResponseHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
@@ -106,7 +107,7 @@ public class DictController {
     })
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public DictResponse add(@RequestBody DictSaveRequest request) throws ApiException {
+    public DictResponse add(@Valid @RequestBody DictSaveRequest request) throws ApiException {
         Dict dict = DictInterfaceAssembler.toEntity(new Dict(), request);
         dictService.add(dict);
         return DictInterfaceAssembler.toResponse(dict);
@@ -123,7 +124,7 @@ public class DictController {
     })
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public DictResponse update(@RequestBody DictSaveRequest request) throws ApiException {
+    public DictResponse update(@Valid @RequestBody DictSaveRequest request) throws ApiException {
         Dict dict = dictService.getById(EntityIdCodec.toDomain(request.getId()));
         if (dict == null) {
             throw new ApiException("id not exist");
@@ -144,7 +145,7 @@ public class DictController {
     })
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public Boolean delete(@RequestBody List<DictIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) throws ApiException {
         List<Dict> beanList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {
             Dict bean = dictService.getById(EntityIdCodec.toDomain(request.getId()));

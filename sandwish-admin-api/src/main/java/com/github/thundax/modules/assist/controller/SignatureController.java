@@ -133,7 +133,7 @@ public class SignatureController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
-    public Boolean delete(@RequestBody List<SignatureDeleteRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<SignatureDeleteRequest> list) throws ApiException {
         List<Signature> beanList = new ArrayList<>();
         for (SignatureDeleteRequest request : RequestListHelper.present(list)) {
             Signature bean = signatureService.getByBusiness(request.getBusinessType(), request.getBusinessId());

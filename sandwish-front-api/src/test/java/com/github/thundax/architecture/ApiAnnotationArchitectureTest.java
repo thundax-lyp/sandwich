@@ -18,6 +18,7 @@ public class ApiAnnotationArchitectureTest {
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertRequestBodyRequestParametersDeclareValid(sourceRoot);
     }
 
     private static Path projectRoot() {

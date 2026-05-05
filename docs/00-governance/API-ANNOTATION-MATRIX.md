@@ -83,9 +83,8 @@
 
 - 已有 ArchUnit 门禁继续覆盖 Request / Response 类级注解。
 - 已有 RestController 架构测试继续约束 REST Controller 不回流手写 `Validator`。
-- 前后台 REST Controller 已纳入 `@Api`、`@ApiOperation`、HTTP mapping 唯一性和访问口径标记门禁。
+- 前后台 REST Controller 已纳入 `@Api`、`@ApiOperation`、HTTP mapping 唯一性、访问口径标记和 `@RequestBody *Request` 参数 `@Valid` 门禁。
 - 新增或修改 Controller、Request、Response 时，必须按本文档人工审阅。
-- `@RequestBody *Request` 参数声明 `@Valid` 仍按存量收敛节奏升级为 ArchUnit 门禁。
 
 ## 9. Open Items
 

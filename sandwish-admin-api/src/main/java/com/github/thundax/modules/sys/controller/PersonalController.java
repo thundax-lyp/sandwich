@@ -198,7 +198,8 @@ public class PersonalController {
     })
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
-    public PersonalAvatarResponse deleteAvatar(@RequestBody(required = false) PersonalAvatarDeleteRequest request) {
+    public PersonalAvatarResponse deleteAvatar(
+            @Valid @RequestBody(required = false) PersonalAvatarDeleteRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
         AvatarUtils.deleteAvatar(EntityIdCodec.toValue(currentUser.getId()));

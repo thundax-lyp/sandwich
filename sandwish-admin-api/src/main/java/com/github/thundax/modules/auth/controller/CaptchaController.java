@@ -19,6 +19,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +103,8 @@ public class CaptchaController {
 
     @ApiOperation(value = "刷新图形验证码")
     @PostMapping(value = "captcha/refresh")
-    public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException {
+    public CaptchaRefreshResponse refreshCaptcha(@Valid @RequestBody CaptchaRefreshRequest request)
+            throws ApiException {
         if (StringUtils.isBlank(request.getLoginToken())) {
             throw new InvalidParameterException("loginToken");
         }

@@ -94,6 +94,18 @@ public final class ApiAnnotationArchitectureRuleSupport {
                 "Mapped controller methods must declare exactly one HTTP mapping: " + violations, violations.isEmpty());
     }
 
+    public static void assertRequestBodyRequestParametersDeclareValid(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectRequestBodyValidViolations(root, path, violations));
+        }
+
+        assertTrue("RequestBody request parameters must declare @Valid: " + violations, violations.isEmpty());
+    }
+
     private static void collectAccessAnnotationViolations(Path root, Path path, List<String> violations) {
         String content = ArchitectureSourceSupport.readSource(path);
         String classAnnotations = restControllerClassAnnotations(content);
@@ -173,6 +185,25 @@ public final class ApiAnnotationArchitectureRuleSupport {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
             }
             previousMethodEnd = matcher.end();
+        }
+    }
+
+    private static void collectRequestBodyValidViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        if (restControllerClassAnnotations(content).length() == 0) {
+            return;
+        }
+        Matcher matcher = PUBLIC_METHOD_DECLARATION_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String methodName = matcher.group(1);
+            int methodBodyStart = content.indexOf("{", matcher.end());
+            if (methodBodyStart < 0) {
+                continue;
+            }
+            String signature = content.substring(matcher.start(), methodBodyStart);
+            if (signature.contains("@RequestBody") && signature.contains("Request") && !signature.contains("@Valid")) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
+            }
         }
     }
 

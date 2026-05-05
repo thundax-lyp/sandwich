@@ -171,7 +171,7 @@ public class MenuController {
     @SysLogger("显示")
     @RequestMapping(value = "display", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public Boolean updateVisibility(@RequestBody List<MenuDisplayRequest> list) throws ApiException {
+    public Boolean updateVisibility(@Valid @RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = new ArrayList<>();
         for (MenuDisplayRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
@@ -203,7 +203,7 @@ public class MenuController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public Boolean delete(@RequestBody List<MenuIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<MenuIdRequest> list) throws ApiException {
         List<Menu> beanList = new ArrayList<>();
         for (MenuIdRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
@@ -233,7 +233,7 @@ public class MenuController {
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
-    public List<MenuResponse> tree(@RequestBody List<MenuIdRequest> excludeList) {
+    public List<MenuResponse> tree(@Valid @RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.list(new Menu());
 
         Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, MenuIdRequest::getId));

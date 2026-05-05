@@ -24,6 +24,7 @@ public class HasPermissionAnnotationArchitectureTest {
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertRequestBodyRequestParametersDeclareValid(sourceRoot);
     }
 
     private static Path projectRoot() {

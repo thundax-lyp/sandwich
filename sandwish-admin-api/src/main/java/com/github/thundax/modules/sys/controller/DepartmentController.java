@@ -169,7 +169,7 @@ public class DepartmentController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:edit')")
-    public Boolean delete(@RequestBody List<DepartmentIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<DepartmentIdRequest> list) throws ApiException {
         List<Department> beanList = new ArrayList<>();
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
             Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
@@ -200,7 +200,7 @@ public class DepartmentController {
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:view')")
-    public List<DepartmentResponse> tree(@RequestBody List<DepartmentIdRequest> excludeList) {
+    public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
         List<Department> beanList = departmentService.list(new Department());
 
         Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, DepartmentIdRequest::getId));

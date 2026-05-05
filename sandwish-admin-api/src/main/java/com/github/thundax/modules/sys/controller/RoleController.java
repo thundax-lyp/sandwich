@@ -180,7 +180,7 @@ public class RoleController {
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public Boolean updateStatus(@RequestBody List<RoleStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@Valid @RequestBody List<RoleStatusRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RoleStatusRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
@@ -211,7 +211,7 @@ public class RoleController {
     @SysLogger("排序")
     @RequestMapping(value = "priority", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public Boolean updatePriority(@RequestBody List<RolePriorityRequest> list) throws ApiException {
+    public Boolean updatePriority(@Valid @RequestBody List<RolePriorityRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RolePriorityRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
@@ -242,7 +242,7 @@ public class RoleController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
-    public Boolean delete(@RequestBody List<RoleIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RoleIdRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));

@@ -317,7 +317,7 @@ public class UserController {
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public Boolean updateStatus(@RequestBody List<UserStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
         List<User> beanList = new ArrayList<>();
@@ -354,7 +354,7 @@ public class UserController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
-    public Boolean delete(@RequestBody List<UserIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
         List<User> beanList = new ArrayList<>();

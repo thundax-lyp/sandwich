@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `storage`：基于 common-oss 重建存储后端适配
-  - 范围文件：
-    - `sandwish-infra/pom.xml`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/store/StoredObjectStore.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStore.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/store/ObjectStorageStoredObjectStore.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStoreTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/store/ObjectStorageStoredObjectStoreTest.java`
-  - 处理动作：让 storage infra 通过 common-oss 的 `ObjectStorageClient` 完成对象读写，同时保留 local file 和 S3 backend 能力。
-  - 验收点：storage 服务测试不再直接处理本地/S3 细节，local file backend 行为保持兼容。
-  - 重要度：9/10
-
 - [ ] `storage`：清理旧存储实现现场
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/store/LocalFileStoredObjectStore.java`

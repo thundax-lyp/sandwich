@@ -28,6 +28,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-oss</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-test</artifactId>
             <scope>test</scope>
         </dependency>

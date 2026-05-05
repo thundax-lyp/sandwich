@@ -10,8 +10,8 @@
 
 当前覆盖范围：
 
-- `assist_storage_object`
-- `assist_storage_object_reference`
+- `assist_storage`
+- `assist_storage_business`
 - `assist_storage_multipart_upload`
 - `assist_storage_multipart_upload_part`
 - `StoredObjectDO`
@@ -39,9 +39,10 @@
 - 存储引擎优先使用 `InnoDB`。
 - 字符集优先使用 `utf8mb4`。
 - `StoredObjectDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `StoredObjectReferenceDO.objectId` 映射数据库列 `object_id`。
-- 对象删除使用 `object_status` 表达，不通过公开业务接口暴露逻辑删除字段。
-- DAO get/list/page 查询应该排除 `DELETED` 对象，除非当前查询明确读取删除态。
+- `StoredObjectReferenceDO.fileId` 映射数据库列 `file_id`，由装配器转换为 `StoredObjectReference.objectId`。
+- 对象公开生命周期可使用 `object_status` 表达。
+- DAO `deleteById` 使用数据库逻辑删除字段 `del_flag` 收口删除状态；`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
+- DAO get/list/page 查询固定追加 `del_flag = '0'` 条件。
 - 枚举字段使用 `varchar` 存储。
 - `storage_type` 固定使用 `LOCAL_FILE` 或 `OSS`。
 - `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`。
@@ -51,13 +52,15 @@
 
 ## 4. Naming Rules
 
-- 存储对象主表固定为 `assist_storage_object`。
-- 存储对象引用表固定为 `assist_storage_object_reference`。
+- 存储对象主表固定为 `assist_storage`。
+- 存储对象引用表固定为 `assist_storage_business`。
 - 存储对象主键列固定为 `id`。
-- 对象引用表的存储对象主键列固定为 `object_id`。
-- 原始文件名列固定为 `original_filename`。
-- 内容类型列固定为 `content_type`。
-- 引用方字段固定为 `owner_id` 和 `owner_type`。
+- 对象引用表的存储对象主键列固定为 `file_id`。
+- 文件基础名列固定为 `name`。
+- 扩展名列固定为 `extend_name`。
+- MIME 类型列固定为 `mime_type`。
+- 上传或持有方字段固定为 `owner_id` 和 `owner_type`。
+- 引用方字段固定为 `reference_owner_id` 和 `reference_owner_type`。
 - 底层存储类型字段固定为 `storage_type`。
 - 存储桶或本地逻辑目录字段固定为 `bucket_name`。
 - 底层对象键字段固定为 `object_key`。
@@ -71,35 +74,42 @@
 
 | Table | DO | Mapper | Entity |
 | --- | --- | --- | --- |
-| `assist_storage_object` | `StoredObjectDO` | `StoredObjectMapper` | `StoredObject` |
-| `assist_storage_object_reference` | `StoredObjectReferenceDO` | `StoredObjectReferenceMapper` | `StoredObjectReference` |
+| `assist_storage` | `StoredObjectDO` | `StoredObjectMapper` | `StoredObject` |
+| `assist_storage_business` | `StoredObjectReferenceDO` | `StoredObjectReferenceMapper` | `StoredObjectReference` |
 | `assist_storage_multipart_upload` | `MultipartUploadSessionDO` | `MultipartUploadSessionMapper` | `MultipartUploadSession` |
 | `assist_storage_multipart_upload_part` | `MultipartUploadPartDO` | `MultipartUploadPartMapper` | `MultipartUploadPart` |
 
 ## 6. Table Design
 
-### 6.1 assist_storage_object
+### 6.1 assist_storage
 
-`assist_storage_object` 保存已存储对象主数据，不保存文件二进制内容。
+`assist_storage` 保存已存储对象主数据，不保存文件二进制内容。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
 | `id` | `id` | `id` | 是 | 存储对象主键 |
+| `name` | `name` | `name` | 是 | 文件基础名 |
+| `extend_name` | `extendName` | `extendName` | 否 | 文件扩展名 |
+| `mime_type` | `mimeType` | `mimeType` | 否 | 内容 MIME 类型 |
+| `owner_id` | `ownerId` | `ownerId` | 否 | 上传或持有方 ID |
+| `owner_type` | `ownerType` | `ownerType` | 否 | 上传或持有方类型 |
 | `storage_type` | `storageType` | `storageType` | 是 | 底层存储类型 |
 | `bucket_name` | `bucketName` | `bucketName` | 否 | 存储桶或本地逻辑目录 |
 | `object_key` | `objectKey` | `objectKey` | 是 | 底层对象键 |
-| `original_filename` | `originalFilename` | `originalFilename` | 是 | 原始文件名 |
-| `content_type` | `contentType` | `contentType` | 是 | 内容类型 |
 | `size` | `size` | `size` | 是 | 文件大小，字节 |
 | `access_endpoint` | `accessEndpoint` | `accessEndpoint` | 否 | 派生访问端点 |
 | `object_status` | `objectStatus` | `objectStatus` | 是 | 对象状态 |
 | `reference_status` | `referenceStatus` | `referenceStatus` | 是 | 引用状态 |
+| `priority` | `priority` | `priority` | 是 | 排序值 |
+| `remarks` | `remarks` | `remarks` | 否 | 备注 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 
 字段规则：
 
 - `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `originalFilename` 是 Entity 派生字段，优先使用显式值，其次由 `name + extendName` 派生。
+- `contentType` 是 Entity 兼容字段，优先使用显式值，并同步到 `mimeType`。
 - `storage_type` 通过 `StorageType.value()` 写入。
 - `object_status` 通过 `StoredObjectStatus.value()` 写入。
 - `reference_status` 通过 `StoredObjectReferenceStatus.value()` 写入。
@@ -108,32 +118,34 @@
 
 索引设计：
 
-- 主键：`pk_assist_storage_object(id)`
-- 唯一索引：`uk_assist_storage_object_key(storage_type, bucket_name, object_key)`
-- 普通索引：`idx_assist_storage_object_status(object_status, reference_status, create_date)`
-- 普通索引：`idx_assist_storage_object_content_type(content_type)`
+- 主键：`pk_assist_storage(id)`
+- 唯一索引：`uk_assist_storage_key(storage_type, bucket_name, object_key)`
+- 普通索引：`idx_assist_storage_status(object_status, reference_status, create_date)`
+- 普通索引：`idx_assist_storage_mime_type(mime_type)`
 
-### 6.2 assist_storage_object_reference
+### 6.2 assist_storage_business
 
-`assist_storage_object_reference` 保存业务模块对存储对象的引用关系。
+`assist_storage_business` 保存业务模块对存储对象的引用关系。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
-| `object_id` | `objectId` | `objectId` | 是 | 存储对象 ID |
-| `owner_type` | `ownerType` | `ownerType` | 是 | 引用方类型 |
-| `owner_id` | `ownerId` | `ownerId` | 是 | 引用方业务主键 |
+| `file_id` | `fileId` | `objectId` | 是 | 存储对象 ID |
+| `reference_owner_id` | `referenceOwnerId` | `ownerId` | 是 | 引用方业务主键 |
+| `reference_owner_type` | `referenceOwnerType` | `ownerType` | 是 | 引用方类型 |
+| `business_params` | `businessParams` | `ownerParams` | 否 | 引用方附加参数 |
+| `reference_status` | `referenceStatus` | `referenceStatus` | 是 | 引用状态 |
 
 字段规则：
 
-- `object_id` 来源是 `StoredObject.id`，不生成新 UUID。
+- `file_id` 来源是 `StoredObject.id`，不生成新 UUID。
 - 同一个对象允许被多个业务资源引用。
-- 引用关系唯一性固定由 `object_id + owner_type + owner_id` 表达。
+- 引用关系唯一性固定由 `file_id + reference_owner_type + reference_owner_id` 表达。
 - `StoredObjectReferenceDO` 固定不包含创建时间、更新时间和逻辑删除字段。
 
 索引设计：
 
-- 联合唯一索引：`uk_assist_storage_object_reference_owner(object_id, owner_type, owner_id)`
-- 普通索引：`idx_assist_storage_object_reference_owner(owner_type, owner_id)`
+- 联合唯一索引：`uk_assist_storage_business_owner(file_id, reference_owner_type, reference_owner_id)`
+- 普通索引：`idx_assist_storage_business_owner(reference_owner_type, reference_owner_id)`
 
 ### 6.3 assist_storage_multipart_upload
 
@@ -145,9 +157,9 @@
 | `upload_id` | `uploadId` | `uploadId` | 是 | 分片上传会话业务键 |
 | `owner_id` | `ownerId` | `ownerId` | 是 | 上传发起人 ID |
 | `owner_type` | `ownerType` | `ownerType` | 是 | 上传发起人类型 |
-| `category` | `category` | `category` | 否 | 业务分类 |
+| `business_type` | `businessType` | `businessType` | 否 | 业务分类 |
 | `original_filename` | `originalFilename` | `originalFilename` | 是 | 原始文件名 |
-| `content_type` | `contentType` | `contentType` | 是 | 内容类型 |
+| `mime_type` | `mimeType` | `mimeType` | 是 | 内容 MIME 类型 |
 | `storage_type` | `storageType` | `storageType` | 是 | 底层存储类型 |
 | `bucket_name` | `bucketName` | `bucketName` | 否 | 存储桶或本地逻辑目录 |
 | `object_key` | `objectKey` | `objectKey` | 是 | 最终对象键 |
@@ -203,13 +215,13 @@
 
 ## 7. Relationship Rules
 
-- `assist_storage_object_reference.object_id` 引用 `assist_storage_object.id`。
+- `assist_storage_business.file_id` 引用 `assist_storage.id`。
 - `assist_storage_multipart_upload_part.upload_id` 引用 `assist_storage_multipart_upload.upload_id`。
 - 当前项目不强制数据库外键。
 - 对象引用关系一致性由 Service 编排和数据库约束共同保证。
 - 建立引用前必须确保对应 `StoredObject` 已存在且处于 `ACTIVE`。
 - 清理最后一个引用后，Service 必须更新 `StoredObject.referenceStatus` 为 `UNREFERENCED`。
-- 分片上传完成后，Service 必须创建 `assist_storage_object` 记录，并将对应会话状态更新为 `COMPLETED`。
+- 分片上传完成后，Service 必须创建 `assist_storage` 记录，并将对应会话状态更新为 `COMPLETED`。
 - 分片上传取消后，Service 必须将对应会话状态更新为 `ABORTED`。
 
 ## 8. Persistence Rules
@@ -233,25 +245,32 @@
 
 目标对象查询支持以下条件：
 
-- `storageType`
 - `objectStatus`
 - `referenceStatus`
 - `originalFilename`
 - `contentType`
-- `objectKey`
+- `ownerId`
+- `ownerType`
+- `referenceOwnerId`
+- `referenceOwnerType`
+- `remarks`
 
 目标 DAO list/page 已落库支持以下条件：
 
-- `storageType` 转换为 `storage_type`
 - `objectStatus` 转换为 `object_status`
 - `referenceStatus` 转换为 `reference_status`
-- `originalFilename` 模糊匹配
-- `contentType` 精确匹配
-- `objectKey` 精确匹配
+- `originalFilename` 拆解到 `name` 或 `extend_name` 相关查询语义
+- `contentType` 转换为 `mime_type`
+- `ownerId` 转换为 `owner_id`
+- `ownerType` 转换为 `owner_type`
+- `referenceOwnerId` 转换为 `reference_owner_id`
+- `referenceOwnerType` 转换为 `reference_owner_type`
+- `remarks` 模糊匹配
 
 目标 DAO list/page 排序固定为：
 
 1. `create_date` 降序。
+2. `priority` 升序。
 
 ## 10. Open Items
 

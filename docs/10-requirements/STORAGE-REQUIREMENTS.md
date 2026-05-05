@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich `Storage` 模块的业务需求边界。
 
-`Storage` 负责统一管理已存储对象、对象引用关系、分片上传会话、底层存储适配和对象生命周期。文件二进制内容不入库，必须通过 `LOCAL_FILE` 或 `OSS` 等底层存储实现保存。
+`Storage` 负责统一管理已存储对象、对象引用关系、分片上传会话、底层存储适配和对象生命周期。文件二进制内容不入库，必须通过 `common-oss` 提供的本地文件或 S3 对象存储客户端保存。
 
 ## 2. Scope
 
@@ -16,7 +16,7 @@
 - 存储对象内容读取。
 - 存储对象删除。
 - 存储对象引用建立和清理。
-- `LOCAL_FILE` 和 `OSS` 底层存储适配。
+- 基于 `common-oss` 的本地文件和 S3 底层存储适配。
 - 存储对象状态和引用状态维护。
 
 当前不覆盖范围：
@@ -42,9 +42,13 @@
 - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
   - 定义 `StoredObject`、`StoredObjectReference`、枚举、Storage Service、DAO interface 和查询对象。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/storage`
-  - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao` 和底层存储端口。
+  - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao`，并通过 `StoredObjectStore` 适配 `common-oss` 对象存储客户端。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java`
   - 提供后台上传、分页、内容读取、删除和引用管理接口。
+- `sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
+  - 装配管理端 `StoredObjectStore`。
+- `sandwish-front-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
+  - 装配前台 `StoredObjectStore`。
 
 ## 5. Core Business Objects
 
@@ -55,11 +59,16 @@
 核心字段：
 
 - `id`：存储对象 ID，使用 `EntityId`。
+- `name`：文件基础名。
+- `extendName`：文件扩展名。
+- `mimeType`：内容 MIME 类型。
+- `ownerId`：上传或持有方 ID。
+- `ownerType`：上传或持有方类型。
 - `storageType`：底层存储类型。
 - `bucketName`：存储桶或本地逻辑目录。
 - `objectKey`：底层对象键。
-- `originalFilename`：原始文件名。
-- `contentType`：内容类型。
+- `originalFilename`：原始文件名，兼容由 `name + extendName` 派生。
+- `contentType`：内容类型，兼容 `mimeType`。
 - `size`：文件大小，字节。
 - `accessEndpoint`：派生访问端点。
 - `objectStatus`：对象状态。
@@ -79,8 +88,10 @@
 核心字段：
 
 - `objectId`：存储对象 ID。
-- `ownerType`：引用方类型。
 - `ownerId`：引用方业务主键。
+- `ownerType`：引用方类型。
+- `ownerParams`：引用方附加参数。
+- `referenceStatus`：引用状态。
 
 说明：
 
@@ -125,9 +136,9 @@
 - `uploadId`：分片上传会话业务键。
 - `ownerId`：上传发起人 ID。
 - `ownerType`：上传发起人类型。
-- `category`：业务分类。
+- `businessType`：业务分类。
 - `originalFilename`：原始文件名。
-- `contentType`：内容类型。
+- `mimeType`：内容 MIME 类型。
 - `storageType`：底层存储类型。
 - `bucketName`：存储桶或本地逻辑目录。
 - `objectKey`：底层对象键。
@@ -169,7 +180,7 @@
 
 - Storage Service 是业务流程入口，Controller 不直接访问 DAO / Mapper。
 - DAO interface 只定义持久化访问契约，不承载 HTTP 适配。
-- 底层存储端口固定下沉到 infra，不作为业务接口模型暴露。
+- 底层存储端口固定下沉到 infra，实际读写通过 `common-oss` 的 `ObjectStorageClient` 完成，不作为业务接口模型暴露。
 - 公开 API 路径应该是 REST resource。
 - 公开 API、Response、数据库主数据和业务模块不得固定暴露 `/servlet/...`。
 - 其他业务模块只能保存 `objectId` 或自身语义包装后的稳定对象标识。
@@ -218,7 +229,7 @@ Storage 公开入口固定使用资源型路径。
 
 ### 8.3 查询
 
-- 分页查询必须支持 `storageType`、`objectStatus`、`referenceStatus`、`originalFilename`、`contentType` 和 `objectKey` 筛选。
+- 分页查询必须支持 `contentType`、`ownerId`、`ownerType`、`objectStatus`、`referenceStatus`、`referenceOwnerId`、`referenceOwnerType`、`originalFilename` 和 `remarks` 筛选。
 - Service 列表和分页查询必须使用查询对象表达过滤条件。
 - 管理端可以查询所有对象元数据。
 - 业务模块按对象 ID 查询时只能获取稳定对象信息，不获取底层存储实现细节。
@@ -236,8 +247,7 @@ Storage 公开入口固定使用资源型路径。
 
 - 删除前必须确认 `StoredObject` 存在。
 - 删除流程由 Storage 负责调用底层存储删除对象。
-- 删除中对象状态必须进入 `DELETING`。
-- 删除完成后对象状态必须进入 `DELETED`。
+- 删除完成后持久化层通过逻辑删除字段排除该对象。
 - 已删除对象不得再建立新引用。
 
 ### 8.6 分片上传
@@ -260,7 +270,7 @@ Storage 公开入口固定使用资源型路径。
 1. Controller 接收 multipart 请求。
 2. Controller 完成入口参数校验。
 3. Service 调用底层存储端口写入对象内容。
-4. 底层存储端口返回 `storageType`、`bucketName`、`objectKey`、`size` 和 contentType。
+4. 底层存储端口返回 `storageType`、`bucketName`、`objectKey`、`size` 和 `contentType`。
 5. Service 创建 `StoredObject` 主数据。
 6. Controller 组装上传响应。
 

@@ -90,7 +90,7 @@
 - `email`：联系邮箱。
 - `mobile`：联系手机号。
 - `tel`：联系电话。
-- `ranks`：用户等级。
+- `rank`：用户访问等级，使用 `AccessRank`；持久化到 `sys_user.ranks`。
 - `privilege`：用户权限等级。
 - `status`：用户状态。
 - `createDate`：创建时间。

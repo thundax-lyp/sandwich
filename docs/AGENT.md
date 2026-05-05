@@ -65,10 +65,18 @@
   通用工具、分页数据模型、加密、i18n、存储和线程等非持久化公共技术能力。
 - `sandwish-common-web`:
   通用 Web 响应模型、请求列表辅助和入口无关的 Web 支撑能力。
+- `sandwish-common-test`:
+  通用测试支撑、架构规则 helper 和测试资源。
 - `sandwish-common-cache`:
   通用 JetCache 基线配置和缓存基础设施，不承载业务 key、TTL、版本和失效语义。
 - `sandwish-common-swagger`:
   通用 Swagger / Springfox 自动配置、文档属性和静态资源映射，不承载业务 API 注解和入口专用配置。
+- `sandwish-common-log`:
+  通用系统日志注解、切面、日志事件模型和日志投递适配。
+- `sandwish-common-mq`:
+  通用消息模型、消息发送契约、消息配置和无消息中间件环境的 no-op sender。
+- `sandwish-common-oss`:
+  通用对象存储契约、OSS 自动配置、本地文件和 S3 对象存储客户端。
 - `sandwish-common-mybatis`:
   通用持久化对象、MyBatis-Plus 基础配置和数据库方言支撑，不承载通用分页数据模型或泛型 Service 公共契约。
 - `sandwish-common-security`:

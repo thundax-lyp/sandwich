@@ -13,6 +13,7 @@ Sandwich 的目标是在现有 Java 8、Spring Boot 2、jar 应用和三层 API 
 - 为什么业务语义和持久化机制要分离
 - 为什么控制抽象新增
 - 为什么收敛 common 工具层级
+- 为什么拆分 common-log、common-mq、common-oss 和 common-test
 - 为什么文档和测试只表达当前系统形态
 - 为什么按单业务域应用建模
 - 为什么区分 formatter 和 rule gate
@@ -55,6 +56,8 @@ Sandwich 的持久化演进不是为了追逐某个工具或单纯减少文件�
 - 保护三层架构边界，例如 Web、线程、存储、加密、i18n 等基础设施契约。
 
 删除或展开 `common` 能力时，不能把复杂逻辑散落到 Controller 或业务流程里。收敛层级的判断标准是“让真实行为更直接可见”，不是把共享复杂性复制到各处。
+
+`common-log`、`common-mq`、`common-oss` 和 `common-test` 是对稳定技术契约的拆分，而不是业务层级扩张。日志、消息、对象存储和测试支撑都可能被多个入口或模块复用，但它们各自只承载通用技术语义：业务日志落库、消息 topic、存储对象生命周期、对象引用关系和具体业务测试仍然归属业务模块、infra 或入口模块。
 
 ## 5. Current Shape Intent
 

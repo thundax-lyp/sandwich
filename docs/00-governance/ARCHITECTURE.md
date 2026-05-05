@@ -22,10 +22,14 @@
   - `sandwish-common`: pom
   - `sandwish-common-core`: jar
   - `sandwish-common-web`: jar
+  - `sandwish-common-test`: jar
   - `sandwish-common-cache`: jar
   - `sandwish-common-mybatis`: jar
   - `sandwish-common-security`: jar
   - `sandwish-common-swagger`: jar
+  - `sandwish-common-log`: jar
+  - `sandwish-common-mq`: jar
+  - `sandwish-common-oss`: jar
   - `sandwish-biz`: jar
   - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
@@ -81,7 +85,7 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - Common 聚合模块
-- 管理 `sandwish-common-core`、`sandwish-common-web`、`sandwish-common-mybatis` 与其他 common 子模块
+- 管理 `sandwish-common-core`、`sandwish-common-web`、`sandwish-common-test`、`sandwish-common-cache`、`sandwish-common-mybatis`、`sandwish-common-security`、`sandwish-common-swagger`、`sandwish-common-log`、`sandwish-common-mq` 和 `sandwish-common-oss`
 
 边界：
 
@@ -121,6 +125,21 @@ Sandwich 固定采用三层 API 架构。
 - Helper 只返回数据，不抛入口层业务异常。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
+### `sandwish-common-test`
+
+职责：
+
+- 通用测试支撑
+- 架构测试 helper
+- 测试资源基线
+
+边界：
+
+- 只作为测试依赖使用。
+- 不承载生产运行逻辑。
+- 不承载业务测试用例本身。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
 ### `sandwish-common-cache`
 
 职责：
@@ -150,6 +169,55 @@ Sandwich 固定采用三层 API 架构。
 - 适配 Spring Boot 2.0.x 与 Springfox 2.x。
 - 不承载业务 Controller、Request 或 Response。
 - 不承载具体业务 API 注解。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
+### `sandwish-common-log`
+
+职责：
+
+- 通用系统日志注解
+- 通用系统日志切面
+- 系统日志事件模型
+- 日志投递适配
+
+边界：
+
+- 可以依赖 `sandwish-common-core` 和 `sandwish-common-mq`。
+- 不承载具体业务日志落库实现。
+- 不承载业务日志查询、展示或管理流程。
+- 不访问业务 DAO、数据库或 Redis。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
+### `sandwish-common-mq`
+
+职责：
+
+- 通用消息模型
+- 消息发送契约
+- 消息配置
+- 无消息中间件环境的 no-op sender
+
+边界：
+
+- 可以依赖 `sandwish-common-core`。
+- 不承载具体业务 topic、tag、key 和消费语义。
+- 不承载业务事件建模。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
+### `sandwish-common-oss`
+
+职责：
+
+- 通用对象存储契约
+- OSS 自动配置
+- 本地文件对象存储客户端
+- S3 对象存储客户端
+
+边界：
+
+- 可以依赖 `sandwish-common-core`。
+- 不承载 `Storage` 业务对象、对象引用关系或业务生命周期。
+- 不承载业务 bucket、object key 生成规则和访问权限规则。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-mybatis`
@@ -254,7 +322,7 @@ Sandwich 固定采用三层 API 架构。
 - 前台 API 应用入口
 - 前台 Controller
 - 前台配置
-- 前台安全、Shiro、过滤器、拦截器等入口适配
+- 前台安全、Spring Security、过滤器、拦截器等入口适配
 - 前台静态 API 支撑资源
 - 前台专用工具、Request 和 Response
 
@@ -290,6 +358,18 @@ Swagger 文档链路允许入口模块依赖：
 `sandwish-admin-api -> sandwish-common-swagger`
 
 `sandwish-front-api -> sandwish-common-swagger`
+
+OSS 存储链路允许 infra 和入口装配依赖：
+
+`sandwish-infra -> sandwish-common-oss`
+
+日志与消息链路允许入口模块依赖：
+
+`sandwish-admin-api -> sandwish-common-log -> sandwish-common-mq -> sandwish-common-core`
+
+测试支撑链路允许测试代码依赖：
+
+`*-test -> sandwish-common-test`
 
 禁止依赖方向：
 

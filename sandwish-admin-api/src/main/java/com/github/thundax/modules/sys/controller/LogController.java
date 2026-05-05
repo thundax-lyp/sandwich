@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
@@ -45,6 +46,7 @@ public class LogController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

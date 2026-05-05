@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
@@ -75,6 +76,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:role:view")
+    @HasPermission("sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -94,6 +96,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:role:view")
+    @HasPermission("sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -111,6 +114,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -138,6 +142,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -164,6 +169,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "启用/禁用", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -194,6 +200,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "排序", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -224,6 +231,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -253,6 +261,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取菜单树", notes = "sys:role:view, sys:role:edit")
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -269,6 +278,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取用户树", notes = "sys:role:view, sys:role:edit")
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -299,6 +309,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取权限用户列表", notes = "sys:role:view, sys:role:edit")
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -320,6 +331,7 @@ public class RoleController {
     }
 
     @ApiOperation(value = "更新权限用户列表", notes = "sys:role:edit")
+    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

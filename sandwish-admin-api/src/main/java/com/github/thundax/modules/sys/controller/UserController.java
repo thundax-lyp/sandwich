@@ -9,6 +9,7 @@ import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -97,6 +98,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -116,6 +118,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -133,6 +136,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取分页列表", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -151,6 +155,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -193,6 +198,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -249,6 +255,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "上传头像", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -268,6 +275,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "删除头像", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -283,6 +291,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取头像相对路径", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -297,6 +306,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "启用/禁用", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -333,6 +343,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:user:edit")
+    @HasPermission("sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -368,6 +379,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "检查 [loginName]是否存在", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -382,6 +394,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取部门树", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -398,6 +411,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "获取权限列表", notes = "sys:user:view")
+    @HasPermission("sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -417,6 +431,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "用户头像", notes = "user")
+    @HasPermission("user")
     @GetMapping(value = "avatar")
     @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
     public void avatarImage(HttpServletRequest request, HttpServletResponse response) throws IOException {

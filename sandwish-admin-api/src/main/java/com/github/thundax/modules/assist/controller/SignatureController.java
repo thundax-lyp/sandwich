@@ -8,6 +8,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -75,6 +76,7 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "获取列表", notes = "assist:signature:view")
+    @HasPermission("assist:signature:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -92,6 +94,7 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "校验", notes = "assist:signature:view")
+    @HasPermission("assist:signature:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -119,6 +122,7 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "删除", notes = "assist:signature:edit")
+    @HasPermission("assist:signature:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

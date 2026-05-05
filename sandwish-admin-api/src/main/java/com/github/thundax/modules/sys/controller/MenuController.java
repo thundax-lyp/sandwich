@@ -8,6 +8,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -54,6 +55,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取对象", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -73,6 +75,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -92,6 +95,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "添加", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -124,6 +128,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "更新", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -155,6 +160,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "显示/隐藏", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -186,6 +192,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "删除", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -215,6 +222,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -258,6 +266,7 @@ public class MenuController {
     }
 
     @ApiOperation(value = "排序", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

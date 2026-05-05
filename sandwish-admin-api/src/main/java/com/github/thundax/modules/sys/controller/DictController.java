@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -45,6 +46,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:dict:view")
+    @HasPermission("sys:dict:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -59,6 +61,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
+    @HasPermission("sys:dict:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -76,6 +79,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "获取分页列表", notes = "sys:dict:view")
+    @HasPermission("sys:dict:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -92,6 +96,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")
+    @HasPermission("sys:dict:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -108,6 +113,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:dict:edit")
+    @HasPermission("sys:dict:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -128,6 +134,7 @@ public class DictController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:dict:edit")
+    @HasPermission("sys:dict:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

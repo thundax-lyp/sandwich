@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.AsyncTaskIdRequest;
 import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
@@ -36,6 +37,7 @@ public class AsyncTaskController {
     }
 
     @ApiOperation(value = "获取对象", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.assist.service.KeypairService;
@@ -80,6 +81,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "当前用户信息", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -99,6 +101,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "更新用户信息，包括：name, email, mobile", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -119,6 +122,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "更新用户密码", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -156,6 +160,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "上传头像", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -183,6 +188,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "删除头像", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -201,6 +207,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "菜单列表", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -271,6 +278,7 @@ public class PersonalController {
     }
 
     @ApiOperation(value = "权限列表", notes = "user")
+    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

@@ -37,6 +37,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-swagger</artifactId>
         </dependency>
         <dependency>

@@ -8,6 +8,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -52,6 +53,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:department:view")
+    @HasPermission("sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -71,6 +73,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:department:view")
+    @HasPermission("sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -90,6 +93,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:department:edit")
+    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -122,6 +126,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:department:edit")
+    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -153,6 +158,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:department:edit")
+    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -183,6 +189,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
+    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -226,6 +233,7 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "移动", notes = "sys:department:edit")
+    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

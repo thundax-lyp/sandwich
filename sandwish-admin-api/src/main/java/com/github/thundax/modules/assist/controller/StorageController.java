@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -73,6 +74,7 @@ public class StorageController {
     }
 
     @ApiOperation(value = "分页查询存储资源", notes = "assist:storage:view")
+    @HasPermission("assist:storage:view")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -86,6 +88,7 @@ public class StorageController {
     }
 
     @ApiOperation(value = "上传存储资源", notes = "assist:storage:edit")
+    @HasPermission("assist:storage:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -119,6 +122,7 @@ public class StorageController {
     }
 
     @ApiOperation(value = "读取存储对象内容", notes = "assist:storage:view")
+    @HasPermission("assist:storage:view")
     @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
     public void content(@PathVariable("id") String id, HttpServletResponse response) throws IOException {
         StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
@@ -148,6 +152,7 @@ public class StorageController {
     }
 
     @ApiOperation(value = "删除存储资源", notes = "assist:storage:edit")
+    @HasPermission("assist:storage:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -171,6 +176,7 @@ public class StorageController {
     }
 
     @ApiOperation(value = "获取业务类型树", notes = "assist:storage:view")
+    @HasPermission("assist:storage:view")
     @RequestMapping(value = "treeData", method = RequestMethod.POST)
     public List<StorageTreeNodeResponse> treeData() {
         return storageService.listReferenceOwnerTypes().stream()

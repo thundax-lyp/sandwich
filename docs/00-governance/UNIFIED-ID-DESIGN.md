@@ -51,10 +51,13 @@
 - `BaseLongId`：数值型 ID 基类
 - `EntityId`：当前通用领域实体标识
 - `EntityIdCodec`：`EntityId <-> String` 边界转换器
+- `EntityIdTypeHandler`：MyBatis-Plus 中 `EntityId <-> VARCHAR` 的类型转换器
 
 ## 5. Hard Rules
 
 - 领域标识采用“单值包装 + 强类型”模型
+- 当前业务实体主键领域标识固定使用 `EntityId`；不为 `User`、`Role`、`Storage` 等当前对象预先新增 `UserId`、`RoleId`、`StorageId`。
+- 只有当某个对象的 ID 存在独立值规则、独立来源或跨上下文防混用收益时，才新增更细粒度强类型 ID。
 - `BaseId<T>` 必须不可变
 - 具体 ID 构造器固定非公开，统一使用 `of(...)`
 - 判等必须基于“具体类型 + 底层值”
@@ -98,6 +101,7 @@ String value = EntityIdCodec.toValue(entity.getId());
 
 - `DO/DataObject` 按数据库字段使用 `String id`
 - `EntityId <-> String` 的持久化转换固定放在 `PersistenceAssembler`
+- MyBatis-Plus 直接读写 `EntityId` 字段时，固定使用 `EntityIdTypeHandler`
 - DAO implementation 不直接把 `String id` 回填到 Entity；通过 `PersistenceAssembler` 完成模型转换
 
 ## 8. Persistence Defaults
@@ -117,5 +121,4 @@ String value = EntityIdCodec.toValue(entity.getId());
 
 ## 10. Open Items
 
-- 是否在 `EntityId` 之外新增 `UserId`、`RoleId`、`StorageId` 等更细粒度强类型 ID。
-- 是否为 MyBatis-Plus 增加强类型 ID TypeHandler。
+无

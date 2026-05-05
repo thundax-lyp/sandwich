@@ -44,6 +44,8 @@
 - 数据库、实体、DAO、Mapper、SQL、持久化查询：
   再读 `00-governance/DATABASE-RULES.md`
   再读对应 `20-database/*-DATABASE-DESIGN.md`
+- 新增或修改数据库建表 SQL、初始化数据脚本：
+  再读根目录 `db/AGENT.md`
 - 领域标识、数据库主键、业务编号、`EntityId` 或 `EntityIdCodec`：
   再读 `00-governance/UNIFIED-ID-DESIGN.md`
 - 静态资源、API 文档、前后台接口入口：

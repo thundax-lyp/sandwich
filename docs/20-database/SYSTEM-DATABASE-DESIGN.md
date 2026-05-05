@@ -6,6 +6,8 @@
 
 本文档以 `SYSTEM-REQUIREMENTS.md` 的后台系统模型为基础，固定 `sys` 拥有的用户、登录标识、认证凭据、角色、菜单、部门、字典和日志的目标持久化设计。认证会话、访问 token、OAuth2 client、authorization、access token 和 refresh token 的数据库设计见 `AUTH-DATABASE-DESIGN.md`。
 
+建表 SQL 见 [`../../db/schema/system.sql`](../../db/schema/system.sql)，初始化脚本见 [`../../db/data/system.sql`](../../db/data/system.sql)。
+
 ## 2. Scope
 
 当前覆盖范围：

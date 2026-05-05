@@ -269,7 +269,7 @@
 - `redirectUris`：允许的回调地址集合。
 - `accessTokenTtlSeconds`：访问 token 有效期。
 - `refreshTokenTtlSeconds`：refresh token 有效期。
-- `enabled`：启用标记。
+- `status`：客户端状态。
 - `contact`：联系人。
 - `remark`：备注。
 

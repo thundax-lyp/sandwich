@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 后台认证、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
+本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
 
 后台系统管理域的完整 sys 表设计见 [`SYSTEM-DATABASE-DESIGN.md`](./SYSTEM-DATABASE-DESIGN.md)。本文档保留 `UserIdentity` 与 `UserCredential` 是为了说明认证流程依赖的 sys 认证前置资料。
 
@@ -253,11 +253,13 @@
 | `redirect_uris` | `redirectUris` | `redirectUris` | 是 | 回调地址集合 |
 | `access_token_ttl_seconds` | `accessTokenTtlSeconds` | `accessTokenTtlSeconds` | 是 | access token TTL |
 | `refresh_token_ttl_seconds` | `refreshTokenTtlSeconds` | `refreshTokenTtlSeconds` | 是 | refresh token TTL |
-| `enabled` | `enabled` | `enabled` | 是 | 启用标记 |
+| `status` | `status` | `status` | 是 | 客户端状态 |
 | `contact` | `contact` | `contact` | 否 | 联系方式 |
 | `remark` | `remark` | `remark` | 否 | 备注 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 索引：
 
@@ -283,7 +285,9 @@
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
 | `used` | `used` | `used` | 是 | 是否已消费 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 索引：
 
@@ -307,7 +311,9 @@
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
 | `status` | `status` | `status` | 是 | token 状态 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 索引：
 
@@ -332,7 +338,9 @@
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
 | `status` | `status` | `status` | 是 | token 状态 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
+| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
+| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 索引：
 
@@ -424,7 +432,7 @@
 
 - 按 `id` 查询。
 - 按 `clientId` 查询。
-- 按 `clientId + enabled` 查询。
+- 按 `clientId + status` 查询。
 
 `OAuthAuthorizationDao` 固定支持以下查询：
 

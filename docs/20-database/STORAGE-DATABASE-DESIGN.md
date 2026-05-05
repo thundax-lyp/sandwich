@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich `Storage` 模块的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以目标 `StoredObject`、`StoredObjectReference`、`MultipartUploadSession` 和 `MultipartUploadPart` 模型为准。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
+本文档以目标 `StoredObject`、`StoredObjectReference`、`MultipartUploadSession` 和 `MultipartUploadPart` 模型为准。建表 SQL 见 [`../../db/schema/storage.sql`](../../db/schema/storage.sql)，初始化脚本见 [`../../db/data/storage.sql`](../../db/data/storage.sql)。
 
 ## 2. Scope
 

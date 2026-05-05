@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-mybatis`：增加通用 EntityId 类型处理器
-  - 范围文件：
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/typehandler/EntityIdTypeHandler.java`
-    - `sandwish-common/sandwish-common-mybatis/src/test/java/com/github/thundax/common/mybatis/typehandler/EntityIdTypeHandlerTest.java`
-    - `sandwish-common/sandwish-common-mybatis/pom.xml`
-  - 处理动作：新增 `EntityId` 与数据库字符串字段的 MyBatis 类型转换。
-  - 验收点：类型处理器能正确写入字符串 ID 并从结果集读取为 `EntityId`，有单元测试覆盖。
-  - 重要度：7/10
-
 - [ ] `common-mybatis`：增加通用 JSON 列表类型处理器
   - 范围文件：
     - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/typehandler/StringListJsonTypeHandler.java`

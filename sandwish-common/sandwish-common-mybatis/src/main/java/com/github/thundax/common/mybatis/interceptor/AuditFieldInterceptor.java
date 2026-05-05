@@ -1,9 +1,10 @@
-package com.github.thundax.modules.common.persistence.interceptor;
+package com.github.thundax.common.mybatis.interceptor;
 
 import com.baomidou.mybatisplus.core.conditions.update.Update;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.common.security.user.CurrentUser;
+import com.github.thundax.common.security.user.CurrentUserProvider;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -22,9 +23,7 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.springframework.stereotype.Component;
 
-@Component
 @Intercepts({
     @Signature(
             type = Executor.class,
@@ -40,7 +39,12 @@ public class AuditFieldInterceptor implements Interceptor {
     private static final String UPDATE_DATE_COLUMN = "update_date";
     private static final String UPDATE_BY_COLUMN = "update_by";
 
+    private final CurrentUserProvider currentUserProvider;
     private final ConcurrentMap<String, Class<?>> mapperDataObjectCache = new ConcurrentHashMap<>();
+
+    public AuditFieldInterceptor(CurrentUserProvider currentUserProvider) {
+        this.currentUserProvider = currentUserProvider;
+    }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -60,7 +64,7 @@ public class AuditFieldInterceptor implements Interceptor {
             return;
         }
         Date now = new Date();
-        String currentUserId = UserAccessHolder.currentUserId();
+        String currentUserId = currentUserId();
         MetaObject metaObject = SystemMetaObject.forObject(parameter);
         setValue(metaObject, CREATE_DATE, now);
         setValue(metaObject, UPDATE_DATE, now);
@@ -73,32 +77,40 @@ public class AuditFieldInterceptor implements Interceptor {
             return;
         }
         Date now = new Date();
-        String currentUserId = UserAccessHolder.currentUserId();
+        String currentUserId = currentUserId();
         if (parameter instanceof Map) {
-            Map<?, ?> parameterMap = (Map<?, ?>) parameter;
-            Object entity = getParameter(parameterMap, Constants.ENTITY);
-            if (entity != null) {
-                MetaObject metaObject = SystemMetaObject.forObject(entity);
-                setValue(metaObject, UPDATE_DATE, now);
-                setValue(metaObject, UPDATE_BY, currentUserId);
-                return;
-            }
-            Object wrapper = getParameter(parameterMap, Constants.WRAPPER);
-            Class<?> dataObjectClass = findMapperDataObjectClass(statement);
-            if (wrapper instanceof Update && dataObjectClass != null) {
-                Update<?, ?> update = (Update<?, ?>) wrapper;
-                if (hasField(dataObjectClass, UPDATE_DATE)) {
-                    update.setSql(UPDATE_DATE_COLUMN + " = {0}", now);
-                }
-                if (hasField(dataObjectClass, UPDATE_BY)) {
-                    update.setSql(UPDATE_BY_COLUMN + " = {0}", currentUserId);
-                }
-            }
+            fillMapUpdate(statement, (Map<?, ?>) parameter, now, currentUserId);
             return;
         }
         MetaObject metaObject = SystemMetaObject.forObject(parameter);
         setValue(metaObject, UPDATE_DATE, now);
         setValue(metaObject, UPDATE_BY, currentUserId);
+    }
+
+    private void fillMapUpdate(MappedStatement statement, Map<?, ?> parameterMap, Date now, String currentUserId) {
+        Object entity = getParameter(parameterMap, Constants.ENTITY);
+        if (entity != null) {
+            MetaObject metaObject = SystemMetaObject.forObject(entity);
+            setValue(metaObject, UPDATE_DATE, now);
+            setValue(metaObject, UPDATE_BY, currentUserId);
+            return;
+        }
+        Object wrapper = getParameter(parameterMap, Constants.WRAPPER);
+        Class<?> dataObjectClass = findMapperDataObjectClass(statement);
+        if (wrapper instanceof Update && dataObjectClass != null) {
+            Update<?, ?> update = (Update<?, ?>) wrapper;
+            if (hasField(dataObjectClass, UPDATE_DATE)) {
+                update.setSql(UPDATE_DATE_COLUMN + " = {0}", now);
+            }
+            if (hasField(dataObjectClass, UPDATE_BY)) {
+                update.setSql(UPDATE_BY_COLUMN + " = {0}", currentUserId);
+            }
+        }
+    }
+
+    private String currentUserId() {
+        CurrentUser currentUser = currentUserProvider.currentUser();
+        return currentUser != null ? currentUser.getUserId() : null;
     }
 
     private void setValue(MetaObject metaObject, String property, Object value) {

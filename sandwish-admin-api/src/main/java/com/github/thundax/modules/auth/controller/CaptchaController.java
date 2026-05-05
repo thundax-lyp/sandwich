@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.controller.response.CaptchaRefreshResponse;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "01-02. 鉴权-图形验证码")
 @RequestMapping(value = "/api/auth")
 @RestController
+@PublicApi
 public class CaptchaController {
 
     private static final int DEFAULT_CAPTCHA_WIDTH = 200;
@@ -49,7 +51,7 @@ public class CaptchaController {
         this.authService = authService;
     }
 
-    @ApiOperation(value = "图形验证码", notes = "ignore")
+    @ApiOperation(value = "图形验证码")
     @GetMapping(value = "captcha")
     public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String loginToken = request.getParameter("loginToken");
@@ -98,7 +100,7 @@ public class CaptchaController {
         */
     }
 
-    @ApiOperation(value = "刷新图形验证码", notes = "ignore")
+    @ApiOperation(value = "刷新图形验证码")
     @PostMapping(value = "captcha/refresh")
     public CaptchaRefreshResponse refreshCaptcha(@RequestBody CaptchaRefreshRequest request) throws ApiException {
         if (StringUtils.isBlank(request.getLoginToken())) {

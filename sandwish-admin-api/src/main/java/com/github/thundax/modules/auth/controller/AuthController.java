@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
@@ -54,6 +55,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
 @RestController
+@PublicApi
 public class AuthController {
 
     private final AuthService authService;
@@ -64,14 +66,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @ApiOperation(value = "请求登录令牌", notes = "ignore")
+    @ApiOperation(value = "请求登录令牌")
     @PostMapping(value = "form")
     @SysLogger("请求登录令牌")
     public AuthLoginFormResponse loginForm() throws ApiException {
         return AuthInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
     }
 
-    @ApiOperation(value = "刷新登录令牌", notes = "ignore")
+    @ApiOperation(value = "刷新登录令牌")
     @PostMapping(value = "form/refresh")
     @SysLogger("刷新登录令牌")
     public AuthLoginFormResponse refreshLoginForm(@Valid @RequestBody AuthLoginFormRefreshRequest request)
@@ -83,7 +85,7 @@ public class AuthController {
         return AuthInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
     }
 
-    @ApiOperation(value = "用户/密码登录", notes = "ignore")
+    @ApiOperation(value = "用户/密码登录")
     @PostMapping(value = "login")
     @SysLogger("用户/密码登录")
     public AuthAccessTokenResponse login(@Valid @RequestBody AuthLoginRequest request) throws ApiException {
@@ -128,7 +130,7 @@ public class AuthController {
         return loginSuccess(user, request.getUsername(), "用户/密码登录成功");
     }
 
-    @ApiOperation(value = "短信登录", notes = "ignore")
+    @ApiOperation(value = "短信登录")
     @PostMapping(value = "login/sms")
     public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
         User user =
@@ -136,21 +138,21 @@ public class AuthController {
         return loginSuccess(user, request.getMobile(), "短信登录成功");
     }
 
-    @ApiOperation(value = "企业微信登录", notes = "ignore")
+    @ApiOperation(value = "企业微信登录")
     @PostMapping(value = "login/wecom")
     public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
         User user = authService.authenticateWecom(request.getCode());
         return loginSuccess(user, "wecom", "企业微信登录成功");
     }
 
-    @ApiOperation(value = "GitHub 登录", notes = "ignore")
+    @ApiOperation(value = "GitHub 登录")
     @PostMapping(value = "login/github")
     public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
         User user = authService.authenticateGithub(request.getCode());
         return loginSuccess(user, "github", "GitHub登录成功");
     }
 
-    @ApiOperation(value = "登出", notes = "ignore")
+    @ApiOperation(value = "登出")
     @PostMapping(value = "logout")
     @SysLogger("登出")
     public Boolean logout(@Valid @RequestBody AuthLogoutRequest request) throws ApiException {
@@ -172,32 +174,32 @@ public class AuthController {
         return true;
     }
 
-    @ApiOperation(value = "校验 token", notes = "ignore")
+    @ApiOperation(value = "校验 token")
     @PostMapping(value = "token/verify")
     public TokenVerifyResponse verifyToken(@Valid @RequestBody AuthTokenRequest request) {
         return AuthInterfaceAssembler.toTokenVerifyResponse(authService.queryToken(request.getToken()));
     }
 
-    @ApiOperation(value = "OAuth2 token introspection", notes = "ignore")
+    @ApiOperation(value = "OAuth2 token introspection")
     @PostMapping(value = "oauth2/introspect")
     public OAuth2IntrospectionResponse introspect(@Valid @RequestBody AuthTokenRequest request) {
         return AuthInterfaceAssembler.toIntrospectionResponse(authService.queryToken(request.getToken()));
     }
 
-    @ApiOperation(value = "OAuth2 userinfo", notes = "ignore")
+    @ApiOperation(value = "OAuth2 userinfo")
     @PostMapping(value = "oauth2/userinfo")
     public OAuth2UserinfoResponse userinfo(@Valid @RequestBody AuthTokenRequest request) {
         return AuthInterfaceAssembler.toUserinfoResponse(authService.queryToken(request.getToken()));
     }
 
-    @ApiOperation(value = "刷新 token", notes = "ignore")
+    @ApiOperation(value = "刷新 token")
     @PostMapping(value = "token/refresh")
     public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
         return AuthInterfaceAssembler.toAccessTokenResponse(
                 authService.refreshAccessToken(request.getClientId(), request.getRefreshToken()));
     }
 
-    @ApiOperation(value = "OAuth2 授权视图", notes = "ignore")
+    @ApiOperation(value = "OAuth2 授权视图")
     @PostMapping(value = "oauth2/authorize")
     public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request)
             throws ApiException {
@@ -205,7 +207,7 @@ public class AuthController {
                 request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState()));
     }
 
-    @ApiOperation(value = "OAuth2 授权决策", notes = "ignore")
+    @ApiOperation(value = "OAuth2 授权决策")
     @PostMapping(value = "oauth2/decision")
     public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request)
             throws ApiException {
@@ -220,7 +222,7 @@ public class AuthController {
                 request.isApproved()));
     }
 
-    @ApiOperation(value = "OAuth2 授权码换 token", notes = "ignore")
+    @ApiOperation(value = "OAuth2 授权码换 token")
     @PostMapping(value = "oauth2/token")
     public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.exchangeOAuth2Token(
@@ -233,7 +235,7 @@ public class AuthController {
                 request.getRefreshToken()));
     }
 
-    @ApiOperation(value = "OAuth2 撤销令牌", notes = "ignore")
+    @ApiOperation(value = "OAuth2 撤销令牌")
     @PostMapping(value = "oauth2/revoke")
     public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
         return authService.revokeOAuth2Token(request.getClientId(), request.getClientSecret(), request.getToken());

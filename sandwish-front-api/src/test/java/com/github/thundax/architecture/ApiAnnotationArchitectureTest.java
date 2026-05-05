@@ -7,29 +7,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.Test;
 
-public class HasPermissionAnnotationArchitectureTest {
-
-    @Test
-    public void shouldDeclareAccessAnnotationWhenApiOperationExists() throws IOException {
-        Path sourceRoot = projectRoot().resolve("sandwish-admin-api/src/main/java/com/github/thundax/modules");
-
-        ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);
-    }
+public class ApiAnnotationArchitectureTest {
 
     @Test
     public void shouldDeclareRestControllerApiAnnotations() throws IOException {
-        Path sourceRoot = projectRoot().resolve("sandwish-admin-api/src/main/java/com/github/thundax/modules");
+        Path sourceRoot = projectRoot().resolve("sandwish-front-api/src/main/java/com/github/thundax/modules");
 
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);
     }
 
     private static Path projectRoot() {
         Path current = Paths.get("").toAbsolutePath();
         while (current != null) {
-            if (Files.exists(current.resolve("pom.xml")) && Files.exists(current.resolve("sandwish-admin-api"))) {
+            if (Files.exists(current.resolve("pom.xml")) && Files.exists(current.resolve("sandwish-front-api"))) {
                 return current;
             }
             current = current.getParent();

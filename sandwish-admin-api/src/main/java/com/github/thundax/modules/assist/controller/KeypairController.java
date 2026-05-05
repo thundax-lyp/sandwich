@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.KeypairPublicKeyRequest;
 import com.github.thundax.modules.assist.controller.response.KeypairPublicKeyResponse;
@@ -40,7 +41,8 @@ public class KeypairController {
         this.keypairService = keypairService;
     }
 
-    @ApiOperation(value = "获取公钥", notes = "")
+    @ApiOperation(value = "获取公钥")
+    @PublicApi
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,

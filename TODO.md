@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-web`：增加统一异常响应处理
-  - 范围文件：
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/exception/GlobalExceptionHandlerTest.java`
-    - `sandwish-common/sandwish-common-web/pom.xml`
-  - 处理动作：将框架级异常转换为统一 `ApiResponse` 失败响应。
-  - 验收点：`SandwishException` 和普通 `Exception` 均能转换为稳定失败响应，并有单元测试覆盖。
-  - 重要度：10/10
-
 - [ ] `common-core`：增加请求上下文传递模型
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/SandwishContext.java`

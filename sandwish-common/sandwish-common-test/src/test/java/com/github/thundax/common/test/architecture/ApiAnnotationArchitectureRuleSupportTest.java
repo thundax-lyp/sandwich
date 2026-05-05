@@ -44,9 +44,59 @@ public class ApiAnnotationArchitectureRuleSupportTest {
         ApiAnnotationArchitectureRuleSupport.assertApiOperationNotesDeclareHasPermission(sourceRoot);
     }
 
+    @Test
+    public void shouldPassWhenRestControllerDeclaresClassRequestMapping() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("mapped").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "@RequestMapping(\"/api/sys/user\")\n"
+                        + "public class FixtureController {\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectRestControllerWithoutClassRequestMapping() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("unmapped").toPath();
+        writeControllerClass(sourceRoot, "@RestController\n" + "public class FixtureController {\n" + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
+    }
+
+    @Test
+    public void shouldPassWhenMappedMethodDeclaresApiOperation() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("operation").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "public class FixtureController {\n"
+                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    @ApiOperation(value = \"list\", notes = \"ignore\")\n"
+                        + "    public void list() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectMappedMethodWithoutApiOperation() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("missingOperation").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "public class FixtureController {\n"
+                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    public void list() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
+    }
+
     private void writeController(Path sourceRoot, String methodSource) throws IOException {
-        Files.write(
-                sourceRoot.resolve("FixtureController.java"),
-                ("public class FixtureController {\n    " + methodSource + "}\n").getBytes(StandardCharsets.UTF_8));
+        writeControllerClass(sourceRoot, "public class FixtureController {\n    " + methodSource + "}\n");
+    }
+
+    private void writeControllerClass(Path sourceRoot, String source) throws IOException {
+        Files.write(sourceRoot.resolve("FixtureController.java"), source.getBytes(StandardCharsets.UTF_8));
     }
 }

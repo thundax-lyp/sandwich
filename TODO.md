@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-test`：补充 API 注解架构规则
-  - 范围文件：
-    - `sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/architecture/ApiAnnotationArchitectureRuleSupport.java`
-    - `sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/architecture/ApiAnnotationArchitectureRuleSupportTest.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/architecture/RequestAnnotationArchitectureTest.java`
-    - `sandwish-front-api/src/test/java/com/github/thundax/architecture/ResponseAnnotationArchitectureTest.java`
-  - 处理动作：补齐 Controller class/method mapping、`@Valid`、`@WrappedApiController`、`@HasPermission` 例外口径的规则支持。
-  - 验收点：新增规则在 common-test 有测试，admin/front 只接入当前能满足的规则。
-  - 重要度：8/10
-
 - [ ] `common-oss`：补充对象存储客户端抽象与本地文件实现
   - 范围文件：
     - `pom.xml`

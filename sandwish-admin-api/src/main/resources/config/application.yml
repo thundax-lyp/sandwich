@@ -1,19 +1,25 @@
 server:
-  port: 20009
+  port: ${SERVER_PORT:20009}
   servlet:
-    context-path: /putuo-interaction-admin-api
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:/admin-api}
   tomcat:
     uri-encoding: UTF-8
 
 spring:
   application:
-    name: putuo-interaction-admin-api
+    name: sandwish-admin-api
 
   main:
     bannerMode: "off"
 
   jmx:
-    default-domain: putuo-interaction-admin-api
+    default-domain: sandwish-admin-api
+
+  datasource:
+    driver-class-name: ${SANDWISH_DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${SANDWISH_DB_URL:jdbc:mysql://127.0.0.1:3306/sandwish?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false}
+    username: ${SANDWISH_DB_USERNAME:sandwish}
+    password: ${SANDWISH_DB_PASSWORD:}
 
   mvc:
     throw-exception-if-no-handler-found: true
@@ -33,7 +39,7 @@ spring:
       max-request-size: 20971520
 
   profiles:
-    active: vastbase-dev
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
 shiro:
   loginUrl: /admin/login
@@ -42,7 +48,7 @@ shiro:
     sessionIdUrlRewritingEnabled: false
     sessionIdCookieEnabled: true
     cookie:
-      name: vltava.sid
+      name: sandwish.admin.sid
 
 jasypt:
   encryptor:
@@ -67,9 +73,9 @@ jetcache:
 logging:
   config: classpath:config/logback-spring.xml
   level:
-    com.wdit: INFO
+    com.github.thundax: INFO
 
 swagger:
   base-package: com.github.thundax.modules
-  title: 沃尔塔瓦服务接口
-  description: 沃尔塔瓦服务相关接口
+  title: Sandwich Admin API
+  description: Sandwich 后台服务接口

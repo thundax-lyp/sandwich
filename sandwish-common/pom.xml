@@ -22,5 +22,6 @@
         <module>sandwish-common-test</module>
         <module>sandwish-common-security</module>
         <module>sandwish-common-cache</module>
+        <module>sandwish-common-swagger</module>
     </modules>
 </project>

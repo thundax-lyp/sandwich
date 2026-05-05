@@ -1,20 +1,29 @@
-package com.github.thundax.autoconfigure;
+package com.github.thundax.common.swagger.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "swagger")
 public class SwaggerProperties {
 
-    private String basePackage = "com.wdit";
-    private String title = "vltava service provider api";
+    private boolean enabled = true;
+    private String basePackage = "com.github.thundax";
+    private String title = "Sandwish API";
     private String description = "";
     private String termsOfServiceUrl = "";
     private String contactName = "support";
-    private String contactUrl = "http://www.wdit.com.cn/support/";
-    private String contactEmail = "support@wdit.com.cn";
+    private String contactUrl = "";
+    private String contactEmail = "";
     private String license = "";
     private String licenseUrl = "";
     private String version = "1.0.0";
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getBasePackage() {
         return basePackage;

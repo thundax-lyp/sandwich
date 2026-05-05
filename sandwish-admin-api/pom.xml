@@ -14,10 +14,6 @@
     <name>${project.artifactId}</name>
     <description>${project.groupId}.${project.artifactId}</description>
 
-    <properties>
-        <swagger.version>2.9.2</swagger.version>
-    </properties>
-
     <!-- 依赖项定义 -->
     <dependencies>
         <dependency>
@@ -38,6 +34,10 @@
         <dependency>
             <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-swagger</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.thundax</groupId>
@@ -121,17 +121,6 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
         </dependency>
 
     </dependencies>

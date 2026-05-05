@@ -63,8 +63,5 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/favicon.ico");
 
         registry.addResourceHandler("/testcase/**").addResourceLocations("classpath:/testcase/");
-
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }

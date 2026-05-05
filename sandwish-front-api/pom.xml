@@ -14,10 +14,6 @@
     <name>${project.artifactId}</name>
     <description>${project.groupId}.${project.artifactId}</description>
 
-    <properties>
-        <swagger.version>2.9.2</swagger.version>
-    </properties>
-
     <!-- 依赖项定义 -->
     <dependencies>
         <dependency>
@@ -38,6 +34,10 @@
         <dependency>
             <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-swagger</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.thundax</groupId>
@@ -178,19 +178,6 @@
             <artifactId>hutool-all</artifactId>
             <version>5.3.6</version>
         </dependency>
-        <!-- swagger 在线文档 begin -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <!-- swagger 在线文档 end -->
-
     </dependencies>
 
     <build>

@@ -41,6 +41,7 @@
         <poi.version>4.1.2</poi.version>
         <jwt.version>3.8.3</jwt.version>
         <cxf.version>3.4.0</cxf.version>
+        <swagger.version>2.9.2</swagger.version>
         <lombok.version>1.16.22</lombok.version>
         <archunit.version>1.4.1</archunit.version>
         <jetcache.version>2.5.16</jetcache.version>
@@ -89,6 +90,11 @@
                 <artifactId>sandwish-common-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.thundax</groupId>
+                <artifactId>sandwish-common-swagger</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
@@ -104,6 +110,16 @@
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-core</artifactId>
                 <version>${jetcache.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
 
             <dependency>

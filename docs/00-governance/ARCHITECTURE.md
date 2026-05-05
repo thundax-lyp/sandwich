@@ -25,6 +25,7 @@
   - `sandwish-common-cache`: jar
   - `sandwish-common-mybatis`: jar
   - `sandwish-common-security`: jar
+  - `sandwish-common-swagger`: jar
   - `sandwish-biz`: jar
   - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
@@ -80,7 +81,7 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - Common 聚合模块
-- 管理 `sandwish-common-core`、`sandwish-common-web` 与 `sandwish-common-mybatis`
+- 管理 `sandwish-common-core`、`sandwish-common-web`、`sandwish-common-mybatis` 与其他 common 子模块
 
 边界：
 
@@ -135,6 +136,21 @@ Sandwich 固定采用三层 API 架构。
 - 不承载具体业务 key、TTL、版本号、回源和失效策略。
 - 不暴露 Redis API、`StringRedisTemplate`、`RedisTemplate` 或通用 Redis 客户端替代封装。
 - 不依赖 `sandwish-common-mybatis`、`sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
+
+### `sandwish-common-swagger`
+
+职责：
+
+- 通用 Swagger / Springfox 自动配置
+- 通用 Swagger 文档属性模型
+- Swagger UI 静态资源映射
+
+边界：
+
+- 适配 Spring Boot 2.0.x 与 Springfox 2.x。
+- 不承载业务 Controller、Request 或 Response。
+- 不承载具体业务 API 注解。
+- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-mybatis`
 
@@ -268,6 +284,12 @@ Spring Security 迁移链路允许入口模块依赖：
 `sandwish-admin-api -> sandwish-common-security -> sandwish-common-core`
 
 `sandwish-front-api -> sandwish-common-security -> sandwish-common-core`
+
+Swagger 文档链路允许入口模块依赖：
+
+`sandwish-admin-api -> sandwish-common-swagger`
+
+`sandwish-front-api -> sandwish-common-swagger`
 
 禁止依赖方向：
 

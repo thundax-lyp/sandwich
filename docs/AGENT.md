@@ -66,6 +66,8 @@
   通用 Web 响应模型、请求列表辅助和入口无关的 Web 支撑能力。
 - `sandwish-common-cache`:
   通用 JetCache 基线配置和缓存基础设施，不承载业务 key、TTL、版本和失效语义。
+- `sandwish-common-swagger`:
+  通用 Swagger / Springfox 自动配置、文档属性和静态资源映射，不承载业务 API 注解和入口专用配置。
 - `sandwish-common-mybatis`:
   通用持久化对象、MyBatis-Plus 基础配置和数据库方言支撑，不承载通用分页数据模型或泛型 Service 公共契约。
 - `sandwish-common-security`:

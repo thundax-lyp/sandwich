@@ -13,21 +13,21 @@ import com.github.thundax.common.security.user.CurrentUserProvider;
 import java.util.List;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(MybatisPlusConfiguration.SandwishMybatisPlusProperties.class)
+@EnableConfigurationProperties(DataSourceProperties.class)
 public class MybatisPlusConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(SandwishMybatisPlusProperties properties) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(DataSourceProperties properties) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(properties.getDbType()));
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(resolveDbType(properties)));
         return interceptor;
     }
 
@@ -48,16 +48,29 @@ public class MybatisPlusConfiguration {
         registry.register(List.class, StringListJsonTypeHandler.class);
     }
 
-    @ConfigurationProperties(prefix = "sandwish.mybatis-plus")
-    public static class SandwishMybatisPlusProperties {
-        private DbType dbType = DbType.MYSQL;
-
-        public DbType getDbType() {
+    private DbType resolveDbType(DataSourceProperties properties) {
+        DbType dbType = resolveDbType(properties.getUrl());
+        if (dbType != DbType.OTHER) {
             return dbType;
         }
-
-        public void setDbType(DbType dbType) {
-            this.dbType = dbType;
+        dbType = resolveDbType(properties.getDriverClassName());
+        if (dbType != DbType.OTHER) {
+            return dbType;
         }
+        throw new IllegalStateException("Unsupported datasource type. Sandwich currently supports MYSQL and DM only.");
+    }
+
+    private DbType resolveDbType(String value) {
+        if (value == null) {
+            return DbType.OTHER;
+        }
+        String normalized = value.toLowerCase();
+        if (normalized.contains(":mysql:") || normalized.contains("mysql")) {
+            return DbType.MYSQL;
+        }
+        if (normalized.contains(":dm:") || normalized.contains("dm.jdbc")) {
+            return DbType.DM;
+        }
+        return DbType.OTHER;
     }
 }

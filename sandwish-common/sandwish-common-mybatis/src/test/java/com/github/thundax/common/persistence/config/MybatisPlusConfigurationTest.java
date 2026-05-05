@@ -22,7 +22,8 @@ public class MybatisPlusConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(
-                    AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class));
+                    AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+            .withPropertyValues("spring.datasource.url=jdbc:mysql://127.0.0.1:3306/sandwish");
 
     @Test
     public void shouldRegisterMybatisPlusBeans() {
@@ -45,14 +46,42 @@ public class MybatisPlusConfigurationTest {
     }
 
     @Test
-    public void shouldUseConfiguredPaginationDbType() {
-        contextRunner.withPropertyValues("sandwish.mybatis-plus.db-type=dm").run(context -> {
+    public void shouldInferPaginationDbTypeFromDatasourceUrl() {
+        contextRunner
+                .withPropertyValues("spring.datasource.url=jdbc:dm://127.0.0.1:5236/SANDWISH")
+                .run(context -> {
+                    MybatisPlusInterceptor interceptor = context.getBean(MybatisPlusInterceptor.class);
+                    PaginationInnerInterceptor pagination = (PaginationInnerInterceptor)
+                            interceptor.getInterceptors().get(1);
+
+                    assertEquals(DbType.DM, pagination.getDbType());
+                });
+    }
+
+    @Test
+    public void shouldInferPaginationDbTypeFromDatasourceDriverWhenUrlMissing() {
+        ApplicationContextRunner runner = new ApplicationContextRunner()
+                .withConfiguration(
+                        AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+                .withPropertyValues("spring.datasource.driver-class-name=dm.jdbc.driver.DmDriver");
+
+        runner.run(context -> {
             MybatisPlusInterceptor interceptor = context.getBean(MybatisPlusInterceptor.class);
             PaginationInnerInterceptor pagination =
                     (PaginationInnerInterceptor) interceptor.getInterceptors().get(1);
 
             assertEquals(DbType.DM, pagination.getDbType());
         });
+    }
+
+    @Test
+    public void shouldRejectUnsupportedDatasourceType() {
+        ApplicationContextRunner runner = new ApplicationContextRunner()
+                .withConfiguration(
+                        AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+                .withPropertyValues("spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/sandwish");
+
+        runner.run(context -> assertTrue(hasCause(context.getStartupFailure(), IllegalStateException.class)));
     }
 
     @Test
@@ -67,5 +96,16 @@ public class MybatisPlusConfigurationTest {
                     configuration.getTypeHandlerRegistry().getTypeHandler(EntityId.class)
                             instanceof EntityIdTypeHandler);
         });
+    }
+
+    private boolean hasCause(Throwable throwable, Class<? extends Throwable> causeType) {
+        Throwable cause = throwable;
+        while (cause != null) {
+            if (causeType.isInstance(cause)) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 }

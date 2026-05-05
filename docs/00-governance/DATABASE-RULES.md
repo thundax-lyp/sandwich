@@ -103,8 +103,7 @@
 - 树结构中 `parentId` 是业务关系字段，可以存在于 `Entity`、`DO/DataObject` 和 API 模型中。
 - 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
-- MyBatis-Plus 分页插件数据库类型必须来自配置，应用环境通过 `SANDWISH_DB_TYPE` 注入，不允许在 common-mybatis 中写死方言。
-- PageHelper 已下线，禁止新增依赖、调用或兼容支撑。
+- MyBatis-Plus 分页插件数据库类型必须从 `spring.datasource.url` 或 `spring.datasource.driver-class-name` 推断；当前只支持 MySQL 和 DM，其他类型必须启动失败，不允许在 common-mybatis 中写死方言或新增重复数据库类型配置。
 - 旧 `CrudDao` / `CrudService` / `TreeService` / `CrudServiceImpl` / 空 `BaseService` / 空 `BaseServiceImpl` 基类已下线，业务 DAO / Service 应该显式声明当前业务需要暴露的方法。
 - DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service / Controller 分页业务数据应该使用 `com.github.thundax.common.page.PageDTO`。
 - `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。

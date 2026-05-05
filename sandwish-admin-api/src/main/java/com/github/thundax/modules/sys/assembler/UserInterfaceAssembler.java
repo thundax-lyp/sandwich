@@ -124,13 +124,14 @@ public final class UserInterfaceAssembler {
         entity.setMobile(request.getMobile());
         entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL);
         entity.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
-        entity.setRoleIdList(
-                request.getRoleList() == null
-                        ? new ArrayList<>()
-                        : request.getRoleList().stream()
-                                .map(role -> role.getId())
-                                .collect(Collectors.toList()));
         return entity;
+    }
+
+    @NonNull
+    public static List<String> toRoleIdList(@NonNull UserSaveRequest request) {
+        return request.getRoleList() == null
+                ? new ArrayList<>()
+                : request.getRoleList().stream().map(role -> role.getId()).collect(Collectors.toList());
     }
 
     private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {

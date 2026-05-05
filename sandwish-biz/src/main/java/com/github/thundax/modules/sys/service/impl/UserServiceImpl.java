@@ -117,22 +117,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(User user, String loginName, String encryptedPassword) {
+    public void add(User user, String loginName, String encryptedPassword, List<String> roleIdList) {
         user.setId(EntityIdCodec.toDomain(dao.insert(user)));
-        afterWrite(user, true, loginName, encryptedPassword);
+        afterWrite(user, true, loginName, encryptedPassword, roleIdList);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(User user, String loginName) {
+    public void update(User user, String loginName, List<String> roleIdList) {
         dao.update(user);
-        afterWrite(user, false, loginName, null);
+        afterWrite(user, false, loginName, null, roleIdList);
     }
 
-    private void afterWrite(User user, boolean added, String loginName, String encryptedPassword) {
-        dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
-        if (user.getRoleIdList() != null && !user.getRoleIdList().isEmpty()) {
-            dao.insertUserRole(EntityIdCodec.toValue(user.getId()), user.getRoleIdList());
+    private void afterWrite(
+            User user, boolean added, String loginName, String encryptedPassword, List<String> roleIdList) {
+        if (roleIdList != null) {
+            dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
+            if (!roleIdList.isEmpty()) {
+                dao.insertUserRole(EntityIdCodec.toValue(user.getId()), roleIdList);
+            }
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserEncrypt userEncrypt = new UserEncrypt();

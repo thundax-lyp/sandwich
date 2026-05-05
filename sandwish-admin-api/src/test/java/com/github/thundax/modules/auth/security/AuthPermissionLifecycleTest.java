@@ -834,10 +834,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void add(User entity, String loginName, String encryptedPassword) {}
+        public void add(User entity, String loginName, String encryptedPassword, List<String> roleIdList) {}
 
         @Override
-        public void update(User entity, String loginName) {}
+        public void update(User entity, String loginName, List<String> roleIdList) {}
 
         public int deleteById(EntityId id) {
             return 1;

@@ -8,19 +8,14 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 /**
@@ -66,8 +61,6 @@ public class User implements Auditable, Signable, Sortable {
 
     public static final int MAX_RANKS = 9;
 
-    private List<String> roleIdList;
-
     @NonNull
     public Integer getRanks() {
         Integer ranks = this.ranks;
@@ -86,31 +79,6 @@ public class User implements Auditable, Signable, Sortable {
 
     public boolean isBelongTo(Department department) {
         return department != null && Objects.equals(this.getDepartmentId(), EntityIdCodec.toValue(department.getId()));
-    }
-
-    @NotNull
-    public List<String> getRoleIdList() {
-        if (this.roleIdList == null) {
-            this.roleIdList = new ArrayList<>();
-        }
-        return this.roleIdList;
-    }
-
-    public void setRoleIdList(List<String> roleIdList) {
-        this.roleIdList = roleIdList;
-    }
-
-    public void setRoleList(List<Role> roleList) {
-        this.roleIdList = roleList == null
-                ? new ArrayList<>()
-                : roleList.stream()
-                        .map(role -> EntityIdCodec.toValue(role.getId()))
-                        .collect(Collectors.toList());
-    }
-
-    public boolean hasRole(@NotNull Role target) {
-        return getRoleIdList().stream()
-                .anyMatch(roleId -> StringUtils.equals(roleId, EntityIdCodec.toValue(target.getId())));
     }
 
     public boolean isSuper() {

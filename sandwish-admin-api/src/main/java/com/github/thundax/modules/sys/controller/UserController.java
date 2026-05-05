@@ -181,6 +181,7 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
+        List<String> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
         String encryptedPassword = passwordService.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
@@ -195,7 +196,7 @@ public class UserController {
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         entity.setRegisterIp(IPUtils.getIpAddr(currentRequest));
 
-        userService.add(entity, request.getLoginName(), encryptedPassword);
+        userService.add(entity, request.getLoginName(), encryptedPassword, roleIdList);
 
         return toResponse(entity);
     }
@@ -243,8 +244,9 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
+        List<String> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
 
-        userService.update(entity, request.getLoginName());
+        userService.update(entity, request.getLoginName(), roleIdList);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
             userService.updatePassword(

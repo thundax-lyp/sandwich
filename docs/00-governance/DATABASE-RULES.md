@@ -36,7 +36,7 @@
 ## Naming
 
 - 表名、字段名、索引名必须与现有数据库风格保持一致
-- 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`
+- 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`、`member_`
 - `tb_` 是存量历史表前缀，只允许既有表继续兼容，不得用于新增表、迁移脚本或新的 `DO/DataObject`
 - 关系表后缀必须显式表达语义
 - 审计字段固定使用 `create_date` / `create_by` / `update_date` / `update_by`

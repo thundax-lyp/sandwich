@@ -24,11 +24,13 @@ db/
 ├── schema/
 │   ├── system.sql
 │   ├── auth.sql
-│   └── storage.sql
+│   ├── storage.sql
+│   └── member.sql
 └── data/
     ├── system.sql
     ├── auth.sql
-    └── storage.sql
+    ├── storage.sql
+    └── member.sql
 ```
 
 - `schema/`: DDL scripts only.
@@ -41,6 +43,7 @@ db/
 - `System`: `schema/system.sql`, `data/system.sql`
 - `Auth`: `schema/auth.sql`, `data/auth.sql`
 - `Storage`: `schema/storage.sql`, `data/storage.sql`
+- `Member`: `schema/member.sql`, `data/member.sql`
 
 ## 4. Execution Order
 
@@ -52,12 +55,15 @@ db/
 4. `db/data/auth.sql`
 5. `db/schema/storage.sql`
 6. `db/data/storage.sql`
+7. `db/schema/member.sql`
+8. `db/data/member.sql`
 
 执行原则：
 
 - 先执行 `schema/`，再执行 `data/`。
 - `auth` 初始化依赖 `system` 的用户与登录标识主数据。
 - `storage` 当前不依赖其他业务域初始化数据。
+- `member` 当前不依赖其他业务域初始化数据。
 
 ## 5. Change Policy
 

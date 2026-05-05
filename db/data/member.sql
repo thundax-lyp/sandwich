@@ -1,0 +1,2 @@
+-- Member currently has no required seed data.
+-- Keep this file as the idempotent initialization hook for future member defaults.

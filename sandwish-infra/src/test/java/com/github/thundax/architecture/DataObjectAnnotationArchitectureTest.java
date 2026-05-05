@@ -31,8 +31,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
     };
     private static final String[] LEGACY_TABLE_NAME_DATA_OBJECTS = {
-        "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO",
-        "com.github.thundax.modules.member.persistence.dataobject.MemberDO"
+        "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO"
     };
 
     @Test
@@ -189,7 +188,10 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
     }
 
     private void assertAllowedTablePrefix(JavaClass javaClass, String tableName) {
-        if (tableName.startsWith("sys_") || tableName.startsWith("auth_") || tableName.startsWith("assist_")) {
+        if (tableName.startsWith("sys_")
+                || tableName.startsWith("auth_")
+                || tableName.startsWith("assist_")
+                || tableName.startsWith("member_")) {
             return;
         }
         fail(javaClass.getFullName() + " uses unsupported table prefix: " + tableName);

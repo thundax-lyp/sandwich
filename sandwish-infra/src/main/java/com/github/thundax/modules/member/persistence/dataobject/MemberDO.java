@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "tb_member", autoResultMap = true)
+@TableName(value = "member_member", autoResultMap = true)
 public class MemberDO {
 
     @TableId(type = IdType.ASSIGN_UUID)

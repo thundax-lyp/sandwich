@@ -522,8 +522,8 @@ OSS 存储链路允许 infra 和入口装配依赖：
 ## Governance Coverage
 
 - 后台、前台、业务模块的详细目录、命名和层次规则固定由 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md) 承载，本文不重复展开。
-- 当前已建立需求文档和数据库设计文档的业务域固定为 `system`、`auth`、`storage`。
-- 修改 `system`、`auth`、`storage` 的需求、数据库、SQL、持久化对象或接口时，必须同步检查对应 `10-requirements/` 与 `20-database/` 文档。
+- 当前已建立需求文档和数据库设计文档的业务域固定为 `system`、`auth`、`storage`、`member`。
+- 修改 `system`、`auth`、`storage`、`member` 的需求、数据库、SQL、持久化对象或接口时，必须同步检查对应 `10-requirements/` 与 `20-database/` 文档。
 - 修改尚未建立需求和数据库设计文档的业务域时，若变更会扩大领域模型、表结构、接口契约或部署边界，必须先补对应需求和数据库设计文档。
 - 轻量架构测试已经作为治理门禁存在于各模块 `src/test/java/com/github/thundax/architecture/`；新增可机械校验的架构红线时，必须补充或扩展对应架构测试。
 

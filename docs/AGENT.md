@@ -35,6 +35,10 @@
   再读 `10-requirements/STORAGE-REQUIREMENTS.md`
 - 存储数据库、存储对象表、对象引用表、分片上传表：
   再读 `20-database/STORAGE-DATABASE-DESIGN.md`
+- 前台会员、会员主表、会员登录信息、会员资料：
+  再读 `10-requirements/MEMBER-REQUIREMENTS.md`
+- 前台会员数据库、会员主表：
+  再读 `20-database/MEMBER-DATABASE-DESIGN.md`
 - 需要解释架构意图、规则冲突、分层取舍、小步提交意图或 AI 误改风险：
   读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：

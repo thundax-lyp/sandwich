@@ -1,8 +1,7 @@
 package com.github.thundax.architecture;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
+import com.github.thundax.common.test.architecture.LayerArchitectureRuleSupport;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import org.junit.Test;
 
@@ -12,12 +11,6 @@ public class ServiceApiInterfaceArchitectureTest extends AbstractArchitectureTes
     public void shouldKeepHttpContractsOnControllers() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        noClasses()
-                .that()
-                .resideInAPackage("..api..")
-                .should()
-                .haveSimpleNameEndingWith("ServiceApi")
-                .allowEmptyShould(true)
-                .check(classes);
+        LayerArchitectureRuleSupport.serviceApiInterfacesShouldNotExist().check(classes);
     }
 }

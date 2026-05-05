@@ -1,17 +1,10 @@
 package com.github.thundax.architecture;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static org.junit.Assert.assertTrue;
-
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
-import com.tngtech.archunit.core.domain.JavaClass;
+import com.github.thundax.common.test.architecture.LayerArchitectureRuleSupport;
+import com.github.thundax.common.test.architecture.NamingArchitectureRuleSupport;
 import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.domain.JavaMethod;
-import com.tngtech.archunit.core.domain.JavaModifier;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Test;
-import org.springframework.stereotype.Component;
 
 public class InterfaceAssemblerArchitectureTest extends AbstractArchitectureTest {
 
@@ -19,11 +12,7 @@ public class InterfaceAssemblerArchitectureTest extends AbstractArchitectureTest
     public void shouldKeepInterfaceAssemblersOutOfSpringComponents() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        noClasses()
-                .that()
-                .haveSimpleNameEndingWith("InterfaceAssembler")
-                .should()
-                .beAnnotatedWith(Component.class)
+        LayerArchitectureRuleSupport.interfaceAssemblersShouldNotBeSpringComponents()
                 .check(classes);
     }
 
@@ -31,51 +20,21 @@ public class InterfaceAssemblerArchitectureTest extends AbstractArchitectureTest
     public void shouldKeepInterfaceAssemblersFreeOfServiceDependencies() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
-        noClasses()
-                .that()
-                .haveSimpleNameEndingWith("InterfaceAssembler")
-                .should()
-                .dependOnClassesThat()
-                .haveSimpleNameEndingWith("Service")
+        LayerArchitectureRuleSupport.interfaceAssemblersShouldNotDependOnServices()
                 .check(classes);
     }
 
     @Test
     public void shouldKeepInterfaceAssemblerMethodsStatic() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
-        List<String> violations = new ArrayList<>();
 
-        for (JavaClass javaClass : classes) {
-            if (!javaClass.getSimpleName().endsWith("InterfaceAssembler")) {
-                continue;
-            }
-            for (JavaMethod method : javaClass.getMethods()) {
-                if (method.getModifiers().contains(JavaModifier.PUBLIC)
-                        && !method.getModifiers().contains(JavaModifier.STATIC)) {
-                    violations.add(method.getFullName());
-                }
-            }
-        }
-
-        assertTrue("InterfaceAssembler public methods must be static: " + violations, violations.isEmpty());
+        NamingArchitectureRuleSupport.assertInterfaceAssemblerPublicMethodsStatic(classes);
     }
 
     @Test
     public void shouldKeepEntityIdConversionOutOfInterfaceAssemblers() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
-        List<String> violations = new ArrayList<>();
 
-        for (JavaClass javaClass : classes) {
-            if (!javaClass.getSimpleName().endsWith("InterfaceAssembler")) {
-                continue;
-            }
-            for (JavaMethod method : javaClass.getMethods()) {
-                if (method.getModifiers().contains(JavaModifier.PUBLIC) && "toEntityId".equals(method.getName())) {
-                    violations.add(method.getFullName());
-                }
-            }
-        }
-
-        assertTrue("InterfaceAssembler must not wrap EntityId conversion: " + violations, violations.isEmpty());
+        NamingArchitectureRuleSupport.assertInterfaceAssemblersDoNotWrapEntityIdConversion(classes);
     }
 }

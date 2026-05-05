@@ -1,217 +1,36 @@
 package com.github.thundax.architecture;
 
-import static org.junit.Assert.assertTrue;
-
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
-import com.tngtech.archunit.core.domain.JavaClass;
+import com.github.thundax.common.test.architecture.NamingArchitectureRuleSupport;
 import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.domain.JavaMethod;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.junit.Test;
 
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Pattern SERVICE_QUERY_SETTER_DECLARATION_PATTERN =
-            Pattern.compile("\\bpublic\\s+void\\s+set[A-Z][A-Za-z0-9_]*\\s*\\(");
-
     @Test
     public void shouldUseServiceMethodShape() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
-        List<String> violations = new ArrayList<>();
 
-        for (JavaClass javaClass : classes) {
-            if (!isServiceInterface(javaClass)) {
-                continue;
-            }
-            for (JavaMethod method : javaClass.getMethods()) {
-                if (!isServiceMethodShape(method)) {
-                    violations.add(method.getFullName());
-                }
-            }
-        }
-
-        assertTrue(
-                "Service methods should use getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx "
-                        + "for generic access and business verbs for workflows: "
-                        + violations,
-                violations.isEmpty());
+        NamingArchitectureRuleSupport.assertServiceInterfaceMethodNames(classes);
     }
 
     @Test
     public void shouldPlaceServiceQueryObjectsUnderServiceQueryPackage() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
-        List<String> violations = new ArrayList<>();
 
-        for (JavaClass javaClass : classes) {
-            if (isServiceQueryObject(javaClass) && !isInServiceQueryPackage(javaClass)) {
-                violations.add(javaClass.getName());
-            }
-        }
-
-        assertTrue(
-                "Service query objects must be placed under "
-                        + "com.github.thundax.modules.{module}.service.query: "
-                        + violations,
-                violations.isEmpty());
+        NamingArchitectureRuleSupport.assertServiceQueryObjectsUnderServiceQueryPackage(classes);
     }
 
     @Test
     public void shouldNotDeclareSettersInServiceQueryObjects() throws IOException {
         Path root = repositoryRoot();
         Path sourceRoot = root.resolve("sandwish-biz").resolve("src/main/java/com/github/thundax/modules");
-        List<String> violations = new ArrayList<>();
 
-        try (Stream<Path> paths = Files.walk(sourceRoot)) {
-            paths.filter(Files::isRegularFile)
-                    .filter(this::isServiceQuerySource)
-                    .filter(path -> containsPattern(path, SERVICE_QUERY_SETTER_DECLARATION_PATTERN))
-                    .map(path -> toRepositoryPath(root, path))
-                    .forEach(violations::add);
-        }
-
-        assertTrue(
-                "Service query objects must only define query fields; request-to-query conversion belongs in "
-                        + "InterfaceAssembler, so service query source must not declare setXxx methods: "
-                        + violations,
-                violations.isEmpty());
-    }
-
-    private boolean isServiceInterface(JavaClass javaClass) {
-        return javaClass.isInterface()
-                && javaClass.getSimpleName().endsWith("Service")
-                && javaClass.getPackageName().contains(".service");
-    }
-
-    private boolean isServiceMethodShape(JavaMethod method) {
-        String name = method.getName();
-        if (isNonStandardIdsListName(name) || name.startsWith("find")) {
-            return false;
-        }
-        return name.equals("add")
-                || name.equals("count")
-                || name.equals("list")
-                || name.equals("page")
-                || name.equals("update")
-                || name.startsWith("add")
-                || name.startsWith("getBy")
-                || name.startsWith("list")
-                || name.startsWith("count")
-                || name.startsWith("deleteBy")
-                || name.startsWith("batch")
-                || name.startsWith("insert")
-                || name.startsWith("update")
-                || isServiceBusinessActionName(name);
-    }
-
-    private boolean isNonStandardIdsListName(String name) {
-        return name.endsWith("ByIds") && !name.equals("listByIds");
-    }
-
-    private boolean isServiceBusinessActionName(String name) {
-        return name.equals("abortMultipartUpload")
-                || name.equals("canReadContent")
-                || name.equals("completeMultipartUpload")
-                || name.equals("createPublicKey")
-                || name.equals("createSession")
-                || name.equals("decrypt")
-                || name.equals("deleteSign")
-                || name.equals("encrypt")
-                || name.equals("getAccountLoginName")
-                || name.equals("getContent")
-                || name.equals("getDictionaryRevision")
-                || name.equals("getPasswordCredential")
-                || name.equals("getPrivateKey")
-                || name.equals("getSession")
-                || name.equals("initMultipartUpload")
-                || name.equals("isChildOf")
-                || name.equals("isPermitted")
-                || name.equals("moveTreeNode")
-                || name.equals("release")
-                || name.equals("reloadAll")
-                || name.equals("removeReferences")
-                || name.equals("sign")
-                || name.equals("touch")
-                || name.equals("uploadMultipartPart")
-                || name.equals("verifySign");
-    }
-
-    private boolean isServiceQueryObject(JavaClass javaClass) {
-        String simpleName = javaClass.getSimpleName();
-        return simpleName.endsWith("Query") && !"Query".equals(simpleName);
-    }
-
-    private boolean isInServiceQueryPackage(JavaClass javaClass) {
-        return javaClass.getPackageName().contains(".service.query");
-    }
-
-    private boolean isServiceQuerySource(Path path) {
-        String value = normalizePath(path);
-        return value.contains("/modules/") && value.contains("/service/query/") && value.endsWith("Query.java");
-    }
-
-    private boolean containsPattern(Path path, Pattern pattern) {
-        return pattern.matcher(readSourceWithoutComments(path)).find();
-    }
-
-    private String readSourceWithoutComments(Path path) {
-        try {
-            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            return removeJavaComments(content);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String toRepositoryPath(Path root, Path path) {
-        return normalizePath(root.relativize(path));
-    }
-
-    private String normalizePath(Path path) {
-        return path.toString().replace('\\', '/');
-    }
-
-    private String removeJavaComments(String content) {
-        StringBuilder builder = new StringBuilder(content.length());
-        boolean inLineComment = false;
-        boolean inBlockComment = false;
-        for (int i = 0; i < content.length(); i++) {
-            char current = content.charAt(i);
-            char next = i + 1 < content.length() ? content.charAt(i + 1) : '\0';
-            if (inLineComment) {
-                if (current == '\n') {
-                    inLineComment = false;
-                    builder.append(current);
-                }
-                continue;
-            }
-            if (inBlockComment) {
-                if (current == '*' && next == '/') {
-                    inBlockComment = false;
-                    i++;
-                }
-                continue;
-            }
-            if (current == '/' && next == '/') {
-                inLineComment = true;
-                i++;
-                continue;
-            }
-            if (current == '/' && next == '*') {
-                inBlockComment = true;
-                i++;
-                continue;
-            }
-            builder.append(current);
-        }
-        return builder.toString();
+        NamingArchitectureRuleSupport.assertServiceQueryObjectsDeclareNoSetters(sourceRoot);
     }
 
     private Path repositoryRoot() {

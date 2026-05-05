@@ -20,14 +20,12 @@
 
 - 不定义 Service、DAO、Mapper 和 `DO/DataObject` 注解规则
 - 不定义数据库字段、索引和 MyBatis 映射规则
-- 不要求历史服务端页面入口继续扩展
 - 不引入 OpenAPI 3 注解体系
 
 ## 3. Selector
 
 - `ADMIN_REST_CONTROLLER_SELECTOR`：`sandwish-admin-api` 中位于 `..modules..controller..` 且声明 `@RestController` 的类
 - `FRONT_REST_CONTROLLER_SELECTOR`：`sandwish-front-api` 中位于 `..modules..controller..` 且声明 `@RestController` 的类
-- `LEGACY_PAGE_CONTROLLER_SELECTOR`：声明 `@Controller` 但不声明 `@RestController` 的历史页面入口
 - `REQUEST_MODEL_SELECTOR`：类名以 `Request` 结尾，且位于 `..controller.request..`
 - `RESPONSE_MODEL_SELECTOR`：类名以 `Response` 结尾，且位于 `..controller.response..`
 
@@ -39,7 +37,6 @@
 
 - 认证公开入口：登录、登出、验证码、登录令牌刷新，必须声明 `@PublicApi`
 - 文件流入口：头像、存储文件、验证码图片等直接写入 `HttpServletResponse` 的接口
-- 历史页面入口：只允许维护，不允许新增业务能力
 
 `@PublicApi` 只表达接口对权限矩阵公开，不替代 Spring Security URL 放行配置，也不替代业务校验。
 
@@ -72,7 +69,6 @@
 | `ANNO_REQUEST_MODEL_CLASS_REQUIRED` | `REQUEST_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_REQUEST_MODEL_CLASS_REQUIRED] <class> violates request class annotations required: <foundAnnotations>` |
 | `ANNO_RESPONSE_MODEL_CLASS_REQUIRED` | `RESPONSE_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_RESPONSE_MODEL_CLASS_REQUIRED] <class> violates response class annotations required: <foundAnnotations>` |
 | `ANNO_MODEL_FIELD_DESCRIPTION_REVIEW` | API Request / Response 字段 | 对外字段应声明 `@ApiModelProperty` 和稳定 JSON 字段名；当前作为人工审阅规则，不作为硬门禁 | review | `[ANNO_MODEL_FIELD_DESCRIPTION_REVIEW] <field> violates field description review: <foundAnnotations>` |
-| `ANNO_LEGACY_PAGE_NO_NEW_BUSINESS` | `LEGACY_PAGE_CONTROLLER_SELECTOR` | 历史页面入口只允许维护既有静态支撑能力，不得新增核心业务规则 | review | `[ANNO_LEGACY_PAGE_NO_NEW_BUSINESS] <class> violates legacy page boundary: <foundUsage>` |
 
 ## 7. Minimal Matrix
 
@@ -82,7 +78,6 @@
 | Front REST Controller | `@RestController @RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
 | Request Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 | Response Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
-| Legacy Page Controller | 仅维护既有页面或静态支撑入口 | 新增核心业务规则、新增服务端页面能力 |
 
 ## 8. CI Gate
 

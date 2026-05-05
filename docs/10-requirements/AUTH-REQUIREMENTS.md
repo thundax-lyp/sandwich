@@ -37,7 +37,7 @@
 - 完整 OIDC discovery、JWKS 和动态客户端注册。
 - Spring Security 权限整改。
 - 用户、角色、菜单授权模型重做。
-- 生产数据迁移执行。
+- 生产数据变更执行。
 
 ## 3. Bounded Context
 
@@ -362,7 +362,7 @@
 固定约束：
 
 - refresh token 只保存哈希，不保存明文。
-- refresh token refresh 成功后必须轮换或标记旧 token 已使用。
+- refresh token refresh 成功后必须轮换或标记原 token 已使用。
 - refresh token 失效必须同步阻断后续访问 token 刷新。
 
 ## 6. Global Constraints
@@ -581,7 +581,7 @@
 1. `OAuth2Controller.token` 接收 refresh token 请求。
 2. Controller 调用认证 Service 校验 client 和 refresh token。
 3. Service 判断 refresh token 状态和过期时间。
-4. Service 标记旧 refresh token 已使用或失效。
+4. Service 标记原 refresh token 已使用或失效。
 5. Service 创建新的 access token。
 6. Service 按策略创建新的 refresh token。
 
@@ -608,7 +608,7 @@
 - 凭据值不得写入日志。
 - 密码明文不得持久化。
 - 认证错误响应不得泄露密码哈希或凭据值。
-- 迁移过程必须保持现有后台账号密码登录接口兼容。
+- 后台账号密码登录接口必须保持稳定。
 - 前后台认证链路不得复制业务规则。
 
 ## 10. Open Items

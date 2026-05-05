@@ -35,7 +35,7 @@
 - `auth_oauth_access_token`
 - `auth_oauth_refresh_token`
 - 前台会员表
-- 生产数据迁移脚本
+- 生产数据变更脚本
 
 ## 3. Database Rules
 
@@ -44,7 +44,7 @@
 - 关系表使用来源主键作为联合关系字段，不单独生成关系 ID。
 - `sys_user.email` 和 `sys_user.mobile` 使用持久化加密 typeHandler。
 - `sys_user.ranks` 和 `sys_menu.ranks` 映射领域 `AccessRank rank`。
-- `super_flag`、`admin_flag`、`enable_flag` 和 `display_flag` 是旧库布尔标记字段，由持久化装配器转换为领域枚举。
+- `super_flag`、`admin_flag`、`enable_flag` 和 `display_flag` 是数据库布尔标记字段，由持久化装配器转换为领域枚举。
 - `sys_menu.lft` / `sys_menu.rgt` 和 `sys_department.lft` / `sys_department.rgt` 是 nested-set 持久化索引。
 - `Entity` 不暴露 `lft` / `rgt`。
 - `create_date` / `create_by` / `update_date` / `update_by` 是通用审计字段，由 infra 统一填充。

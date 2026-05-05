@@ -14,7 +14,7 @@
 - `docs/00-governance/how-to/` 操作手册
 - `docs/10-requirements/` 业务需求文档
 - `docs/20-database/` 数据库设计文档
-- `docs/30-designs/` 专项方案和临时迁移手册
+- `docs/30-designs/` 专项方案
 - `docs/40-readiness/` 上线准备文档
 - `docs/50-prompts/` 人工触发的固定格式提示词模板
 - `docs/60-human/` 人类阅读材料与项目叙事
@@ -42,7 +42,7 @@
 - 文档写作、路由和提交口径：本文档
 - 部署单元、运行入口、前后台流量边界：[`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
 
-新增稳定治理规则时，必须放入对应入口文档。临时迁移步骤只放入 `docs/30-designs/` 或 `how-to/`，不得混入长期架构红线。
+新增稳定治理规则时，必须放入对应入口文档。临时执行步骤只放入 `docs/30-designs/` 或 `how-to/`，不得混入长期架构红线。
 
 ## 4. File Naming
 
@@ -82,9 +82,9 @@
 - 同一规则不得在多处重复且表述不一致
 - 文档必须保持 Sandwich 项目独立口径
 - 文档不得引用外部项目作为正式规则来源
-- 治理文档只沉淀稳定规则，不记录完成历史
+- 治理文档只沉淀稳定规则，不记录完成清单
 - 临时讨论结论进入 `TODO.md` 或专项设计文档，稳定后再收敛到治理文档
-- `docs/50-prompts/` 只保存人工明确触发的生成提示词，不承载工程规则、业务需求或完成历史
+- `docs/50-prompts/` 只保存人工明确触发的生成提示词，不承载工程规则、业务需求或完成清单
 - `docs/60-human/` 只保存人类阅读材料、项目叙事和非实现约束材料，不承载 AI 默认执行规则
 
 ## 7. Rule Expression Style
@@ -135,8 +135,8 @@
 
 ## 10. TODO And Commit Rules
 
-- `TODO.md` 是任务执行队列，不是完成历史。
-- 完成历史保留在 commit / PR 中。
+- `TODO.md` 是任务执行队列，不是完成清单。
+- 完成记录保留在 commit / PR 中。
 - 任务收口必须按 `TODO-RULES.md` 检查。
 - 提交格式固定为 `Type(domain): 中文说明`。
 - 已完成 `TODO.md` 项必须删除、拆分或收窄，并与对应文档、代码或测试改动放在同一个 commit。

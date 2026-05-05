@@ -239,7 +239,7 @@ Sandwich 固定采用三层 API 架构。
 
 - 可以依赖 `sandwish-common-core`。
 - MyBatis-Plus 分页插件数据库类型必须从 `spring.datasource.url` 或 `spring.datasource.driver-class-name` 推断；当前只支持 MySQL 和 DM，其他类型必须启动失败，禁止另设重复数据库类型配置。
-- 不承载 PageHelper、旧 CRUD / Tree Service 公共契约、旧 CRUD 基类或 MyBatis 扫描标记。
+- 不承载通用 CRUD / Tree Service 公共契约、CRUD 基类或 MyBatis 扫描标记。
 - 不承载通用分页数据模型。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
@@ -354,7 +354,7 @@ Sandwich 固定采用三层 API 架构。
 
 `sandwish-front-api -> sandwish-common-web -> sandwish-common-core`
 
-Spring Security 迁移链路允许入口模块依赖：
+Spring Security 接入链路允许入口模块依赖：
 
 `sandwish-admin-api -> sandwish-common-security -> sandwish-common-core`
 
@@ -516,7 +516,7 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 先复用现有模块和包结构，再新增目录。
 - 先把共享业务规则放到 `sandwish-biz`，再考虑入口模块专用适配。
 - 先保证数据库是真相源，再考虑缓存和本地临时状态。
-- 先保留旧项目可运行性，再做结构治理。
+- 先保证当前应用可运行，再做结构治理。
 - 文档、代码、测试和提交记录必须保持同一套项目口径。
 
 ## Governance Coverage

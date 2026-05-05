@@ -130,11 +130,11 @@
 - DTO 命名表达使用场景或业务对象
 - 业务枚举常量使用 `UPPER_SNAKE_CASE` 业务语义名，简单枚举统一实现 `value() -> name()` 和大小写不敏感的 `from(String value)`；解析失败统一抛 `BizException`，不返回 `null`，不静默 fallback 到默认值。
 - 新增目录前先确认现有目录无法承载
-- 历史包名与现有模块风格冲突时，优先保持当前模块内部一致
+- 包名与现有模块风格冲突时，优先保持当前模块内部一致
 - `DO/DataObject` 显式查询字段按对应业务字段命名，必要时使用 `query` 前缀区分非表字段
 - DAO interface 命名应保持“DAO 端口”而非 Service 流程语义；优先用 `getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx` 表达持久化访问形状
 - DAO interface 的 `list/page/count` 条件参数顺序必须一致，`pageNo/pageSize` 固定放在分页方法参数末尾
-- DAO interface 参数名不使用 `xxxFlag` 新增旧数据库口径，优先使用 `status`、`visibility`、`privilege`、`ownerType` 等业务名
+- DAO interface 参数名优先使用 `status`、`visibility`、`privilege`、`ownerType` 等业务名
 - Service 的通用 CRUD 方法与 DAO 形状保持一致，业务流程方法不为贴合 CRUD 而弱化业务语义；例如 `verifySign/removeBusiness/updateStatus` 优先保留业务动词
 
 ## Open Items

@@ -109,7 +109,7 @@
 
 - `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
 - `originalFilename` 是 Entity 派生字段，优先使用显式值，其次由 `name + extendName` 派生。
-- `contentType` 是 Entity 兼容字段，优先使用显式值，并同步到 `mimeType`。
+- `contentType` 是 Entity 内容类型字段，优先使用显式值，并同步到 `mimeType`。
 - `storage_type` 通过 `StorageType.value()` 写入。
 - `object_status` 通过 `StoredObjectStatus.value()` 写入。
 - `reference_status` 通过 `StoredObjectReferenceStatus.value()` 写入。

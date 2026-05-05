@@ -27,7 +27,7 @@
 - 前台会员体系。
 - 多租户组织模型。
 - 服务端页面和标签库。
-- 生产数据迁移脚本。
+- 生产数据变更脚本。
 
 ## 3. Bounded Context
 
@@ -273,7 +273,7 @@
 - 请求参数必须裁剪长度。
 - password 相关参数必须脱敏。
 - 系统日志查询支持按用户、类型、地址、标题、URI 和时间范围过滤。
-- `remarks` 和 `createDate` 是当前领域兼容字段，当前 `sys_log` 持久化主表不落这两个字段。
+- `remarks` 和 `createDate` 是领域读取字段，当前 `sys_log` 持久化主表不落这两个字段。
 
 ## 6. Global Constraints
 
@@ -351,7 +351,7 @@
 
 1. Controller 接收角色菜单授权请求。
 2. Service 校验角色存在。
-3. Service 删除旧 `sys_role_menu` 关系。
+3. Service 删除当前角色的 `sys_role_menu` 关系。
 4. Service 写入新 `sys_role_menu` 关系。
 
 ### 8.4 菜单或部门移动

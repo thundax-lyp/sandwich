@@ -30,7 +30,7 @@
 - 字符集优先使用 `utf8mb4`。
 - `MemberDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
 - 会员主表使用 `member_` 业务域前缀。
-- `tb_member` 是历史表名，不作为 Sandwich 新库基线。
+- 会员主表固定使用 `member_member`。
 - `email`、`mobile` 和 `address` 由持久化类型处理器加密处理。
 - `login_pass` 不保存明文。
 - DAO list/page 查询固定追加 `del_flag = '0'` 条件。

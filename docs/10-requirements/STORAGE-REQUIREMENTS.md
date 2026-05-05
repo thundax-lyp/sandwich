@@ -70,8 +70,8 @@
 - `storageType`：底层存储类型。
 - `bucketName`：存储桶或本地逻辑目录。
 - `objectKey`：底层对象键。
-- `originalFilename`：原始文件名，兼容由 `name + extendName` 派生。
-- `contentType`：内容类型，兼容 `mimeType`。
+- `originalFilename`：原始文件名；未显式提供时由 `name + extendName` 派生。
+- `contentType`：内容类型；未显式提供时使用 `mimeType`。
 - `size`：文件大小，字节。
 - `accessEndpoint`：派生访问端点。
 - `objectStatus`：对象状态。

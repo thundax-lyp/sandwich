@@ -37,7 +37,7 @@
 
 - 表名、字段名、索引名必须与现有数据库风格保持一致
 - 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`、`member_`
-- `tb_` 是存量历史表前缀，只允许既有表继续兼容，不得用于新增表、迁移脚本或新的 `DO/DataObject`
+- 新增表、数据库脚本和 `DO/DataObject` 不使用 `tb_` 前缀
 - 关系表后缀必须显式表达语义
 - 审计字段固定使用 `create_date` / `create_by` / `update_date` / `update_by`
 - 逻辑删除字段固定使用 `del_flag`，未逻辑删除值固定为 `'0'`
@@ -49,14 +49,14 @@
 - 主数据表：后台维护的主数据和配置表
 - 运行时业务表：保留业务主状态和必要领域时间字段
 - 关系表：只保留关系本身的最小字段，关系唯一性用联合唯一约束表达
-- 台账表：只追加，不回写历史
+- 台账表：只追加，不回写既有记录
 - 审计日志表：只追加，不保存敏感明文
 
 ## Field Rules
 
 - 是否增加时间字段，取决于对象是否有独立生命周期
 - Java 8 项目默认沿用现有日期时间类型
-- 不为追随外部规则强制迁移为 `Instant`
+- 日期时间类型保持当前 Java 8 技术栈可直接支持的形态
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
 - `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
 - `createDate` / `createBy` / `updateDate` / `updateBy` 是持久化审计字段，由 infra 在 insert / update 时统一填充；`createBy` / `updateBy` 只透传当前请求的 `currentUserId`，Service 不预填审计字段。
@@ -104,7 +104,7 @@
 - 树结构中 `lft` / `rgt` 是 nested-set 持久化索引，只能存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
 - MyBatis-Plus 分页插件数据库类型必须从 `spring.datasource.url` 或 `spring.datasource.driver-class-name` 推断；当前只支持 MySQL 和 DM，其他类型必须启动失败，不允许在 common-mybatis 中写死方言或新增重复数据库类型配置。
-- 旧 `CrudDao` / `CrudService` / `TreeService` / `CrudServiceImpl` / 空 `BaseService` / 空 `BaseServiceImpl` 基类已下线，业务 DAO / Service 应该显式声明当前业务需要暴露的方法。
+- 业务 DAO / Service 显式声明当前业务需要暴露的方法，不通过通用 CRUD / Tree 基类继承业务端口。
 - DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service / Controller 分页业务数据应该使用 `com.github.thundax.common.page.PageDTO`。
 - `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。
 

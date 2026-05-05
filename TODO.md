@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-core`：增加请求上下文传递模型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/SandwishContext.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/SandwishContextHolder.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/ContextSnapshot.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/ContextAwareRunnable.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/context/ContextAwareCallable.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/context/SandwishContextHolderTest.java`
-  - 处理动作：新增请求上下文、线程持有器和异步任务上下文快照。
-  - 验收点：上下文能设置、读取、清理，并能通过 Runnable/Callable 传递到异步执行中。
-  - 重要度：9/10
-
 - [ ] `common-security`：增加当前用户基础契约
   - 范围文件：
     - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/CurrentUser.java`

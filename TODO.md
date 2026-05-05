@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-security`：增加 Spring Security 当前用户解析器
-  - 范围文件：
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/CurrentUserResolver.java`
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/SecurityContextCurrentUserResolver.java`
-    - `sandwish-common/sandwish-common-security/src/main/java/com/github/thundax/common/security/user/SpringSecurityCurrentUserProvider.java`
-    - `sandwish-common/sandwish-common-security/src/test/java/com/github/thundax/common/security/user/SecurityContextCurrentUserResolverTest.java`
-    - `sandwish-common/sandwish-common-security/src/test/java/com/github/thundax/common/security/user/SpringSecurityCurrentUserProviderTest.java`
-  - 处理动作：将 Spring Security `Authentication` 转换为 common `CurrentUser`，并通过 Provider 暴露当前用户。
-  - 验收点：认证用户、匿名用户和空上下文都能得到稳定 `CurrentUser`，权限从 `GrantedAuthority` 转换，并有单元测试覆盖。
-  - 重要度：9/10
-
 ## 待审阅任务项
 
 ## 待讨论项

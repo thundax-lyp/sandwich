@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-test`：补充并发与路径架构规则
-  - 范围文件：
-    - `sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/architecture/ConcurrencyArchitectureRuleSupport.java`
-    - `sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/architecture/PathArchitectureRuleSupport.java`
-    - `sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/architecture/ConcurrencyArchitectureRuleSupportTest.java`
-    - `sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/architecture/PathArchitectureRuleSupportTest.java`
-  - 处理动作：新增禁止裸线程、禁止 `Executors` 工厂、禁止无 executor 的 `CompletableFuture` 以及 Controller 路径约束的可复用规则。
-  - 验收点：规则支持类有正反例测试，暂不强行套到全部业务模块。
-  - 重要度：8/10
-
 - [ ] `common-test`：补充 API 注解架构规则
   - 范围文件：
     - `sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/architecture/ApiAnnotationArchitectureRuleSupport.java`

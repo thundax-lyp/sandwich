@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.entity;
+package com.github.thundax.modules.sys.entity.valueobject;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.UserRank;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;

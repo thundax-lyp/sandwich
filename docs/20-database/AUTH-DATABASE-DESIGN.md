@@ -6,6 +6,8 @@
 
 本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。当前仓库未提供独立建表 SQL，真实数据库 DDL 必须在上线前与本文档完成核对。
 
+后台系统管理域的完整 sys 表设计见 [`SYSTEM-DATABASE-DESIGN.md`](./SYSTEM-DATABASE-DESIGN.md)。本文档保留 `UserIdentity` 与 `UserCredential` 是为了说明认证流程依赖的 sys 认证前置资料。
+
 ## 2. Scope
 
 当前覆盖范围：

@@ -6,6 +6,8 @@
 
 `Auth` 负责后台登录表单、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
 
+后台用户主体、登录标识和认证凭据的系统管理需求见 [`SYSTEM-REQUIREMENTS.md`](./SYSTEM-REQUIREMENTS.md)。本文档只定义这些资料在认证流程中的使用规则。
+
 ## 2. Scope
 
 当前覆盖范围：

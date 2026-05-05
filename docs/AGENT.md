@@ -23,6 +23,18 @@
 
 - 纯实现、修 bug、重构业务逻辑：
   读 `ARCHITECTURE.md`，再读对应 `10-requirements/*-REQUIREMENTS.md`
+- 后台系统管理、用户主体、角色、菜单、部门、字典、系统日志：
+  再读 `10-requirements/SYSTEM-REQUIREMENTS.md`
+- 后台系统管理数据库、用户主体表、角色表、菜单表、部门表、字典表、系统日志表、用户角色关系、角色菜单关系：
+  再读 `20-database/SYSTEM-DATABASE-DESIGN.md`
+- 后台认证、登录标识、认证凭据、token、OAuth2、认证会话：
+  再读 `10-requirements/AUTH-REQUIREMENTS.md`
+- 后台认证数据库、登录标识表、认证凭据表、认证会话表、OAuth2 表：
+  再读 `20-database/AUTH-DATABASE-DESIGN.md`
+- 存储对象、对象引用、分片上传、对象存储适配：
+  再读 `10-requirements/STORAGE-REQUIREMENTS.md`
+- 存储数据库、存储对象表、对象引用表、分片上传表：
+  再读 `20-database/STORAGE-DATABASE-DESIGN.md`
 - 需要解释架构意图、规则冲突、分层取舍、小步提交意图或 AI 误改风险：
   读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：

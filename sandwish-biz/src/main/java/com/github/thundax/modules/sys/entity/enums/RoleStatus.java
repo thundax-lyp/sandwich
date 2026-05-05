@@ -1,12 +1,14 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
 public enum RoleStatus {
     ENABLED,
     DISABLED;
+
+    private static final String LEGACY_ENABLED = "1";
+    private static final String LEGACY_DISABLED = "0";
 
     public String value() {
         return name();
@@ -21,6 +23,6 @@ public enum RoleStatus {
     }
 
     private String legacyValue() {
-        return this == ENABLED ? Global.ENABLE : Global.DISABLE;
+        return this == ENABLED ? LEGACY_ENABLED : LEGACY_DISABLED;
     }
 }

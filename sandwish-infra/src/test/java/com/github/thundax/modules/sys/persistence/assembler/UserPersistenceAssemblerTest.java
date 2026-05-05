@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -13,12 +12,15 @@ import org.junit.Test;
 
 public class UserPersistenceAssemblerTest {
 
+    private static final String LEGACY_YES = "1";
+    private static final String LEGACY_NO = "0";
+
     @Test
     public void shouldReadLegacyFlagsAsDomainValues() {
         UserDO dataObject = new UserDO();
-        dataObject.setSuperFlag(Global.YES);
-        dataObject.setAdminFlag(Global.NO);
-        dataObject.setEnableFlag(Global.ENABLE);
+        dataObject.setSuperFlag(LEGACY_YES);
+        dataObject.setAdminFlag(LEGACY_NO);
+        dataObject.setEnableFlag(LEGACY_YES);
 
         User entity = UserPersistenceAssembler.toEntity(dataObject);
 
@@ -34,8 +36,8 @@ public class UserPersistenceAssemblerTest {
 
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
 
-        assertEquals(Global.NO, dataObject.getSuperFlag());
-        assertEquals(Global.YES, dataObject.getAdminFlag());
+        assertEquals(LEGACY_NO, dataObject.getSuperFlag());
+        assertEquals(LEGACY_YES, dataObject.getAdminFlag());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
 

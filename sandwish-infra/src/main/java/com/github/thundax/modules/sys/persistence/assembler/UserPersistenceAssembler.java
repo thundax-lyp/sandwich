@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
@@ -12,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class UserPersistenceAssembler {
+
+    private static final String LEGACY_YES = "1";
+    private static final String LEGACY_NO = "0";
 
     private UserPersistenceAssembler() {}
 
@@ -82,18 +84,18 @@ public final class UserPersistenceAssembler {
     }
 
     private static String superFlag(UserPrivilege privilege) {
-        return UserPrivilege.SUPER == privilege ? Global.YES : Global.NO;
+        return UserPrivilege.SUPER == privilege ? LEGACY_YES : LEGACY_NO;
     }
 
     private static String adminFlag(UserPrivilege privilege) {
-        return UserPrivilege.ADMIN == privilege ? Global.YES : Global.NO;
+        return UserPrivilege.ADMIN == privilege ? LEGACY_YES : LEGACY_NO;
     }
 
     private static UserPrivilege privilegeFrom(String superFlag, String adminFlag) {
-        if (Global.YES.equals(superFlag)) {
+        if (LEGACY_YES.equals(superFlag)) {
             return UserPrivilege.SUPER;
         }
-        return Global.YES.equals(adminFlag) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL;
+        return LEGACY_YES.equals(adminFlag) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL;
     }
 
     private static String statusValue(UserStatus status) {

@@ -1,12 +1,14 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
 public enum MenuVisibility {
     VISIBLE,
     HIDDEN;
+
+    private static final String LEGACY_VISIBLE = "1";
+    private static final String LEGACY_HIDDEN = "0";
 
     public String value() {
         return name();
@@ -21,6 +23,6 @@ public enum MenuVisibility {
     }
 
     private String legacyValue() {
-        return this == VISIBLE ? Global.SHOW : Global.HIDE;
+        return this == VISIBLE ? LEGACY_VISIBLE : LEGACY_HIDDEN;
     }
 }

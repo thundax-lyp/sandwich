@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
@@ -35,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+    private static final String LEGACY_SUPER_FLAG = "1";
 
     private final UserDao dao;
     private final SignService signService;
@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private String superFlagValue(UserPrivilege privilege) {
-        return UserPrivilege.SUPER == privilege ? Global.YES : null;
+        return UserPrivilege.SUPER == privilege ? LEGACY_SUPER_FLAG : null;
     }
 
     private UserIdentity upsertAccountIdentity(User user, String loginName) {

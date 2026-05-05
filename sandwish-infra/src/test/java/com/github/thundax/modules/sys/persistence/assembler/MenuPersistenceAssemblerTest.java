@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
@@ -12,10 +11,12 @@ import org.junit.Test;
 
 public class MenuPersistenceAssemblerTest {
 
+    private static final String LEGACY_VISIBLE = "1";
+
     @Test
     public void shouldReadLegacyDisplayFlagAsDomainValue() {
         MenuDO dataObject = new MenuDO();
-        dataObject.setDisplayFlag(Global.SHOW);
+        dataObject.setDisplayFlag(LEGACY_VISIBLE);
 
         Menu entity = MenuPersistenceAssembler.toEntity(dataObject);
 

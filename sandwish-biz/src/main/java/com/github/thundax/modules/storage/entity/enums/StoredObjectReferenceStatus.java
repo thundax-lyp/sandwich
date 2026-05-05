@@ -1,12 +1,14 @@
 package com.github.thundax.modules.storage.entity.enums;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
 public enum StoredObjectReferenceStatus {
     UNREFERENCED,
     REFERENCED;
+
+    private static final String LEGACY_REFERENCED = "1";
+    private static final String LEGACY_UNREFERENCED = "0";
 
     public String value() {
         return name();
@@ -21,6 +23,6 @@ public enum StoredObjectReferenceStatus {
     }
 
     private String legacyValue() {
-        return this == REFERENCED ? Global.YES : Global.NO;
+        return this == REFERENCED ? LEGACY_REFERENCED : LEGACY_UNREFERENCED;
     }
 }

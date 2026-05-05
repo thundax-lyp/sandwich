@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -12,11 +11,14 @@ import org.junit.Test;
 
 public class RolePersistenceAssemblerTest {
 
+    private static final String LEGACY_YES = "1";
+    private static final String LEGACY_NO = "0";
+
     @Test
     public void shouldReadLegacyFlagsAsDomainValues() {
         RoleDO dataObject = new RoleDO();
-        dataObject.setAdminFlag(Global.YES);
-        dataObject.setEnableFlag(Global.ENABLE);
+        dataObject.setAdminFlag(LEGACY_YES);
+        dataObject.setEnableFlag(LEGACY_YES);
 
         Role entity = RolePersistenceAssembler.toEntity(dataObject);
 
@@ -32,7 +34,7 @@ public class RolePersistenceAssemblerTest {
 
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
 
-        assertEquals(Global.NO, dataObject.getAdminFlag());
+        assertEquals(LEGACY_NO, dataObject.getAdminFlag());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
 

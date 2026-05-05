@@ -3,7 +3,6 @@ package com.github.thundax.modules.storage.persistence.assembler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -22,6 +21,8 @@ import java.util.Date;
 import org.junit.Test;
 
 public class StoragePersistenceAssemblerTest {
+
+    private static final String LEGACY_YES = "1";
 
     @Test
     public void shouldReadLegacyLowerCaseOwnerType() {
@@ -58,8 +59,8 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldReadLegacyFlagsAsDomainValues() {
         StoredObjectDO dataObject = new StoredObjectDO();
-        dataObject.setObjectStatus(Global.ENABLE);
-        dataObject.setReferenceStatus(Global.YES);
+        dataObject.setObjectStatus(LEGACY_YES);
+        dataObject.setReferenceStatus(LEGACY_YES);
 
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 

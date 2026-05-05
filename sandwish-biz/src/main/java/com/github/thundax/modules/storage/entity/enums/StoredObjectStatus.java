@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.entity.enums;
 
-import com.github.thundax.common.config.Global;
 import com.github.thundax.common.exception.BizException;
 import java.util.Arrays;
 
@@ -8,6 +7,9 @@ public enum StoredObjectStatus {
     ACTIVE,
     DELETING,
     DELETED;
+
+    private static final String LEGACY_ACTIVE = "1";
+    private static final String LEGACY_INACTIVE = "0";
 
     public String value() {
         return name();
@@ -22,6 +24,6 @@ public enum StoredObjectStatus {
     }
 
     private String legacyValue() {
-        return this == ACTIVE ? Global.ENABLE : Global.DISABLE;
+        return this == ACTIVE ? LEGACY_ACTIVE : LEGACY_INACTIVE;
     }
 }

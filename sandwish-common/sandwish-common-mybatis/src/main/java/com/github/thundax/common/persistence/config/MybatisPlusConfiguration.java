@@ -2,6 +2,8 @@ package com.github.thundax.common.persistence.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusPropertiesCustomizer;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -41,6 +43,19 @@ public class MybatisPlusConfiguration {
     @ConditionalOnMissingBean(name = "mybatisPlusTypeHandlerCustomizer")
     public ConfigurationCustomizer mybatisPlusTypeHandlerCustomizer() {
         return configuration -> registerDefaultTypeHandlers(configuration.getTypeHandlerRegistry());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = "mybatisPlusBannerCustomizer")
+    public MybatisPlusPropertiesCustomizer mybatisPlusBannerCustomizer() {
+        return properties -> {
+            GlobalConfig globalConfig = properties.getGlobalConfig();
+            if (globalConfig == null) {
+                globalConfig = new GlobalConfig();
+                properties.setGlobalConfig(globalConfig);
+            }
+            globalConfig.setBanner(false);
+        };
     }
 
     private void registerDefaultTypeHandlers(TypeHandlerRegistry registry) {

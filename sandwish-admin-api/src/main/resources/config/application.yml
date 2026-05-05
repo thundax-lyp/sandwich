@@ -10,7 +10,7 @@ spring:
     name: sandwish-admin-api
 
   main:
-    bannerMode: "off"
+    banner-mode: "off"
 
   jmx:
     default-domain: sandwish-admin-api
@@ -65,6 +65,10 @@ jetcache:
       keyConvertor: fastjson
       valueEncoder: java
       valueDecoder: java
+
+mybatis-plus:
+  global-config:
+    banner: false
 
 sandwish:
   oss:

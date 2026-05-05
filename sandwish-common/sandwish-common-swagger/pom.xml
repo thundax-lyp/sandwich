@@ -32,6 +32,10 @@
             <artifactId>springfox-swagger-ui</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-test</artifactId>
             <scope>test</scope>

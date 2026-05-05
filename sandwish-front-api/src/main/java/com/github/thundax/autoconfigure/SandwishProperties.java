@@ -239,7 +239,7 @@ public class SandwishProperties {
         private String urlExcludes;
 
         public String getEnabled() {
-            return enabled;
+            return StringUtils.defaultString(enabled);
         }
 
         public void setEnabled(String enabled) {
@@ -247,7 +247,7 @@ public class SandwishProperties {
         }
 
         public String getTagExcludes() {
-            return tagExcludes;
+            return StringUtils.defaultString(tagExcludes);
         }
 
         public void setTagExcludes(String tagExcludes) {
@@ -255,7 +255,7 @@ public class SandwishProperties {
         }
 
         public String getTagIncludes() {
-            return tagIncludes;
+            return StringUtils.defaultString(tagIncludes);
         }
 
         public void setTagIncludes(String tagIncludes) {
@@ -271,7 +271,7 @@ public class SandwishProperties {
         }
 
         public String getUrlExcludes() {
-            return urlExcludes;
+            return StringUtils.defaultString(urlExcludes);
         }
 
         public void setUrlExcludes(String urlExcludes) {

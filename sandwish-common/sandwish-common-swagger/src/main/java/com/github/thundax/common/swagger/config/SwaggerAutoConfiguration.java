@@ -36,6 +36,12 @@ public class SwaggerAutoConfiguration implements WebMvcConfigurer {
         this.properties = properties;
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public SwaggerEndpointLogger swaggerEndpointLogger() {
+        return new SwaggerEndpointLogger(properties);
+    }
+
     @SuppressWarnings("deprecation")
     @Bean
     @ConditionalOnMissingBean

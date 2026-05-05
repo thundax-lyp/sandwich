@@ -10,7 +10,7 @@ spring:
     name: sandwish-front-api
 
   main:
-    bannerMode: "off"
+    banner-mode: "off"
 
   jmx:
     default-domain: sandwish-front-api
@@ -66,6 +66,10 @@ jetcache:
       valueEncoder: java
       valueDecoder: java
 
+mybatis-plus:
+  global-config:
+    banner: false
+
 sandwish:
   oss:
     type: ${SANDWISH_OSS_TYPE:local}
@@ -85,3 +89,8 @@ logging:
   config: classpath:config/logback-spring.xml
   level:
     com.github.thundax: INFO
+
+swagger:
+  base-package: com.github.thundax.modules
+  title: Sandwich Front API
+  description: Sandwich 前台服务接口

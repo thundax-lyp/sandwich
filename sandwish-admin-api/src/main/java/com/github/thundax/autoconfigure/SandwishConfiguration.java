@@ -14,11 +14,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
-@EnableConfigurationProperties({VltavaProperties.class, AuthProperties.class})
-public class VltavaConfiguration {
+@EnableConfigurationProperties({SandwishProperties.class, AuthProperties.class})
+public class SandwishConfiguration {
 
     @Autowired
-    public VltavaConfiguration(VltavaProperties properties) {
+    public SandwishConfiguration(SandwishProperties properties) {
         AvatarUtils.setStoragePath(properties.getUpload().getStoragePath());
     }
 

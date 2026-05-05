@@ -1,6 +1,6 @@
 package com.github.thundax;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan(
         basePackages = {"com.github.thundax.modules"},
         annotationClass = Mapper.class)
-@EnableConfigurationProperties(value = {VltavaProperties.class})
+@EnableConfigurationProperties(value = {SandwishProperties.class})
 @EnableAsync
 @EnableScheduling
 public class ApiApplication extends SpringBootServletInitializer {

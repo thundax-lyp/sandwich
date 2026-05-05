@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "vltava.login")
+@ConfigurationProperties(prefix = "sandwish.login")
 public class LoginProperties {
     private boolean enable;
     private int maxFailCount;

@@ -25,8 +25,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Bean
     public StoredObjectStore storedObjectStore(
-            VltavaProperties properties, ObjectStorageClient objectStorageClient, SandwishOssProperties ossProperties) {
-        VltavaProperties.UploadProperties upload = properties.getUpload();
+            SandwishProperties properties,
+            ObjectStorageClient objectStorageClient,
+            SandwishOssProperties ossProperties) {
+        SandwishProperties.UploadProperties upload = properties.getUpload();
         if (StorageType.OSS == storageType(ossProperties)) {
             return new ObjectStorageStoredObjectStore(
                     objectStorageClient, StorageType.OSS, ossProperties.getS3().getBucket(), upload.getContentPath());
@@ -59,7 +61,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(VltavaProperties properties) {
+    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(SandwishProperties properties) {
         FilterRegistrationBean<XssFilter> registration = new FilterRegistrationBean<>();
         registration.setDispatcherTypes(DispatcherType.REQUEST);
         registration.setFilter(new XssFilter());

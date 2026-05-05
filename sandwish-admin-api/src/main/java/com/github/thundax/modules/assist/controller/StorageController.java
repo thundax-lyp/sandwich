@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.controller;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
@@ -56,14 +56,14 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 public class StorageController {
 
-    private final VltavaProperties.UploadProperties properties;
+    private final SandwishProperties.UploadProperties properties;
     private final StorageService storageService;
     private final StorageConverter storageConverter;
     private final StoredObjectStore storedObjectStore;
 
     @Autowired
     public StorageController(
-            VltavaProperties properties,
+            SandwishProperties properties,
             StorageService storageService,
             StorageConverter storageConverter,
             StoredObjectStore storedObjectStore) {

@@ -1,7 +1,7 @@
 package com.github.thundax.modules.auth.security;
 
 import com.github.thundax.autoconfigure.LoginProperties;
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
@@ -346,7 +346,7 @@ public class AuthPermissionLifecycleTest {
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(),
+                new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
                 new TestUserService());
@@ -371,7 +371,7 @@ public class AuthPermissionLifecycleTest {
     public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
         AccessToken accessToken = authService.createAccessToken("u1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(),
+                new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
                 new TestUserService());
@@ -392,7 +392,7 @@ public class AuthPermissionLifecycleTest {
     @Test
     public void shouldRejectRequestWithoutToken() throws Exception {
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
-                new VltavaProperties.AccessTokenFilterProperties(),
+                new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
                 new TestUserService());

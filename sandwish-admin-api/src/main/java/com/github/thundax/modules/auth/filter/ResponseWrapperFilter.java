@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.filter;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class ResponseWrapperFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludePatternList = new ArrayList<>();
 
-    public ResponseWrapperFilter(VltavaProperties.ResponseWrapperFilterProperties properties) {
+    public ResponseWrapperFilter(SandwishProperties.ResponseWrapperFilterProperties properties) {
         this.excludePatternList.addAll(properties.getExcludePath());
     }
 

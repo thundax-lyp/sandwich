@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(VltavaProperties.class)
-public class VltavaConfiguration {
+@EnableConfigurationProperties(SandwishProperties.class)
+public class SandwishConfiguration {
 
     @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {

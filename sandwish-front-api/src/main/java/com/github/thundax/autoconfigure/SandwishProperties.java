@@ -8,10 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
-@ConfigurationProperties(prefix = "vltava")
-public class VltavaProperties {
+@ConfigurationProperties(prefix = "sandwish")
+public class SandwishProperties {
 
-    private static VltavaProperties instance;
+    private static SandwishProperties instance;
 
     private String whiteCaptcha;
 
@@ -21,11 +21,11 @@ public class VltavaProperties {
 
     private XssFilterProperties xssFilter;
 
-    public VltavaProperties() {
+    public SandwishProperties() {
         instance = this;
     }
 
-    public static VltavaProperties getInstance() {
+    public static SandwishProperties getInstance() {
         return instance;
     }
 

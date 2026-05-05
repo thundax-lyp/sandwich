@@ -16,7 +16,7 @@ spring:
     default-domain: sandwish-front-api
 
   datasource:
-    driver-class-name: ${SANDWISH_DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    driver-class-name: ${SANDWISH_DB_DRIVER:com.mysql.jdbc.Driver}
     url: ${SANDWISH_DB_URL:jdbc:mysql://127.0.0.1:3306/sandwish?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false}
     username: ${SANDWISH_DB_USERNAME:sandwish}
     password: ${SANDWISH_DB_PASSWORD:}

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
@@ -121,8 +121,8 @@ public class StorageControllerContractTest {
 
     private StorageController controller(
             StorageService storageService, StorageConverter storageConverter, StoredObjectStore objectStore) {
-        VltavaProperties properties = new VltavaProperties();
-        VltavaProperties.UploadProperties upload = new VltavaProperties.UploadProperties();
+        SandwishProperties properties = new SandwishProperties();
+        SandwishProperties.UploadProperties upload = new SandwishProperties.UploadProperties();
         upload.setAllowSuffix(Collections.singletonList("txt"));
         properties.setUpload(upload);
         return new StorageController(properties, storageService, storageConverter, objectStore);

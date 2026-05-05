@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.security.filter;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
@@ -43,13 +43,19 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     public AccessTokenAuthenticationFilter(
-            VltavaProperties.AccessTokenFilterProperties properties,
+            SandwishProperties.AccessTokenFilterProperties properties,
             AuthService authService,
             PermissionService permissionService,
             UserService userService) {
-        if (properties.getExcludePath() != null) {
-            this.excludePatternList.addAll(properties.getExcludePath());
-        }
+        this(properties.getExcludePath(), authService, permissionService, userService);
+    }
+
+    public AccessTokenAuthenticationFilter(
+            List<String> excludePaths,
+            AuthService authService,
+            PermissionService permissionService,
+            UserService userService) {
+        this.excludePatternList.addAll(excludePaths);
         this.authService = authService;
         this.permissionService = permissionService;
         this.userService = userService;

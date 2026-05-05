@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.utils;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.JsonUtils;
@@ -34,15 +34,15 @@ public class SysLogUtils {
     public static final DateFormat LOG_FILENAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final String LOG_EXTEND_NAME = ".log";
 
-    private static VltavaProperties.LogProperties properties;
+    private static SandwishProperties.LogProperties properties;
 
     private static AmqpTemplate template;
     private final LogService logService;
 
     @Autowired
-    public SysLogUtils(AmqpTemplate targetTemplate, VltavaProperties vltavaProperties, LogService logService) {
+    public SysLogUtils(AmqpTemplate targetTemplate, SandwishProperties sandwishProperties, LogService logService) {
         template = targetTemplate;
-        properties = vltavaProperties.getLog();
+        properties = sandwishProperties.getLog();
         this.logService = logService;
     }
 
@@ -53,10 +53,10 @@ public class SysLogUtils {
         return template;
     }
 
-    public static VltavaProperties.LogProperties getProperties() {
+    public static SandwishProperties.LogProperties getProperties() {
         if (properties == null) {
-            VltavaProperties vltavaProperties = SpringContextHolder.getBean(VltavaProperties.class);
-            properties = vltavaProperties.getLog();
+            SandwishProperties sandwishProperties = SpringContextHolder.getBean(SandwishProperties.class);
+            properties = sandwishProperties.getLog();
         }
         return properties;
     }

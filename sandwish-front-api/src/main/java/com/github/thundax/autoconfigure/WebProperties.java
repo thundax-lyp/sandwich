@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "vltava.web")
+@ConfigurationProperties(prefix = "sandwish.web")
 public class WebProperties {
 
     private String baseUrl;

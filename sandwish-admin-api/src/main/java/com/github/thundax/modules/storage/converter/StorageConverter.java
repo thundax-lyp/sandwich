@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.converter;
 
-import com.github.thundax.autoconfigure.VltavaProperties;
+import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.service.StorageService;
@@ -13,7 +13,7 @@ public class StorageConverter {
     private final String contentPath;
     private final StorageService storageService;
 
-    public StorageConverter(VltavaProperties properties, StorageService storageService) {
+    public StorageConverter(SandwishProperties properties, StorageService storageService) {
         this.contentPath = properties.getUpload().getContentPath();
         this.storageService = storageService;
     }

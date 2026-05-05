@@ -9,12 +9,12 @@ import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
-@ConfigurationProperties(prefix = "vltava")
-public class VltavaProperties {
+@ConfigurationProperties(prefix = "sandwish")
+public class SandwishProperties {
 
     private static final int DEFAULT_LOG_ALIVE_DAYS = 90;
 
-    private static VltavaProperties instance;
+    private static SandwishProperties instance;
 
     private String whiteCaptcha;
 
@@ -28,11 +28,11 @@ public class VltavaProperties {
     private ResponseWrapperFilterProperties responseWrapperFilter;
     private AccessTokenFilterProperties accessTokenFilter;
 
-    public VltavaProperties() {
+    public SandwishProperties() {
         instance = this;
     }
 
-    public static VltavaProperties getInstance() {
+    public static SandwishProperties getInstance() {
         return instance;
     }
 
@@ -295,6 +295,9 @@ public class VltavaProperties {
         }
 
         public List<String> getExcludePath() {
+            if (excludePath == null) {
+                return new ArrayList<>();
+            }
             return excludePath;
         }
 
@@ -317,6 +320,9 @@ public class VltavaProperties {
         }
 
         public List<String> getExcludePath() {
+            if (excludePath == null) {
+                return new ArrayList<>();
+            }
             return excludePath;
         }
 

@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-core`：增加统一标识值对象和编码器
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/EntityId.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/EntityIdCodec.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/EntityIdTest.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/EntityIdCodecTest.java`
-  - 处理动作：收敛通用实体标识值对象和字符串编码转换能力。
-  - 验收点：`EntityId` 能表达非空标识、相等性和字符串转换，编码器有单元测试覆盖。
-  - 重要度：8/10
-
 - [ ] `common-core`：增加统一 ID 生成契约
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/IdGenerator.java`

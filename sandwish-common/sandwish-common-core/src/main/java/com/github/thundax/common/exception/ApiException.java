@@ -1,13 +1,17 @@
 package com.github.thundax.common.exception;
 
-import org.springframework.http.HttpStatus;
-
 public class ApiException extends Exception {
 
-    private int code = HttpStatus.INTERNAL_SERVER_ERROR.value();
+    private final int code;
 
     public ApiException(String message) {
         super(message);
+        this.code = ErrorCode.SYSTEM_ERROR.getCode();
+    }
+
+    public ApiException(int code, String message) {
+        super(message);
+        this.code = code;
     }
 
     public int getCode() {

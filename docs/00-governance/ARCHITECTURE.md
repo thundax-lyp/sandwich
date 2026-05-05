@@ -238,7 +238,7 @@ Sandwich 固定采用三层 API 架构。
 边界：
 
 - 可以依赖 `sandwish-common-core`。
-- MyBatis-Plus 分页插件固定使用 `DbType.DM`。
+- MyBatis-Plus 分页插件数据库类型必须来自 `sandwish.mybatis-plus.db-type` 配置，应用环境通过 `SANDWISH_DB_TYPE` 注入。
 - 不承载 PageHelper、旧 CRUD / Tree Service 公共契约、旧 CRUD 基类或 MyBatis 扫描标记。
 - 不承载通用分页数据模型。
 - 不承载业务 DAO implementation、业务 Mapper XML 或业务 SQL。

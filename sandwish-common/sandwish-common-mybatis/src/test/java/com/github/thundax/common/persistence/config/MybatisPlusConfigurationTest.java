@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -40,6 +41,17 @@ public class MybatisPlusConfigurationTest {
             assertEquals(2, interceptor.getInterceptors().size());
             assertTrue(interceptor.getInterceptors().get(0) instanceof OptimisticLockerInnerInterceptor);
             assertTrue(interceptor.getInterceptors().get(1) instanceof PaginationInnerInterceptor);
+        });
+    }
+
+    @Test
+    public void shouldUseConfiguredPaginationDbType() {
+        contextRunner.withPropertyValues("sandwish.mybatis-plus.db-type=dm").run(context -> {
+            MybatisPlusInterceptor interceptor = context.getBean(MybatisPlusInterceptor.class);
+            PaginationInnerInterceptor pagination =
+                    (PaginationInnerInterceptor) interceptor.getInterceptors().get(1);
+
+            assertEquals(DbType.DM, pagination.getDbType());
         });
     }
 

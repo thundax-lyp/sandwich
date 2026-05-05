@@ -67,6 +67,8 @@ jetcache:
       valueDecoder: java
 
 sandwish:
+  mybatis-plus:
+    db-type: ${SANDWISH_DB_TYPE:MYSQL}
   oss:
     type: ${SANDWISH_OSS_TYPE:local}
     local:

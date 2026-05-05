@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-core`：增加统一 ID 生成契约
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/IdGenerator.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/UuidIdGenerator.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/SnowflakeIdGenerator.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/UuidIdGeneratorTest.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/SnowflakeIdGeneratorTest.java`
-  - 处理动作：新增 ID 生成接口和默认 UUID、Snowflake 实现。
-  - 验收点：两类生成器都能生成非空且可区分的 ID，并有单元测试覆盖。
-  - 重要度：7/10
-
 - [ ] `common-mybatis`：增加通用 EntityId 类型处理器
   - 范围文件：
     - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/typehandler/EntityIdTypeHandler.java`

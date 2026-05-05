@@ -11,7 +11,6 @@ import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,14 +70,6 @@ public class User implements Auditable, Signable, Sortable {
         } else {
             return ranks;
         }
-    }
-
-    public void setDepartment(Department department) {
-        this.setDepartmentId(department == null ? null : EntityIdCodec.toValue(department.getId()));
-    }
-
-    public boolean isBelongTo(Department department) {
-        return department != null && Objects.equals(this.getDepartmentId(), EntityIdCodec.toValue(department.getId()));
     }
 
     public boolean isSuper() {

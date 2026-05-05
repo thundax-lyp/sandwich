@@ -58,18 +58,14 @@ public class User implements Auditable, Signable, Sortable {
 
     public static final String BEAN_NAME = "User";
 
-    public static final int MAX_RANKS = 9;
-
     @NonNull
     public Integer getRanks() {
-        Integer ranks = this.ranks;
-        if (ranks == null || ranks < 0) {
-            return 0;
-        } else if (ranks >= MAX_RANKS) {
-            return MAX_RANKS;
-        } else {
-            return ranks;
-        }
+        return rank().value();
+    }
+
+    @NonNull
+    public UserRank rank() {
+        return UserRank.of(this.ranks);
     }
 
     public boolean isSuper() {

@@ -238,7 +238,8 @@ public class UserController {
         }
         // 无权限修改超管/等级高于自身的用户信息
         if (!currentUser.isSuper()) {
-            if (bean.isSuper() || (bean.getRanks() >= currentUser.getRanks())) {
+            if (bean.isSuper()
+                    || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw new PermissionDeniedException();
             }
         }
@@ -324,7 +325,8 @@ public class UserController {
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, request.getId());
             }
-            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+            if (bean.isSuper()
+                    || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw new PermissionDeniedException();
             }
             bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
@@ -359,7 +361,8 @@ public class UserController {
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, request.getId());
             }
-            if (bean.isSuper() || bean.getRanks() >= currentUser.getRanks()) {
+            if (bean.isSuper()
+                    || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw new PermissionDeniedException();
             }
             beanList.add(bean);

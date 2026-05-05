@@ -57,6 +57,7 @@ import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.UserRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -852,7 +853,7 @@ public class AuthPermissionLifecycleTest {
             user.setId(EntityIdCodec.toDomain("u1"));
             user.setStatus(UserStatus.ENABLED);
             user.setPrivilege(UserPrivilege.SUPER);
-            user.setRanks(0);
+            user.setRank(UserRank.of(0));
             return user;
         }
     }

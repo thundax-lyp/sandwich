@@ -34,6 +34,10 @@ public final class UserRank {
         return value >= of(targetRank).value();
     }
 
+    public boolean canAccess(UserRank targetRank) {
+        return value >= (targetRank == null ? MIN_VALUE : targetRank.value());
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {

@@ -7,6 +7,7 @@ import com.github.thundax.common.config.Global;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.UserRank;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import org.junit.Test;
 
@@ -49,5 +50,18 @@ public class UserPersistenceAssemblerTest {
                 Integer.valueOf(0),
                 UserPersistenceAssembler.toDataObject(entity).getPriority());
         assertEquals(0, UserPersistenceAssembler.toEntity(dataObject).getPriority());
+    }
+
+    @Test
+    public void shouldMapRankValueObjectToRanksColumn() {
+        User entity = new User();
+        entity.setRank(UserRank.of(12));
+
+        UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
+        assertEquals(Integer.valueOf(9), dataObject.getRanks());
+
+        dataObject.setRanks(-1);
+        User restored = UserPersistenceAssembler.toEntity(dataObject);
+        assertEquals(UserRank.of(0), restored.getRank());
     }
 }

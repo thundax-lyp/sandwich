@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.modules.sys.codec.UserRankCodec;
 import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.response.PersonalAvatarResponse;
@@ -26,7 +27,7 @@ public final class PersonalInterfaceAssembler {
         PersonalInfoResponse response = new PersonalInfoResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setLoginName(loginName);
-        response.setRanks(entity.getRanks());
+        response.setRanks(UserRankCodec.toValue(entity.getRank()));
         response.setName(entity.getName());
         response.setMobile(entity.getMobile());
         response.setEmail(entity.getEmail());

@@ -21,6 +21,8 @@ public class UserRankTest {
         Assert.assertTrue(rank.canAccess(2));
         Assert.assertTrue(rank.canAccess(3));
         Assert.assertFalse(rank.canAccess(4));
+        Assert.assertTrue(rank.canAccess(UserRank.of(3)));
+        Assert.assertFalse(rank.canAccess(UserRank.of(4)));
     }
 
     @Test

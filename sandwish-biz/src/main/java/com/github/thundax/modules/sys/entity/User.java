@@ -36,7 +36,7 @@ public class User implements Auditable, Signable, Sortable {
     private String mobile;
     private String tel;
     private String name;
-    private Integer ranks = 0;
+    private UserRank rank = UserRank.of(0);
 
     private Date registerDate;
     private String registerIp;
@@ -60,13 +60,12 @@ public class User implements Auditable, Signable, Sortable {
     }
 
     @NonNull
-    public Integer getRanks() {
-        return rank().value();
+    public UserRank getRank() {
+        return rank == null ? UserRank.of(null) : rank;
     }
 
-    @NonNull
-    public UserRank rank() {
-        return UserRank.of(this.ranks);
+    public void setRank(UserRank rank) {
+        this.rank = rank == null ? UserRank.of(null) : rank;
     }
 
     public boolean isSuper() {
@@ -93,7 +92,7 @@ public class User implements Auditable, Signable, Sortable {
         map.put("email", this.getEmail());
         map.put("mobile", this.getMobile());
         map.put("name", this.getName());
-        map.put("ranks", this.getRanks());
+        map.put("ranks", this.getRank().value());
 
         map.put("super", this.isSuper());
         map.put("admin", this.isAdmin());

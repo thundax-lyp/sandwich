@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-oss`：补充 S3 对象存储实现
-  - 范围文件：
-    - `sandwish-common/sandwish-common-oss/pom.xml`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/config/SandwishOssProperties.java`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/support/S3ObjectStorageClient.java`
-    - `sandwish-common/sandwish-common-oss/src/test/java/com/github/thundax/common/oss/support/S3ObjectStorageClientTest.java`
-  - 处理动作：在 common-oss 内提供 S3 backend，保持 endpoint、bucket、access key 等配置外置。
-  - 验收点：S3 client 创建和对象 key 组装有测试，不提交任何环境密钥。
-  - 重要度：8/10
-
 - [ ] `storage`：基于 common-oss 重建存储后端适配
   - 范围文件：
     - `sandwish-infra/pom.xml`

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
@@ -20,7 +21,7 @@ public final class MenuPersistenceAssembler {
         dataObject.setParentId(entity.getParentId());
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
-        dataObject.setRanks(entity.getRanks());
+        dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
         dataObject.setDisplayFlag(visibilityValue(entity.getVisibility()));
         dataObject.setDisplayParams(entity.getDisplayParams());
         dataObject.setUrl(entity.getUrl());
@@ -43,7 +44,7 @@ public final class MenuPersistenceAssembler {
         entity.setParentId(dataObject.getParentId());
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
-        entity.setRanks(dataObject.getRanks());
+        entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
         entity.setVisibility(visibilityFrom(dataObject.getDisplayFlag()));
         entity.setDisplayParams(dataObject.getDisplayParams());
         entity.setUrl(dataObject.getUrl());

@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
 
     private String name;
     private String perms;
-    private Integer ranks;
+    private AccessRank rank = AccessRank.of(0);
     private MenuVisibility visibility = MenuVisibility.VISIBLE;
     private String displayParams;
     private String url;
@@ -103,9 +104,9 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
         if (priorityCompare != 0) {
             return priorityCompare;
         }
-        int ranksCompare = compareInteger(this.getRanks(), that.getRanks());
-        if (ranksCompare != 0) {
-            return ranksCompare;
+        int rankCompare = this.getRank().compareTo(that.getRank());
+        if (rankCompare != 0) {
+            return rankCompare;
         }
         return StringUtils.compare(this.getName(), that.getName());
     }
@@ -134,11 +135,19 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
         map.put("name", this.getName());
         map.put("parentId", this.getParentId());
         map.put("perms", this.getPerms());
-        map.put("ranks", this.getRanks());
+        map.put("ranks", this.getRank().value());
         map.put("display", this.isDisplay());
         map.put("url", this.getUrl());
         map.put("target", this.getTarget());
 
         return JsonUtils.toJson(map);
+    }
+
+    public AccessRank getRank() {
+        return rank == null ? AccessRank.of(null) : rank;
+    }
+
+    public void setRank(AccessRank rank) {
+        this.rank = rank == null ? AccessRank.of(null) : rank;
     }
 }

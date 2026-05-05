@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.request.MenuQueryRequest;
 import com.github.thundax.modules.sys.controller.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.controller.response.MenuResponse;
@@ -29,7 +30,7 @@ public final class MenuInterfaceAssembler {
         }
         response.setName(entity.getName());
         response.setPerms(entity.getPerms());
-        response.setRanks(entity.getRanks());
+        response.setRanks(AccessRankCodec.toValue(entity.getRank()));
         response.setDisplay(entity.isDisplay());
         response.setDisplayParams(entity.getDisplayParams());
         response.setUrl(entity.getUrl());
@@ -70,7 +71,7 @@ public final class MenuInterfaceAssembler {
         }
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());
-        entity.setRanks(request.getRanks());
+        entity.setRank(AccessRankCodec.toDomain(request.getRanks()));
         entity.setVisibility(
                 Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         entity.setDisplayParams(request.getDisplayParams());

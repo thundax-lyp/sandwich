@@ -3,27 +3,27 @@ package com.github.thundax.modules.sys.entity.valueobject;
 import java.util.Objects;
 
 /**
- * 后台用户等级。
+ * 访问等级。
  */
-public final class UserRank {
+public final class AccessRank implements Comparable<AccessRank> {
 
     public static final int MIN_VALUE = 0;
     public static final int MAX_VALUE = 9;
 
     private final int value;
 
-    private UserRank(int value) {
+    private AccessRank(int value) {
         this.value = value;
     }
 
-    public static UserRank of(Integer value) {
+    public static AccessRank of(Integer value) {
         if (value == null || value < MIN_VALUE) {
-            return new UserRank(MIN_VALUE);
+            return new AccessRank(MIN_VALUE);
         }
         if (value >= MAX_VALUE) {
-            return new UserRank(MAX_VALUE);
+            return new AccessRank(MAX_VALUE);
         }
-        return new UserRank(value);
+        return new AccessRank(value);
     }
 
     public int value() {
@@ -34,8 +34,13 @@ public final class UserRank {
         return value >= of(targetRank).value();
     }
 
-    public boolean canAccess(UserRank targetRank) {
+    public boolean canAccess(AccessRank targetRank) {
         return value >= (targetRank == null ? MIN_VALUE : targetRank.value());
+    }
+
+    @Override
+    public int compareTo(AccessRank that) {
+        return Integer.compare(value, that == null ? MIN_VALUE : that.value());
     }
 
     @Override
@@ -43,11 +48,11 @@ public final class UserRank {
         if (this == that) {
             return true;
         }
-        if (!(that instanceof UserRank)) {
+        if (!(that instanceof AccessRank)) {
             return false;
         }
-        UserRank userRank = (UserRank) that;
-        return value == userRank.value;
+        AccessRank accessRank = (AccessRank) that;
+        return value == accessRank.value;
     }
 
     @Override

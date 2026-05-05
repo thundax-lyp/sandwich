@@ -13,6 +13,7 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public class MenuServiceImplTest {
         MenuQuery query = new MenuQuery();
         query.setParentId("ROOT");
         query.setVisibility(MenuVisibility.VISIBLE);
-        query.setMaxRank(3);
+        query.setMaxRank(AccessRank.of(3));
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
         service.list(query);
@@ -50,7 +51,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.list(2);
+        service.list(AccessRank.of(2));
         assertEquals(Integer.valueOf(2), dao.maxRank);
 
         service.listChildren("parent-1");

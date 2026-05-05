@@ -4,6 +4,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public interface MenuService {
 
     int batchDeleteById(List<EntityId> ids);
 
-    List<Menu> list(Integer maxRank);
+    List<Menu> list(AccessRank maxRank);
 
     List<Menu> listChildren(String parentId);
 

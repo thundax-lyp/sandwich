@@ -12,7 +12,6 @@ import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.PermissionService;
-import com.github.thundax.modules.sys.codec.UserRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -151,7 +150,7 @@ public class PermissionServiceImpl implements PermissionService {
             boolean isAdmin = user.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
 
             if (isAdmin) {
-                menuIdList = menuService.list(UserRankCodec.toValue(user.getRank())).stream()
+                menuIdList = menuService.list(user.getRank()).stream()
                         .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
             } else {
@@ -163,7 +162,7 @@ public class PermissionServiceImpl implements PermissionService {
                 }
                 menuIds.removeIf(menuId -> {
                     Menu menu = menuService.getById(EntityIdCodec.toDomain(menuId));
-                    return menu == null || !user.getRank().canAccess(menu.getRanks());
+                    return menu == null || !user.getRank().canAccess(menu.getRank());
                 });
                 menuIdList = new ArrayList<>(menuIds);
             }

@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import com.github.thundax.common.config.Global;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.sys.codec.UserRankCodec;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -26,7 +26,7 @@ public final class UserPersistenceAssembler {
         dataObject.setMobile(entity.getMobile());
         dataObject.setTel(entity.getTel());
         dataObject.setName(entity.getName());
-        dataObject.setRanks(UserRankCodec.toValue(entity.getRank()));
+        dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
         dataObject.setRegisterDate(entity.getRegisterDate());
         dataObject.setRegisterIp(entity.getRegisterIp());
         dataObject.setLastLoginDate(entity.getLastLoginDate());
@@ -55,7 +55,7 @@ public final class UserPersistenceAssembler {
         entity.setMobile(dataObject.getMobile());
         entity.setTel(dataObject.getTel());
         entity.setName(dataObject.getName());
-        entity.setRank(UserRankCodec.toDomain(dataObject.getRanks()));
+        entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
         entity.setRegisterDate(dataObject.getRegisterDate());
         entity.setRegisterIp(dataObject.getRegisterIp());
         entity.setLastLoginDate(dataObject.getLastLoginDate());

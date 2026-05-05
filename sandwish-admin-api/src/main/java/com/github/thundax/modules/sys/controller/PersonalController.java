@@ -13,7 +13,6 @@ import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
-import com.github.thundax.modules.sys.codec.UserRankCodec;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarDeleteRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
@@ -248,7 +247,7 @@ public class PersonalController {
             boolean isAdmin = user.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
 
             if (isAdmin) {
-                menuIdList = menuService.list(UserRankCodec.toValue(user.getRank())).stream()
+                menuIdList = menuService.list(user.getRank()).stream()
                         .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
             } else {
@@ -260,7 +259,7 @@ public class PersonalController {
                 }
                 menuIds.removeIf(menuId -> {
                     Menu menu = menuService.getById(EntityIdCodec.toDomain(menuId));
-                    return menu == null || !user.getRank().canAccess(menu.getRanks());
+                    return menu == null || !user.getRank().canAccess(menu.getRank());
                 });
                 menuIdList = new ArrayList<>(menuIds);
             }

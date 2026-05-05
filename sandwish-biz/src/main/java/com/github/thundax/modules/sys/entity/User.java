@@ -8,7 +8,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import com.github.thundax.modules.sys.entity.valueobject.UserRank;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class User implements Auditable, Signable, Sortable {
     private String mobile;
     private String tel;
     private String name;
-    private UserRank rank = UserRank.of(0);
+    private AccessRank rank = AccessRank.of(0);
 
     private Date registerDate;
     private String registerIp;
@@ -60,12 +60,12 @@ public class User implements Auditable, Signable, Sortable {
     }
 
     @NonNull
-    public UserRank getRank() {
-        return rank == null ? UserRank.of(null) : rank;
+    public AccessRank getRank() {
+        return rank == null ? AccessRank.of(null) : rank;
     }
 
-    public void setRank(UserRank rank) {
-        this.rank = rank == null ? UserRank.of(null) : rank;
+    public void setRank(AccessRank rank) {
+        this.rank = rank == null ? AccessRank.of(null) : rank;
     }
 
     public boolean isSuper() {

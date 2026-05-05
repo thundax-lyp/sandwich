@@ -8,9 +8,11 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.SignService;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Collection;
@@ -52,7 +54,7 @@ public class MenuServiceImpl implements MenuService {
         return dao.list(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
-                query == null ? null : query.getMaxRank());
+                query == null ? null : rankValue(query.getMaxRank()));
     }
 
     public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
@@ -60,7 +62,7 @@ public class MenuServiceImpl implements MenuService {
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
-                query == null ? null : query.getMaxRank(),
+                query == null ? null : rankValue(query.getMaxRank()),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -70,8 +72,8 @@ public class MenuServiceImpl implements MenuService {
         return normalizedPage;
     }
 
-    public List<Menu> list(Integer maxRank) {
-        return dao.list(null, null, maxRank);
+    public List<Menu> list(AccessRank maxRank) {
+        return dao.list(null, null, rankValue(maxRank));
     }
 
     @Override
@@ -186,5 +188,9 @@ public class MenuServiceImpl implements MenuService {
 
     private String visibilityValue(MenuVisibility visibility) {
         return visibility == null ? null : visibility.value();
+    }
+
+    private Integer rankValue(AccessRank rank) {
+        return rank == null ? null : AccessRankCodec.toValue(rank);
     }
 }

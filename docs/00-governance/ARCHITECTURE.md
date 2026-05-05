@@ -1,6 +1,6 @@
 # Sandwich 系统架构
 
-本文件只保留架构决策和实现红线。本文档是讨论稿，后续规则收敛后再拆分到命名、数据库、部署等专项治理文档。
+本文件只保留架构决策和实现红线。已经拆分到专项治理文档的规则，在本文只保留入口链接和最高层边界。
 
 相关文档：
 
@@ -39,6 +39,13 @@
 - api docs: Swagger / Springfox
 - formatter: Spotless
 - rule gate: Checkstyle
+
+## Project Identity
+
+- 项目对外展示名固定为 `Sandwich`。
+- Maven artifact、模块名、目录名和包内项目名前缀继续沿用现有 `sandwish`，不得为了拼写统一做无业务收益的大规模重命名。
+- 运行 jar 的 `finalName` 固定使用入口模块名：`sandwish-admin-api`、`sandwish-front-api`。
+- 部署样例、README、数据库脚本和治理文档使用 `Sandwich` 表达项目展示名，引用真实模块、路径或 artifact 时使用对应 `sandwish-*` 名称。
 
 ## Quality Tools
 
@@ -512,10 +519,14 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 先保留旧项目可运行性，再做结构治理。
 - 文档、代码、测试和提交记录必须保持同一套项目口径。
 
+## Governance Coverage
+
+- 后台、前台、业务模块的详细目录、命名和层次规则固定由 [`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md) 承载，本文不重复展开。
+- 当前已建立需求文档和数据库设计文档的业务域固定为 `system`、`auth`、`storage`。
+- 修改 `system`、`auth`、`storage` 的需求、数据库、SQL、持久化对象或接口时，必须同步检查对应 `10-requirements/` 与 `20-database/` 文档。
+- 修改尚未建立需求和数据库设计文档的业务域时，若变更会扩大领域模型、表结构、接口契约或部署边界，必须先补对应需求和数据库设计文档。
+- 轻量架构测试已经作为治理门禁存在于各模块 `src/test/java/com/github/thundax/architecture/`；新增可机械校验的架构红线时，必须补充或扩展对应架构测试。
+
 ## Open Items
 
-- 是否统一项目展示名为 `sandwich`，还是继续沿用 Maven artifact `sandwish`。
-- 是否保留 jar finalName 中的 `interaction-admin-api`、`hudong` 等历史命名。
-- 是否补充后台、前台、业务模块的详细目录规范。
-- 是否为现有业务域建立 `10-requirements/` 和 `20-database/` 文档。
-- 是否引入轻量架构测试或 Maven 检查来守住模块依赖方向。
+无

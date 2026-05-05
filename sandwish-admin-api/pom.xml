@@ -130,7 +130,7 @@
     </dependencies>
 
     <build>
-        <finalName>interaction-admin-api</finalName>
+        <finalName>sandwish-admin-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

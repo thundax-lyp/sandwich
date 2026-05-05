@@ -31,8 +31,8 @@ mvn -q -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
 
 产物路径：
 
-- `sandwish-admin-api/target/interaction-admin-api.jar`
-- `sandwish-front-api/target/hudong.jar`
+- `sandwish-admin-api/target/sandwish-admin-api.jar`
+- `sandwish-front-api/target/sandwish-front-api.jar`
 
 ## Start
 

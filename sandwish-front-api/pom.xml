@@ -181,7 +181,7 @@
     </dependencies>
 
     <build>
-        <finalName>hudong</finalName>
+        <finalName>sandwish-front-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

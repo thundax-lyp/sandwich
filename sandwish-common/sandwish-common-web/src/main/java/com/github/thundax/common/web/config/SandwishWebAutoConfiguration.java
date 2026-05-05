@@ -1,0 +1,52 @@
+package com.github.thundax.common.web.config;
+
+import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
+import com.github.thundax.common.web.context.DefaultSandwishContextResolver;
+import com.github.thundax.common.web.context.SandwishContextFilter;
+import com.github.thundax.common.web.context.SandwishContextResolver;
+import com.github.thundax.common.web.exception.GlobalExceptionHandler;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+
+@Configuration
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+public class SandwishWebAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ApiResponseBodyAdvice apiResponseBodyAdvice() {
+        return new ApiResponseBodyAdvice();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SandwishContextResolver sandwishContextResolver() {
+        return new DefaultSandwishContextResolver();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SandwishContextFilter sandwishContextFilter(SandwishContextResolver sandwishContextResolver) {
+        return new SandwishContextFilter(sandwishContextResolver);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(name = "sandwishContextFilterRegistration")
+    public FilterRegistrationBean<SandwishContextFilter> sandwishContextFilterRegistration(
+            SandwishContextFilter sandwishContextFilter) {
+        FilterRegistrationBean<SandwishContextFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(sandwishContextFilter);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registration;
+    }
+}

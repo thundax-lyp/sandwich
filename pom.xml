@@ -105,6 +105,11 @@
                 <artifactId>sandwish-common-mq</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.thundax</groupId>
+                <artifactId>sandwish-common-oss</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>

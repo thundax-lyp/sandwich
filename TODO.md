@@ -9,21 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-oss`：补充对象存储客户端抽象与本地文件实现
-  - 范围文件：
-    - `pom.xml`
-    - `sandwish-common/pom.xml`
-    - `sandwish-common/sandwish-common-oss/pom.xml`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/client/ObjectStorageClient.java`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/config/SandwishOssAutoConfiguration.java`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/config/SandwishOssProperties.java`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/model/ObjectStorageWriteResult.java`
-    - `sandwish-common/sandwish-common-oss/src/main/java/com/github/thundax/common/oss/support/LocalFileObjectStorageClient.java`
-    - `sandwish-common/sandwish-common-oss/src/test/java/com/github/thundax/common/oss/support/LocalFileObjectStorageClientTest.java`
-  - 处理动作：新增 common-oss 模块，定义对象存储契约、配置和 local file backend。
-  - 验收点：local file 写入、读取、删除测试通过，模块不依赖 storage 业务。
-  - 重要度：9/10
-
 - [ ] `common-oss`：补充 S3 对象存储实现
   - 范围文件：
     - `sandwish-common/sandwish-common-oss/pom.xml`

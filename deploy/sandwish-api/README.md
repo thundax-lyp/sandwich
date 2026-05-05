@@ -73,6 +73,18 @@ docker compose --env-file deploy/sandwish-api/.env -f deploy/sandwish-api/docker
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
 
+## Smoke Check
+
+真实环境冒烟脚本见 `scripts/smoke/`。脚本通过环境变量指定 API 地址和访问 token，不绑定 staging 环境。
+
+本地 Compose 启动后可执行：
+
+```bash
+scripts/smoke/smoke-all.sh
+```
+
+需要认证态检查时，复制 `scripts/smoke/.env.example` 为 `.env.smoke`，填入实际 token 后再执行脚本。
+
 ## Data Initialization
 
 MySQL 首次初始化会按以下顺序自动导入数据库脚本：

@@ -9,21 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-log`：补充统一操作日志框架
-  - 范围文件：
-    - `pom.xml`
-    - `sandwish-common/pom.xml`
-    - `sandwish-common/sandwish-common-log/pom.xml`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/annotation/SysLog.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/aspect/SysLogAspect.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/config/SandwishLogAutoConfiguration.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/model/SysLogEvent.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/producer/SysLogProducer.java`
-    - `sandwish-common/sandwish-common-log/src/test/java/com/github/thundax/common/log/aspect/SysLogAspectTest.java`
-  - 处理动作：新增 common-log 模块，提供 `@SysLog`、日志事件模型、AOP 拦截和默认 NoOp producer。
-  - 验收点：common-log 可独立测试通过，未引入业务模块依赖。
-  - 重要度：9/10
-
 - [ ] `common-mq`：补充统一消息发送门面
   - 范围文件：
     - `pom.xml`

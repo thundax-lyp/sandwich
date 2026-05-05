@@ -95,6 +95,11 @@
                 <artifactId>sandwish-common-swagger</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.thundax</groupId>
+                <artifactId>sandwish-common-log</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>

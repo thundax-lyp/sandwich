@@ -41,15 +41,6 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 
-shiro:
-  loginUrl: /admin/login
-  successUrl: /admin/index
-  sessionManager:
-    sessionIdUrlRewritingEnabled: false
-    sessionIdCookieEnabled: true
-    cookie:
-      name: sandwish.admin.sid
-
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor

@@ -42,10 +42,22 @@ mvn -q -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
 cp deploy/sandwish-api/.env.example deploy/sandwish-api/.env
 ```
 
+本地私密配置可以使用：
+
+```bash
+cp deploy/sandwish-api/.env.example deploy/sandwish-api/.env.dev
+```
+
 启动：
 
 ```bash
 docker compose --env-file deploy/sandwish-api/.env -f deploy/sandwish-api/docker-compose.yml up -d
+```
+
+使用本地私密配置启动：
+
+```bash
+docker compose --env-file deploy/sandwish-api/.env.dev -f deploy/sandwish-api/docker-compose.yml up -d
 ```
 
 停止：
@@ -80,7 +92,25 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 - 默认用户：`developer`
 - 默认密码：部署默认密码，首次登录后应立即修改
 
+## Storage Backend
+
+对象存储运行配置使用 `SANDWISH_OSS_TYPE`：
+
+- `local`：使用本地文件存储，对应 `SANDWISH_OSS_LOCAL_*`
+- `s3`：使用 S3 API 存储，对应 `SANDWISH_OSS_S3_*`
+
+业务数据库中的 `storage_type` 字段仍写入领域枚举值：`LOCAL_FILE` 或 `OSS`。
+
 ## Environment Variables
+
+单应用运行样例：
+
+- `sandwish-admin-api/.env.example`
+- `sandwish-front-api/.env.example`
+
+Compose 部署样例：
+
+- `deploy/sandwish-api/.env.example`
 
 关键变量：
 

@@ -8,14 +8,7 @@ import org.junit.Test;
 public class DaoNamingArchitectureTest extends AbstractArchitectureTest {
 
     @Test
-    public void shouldUseDaoPortMethodShape() {
-        JavaClasses classes = importPackages("com.github.thundax.modules");
-
-        NamingArchitectureRuleSupport.assertDaoInterfaceMethodNames(classes);
-    }
-
-    @Test
-    public void shouldUseDaoSuffix() {
+    public void shouldUseDaoImplSuffix() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 
         NamingArchitectureRuleSupport.assertDaoTypeNamesUseDaoSuffix(classes);

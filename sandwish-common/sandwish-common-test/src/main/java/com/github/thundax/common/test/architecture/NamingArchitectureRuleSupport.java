@@ -49,6 +49,19 @@ public final class NamingArchitectureRuleSupport {
         assertTrue("Tool packages must not use architecture role suffixes: " + violations, violations.isEmpty());
     }
 
+    public static void assertLayerTypeNames(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+
+        for (JavaClass javaClass : classes) {
+            if (isTestType(javaClass) || javaClass.getName().contains("$")) {
+                continue;
+            }
+            collectLayerTypeNameViolation(javaClass, violations);
+        }
+
+        assertTrue("Layer types must use the fixed suffix for their package: " + violations, violations.isEmpty());
+    }
+
     public static void assertDaoInterfaceMethodNames(JavaClasses classes) {
         List<String> violations = new ArrayList<String>();
 
@@ -68,6 +81,30 @@ public final class NamingArchitectureRuleSupport {
                         + "naming: "
                         + violations,
                 violations.isEmpty());
+    }
+
+    public static void assertDaoTypeNamesUseDaoSuffix(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+
+        for (JavaClass javaClass : classes) {
+            if (!isDaoPackage(javaClass) || isTestType(javaClass)) {
+                continue;
+            }
+            if (javaClass.isInterface() && !javaClass.getSimpleName().endsWith("Dao")) {
+                violations.add(javaClass.getName());
+            }
+            if (!javaClass.isInterface()
+                    && javaClass.getPackageName().contains(".persistence.dao")
+                    && !javaClass.getSimpleName().endsWith("DaoImpl")) {
+                violations.add(javaClass.getName());
+            }
+            if (javaClass.getSimpleName().endsWith("DAO")
+                    || javaClass.getSimpleName().endsWith("DAOImpl")) {
+                violations.add(javaClass.getName());
+            }
+        }
+
+        assertTrue("DAO types must use Dao/DaoImpl suffixes: " + violations, violations.isEmpty());
     }
 
     public static void assertServiceInterfaceMethodNames(JavaClasses classes) {
@@ -169,10 +206,75 @@ public final class NamingArchitectureRuleSupport {
                 || packageName.contains(".web.response");
     }
 
+    private static void collectLayerTypeNameViolation(JavaClass javaClass, List<String> violations) {
+        String packageName = javaClass.getPackageName();
+        String simpleName = javaClass.getSimpleName();
+        if (isDirectControllerPackage(packageName) && !simpleName.endsWith("Controller")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".controller.request") && !simpleName.endsWith("Request")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".controller.response") && !simpleName.endsWith("Response")) {
+            violations.add(javaClass.getName());
+        } else if (isServiceImplementation(javaClass) && !simpleName.endsWith("ServiceImpl")) {
+            violations.add(javaClass.getName());
+        } else if (isServiceInterfacePackage(javaClass) && !simpleName.endsWith("Service")) {
+            violations.add(javaClass.getName());
+        } else if (isDaoInterfacePackage(javaClass) && !simpleName.endsWith("Dao")) {
+            violations.add(javaClass.getName());
+        } else if (isDaoImplementation(javaClass) && !simpleName.endsWith("DaoImpl")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".persistence.mapper") && !simpleName.endsWith("Mapper")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".persistence.dataobject")
+                && !simpleName.endsWith("DO")
+                && !simpleName.endsWith("DataObject")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".persistence.assembler") && !simpleName.endsWith("PersistenceAssembler")) {
+            violations.add(javaClass.getName());
+        } else if (isInterfaceAssemblerPackage(packageName) && !simpleName.endsWith("InterfaceAssembler")) {
+            violations.add(javaClass.getName());
+        } else if (packageName.contains(".service.query") && !simpleName.endsWith("Query")) {
+            violations.add(javaClass.getName());
+        }
+    }
+
+    private static boolean isDirectControllerPackage(String packageName) {
+        return packageName.endsWith(".controller");
+    }
+
+    private static boolean isServiceImplementation(JavaClass javaClass) {
+        return !javaClass.isInterface() && javaClass.getPackageName().contains(".service.impl");
+    }
+
+    private static boolean isServiceInterfacePackage(JavaClass javaClass) {
+        String packageName = javaClass.getPackageName();
+        return javaClass.isInterface() && packageName.endsWith(".service");
+    }
+
+    private static boolean isDaoInterfacePackage(JavaClass javaClass) {
+        return javaClass.isInterface() && javaClass.getPackageName().contains(".dao");
+    }
+
+    private static boolean isDaoImplementation(JavaClass javaClass) {
+        return !javaClass.isInterface() && javaClass.getPackageName().contains(".persistence.dao");
+    }
+
+    private static boolean isInterfaceAssemblerPackage(String packageName) {
+        return packageName.contains(".assembler") && !packageName.contains(".persistence.assembler");
+    }
+
     private static boolean isDaoInterface(JavaClass javaClass) {
         return javaClass.isInterface()
                 && javaClass.getSimpleName().endsWith("Dao")
                 && javaClass.getPackageName().contains(".dao");
+    }
+
+    private static boolean isDaoPackage(JavaClass javaClass) {
+        return javaClass.getPackageName().contains(".dao");
+    }
+
+    private static boolean isTestType(JavaClass javaClass) {
+        return javaClass.getName().contains("Test");
     }
 
     private static boolean isServiceInterface(JavaClass javaClass) {

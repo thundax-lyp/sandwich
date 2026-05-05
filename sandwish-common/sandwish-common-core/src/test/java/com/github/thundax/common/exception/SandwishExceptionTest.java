@@ -40,13 +40,11 @@ public class SandwishExceptionTest {
     }
 
     @Test
-    public void shouldKeepCustomMessageAndCause() {
-        RuntimeException cause = new RuntimeException("root");
-        SandwishException custom = new SandwishException(errorCode, "custom", cause);
+    public void shouldKeepCustomMessage() {
+        SandwishException custom = new SandwishException(errorCode, "custom");
 
         assertSame(errorCode, custom.getErrorCode());
         assertEquals(errorCode.getCode(), custom.getCode());
         assertEquals("custom", custom.getMessage());
-        assertSame(cause, custom.getCause());
     }
 }

@@ -14,11 +14,6 @@ public class SandwishException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public SandwishException(ErrorCode errorCode, String message, Throwable cause) {
-        super(message, cause);
-        this.errorCode = errorCode;
-    }
-
     public ErrorCode getErrorCode() {
         return errorCode;
     }

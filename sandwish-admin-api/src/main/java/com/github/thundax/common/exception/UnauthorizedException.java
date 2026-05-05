@@ -7,8 +7,4 @@ public class UnauthorizedException extends ApiException {
     public UnauthorizedException() {
         super(I18nMessages.getMessage("common.exception.unauthorized"));
     }
-
-    public UnauthorizedException(String message) {
-        super(message);
-    }
 }

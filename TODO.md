@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-log`：接入 common-mq 日志生产者
-  - 范围文件：
-    - `sandwish-common/sandwish-common-log/pom.xml`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/config/SandwishLogAutoConfiguration.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/producer/MqSysLogProducer.java`
-    - `sandwish-common/sandwish-common-log/src/main/java/com/github/thundax/common/log/producer/NoOpSysLogProducer.java`
-    - `sandwish-common/sandwish-common-log/src/test/java/com/github/thundax/common/log/producer/MqSysLogProducerTest.java`
-  - 处理动作：让 common-log 在存在 `SandwishMqSender` 时输出日志消息，否则保持 NoOp。
-  - 验收点：无 MQ 客户端时应用仍可启动，有 sender 时日志事件能转换为统一 MQ 消息。
-  - 重要度：8/10
-
 - [ ] `common-test`：补充并发与路径架构规则
   - 范围文件：
     - `sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/architecture/ConcurrencyArchitectureRuleSupport.java`

@@ -119,8 +119,23 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 
 单应用运行样例：
 
-- `sandwish-admin-api/.env.example`
-- `sandwish-front-api/.env.example`
+- `.env.example`
+
+本地私密配置使用根目录 `dev.env`，由 `.env.example` 复制后填写，不提交到 git。`dev.env` 只放 admin/front 共享依赖配置；入口差异通过启动命令指定。
+
+后台入口：
+
+```bash
+set -a; . ./dev.env; set +a
+SERVER_PORT=20009 SERVER_SERVLET_CONTEXT_PATH=/admin-api java -jar sandwish-admin-api/target/sandwish-admin-api.jar
+```
+
+前台入口：
+
+```bash
+set -a; . ./dev.env; set +a
+SERVER_PORT=20002 SERVER_SERVLET_CONTEXT_PATH=/front-api java -jar sandwish-front-api/target/sandwish-front-api.jar
+```
 
 Compose 部署样例：
 

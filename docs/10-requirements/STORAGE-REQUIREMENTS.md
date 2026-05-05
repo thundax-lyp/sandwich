@@ -21,6 +21,7 @@
 
 当前不覆盖范围：
 
+- 前台普通对象上传接口。
 - CDN 分发。
 - 图片裁剪、压缩和水印。
 - 视频转码。
@@ -45,6 +46,8 @@
   - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao`，并通过 `StoredObjectStore` 适配 `common-oss` 对象存储客户端。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java`
   - 提供后台上传、分页、内容读取、删除和引用管理接口。
+- `sandwish-front-api`
+  - 当前不提供前台 Storage Controller；前台业务需要文件能力时，通过业务 Service 复用 Storage Service，不复制后台上传入口。
 - `sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
   - 装配管理端 `StoredObjectStore`。
 - `sandwish-front-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
@@ -181,6 +184,8 @@
 - Storage Service 是业务流程入口，Controller 不直接访问 DAO / Mapper。
 - DAO interface 只定义持久化访问契约，不承载 HTTP 适配。
 - 底层存储端口固定下沉到 infra，实际读写通过 `common-oss` 的 `ObjectStorageClient` 完成，不作为业务接口模型暴露。
+- Storage 当前公开上传入口固定在后台 API；前台 API 当前只装配底层存储能力，不开放通用上传 Controller。
+- 前台后续需要上传时，必须先沉淀明确业务资源和权限边界，再新增前台业务专用接口，并复用 `sandwish-biz` 的 Storage Service。
 - 公开 API 路径应该是 REST resource。
 - 公开 API、Response、数据库主数据和业务模块不得固定暴露 `/servlet/...`。
 - 其他业务模块只能保存 `objectId` 或自身语义包装后的稳定对象标识。
@@ -189,6 +194,10 @@
 - 分片记录必须按 `uploadId + partNumber` 唯一约束。
 - 审计日志和 outbox 固定不纳入 Sandwich `Storage` 当前实现。
 - 前后台入口不得复制业务规则；共享规则必须进入 `sandwish-biz`。
+- OSS 运行配置固定由 `sandwish.oss` 配置树提供，并允许通过 `SANDWISH_OSS_*` 环境变量注入。
+- `sandwish.oss.type=local` 时使用本地文件存储，必填运行含义为 `sandwish.oss.local.root-path`；`sandwish.oss.local.location-prefix` 用于派生访问端点。
+- `sandwish.oss.type=s3` 时使用 S3 API 存储，必填运行含义为 `sandwish.oss.s3.bucket`、`sandwish.oss.s3.access-key` 和 `sandwish.oss.s3.secret-key`；`endpoint`、`region`、`location-prefix` 和 `path-style-access` 按部署环境配置。
+- 本地开发和自动化测试默认使用 `local`；S3 行为通过 `S3ObjectStorageClient` 单元测试和 Docker 部署样例中的 MinIO 配置替身覆盖。
 
 ## 7. REST Resources
 
@@ -314,5 +323,4 @@ Storage 公开入口固定使用资源型路径。
 
 ## 11. Open Items
 
-- 明确前台是否需要普通上传接口。
-- 明确 `OSS` 供应商配置来源、必填字段和本地测试替身。
+无

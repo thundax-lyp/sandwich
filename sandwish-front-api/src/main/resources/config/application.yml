@@ -21,6 +21,11 @@ spring:
     username: ${SANDWISH_DB_USERNAME:sandwish}
     password: ${SANDWISH_DB_PASSWORD:}
 
+  redis:
+    url: ${SANDWISH_REDIS_URI:redis://127.0.0.1:6379/0}
+    password: ${SANDWISH_REDIS_PASSWORD:}
+    timeout: ${SANDWISH_REDIS_TIMEOUT:5s}
+
   mvc:
     throw-exception-if-no-handler-found: true
 

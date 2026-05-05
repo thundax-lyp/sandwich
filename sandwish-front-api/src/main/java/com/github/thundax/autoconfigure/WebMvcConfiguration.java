@@ -5,14 +5,10 @@ import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.storage.store.LocalFileStoredObjectStore;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
-import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
-import com.github.thundax.modules.sys.servlet.SmsValidateCodeServlet;
-import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.DispatcherType;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -22,28 +18,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableWebMvc
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
-    @Bean
-    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(
-            VltavaProperties properties) {
-        ValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
-
-        ServletRegistrationBean<ValidateCodeServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new ValidateCodeServlet());
-        bean.addUrlMappings("/servlet/validateCodeServlet");
-        return bean;
-    }
-
-    @Bean
-    public ServletRegistrationBean<SmsValidateCodeServlet> smsValidateCodeServletServletRegistrationBean(
-            VltavaProperties properties, SmsValidateCodeDao smsValidateCodeDao) {
-        SmsValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
-
-        ServletRegistrationBean<SmsValidateCodeServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new SmsValidateCodeServlet(smsValidateCodeDao));
-        bean.addUrlMappings("/servlet/smsValidateCodeServlet");
-        return bean;
-    }
 
     @Bean
     public StoredObjectStore storedObjectStore(VltavaProperties properties) {

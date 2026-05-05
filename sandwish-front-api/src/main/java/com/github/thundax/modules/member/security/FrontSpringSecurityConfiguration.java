@@ -40,7 +40,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .httpBasic()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/static/**", "/servlet/**", "/auth/register", "/auth/login")
+                .antMatchers("/static/**", "/auth/register", "/auth/login")
                 .permitAll()
                 .antMatchers("/member/**")
                 .authenticated()

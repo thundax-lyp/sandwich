@@ -23,7 +23,7 @@
 
 上线前必须确认：
 
-- 后台和前台存储访问路径与当前 Servlet / Converter 实现一致
+- 后台和前台存储访问路径与当前 Controller / Converter 实现一致
 - 文档中的接口路径、字段名、状态值与当前代码一致
 - `StorageResponse`、`StorageQuery`、`StorageStatus`、`StorageVisibility`、`StorageOwnerType` 的公开语义一致
 - 分片上传初始化、上传分片、完成和取消接口与需求文档一致

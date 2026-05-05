@@ -5,9 +5,7 @@ import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.auth.filter.ResponseWrapperFilter;
 import com.github.thundax.modules.storage.store.LocalFileStoredObjectStore;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
-import com.github.thundax.modules.sys.servlet.ValidateCodeServlet;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -22,17 +20,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public StoredObjectStore storedObjectStore(VltavaProperties properties) {
         VltavaProperties.UploadProperties upload = properties.getUpload();
         return new LocalFileStoredObjectStore(upload.getStoragePath(), upload.getContentPath());
-    }
-
-    @Bean
-    public ServletRegistrationBean<ValidateCodeServlet> validateCodeServletServletRegistrationBean(
-            VltavaProperties properties) {
-        ValidateCodeServlet.setWhiteCaptcha(properties.getWhiteCaptcha());
-
-        ServletRegistrationBean<ValidateCodeServlet> bean = new ServletRegistrationBean<>();
-        bean.setServlet(new ValidateCodeServlet());
-        bean.addUrlMappings("/servlet/validateCodeServlet");
-        return bean;
     }
 
     @Bean

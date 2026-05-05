@@ -9,21 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `common-core`：增加统一异常模型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ErrorCode.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/SandwishException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/BadRequestException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/UnauthorizedException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ForbiddenException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/NotFoundException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ConflictException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/SystemException.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/exception/SandwishExceptionTest.java`
-  - 处理动作：新增框架级错误码和标准业务异常层级。
-  - 验收点：每类标准异常都能稳定暴露错误码和错误消息，并有单元测试覆盖。
-  - 重要度：10/10
-
 - [ ] `common-web`：增加统一异常响应处理
   - 范围文件：
     - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`

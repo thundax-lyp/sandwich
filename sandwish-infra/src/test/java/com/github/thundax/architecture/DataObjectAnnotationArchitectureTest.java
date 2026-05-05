@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
 import com.github.thundax.common.test.architecture.ModelAnnotationArchitectureRuleSupport;
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -28,6 +29,10 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
+    };
+    private static final String[] LEGACY_TABLE_NAME_DATA_OBJECTS = {
+        "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO",
+        "com.github.thundax.modules.member.persistence.dataobject.MemberDO"
     };
 
     @Test
@@ -87,6 +92,23 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             assertFalse(
                     javaClass.getFullName() + " must not declare updateUserId field",
                     javaClass.tryGetField("updateUserId").isPresent());
+        }
+    }
+
+    @Test
+    public void shouldUseAllowedTableNamePrefixForDataObjects() {
+        JavaClasses classes = importPackages(BASE_PACKAGE);
+
+        for (JavaClass javaClass : classes) {
+            if (!isDataObjectClass(javaClass) || !javaClass.isAnnotatedWith(TableName.class)) {
+                continue;
+            }
+            String tableName = javaClass.getAnnotationOfType(TableName.class).value();
+            if (isLegacyTableNameDataObject(javaClass)) {
+                assertStartsWith(javaClass, tableName, "tb_");
+            } else {
+                assertAllowedTablePrefix(javaClass, tableName);
+            }
         }
     }
 
@@ -155,5 +177,28 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             }
         }
         return false;
+    }
+
+    private boolean isLegacyTableNameDataObject(JavaClass javaClass) {
+        for (String className : LEGACY_TABLE_NAME_DATA_OBJECTS) {
+            if (javaClass.getFullName().equals(className)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void assertAllowedTablePrefix(JavaClass javaClass, String tableName) {
+        if (tableName.startsWith("sys_") || tableName.startsWith("auth_") || tableName.startsWith("assist_")) {
+            return;
+        }
+        fail(javaClass.getFullName() + " uses unsupported table prefix: " + tableName);
+    }
+
+    private void assertStartsWith(JavaClass javaClass, String tableName, String prefix) {
+        if (tableName.startsWith(prefix)) {
+            return;
+        }
+        fail(javaClass.getFullName() + " legacy table name must start with " + prefix + ": " + tableName);
     }
 }

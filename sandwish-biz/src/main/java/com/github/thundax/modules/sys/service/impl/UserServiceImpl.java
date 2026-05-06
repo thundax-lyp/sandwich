@@ -6,26 +6,20 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.assist.service.SignService;
-import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserDao;
-import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.UserIdentity;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.service.UserCredentialService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,23 +27,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
     private static final String LEGACY_SUPER_FLAG = "1";
 
     private final UserDao dao;
     private final SignService signService;
-    private final UserIdentityDao userIdentityDao;
-    private final UserCredentialDao userCredentialDao;
+    private final UserIdentityService userIdentityService;
+    private final UserCredentialService userCredentialService;
 
     public UserServiceImpl(
             UserDao dao,
             SignService signService,
-            UserIdentityDao userIdentityDao,
-            UserCredentialDao userCredentialDao) {
+            UserIdentityService userIdentityService,
+            UserCredentialService userCredentialService) {
         this.dao = dao;
         this.signService = signService;
-        this.userIdentityDao = userIdentityDao;
-        this.userCredentialDao = userCredentialDao;
+        this.userIdentityService = userIdentityService;
+        this.userCredentialService = userCredentialService;
     }
 
     public User getById(EntityId id) {
@@ -113,9 +106,9 @@ public class UserServiceImpl implements UserService {
             }
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        UserIdentity accountIdentity = upsertAccountIdentity(user, loginName);
+        UserIdentity accountIdentity = userIdentityService.updateAccountIdentity(user, loginName);
         if (added) {
-            upsertPasswordCredential(user, accountIdentity, encryptedPassword);
+            userCredentialService.updatePasswordCredential(user, accountIdentity, encryptedPassword);
         }
     }
 
@@ -197,55 +190,5 @@ public class UserServiceImpl implements UserService {
 
     private String superFlagValue(UserPrivilege privilege) {
         return UserPrivilege.SUPER == privilege ? LEGACY_SUPER_FLAG : null;
-    }
-
-    private UserIdentity upsertAccountIdentity(User user, String loginName) {
-        if (user == null || user.getId() == null || StringUtils.isBlank(loginName)) {
-            return null;
-        }
-        UserIdentity identity = userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT);
-        if (identity == null) {
-            identity = new UserIdentity();
-            identity.setUserId(user.getId());
-            identity.setIdentityType(UserIdentityType.ACCOUNT);
-            identity.setIdentityValue(loginName);
-            identity.setStatus(UserIdentityStatus.ENABLED);
-            identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
-            return identity;
-        }
-
-        identity.setIdentityValue(loginName);
-        identity.setStatus(UserIdentityStatus.ENABLED);
-        userIdentityDao.update(identity);
-        return identity;
-    }
-
-    private void upsertPasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
-        if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
-            return;
-        }
-        UserCredential credential =
-                userCredentialDao.getByIdentityIdAndType(accountIdentity.getId(), UserCredentialType.PASSWORD);
-        if (credential == null) {
-            credential = new UserCredential();
-            credential.setUserId(user.getId());
-            credential.setIdentityId(accountIdentity.getId());
-            credential.setCredentialType(UserCredentialType.PASSWORD);
-            credential.setCredentialValue(encryptedPassword);
-            credential.setStatus(UserCredentialStatus.ACTIVE);
-            credential.setNeedChangePassword(false);
-            credential.setFailedCount(0);
-            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            credential.setId(EntityIdCodec.toDomain(userCredentialDao.insert(credential)));
-            return;
-        }
-
-        credential.setCredentialValue(encryptedPassword);
-        credential.setStatus(UserCredentialStatus.ACTIVE);
-        credential.setNeedChangePassword(false);
-        credential.setFailedCount(0);
-        credential.setLockedUntil(null);
-        credential.setLastVerifiedAt(null);
-        userCredentialDao.update(credential);
     }
 }

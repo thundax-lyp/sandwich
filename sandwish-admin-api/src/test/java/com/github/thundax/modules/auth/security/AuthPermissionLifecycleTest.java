@@ -909,6 +909,16 @@ public class AuthPermissionLifecycleTest {
         public String getAccountLoginName(EntityId userId) {
             return "tester";
         }
+
+        @Override
+        public UserIdentity updateAccountIdentity(User user, String loginName) {
+            UserIdentity identity = new UserIdentity();
+            identity.setId(EntityId.of("identity-1"));
+            identity.setUserId(user.getId());
+            identity.setIdentityType(UserIdentityType.ACCOUNT);
+            identity.setIdentityValue(loginName);
+            return identity;
+        }
     }
 
     private static class TestUserCredentialService implements UserCredentialService {
@@ -920,6 +930,9 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {}
+
+        @Override
+        public void updatePasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {}
     }
 
     private static class TestMenuService implements MenuService {

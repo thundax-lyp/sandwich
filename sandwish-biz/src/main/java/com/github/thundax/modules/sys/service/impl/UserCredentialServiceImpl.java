@@ -4,17 +4,16 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
+import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
-import com.github.thundax.modules.sys.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,19 +24,19 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
-    private final UserService userService;
+    private final UserDao userDao;
     private final UserIdentityService userIdentityService;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
     private final SignService signService;
 
     public UserCredentialServiceImpl(
-            UserService userService,
+            UserDao userDao,
             UserIdentityService userIdentityService,
             UserIdentityDao userIdentityDao,
             UserCredentialDao userCredentialDao,
             SignService signService) {
-        this.userService = userService;
+        this.userDao = userDao;
         this.userIdentityService = userIdentityService;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
@@ -55,33 +54,20 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {
-        User user = userService.getById(userId);
+        User user = userId == null ? null : userDao.getById(userId);
         if (user == null) {
             return;
         }
         user.setUpdateUserId(updateUserId);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        updatePasswordCredential(user, accountIdentity(user), encryptedPassword);
+        UserIdentity accountIdentity =
+                userIdentityService.updateAccountIdentity(user, userIdentityService.getAccountLoginName(userId));
+        updatePasswordCredential(user, accountIdentity, encryptedPassword);
     }
 
-    private UserIdentity accountIdentity(User user) {
-        String loginName = userIdentityService.getAccountLoginName(user.getId());
-        if (StringUtils.isBlank(loginName)) {
-            return null;
-        }
-        UserIdentity identity = userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT);
-        if (identity == null) {
-            identity = new UserIdentity();
-            identity.setUserId(user.getId());
-            identity.setIdentityType(UserIdentityType.ACCOUNT);
-            identity.setIdentityValue(loginName);
-            identity.setStatus(UserIdentityStatus.ENABLED);
-            identity.setId(EntityIdCodec.toDomain(userIdentityDao.insert(identity)));
-        }
-        return identity;
-    }
-
-    private void updatePasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
         if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }

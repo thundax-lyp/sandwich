@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-user-write-orchestration`：收敛用户写入身份和凭据协作
-  - 范围文件：`sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImpl.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImpl.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserServiceImplTest.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImplTest.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImplTest.java`
-  - 处理动作：让 `UserServiceImpl.add` 和 `UserServiceImpl.update` 通过身份和凭据 Service 协作完成账号身份、密码凭据写入。
-  - 验收点：用户新增和更新仍由 `UserService` 作为事务入口，Controller 不新增跨 Service 写事务编排，用户、角色、身份、凭据和签名测试通过。
-  - 重要度：7/10
-
 - [ ] `sys-user-service-boundary-docs`：固定用户主体、身份和凭据 Service 边界
   - 范围文件：`docs/10-requirements/SYSTEM-REQUIREMENTS.md`
     `sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java`

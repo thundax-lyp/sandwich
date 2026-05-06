@@ -13,6 +13,8 @@ import org.springframework.lang.NonNull;
 public class SandwishProperties {
 
     private static final int DEFAULT_LOG_ALIVE_DAYS = 90;
+    private static final String DEFAULT_LOG_STORAGE_PATH =
+            System.getProperty("java.io.tmpdir") + File.separator + "sandwish" + File.separator + "sys-log";
 
     private static SandwishProperties instance;
 
@@ -260,7 +262,7 @@ public class SandwishProperties {
         @NonNull
         public String getStoragePath() {
             if (StringUtils.isBlank(storagePath)) {
-                return File.separator;
+                return DEFAULT_LOG_STORAGE_PATH + File.separator;
             } else if (!StringUtils.endsWith(storagePath, File.separator)) {
                 return storagePath + File.separator;
             }

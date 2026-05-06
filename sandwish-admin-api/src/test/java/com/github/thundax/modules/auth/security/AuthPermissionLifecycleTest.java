@@ -408,6 +408,25 @@ public class AuthPermissionLifecycleTest {
         Assert.assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
+    @Test
+    public void shouldSkipConfiguredPublicAuthPathWithoutToken() throws Exception {
+        SandwishProperties.AccessTokenFilterProperties properties =
+                new SandwishProperties.AccessTokenFilterProperties();
+        properties.setExcludePath(Collections.singletonList("/api/auth/**"));
+        AccessTokenAuthenticationFilter filter =
+                new AccessTokenAuthenticationFilter(properties, authService, permissionService, new TestUserService());
+
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/auth/captcha");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain chain = new MockFilterChain();
+
+        filter.doFilter(request, response, chain);
+
+        Assert.assertSame(request, chain.getRequest());
+        Assert.assertEquals("", response.getContentAsString());
+        Assert.assertNull(SecurityContextHolder.getContext().getAuthentication());
+    }
+
     private static class PlainPasswordService implements PasswordService {
 
         @Override

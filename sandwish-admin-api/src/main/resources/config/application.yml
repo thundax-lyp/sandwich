@@ -71,6 +71,11 @@ mybatis-plus:
     banner: false
 
 sandwish:
+  log:
+    storage-path: ${SANDWISH_LOG_STORAGE_PATH:${java.io.tmpdir}/sandwish/sys-log}
+  access-token-filter:
+    exclude-path:
+      - /api/auth/**
   oss:
     type: ${SANDWISH_OSS_TYPE:local}
     local:

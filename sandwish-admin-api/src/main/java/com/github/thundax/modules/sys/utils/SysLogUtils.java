@@ -74,14 +74,12 @@ public class SysLogUtils {
 
                 try {
                     String filename = LOG_FILENAME_FORMAT.format(sysLog.getLogDate()) + LOG_EXTEND_NAME;
+                    File logFile = new File(getProperties().getStoragePath(), filename);
 
-                    FileUtils.writeLines(
-                            new File(getProperties().getStoragePath(), filename),
-                            new ArrayList<>(Collections.singletonList(paramString)),
-                            true);
+                    FileUtils.writeLines(logFile, new ArrayList<>(Collections.singletonList(paramString)), true);
 
                 } catch (Exception e) {
-                    log.warn("can not save sys-log");
+                    log.warn("can not save sys-log to {}", getProperties().getStoragePath(), e);
                 }
             }
 

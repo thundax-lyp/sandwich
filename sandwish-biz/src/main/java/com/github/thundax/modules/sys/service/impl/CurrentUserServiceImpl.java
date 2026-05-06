@@ -51,7 +51,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         currentUser.setName(name);
         currentUser.setEmail(email);
         currentUser.setMobile(mobile);
-        userService.update(currentUser, userService.getAccountLoginName(currentUser.getId()));
+        userService.update(currentUser, userService.getAccountLoginName(currentUser.getId()), null);
         return currentUser;
     }
 

@@ -23,7 +23,6 @@ import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
-import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -195,7 +194,7 @@ public class RoleController {
             throw new InvalidParameterException("list");
         }
 
-        roleService.updateStatus(beanList);
+        roleService.batchUpdateStatus(beanList);
 
         return true;
     }
@@ -292,12 +291,12 @@ public class RoleController {
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
-        list.addAll(departmentService.list(new Department()).stream()
+        list.addAll(departmentService.listAll().stream()
                 .map(department -> RoleInterfaceAssembler.toDepartmentTreeNode(
                         DEPARTMENT_ID_PREFIX + department.getId(), department))
                 .collect(Collectors.toList()));
 
-        list.addAll(userService.list(new User()).stream()
+        list.addAll(userService.listAll().stream()
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         DEPARTMENT_ID_PREFIX,
                         user,

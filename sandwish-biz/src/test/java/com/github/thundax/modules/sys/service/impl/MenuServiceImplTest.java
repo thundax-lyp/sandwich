@@ -126,7 +126,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        int count = service.updateVisibility(Arrays.asList(menu("m1"), menu("m2")));
+        int count = service.batchUpdateVisibility(Arrays.asList(menu("m1"), menu("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.displayFlagCalls);

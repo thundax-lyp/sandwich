@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
         return dao.getById(id);
     }
 
-    public List<User> list(User user) {
+    public List<User> listAll() {
         return list((UserQuery) null);
     }
 
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(List<User> list) {
+    public int batchUpdateStatus(List<User> list) {
         return batchOperate(list, this::updateStatus);
     }
 

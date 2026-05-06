@@ -11,8 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -154,6 +156,32 @@ public final class NamingArchitectureRuleSupport {
         }
 
         assertTrue("Service add methods must return the created entity id: " + violations, violations.isEmpty());
+    }
+
+    public static void assertServiceInterfaceMethodsAreNotOverloaded(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+
+        for (JavaClass javaClass : classes) {
+            if (!isServiceInterface(javaClass)) {
+                continue;
+            }
+            Map<String, Integer> methodNameCounts = new HashMap<String, Integer>();
+            for (JavaMethod method : javaClass.getMethods()) {
+                Integer count = methodNameCounts.get(method.getName());
+                methodNameCounts.put(method.getName(), count == null ? 1 : count + 1);
+            }
+            for (Map.Entry<String, Integer> entry : methodNameCounts.entrySet()) {
+                if (entry.getValue() > 1) {
+                    violations.add(javaClass.getName() + "#" + entry.getKey());
+                }
+            }
+        }
+
+        assertTrue(
+                "Service interface methods must not be overloaded; express batch/by-condition/by-id/cascade "
+                        + "semantics in the method name: "
+                        + violations,
+                violations.isEmpty());
     }
 
     public static void assertServiceQueryObjectsUnderServiceQueryPackage(JavaClasses classes) {

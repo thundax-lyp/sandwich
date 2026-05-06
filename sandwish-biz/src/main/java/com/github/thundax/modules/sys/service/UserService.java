@@ -12,17 +12,13 @@ public interface UserService {
 
     User getById(EntityId id);
 
-    List<User> list(User user);
+    List<User> listAll();
 
     List<User> list(UserQuery query);
 
     PageDTO<User> page(UserQuery query, PageDTO<User> page);
 
     EntityId add(User user, String loginName, String encryptedPassword, List<String> roleIdList);
-
-    default void update(User user, String loginName) {
-        update(user, loginName, null);
-    }
 
     void update(User user, String loginName, List<String> roleIdList);
 
@@ -38,7 +34,7 @@ public interface UserService {
 
     int updateStatus(User user);
 
-    int updateStatus(List<User> list);
+    int batchUpdateStatus(List<User> list);
 
     List<Role> listUserRoles(User user);
 }

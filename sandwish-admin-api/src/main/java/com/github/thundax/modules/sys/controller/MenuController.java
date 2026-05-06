@@ -186,7 +186,7 @@ public class MenuController {
             throw new InvalidParameterException("list");
         }
 
-        menuService.updateVisibility(beanList);
+        menuService.batchUpdateVisibility(beanList);
 
         return true;
     }

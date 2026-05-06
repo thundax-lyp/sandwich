@@ -33,7 +33,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         return dao.getById(id);
     }
 
-    public List<Department> list(Department department) {
+    public List<Department> listAll() {
         return list((DepartmentQuery) null);
     }
 

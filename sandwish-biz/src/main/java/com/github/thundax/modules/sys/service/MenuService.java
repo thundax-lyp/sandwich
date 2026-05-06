@@ -25,7 +25,7 @@ public interface MenuService {
 
     int updateVisibility(Menu menu);
 
-    int updateVisibility(List<Menu> list);
+    int batchUpdateVisibility(List<Menu> list);
 
     void moveTreeNode(Menu fromBean, Menu toBean, TreeNodeMoveType moveType);
 

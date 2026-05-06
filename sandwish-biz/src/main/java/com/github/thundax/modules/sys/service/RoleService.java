@@ -30,7 +30,7 @@ public interface RoleService {
 
     int updateStatus(Role role);
 
-    int updateStatus(List<Role> list);
+    int batchUpdateStatus(List<Role> list);
 
     void updateUserList(Role role, List<User> userList);
 

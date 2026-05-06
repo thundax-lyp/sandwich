@@ -39,7 +39,7 @@ public interface MemberService {
 
     int updateStatus(Member member);
 
-    int updateStatus(List<Member> list);
+    int batchUpdateStatus(List<Member> list);
 
     Member getByZjhm(MemberQuery query);
 

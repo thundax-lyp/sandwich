@@ -345,7 +345,7 @@ public class UserController {
             throw new InvalidParameterException("list");
         }
 
-        userService.updateStatus(beanList);
+        userService.batchUpdateStatus(beanList);
 
         return true;
     }
@@ -416,7 +416,7 @@ public class UserController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     @WrappedApiResponse
     public List<UserDepartmentResponse> departmentTree() {
-        return departmentService.list(new Department()).stream()
+        return departmentService.listAll().stream()
                 .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, departmentService::getById))
                 .collect(Collectors.toList());
     }

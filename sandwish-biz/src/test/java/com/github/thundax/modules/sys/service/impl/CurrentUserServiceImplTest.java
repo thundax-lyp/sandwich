@@ -57,7 +57,7 @@ public class CurrentUserServiceImplTest {
         assertEquals("New Name", updated.getName());
         assertEquals("new@example.com", updated.getEmail());
         assertEquals("13800138000", updated.getMobile());
-        verify(userService).update(currentUser, "tester");
+        verify(userService).update(currentUser, "tester", null);
     }
 
     @Test

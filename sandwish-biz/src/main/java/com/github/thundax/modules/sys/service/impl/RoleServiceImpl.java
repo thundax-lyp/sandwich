@@ -126,7 +126,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(List<Role> list) {
+    public int batchUpdateStatus(List<Role> list) {
         return batchOperate(list, this::updateStatus);
     }
 

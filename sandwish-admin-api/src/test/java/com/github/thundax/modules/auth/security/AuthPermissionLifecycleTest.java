@@ -852,7 +852,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public int updateStatus(List<User> list) {
+        public int batchUpdateStatus(List<User> list) {
             return list.size();
         }
 
@@ -869,7 +869,7 @@ public class AuthPermissionLifecycleTest {
             return Collections.singletonList(user());
         }
 
-        public List<User> list(User entity) {
+        public List<User> listAll() {
             return Collections.singletonList(user());
         }
 
@@ -915,7 +915,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public int updateVisibility(List<Menu> list) {
+        public int batchUpdateVisibility(List<Menu> list) {
             return list.size();
         }
 
@@ -982,7 +982,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public int updateStatus(List<com.github.thundax.modules.sys.entity.Role> list) {
+        public int batchUpdateStatus(List<com.github.thundax.modules.sys.entity.Role> list) {
             return list.size();
         }
 

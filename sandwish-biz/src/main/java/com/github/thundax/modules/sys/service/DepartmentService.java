@@ -11,7 +11,7 @@ public interface DepartmentService {
 
     Department getById(EntityId id);
 
-    List<Department> list(Department department);
+    List<Department> listAll();
 
     List<Department> list(DepartmentQuery query);
 

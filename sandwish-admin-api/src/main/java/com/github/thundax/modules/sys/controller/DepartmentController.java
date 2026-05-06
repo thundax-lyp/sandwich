@@ -201,7 +201,7 @@ public class DepartmentController {
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:view')")
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
-        List<Department> beanList = departmentService.list(new Department());
+        List<Department> beanList = departmentService.listAll();
 
         Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, DepartmentIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));

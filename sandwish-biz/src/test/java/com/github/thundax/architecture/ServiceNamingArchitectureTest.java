@@ -26,6 +26,13 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     }
 
     @Test
+    public void shouldNotOverloadServiceInterfaceMethods() {
+        JavaClasses classes = importPackages("com.github.thundax.modules");
+
+        NamingArchitectureRuleSupport.assertServiceInterfaceMethodsAreNotOverloaded(classes);
+    }
+
+    @Test
     public void shouldPlaceServiceQueryObjectsUnderServiceQueryPackage() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 

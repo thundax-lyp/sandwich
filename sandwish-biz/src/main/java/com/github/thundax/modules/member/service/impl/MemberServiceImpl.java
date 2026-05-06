@@ -122,7 +122,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(List<Member> list) {
+    public int batchUpdateStatus(List<Member> list) {
         return batchOperate(list, this::updateStatus);
     }
 

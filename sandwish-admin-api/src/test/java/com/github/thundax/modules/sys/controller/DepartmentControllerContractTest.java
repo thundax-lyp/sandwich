@@ -38,7 +38,7 @@ public class DepartmentControllerContractTest {
     public void shouldExcludeSelectedDepartmentAndDescendantsFromTree() {
         DepartmentService departmentService = mock(DepartmentService.class);
         DepartmentController controller = new DepartmentController(departmentService);
-        when(departmentService.list(any(Department.class)))
+        when(departmentService.listAll())
                 .thenReturn(new ArrayList<>(Arrays.asList(
                         department("root", null), department("child", "root"), department("peer", null))));
 

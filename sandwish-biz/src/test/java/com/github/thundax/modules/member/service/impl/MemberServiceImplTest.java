@@ -83,7 +83,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        int count = service.updateStatus(Arrays.asList(member("m1"), member("m2")));
+        int count = service.batchUpdateStatus(Arrays.asList(member("m1"), member("m2")));
 
         assertEquals(2, count);
         assertEquals(2, dao.enableUpdateCalls);

@@ -99,7 +99,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateVisibility(List<Menu> list) {
+    public int batchUpdateVisibility(List<Menu> list) {
         return batchOperate(list, this::updateVisibility);
     }
 

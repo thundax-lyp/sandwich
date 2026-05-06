@@ -18,7 +18,7 @@ public final class MenuPersistenceAssembler {
         }
         MenuDO dataObject = new MenuDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setParentId(entity.getParentId());
+        dataObject.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));

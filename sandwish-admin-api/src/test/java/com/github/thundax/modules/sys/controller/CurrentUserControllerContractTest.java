@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.controller.request.PersonalAvatarDeleteRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalPasswordUpdateRequest;
@@ -59,9 +58,7 @@ public class CurrentUserControllerContractTest {
                         .getAnnotation(RequestMapping.class),
                 "avatar/upload");
         assertMapping(
-                CurrentUserController.class
-                        .getMethod("deleteAvatar", PersonalAvatarDeleteRequest.class)
-                        .getAnnotation(RequestMapping.class),
+                CurrentUserController.class.getMethod("deleteAvatar").getAnnotation(RequestMapping.class),
                 "avatar/delete");
         assertMapping(CurrentUserController.class.getMethod("menus").getAnnotation(RequestMapping.class), "menus");
         assertMapping(CurrentUserController.class.getMethod("perms").getAnnotation(RequestMapping.class), "perms");
@@ -80,7 +77,7 @@ public class CurrentUserControllerContractTest {
         UserAccessHolder.currentUserId("user-1", "token-1");
 
         CurrentUserController controller = new CurrentUserController(
-                userService, currentUserService, mock(UserIdentityService.class), mock(KeypairService.class));
+                currentUserService, mock(UserIdentityService.class), mock(KeypairService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 

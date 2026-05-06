@@ -16,8 +16,6 @@ import lombok.Setter;
 @TableName("sys_menu")
 public class MenuDO {
 
-    public static final String ROOT_ID = "ROOT";
-
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
 

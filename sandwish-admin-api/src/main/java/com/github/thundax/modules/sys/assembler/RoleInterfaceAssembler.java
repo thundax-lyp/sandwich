@@ -58,8 +58,9 @@ public final class RoleInterfaceAssembler {
 
         RoleMenuResponse response = new RoleMenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        if (StringUtils.isNotBlank(entity.getParentId())) {
-            response.setParentId(entity.getParentId());
+        String parentId = EntityIdCodec.toValue(entity.getParentId());
+        if (StringUtils.isNotBlank(parentId)) {
+            response.setParentId(parentId);
         }
         response.setName(entity.getName());
         response.setPerms(entity.getPerms());

@@ -51,7 +51,7 @@ public final class PersonalInterfaceAssembler {
         }
         PersonalMenuResponse response = new PersonalMenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setParentId(entity.getParentId());
+        response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         response.setName(entity.getName());
         response.setPriority(entity.getPriority());
         response.setUrl(entity.getUrl());

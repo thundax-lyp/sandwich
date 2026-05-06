@@ -12,7 +12,6 @@ import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
-import com.github.thundax.modules.sys.controller.request.PersonalAvatarDeleteRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalPasswordUpdateRequest;
@@ -23,7 +22,6 @@ import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
-import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -47,18 +45,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @WrappedApiController
 public class CurrentUserController {
 
-    private final UserService userService;
     private final CurrentUserService currentUserService;
     private final UserIdentityService userIdentityService;
     private final KeypairService keypairService;
 
     public CurrentUserController(
-            UserService userService,
             CurrentUserService currentUserService,
             UserIdentityService userIdentityService,
             KeypairService keypairService) {
 
-        this.userService = userService;
         this.currentUserService = currentUserService;
         this.userIdentityService = userIdentityService;
         this.keypairService = keypairService;
@@ -171,8 +166,7 @@ public class CurrentUserController {
     })
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
-    public PersonalAvatarResponse deleteAvatar(
-            @Valid @RequestBody(required = false) PersonalAvatarDeleteRequest request) {
+    public PersonalAvatarResponse deleteAvatar() {
         User currentUser = UserAccessHolder.currentUser();
 
         AvatarUtils.deleteAvatar(EntityIdCodec.toValue(currentUser.getId()));
@@ -192,7 +186,7 @@ public class CurrentUserController {
     @RequestMapping(value = "menus", method = RequestMethod.POST)
     public List<PersonalMenuResponse> menus() {
         return currentUserService.listVisibleMenus(UserAccessHolder.currentUser()).stream()
-                .map(menu -> PersonalInterfaceAssembler.toMenuResponse(menu))
+                .map(PersonalInterfaceAssembler::toMenuResponse)
                 .collect(Collectors.toList());
     }
 

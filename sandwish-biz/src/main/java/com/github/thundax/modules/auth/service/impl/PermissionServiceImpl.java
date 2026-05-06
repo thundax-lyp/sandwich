@@ -1,9 +1,9 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import static com.github.thundax.modules.sys.entity.Menu.PERM_ADMIN;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_SEPARATOR;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_SUPER;
-import static com.github.thundax.modules.sys.entity.Menu.PERM_USER;
+import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.ADMIN;
+import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.SEPARATOR;
+import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.SUPER;
+import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.USER;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionMatcher;
@@ -14,6 +14,7 @@ import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.HashSet;
@@ -108,10 +109,8 @@ public class PermissionServiceImpl implements PermissionService {
         if (menuList != null && !menuList.isEmpty()) {
             menuList.forEach(menu -> {
                 if (StringUtils.isNotBlank(menu.getPerms())) {
-                    for (String permission : StringUtils.split(menu.getPerms(), PERM_SEPARATOR)) {
-                        if (!PERM_USER.equals(permission)
-                                && !PERM_SUPER.equals(permission)
-                                && !PERM_ADMIN.equals(permission)) {
+                    for (String permission : StringUtils.split(menu.getPerms(), SEPARATOR)) {
+                        if (!PermissionCode.isBuiltIn(permission)) {
                             permissions.add(permission);
                         }
                     }
@@ -119,12 +118,12 @@ public class PermissionServiceImpl implements PermissionService {
             });
         }
 
-        permissions.add(PERM_USER);
+        permissions.add(USER);
         if (user.isSuper()) {
-            permissions.add(PERM_SUPER);
-            permissions.add(PERM_ADMIN);
+            permissions.add(SUPER);
+            permissions.add(ADMIN);
         } else if (user.isAdmin()) {
-            permissions.add(PERM_ADMIN);
+            permissions.add(ADMIN);
         }
 
         return permissions;

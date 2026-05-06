@@ -25,8 +25,9 @@ public final class MenuInterfaceAssembler {
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
-        if (StringUtils.isNotEmpty(entity.getParentId())) {
-            response.setParentId(entity.getParentId());
+        String parentId = EntityIdCodec.toValue(entity.getParentId());
+        if (StringUtils.isNotEmpty(parentId)) {
+            response.setParentId(parentId);
         }
         response.setName(entity.getName());
         response.setPerms(entity.getPerms());
@@ -44,7 +45,7 @@ public final class MenuInterfaceAssembler {
         }
         MenuResponse response = new MenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setParentId(entity.getParentId());
+        response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         response.setName(entity.getName());
         return response;
     }

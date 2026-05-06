@@ -9,6 +9,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Date;
@@ -26,18 +27,11 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
-    public static final String ROOT_ID = "ROOT";
-
-    public static final String BEAN_NAME = "Menu";
-
-    public static final String PERM_SEPARATOR = ",";
-    public static final String PERM_USER = "user";
-    public static final String PERM_ADMIN = "admin";
-    public static final String PERM_SUPER = "super";
+    private static final String SIGN_NAME = "Menu";
 
     private EntityId id;
 
-    private String parentId;
+    private EntityId parentId;
 
     private String name;
     private String perms;
@@ -59,17 +53,17 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     }
 
     public void setParentId(String parentId) {
-        this.parentId = StringUtils.isBlank(parentId) ? null : parentId;
+        this.parentId = StringUtils.isBlank(parentId) ? null : EntityIdCodec.toDomain(parentId);
     }
 
     public void setParent(Menu parent) {
-        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
+        this.parentId = parent == null ? null : parent.getId();
     }
 
     public Set<String> getAllPerms() {
         Set<String> allPerms = Sets.newHashSet();
         if (StringUtils.isNotBlank(this.getPerms())) {
-            for (String perm : this.getPerms().split(PERM_SEPARATOR)) {
+            for (String perm : this.getPerms().split(PermissionCode.SEPARATOR)) {
                 if (StringUtils.isNotBlank(perm)) {
                     allPerms.add(perm.trim());
                 }
@@ -126,14 +120,14 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
 
     @Override
     public String getSignName() {
-        return BEAN_NAME;
+        return SIGN_NAME;
     }
 
     @Override
     public String getSignBody() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("name", this.getName());
-        map.put("parentId", this.getParentId());
+        map.put("parentId", EntityIdCodec.toValue(this.getParentId()));
         map.put("perms", this.getPerms());
         map.put("ranks", this.getRank().value());
         map.put("display", this.isDisplay());

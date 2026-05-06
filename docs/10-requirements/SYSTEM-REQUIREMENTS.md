@@ -49,7 +49,7 @@
 
 树结构中：
 
-- `Department.parentId` 和 `Menu.parentId` 表达业务父子关系。
+- `Department.parentId` 和 `Menu.parentId` 表达业务父子关系；`Menu.parentId` 在领域实体中使用 `EntityId`，接口和持久化边界使用字符串值。
 - `lft` / `rgt` 是持久化 nested-set 索引，只存在于 `DO/DataObject`、Mapper 和 infra DAO implementation。
 
 ## 4. Module Mapping
@@ -187,7 +187,7 @@
 核心字段：
 
 - `id`：菜单 ID。
-- `parentId`：父菜单 ID。
+- `parentId`：父菜单 ID，领域实体中使用 `EntityId`。
 - `name`：菜单名称。
 - `perms`：权限编码，多个编码使用逗号分隔。
 - `rank`：访问等级，使用 `AccessRank`；持久化到 `sys_menu.ranks`。
@@ -313,7 +313,7 @@
 - 更新当前用户信息固定使用 `/api/sys/current-user/info/update`。
 - 更新当前用户密码固定使用 `/api/sys/current-user/password/update`。
 - 当前用户资料更新、密码更新和菜单计算必须由 `CurrentUserService` 承载，Controller 只做入口适配、传输解密和响应组装。
-- 当前用户可见菜单必须按角色授权菜单和用户访问等级过滤。
+- 当前用户可见菜单必须按角色授权菜单、用户访问等级和显示状态过滤，并且只返回从根菜单可达的菜单节点。
 - 当前用户权限编码必须来自认证上下文。
 
 ### 7.3 角色管理

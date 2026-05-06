@@ -87,7 +87,7 @@ public class MenuServiceImplTest {
         assertNotNull(menu.getId());
         assertEquals(null, menu.getCreateDate());
         assertSame(menu, dao.inserted);
-        assertEquals(Menu.BEAN_NAME, signService.businessType);
+        assertEquals("Menu", signService.businessType);
         assertEquals(menu.getSignId(), signService.businessId);
     }
 
@@ -102,7 +102,7 @@ public class MenuServiceImplTest {
 
         assertEquals(null, menu.getUpdateDate());
         assertSame(menu, dao.updated);
-        assertEquals(Menu.BEAN_NAME, signService.businessType);
+        assertEquals("Menu", signService.businessType);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class MenuServiceImplTest {
         assertEquals(1, count);
         assertEquals("menu-1", dao.deletedMenuRoleId);
         assertEquals("menu-1", dao.deletedId);
-        assertEquals(Menu.BEAN_NAME, signService.deletedBusinessType);
+        assertEquals("Menu", signService.deletedBusinessType);
     }
 
     @Test

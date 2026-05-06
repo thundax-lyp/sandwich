@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
@@ -47,7 +48,35 @@ public class CurrentUserServiceImplTest {
         assertEquals(2, responses.size());
         assertEquals("menu-system", EntityIdCodec.toValue(responses.get(0).getId()));
         assertEquals("menu-user", EntityIdCodec.toValue(responses.get(1).getId()));
-        assertEquals("menu-system", responses.get(1).getParentId());
+        assertEquals("menu-system", EntityIdCodec.toValue(responses.get(1).getParentId()));
+    }
+
+    @Test
+    public void shouldOnlyReturnVisibleMenusReachableFromRoot() {
+        UserService userService = mock(UserService.class);
+        MenuService menuService = mock(MenuService.class);
+        CurrentUserServiceImpl service = new CurrentUserServiceImpl(
+                userService,
+                mock(RoleService.class),
+                menuService,
+                mock(PasswordService.class),
+                mock(UserCredentialService.class),
+                mock(UserIdentityService.class));
+        List<Menu> menus = Arrays.asList(
+                menu("menu-system", null, "系统管理"),
+                menu("menu-user", "menu-system", "用户管理"),
+                menu("menu-hidden", null, "隐藏菜单", MenuVisibility.HIDDEN),
+                menu("menu-hidden-child", "menu-hidden", "隐藏子菜单"),
+                menu("menu-orphan", "menu-missing", "散落菜单"));
+
+        when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
+        when(menuService.listByIds(anyList())).thenReturn(menus);
+
+        List<Menu> responses = service.listVisibleMenus(superUser());
+
+        assertEquals(2, responses.size());
+        assertEquals("menu-system", EntityIdCodec.toValue(responses.get(0).getId()));
+        assertEquals("menu-user", EntityIdCodec.toValue(responses.get(1).getId()));
     }
 
     @Test
@@ -106,10 +135,15 @@ public class CurrentUserServiceImplTest {
     }
 
     private Menu menu(String id, String parentId, String name) {
+        return menu(id, parentId, name, MenuVisibility.VISIBLE);
+    }
+
+    private Menu menu(String id, String parentId, String name, MenuVisibility visibility) {
         Menu menu = new Menu();
         menu.setId(EntityId.of(id));
         menu.setParentId(parentId);
         menu.setName(name);
+        menu.setVisibility(visibility);
         return menu;
     }
 }

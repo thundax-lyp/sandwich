@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class RoleController {
 
     private static final String DEPARTMENT_ID_PREFIX = "DEPARTMENT_";
+    private static final String MENU_NAME = "Menu";
 
     private final RoleService roleService;
     private final MenuService menuService;
@@ -406,7 +407,7 @@ public class RoleController {
             } else {
                 Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(Menu.BEAN_NAME, request.getId());
+                    throw new NullBeanException(MENU_NAME, request.getId());
                 }
             }
         }

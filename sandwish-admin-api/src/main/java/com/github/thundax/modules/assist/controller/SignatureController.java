@@ -25,7 +25,6 @@ import com.github.thundax.modules.assist.service.SignatureService;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
-import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.LogService;
@@ -50,6 +49,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = "/api/assist/signature")
 @WrappedApiController
 public class SignatureController {
+
+    private static final String MENU_SIGN_NAME = "Menu";
 
     private final SignatureService signatureService;
     private final SignService signService;
@@ -157,7 +158,7 @@ public class SignatureController {
                 return logService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             case User.BEAN_NAME:
                 return userService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
-            case Menu.BEAN_NAME:
+            case MENU_SIGN_NAME:
                 return menuService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));
             case Role.BEAN_NAME:
                 return roleService.getById(EntityIdCodec.toDomain(bean.getBusinessId()));

@@ -2,7 +2,9 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
@@ -11,13 +13,26 @@ import org.junit.Test;
 public class LogPersistenceAssemblerTest {
 
     @Test
-    public void shouldReadLegacyNumericType() {
+    public void shouldReadEnumType() {
         LogDO dataObject = new LogDO();
-        dataObject.setType("1");
+        dataObject.setType("ACCESS");
 
         Log entity = LogPersistenceAssembler.toEntity(dataObject);
 
         assertSame(LogType.ACCESS, entity.getType());
+    }
+
+    @Test
+    public void shouldRejectLegacyNumericType() {
+        LogDO dataObject = new LogDO();
+        dataObject.setType("1");
+
+        try {
+            LogPersistenceAssembler.toEntity(dataObject);
+            fail("Legacy log type value must be rejected");
+        } catch (BizException expected) {
+            assertEquals("Unknown log type: 1", expected.getMessage());
+        }
     }
 
     @Test

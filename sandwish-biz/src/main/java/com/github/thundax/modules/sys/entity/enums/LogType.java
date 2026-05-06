@@ -13,13 +13,8 @@ public enum LogType {
 
     public static LogType from(String value) {
         return Arrays.stream(values())
-                .filter(item -> item.name().equalsIgnoreCase(value)
-                        || item.legacyValue().equals(value))
+                .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new BizException("Unknown log type: " + value));
-    }
-
-    private String legacyValue() {
-        return String.valueOf(ordinal() + 1);
     }
 }

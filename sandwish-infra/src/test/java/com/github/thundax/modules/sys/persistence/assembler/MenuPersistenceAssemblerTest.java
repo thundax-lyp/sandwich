@@ -2,7 +2,9 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
@@ -11,12 +13,10 @@ import org.junit.Test;
 
 public class MenuPersistenceAssemblerTest {
 
-    private static final String LEGACY_VISIBLE = "1";
-
     @Test
-    public void shouldReadLegacyDisplayFlagAsDomainValue() {
+    public void shouldReadDisplayFlagAsDomainValue() {
         MenuDO dataObject = new MenuDO();
-        dataObject.setDisplayFlag(LEGACY_VISIBLE);
+        dataObject.setDisplayFlag("VISIBLE");
 
         Menu entity = MenuPersistenceAssembler.toEntity(dataObject);
 
@@ -24,7 +24,20 @@ public class MenuPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldWriteDomainValueToLegacyDisplayFlag() {
+    public void shouldRejectLegacyDisplayFlagValue() {
+        MenuDO dataObject = new MenuDO();
+        dataObject.setDisplayFlag("1");
+
+        try {
+            MenuPersistenceAssembler.toEntity(dataObject);
+            fail("Legacy display flag value must be rejected");
+        } catch (BizException expected) {
+            assertEquals("Unknown menu visibility: 1", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldWriteDomainValueToDisplayFlag() {
         Menu entity = new Menu();
         entity.setVisibility(MenuVisibility.HIDDEN);
 

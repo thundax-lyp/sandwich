@@ -2,7 +2,9 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -12,15 +14,15 @@ import org.junit.Test;
 
 public class UserPersistenceAssemblerTest {
 
-    private static final String LEGACY_YES = "1";
-    private static final String LEGACY_NO = "0";
+    private static final String FLAG_YES = "1";
+    private static final String FLAG_NO = "0";
 
     @Test
-    public void shouldReadLegacyFlagsAsDomainValues() {
+    public void shouldReadFlagsAndEnumStatusAsDomainValues() {
         UserDO dataObject = new UserDO();
-        dataObject.setSuperFlag(LEGACY_YES);
-        dataObject.setAdminFlag(LEGACY_NO);
-        dataObject.setEnableFlag(LEGACY_YES);
+        dataObject.setSuperFlag(FLAG_YES);
+        dataObject.setAdminFlag(FLAG_NO);
+        dataObject.setEnableFlag("ENABLED");
 
         User entity = UserPersistenceAssembler.toEntity(dataObject);
 
@@ -29,15 +31,28 @@ public class UserPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldWriteDomainValuesToLegacyFlags() {
+    public void shouldRejectLegacyEnableFlagValue() {
+        UserDO dataObject = new UserDO();
+        dataObject.setEnableFlag("1");
+
+        try {
+            UserPersistenceAssembler.toEntity(dataObject);
+            fail("Legacy enable flag value must be rejected");
+        } catch (BizException expected) {
+            assertEquals("Unknown user status: 1", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldWriteDomainValuesToFlagsAndEnumStatus() {
         User entity = new User();
         entity.setPrivilege(UserPrivilege.ADMIN);
         entity.setStatus(UserStatus.DISABLED);
 
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
 
-        assertEquals(LEGACY_NO, dataObject.getSuperFlag());
-        assertEquals(LEGACY_YES, dataObject.getAdminFlag());
+        assertEquals(FLAG_NO, dataObject.getSuperFlag());
+        assertEquals(FLAG_YES, dataObject.getAdminFlag());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
 

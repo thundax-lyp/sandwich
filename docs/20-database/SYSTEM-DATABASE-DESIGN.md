@@ -44,7 +44,9 @@
 - 关系表使用来源主键作为联合关系字段，不单独生成关系 ID。
 - `sys_user.email` 和 `sys_user.mobile` 使用持久化加密 typeHandler。
 - `sys_user.ranks` 和 `sys_menu.ranks` 映射领域 `AccessRank rank`。
-- `super_flag`、`admin_flag`、`enable_flag` 和 `display_flag` 是数据库布尔标记字段，由持久化装配器转换为领域枚举。
+- `super_flag` 和 `admin_flag` 是数据库布尔标记字段，由持久化装配器转换为领域权限枚举。
+- `sys_user.enable_flag` 和 `sys_role.enable_flag` 固定存储状态枚举名：`ENABLED` / `DISABLED`，默认值固定为 `ENABLED`。
+- `sys_menu.display_flag` 固定存储 `MenuVisibility` 枚举名：`VISIBLE` / `HIDDEN`，默认值固定为 `VISIBLE`。
 - `sys_menu.lft` / `sys_menu.rgt` 和 `sys_department.lft` / `sys_department.rgt` 是 nested-set 持久化索引。
 - `Entity` 不暴露 `lft` / `rgt`。
 - `create_date` / `create_by` / `update_date` / `update_by` 是通用审计字段，由 infra 统一填充。
@@ -200,7 +202,7 @@
 | `name` | `name` | `name` | 是 | 菜单名称 |
 | `perms` | `perms` | `perms` | 否 | 权限编码 |
 | `ranks` | `ranks` | `rank` | 是 | 访问等级 |
-| `display_flag` | `displayFlag` | `visibility` | 是 | 显示状态 |
+| `display_flag` | `displayFlag` | `visibility` | 是 | 显示状态，取值固定为 `VISIBLE` / `HIDDEN` |
 | `display_params` | `displayParams` | `displayParams` | 否 | 显示参数 |
 | `url` | `url` | `url` | 否 | 访问路径 |
 | `target` | `target` | `target` | 否 | 打开目标 |

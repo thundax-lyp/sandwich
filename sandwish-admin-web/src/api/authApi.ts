@@ -48,8 +48,8 @@ export function logout(request: LogoutRequest) {
 export function buildCaptchaUrl(loginToken: string, version: number) {
     const params = new URLSearchParams({
         loginToken,
-        width: "140",
-        height: "48",
+        width: "150",
+        height: "40",
         _: String(version)
     });
 

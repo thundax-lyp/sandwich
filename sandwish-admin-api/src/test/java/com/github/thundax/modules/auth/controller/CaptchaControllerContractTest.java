@@ -2,6 +2,8 @@ package com.github.thundax.modules.auth.controller;
 
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +18,7 @@ import com.github.thundax.modules.auth.service.AuthService;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 public class CaptchaControllerContractTest {
@@ -53,14 +56,22 @@ public class CaptchaControllerContractTest {
         AuthService authService = mock(AuthService.class);
         when(authService.getCaptcha("login-token-1")).thenReturn("1234");
 
-        mockMvc(authService)
+        MvcResult result = mockMvc(authService)
                 .perform(get("/api/auth/captcha")
                         .param("loginToken", "login-token-1")
-                        .param("width", "140")
-                        .param("height", "48"))
+                        .param("width", "150")
+                        .param("height", "40"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
-                .andExpect(content().string(not(startsWith("{\"code\""))));
+                .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
+                .andExpect(content().string(not(startsWith("{\"code\""))))
+                .andReturn();
+
+        byte[] body = result.getResponse().getContentAsByteArray();
+        assertTrue(body.length > 8);
+        assertEquals(0x89, body[0] & 0xFF);
+        assertEquals('P', body[1]);
+        assertEquals('N', body[2]);
+        assertEquals('G', body[3]);
     }
 
     private MockMvc mockMvc(AuthService authService) {

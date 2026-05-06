@@ -12,7 +12,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +47,7 @@ public class CaptchaController {
     private static final int MAX_CAPTCHA_WIDTH = 480;
     private static final int MAX_CAPTCHA_HEIGHT = 320;
 
-    private static final int BACKGROUND_LINE_COUNT = 16;
+    private static final int NOISE_LINE_COUNT = 12;
     private static final int MAX_COLOR = 255;
 
     private final AuthService authService;
@@ -130,7 +133,7 @@ public class CaptchaController {
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
-        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        response.setContentType(MediaType.IMAGE_PNG_VALUE);
 
         /*
          * 得到参数高，宽，都为数字时，则使用设置高宽，否则使用默认值
@@ -152,20 +155,22 @@ public class CaptchaController {
             height = DEFAULT_CAPTCHA_HEIGHT;
         }
 
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = image.getGraphics();
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 生成背景
-        createBackground(graphics, width, height);
+        // 透明底上保留轻量干扰线，避免前端容器背景被图片盖住。
+        drawNoise(graphics, width, height);
 
         // 画字符
         drawCharacter(graphics, width, height, captcha);
 
         graphics.dispose();
 
-        OutputStream out = response.getOutputStream();
-        ImageIO.write(image, "JPEG", out);
-        out.close();
+        try (OutputStream out = response.getOutputStream()) {
+            ImageIO.write(image, "PNG", out);
+        }
     }
 
     private Color getRandColor(int fc, int bc) {
@@ -178,16 +183,20 @@ public class CaptchaController {
         if (b > MAX_COLOR) {
             b = MAX_COLOR;
         }
+        if (b <= f) {
+            b = f + 1;
+        }
         return new Color(f + random.nextInt(b - f), f + random.nextInt(b - f), f + random.nextInt(b - f));
     }
 
-    private void createBackground(Graphics graphics, int width, int height) {
-        // 填充背景
-        graphics.setColor(getRandColor(220, 250));
-        graphics.fillRect(0, 0, width, height);
-        // 加入干扰线条
-        for (int i = 0; i < BACKGROUND_LINE_COUNT; i++) {
-            graphics.setColor(getRandColor(40, 150));
+    private Color getRandColor(int fc, int bc, int alpha) {
+        Color color = getRandColor(fc, bc);
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
+    }
+
+    private void drawNoise(Graphics2D graphics, int width, int height) {
+        for (int i = 0; i < NOISE_LINE_COUNT; i++) {
+            graphics.setColor(getRandColor(70, 170, 70));
             Random random = new Random();
             int x = random.nextInt(width);
             int y = random.nextInt(height);
@@ -197,13 +206,20 @@ public class CaptchaController {
         }
     }
 
-    private void drawCharacter(Graphics graphics, int width, int height, String captcha) {
+    private void drawCharacter(Graphics2D graphics, int width, int height, String captcha) {
         String[] fontTypes = {"Arial", "Arial Black", "AvantGarde Bk BT", "Calibri"};
 
         char[] codes = captcha.toCharArray();
+        if (codes.length == 0) {
+            return;
+        }
 
-        int fontSize = Math.max(height, 10);
-        int charWidth = (width - 20) / codes.length;
+        int horizontalPadding = Math.max(8, width / 18);
+        int verticalPadding = Math.max(4, height / 10);
+        int drawableWidth = Math.max(width - horizontalPadding * 2, codes.length);
+        int drawableHeight = Math.max(height - verticalPadding * 2, 12);
+        int fontSize = Math.max(18, Math.min(drawableHeight, drawableWidth / codes.length + 8));
+        int charWidth = drawableWidth / codes.length;
 
         Random random = new Random();
 
@@ -211,14 +227,23 @@ public class CaptchaController {
             String code = String.valueOf(codes[idx]);
             Font font = new Font(fontTypes[random.nextInt(fontTypes.length)], Font.PLAIN, fontSize);
 
-            graphics.setColor(getRandColor(50, 100));
+            graphics.setColor(getRandColor(35, 95, 220));
             graphics.setFont(font);
 
-            // 只有数字，字符高度取 fontMetrics.getAscent()
-            int fontHeight = graphics.getFontMetrics().getAscent();
+            FontMetrics fontMetrics = graphics.getFontMetrics();
+            int charX = horizontalPadding
+                    + charWidth * idx
+                    + Math.max((charWidth - fontMetrics.charWidth(codes[idx])) / 2, 0);
+            int baseline = (height - fontMetrics.getHeight()) / 2
+                    + fontMetrics.getAscent()
+                    + random.nextInt(Math.max(verticalPadding * 2, 1))
+                    - verticalPadding;
 
-            int yOffset = height < fontHeight ? 0 : random.nextInt(height - fontHeight);
-            graphics.drawString(code, charWidth * idx + 10, height - 5 - yOffset);
+            AffineTransform transform = graphics.getTransform();
+            double angle = Math.toRadians(random.nextInt(17) - 8);
+            graphics.rotate(angle, charX + charWidth / 2.0, height / 2.0);
+            graphics.drawString(code, charX, baseline);
+            graphics.setTransform(transform);
         }
     }
 }

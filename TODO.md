@@ -9,15 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-api-auth-response-wrapper`：迁移后台认证 JSON 接口响应包装
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/AuthControllerContractTest.java
-    sandwish-admin-web/src/api/authApi.ts
-    sandwish-admin-web/src/App.test.tsx
-  - 处理动作：将 `AuthController` 迁移到 `@WrappedApiController` 并确认前端继续读取 `{code,message,data}` 响应
-  - 验收点：登录、登出、token JSON 接口保持统一响应结构，前端登录和登出测试通过
-  - 重要度：8/10
-
 - [ ] `admin-api-response-wrapper-filter`：移除后台响应包装过滤器
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/filter/ResponseWrapperFilter.java
     sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java

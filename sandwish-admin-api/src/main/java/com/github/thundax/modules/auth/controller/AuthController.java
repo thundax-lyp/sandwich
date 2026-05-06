@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
@@ -47,14 +48,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Api(tags = "01-01. 鉴权")
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
-@RestController
+@WrappedApiController
 @PublicApi
 public class AuthController {
 

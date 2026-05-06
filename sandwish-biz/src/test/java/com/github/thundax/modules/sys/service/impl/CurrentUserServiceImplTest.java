@@ -80,6 +80,32 @@ public class CurrentUserServiceImplTest {
     }
 
     @Test
+    public void shouldReturnVisibleMenuDescendantsReachableFromRoot() {
+        UserService userService = mock(UserService.class);
+        MenuService menuService = mock(MenuService.class);
+        CurrentUserServiceImpl service = new CurrentUserServiceImpl(
+                userService,
+                mock(RoleService.class),
+                menuService,
+                mock(PasswordService.class),
+                mock(UserCredentialService.class),
+                mock(UserIdentityService.class));
+        List<Menu> menus = Arrays.asList(
+                menu("menu-root", null, "A-root"),
+                menu("menu-child", "menu-root", "B-child"),
+                menu("menu-grandchild", "menu-child", "C-grandchild"));
+
+        when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
+
+        List<Menu> responses = service.listVisibleMenus(superUser());
+
+        assertEquals(3, responses.size());
+        assertEquals("menu-root", EntityIdCodec.toValue(responses.get(0).getId()));
+        assertEquals("menu-child", EntityIdCodec.toValue(responses.get(1).getId()));
+        assertEquals("menu-grandchild", EntityIdCodec.toValue(responses.get(2).getId()));
+    }
+
+    @Test
     public void shouldUpdateCurrentUserInfo() {
         UserService userService = mock(UserService.class);
         UserIdentityService userIdentityService = mock(UserIdentityService.class);

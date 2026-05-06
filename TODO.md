@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-user-credential-service`：拆分后台用户认证凭据 Service
-  - 范围文件：`sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserCredentialService.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImpl.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImpl.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImplTest.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImplTest.java`
-  - 处理动作：新增 `UserCredentialService`，迁移密码凭据读取和密码更新能力。
-  - 验收点：`UserService` 不再公开 `getPasswordCredential` 和 `updatePassword`，当前用户改密流程改用 `UserCredentialService` 且测试通过。
-  - 重要度：8/10
-
 - [ ] `sys-user-write-orchestration`：收敛用户写入身份和凭据协作
   - 范围文件：`sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
     `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImpl.java`

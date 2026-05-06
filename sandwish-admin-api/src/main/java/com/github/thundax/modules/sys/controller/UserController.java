@@ -37,6 +37,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -79,6 +80,7 @@ public class UserController {
     private final UserService userService;
     private final DepartmentService departmentService;
     private final RoleService roleService;
+    private final UserCredentialService userCredentialService;
     private final UserIdentityService userIdentityService;
     private final KeypairService keypairService;
     private final PasswordService passwordService;
@@ -88,6 +90,7 @@ public class UserController {
             UserService userService,
             DepartmentService departmentService,
             RoleService roleService,
+            UserCredentialService userCredentialService,
             UserIdentityService userIdentityService,
             KeypairService keypairService,
             PasswordService passwordService) {
@@ -95,6 +98,7 @@ public class UserController {
         this.userService = userService;
         this.departmentService = departmentService;
         this.roleService = roleService;
+        this.userCredentialService = userCredentialService;
         this.userIdentityService = userIdentityService;
         this.keypairService = keypairService;
         this.passwordService = passwordService;
@@ -254,7 +258,7 @@ public class UserController {
         userService.update(entity, request.getLoginName(), roleIdList);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            userService.updatePassword(
+            userCredentialService.updatePassword(
                     entity.getId(), passwordService.encrypt(request.getLoginPass()), entity.getUpdateUserId());
         }
 

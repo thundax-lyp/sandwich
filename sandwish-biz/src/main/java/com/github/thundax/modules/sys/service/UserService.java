@@ -4,7 +4,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.List;
 
@@ -23,10 +22,6 @@ public interface UserService {
     void update(User user, String loginName, List<String> roleIdList);
 
     int batchDeleteById(List<EntityId> ids);
-
-    UserCredential getPasswordCredential(EntityId userId);
-
-    void updatePassword(EntityId userId, String encryptedPassword, String updateUserId);
 
     int updateStatus(User user);
 

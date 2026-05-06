@@ -12,6 +12,7 @@ import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -34,6 +35,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private final RoleService roleService;
     private final MenuService menuService;
     private final PasswordService passwordService;
+    private final UserCredentialService userCredentialService;
     private final UserIdentityService userIdentityService;
 
     public CurrentUserServiceImpl(
@@ -41,11 +43,13 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             RoleService roleService,
             MenuService menuService,
             PasswordService passwordService,
+            UserCredentialService userCredentialService,
             UserIdentityService userIdentityService) {
         this.userService = userService;
         this.roleService = roleService;
         this.menuService = menuService;
         this.passwordService = passwordService;
+        this.userCredentialService = userCredentialService;
         this.userIdentityService = userIdentityService;
     }
 
@@ -68,12 +72,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             throw new ApiException(SysApiUtils.PASSWORD_VALIDATE_MESSAGE);
         }
 
-        UserCredential credential = userService.getPasswordCredential(currentUser.getId());
+        UserCredential credential = userCredentialService.getPasswordCredential(currentUser.getId());
         if (credential == null || !passwordService.validate(oldPassword, credential.getCredentialValue())) {
             throw new InvalidPasswordException();
         }
 
-        userService.updatePassword(
+        userCredentialService.updatePassword(
                 currentUser.getId(), passwordService.encrypt(password), EntityIdCodec.toValue(currentUser.getId()));
     }
 

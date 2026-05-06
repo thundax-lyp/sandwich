@@ -61,6 +61,7 @@ import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
@@ -114,6 +115,7 @@ public class AuthPermissionLifecycleTest {
                         new TestRoleService(),
                         new TestMenuService(),
                         new PlainPasswordService(),
+                        new TestUserCredentialService(),
                         userIdentityService));
         authService = new AuthServiceImpl(
                 authProperties,
@@ -836,14 +838,6 @@ public class AuthPermissionLifecycleTest {
     private static class TestUserService implements UserService {
 
         @Override
-        public UserCredential getPasswordCredential(EntityId userId) {
-            return new TestUserCredentialDao().credential();
-        }
-
-        @Override
-        public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {}
-
-        @Override
         public int updateStatus(User user) {
             return 1;
         }
@@ -915,6 +909,17 @@ public class AuthPermissionLifecycleTest {
         public String getAccountLoginName(EntityId userId) {
             return "tester";
         }
+    }
+
+    private static class TestUserCredentialService implements UserCredentialService {
+
+        @Override
+        public UserCredential getPasswordCredential(EntityId userId) {
+            return new TestUserCredentialDao().credential();
+        }
+
+        @Override
+        public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {}
     }
 
     private static class TestMenuService implements MenuService {

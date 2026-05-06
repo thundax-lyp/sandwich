@@ -90,14 +90,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserCredential getPasswordCredential(EntityId userId) {
-        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
-        return identity == null
-                ? null
-                : userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(User user, String loginName, String encryptedPassword, List<String> roleIdList) {
         user.setId(EntityIdCodec.toDomain(dao.insert(user)));
@@ -125,19 +117,6 @@ public class UserServiceImpl implements UserService {
         if (added) {
             upsertPasswordCredential(user, accountIdentity, encryptedPassword);
         }
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {
-        User user = getById(userId);
-        if (user == null) {
-            return;
-        }
-        user.setUpdateUserId(updateUserId);
-        signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        upsertPasswordCredential(
-                user, upsertAccountIdentity(user, getAccountLoginName(user.getId())), encryptedPassword);
     }
 
     @Override
@@ -218,11 +197,6 @@ public class UserServiceImpl implements UserService {
 
     private String superFlagValue(UserPrivilege privilege) {
         return UserPrivilege.SUPER == privilege ? LEGACY_SUPER_FLAG : null;
-    }
-
-    private String getAccountLoginName(EntityId userId) {
-        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
-        return identity == null ? null : identity.getIdentityValue();
     }
 
     private UserIdentity upsertAccountIdentity(User user, String loginName) {

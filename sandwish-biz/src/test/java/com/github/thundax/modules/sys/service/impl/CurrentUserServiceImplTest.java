@@ -16,6 +16,7 @@ import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -34,6 +35,7 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 menuService,
                 mock(PasswordService.class),
+                mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(menu("menu-system", null, "系统管理"), menu("menu-user", "menu-system", "用户管理"));
 
@@ -57,6 +59,7 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 mock(MenuService.class),
                 mock(PasswordService.class),
+                mock(UserCredentialService.class),
                 userIdentityService);
         User currentUser = superUser();
 
@@ -73,24 +76,26 @@ public class CurrentUserServiceImplTest {
     @Test
     public void shouldValidateOldPasswordAndUpdatePasswordCredential() throws Exception {
         UserService userService = mock(UserService.class);
+        UserCredentialService userCredentialService = mock(UserCredentialService.class);
         PasswordService passwordService = mock(PasswordService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
                 userService,
                 mock(RoleService.class),
                 mock(MenuService.class),
                 passwordService,
+                userCredentialService,
                 mock(UserIdentityService.class));
         User currentUser = superUser();
         UserCredential credential = new UserCredential();
         credential.setCredentialValue("encrypted-old");
 
-        when(userService.getPasswordCredential(currentUser.getId())).thenReturn(credential);
+        when(userCredentialService.getPasswordCredential(currentUser.getId())).thenReturn(credential);
         when(passwordService.validate("OldPass1$", "encrypted-old")).thenReturn(true);
         when(passwordService.encrypt("NewPass1$")).thenReturn("encrypted-new");
 
         service.updatePassword(currentUser, "OldPass1$", "NewPass1$");
 
-        verify(userService)
+        verify(userCredentialService)
                 .updatePassword(currentUser.getId(), "encrypted-new", EntityIdCodec.toValue(currentUser.getId()));
     }
 

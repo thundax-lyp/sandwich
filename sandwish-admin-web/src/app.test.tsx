@@ -4,6 +4,12 @@ import App from "./app";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
 import { queryClient } from "./query/query-client";
 
+vi.mock("sm-crypto", () => ({
+    sm2: {
+        doEncrypt: () => "encrypted-password"
+    }
+}));
+
 describe("App", () => {
     beforeEach(() => {
         localStorage.clear();
@@ -138,6 +144,139 @@ describe("App", () => {
         );
         await waitFor(() => expect(hasPermission("sys:user:view")).toBe(true));
         expect(hasPermission("sys:role:edit")).toBe(false);
+    });
+
+    it("loads permissions as part of successful login", async () => {
+        vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+            const url = String(input);
+            if (url.endsWith("/auth/form")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: {
+                                loginToken: "login-form-token",
+                                refreshToken: "refresh-token",
+                                expireSeconds: 300,
+                                publicKey: "public-key"
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/auth/login")) {
+                expect(init).toEqual(
+                    expect.objectContaining({
+                        body: JSON.stringify({
+                            loginToken: "login-form-token",
+                            userName: "developer",
+                            password: "encrypted-password",
+                            captcha: "1234"
+                        })
+                    })
+                );
+
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: {
+                                token: "login-access-token",
+                                refreshToken: "login-refresh-token"
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/perms")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: {
+                                perms: ["sys:user:view", "sys:user:edit"]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/info")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: {
+                                id: "user-1",
+                                loginName: "developer",
+                                name: "Developer"
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/menus")) {
+                return Promise.resolve(
+                    new Response(JSON.stringify({ code: 0, message: "success", data: [] }), {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    })
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(<App />);
+
+        await userEvent.type(await screen.findByPlaceholderText("请输入后台账号"), "developer");
+        await userEvent.type(screen.getByPlaceholderText("请输入密码"), "sandwich");
+        await userEvent.type(screen.getByPlaceholderText("验证码"), "1234");
+        await userEvent.click(screen.getByRole("button", { name: /登\s*录/ }));
+
+        expect(
+            await screen.findByRole("heading", { name: "Dashboard 已就绪" })
+        ).toBeInTheDocument();
+        expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("login-access-token");
+        await waitFor(() => expect(hasPermission("sys:user:view")).toBe(true));
+        expect(hasPermission("sys:role:view")).toBe(false);
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/sys/current-user/perms",
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    "Access-Token": "login-access-token"
+                }),
+                method: "POST"
+            })
+        );
     });
 
     it("logs out and returns to the login route", async () => {

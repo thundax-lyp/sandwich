@@ -4,8 +4,9 @@ import { Alert, Button, Card, Form, Input, Space, Typography, message } from "an
 import { sm2 } from "sm-crypto";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { buildCaptchaUrl, createLoginForm, login, refreshCaptcha } from "../../api/auth-api";
-import { getAccessToken, saveAccessToken } from "../../auth/token-storage";
+import { buildCaptchaUrl, createLoginForm, refreshCaptcha } from "../../api/auth-api";
+import { loginWithPermissions } from "../../auth/auth-session-service";
+import { getAccessToken } from "../../auth/token-storage";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -59,15 +60,14 @@ export function LoginPage() {
 
             const encryptedPassword = sm2.doEncrypt(values.password, loginForm.publicKey, 0);
 
-            return login({
+            return loginWithPermissions({
                 loginToken: loginForm.loginToken,
                 userName: values.userName,
                 password: encryptedPassword,
                 captcha: values.captcha
             });
         },
-        onSuccess: (response) => {
-            saveAccessToken(response.token);
+        onSuccess: () => {
             message.success("登录成功");
             navigate(resolveRedirectPath(location.state), { replace: true });
         },

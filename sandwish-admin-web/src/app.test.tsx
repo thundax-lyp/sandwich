@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
+import { DepartmentPage } from "./pages/system/department/department-page";
 import { queryClient } from "./query/query-client";
 
 vi.mock("sm-crypto", () => ({
@@ -354,6 +356,77 @@ describe("App", () => {
         );
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBeNull();
         expect(await screen.findByRole("heading", { name: "登录" })).toBeInTheDocument();
+    });
+
+    it("renders the department list page", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["sys:department:view", "sys:department:edit"])
+        );
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/sys/department/list")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: [
+                                {
+                                    id: "dept-root",
+                                    name: "总部",
+                                    shortName: "HQ",
+                                    namePath: "总部",
+                                    priority: 1,
+                                    remarks: "核心组织"
+                                },
+                                {
+                                    id: "dept-tech",
+                                    parentId: "dept-root",
+                                    name: "技术部",
+                                    shortName: "Tech",
+                                    namePath: "总部/技术部",
+                                    priority: 2
+                                }
+                            ]
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <DepartmentPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByRole("heading", { name: "部门管理" })).toBeInTheDocument();
+        expect((await screen.findAllByText("总部")).length).toBeGreaterThan(0);
+        expect(await screen.findByText("技术部")).toBeInTheDocument();
+        expect(screen.getByText("核心组织")).toBeInTheDocument();
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/sys/department/list",
+            expect.objectContaining({
+                body: JSON.stringify({}),
+                headers: expect.objectContaining({
+                    "Access-Token": "test-token"
+                }),
+                method: "POST"
+            })
+        );
     });
 
     it("clears stale tokens when protected menu loading is unauthorized", async () => {

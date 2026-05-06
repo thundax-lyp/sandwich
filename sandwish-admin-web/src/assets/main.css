@@ -164,6 +164,70 @@ p {
     line-height: 1.8;
 }
 
+.department-page {
+    display: grid;
+    gap: 20px;
+}
+
+.department-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.department-page-header h2.ant-typography,
+.department-list-toolbar h3.ant-typography {
+    margin: 0;
+}
+
+.department-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.department-summary-card {
+    border-color: #dce3e6;
+}
+
+.department-summary-card .ant-card-body {
+    display: grid;
+    gap: 10px;
+}
+
+.department-summary-card strong {
+    color: #17242f;
+    font-size: 32px;
+    line-height: 1;
+}
+
+.department-list-panel {
+    border-color: #dce3e6;
+}
+
+.department-list-toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.department-search-form {
+    justify-content: flex-end;
+    row-gap: 10px;
+}
+
+.department-name-icon,
+.department-empty-icon {
+    color: #315c54;
+}
+
+.department-empty-icon {
+    font-size: 28px;
+}
+
 .login-page {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 420px;
@@ -270,6 +334,19 @@ p {
 
     .metrics {
         grid-template-columns: 1fr;
+    }
+
+    .department-page-header,
+    .department-list-toolbar {
+        flex-direction: column;
+    }
+
+    .department-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .department-search-form {
+        justify-content: flex-start;
     }
 
     .login-page {

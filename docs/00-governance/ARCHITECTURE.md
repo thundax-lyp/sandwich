@@ -170,6 +170,7 @@ Sandwich 固定采用三层 API 架构。
 - 通用 Swagger / Springfox 自动配置
 - 通用 Swagger 文档属性模型
 - Swagger UI 静态资源映射
+- Swagger API 分组字母序排序规则
 
 边界：
 

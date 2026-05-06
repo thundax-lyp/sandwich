@@ -65,6 +65,7 @@ public class SwaggerAutoConfiguration implements WebMvcConfigurer {
                 .enable(properties.isEnabled())
                 .globalResponseMessage(RequestMethod.GET, responseMessageList)
                 .globalResponseMessage(RequestMethod.POST, responseMessageList)
+                .apiListingReferenceOrdering(SwaggerApiOrdering.apiListingReferenceOrdering())
                 .apiInfo(apiInfo)
                 .select();
 

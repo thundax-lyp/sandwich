@@ -45,8 +45,8 @@
 - DAO get/list/page 查询固定追加 `del_flag = '0'` 条件。
 - 枚举字段使用 `varchar` 存储。
 - `storage_type` 固定使用 `LOCAL_FILE` 或 `OSS`。
-- `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`。
-- `reference_status` 固定使用 `UNREFERENCED`、`REFERENCED`。
+- `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`，默认值固定为 `ACTIVE`。
+- `reference_status` 固定使用 `UNREFERENCED`、`REFERENCED`，对象主表默认值固定为 `UNREFERENCED`，引用关系表默认值固定为 `REFERENCED`。
 - `upload_status` 固定使用 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 

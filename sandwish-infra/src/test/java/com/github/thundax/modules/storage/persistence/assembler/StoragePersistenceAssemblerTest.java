@@ -2,7 +2,9 @@ package com.github.thundax.modules.storage.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -21,8 +23,6 @@ import java.util.Date;
 import org.junit.Test;
 
 public class StoragePersistenceAssemblerTest {
-
-    private static final String LEGACY_YES = "1";
 
     @Test
     public void shouldReadLegacyLowerCaseOwnerType() {
@@ -57,10 +57,10 @@ public class StoragePersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldReadLegacyFlagsAsDomainValues() {
+    public void shouldReadStatusesAsDomainValues() {
         StoredObjectDO dataObject = new StoredObjectDO();
-        dataObject.setObjectStatus(LEGACY_YES);
-        dataObject.setReferenceStatus(LEGACY_YES);
+        dataObject.setObjectStatus("ACTIVE");
+        dataObject.setReferenceStatus("REFERENCED");
 
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
@@ -69,7 +69,30 @@ public class StoragePersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldWriteDomainValuesToLegacyFlags() {
+    public void shouldRejectLegacyStatusValues() {
+        StoredObjectDO dataObject = new StoredObjectDO();
+        dataObject.setObjectStatus("1");
+        dataObject.setReferenceStatus("REFERENCED");
+
+        try {
+            StoragePersistenceAssembler.toEntity(dataObject);
+            fail("Legacy object status value must be rejected");
+        } catch (BizException expected) {
+            assertEquals("Unknown storage status: 1", expected.getMessage());
+        }
+
+        dataObject.setObjectStatus("ACTIVE");
+        dataObject.setReferenceStatus("1");
+        try {
+            StoragePersistenceAssembler.toEntity(dataObject);
+            fail("Legacy reference status value must be rejected");
+        } catch (BizException expected) {
+            assertEquals("Unknown storage reference status: 1", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldWriteDomainValuesToStatuses() {
         StoredObject entity = new StoredObject();
         entity.setStatus(StoredObjectStatus.DELETED);
         entity.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);

@@ -8,22 +8,14 @@ public enum StoredObjectStatus {
     DELETING,
     DELETED;
 
-    private static final String LEGACY_ACTIVE = "1";
-    private static final String LEGACY_INACTIVE = "0";
-
     public String value() {
         return name();
     }
 
     public static StoredObjectStatus from(String value) {
         return Arrays.stream(values())
-                .filter(item -> item.name().equalsIgnoreCase(value)
-                        || item.legacyValue().equals(value))
+                .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
                 .orElseThrow(() -> new BizException("Unknown storage status: " + value));
-    }
-
-    private String legacyValue() {
-        return this == ACTIVE ? LEGACY_ACTIVE : LEGACY_INACTIVE;
     }
 }

@@ -1,7 +1,47 @@
+import {
+    AppstoreOutlined,
+    AuditOutlined,
+    CloudServerOutlined,
+    SafetyCertificateOutlined,
+    TeamOutlined
+} from "@ant-design/icons";
+import { Button, Card, Layout, Menu, Space, Typography } from "antd";
+
+const { Header, Sider, Content } = Layout;
+const { Title, Text, Paragraph } = Typography;
+
+const menuItems = [
+    {
+        key: "dashboard",
+        icon: <AppstoreOutlined />,
+        label: "概览"
+    },
+    {
+        key: "users",
+        icon: <TeamOutlined />,
+        label: "用户管理"
+    },
+    {
+        key: "roles",
+        icon: <SafetyCertificateOutlined />,
+        label: "角色权限"
+    },
+    {
+        key: "logs",
+        icon: <AuditOutlined />,
+        label: "系统日志"
+    },
+    {
+        key: "storage",
+        icon: <CloudServerOutlined />,
+        label: "存储管理"
+    }
+];
+
 export function AdminShell() {
     return (
-        <div className="admin-shell">
-            <aside className="sidebar">
+        <Layout className="admin-shell">
+            <Sider className="sidebar" width={248}>
                 <div className="brand">
                     <span className="brand-mark">S</span>
                     <div>
@@ -10,62 +50,53 @@ export function AdminShell() {
                     </div>
                 </div>
 
-                <nav className="nav-list" aria-label="后台导航">
-                    <a className="nav-item active" href="#">
-                        概览
-                    </a>
-                    <a className="nav-item" href="#">
-                        用户管理
-                    </a>
-                    <a className="nav-item" href="#">
-                        角色权限
-                    </a>
-                    <a className="nav-item" href="#">
-                        系统日志
-                    </a>
-                    <a className="nav-item" href="#">
-                        存储管理
-                    </a>
-                </nav>
-            </aside>
+                <Menu
+                    className="nav-menu"
+                    mode="inline"
+                    selectedKeys={["dashboard"]}
+                    items={menuItems}
+                />
+            </Sider>
 
-            <main className="workspace">
-                <header className="topbar">
+            <Layout>
+                <Header className="topbar">
                     <div>
-                        <p className="eyebrow">admin-api workspace</p>
-                        <h1>后台管理台</h1>
+                        <Text className="eyebrow">admin-api workspace</Text>
+                        <Title level={1}>后台管理台</Title>
                     </div>
-                    <button className="ghost-button" type="button">
+                    <Button type="default">
                         连接检查
-                    </button>
-                </header>
+                    </Button>
+                </Header>
 
-                <section className="metrics" aria-label="核心指标">
-                    <article className="metric-card">
-                        <span>在线会话</span>
-                        <strong>--</strong>
-                    </article>
-                    <article className="metric-card">
-                        <span>待处理日志</span>
-                        <strong>--</strong>
-                    </article>
-                    <article className="metric-card">
-                        <span>存储对象</span>
-                        <strong>--</strong>
-                    </article>
-                </section>
+                <Content className="workspace">
+                    <section className="metrics" aria-label="核心指标">
+                        <Card className="metric-card">
+                            <Text type="secondary">在线会话</Text>
+                            <strong>--</strong>
+                        </Card>
+                        <Card className="metric-card">
+                            <Text type="secondary">待处理日志</Text>
+                            <strong>--</strong>
+                        </Card>
+                        <Card className="metric-card">
+                            <Text type="secondary">存储对象</Text>
+                            <strong>--</strong>
+                        </Card>
+                    </section>
 
-                <section className="panel">
-                    <div>
-                        <p className="eyebrow">getting started</p>
-                        <h2>前端工程已就绪</h2>
-                        <p>
-                            这里是管理端的应用壳，后续可以接入登录、路由、权限菜单和
-                            <code>sandwish-admin-api</code> 的业务接口。
-                        </p>
-                    </div>
-                </section>
-            </main>
-        </div>
+                    <Card className="panel">
+                        <Space direction="vertical" size={8}>
+                            <Text className="eyebrow">getting started</Text>
+                            <Title level={2}>Ant Design 已接入</Title>
+                            <Paragraph>
+                                这里是管理端的应用壳，后续可以接入登录、路由、权限菜单和
+                                <code>sandwish-admin-api</code> 的业务接口。
+                            </Paragraph>
+                        </Space>
+                    </Card>
+                </Content>
+            </Layout>
+        </Layout>
     );
 }

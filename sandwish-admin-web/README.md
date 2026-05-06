@@ -2,6 +2,14 @@
 
 Sandwich 后台管理前端工程，对接 `sandwish-admin-api`。
 
+## 技术栈
+
+- React
+- Vite
+- TypeScript
+- Ant Design
+- @ant-design/icons
+
 ## 开发命令
 
 ```bash

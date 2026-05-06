@@ -23,24 +23,20 @@ button {
 }
 
 .admin-shell {
-    display: grid;
-    grid-template-columns: 248px minmax(0, 1fr);
     min-height: 100vh;
 }
 
 .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    padding: 28px 20px;
+    padding: 28px 16px;
     color: #f5f0e8;
-    background: #17242f;
+    background: #17242f !important;
 }
 
 .brand {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-bottom: 32px;
 }
 
 .brand-mark {
@@ -65,22 +61,19 @@ button {
     font-size: 12px;
 }
 
-.nav-list {
-    display: grid;
-    gap: 8px;
+.nav-menu {
+    background: transparent;
+    border-inline-end: 0 !important;
 }
 
-.nav-item {
-    padding: 11px 12px;
+.nav-menu .ant-menu-item {
     color: #d6e0df;
-    border-radius: 8px;
-    text-decoration: none;
 }
 
-.nav-item:hover,
-.nav-item.active {
-    color: #17242f;
-    background: #d7f171;
+.nav-menu .ant-menu-item:hover,
+.nav-menu .ant-menu-item-selected {
+    color: #17242f !important;
+    background: #d7f171 !important;
 }
 
 .workspace {
@@ -95,6 +88,10 @@ button {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    height: auto;
+    padding: 28px 32px 0;
+    background: #eef2f4;
+    line-height: normal;
 }
 
 .eyebrow {
@@ -112,29 +109,15 @@ p {
     margin-top: 0;
 }
 
-h1 {
-    margin-bottom: 0;
+.topbar h1.ant-typography {
+    margin: 0;
     font-size: 30px;
     line-height: 1.2;
 }
 
-h2 {
+.panel h2.ant-typography {
     margin-bottom: 12px;
     font-size: 22px;
-}
-
-.ghost-button {
-    min-height: 40px;
-    padding: 0 16px;
-    color: #17242f;
-    background: transparent;
-    border: 1px solid #b9c4c8;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.ghost-button:hover {
-    border-color: #17242f;
 }
 
 .metrics {
@@ -143,22 +126,13 @@ h2 {
     gap: 16px;
 }
 
-.metric-card,
-.panel {
-    background: #ffffff;
-    border: 1px solid #dce3e6;
-    border-radius: 8px;
+.metric-card {
+    border-color: #dce3e6;
 }
 
-.metric-card {
+.metric-card .ant-card-body {
     display: grid;
     gap: 10px;
-    padding: 20px;
-}
-
-.metric-card span {
-    color: #62727a;
-    font-size: 14px;
 }
 
 .metric-card strong {
@@ -167,10 +141,10 @@ h2 {
 }
 
 .panel {
-    padding: 28px;
+    border-color: #dce3e6;
 }
 
-.panel p:last-child {
+.panel .ant-typography:last-child {
     max-width: 660px;
     margin-bottom: 0;
     color: #56656d;
@@ -179,15 +153,20 @@ h2 {
 
 @media (max-width: 760px) {
     .admin-shell {
-        grid-template-columns: 1fr;
+        display: block;
     }
 
     .sidebar {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
         gap: 18px;
     }
 
-    .nav-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .nav-menu .ant-menu-item {
+        display: inline-flex;
+        width: calc(50% - 4px);
+        margin-inline: 2px;
     }
 
     .workspace {

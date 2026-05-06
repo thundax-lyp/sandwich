@@ -49,6 +49,7 @@ import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordService passwordService;
     private final PermissionService permissionService;
     private final UserService userService;
+    private final UserIdentityService userIdentityService;
 
     @Autowired(required = false)
     private WecomLoginProvider wecomLoginProvider;
@@ -115,7 +117,8 @@ public class AuthServiceImpl implements AuthService {
             UserCredentialDao userCredentialDao,
             PasswordService passwordService,
             PermissionService permissionService,
-            UserService userService) {
+            UserService userService,
+            UserIdentityService userIdentityService) {
         this.properties = properties;
         this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
@@ -127,6 +130,7 @@ public class AuthServiceImpl implements AuthService {
         this.passwordService = passwordService;
         this.permissionService = permissionService;
         this.userService = userService;
+        this.userIdentityService = userIdentityService;
     }
 
     @Override
@@ -349,7 +353,7 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, session, user, userService.getAccountLoginName(user.getId()));
+        return AuthTokenQueryResult.active(token, session, user, userIdentityService.getAccountLoginName(user.getId()));
     }
 
     private AuthTokenQueryResult queryOAuthAccessToken(String token) {
@@ -367,7 +371,8 @@ public class AuthServiceImpl implements AuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, accessToken, user, userService.getAccountLoginName(user.getId()));
+        return AuthTokenQueryResult.active(
+                token, accessToken, user, userIdentityService.getAccountLoginName(user.getId()));
     }
 
     @Override
@@ -606,7 +611,7 @@ public class AuthServiceImpl implements AuthService {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
-        String loginName = userService.getAccountLoginName(user.getId());
+        String loginName = userIdentityService.getAccountLoginName(user.getId());
         if (StringUtils.isBlank(loginName)) {
             throw new InvalidUsernamePasswordException();
         }

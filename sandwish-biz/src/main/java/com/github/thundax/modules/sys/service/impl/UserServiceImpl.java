@@ -90,18 +90,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByLoginName(String loginName) {
-        UserIdentity identity = userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
-        return identity == null ? null : getById(identity.getUserId());
-    }
-
-    @Override
-    public String getAccountLoginName(EntityId userId) {
-        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
-        return identity == null ? null : identity.getIdentityValue();
-    }
-
-    @Override
     public UserCredential getPasswordCredential(EntityId userId) {
         UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
         return identity == null
@@ -230,6 +218,11 @@ public class UserServiceImpl implements UserService {
 
     private String superFlagValue(UserPrivilege privilege) {
         return UserPrivilege.SUPER == privilege ? LEGACY_SUPER_FLAG : null;
+    }
+
+    private String getAccountLoginName(EntityId userId) {
+        UserIdentity identity = userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
     }
 
     private UserIdentity upsertAccountIdentity(User user, String loginName) {

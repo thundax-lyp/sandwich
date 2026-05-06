@@ -11,21 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `sys-user-identity-service`：拆分后台用户账号身份 Service
-  - 范围文件：`sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserIdentityService.java`
-    `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImpl.java`
-    `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AuthServiceImpl.java`
-    `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/CurrentUserController.java`
-    `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/LogController.java`
-    `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/RoleController.java`
-    `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/UserController.java`
-    `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImplTest.java`
-  - 处理动作：新增 `UserIdentityService`，迁移账号登录名读取能力并更新调用点。
-  - 验收点：`UserService` 不再公开 `getByLoginName` 和 `getAccountLoginName`，相关调用点改用 `UserIdentityService` 且测试通过。
-  - 重要度：8/10
-
 - [ ] `sys-user-credential-service`：拆分后台用户认证凭据 Service
   - 范围文件：`sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java`
     `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`

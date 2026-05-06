@@ -61,6 +61,7 @@ import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -103,12 +104,17 @@ public class AuthPermissionLifecycleTest {
         authProperties.setLoginExpiredSeconds(60);
 
         TestUserService userService = new TestUserService();
+        TestUserIdentityService userIdentityService = new TestUserIdentityService();
         permissionService = new PermissionServiceImpl(
                 permissionDao,
                 authProperties,
                 userService,
                 new CurrentUserServiceImpl(
-                        userService, new TestRoleService(), new TestMenuService(), new PlainPasswordService()));
+                        userService,
+                        new TestRoleService(),
+                        new TestMenuService(),
+                        new PlainPasswordService(),
+                        userIdentityService));
         authService = new AuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
@@ -120,7 +126,8 @@ public class AuthPermissionLifecycleTest {
                 new TestUserCredentialDao(),
                 new PlainPasswordService(),
                 permissionService,
-                new TestUserService());
+                userService,
+                userIdentityService);
     }
 
     @After
@@ -829,16 +836,6 @@ public class AuthPermissionLifecycleTest {
     private static class TestUserService implements UserService {
 
         @Override
-        public User getByLoginName(String loginName) {
-            return user();
-        }
-
-        @Override
-        public String getAccountLoginName(EntityId userId) {
-            return "tester";
-        }
-
-        @Override
         public UserCredential getPasswordCredential(EntityId userId) {
             return new TestUserCredentialDao().credential();
         }
@@ -904,6 +901,19 @@ public class AuthPermissionLifecycleTest {
             user.setPrivilege(UserPrivilege.SUPER);
             user.setRank(AccessRank.of(0));
             return user;
+        }
+    }
+
+    private static class TestUserIdentityService implements UserIdentityService {
+
+        @Override
+        public User getByLoginName(String loginName) {
+            return new TestUserService().getById(EntityId.of("u1"));
+        }
+
+        @Override
+        public String getAccountLoginName(EntityId userId) {
+            return "tester";
         }
     }
 

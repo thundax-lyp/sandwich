@@ -12,6 +12,7 @@ import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
@@ -33,16 +34,19 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private final RoleService roleService;
     private final MenuService menuService;
     private final PasswordService passwordService;
+    private final UserIdentityService userIdentityService;
 
     public CurrentUserServiceImpl(
             UserService userService,
             RoleService roleService,
             MenuService menuService,
-            PasswordService passwordService) {
+            PasswordService passwordService,
+            UserIdentityService userIdentityService) {
         this.userService = userService;
         this.roleService = roleService;
         this.menuService = menuService;
         this.passwordService = passwordService;
+        this.userIdentityService = userIdentityService;
     }
 
     @Override
@@ -51,7 +55,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         currentUser.setName(name);
         currentUser.setEmail(email);
         currentUser.setMobile(mobile);
-        userService.update(currentUser, userService.getAccountLoginName(currentUser.getId()), null);
+        userService.update(currentUser, userIdentityService.getAccountLoginName(currentUser.getId()), null);
         return currentUser;
     }
 

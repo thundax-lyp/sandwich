@@ -16,6 +16,7 @@ import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
@@ -29,7 +30,11 @@ public class CurrentUserServiceImplTest {
         UserService userService = mock(UserService.class);
         MenuService menuService = mock(MenuService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
-                userService, mock(RoleService.class), menuService, mock(PasswordService.class));
+                userService,
+                mock(RoleService.class),
+                menuService,
+                mock(PasswordService.class),
+                mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(menu("menu-system", null, "系统管理"), menu("menu-user", "menu-system", "用户管理"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
@@ -46,11 +51,16 @@ public class CurrentUserServiceImplTest {
     @Test
     public void shouldUpdateCurrentUserInfo() {
         UserService userService = mock(UserService.class);
+        UserIdentityService userIdentityService = mock(UserIdentityService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
-                userService, mock(RoleService.class), mock(MenuService.class), mock(PasswordService.class));
+                userService,
+                mock(RoleService.class),
+                mock(MenuService.class),
+                mock(PasswordService.class),
+                userIdentityService);
         User currentUser = superUser();
 
-        when(userService.getAccountLoginName(currentUser.getId())).thenReturn("tester");
+        when(userIdentityService.getAccountLoginName(currentUser.getId())).thenReturn("tester");
 
         User updated = service.updateInfo(currentUser, "New Name", "new@example.com", "13800138000");
 
@@ -65,7 +75,11 @@ public class CurrentUserServiceImplTest {
         UserService userService = mock(UserService.class);
         PasswordService passwordService = mock(PasswordService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
-                userService, mock(RoleService.class), mock(MenuService.class), passwordService);
+                userService,
+                mock(RoleService.class),
+                mock(MenuService.class),
+                passwordService,
+                mock(UserIdentityService.class));
         User currentUser = superUser();
         UserCredential credential = new UserCredential();
         credential.setCredentialValue("encrypted-old");

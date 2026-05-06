@@ -30,6 +30,7 @@ import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -61,18 +62,21 @@ public class RoleController {
     private final MenuService menuService;
     private final DepartmentService departmentService;
     private final UserService userService;
+    private final UserIdentityService userIdentityService;
 
     @Autowired
     public RoleController(
             RoleService roleService,
             MenuService menuService,
             DepartmentService departmentService,
-            UserService userService) {
+            UserService userService,
+            UserIdentityService userIdentityService) {
 
         this.roleService = roleService;
         this.menuService = menuService;
         this.departmentService = departmentService;
         this.userService = userService;
+        this.userIdentityService = userIdentityService;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:role:view")
@@ -300,7 +304,7 @@ public class RoleController {
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         DEPARTMENT_ID_PREFIX,
                         user,
-                        userService.getAccountLoginName(user.getId()),
+                        userIdentityService.getAccountLoginName(user.getId()),
                         departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                         departmentService::getById))
                 .collect(Collectors.toList()));
@@ -368,7 +372,7 @@ public class RoleController {
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
                 user,
-                userService.getAccountLoginName(user.getId()),
+                userIdentityService.getAccountLoginName(user.getId()),
                 departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                 departmentService::getById);
     }

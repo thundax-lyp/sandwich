@@ -24,10 +24,6 @@ public interface UserService {
 
     int batchDeleteById(List<EntityId> ids);
 
-    User getByLoginName(String loginName);
-
-    String getAccountLoginName(EntityId userId);
-
     UserCredential getPasswordCredential(EntityId userId);
 
     void updatePassword(EntityId userId, String encryptedPassword, String updateUserId);

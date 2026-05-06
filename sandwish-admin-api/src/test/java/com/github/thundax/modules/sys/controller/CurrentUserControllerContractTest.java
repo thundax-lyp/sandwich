@@ -17,6 +17,7 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.CurrentUserService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import io.swagger.annotations.Api;
 import java.util.Arrays;
@@ -78,8 +79,8 @@ public class CurrentUserControllerContractTest {
         mockApplicationContext(userService);
         UserAccessHolder.currentUserId("user-1", "token-1");
 
-        CurrentUserController controller =
-                new CurrentUserController(userService, currentUserService, mock(KeypairService.class));
+        CurrentUserController controller = new CurrentUserController(
+                userService, currentUserService, mock(UserIdentityService.class), mock(KeypairService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 

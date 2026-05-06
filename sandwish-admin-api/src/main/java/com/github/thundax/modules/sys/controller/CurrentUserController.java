@@ -22,6 +22,7 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.CurrentUserService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
@@ -48,13 +49,18 @@ public class CurrentUserController {
 
     private final UserService userService;
     private final CurrentUserService currentUserService;
+    private final UserIdentityService userIdentityService;
     private final KeypairService keypairService;
 
     public CurrentUserController(
-            UserService userService, CurrentUserService currentUserService, KeypairService keypairService) {
+            UserService userService,
+            CurrentUserService currentUserService,
+            UserIdentityService userIdentityService,
+            KeypairService keypairService) {
 
         this.userService = userService;
         this.currentUserService = currentUserService;
+        this.userIdentityService = userIdentityService;
         this.keypairService = keypairService;
     }
 
@@ -75,7 +81,7 @@ public class CurrentUserController {
         }
 
         return PersonalInterfaceAssembler.toInfoResponse(
-                currentUser, userService.getAccountLoginName(currentUser.getId()));
+                currentUser, userIdentityService.getAccountLoginName(currentUser.getId()));
     }
 
     @ApiOperation(value = "更新当前用户信息", notes = "更新当前登录后台用户的姓名、邮箱和手机号")
@@ -96,7 +102,7 @@ public class CurrentUserController {
                 currentUserService.updateInfo(currentUser, request.getName(), request.getEmail(), request.getMobile());
 
         return PersonalInterfaceAssembler.toInfoResponse(
-                currentUser, userService.getAccountLoginName(currentUser.getId()));
+                currentUser, userIdentityService.getAccountLoginName(currentUser.getId()));
     }
 
     @ApiOperation(value = "更新当前用户密码", notes = "校验当前登录后台用户旧密码后更新密码凭据")

@@ -37,6 +37,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
@@ -78,6 +79,7 @@ public class UserController {
     private final UserService userService;
     private final DepartmentService departmentService;
     private final RoleService roleService;
+    private final UserIdentityService userIdentityService;
     private final KeypairService keypairService;
     private final PasswordService passwordService;
 
@@ -86,12 +88,14 @@ public class UserController {
             UserService userService,
             DepartmentService departmentService,
             RoleService roleService,
+            UserIdentityService userIdentityService,
             KeypairService keypairService,
             PasswordService passwordService) {
 
         this.userService = userService;
         this.departmentService = departmentService;
         this.roleService = roleService;
+        this.userIdentityService = userIdentityService;
         this.keypairService = keypairService;
         this.passwordService = passwordService;
     }
@@ -528,7 +532,7 @@ public class UserController {
         if (StringUtils.isBlank(loginName)) {
             return true;
         }
-        User bean = userService.getByLoginName(loginName);
+        User bean = userIdentityService.getByLoginName(loginName);
         if (bean == null) {
             return true;
         }
@@ -540,7 +544,11 @@ public class UserController {
         Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         List<Role> roleList = userService.listUserRoles(user);
         return UserInterfaceAssembler.toResponse(
-                user, userService.getAccountLoginName(user.getId()), department, roleList, departmentService::getById);
+                user,
+                userIdentityService.getAccountLoginName(user.getId()),
+                department,
+                roleList,
+                departmentService::getById);
     }
 
     public static String getAvatarUrl(String userId, String token) {

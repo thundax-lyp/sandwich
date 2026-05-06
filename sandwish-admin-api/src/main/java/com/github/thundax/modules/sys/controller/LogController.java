@@ -17,6 +17,7 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import io.swagger.annotations.Api;
@@ -36,12 +37,18 @@ public class LogController {
 
     private final LogService logService;
     private final UserService userService;
+    private final UserIdentityService userIdentityService;
     private final DepartmentService departmentService;
 
     @Autowired
-    public LogController(LogService logService, UserService userService, DepartmentService departmentService) {
+    public LogController(
+            LogService logService,
+            UserService userService,
+            UserIdentityService userIdentityService,
+            DepartmentService departmentService) {
         this.logService = logService;
         this.userService = userService;
+        this.userIdentityService = userIdentityService;
         this.departmentService = departmentService;
     }
 
@@ -68,7 +75,7 @@ public class LogController {
         return LogInterfaceAssembler.toResponse(
                 log,
                 user,
-                user == null ? null : userService.getAccountLoginName(user.getId()),
+                user == null ? null : userIdentityService.getAccountLoginName(user.getId()),
                 department,
                 departmentService::getById);
     }

@@ -1,11 +1,9 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.List;
 
@@ -15,22 +13,15 @@ public interface MenuService {
 
     List<Menu> listByIds(List<EntityId> ids);
 
-    List<Menu> list(Menu menu);
-
     List<Menu> list(MenuQuery query);
 
     PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page);
 
-    void add(Menu menu);
+    EntityId add(Menu menu);
 
     void update(Menu menu);
 
     int batchDeleteById(List<EntityId> ids);
-
-    List<Menu> list(AccessRank maxRank);
-
-    @LayerPublicApi(reason = "菜单树节点维护时按父节点读取子菜单的业务入口")
-    List<Menu> listChildren(String parentId);
 
     int updateVisibility(Menu menu);
 

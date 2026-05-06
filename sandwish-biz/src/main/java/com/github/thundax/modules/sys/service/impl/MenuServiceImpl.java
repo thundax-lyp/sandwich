@@ -46,10 +46,6 @@ public class MenuServiceImpl implements MenuService {
         return dao.listByIds(EntityIdCodec.toValues(ids));
     }
 
-    public List<Menu> list(Menu menu) {
-        return list((MenuQuery) null);
-    }
-
     public List<Menu> list(MenuQuery query) {
         return dao.list(
                 query == null ? null : query.getParentId(),
@@ -72,20 +68,12 @@ public class MenuServiceImpl implements MenuService {
         return normalizedPage;
     }
 
-    public List<Menu> list(AccessRank maxRank) {
-        return dao.list(null, null, rankValue(maxRank));
-    }
-
-    @Override
-    public List<Menu> listChildren(String parentId) {
-        return dao.list(parentId, null, null);
-    }
-
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Menu menu) {
+    public EntityId add(Menu menu) {
         menu.setId(EntityIdCodec.toDomain(dao.insert(menu)));
         afterWrite(menu);
+        return menu.getId();
     }
 
     @Override

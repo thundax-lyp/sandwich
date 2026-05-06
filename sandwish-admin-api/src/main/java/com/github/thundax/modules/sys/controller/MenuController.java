@@ -234,7 +234,7 @@ public class MenuController {
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> tree(@Valid @RequestBody List<MenuIdRequest> excludeList) {
-        List<Menu> beanList = menuService.list(new Menu());
+        List<Menu> beanList = menuService.list(new MenuQuery());
 
         Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, MenuIdRequest::getId));
         beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));

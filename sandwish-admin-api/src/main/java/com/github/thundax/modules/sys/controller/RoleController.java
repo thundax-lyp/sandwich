@@ -32,6 +32,7 @@ import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -272,7 +273,7 @@ public class RoleController {
     @RequestMapping(value = "menu/tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role')")
     public List<RoleMenuResponse> menuTree() {
-        return menuService.list(new Menu()).stream()
+        return menuService.list(new MenuQuery()).stream()
                 .map(menu -> RoleInterfaceAssembler.toMenuResponse(menu))
                 .collect(Collectors.toList());
     }

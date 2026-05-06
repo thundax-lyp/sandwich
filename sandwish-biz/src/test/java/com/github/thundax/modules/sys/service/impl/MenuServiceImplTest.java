@@ -47,15 +47,17 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldUseDaoFiltersForConvenienceQueries() {
+    public void shouldUseQueryForRankAndParentFilters() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
 
-        service.list(AccessRank.of(2));
-        assertEquals(Integer.valueOf(2), dao.maxRank);
+        MenuQuery query = new MenuQuery();
+        query.setParentId("parent-1");
+        query.setMaxRank(AccessRank.of(2));
+        service.list(query);
 
-        service.listChildren("parent-1");
         assertEquals("parent-1", dao.parentId);
+        assertEquals(Integer.valueOf(2), dao.maxRank);
     }
 
     @Test

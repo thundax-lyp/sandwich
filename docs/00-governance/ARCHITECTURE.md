@@ -451,6 +451,7 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 不在 DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
 - `*Query` 固定作为 Service 入参读取条件模型。
+- `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。
 - `PersistenceAssembler` 不回填查询对象；查询条件从 Service 到 DAO / Mapper 时必须显式拆解或转换为 infra 内部 persistence 参数对象。
 - 树业务 `Entity` 只表达 `parentId` 等业务关系字段，不暴露 `lft` / `rgt` 或 nested-set 区间计算方法。

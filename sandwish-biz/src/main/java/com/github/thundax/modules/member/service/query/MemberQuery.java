@@ -1,14 +1,17 @@
 package com.github.thundax.modules.member.service.query;
 
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
-import java.io.Serializable;
 import java.util.Date;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class MemberQuery implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class MemberQuery {
     private MemberStatus status;
     private String email;
     private String name;

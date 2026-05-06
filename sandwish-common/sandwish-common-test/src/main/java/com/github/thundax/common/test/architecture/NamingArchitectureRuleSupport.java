@@ -10,7 +10,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -22,6 +26,11 @@ public final class NamingArchitectureRuleSupport {
     private static final String GENERIC_HELPER_NAMES = "(List|Object|Data|Common|Base|Generic)Helper";
     private static final Pattern SERVICE_QUERY_SETTER_DECLARATION_PATTERN =
             Pattern.compile("\\bpublic\\s+void\\s+set[A-Z][A-Za-z0-9_]*\\s*\\(");
+    private static final Set<String> SERVICE_QUERY_REQUIRED_ANNOTATIONS =
+            new LinkedHashSet<String>(Arrays.asList("Getter", "Setter", "NoArgsConstructor", "AllArgsConstructor"));
+    private static final Pattern SERVICE_QUERY_CLASS_DECLARATION_PATTERN =
+            Pattern.compile("(?s)(.*?)\\bpublic\\s+class\\s+\\w+Query\\b");
+    private static final Pattern SOURCE_ANNOTATION_PATTERN = Pattern.compile("@(?:[\\w.]+\\.)?(\\w+)\\b");
 
     private NamingArchitectureRuleSupport() {}
 
@@ -159,6 +168,25 @@ public final class NamingArchitectureRuleSupport {
         assertTrue(
                 "Service query objects must only define query fields; request-to-query conversion belongs in "
                         + "InterfaceAssembler, so service query source must not declare setXxx methods: "
+                        + violations,
+                violations.isEmpty());
+    }
+
+    public static void assertServiceQueryObjectsDeclareOnlyRequiredAnnotations(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(NamingArchitectureRuleSupport::isServiceQuerySource)
+                    .filter(NamingArchitectureRuleSupport::violatesServiceQueryAnnotations)
+                    .map(path -> ArchitectureSourceSupport.repositoryPath(root, path))
+                    .forEach(violations::add);
+        }
+
+        assertTrue(
+                "Service query objects must declare exactly @Getter, @Setter, @NoArgsConstructor, "
+                        + "@AllArgsConstructor as class annotations: "
                         + violations,
                 violations.isEmpty());
     }
@@ -373,6 +401,7 @@ public final class NamingArchitectureRuleSupport {
                 || name.equals("sign")
                 || name.equals("touch")
                 || name.equals("uploadMultipartPart")
+                || name.equals("validate")
                 || name.equals("verifySign");
     }
 
@@ -394,5 +423,19 @@ public final class NamingArchitectureRuleSupport {
         return SERVICE_QUERY_SETTER_DECLARATION_PATTERN
                 .matcher(ArchitectureSourceSupport.readSourceWithoutComments(path))
                 .find();
+    }
+
+    private static boolean violatesServiceQueryAnnotations(Path path) {
+        String source = ArchitectureSourceSupport.readSourceWithoutComments(path);
+        Matcher classDeclaration = SERVICE_QUERY_CLASS_DECLARATION_PATTERN.matcher(source);
+        if (!classDeclaration.find()) {
+            return true;
+        }
+        Matcher annotation = SOURCE_ANNOTATION_PATTERN.matcher(classDeclaration.group(1));
+        Set<String> annotations = new LinkedHashSet<String>();
+        while (annotation.find()) {
+            annotations.add(annotation.group(1));
+        }
+        return !SERVICE_QUERY_REQUIRED_ANNOTATIONS.equals(annotations);
     }
 }

@@ -1,13 +1,16 @@
 package com.github.thundax.modules.assist.service.query;
 
-import java.io.Serializable;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class SignatureQuery implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class SignatureQuery {
     private String businessType;
     private String businessId;
     private String isVerifySign;

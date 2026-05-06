@@ -33,6 +33,14 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
         NamingArchitectureRuleSupport.assertServiceQueryObjectsDeclareNoSetters(sourceRoot);
     }
 
+    @Test
+    public void shouldDeclareOnlyRequiredAnnotationsInServiceQueryObjects() throws IOException {
+        Path root = repositoryRoot();
+        Path sourceRoot = root.resolve("sandwish-biz").resolve("src/main/java/com/github/thundax/modules");
+
+        NamingArchitectureRuleSupport.assertServiceQueryObjectsDeclareOnlyRequiredAnnotations(sourceRoot);
+    }
+
     private Path repositoryRoot() {
         Path current = Paths.get("").toAbsolutePath();
         if (Files.exists(current.resolve("TODO.md"))) {

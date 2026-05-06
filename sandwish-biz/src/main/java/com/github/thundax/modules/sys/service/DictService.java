@@ -14,7 +14,7 @@ public interface DictService {
 
     PageDTO<Dict> page(DictQuery query, PageDTO<Dict> page);
 
-    void add(Dict dict);
+    EntityId add(Dict dict);
 
     void update(Dict dict);
 

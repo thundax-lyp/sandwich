@@ -95,8 +95,9 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(StoredObject storage) {
+    public EntityId add(StoredObject storage) {
         storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
+        return storage.getId();
     }
 
     @Override

@@ -16,7 +16,7 @@ public interface RoleService {
 
     PageDTO<Role> page(RoleQuery query, PageDTO<Role> page);
 
-    void add(Role role);
+    EntityId add(Role role);
 
     void update(Role role);
 

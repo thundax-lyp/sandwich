@@ -14,7 +14,7 @@ public interface LogService {
 
     PageDTO<Log> page(LogQuery query, PageDTO<Log> page);
 
-    void add(Log log);
+    EntityId add(Log log);
 
     void update(Log log);
 

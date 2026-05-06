@@ -21,7 +21,7 @@ public interface StorageService {
 
     PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page);
 
-    void add(StoredObject storage);
+    EntityId add(StoredObject storage);
 
     void update(StoredObject storage);
 

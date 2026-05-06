@@ -91,8 +91,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Member member) {
+    public EntityId add(Member member) {
         member.setId(EntityIdCodec.toDomain(dao.insert(member)));
+        return member.getId();
     }
 
     @Override

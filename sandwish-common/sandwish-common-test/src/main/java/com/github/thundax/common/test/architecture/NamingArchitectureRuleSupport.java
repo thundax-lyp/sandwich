@@ -137,6 +137,25 @@ public final class NamingArchitectureRuleSupport {
                 violations.isEmpty());
     }
 
+    public static void assertServiceAddMethodsReturnEntityId(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+
+        for (JavaClass javaClass : classes) {
+            if (!isServiceInterface(javaClass)) {
+                continue;
+            }
+            for (JavaMethod method : javaClass.getMethods()) {
+                if ("add".equals(method.getName())
+                        && !"com.github.thundax.common.id.EntityId"
+                                .equals(method.getRawReturnType().getName())) {
+                    violations.add(method.getFullName());
+                }
+            }
+        }
+
+        assertTrue("Service add methods must return the created entity id: " + violations, violations.isEmpty());
+    }
+
     public static void assertServiceQueryObjectsUnderServiceQueryPackage(JavaClasses classes) {
         List<String> violations = new ArrayList<String>();
 

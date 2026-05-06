@@ -78,8 +78,9 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Dict dict) {
+    public EntityId add(Dict dict) {
         dict.setId(EntityIdCodec.toDomain(dao.insert(dict)));
+        return dict.getId();
     }
 
     @Override

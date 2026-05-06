@@ -1,5 +1,6 @@
 package com.github.thundax.modules.assist.service;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.assist.entity.Signature;
 import com.github.thundax.modules.assist.service.query.SignatureQuery;
@@ -21,7 +22,7 @@ public interface SignatureService {
 
     PageDTO<Signature> page(SignatureQuery query, PageDTO<Signature> page);
 
-    void add(Signature entity);
+    EntityId add(Signature entity);
 
     void update(Signature entity);
 

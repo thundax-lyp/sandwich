@@ -19,7 +19,7 @@ public interface MemberService {
 
     PageDTO<Member> page(MemberQuery query, PageDTO<Member> page);
 
-    void add(Member member);
+    EntityId add(Member member);
 
     void update(Member member);
 

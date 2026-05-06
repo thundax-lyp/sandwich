@@ -1,6 +1,7 @@
 package com.github.thundax.modules.assist.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.modules.assist.dao.SignatureDao;
@@ -51,8 +52,9 @@ public class SignatureServiceImpl implements SignatureService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Signature entity) {
+    public EntityId add(Signature entity) {
         entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
+        return entity.getId();
     }
 
     @Override

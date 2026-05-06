@@ -282,6 +282,7 @@
 - DAO interface 只暴露业务持久化契约。
 - Service、DAO 和 Mapper 公开方法不得仅由测试代码调用；仅测试调用的方法必须删除、收窄为内部实现，或重塑为真实业务协作方。
 - 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")`，且 reason 不得以测试作为理由。
+- Service `add` 方法必须返回新建主实体的 `EntityId`。
 - Service `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
 - `UserIdentity` 和 `UserCredential` 属于 System 用户模型，认证使用方式由 Auth 编排。

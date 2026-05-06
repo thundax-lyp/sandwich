@@ -18,7 +18,7 @@ public interface UserService {
 
     PageDTO<User> page(UserQuery query, PageDTO<User> page);
 
-    void add(User user, String loginName, String encryptedPassword, List<String> roleIdList);
+    EntityId add(User user, String loginName, String encryptedPassword, List<String> roleIdList);
 
     default void update(User user, String loginName) {
         update(user, loginName, null);

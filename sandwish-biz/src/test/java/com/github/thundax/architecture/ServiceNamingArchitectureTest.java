@@ -19,6 +19,13 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     }
 
     @Test
+    public void shouldReturnCreatedEntityIdFromServiceAddMethods() {
+        JavaClasses classes = importPackages("com.github.thundax.modules");
+
+        NamingArchitectureRuleSupport.assertServiceAddMethodsReturnEntityId(classes);
+    }
+
+    @Test
     public void shouldPlaceServiceQueryObjectsUnderServiceQueryPackage() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 

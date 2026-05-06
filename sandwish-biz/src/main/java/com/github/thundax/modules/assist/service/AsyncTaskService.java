@@ -7,7 +7,7 @@ public interface AsyncTaskService {
 
     AsyncTask getById(EntityId id);
 
-    void add(AsyncTask asyncTask);
+    EntityId add(AsyncTask asyncTask);
 
     void update(AsyncTask asyncTask);
 

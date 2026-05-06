@@ -24,11 +24,12 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     }
 
     @Override
-    public void add(AsyncTask asyncTask) {
+    public EntityId add(AsyncTask asyncTask) {
         if (StringUtils.isBlank(EntityIdCodec.toValue(asyncTask.getId()))) {
             asyncTask.setId(EntityIdCodec.toDomain(UuidHelper.compact()));
         }
         asyncTaskDao.insert(asyncTask);
+        return asyncTask.getId();
     }
 
     @Override

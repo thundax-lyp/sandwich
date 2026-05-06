@@ -73,12 +73,13 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Log log) {
+    public EntityId add(Log log) {
         log.setId(EntityIdCodec.toDomain(dao.insert(log)));
 
         if (log.isSignable()) {
             signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
         }
+        return log.getId();
     }
 
     @Override

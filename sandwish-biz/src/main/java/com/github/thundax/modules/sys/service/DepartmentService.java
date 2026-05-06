@@ -17,7 +17,7 @@ public interface DepartmentService {
 
     PageDTO<Department> page(DepartmentQuery query, PageDTO<Department> page);
 
-    void add(Department department);
+    EntityId add(Department department);
 
     void update(Department department);
 

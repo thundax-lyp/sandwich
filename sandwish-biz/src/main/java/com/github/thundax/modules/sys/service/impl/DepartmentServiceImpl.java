@@ -61,8 +61,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void add(Department entity) {
+    public EntityId add(Department entity) {
         entity.setId(EntityIdCodec.toDomain(dao.insert(entity)));
+        return entity.getId();
     }
 
     @Override

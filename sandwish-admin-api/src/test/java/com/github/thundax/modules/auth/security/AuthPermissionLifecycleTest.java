@@ -62,6 +62,7 @@ import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -101,8 +102,13 @@ public class AuthPermissionLifecycleTest {
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
 
+        TestUserService userService = new TestUserService();
         permissionService = new PermissionServiceImpl(
-                permissionDao, authProperties, new TestUserService(), new TestRoleService(), new TestMenuService());
+                permissionDao,
+                authProperties,
+                userService,
+                new CurrentUserServiceImpl(
+                        userService, new TestRoleService(), new TestMenuService(), new PlainPasswordService()));
         authService = new AuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
@@ -876,7 +882,9 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void add(User entity, String loginName, String encryptedPassword, List<String> roleIdList) {}
+        public EntityId add(User entity, String loginName, String encryptedPassword, List<String> roleIdList) {
+            return EntityId.of("user-id");
+        }
 
         @Override
         public void update(User entity, String loginName, List<String> roleIdList) {}
@@ -900,15 +908,6 @@ public class AuthPermissionLifecycleTest {
     }
 
     private static class TestMenuService implements MenuService {
-
-        public List<Menu> list(AccessRank maxRank) {
-            return menus();
-        }
-
-        @Override
-        public List<Menu> listChildren(String parentId) {
-            return Collections.emptyList();
-        }
 
         @Override
         public int updateVisibility(Menu menu) {
@@ -936,10 +935,6 @@ public class AuthPermissionLifecycleTest {
             return menus();
         }
 
-        public List<Menu> list(Menu entity) {
-            return menus();
-        }
-
         public List<Menu> list(MenuQuery query) {
             return menus();
         }
@@ -949,7 +944,9 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void add(Menu entity) {}
+        public EntityId add(Menu entity) {
+            return EntityId.of("menu-id");
+        }
 
         @Override
         public void update(Menu entity) {}
@@ -1031,7 +1028,9 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public void add(com.github.thundax.modules.sys.entity.Role entity) {}
+        public EntityId add(com.github.thundax.modules.sys.entity.Role entity) {
+            return EntityId.of("role-id");
+        }
 
         @Override
         public void update(com.github.thundax.modules.sys.entity.Role entity) {}

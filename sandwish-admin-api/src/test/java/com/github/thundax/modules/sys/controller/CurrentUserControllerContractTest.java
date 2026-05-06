@@ -1,15 +1,12 @@
 package com.github.thundax.modules.sys.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.assist.service.KeypairService;
-import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarDeleteRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
@@ -19,8 +16,7 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
-import com.github.thundax.modules.sys.service.MenuService;
-import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import io.swagger.annotations.Api;
 import java.util.Arrays;
@@ -71,24 +67,19 @@ public class CurrentUserControllerContractTest {
     }
 
     @Test
-    public void shouldReturnChildMenusWhenParentIdMatchesMenuIdValue() {
+    public void shouldReturnVisibleMenusFromCurrentUserService() {
         UserService userService = mock(UserService.class);
-        MenuService menuService = mock(MenuService.class);
+        CurrentUserService currentUserService = mock(CurrentUserService.class);
         List<Menu> menus = Arrays.asList(menu("menu-system", null, "系统管理"), menu("menu-user", "menu-system", "用户管理"));
         User currentUser = superUser();
 
         when(userService.getById(EntityId.of("user-1"))).thenReturn(currentUser);
-        when(menuService.list(any(Menu.class))).thenReturn(menus);
-        when(menuService.listByIds(anyList())).thenReturn(menus);
+        when(currentUserService.listVisibleMenus(currentUser)).thenReturn(menus);
         mockApplicationContext(userService);
         UserAccessHolder.currentUserId("user-1", "token-1");
 
-        CurrentUserController controller = new CurrentUserController(
-                userService,
-                mock(RoleService.class),
-                menuService,
-                mock(PasswordService.class),
-                mock(KeypairService.class));
+        CurrentUserController controller =
+                new CurrentUserController(userService, currentUserService, mock(KeypairService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 

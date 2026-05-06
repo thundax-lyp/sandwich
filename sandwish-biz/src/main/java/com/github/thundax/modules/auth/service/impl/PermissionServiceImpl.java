@@ -13,18 +13,13 @@ import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.service.MenuService;
-import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.google.common.collect.Sets;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -39,21 +34,18 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionDao permissionDao;
     private final AuthProperties properties;
     private final UserService userService;
-    private final RoleService roleService;
-    private final MenuService menuService;
+    private final CurrentUserService currentUserService;
     private final PermissionMatcher permissionMatcher = new PrefixPermissionMatcher();
 
     public PermissionServiceImpl(
             PermissionDao permissionDao,
             AuthProperties properties,
             UserService userService,
-            RoleService roleService,
-            MenuService menuService) {
+            CurrentUserService currentUserService) {
         this.permissionDao = permissionDao;
         this.properties = properties;
         this.userService = userService;
-        this.roleService = roleService;
-        this.menuService = menuService;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -112,7 +104,7 @@ public class PermissionServiceImpl implements PermissionService {
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
-        List<Menu> menuList = listPermittedMenus(user);
+        List<Menu> menuList = currentUserService.listAccessibleMenus(user);
         if (menuList != null && !menuList.isEmpty()) {
             menuList.forEach(menu -> {
                 if (StringUtils.isNotBlank(menu.getPerms())) {
@@ -136,41 +128,6 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return permissions;
-    }
-
-    private List<Menu> listPermittedMenus(User user) {
-        List<String> menuIdList;
-
-        if (user.isSuper()) {
-            menuIdList = menuService.list(new Menu()).stream()
-                    .map(menu -> EntityIdCodec.toValue(menu.getId()))
-                    .collect(Collectors.toList());
-        } else {
-            List<Role> roleList = userService.listUserRoles(user);
-            boolean isAdmin = user.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
-
-            if (isAdmin) {
-                menuIdList = menuService.list(user.getRank()).stream()
-                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
-                        .collect(Collectors.toList());
-            } else {
-                Set<String> menuIds = Sets.newHashSet();
-                for (Role role : roleList) {
-                    menuIds.addAll(roleService.listRoleMenus(role).stream()
-                            .map(menu -> EntityIdCodec.toValue(menu.getId()))
-                            .collect(Collectors.toList()));
-                }
-                menuIds.removeIf(menuId -> {
-                    Menu menu = menuService.getById(EntityIdCodec.toDomain(menuId));
-                    return menu == null || !user.getRank().canAccess(menu.getRank());
-                });
-                menuIdList = new ArrayList<>(menuIds);
-            }
-        }
-
-        List<Menu> menuList = menuService.listByIds(EntityIdCodec.toDomains(menuIdList));
-        menuList.sort(Menu::compareTo);
-        return menuList;
     }
 
     private int expiredSeconds() {

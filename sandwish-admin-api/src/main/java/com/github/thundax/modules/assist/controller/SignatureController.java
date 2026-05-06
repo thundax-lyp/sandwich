@@ -9,6 +9,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -43,12 +44,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "08-04.辅助-签名与验签")
 @SysLogger(module = {"辅助", "签名"})
 @RequestMapping(value = "/api/assist/signature")
-@RestController
+@WrappedApiController
 public class SignatureController {
 
     private final SignatureService signatureService;

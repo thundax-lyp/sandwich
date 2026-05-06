@@ -70,6 +70,27 @@ public class ApiAnnotationArchitectureRuleSupportTest {
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
     }
 
+    @Test
+    public void shouldTreatWrappedApiControllerAsRestController() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("wrapped").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@Api(tags = \"fixture\")\n"
+                        + "@RequestMapping(\"/api/sys/user\")\n"
+                        + "@WrappedApiController\n"
+                        + "public class FixtureController {\n"
+                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    @ApiOperation(value = \"list\", notes = \"sys:user:view\")\n"
+                        + "    @HasPermission(\"sys:user:view\")\n"
+                        + "    public void list() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);
+    }
+
     @Test(expected = AssertionError.class)
     public void shouldRejectRestControllerWithoutClassRequestMapping() throws IOException {
         Path sourceRoot = temporaryFolder.newFolder("unmapped").toPath();

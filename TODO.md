@@ -9,13 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-api-assist-response-wrapper`：迁移辅助签名接口响应包装
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/SignatureController.java
-    sandwish-admin-api/src/test/java/com/github/thundax/modules/assist/controller/SignatureControllerContractTest.java
-  - 处理动作：将纯 JSON Controller 迁移到 `@WrappedApiController` 并补真实响应结构测试
-  - 验收点：`SignatureController` 成功 JSON 响应由 `ApiResponseBodyAdvice` 包装，`PageResponse` 不被二次包装
-  - 重要度：7/10
-
 - [ ] `admin-api-auth-response-wrapper`：迁移后台认证 JSON 接口响应包装
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java
     sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/AuthControllerContractTest.java

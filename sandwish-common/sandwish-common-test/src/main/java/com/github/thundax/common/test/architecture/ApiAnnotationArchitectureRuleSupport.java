@@ -17,6 +17,7 @@ public final class ApiAnnotationArchitectureRuleSupport {
     private static final String[] HTTP_MAPPING_ANNOTATIONS = {
         "@RequestMapping", "@GetMapping", "@PostMapping", "@PutMapping", "@DeleteMapping", "@PatchMapping"
     };
+    private static final String[] REST_CONTROLLER_ANNOTATIONS = {"@RestController", "@WrappedApiController"};
 
     private static final Pattern REST_CONTROLLER_CLASS_PATTERN = Pattern.compile(
             "((?:@[A-Za-z0-9_.]+(?:\\([^)]*\\))?\\s+)*)public\\s+class\\s+([A-Za-z0-9_]+Controller)\\b");
@@ -135,7 +136,7 @@ public final class ApiAnnotationArchitectureRuleSupport {
         while (matcher.find()) {
             String annotations = matcher.group(1);
             String className = matcher.group(2);
-            if (annotations.contains("@RestController") && !annotations.contains("@RequestMapping")) {
+            if (containsRestControllerAnnotation(annotations) && !annotations.contains("@RequestMapping")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
             }
         }
@@ -147,7 +148,7 @@ public final class ApiAnnotationArchitectureRuleSupport {
         while (matcher.find()) {
             String annotations = matcher.group(1);
             String className = matcher.group(2);
-            if (annotations.contains("@RestController") && !annotations.contains("@Api")) {
+            if (containsRestControllerAnnotation(annotations) && !annotations.contains("@Api")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
             }
         }
@@ -219,7 +220,7 @@ public final class ApiAnnotationArchitectureRuleSupport {
 
     private static String restControllerClassAnnotations(String content) {
         Matcher matcher = REST_CONTROLLER_CLASS_PATTERN.matcher(content);
-        if (matcher.find() && matcher.group(1).contains("@RestController")) {
+        if (matcher.find() && containsRestControllerAnnotation(matcher.group(1))) {
             return matcher.group(1);
         }
         return "";
@@ -227,9 +228,18 @@ public final class ApiAnnotationArchitectureRuleSupport {
 
     private static int restControllerClassEnd(String content) {
         Matcher matcher = REST_CONTROLLER_CLASS_PATTERN.matcher(content);
-        if (matcher.find() && matcher.group(1).contains("@RestController")) {
+        if (matcher.find() && containsRestControllerAnnotation(matcher.group(1))) {
             return matcher.end();
         }
         return 0;
+    }
+
+    private static boolean containsRestControllerAnnotation(String annotations) {
+        for (String annotation : REST_CONTROLLER_ANNOTATIONS) {
+            if (annotations.contains(annotation)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

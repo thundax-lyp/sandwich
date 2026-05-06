@@ -24,8 +24,8 @@
 
 ## 3. Selector
 
-- `ADMIN_REST_CONTROLLER_SELECTOR`：`sandwish-admin-api` 中位于 `..modules..controller..` 且声明 `@RestController` 的类
-- `FRONT_REST_CONTROLLER_SELECTOR`：`sandwish-front-api` 中位于 `..modules..controller..` 且声明 `@RestController` 的类
+- `ADMIN_REST_CONTROLLER_SELECTOR`：`sandwish-admin-api` 中位于 `..modules..controller..` 且声明 `@RestController` 或 `@WrappedApiController` 的类
+- `FRONT_REST_CONTROLLER_SELECTOR`：`sandwish-front-api` 中位于 `..modules..controller..` 且声明 `@RestController` 或 `@WrappedApiController` 的类
 - `REQUEST_MODEL_SELECTOR`：类名以 `Request` 结尾，且位于 `..controller.request..`
 - `RESPONSE_MODEL_SELECTOR`：类名以 `Response` 结尾，且位于 `..controller.response..`
 
@@ -60,7 +60,7 @@
 
 | Rule ID | Scope | Constraint | Detection | Violation Message |
 | --- | --- | --- | --- | --- |
-| `ANNO_REST_CLASS_BASE_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | REST API 入口类必须声明 `@RestController` 和类级 `@RequestMapping` | ArchUnit / review | `[ANNO_REST_CLASS_BASE_REQUIRED] <class> violates class base annotations required: <missingAnnotations>` |
+| `ANNO_REST_CLASS_BASE_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | REST API 入口类必须声明 `@RestController` 或 `@WrappedApiController`，并声明类级 `@RequestMapping` | ArchUnit / review | `[ANNO_REST_CLASS_BASE_REQUIRED] <class> violates class base annotations required: <missingAnnotations>` |
 | `ANNO_REST_CLASS_SWAGGER_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | REST API 入口类必须声明 `@Api` | ArchUnit / review | `[ANNO_REST_CLASS_SWAGGER_REQUIRED] <class> violates Api annotation required: <foundAnnotations>` |
 | `ANNO_REST_METHOD_MAPPING_REQUIRED` | REST API 入口类中的公开 HTTP 方法 | 必须且仅能有一个 HTTP 映射注解：`@RequestMapping`、`@GetMapping`、`@PostMapping`、`@PutMapping`、`@DeleteMapping`、`@PatchMapping` | ArchUnit / review | `[ANNO_REST_METHOD_MAPPING_REQUIRED] <class#method> violates method mapping required: <foundMappings>` |
 | `ANNO_REST_METHOD_SWAGGER_REQUIRED` | REST API 入口类中的公开 HTTP 方法 | 必须声明 `@ApiOperation`；认证公开入口和文件流入口也必须声明 | ArchUnit / review | `[ANNO_REST_METHOD_SWAGGER_REQUIRED] <class#method> violates ApiOperation required: <foundAnnotations>` |
@@ -74,8 +74,8 @@
 
 | Interface Type | Required | Forbidden |
 | --- | --- | --- |
-| Admin REST Controller | `@RestController @RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
-| Front REST Controller | `@RestController @RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
+| Admin REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
+| Front REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
 | Request Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 | Response Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 

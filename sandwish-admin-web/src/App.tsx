@@ -10,7 +10,7 @@ export default function App() {
                 token: {
                     colorPrimary: "#315c54",
                     borderRadius: 8,
-                    fontFamily: "\"Avenir Next\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif"
+                    fontFamily: '"Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif'
                 }
             }}
         >

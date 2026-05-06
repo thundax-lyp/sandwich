@@ -1,28 +1,40 @@
 {
-  "name": "sandwish-admin-web",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host 0.0.0.0"
-  },
-  "dependencies": {
-    "@ant-design/icons": "^6.2.2",
-    "antd": "^6.3.7",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.15.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.7.2",
-    "vite": "^5.4.11"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+    "name": "sandwish-admin-web",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host 0.0.0.0",
+        "build": "tsc --noEmit && vite build",
+        "preview": "vite preview --host 0.0.0.0",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier . --write",
+        "format:check": "prettier . --check"
+    },
+    "dependencies": {
+        "@ant-design/icons": "^6.2.2",
+        "antd": "^6.3.7",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-router-dom": "^7.15.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/react": "^18.3.18",
+        "@types/react-dom": "^18.3.5",
+        "@vitejs/plugin-react": "^4.3.4",
+        "eslint": "^10.3.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "eslint-plugin-react-refresh": "^0.5.2",
+        "globals": "^17.6.0",
+        "prettier": "^3.8.3",
+        "typescript": "^5.7.2",
+        "typescript-eslint": "^8.59.2",
+        "vite": "^5.4.11"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
 }

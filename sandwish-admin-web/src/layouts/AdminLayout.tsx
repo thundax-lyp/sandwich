@@ -116,9 +116,7 @@ export function AdminLayout() {
                         <Text className="eyebrow">admin-api workspace</Text>
                         <Title level={1}>后台管理台</Title>
                     </div>
-                    <Button type="default">
-                        连接检查
-                    </Button>
+                    <Button type="default">连接检查</Button>
                 </Header>
 
                 <Content className="workspace">

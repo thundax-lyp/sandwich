@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,7 +52,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:department:view")
-    @HasPermission("sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -61,9 +59,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:view")
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:view')")
     public DepartmentResponse get(@Valid @RequestBody DepartmentIdRequest request) throws ApiException {
         Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -73,7 +71,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:department:view")
-    @HasPermission("sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -81,9 +78,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:view")
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:view')")
     public List<DepartmentResponse> list(@Valid @RequestBody DepartmentQueryRequest request) throws ApiException {
         DepartmentQuery query = DepartmentInterfaceAssembler.toQuery(request);
 
@@ -93,7 +90,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:department:edit")
-    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -101,9 +97,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:edit")
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:edit')")
     public DepartmentResponse add(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
         Department entity = DepartmentInterfaceAssembler.toEntity(new Department(), request);
         if (entity.getId() != null) {
@@ -126,7 +122,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:department:edit")
-    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -134,9 +129,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:edit")
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:edit')")
     public DepartmentResponse update(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
         Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -158,7 +153,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:department:edit")
-    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -166,9 +160,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:edit")
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:edit')")
     public Boolean delete(@Valid @RequestBody List<DepartmentIdRequest> list) throws ApiException {
         List<Department> beanList = new ArrayList<>();
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
@@ -189,7 +183,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -197,9 +190,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:view')")
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
         List<Department> beanList = departmentService.listAll();
 
@@ -233,7 +226,6 @@ public class DepartmentController {
     }
 
     @ApiOperation(value = "移动", notes = "sys:department:edit")
-    @HasPermission("sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -241,9 +233,9 @@ public class DepartmentController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:department:edit")
     @SysLogger("移动")
     @RequestMapping(value = "move", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:department:edit')")
     public Boolean move(@Valid @RequestBody DepartmentMoveRequest request) throws ApiException {
         Department fromBean = departmentService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {

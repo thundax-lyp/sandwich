@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,7 +36,6 @@ public class AsyncTaskController {
     }
 
     @ApiOperation(value = "获取对象", notes = "user")
-    @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -45,8 +43,8 @@ public class AsyncTaskController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("user")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('user')")
     public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
         AsyncTask bean = asyncTaskService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {

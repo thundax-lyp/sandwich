@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,7 +56,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取对象", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -65,9 +63,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
         Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -77,7 +75,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -85,9 +82,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("读取")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> list(@Valid @RequestBody MenuQueryRequest request) throws ApiException {
         MenuQuery query = MenuInterfaceAssembler.toQuery(request);
 
@@ -97,7 +94,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "添加", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -105,9 +101,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse add(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
@@ -130,7 +126,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "更新", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -138,9 +133,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("修改")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public MenuResponse update(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -162,7 +157,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "显示/隐藏", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -170,9 +164,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("显示")
     @RequestMapping(value = "display", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean updateVisibility(@Valid @RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<Menu> beanList = new ArrayList<>();
         for (MenuDisplayRequest request : RequestListHelper.present(list)) {
@@ -194,7 +188,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "删除", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -202,9 +195,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean delete(@Valid @RequestBody List<MenuIdRequest> list) throws ApiException {
         List<Menu> beanList = new ArrayList<>();
         for (MenuIdRequest request : RequestListHelper.present(list)) {
@@ -224,7 +217,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "获取列表", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -232,9 +224,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public List<MenuResponse> tree(@Valid @RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.list(new MenuQuery());
 
@@ -268,7 +260,6 @@ public class MenuController {
     }
 
     @ApiOperation(value = "排序", notes = "super")
-    @HasPermission("super")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -276,9 +267,9 @@ public class MenuController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("super")
     @SysLogger("排序")
     @RequestMapping(value = "move", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('super')")
     public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
         Menu fromBean = menuService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {

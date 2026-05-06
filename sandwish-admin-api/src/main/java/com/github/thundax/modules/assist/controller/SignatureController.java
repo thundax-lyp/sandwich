@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -77,7 +76,6 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "获取列表", notes = "assist:signature:view")
-    @HasPermission("assist:signature:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -85,9 +83,9 @@ public class SignatureController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("assist:signature:view")
     @SysLogger("列表")
     @RequestMapping(value = "page", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
     public PageResponse<SignatureResponse> page(@Valid @RequestBody SignaturePageRequest request) throws ApiException {
         SignatureQuery query = SignatureInterfaceAssembler.toQuery(request);
         return PageResponseHelper.fromEntityPage(
@@ -95,7 +93,6 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "校验", notes = "assist:signature:view")
-    @HasPermission("assist:signature:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -103,9 +100,9 @@ public class SignatureController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("assist:signature:view")
     @SysLogger("校验")
     @RequestMapping(value = "verify", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:view')")
     public SignatureVerifyResponse verify(@Valid @RequestBody SignatureVerifyRequest request) throws ApiException {
         Signature bean = signatureService.getByBusiness(request.getBusinessType(), request.getBusinessId());
 
@@ -123,7 +120,6 @@ public class SignatureController {
     }
 
     @ApiOperation(value = "删除", notes = "assist:signature:edit")
-    @HasPermission("assist:signature:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -131,9 +127,9 @@ public class SignatureController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("assist:signature:edit")
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('assist:signature:edit')")
     public Boolean delete(@Valid @RequestBody List<SignatureDeleteRequest> list) throws ApiException {
         List<Signature> beanList = new ArrayList<>();
         for (SignatureDeleteRequest request : RequestListHelper.present(list)) {

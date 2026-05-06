@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -81,7 +80,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:role:view")
-    @HasPermission("sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -89,9 +87,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:view")
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public RoleResponse get(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -101,7 +99,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:role:view")
-    @HasPermission("sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -109,9 +106,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:view")
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) throws ApiException {
         RoleQuery query = RoleInterfaceAssembler.toQuery(request);
 
@@ -119,7 +116,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "添加", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -127,9 +123,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public RoleResponse add(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
@@ -147,7 +143,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "更新", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -155,9 +150,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public RoleResponse update(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
@@ -174,7 +169,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "启用/禁用", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -182,9 +176,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updateStatus(@Valid @RequestBody List<RoleStatusRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RoleStatusRequest request : RequestListHelper.present(list)) {
@@ -205,7 +199,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "排序", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -213,9 +206,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("排序")
     @RequestMapping(value = "priority", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean updatePriority(@Valid @RequestBody List<RolePriorityRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RolePriorityRequest request : RequestListHelper.present(list)) {
@@ -236,7 +229,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "删除", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -244,9 +236,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) throws ApiException {
         List<Role> beanList = new ArrayList<>();
         for (RoleIdRequest request : RequestListHelper.present(list)) {
@@ -266,7 +258,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取菜单树", notes = "sys:role:view, sys:role:edit")
-    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -274,8 +265,8 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @RequestMapping(value = "menu/tree", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role')")
     public List<RoleMenuResponse> menuTree() {
         return menuService.list(new MenuQuery()).stream()
                 .map(menu -> RoleInterfaceAssembler.toMenuResponse(menu))
@@ -283,7 +274,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取用户树", notes = "sys:role:view, sys:role:edit")
-    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -291,8 +281,8 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @RequestMapping(value = "user/tree", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role')")
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
@@ -314,7 +304,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "获取权限用户列表", notes = "sys:role:view, sys:role:edit")
-    @HasPermission({"sys:role:view", "sys:role:edit"})
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -322,8 +311,8 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission({"sys:role:view", "sys:role:edit"})
     @RequestMapping(value = "user/list", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:view')")
     public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -336,7 +325,6 @@ public class RoleController {
     }
 
     @ApiOperation(value = "更新权限用户列表", notes = "sys:role:edit")
-    @HasPermission("sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
                 name = Constants.HEADER_TOKEN,
@@ -344,9 +332,9 @@ public class RoleController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
+    @HasPermission("sys:role:edit")
     @SysLogger("授权")
     @RequestMapping(value = "user/assign", method = RequestMethod.POST)
-    @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:role:edit')")
     public Boolean assignUser(@Valid @RequestBody RoleAssignUserRequest request) throws ApiException {
         validateAssignUser(request);
 

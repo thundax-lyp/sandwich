@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "../common/placeholder-page";
 
-export function SystemLogPage() {
+export const SystemLogPage = () => {
     return (
         <PlaceholderPage
             domain="system"
@@ -8,4 +8,4 @@ export function SystemLogPage() {
             description="查看后台操作日志、请求记录和审计线索。"
         />
     );
-}
+};

@@ -23,29 +23,29 @@ export interface LogoutRequest {
     token: string;
 }
 
-export function createLoginForm() {
+export const createLoginForm = () => {
     return postJson<LoginFormResponse>("/auth/form");
-}
+};
 
-export function refreshCaptcha(loginToken: string) {
+export const refreshCaptcha = (loginToken: string) => {
     return postJson<{ refreshed: boolean }, { loginToken: string }>("/auth/captcha/refresh", {
         body: { loginToken }
     });
-}
+};
 
-export function login(request: LoginRequest) {
+export const login = (request: LoginRequest) => {
     return postJson<AccessTokenResponse, LoginRequest>("/auth/login", {
         body: request
     });
-}
+};
 
-export function logout(request: LogoutRequest) {
+export const logout = (request: LogoutRequest) => {
     return postJson<boolean, LogoutRequest>("/auth/logout", {
         body: request
     });
-}
+};
 
-export function buildCaptchaUrl(loginToken: string, version: number) {
+export const buildCaptchaUrl = (loginToken: string, version: number) => {
     const params = new URLSearchParams({
         loginToken,
         width: "150",
@@ -54,4 +54,4 @@ export function buildCaptchaUrl(loginToken: string, version: number) {
     });
 
     return `${ADMIN_API_BASE_URL}/auth/captcha?${params.toString()}`;
-}
+};

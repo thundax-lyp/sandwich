@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "../common/placeholder-page";
 
-export function DepartmentPage() {
+export const DepartmentPage = () => {
     return (
         <PlaceholderPage
             domain="system"
@@ -8,4 +8,4 @@ export function DepartmentPage() {
             description="维护后台组织结构，为用户归属、数据筛选和权限边界预留入口。"
         />
     );
-}
+};

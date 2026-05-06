@@ -97,7 +97,7 @@ const menuIconMap: Record<string, ReactNode> = {
     storage: <CloudServerOutlined />
 };
 
-function getOpenKeys(pathname: string) {
+const getOpenKeys = (pathname: string) => {
     const openKeys: string[] = [];
 
     if (pathname.startsWith("/system/")) {
@@ -109,15 +109,15 @@ function getOpenKeys(pathname: string) {
     }
 
     return openKeys;
-}
+};
 
-function normalizeMenuKey(menu: { id: string; url?: string | null }) {
+const normalizeMenuKey = (menu: { id: string; url?: string | null }) => {
     return menu.url || menu.id;
-}
+};
 
-function buildAuthorizedMenuItems(
+const buildAuthorizedMenuItems = (
     menus: Awaited<ReturnType<typeof listCurrentUserMenus>>
-): MenuProps["items"] {
+): MenuProps["items"] => {
     if (!menus.length) {
         return fallbackMenuItems;
     }
@@ -150,9 +150,9 @@ function buildAuthorizedMenuItems(
         },
         ...((childrenByParentId.get(null) || []).map(toMenuItem) as NonNullable<MenuProps["items"]>)
     ];
-}
+};
 
-export function AdminLayout() {
+export const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const currentUserInfoQuery = useQuery({
@@ -279,4 +279,4 @@ export function AdminLayout() {
             </Layout>
         </Layout>
     );
-}
+};

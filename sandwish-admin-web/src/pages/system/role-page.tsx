@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "../common/placeholder-page";
 
-export function RolePage() {
+export const RolePage = () => {
     return (
         <PlaceholderPage
             domain="system"
@@ -8,4 +8,4 @@ export function RolePage() {
             description="维护后台角色和角色授权关系。"
         />
     );
-}
+};

@@ -22,12 +22,12 @@ interface LoginLocationState {
     };
 }
 
-function resolveRedirectPath(state: unknown) {
+const resolveRedirectPath = (state: unknown) => {
     const from = (state as LoginLocationState | null)?.from;
     return from?.pathname && from.pathname !== "/login" ? from.pathname : "/dashboard";
-}
+};
 
-export function LoginPage() {
+export const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [captchaVersion, setCaptchaVersion] = useState(() => Date.now());
@@ -181,4 +181,4 @@ export function LoginPage() {
             </Card>
         </main>
     );
-}
+};

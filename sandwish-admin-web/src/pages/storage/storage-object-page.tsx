@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "../common/placeholder-page";
 
-export function StorageObjectPage() {
+export const StorageObjectPage = () => {
     return (
         <PlaceholderPage
             domain="storage"
@@ -8,4 +8,4 @@ export function StorageObjectPage() {
             description="管理上传后的对象文件、存储状态和业务引用入口。"
         />
     );
-}
+};

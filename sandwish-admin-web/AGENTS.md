@@ -13,11 +13,12 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 ## Core Conventions
 
 - Keep source file names in kebab-case, for example `current-user-service.ts`.
-- Prefer arrow functions for frontend service, storage, hook-like helpers, and small local utilities.
+- Prefer arrow functions for most frontend methods.
+- Prefer `export const XxxPage = () => {}` for React components.
 
 ## File And Code Style
 
-- Keep React components as named exports.
+- Keep React components as named arrow-function exports.
 - Keep API access in `src/api/` or `src/service/`; do not call `fetch` directly from pages or layouts.
 - Keep auth token and permission persistence in `src/auth/`.
 - Use TypeScript interfaces for request and response shapes when the shape is shared or crosses file boundaries.

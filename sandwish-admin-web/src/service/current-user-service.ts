@@ -25,14 +25,14 @@ export interface CurrentUserPermsResponse {
     perms?: string[] | null;
 }
 
-export function getCurrentUserInfo() {
+export const getCurrentUserInfo = () => {
     return postJson<CurrentUserInfoResponse>("/sys/current-user/info");
-}
+};
 
-export function listCurrentUserMenus() {
+export const listCurrentUserMenus = () => {
     return postJson<CurrentUserMenuResponse[]>("/sys/current-user/menus");
-}
+};
 
-export function listCurrentUserPerms() {
+export const listCurrentUserPerms = () => {
     return postJson<CurrentUserPermsResponse>("/sys/current-user/perms");
-}
+};

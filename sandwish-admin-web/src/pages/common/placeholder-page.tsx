@@ -8,7 +8,7 @@ interface PlaceholderPageProps {
     description: string;
 }
 
-export function PlaceholderPage({ title, domain, description }: PlaceholderPageProps) {
+export const PlaceholderPage = ({ title, domain, description }: PlaceholderPageProps) => {
     return (
         <Card className="panel">
             <Space orientation="vertical" size={8}>
@@ -18,4 +18,4 @@ export function PlaceholderPage({ title, domain, description }: PlaceholderPageP
             </Space>
         </Card>
     );
-}
+};

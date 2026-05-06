@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAccessToken, subscribeAccessTokenChange } from "../auth/token-storage";
 
-export function ProtectedRoute() {
+export const ProtectedRoute = () => {
     const location = useLocation();
     const [hasAccessToken, setHasAccessToken] = useState(() => Boolean(getAccessToken()));
 
@@ -15,4 +15,4 @@ export function ProtectedRoute() {
     }
 
     return <Outlet />;
-}
+};

@@ -4,7 +4,7 @@ import zhCN from "antd/locale/zh_CN";
 import { queryClient } from "./query/query-client";
 import { AppRouter } from "./router";
 
-export default function App() {
+const App = () => {
     return (
         <ConfigProvider
             locale={zhCN}
@@ -21,4 +21,6 @@ export default function App() {
             </QueryClientProvider>
         </ConfigProvider>
     );
-}
+};
+
+export default App;

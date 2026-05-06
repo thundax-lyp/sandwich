@@ -1,6 +1,6 @@
 import { PlaceholderPage } from "../common/placeholder-page";
 
-export function DictionaryPage() {
+export const DictionaryPage = () => {
     return (
         <PlaceholderPage
             domain="system"
@@ -8,4 +8,4 @@ export function DictionaryPage() {
             description="维护系统字典类型和字典项。"
         />
     );
-}
+};

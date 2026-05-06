@@ -23,10 +23,10 @@ export class ApiError extends Error {
     }
 }
 
-export async function postJson<TResponse, TBody = unknown>(
+export const postJson = async <TResponse, TBody = unknown>(
     path: string,
     options: RequestOptions<TBody> = {}
-) {
+) => {
     const headers: HeadersInit = {
         "Content-Type": "application/json"
     };
@@ -51,4 +51,4 @@ export async function postJson<TResponse, TBody = unknown>(
     }
 
     return payload.data;
-}
+};

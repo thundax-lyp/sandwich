@@ -2,7 +2,7 @@ import { Card, Space, Typography } from "antd";
 
 const { Title, Text, Paragraph } = Typography;
 
-export function DashboardPage() {
+export const DashboardPage = () => {
     return (
         <>
             <section className="metrics" aria-label="核心指标">
@@ -31,4 +31,4 @@ export function DashboardPage() {
             </Card>
         </>
     );
-}
+};

@@ -33,3 +33,8 @@ hs_err_pid*
 replay_pid*
 **/application-vastbase-dev.yml
 **/dev.env
+
+# Frontend
+**/node_modules/
+**/dist/
+**/.vite/

@@ -21,7 +21,7 @@ export function DashboardPage() {
             </section>
 
             <Card className="panel">
-                <Space direction="vertical" size={8}>
+                <Space orientation="vertical" size={8}>
                     <Text className="eyebrow">dashboard</Text>
                     <Title level={2}>Dashboard 已就绪</Title>
                     <Paragraph>

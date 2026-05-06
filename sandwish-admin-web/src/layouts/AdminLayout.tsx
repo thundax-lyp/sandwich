@@ -3,13 +3,17 @@ import {
     AuditOutlined,
     BookOutlined,
     CloudServerOutlined,
+    LogoutOutlined,
     MenuOutlined,
     SafetyCertificateOutlined,
     TeamOutlined
 } from "@ant-design/icons";
-import { Button, Layout, Menu, Typography } from "antd";
+import { Button, Layout, Menu, Space, Typography, message } from "antd";
+import { useMutation } from "@tanstack/react-query";
 import type { MenuProps } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../api/authApi";
+import { clearAccessToken, getAccessToken } from "../auth/tokenStorage";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -88,6 +92,21 @@ function getOpenKeys(pathname: string) {
 export function AdminLayout() {
     const location = useLocation();
     const navigate = useNavigate();
+    const logoutMutation = useMutation({
+        mutationFn: async () => {
+            const token = getAccessToken();
+            if (!token) {
+                return false;
+            }
+
+            return logout({ token });
+        },
+        onSettled: () => {
+            clearAccessToken();
+            message.success("已退出登录");
+            navigate("/login", { replace: true });
+        }
+    });
 
     return (
         <Layout className="admin-shell">
@@ -116,7 +135,16 @@ export function AdminLayout() {
                         <Text className="eyebrow">admin-api workspace</Text>
                         <Title level={1}>后台管理台</Title>
                     </div>
-                    <Button type="default">连接检查</Button>
+                    <Space className="topbar-actions">
+                        <Button type="default">连接检查</Button>
+                        <Button
+                            icon={<LogoutOutlined />}
+                            loading={logoutMutation.isPending}
+                            onClick={() => logoutMutation.mutate()}
+                        >
+                            退出登录
+                        </Button>
+                    </Space>
                 </Header>
 
                 <Content className="workspace">

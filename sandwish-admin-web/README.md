@@ -34,6 +34,7 @@ npm run build
 
 ```text
 /dashboard
+/login
 /system/users
 /system/departments
 /system/roles

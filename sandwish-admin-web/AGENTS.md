@@ -18,6 +18,9 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 
 ## File And Code Style
 
+- Organize pages as `src/pages/<module>/<domain>/<domain-page>.tsx`.
+- Put domain-specific page components under `src/pages/<module>/<domain>/components/`.
+- Put shared frontend components under `src/components/`.
 - Keep React components as named arrow-function exports.
 - Keep API access in `src/api/` or `src/service/`; do not call `fetch` directly from pages or layouts.
 - Keep auth token and permission persistence in `src/auth/`.

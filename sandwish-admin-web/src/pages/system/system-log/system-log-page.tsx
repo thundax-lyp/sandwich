@@ -1,4 +1,4 @@
-import { PlaceholderPage } from "../common/placeholder-page";
+import { PlaceholderPage } from "../../../components/placeholder-page";
 
 export const SystemLogPage = () => {
     return (

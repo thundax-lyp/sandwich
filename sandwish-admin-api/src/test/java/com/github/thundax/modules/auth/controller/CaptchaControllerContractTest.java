@@ -31,9 +31,21 @@ public class CaptchaControllerContractTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"loginToken\":\"login-token-1\"}"))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
                 .andExpect(jsonPath("$.data.refreshed").value(true));
+    }
+
+    @Test
+    public void shouldUseJsonUtf8ForCaptchaErrorResponse() throws Exception {
+        AuthService authService = mock(AuthService.class);
+
+        mockMvc(authService)
+                .perform(get("/api/auth/captcha"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.code").value(-1));
     }
 
     @Test

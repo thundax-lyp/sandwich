@@ -404,6 +404,7 @@ public class AuthPermissionLifecycleTest {
         filter.doFilter(request, response, chain);
 
         Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals("application/json;charset=UTF-8", response.getContentType());
         Assert.assertTrue(response.getContentAsString().contains("未授权用户"));
         Assert.assertNull(SecurityContextHolder.getContext().getAuthentication());
     }

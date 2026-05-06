@@ -34,6 +34,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String HEADER_TOKEN = Constants.HEADER_TOKEN;
     private static final String PARAM_TOKEN = Constants.PARAM_TOKEN;
+    private static final String APPLICATION_JSON_UTF8_VALUE = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8";
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludePatternList = new ArrayList<>();
@@ -140,7 +141,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getOutputStream().write(jsonString.getBytes(StandardCharsets.UTF_8));
     }
 }

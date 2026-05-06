@@ -1,6 +1,6 @@
 package com.github.thundax.modules.assist.controller;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.ApiResponse;
+import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.modules.assist.controller.request.SignaturePageRequest;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.assist.service.SignatureService;
@@ -55,8 +56,17 @@ public class SignatureControllerContractTest {
 
     @Test
     public void shouldNotWrapPageResponseAgain() throws Exception {
-        assertFalse(advice.supports(
-                returnType("page", SignaturePageRequest.class), MappingJackson2HttpMessageConverter.class));
+        PageResponse<Object> body = new PageResponse<>();
+
+        Object result = advice.beforeBodyWrite(
+                body,
+                returnType("page", SignaturePageRequest.class),
+                MediaType.APPLICATION_JSON,
+                MappingJackson2HttpMessageConverter.class,
+                null,
+                null);
+
+        assertSame(body, result);
     }
 
     private SignatureController controller(SignatureService signatureService) {

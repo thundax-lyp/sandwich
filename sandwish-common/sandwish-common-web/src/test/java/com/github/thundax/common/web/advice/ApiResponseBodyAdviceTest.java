@@ -1,7 +1,6 @@
 package com.github.thundax.common.web.advice;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -9,11 +8,16 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import org.junit.Test;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestController;
 
 public class ApiResponseBodyAdviceTest {
@@ -27,8 +31,8 @@ public class ApiResponseBodyAdviceTest {
     }
 
     @Test
-    public void shouldSkipUnwrappedController() throws Exception {
-        assertFalse(advice.supports(
+    public void shouldSupportUnwrappedControllerJsonContentType() throws Exception {
+        assertTrue(advice.supports(
                 returnType(UnwrappedController.class, "plain"), MappingJackson2HttpMessageConverter.class));
     }
 
@@ -39,20 +43,20 @@ public class ApiResponseBodyAdviceTest {
     }
 
     @Test
-    public void shouldSkipAlreadyWrappedResponse() throws Exception {
-        assertFalse(advice.supports(
+    public void shouldSupportAlreadyWrappedResponseJsonContentType() throws Exception {
+        assertTrue(advice.supports(
                 returnType(WrappedController.class, "apiResponse"), MappingJackson2HttpMessageConverter.class));
     }
 
     @Test
-    public void shouldSkipStringResponse() throws Exception {
-        assertFalse(advice.supports(
+    public void shouldSupportStringResponseJsonContentType() throws Exception {
+        assertTrue(advice.supports(
                 returnType(WrappedController.class, "text"), MappingJackson2HttpMessageConverter.class));
     }
 
     @Test
-    public void shouldSkipPageResponse() throws Exception {
-        assertFalse(advice.supports(
+    public void shouldSupportPageResponseJsonContentType() throws Exception {
+        assertTrue(advice.supports(
                 returnType(WrappedController.class, "page"), MappingJackson2HttpMessageConverter.class));
     }
 
@@ -72,6 +76,23 @@ public class ApiResponseBodyAdviceTest {
     }
 
     @Test
+    public void shouldSetJsonUtf8ContentType() throws Exception {
+        TestServerHttpResponse response = new TestServerHttpResponse();
+
+        advice.beforeBodyWrite(
+                100,
+                returnType(WrappedController.class, "plain"),
+                MediaType.APPLICATION_JSON,
+                MappingJackson2HttpMessageConverter.class,
+                null,
+                response);
+
+        assertEquals(
+                "application/json;charset=UTF-8",
+                response.getHeaders().getContentType().toString());
+    }
+
+    @Test
     public void shouldKeepAlreadyWrappedBody() throws Exception {
         ApiResponse<Object> body = ApiResponse.success();
 
@@ -86,9 +107,49 @@ public class ApiResponseBodyAdviceTest {
         assertSame(body, result);
     }
 
+    @Test
+    public void shouldKeepUnwrappedControllerBody() throws Exception {
+        Object body = 100;
+
+        Object result = advice.beforeBodyWrite(
+                body,
+                returnType(UnwrappedController.class, "plain"),
+                MediaType.APPLICATION_JSON,
+                MappingJackson2HttpMessageConverter.class,
+                null,
+                null);
+
+        assertSame(body, result);
+    }
+
     private MethodParameter returnType(Class<?> controllerClass, String methodName) throws Exception {
         Method method = controllerClass.getDeclaredMethod(methodName);
         return new MethodParameter(method, -1);
+    }
+
+    private static class TestServerHttpResponse implements ServerHttpResponse {
+
+        private final HttpHeaders headers = new HttpHeaders();
+        private final ByteArrayOutputStream body = new ByteArrayOutputStream();
+
+        @Override
+        public void setStatusCode(HttpStatus status) {}
+
+        @Override
+        public HttpHeaders getHeaders() {
+            return headers;
+        }
+
+        @Override
+        public OutputStream getBody() {
+            return body;
+        }
+
+        @Override
+        public void flush() {}
+
+        @Override
+        public void close() {}
     }
 
     @WrappedApiController

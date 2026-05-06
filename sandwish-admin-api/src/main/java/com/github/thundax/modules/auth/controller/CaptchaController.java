@@ -16,6 +16,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 @PublicApi
 public class CaptchaController {
 
+    private static final String APPLICATION_JSON_UTF8_VALUE = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8";
     private static final int DEFAULT_CAPTCHA_WIDTH = 200;
     private static final int DEFAULT_CAPTCHA_HEIGHT = 80;
     private static final int MAX_CAPTCHA_WIDTH = 480;
@@ -117,6 +119,8 @@ public class CaptchaController {
     }
 
     private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(APPLICATION_JSON_UTF8_VALUE);
         response.getWriter().print("{\"code\":" + code + ",\"message\":\"" + message + "\"}");
     }
 

@@ -40,8 +40,6 @@ public class Member implements Auditable, Sortable {
     private String lastLoginIp;
     private Date lastLoginDate;
 
-    private String ywtbId;
-
     private int loginCount;
     private int priority;
     private String remarks;

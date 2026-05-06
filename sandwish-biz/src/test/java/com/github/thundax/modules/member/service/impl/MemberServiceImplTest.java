@@ -89,20 +89,6 @@ public class MemberServiceImplTest {
         assertEquals(2, dao.enableUpdateCalls);
     }
 
-    @Test
-    public void shouldExpandYwtbAndZjhmQueries() {
-        RecordingMemberDao dao = new RecordingMemberDao();
-        MemberQuery query = new MemberQuery();
-        query.setZjhm("310000");
-
-        MemberServiceImpl service = new MemberServiceImpl(dao);
-        service.getByZjhm(query);
-        service.getByYwtbId("ywtb-1");
-
-        assertEquals("310000", dao.zjhm);
-        assertEquals("ywtb-1", dao.ywtbId);
-    }
-
     private static Member member(String id) {
         Member member = new Member();
         member.setId(EntityIdCodec.toDomain(id));
@@ -123,8 +109,6 @@ public class MemberServiceImplTest {
         private String mobile;
         private Member inserted;
         private int enableUpdateCalls;
-        private String zjhm;
-        private String ywtbId;
 
         @Override
         public Member getById(EntityId id) {
@@ -219,18 +203,6 @@ public class MemberServiceImplTest {
         public int updateStatus(Member member) {
             this.enableUpdateCalls++;
             return 1;
-        }
-
-        @Override
-        public Member getByZjhm(String zjhm) {
-            this.zjhm = zjhm;
-            return null;
-        }
-
-        @Override
-        public Member getByYwtbId(String ywtbId) {
-            this.ywtbId = ywtbId;
-            return null;
         }
     }
 }

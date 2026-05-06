@@ -30,7 +30,6 @@ public final class MemberPersistenceAssembler {
         dataObject.setRegisterDate(entity.getRegisterDate());
         dataObject.setLastLoginIp(entity.getLastLoginIp());
         dataObject.setLastLoginDate(entity.getLastLoginDate());
-        dataObject.setYwtbId(entity.getYwtbId());
         dataObject.setLoginCount(entity.getLoginCount());
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
@@ -60,7 +59,6 @@ public final class MemberPersistenceAssembler {
         entity.setRegisterDate(dataObject.getRegisterDate());
         entity.setLastLoginIp(dataObject.getLastLoginIp());
         entity.setLastLoginDate(dataObject.getLastLoginDate());
-        entity.setYwtbId(dataObject.getYwtbId());
         entity.setLoginCount(dataObject.getLoginCount());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());

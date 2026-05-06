@@ -45,7 +45,6 @@
 - 会员状态字段固定为 `enable_flag`。
 - 注册行为字段固定为 `register_ip` 和 `register_date`。
 - 最近登录行为字段固定为 `last_login_ip`、`last_login_date` 和 `login_count`。
-- 外部同步标识字段固定为 `ywtb_id`。
 - 审计字段固定为 `create_date`、`create_by`、`update_date`、`update_by`。
 - 逻辑删除字段固定为 `del_flag`。
 
@@ -77,7 +76,6 @@
 | `register_date` | `registerDate` | `registerDate` | 否 | 注册时间 |
 | `last_login_ip` | `lastLoginIp` | `lastLoginIp` | 否 | 最近登录 IP |
 | `last_login_date` | `lastLoginDate` | `lastLoginDate` | 否 | 最近登录时间 |
-| `ywtb_id` | `ywtbId` | `ywtbId` | 否 | 外部同步标识 |
 | `login_count` | `loginCount` | `loginCount` | 是 | 登录次数 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
@@ -98,7 +96,6 @@
 
 - 主键：`pk_member_member(id)`
 - 唯一索引：`uk_member_member_login_name(login_name)`
-- 唯一索引：`uk_member_member_ywtb_id(ywtb_id)`
 - 普通索引：`idx_member_member_status(enable_flag, priority, create_date)`
 - 普通索引：`idx_member_member_email(email)`
 - 普通索引：`idx_member_member_mobile(mobile)`

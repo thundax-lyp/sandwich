@@ -1,7 +1,6 @@
 package com.github.thundax.modules.member.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -182,20 +181,6 @@ public class MemberDaoImpl implements MemberDao {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
         return mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MemberDO::getEnableFlag, dataObject.getEnableFlag()));
-    }
-
-    @Override
-    public Member getByZjhm(String zjhm) {
-        QueryWrapper<MemberDO> wrapper = new QueryWrapper<>();
-        wrapper.eq("zjhm", zjhm);
-        return MemberPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
-    }
-
-    @Override
-    public Member getByYwtbId(String ywtbId) {
-        LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberDO::getYwtbId, ywtbId);
-        return MemberPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
     }
 
     private LambdaUpdateWrapper<MemberDO> buildIdUpdateWrapper(MemberDO dataObject) {

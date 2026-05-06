@@ -40,8 +40,4 @@ public interface MemberService {
     int updateStatus(Member member);
 
     int batchUpdateStatus(List<Member> list);
-
-    Member getByZjhm(MemberQuery query);
-
-    Member getByYwtbId(String ywtbUserId);
 }

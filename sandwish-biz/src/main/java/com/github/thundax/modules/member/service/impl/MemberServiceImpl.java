@@ -12,7 +12,6 @@ import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,20 +135,6 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Member getByZjhm(MemberQuery query) {
-        return dao.getByZjhm(query == null ? null : query.getZjhm());
-    }
-
-    @Override
-    public Member getByYwtbId(String ywtbUserId) {
-        if (StringUtils.isEmpty(ywtbUserId)) {
-            return null;
-        }
-        return dao.getByYwtbId(ywtbUserId);
     }
 
     @Override

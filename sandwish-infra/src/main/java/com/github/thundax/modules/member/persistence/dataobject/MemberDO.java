@@ -49,8 +49,6 @@ public class MemberDO {
 
     private Date lastLoginDate;
 
-    private String ywtbId;
-
     private int loginCount;
 
     private Integer priority;

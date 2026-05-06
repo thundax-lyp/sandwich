@@ -20,7 +20,5 @@ public class MemberQuery {
     private Date endRegisterDate;
     private Date beginLoginDate;
     private Date endLoginDate;
-    private String ywtbId;
-    private String zjhm;
     private String mobile;
 }

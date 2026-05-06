@@ -55,8 +55,4 @@ public interface MemberDao {
     void updateLoginPass(Member member);
 
     int updateStatus(Member member);
-
-    Member getByZjhm(String zjhm);
-
-    Member getByYwtbId(String ywtbId);
 }

@@ -1,15 +1,15 @@
 import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
-import { AdminLayout } from "../layouts/AdminLayout";
-import { DashboardPage } from "../pages/dashboard/DashboardPage";
-import { LoginPage } from "../pages/auth/LoginPage";
-import { DepartmentPage } from "../pages/system/DepartmentPage";
-import { DictionaryPage } from "../pages/system/DictionaryPage";
-import { MenuPage } from "../pages/system/MenuPage";
-import { RolePage } from "../pages/system/RolePage";
-import { SystemLogPage } from "../pages/system/SystemLogPage";
-import { UserPage } from "../pages/system/UserPage";
-import { StorageObjectPage } from "../pages/storage/StorageObjectPage";
-import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminLayout } from "../layouts/admin-layout";
+import { DashboardPage } from "../pages/dashboard/dashboard-page";
+import { LoginPage } from "../pages/auth/login-page";
+import { DepartmentPage } from "../pages/system/department-page";
+import { DictionaryPage } from "../pages/system/dictionary-page";
+import { MenuPage } from "../pages/system/menu-page";
+import { RolePage } from "../pages/system/role-page";
+import { SystemLogPage } from "../pages/system/system-log-page";
+import { UserPage } from "../pages/system/user-page";
+import { StorageObjectPage } from "../pages/storage/storage-object-page";
+import { ProtectedRoute } from "./protected-route";
 
 const router = createBrowserRouter([
     {

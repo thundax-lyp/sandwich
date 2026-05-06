@@ -1,4 +1,4 @@
-import { PlaceholderPage } from "../common/PlaceholderPage";
+import { PlaceholderPage } from "../common/placeholder-page";
 
 export function UserPage() {
     return (

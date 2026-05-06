@@ -1,0 +1,38 @@
+import { postJson } from "../api/http";
+
+export interface CurrentUserInfoResponse {
+    id: string;
+    loginName: string;
+    ranks?: number | null;
+    name?: string | null;
+    email?: string | null;
+    mobile?: string | null;
+    avatar?: string | null;
+    admin?: boolean | null;
+    superAdmin?: boolean | null;
+}
+
+export interface CurrentUserMenuResponse {
+    id: string;
+    parentId?: string | null;
+    name: string;
+    priority?: number | null;
+    url?: string | null;
+    displayParams?: string | null;
+}
+
+export interface CurrentUserPermsResponse {
+    perms?: string[] | null;
+}
+
+export function getCurrentUserInfo() {
+    return postJson<CurrentUserInfoResponse>("/sys/current-user/info");
+}
+
+export function listCurrentUserMenus() {
+    return postJson<CurrentUserMenuResponse[]>("/sys/current-user/menus");
+}
+
+export function listCurrentUserPerms() {
+    return postJson<CurrentUserPermsResponse>("/sys/current-user/perms");
+}

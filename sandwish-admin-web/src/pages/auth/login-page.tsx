@@ -4,8 +4,8 @@ import { Alert, Button, Card, Form, Input, Space, Typography, message } from "an
 import { sm2 } from "sm-crypto";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { buildCaptchaUrl, createLoginForm, login, refreshCaptcha } from "../../api/authApi";
-import { getAccessToken, saveAccessToken } from "../../auth/tokenStorage";
+import { buildCaptchaUrl, createLoginForm, login, refreshCaptcha } from "../../api/auth-api";
+import { getAccessToken, saveAccessToken } from "../../auth/token-storage";
 
 const { Title, Text, Paragraph } = Typography;
 

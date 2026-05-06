@@ -6,6 +6,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
@@ -27,11 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "02-06.系统-日志")
 @RequestMapping(value = "/api/sys/log")
-@RestController
+@WrappedApiController
 public class LogController {
 
     private final LogService logService;

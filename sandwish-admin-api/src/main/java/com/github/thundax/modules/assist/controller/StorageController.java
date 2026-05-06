@@ -8,6 +8,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -93,6 +94,7 @@ public class StorageController {
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "upload", method = RequestMethod.POST)
+    @WrappedApiResponse
     public StorageUploadResponse upload(HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
             return StorageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
@@ -157,6 +159,7 @@ public class StorageController {
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
         List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
@@ -178,6 +181,7 @@ public class StorageController {
     @ApiOperation(value = "获取业务类型树", notes = "assist:storage:view")
     @HasPermission("assist:storage:view")
     @RequestMapping(value = "treeData", method = RequestMethod.POST)
+    @WrappedApiResponse
     public List<StorageTreeNodeResponse> treeData() {
         return storageService.listReferenceOwnerTypes().stream()
                 .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)

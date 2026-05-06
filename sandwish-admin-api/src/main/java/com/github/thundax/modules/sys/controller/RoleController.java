@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
@@ -47,12 +48,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "02-04.系统-权限")
 @SysLogger(module = {"系统", "权限"})
 @RequestMapping(value = "/api/sys/role")
-@RestController
+@WrappedApiController
 public class RoleController {
 
     private static final String DEPARTMENT_ID_PREFIX = "DEPARTMENT_";

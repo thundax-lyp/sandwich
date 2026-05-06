@@ -79,6 +79,8 @@
 | Request Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 | Response Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 
+混合 REST Controller 可以保留 `@RestController`，并在需要统一响应包装的 JSON 方法上声明 `@WrappedApiResponse`。直接写入 `HttpServletResponse` 的图片、文件或头像方法不得声明 `@WrappedApiResponse`。
+
 ## 8. CI Gate
 
 - 已有 ArchUnit 门禁继续覆盖 Request / Response 类级注解。

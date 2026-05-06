@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
 import java.lang.reflect.Method;
@@ -29,6 +30,12 @@ public class ApiResponseBodyAdviceTest {
     public void shouldSkipUnwrappedController() throws Exception {
         assertFalse(advice.supports(
                 returnType(UnwrappedController.class, "plain"), MappingJackson2HttpMessageConverter.class));
+    }
+
+    @Test
+    public void shouldSupportMethodWrappedResponse() throws Exception {
+        assertTrue(advice.supports(
+                returnType(MethodWrappedController.class, "plain"), MappingJackson2HttpMessageConverter.class));
     }
 
     @Test
@@ -107,6 +114,15 @@ public class ApiResponseBodyAdviceTest {
     @RestController
     private static class UnwrappedController {
 
+        public Object plain() {
+            return null;
+        }
+    }
+
+    @RestController
+    private static class MethodWrappedController {
+
+        @WrappedApiResponse
         public Object plain() {
             return null;
         }

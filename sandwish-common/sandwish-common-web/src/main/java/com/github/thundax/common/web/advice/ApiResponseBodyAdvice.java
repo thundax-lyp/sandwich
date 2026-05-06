@@ -1,6 +1,7 @@
 package com.github.thundax.common.web.advice;
 
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
 import org.springframework.core.MethodParameter;
@@ -17,7 +18,9 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         Class<?> containingClass = returnType.getContainingClass();
-        if (containingClass == null || !containingClass.isAnnotationPresent(WrappedApiController.class)) {
+        boolean wrappedController =
+                containingClass != null && containingClass.isAnnotationPresent(WrappedApiController.class);
+        if (!wrappedController && !returnType.hasMethodAnnotation(WrappedApiResponse.class)) {
             return false;
         }
 

@@ -23,9 +23,6 @@ public class SandwishProperties {
     private UploadProperties upload;
 
     @Setter
-    private ResponseWrapperFilterProperties responseWrapperFilter;
-
-    @Setter
     private AccessTokenFilterProperties accessTokenFilter;
 
     @NonNull
@@ -36,11 +33,6 @@ public class SandwishProperties {
     @NonNull
     public UploadProperties getUpload() {
         return upload != null ? upload : new UploadProperties();
-    }
-
-    @NotNull
-    public ResponseWrapperFilterProperties getResponseWrapperFilter() {
-        return responseWrapperFilter != null ? responseWrapperFilter : new ResponseWrapperFilterProperties();
     }
 
     @NotNull
@@ -152,26 +144,6 @@ public class SandwishProperties {
         @NonNull
         public Integer getAliveDays() {
             return aliveDays == null ? DEFAULT_LOG_ALIVE_DAYS : aliveDays;
-        }
-    }
-
-    public static class ResponseWrapperFilterProperties {
-
-        @Setter
-        private List<String> urlPatterns;
-
-        @Setter
-        private List<String> excludePath;
-
-        public List<String> getUrlPatterns() {
-            return urlPatterns;
-        }
-
-        public List<String> getExcludePath() {
-            if (excludePath == null) {
-                return new ArrayList<>();
-            }
-            return excludePath;
         }
     }
 

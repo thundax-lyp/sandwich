@@ -11,6 +11,7 @@ import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
+import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -109,6 +110,7 @@ public class UserController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
+    @WrappedApiResponse
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -129,6 +131,7 @@ public class UserController {
     @SysLogger("列表")
     @RequestMapping(value = "list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
+    @WrappedApiResponse
     public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         UserQuery query = readQuery(request);
 
@@ -166,6 +169,7 @@ public class UserController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         String password = Sm2Helper.decrypt(request.getLoginPass(), keypairService.getPrivateKey(request.getToken()));
@@ -209,6 +213,7 @@ public class UserController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
@@ -270,6 +275,7 @@ public class UserController {
             method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
         return true;
     }
@@ -286,6 +292,7 @@ public class UserController {
     @SysLogger("删除头像")
     @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
         return true;
     }
@@ -317,6 +324,7 @@ public class UserController {
     @SysLogger("启用")
     @RequestMapping(value = "enable", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -354,6 +362,7 @@ public class UserController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:edit')")
+    @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -389,6 +398,7 @@ public class UserController {
     })
     @RequestMapping(value = "check", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
+    @WrappedApiResponse
     public Boolean check(@Valid @RequestBody UserCheckRequest request) {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
     }
@@ -404,6 +414,7 @@ public class UserController {
     })
     @RequestMapping(value = "department/tree", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
+    @WrappedApiResponse
     public List<UserDepartmentResponse> departmentTree() {
         return departmentService.list(new Department()).stream()
                 .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, departmentService::getById))
@@ -421,6 +432,7 @@ public class UserController {
     })
     @RequestMapping(value = "role/list", method = RequestMethod.POST)
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
+    @WrappedApiResponse
     public List<UserRoleResponse> roleList() {
         RoleQuery query = new RoleQuery();
         query.setStatus(RoleStatus.ENABLED);

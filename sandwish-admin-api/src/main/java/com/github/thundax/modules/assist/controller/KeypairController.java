@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.security.annotation.PublicApi;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.assist.assembler.KeypairInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.KeypairPublicKeyRequest;
 import com.github.thundax.modules.assist.controller.response.KeypairPublicKeyResponse;
@@ -23,12 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "08-05.辅助-公钥与私钥")
 @SysLogger(module = {"辅助", "公私钥对"})
 @RequestMapping(value = "/api/assist/keypair")
-@RestController
+@WrappedApiController
 public class KeypairController {
 
     private final AuthService authService;

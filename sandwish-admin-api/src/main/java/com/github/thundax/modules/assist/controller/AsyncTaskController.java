@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.AsyncTaskIdRequest;
 import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
@@ -21,11 +22,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "03-01.辅助-异步任务")
 @RequestMapping(value = "/api/assist/async-task")
-@RestController
+@WrappedApiController
 public class AsyncTaskController {
 
     private final AsyncTaskService asyncTaskService;

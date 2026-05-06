@@ -11,7 +11,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.service.UserCredentialService;
 import com.github.thundax.modules.sys.service.UserIdentityService;
 import java.util.Arrays;
@@ -28,10 +27,8 @@ public class UserServiceImplTest {
         UserCredentialService userCredentialService = mock(UserCredentialService.class);
         UserServiceImpl service = new UserServiceImpl(userDao, signService, userIdentityService, userCredentialService);
         User user = new User();
-        UserIdentity identity = new UserIdentity();
 
         when(userDao.insert(user)).thenReturn("user-1");
-        when(userIdentityService.updateAccountIdentity(user, "tester")).thenReturn(identity);
 
         EntityId userId = service.add(user, "tester", "encrypted", Arrays.asList("role-1", "role-2"));
 
@@ -40,7 +37,7 @@ public class UserServiceImplTest {
         verify(userDao).insertUserRole("user-1", Arrays.asList("role-1", "role-2"));
         verify(signService).sign(user.getSignName(), user.getSignId(), user.getSignBody());
         verify(userIdentityService).updateAccountIdentity(user, "tester");
-        verify(userCredentialService).updatePasswordCredential(user, identity, "encrypted");
+        verify(userCredentialService).upsertPassword(user, "encrypted");
     }
 
     @Test
@@ -60,6 +57,6 @@ public class UserServiceImplTest {
         verify(userDao).insertUserRole("user-1", Collections.singletonList("role-1"));
         verify(signService).sign(user.getSignName(), user.getSignId(), user.getSignBody());
         verify(userIdentityService).updateAccountIdentity(user, "tester");
-        verify(userCredentialService, never()).updatePasswordCredential(user, null, null);
+        verify(userCredentialService, never()).upsertPassword(user, null);
     }
 }

@@ -34,6 +34,7 @@ import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
@@ -258,8 +259,7 @@ public class UserController {
         userService.update(entity, request.getLoginName(), roleIdList);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            userCredentialService.updatePassword(
-                    entity.getId(), passwordService.encrypt(request.getLoginPass()), entity.getUpdateUserId());
+            userCredentialService.upsertPassword(entity, passwordService.encrypt(request.getLoginPass()));
         }
 
         return toResponse(entity);
@@ -536,12 +536,12 @@ public class UserController {
         if (StringUtils.isBlank(loginName)) {
             return true;
         }
-        User bean = userIdentityService.getByLoginName(loginName);
-        if (bean == null) {
+        UserIdentity identity = userIdentityService.getByLoginName(loginName);
+        if (identity == null) {
             return true;
         }
 
-        return StringUtils.equals(EntityIdCodec.toValue(bean.getId()), id);
+        return StringUtils.equals(EntityIdCodec.toValue(identity.getUserId()), id);
     }
 
     private UserResponse toResponse(User user) {

@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserIdentity;
@@ -16,18 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserIdentityServiceImpl implements UserIdentityService {
 
-    private final UserDao userDao;
     private final UserIdentityDao userIdentityDao;
 
-    public UserIdentityServiceImpl(UserDao userDao, UserIdentityDao userIdentityDao) {
-        this.userDao = userDao;
+    public UserIdentityServiceImpl(UserIdentityDao userIdentityDao) {
         this.userIdentityDao = userIdentityDao;
     }
 
     @Override
-    public User getByLoginName(String loginName) {
-        UserIdentity identity = userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
-        return identity == null ? null : userDao.getById(identity.getUserId());
+    public UserIdentity getByLoginName(String loginName) {
+        return userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
     }
 
     @Override

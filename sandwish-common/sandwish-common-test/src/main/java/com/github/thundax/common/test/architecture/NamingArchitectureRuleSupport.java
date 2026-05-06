@@ -418,6 +418,7 @@ public final class NamingArchitectureRuleSupport {
                 || name.startsWith("batch")
                 || name.startsWith("insert")
                 || name.startsWith("update")
+                || name.startsWith("upsert")
                 || isServiceBusinessActionName(name);
     }
 

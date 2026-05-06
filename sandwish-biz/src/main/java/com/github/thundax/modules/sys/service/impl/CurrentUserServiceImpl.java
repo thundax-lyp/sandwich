@@ -77,8 +77,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             throw new InvalidPasswordException();
         }
 
-        userCredentialService.updatePassword(
-                currentUser.getId(), passwordService.encrypt(password), EntityIdCodec.toValue(currentUser.getId()));
+        userCredentialService.upsertPassword(currentUser, passwordService.encrypt(password));
     }
 
     @Override

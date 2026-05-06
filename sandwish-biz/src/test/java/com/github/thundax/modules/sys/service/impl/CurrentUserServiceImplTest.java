@@ -95,8 +95,7 @@ public class CurrentUserServiceImplTest {
 
         service.updatePassword(currentUser, "OldPass1$", "NewPass1$");
 
-        verify(userCredentialService)
-                .updatePassword(currentUser.getId(), "encrypted-new", EntityIdCodec.toValue(currentUser.getId()));
+        verify(userCredentialService).upsertPassword(currentUser, "encrypted-new");
     }
 
     private User superUser() {

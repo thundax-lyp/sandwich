@@ -4,7 +4,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
-import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
@@ -24,19 +23,16 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
-    private final UserDao userDao;
     private final UserIdentityService userIdentityService;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
     private final SignService signService;
 
     public UserCredentialServiceImpl(
-            UserDao userDao,
             UserIdentityService userIdentityService,
             UserIdentityDao userIdentityDao,
             UserCredentialDao userCredentialDao,
             SignService signService) {
-        this.userDao = userDao;
         this.userIdentityService = userIdentityService;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
@@ -53,21 +49,17 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePassword(EntityId userId, String encryptedPassword, String updateUserId) {
-        User user = userId == null ? null : userDao.getById(userId);
-        if (user == null) {
+    public void upsertPassword(User user, String encryptedPassword) {
+        if (user == null || user.getId() == null) {
             return;
         }
-        user.setUpdateUserId(updateUserId);
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserIdentity accountIdentity =
-                userIdentityService.updateAccountIdentity(user, userIdentityService.getAccountLoginName(userId));
-        updatePasswordCredential(user, accountIdentity, encryptedPassword);
+                userIdentityService.updateAccountIdentity(user, userIdentityService.getAccountLoginName(user.getId()));
+        upsertPasswordCredential(user, accountIdentity, encryptedPassword);
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
+    private void upsertPasswordCredential(User user, UserIdentity accountIdentity, String encryptedPassword) {
         if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }

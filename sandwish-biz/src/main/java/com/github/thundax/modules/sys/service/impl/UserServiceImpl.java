@@ -9,7 +9,6 @@ import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.UserCredentialService;
@@ -106,9 +105,9 @@ public class UserServiceImpl implements UserService {
             }
         }
         signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-        UserIdentity accountIdentity = userIdentityService.updateAccountIdentity(user, loginName);
+        userIdentityService.updateAccountIdentity(user, loginName);
         if (added) {
-            userCredentialService.updatePasswordCredential(user, accountIdentity, encryptedPassword);
+            userCredentialService.upsertPassword(user, encryptedPassword);
         }
     }
 

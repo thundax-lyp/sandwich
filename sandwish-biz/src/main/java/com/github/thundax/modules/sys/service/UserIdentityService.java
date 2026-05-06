@@ -6,7 +6,7 @@ import com.github.thundax.modules.sys.entity.UserIdentity;
 
 public interface UserIdentityService {
 
-    User getByLoginName(String loginName);
+    UserIdentity getByLoginName(String loginName);
 
     String getAccountLoginName(EntityId userId);
 

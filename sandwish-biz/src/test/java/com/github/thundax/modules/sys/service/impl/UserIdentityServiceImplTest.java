@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserIdentity;
@@ -17,25 +16,20 @@ import org.junit.Test;
 public class UserIdentityServiceImplTest {
 
     @Test
-    public void shouldGetUserByLoginName() {
-        UserDao userDao = mock(UserDao.class);
+    public void shouldGetIdentityByLoginName() {
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
-        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userDao, userIdentityDao);
-        User user = new User();
-        user.setId(EntityId.of("user-1"));
-        UserIdentity identity = accountIdentity(user.getId(), "tester");
+        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
+        UserIdentity identity = accountIdentity(EntityId.of("user-1"), "tester");
 
         when(userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, "tester")).thenReturn(identity);
-        when(userDao.getById(user.getId())).thenReturn(user);
 
-        assertSame(user, service.getByLoginName("tester"));
+        assertSame(identity, service.getByLoginName("tester"));
     }
 
     @Test
     public void shouldGetAccountLoginName() {
-        UserDao userDao = mock(UserDao.class);
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
-        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userDao, userIdentityDao);
+        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
         EntityId userId = EntityId.of("user-1");
 
         when(userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT))
@@ -46,9 +40,8 @@ public class UserIdentityServiceImplTest {
 
     @Test
     public void shouldUpdateAccountIdentity() {
-        UserDao userDao = mock(UserDao.class);
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
-        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userDao, userIdentityDao);
+        UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
         User user = new User();
         user.setId(EntityId.of("user-1"));
         UserIdentity identity = accountIdentity(user.getId(), "old");

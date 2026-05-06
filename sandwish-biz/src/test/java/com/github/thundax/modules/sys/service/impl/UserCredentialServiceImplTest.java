@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
-import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
@@ -39,29 +38,26 @@ public class UserCredentialServiceImplTest {
     }
 
     @Test
-    public void shouldUpdatePasswordCredential() {
-        UserDao userDao = mock(UserDao.class);
+    public void shouldUpsertPasswordCredential() {
         UserIdentityService userIdentityService = mock(UserIdentityService.class);
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserCredentialDao userCredentialDao = mock(UserCredentialDao.class);
         SignService signService = mock(SignService.class);
-        UserCredentialServiceImpl service = new UserCredentialServiceImpl(
-                userDao, userIdentityService, userIdentityDao, userCredentialDao, signService);
+        UserCredentialServiceImpl service =
+                new UserCredentialServiceImpl(userIdentityService, userIdentityDao, userCredentialDao, signService);
         EntityId userId = EntityId.of("user-1");
         User user = new User();
         user.setId(userId);
         UserIdentity identity = accountIdentity(userId);
         UserCredential credential = new UserCredential();
 
-        when(userDao.getById(userId)).thenReturn(user);
         when(userIdentityService.getAccountLoginName(userId)).thenReturn("tester");
         when(userIdentityService.updateAccountIdentity(user, "tester")).thenReturn(identity);
         when(userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD))
                 .thenReturn(credential);
 
-        service.updatePassword(userId, "encrypted-new", "operator-1");
+        service.upsertPassword(user, "encrypted-new");
 
-        assertEquals("operator-1", user.getUpdateUserId());
         assertEquals("encrypted-new", credential.getCredentialValue());
         verify(userCredentialDao).update(credential);
         verify(signService).sign(user.getSignName(), user.getSignId(), user.getSignBody());
@@ -69,11 +65,7 @@ public class UserCredentialServiceImplTest {
 
     private UserCredentialServiceImpl newService(UserIdentityDao userIdentityDao, UserCredentialDao userCredentialDao) {
         return new UserCredentialServiceImpl(
-                mock(UserDao.class),
-                mock(UserIdentityService.class),
-                userIdentityDao,
-                userCredentialDao,
-                mock(SignService.class));
+                mock(UserIdentityService.class), userIdentityDao, userCredentialDao, mock(SignService.class));
     }
 
     private UserIdentity accountIdentity(EntityId userId) {

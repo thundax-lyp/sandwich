@@ -34,12 +34,10 @@ import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
@@ -434,10 +432,7 @@ public class UserController {
     @PreAuthorize("@permissionAuthorizationService.isPermitted('sys:user:view')")
     @WrappedApiResponse
     public List<UserRoleResponse> roleList() {
-        RoleQuery query = new RoleQuery();
-        query.setStatus(RoleStatus.ENABLED);
-
-        return roleService.list(query).stream()
+        return roleService.listEnabled().stream()
                 .map(role -> UserInterfaceAssembler.toRoleResponse(role))
                 .collect(Collectors.toList());
     }

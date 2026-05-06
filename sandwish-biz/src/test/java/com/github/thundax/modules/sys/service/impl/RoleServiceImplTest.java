@@ -33,6 +33,16 @@ public class RoleServiceImplTest {
     }
 
     @Test
+    public void shouldListEnabledRolesWithEnabledStatus() {
+        RecordingRoleDao dao = new RecordingRoleDao();
+        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+
+        service.listEnabled();
+
+        assertEquals("ENABLED", dao.enableFlag);
+    }
+
+    @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingRoleDao dao = new RecordingRoleDao();
         PageDTO<Role> page = new PageDTO<>();

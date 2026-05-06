@@ -33,6 +33,13 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     }
 
     @Test
+    public void shouldKeepUserServiceIdentityAndCredentialBoundaries() {
+        JavaClasses classes = importPackages("com.github.thundax.modules");
+
+        NamingArchitectureRuleSupport.assertUserServiceDoesNotExposeIdentityOrCredentialMethods(classes);
+    }
+
+    @Test
     public void shouldPlaceServiceQueryObjectsUnderServiceQueryPackage() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 

@@ -284,6 +284,9 @@
 - 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")`，且 reason 不得以测试作为理由。
 - Service `add` 方法必须返回新建主实体的 `EntityId`。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
+- `UserService` 固定承载后台用户主体、用户角色关系和用户主事务入口，不公开登录标识读取、账号名读取、密码凭据读取和密码凭据更新方法。
+- `UserIdentityService` 固定承载后台用户登录标识读取和 `ACCOUNT` 标识写入。
+- `UserCredentialService` 固定承载后台用户认证凭据读取和 `PASSWORD` 凭据写入。
 - Service `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
 - `UserIdentity` 和 `UserCredential` 属于 System 用户模型，认证使用方式由 Auth 编排。

@@ -184,6 +184,29 @@ public final class NamingArchitectureRuleSupport {
                 violations.isEmpty());
     }
 
+    public static void assertUserServiceDoesNotExposeIdentityOrCredentialMethods(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+        Set<String> prohibitedMethods = new LinkedHashSet<String>(
+                Arrays.asList("getByLoginName", "getAccountLoginName", "getPasswordCredential", "updatePassword"));
+
+        for (JavaClass javaClass : classes) {
+            if (!isServiceInterface(javaClass) || !"UserService".equals(javaClass.getSimpleName())) {
+                continue;
+            }
+            for (JavaMethod method : javaClass.getMethods()) {
+                if (prohibitedMethods.contains(method.getName())) {
+                    violations.add(method.getFullName());
+                }
+            }
+        }
+
+        assertTrue(
+                "UserService must keep user principal and role boundaries; identity and credential methods belong "
+                        + "to UserIdentityService/UserCredentialService: "
+                        + violations,
+                violations.isEmpty());
+    }
+
     public static void assertServiceQueryObjectsUnderServiceQueryPackage(JavaClasses classes) {
         List<String> violations = new ArrayList<String>();
 

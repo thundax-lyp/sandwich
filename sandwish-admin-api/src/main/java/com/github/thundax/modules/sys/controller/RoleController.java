@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "02-04.系统-权限")
+@Api(tags = "系统/权限")
 @SysLogger(module = {"系统", "权限"})
 @RequestMapping(value = "/api/sys/role")
 @WrappedApiController

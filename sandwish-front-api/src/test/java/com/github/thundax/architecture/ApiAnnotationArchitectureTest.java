@@ -15,6 +15,7 @@ public class ApiAnnotationArchitectureTest {
 
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertApiTagsDoNotUseNumericPrefix(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);

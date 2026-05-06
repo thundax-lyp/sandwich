@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "08-04.辅助-签名与验签")
+@Api(tags = "辅助/签名与验签")
 @SysLogger(module = {"辅助", "签名"})
 @RequestMapping(value = "/api/assist/signature")
 @WrappedApiController

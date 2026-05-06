@@ -69,7 +69,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Api(tags = "02-05.系统-用户")
+@Api(tags = "系统/用户")
 @SysLogger(module = {"系统", "用户"})
 @RequestMapping(value = "/api/sys/user")
 @RestController

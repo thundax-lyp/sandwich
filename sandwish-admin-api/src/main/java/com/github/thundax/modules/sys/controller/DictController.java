@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "02-05.系统-字典")
+@Api(tags = "系统/字典")
 @SysLogger(module = {"系统", "字典"})
 @RequestMapping(value = "/api/sys/dict")
 @WrappedApiController

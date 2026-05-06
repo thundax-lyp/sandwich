@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "08-05.辅助-公钥与私钥")
+@Api(tags = "辅助/公钥与私钥")
 @SysLogger(module = {"辅助", "公私钥对"})
 @RequestMapping(value = "/api/assist/keypair")
 @WrappedApiController

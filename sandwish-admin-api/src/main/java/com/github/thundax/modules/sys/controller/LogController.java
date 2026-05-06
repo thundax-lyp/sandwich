@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "02-06.系统-日志")
+@Api(tags = "系统/日志")
 @RequestMapping(value = "/api/sys/log")
 @WrappedApiController
 public class LogController {

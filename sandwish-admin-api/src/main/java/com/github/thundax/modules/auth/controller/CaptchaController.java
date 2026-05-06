@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "01-02. 鉴权-图形验证码")
+@Api(tags = "鉴权/图形验证码")
 @RequestMapping(value = "/api/auth")
 @RestController
 @PublicApi

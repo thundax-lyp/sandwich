@@ -32,7 +32,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public class PersonalControllerContractTest {
+public class CurrentUserControllerContractTest {
 
     @After
     public void tearDown() {
@@ -43,31 +43,31 @@ public class PersonalControllerContractTest {
     @Test
     public void shouldExposeCurrentUserBusinessPaths() throws NoSuchMethodException {
         assertEquals(
-                "系统/当前用户", PersonalController.class.getAnnotation(Api.class).tags()[0]);
-        assertMapping(PersonalController.class.getAnnotation(RequestMapping.class), "/api/sys/current-user");
-        assertMapping(PersonalController.class.getMethod("info").getAnnotation(RequestMapping.class), "info");
+                "系统/当前用户", CurrentUserController.class.getAnnotation(Api.class).tags()[0]);
+        assertMapping(CurrentUserController.class.getAnnotation(RequestMapping.class), "/api/sys/current-user");
+        assertMapping(CurrentUserController.class.getMethod("info").getAnnotation(RequestMapping.class), "info");
         assertMapping(
-                PersonalController.class
+                CurrentUserController.class
                         .getMethod("updateInfo", PersonalInfoUpdateRequest.class)
                         .getAnnotation(RequestMapping.class),
                 "info/update");
         assertMapping(
-                PersonalController.class
+                CurrentUserController.class
                         .getMethod("updatePassword", PersonalPasswordUpdateRequest.class)
                         .getAnnotation(RequestMapping.class),
                 "password/update");
         assertMapping(
-                PersonalController.class
+                CurrentUserController.class
                         .getMethod("uploadAvatar", PersonalAvatarUploadRequest.class)
                         .getAnnotation(RequestMapping.class),
                 "avatar/upload");
         assertMapping(
-                PersonalController.class
+                CurrentUserController.class
                         .getMethod("deleteAvatar", PersonalAvatarDeleteRequest.class)
                         .getAnnotation(RequestMapping.class),
                 "avatar/delete");
-        assertMapping(PersonalController.class.getMethod("menus").getAnnotation(RequestMapping.class), "menus");
-        assertMapping(PersonalController.class.getMethod("perms").getAnnotation(RequestMapping.class), "perms");
+        assertMapping(CurrentUserController.class.getMethod("menus").getAnnotation(RequestMapping.class), "menus");
+        assertMapping(CurrentUserController.class.getMethod("perms").getAnnotation(RequestMapping.class), "perms");
     }
 
     @Test
@@ -83,7 +83,7 @@ public class PersonalControllerContractTest {
         mockApplicationContext(userService);
         UserAccessHolder.currentUserId("user-1", "token-1");
 
-        PersonalController controller = new PersonalController(
+        CurrentUserController controller = new CurrentUserController(
                 userService,
                 mock(RoleService.class),
                 menuService,

@@ -57,7 +57,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @SysLogger(module = {"系统", "当前用户"})
 @RequestMapping(value = "/api/sys/current-user")
 @WrappedApiController
-public class PersonalController {
+public class CurrentUserController {
 
     private final UserService userService;
     private final RoleService roleService;
@@ -65,7 +65,7 @@ public class PersonalController {
     private final PasswordService passwordService;
     private final KeypairService keypairService;
 
-    public PersonalController(
+    public CurrentUserController(
             UserService userService,
             RoleService roleService,
             MenuService menuService,

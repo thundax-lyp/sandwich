@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-@Api(tags = "01-01. 鉴权")
+@Api(tags = "鉴权")
 @RequestMapping(value = "/api/auth")
 @SysLogger(module = {"系统", "登录"})
 @WrappedApiController

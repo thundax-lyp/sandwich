@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "01-01.会员认证")
+@Api(tags = "会员认证")
 @RestController
 @RequestMapping(value = "/auth")
 @PublicApi

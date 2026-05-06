@@ -52,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-@Api(tags = "08-03.辅助-存储")
+@Api(tags = "辅助/存储")
 @RequestMapping(value = "/api/assist/storage")
 @RestController
 public class StorageController {

@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "02-03.系统-菜单")
+@Api(tags = "系统/菜单")
 @SysLogger(module = {"系统", "菜单"})
 @RequestMapping(value = "/api/sys/menu")
 @WrappedApiController

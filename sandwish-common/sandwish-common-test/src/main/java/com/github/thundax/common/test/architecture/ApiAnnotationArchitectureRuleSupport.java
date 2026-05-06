@@ -23,6 +23,8 @@ public final class ApiAnnotationArchitectureRuleSupport {
             "((?:@[A-Za-z0-9_.]+(?:\\([^)]*\\))?\\s+)*)public\\s+class\\s+([A-Za-z0-9_]+Controller)\\b");
     private static final Pattern PUBLIC_METHOD_DECLARATION_PATTERN =
             Pattern.compile("public\\s+[^{;]+\\s+([A-Za-z0-9_]+)\\s*\\(");
+    private static final Pattern API_TAGS_PATTERN = Pattern.compile("@Api\\s*\\([^)]*tags\\s*=\\s*\"([^\"]+)\"");
+    private static final Pattern API_TAG_NUMERIC_PREFIX_PATTERN = Pattern.compile("^\\d+(?:-\\d+)*\\.\\s*");
 
     private ApiAnnotationArchitectureRuleSupport() {}
 
@@ -68,6 +70,18 @@ public final class ApiAnnotationArchitectureRuleSupport {
         }
 
         assertTrue("REST controllers must declare @Api: " + violations, violations.isEmpty());
+    }
+
+    public static void assertApiTagsDoNotUseNumericPrefix(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectApiTagNumericPrefixViolations(root, path, violations));
+        }
+
+        assertTrue("API tags must not use numeric prefixes: " + violations, violations.isEmpty());
     }
 
     public static void assertMappedMethodsDeclareApiOperation(Path sourceRoot) throws IOException {
@@ -150,6 +164,21 @@ public final class ApiAnnotationArchitectureRuleSupport {
             String className = matcher.group(2);
             if (containsRestControllerAnnotation(annotations) && !annotations.contains("@Api")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
+            }
+        }
+    }
+
+    private static void collectApiTagNumericPrefixViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        String classAnnotations = restControllerClassAnnotations(content);
+        if (classAnnotations.length() == 0) {
+            return;
+        }
+        Matcher matcher = API_TAGS_PATTERN.matcher(classAnnotations);
+        while (matcher.find()) {
+            String tag = matcher.group(1);
+            if (API_TAG_NUMERIC_PREFIX_PATTERN.matcher(tag).find()) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " tag=" + tag);
             }
         }
     }

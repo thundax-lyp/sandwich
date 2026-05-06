@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.service;
 
+import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
@@ -114,6 +115,7 @@ public interface AuthService {
 
     void invalidateSessionByToken(String token, String reason);
 
+    @LayerPublicApi(reason = "账号状态变化时按用户维度失效在线会话的业务入口")
     int invalidateSessionsByUserId(EntityId userId, String reason);
 
     /**

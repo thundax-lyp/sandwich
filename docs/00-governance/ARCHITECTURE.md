@@ -414,6 +414,8 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - Java-Type 包含 primitive / boxed primitive、`String`、`BigDecimal`、`Date`、`Enum`、数组、`java.*` 集合容器和项目统一标识值类型。
 - 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
 - Service 接口应该显式声明当前业务需要暴露的方法。
+- Service 公开方法不得仅由测试代码调用；测试不得成为公开方法存在的唯一理由。
+- 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")` 并说明非测试原因。
 - 不新增空 `BaseService`、空 marker Service、通用 `BaseServiceImpl` 或泛型 CRUD / Tree Service 公共契约。
 - 不直接依赖 API `Request` / `Response`。
 - 不直接依赖 `DO` / `DataObject`。
@@ -424,6 +426,8 @@ OSS 存储链路允许 infra 和入口装配依赖：
 
 - 负责数据库访问和 SQL 映射。
 - 查询、分页、过滤、排序优先下推到持久化层。
+- DAO / Mapper 公开方法不得仅由测试代码调用；测试不得通过新增持久化公开方法绕过业务层。
+- DAO / Mapper 的 `@LayerPublicApi` 使用必须更谨慎，reason 必须说明真实持久化契约或框架调用来源。
 - 不承载业务流程。
 - 不处理 Web 会话、权限适配和页面语义。
 - SQL 变化必须同步检查实体、DAO implementation、Mapper、Service 调用和数据库文档。

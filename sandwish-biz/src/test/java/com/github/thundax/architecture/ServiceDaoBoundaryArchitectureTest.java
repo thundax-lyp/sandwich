@@ -27,4 +27,9 @@ public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest
 
         LayerArchitectureRuleSupport.assertNoEmptyServiceBaseTypes(classes);
     }
+
+    @Test
+    public void shouldRejectLayerPublicApiMethodsUsedOnlyByTests() {
+        LayerArchitectureRuleSupport.assertLayerPublicApiMethodsAreNotTestOnly();
+    }
 }

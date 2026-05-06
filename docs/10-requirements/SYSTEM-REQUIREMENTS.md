@@ -280,6 +280,8 @@
 - Controller 只做入口适配、权限、参数接收和响应组装。
 - Service 负责业务流程、事务、校验、跨 DAO 编排和关系维护。
 - DAO interface 只暴露业务持久化契约。
+- Service、DAO 和 Mapper 公开方法不得仅由测试代码调用；仅测试调用的方法必须删除、收窄为内部实现，或重塑为真实业务协作方。
+- 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")`，且 reason 不得以测试作为理由。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
 - `UserIdentity` 和 `UserCredential` 属于 System 用户模型，认证使用方式由 Auth 编排。
 - `AccessRank` 是用户和菜单共用的访问等级值对象。
@@ -304,6 +306,7 @@
 - 支持读取当前用户信息、更新当前用户信息、更新当前用户密码、上传头像、删除头像、读取当前用户可见菜单和读取当前用户权限编码。
 - 更新当前用户信息固定使用 `/api/sys/current-user/info/update`。
 - 更新当前用户密码固定使用 `/api/sys/current-user/password/update`。
+- 当前用户资料更新、密码更新和菜单计算必须由 `CurrentUserService` 承载，Controller 只做入口适配、传输解密和响应组装。
 - 当前用户可见菜单必须按角色授权菜单和用户访问等级过滤。
 - 当前用户权限编码必须来自认证上下文。
 

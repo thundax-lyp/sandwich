@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.service;
 
+import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
@@ -28,6 +29,7 @@ public interface MenuService {
 
     List<Menu> list(AccessRank maxRank);
 
+    @LayerPublicApi(reason = "菜单树节点维护时按父节点读取子菜单的业务入口")
     List<Menu> listChildren(String parentId);
 
     int updateVisibility(Menu menu);

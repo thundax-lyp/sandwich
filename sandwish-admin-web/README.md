@@ -9,6 +9,7 @@ Sandwich 后台管理前端工程，对接 `sandwish-admin-api`。
 - TypeScript
 - Ant Design
 - @ant-design/icons
+- react-router-dom
 
 ## 开发命令
 
@@ -19,12 +20,29 @@ npm run dev
 
 默认开发服务端口为 `5173`，后台接口代理目标通过 `.env` 中的 `VITE_ADMIN_API_BASE_URL` 配置。
 
+## 路由规划
+
+```text
+/dashboard
+/system/users
+/system/departments
+/system/roles
+/system/menus
+/system/dictionaries
+/system/logs
+/storage/objects
+```
+
 ## 目录说明
 
 ```text
+public/
+  sandwich-logo.svg    产品 Logo
 src/
   App.tsx              后台管理端应用壳
   main.tsx             React 入口
+  layouts/             后台布局
+  router/              路由配置
+  pages/               页面入口
   assets/              全局样式等静态资源
-  components/          页面组件
 ```

@@ -1,6 +1,6 @@
-import { AdminShell } from "./components/AdminShell";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
+import { AppRouter } from "./router";
 
 export default function App() {
     return (
@@ -14,7 +14,7 @@ export default function App() {
                 }
             }}
         >
-            <AdminShell />
+            <AppRouter />
         </ConfigProvider>
     );
 }

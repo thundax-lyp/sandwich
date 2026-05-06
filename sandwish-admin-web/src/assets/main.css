@@ -39,15 +39,10 @@ button {
     margin-bottom: 32px;
 }
 
-.brand-mark {
+.brand-logo {
     display: grid;
     width: 40px;
     height: 40px;
-    place-items: center;
-    color: #17242f;
-    background: #d7f171;
-    border-radius: 8px;
-    font-weight: 800;
 }
 
 .brand strong,
@@ -70,10 +65,24 @@ button {
     color: #d6e0df;
 }
 
+.nav-menu .ant-menu-submenu-title,
+.nav-menu .ant-menu-item {
+    color: #d6e0df !important;
+}
+
+.nav-menu .ant-menu-submenu-arrow {
+    color: #d6e0df !important;
+}
+
+.nav-menu .ant-menu-submenu-title:hover,
 .nav-menu .ant-menu-item:hover,
 .nav-menu .ant-menu-item-selected {
     color: #17242f !important;
     background: #d7f171 !important;
+}
+
+.nav-menu .ant-menu-submenu-title:hover .ant-menu-submenu-arrow {
+    color: #17242f !important;
 }
 
 .workspace {
@@ -163,7 +172,8 @@ p {
         gap: 18px;
     }
 
-    .nav-menu .ant-menu-item {
+    .nav-menu .ant-menu-item,
+    .nav-menu .ant-menu-submenu-title {
         display: inline-flex;
         width: calc(50% - 4px);
         margin-inline: 2px;

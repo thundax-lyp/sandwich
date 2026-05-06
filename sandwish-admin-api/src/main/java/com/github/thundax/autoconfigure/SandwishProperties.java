@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.lang.NonNull;
 
@@ -17,14 +16,6 @@ public class SandwishProperties {
     private static final String DEFAULT_LOG_STORAGE_PATH =
             System.getProperty("java.io.tmpdir") + File.separator + "sandwish" + File.separator + "sys-log";
 
-    private static SandwishProperties instance;
-
-    @Setter
-    private String whiteCaptcha;
-
-    @Setter
-    private ProductProperties product;
-
     @Setter
     private LogProperties log;
 
@@ -32,33 +23,10 @@ public class SandwishProperties {
     private UploadProperties upload;
 
     @Setter
-    private V2ClientProperties v2Client;
-
-    @Setter
-    private MailProperties mail;
-
-    @Setter
     private ResponseWrapperFilterProperties responseWrapperFilter;
 
     @Setter
     private AccessTokenFilterProperties accessTokenFilter;
-
-    public SandwishProperties() {
-        instance = this;
-    }
-
-    public static SandwishProperties getInstance() {
-        return instance;
-    }
-
-    public String getWhiteCaptcha() {
-        return whiteCaptcha;
-    }
-
-    @NonNull
-    public ProductProperties getProduct() {
-        return product != null ? product : new ProductProperties();
-    }
 
     @NonNull
     public LogProperties getLog() {
@@ -71,16 +39,6 @@ public class SandwishProperties {
     }
 
     @NotNull
-    public V2ClientProperties getV2Client() {
-        return v2Client != null ? v2Client : new V2ClientProperties();
-    }
-
-    @NotNull
-    public MailProperties getMail() {
-        return mail != null ? mail : new MailProperties();
-    }
-
-    @NotNull
     public ResponseWrapperFilterProperties getResponseWrapperFilter() {
         return responseWrapperFilter != null ? responseWrapperFilter : new ResponseWrapperFilterProperties();
     }
@@ -88,37 +46,6 @@ public class SandwishProperties {
     @NotNull
     public AccessTokenFilterProperties getAccessTokenFilter() {
         return accessTokenFilter != null ? accessTokenFilter : new AccessTokenFilterProperties();
-    }
-
-    public static class ProductProperties {
-
-        @Setter
-        private String name;
-
-        @Setter
-        private String shortName;
-
-        @Setter
-        private String plainName;
-
-        @Setter
-        private String version;
-
-        public String getName() {
-            return name;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public String getPlainName() {
-            return plainName;
-        }
-
-        public String getVersion() {
-            return version;
-        }
     }
 
     public static class UploadProperties {
@@ -265,29 +192,6 @@ public class SandwishProperties {
                 return new ArrayList<>();
             }
             return excludePath;
-        }
-    }
-
-    public static class V2ClientProperties {
-        @Setter
-        private String serviceUrl;
-
-        @Setter
-        private Integer appId;
-
-        @Setter
-        private String appSecret;
-
-        public String getServiceUrl() {
-            return serviceUrl;
-        }
-
-        public Integer getAppId() {
-            return appId;
-        }
-
-        public String getAppSecret() {
-            return appSecret;
         }
     }
 }

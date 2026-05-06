@@ -11,40 +11,9 @@ import org.springframework.lang.NonNull;
 @ConfigurationProperties(prefix = "sandwish")
 public class SandwishProperties {
 
-    private static SandwishProperties instance;
-
-    private String whiteCaptcha;
-
-    private ProductProperties productProperties;
     private UploadProperties uploadProperties;
-    private ApiProperties apiProperties;
 
     private XssFilterProperties xssFilter;
-
-    public SandwishProperties() {
-        instance = this;
-    }
-
-    public static SandwishProperties getInstance() {
-        return instance;
-    }
-
-    public String getWhiteCaptcha() {
-        return whiteCaptcha;
-    }
-
-    public void setWhiteCaptcha(String whiteCaptcha) {
-        this.whiteCaptcha = whiteCaptcha;
-    }
-
-    @NonNull
-    public ProductProperties getProduct() {
-        return productProperties != null ? productProperties : new ProductProperties();
-    }
-
-    public void setProduct(ProductProperties productProperties) {
-        this.productProperties = productProperties;
-    }
 
     @NonNull
     public UploadProperties getUpload() {
@@ -56,61 +25,12 @@ public class SandwishProperties {
     }
 
     @NotNull
-    public ApiProperties getApi() {
-        return apiProperties != null ? apiProperties : new ApiProperties();
-    }
-
-    public void setApi(ApiProperties apiProperties) {
-        this.apiProperties = apiProperties;
-    }
-
-    @NotNull
     public XssFilterProperties getXssFilter() {
         return xssFilter != null ? xssFilter : new XssFilterProperties();
     }
 
     public void setXssFilter(XssFilterProperties xssFilter) {
         this.xssFilter = xssFilter;
-    }
-
-    public static class ProductProperties {
-
-        private String name;
-        private String shortName;
-        private String plainName;
-        private String version;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public void setShortName(String shortName) {
-            this.shortName = shortName;
-        }
-
-        public String getPlainName() {
-            return plainName;
-        }
-
-        public void setPlainName(String plainName) {
-            this.plainName = plainName;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public void setVersion(String version) {
-            this.version = version;
-        }
     }
 
     public static class UploadProperties {
@@ -215,19 +135,6 @@ public class SandwishProperties {
 
         public void setImageQuality(Float imageQuality) {
             this.imageQuality = imageQuality;
-        }
-    }
-
-    public static class ApiProperties {
-
-        private String adviceUrlFormat;
-
-        public String getAdviceUrlFormat() {
-            return adviceUrlFormat;
-        }
-
-        public void setAdviceUrlFormat(String adviceUrlFormat) {
-            this.adviceUrlFormat = adviceUrlFormat;
         }
     }
 

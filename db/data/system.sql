@@ -95,7 +95,7 @@ INSERT INTO `sys_menu` (
     `create_date`, `create_by`, `update_date`, `update_by`, `del_flag`
 ) VALUES
     (
-        'menu-system', NULL, 1, 32, '系统管理', NULL, 0,
+        'menu-system', NULL, 1, 30, '系统管理', NULL, 0,
         'VISIBLE', NULL, '/system', NULL, 0, '系统管理根菜单',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
@@ -115,7 +115,7 @@ INSERT INTO `sys_menu` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-role', 'menu-system', 8, 15, '角色管理', NULL, 0,
+        'menu-role', 'menu-system', 8, 13, '角色管理', NULL, 0,
         'VISIBLE', NULL, '/system/roles', NULL, 2, '角色管理',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
@@ -130,82 +130,77 @@ INSERT INTO `sys_menu` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-role-manage', 'menu-role', 13, 14, '角色管理权限', 'sys:role', 0,
-        'HIDDEN', NULL, NULL, NULL, 3, '角色授权辅助权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        'menu-menu', 'menu-system', 16, 17, '菜单管理', 'super', 0,
+        'menu-menu', 'menu-system', 14, 15, '菜单管理', 'super', 0,
         'VISIBLE', NULL, '/system/menus', NULL, 3, '菜单管理',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-department', 'menu-system', 18, 23, '部门管理', NULL, 0,
+        'menu-department', 'menu-system', 16, 21, '部门管理', NULL, 0,
         'VISIBLE', NULL, '/system/departments', NULL, 4, '部门管理',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-department-view', 'menu-department', 19, 20, '部门查看', 'sys:department:view', 0,
+        'menu-department-view', 'menu-department', 17, 18, '部门查看', 'sys:department:view', 0,
         'HIDDEN', NULL, NULL, NULL, 1, '部门查看权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-department-edit', 'menu-department', 21, 22, '部门编辑', 'sys:department:edit', 0,
+        'menu-department-edit', 'menu-department', 19, 20, '部门编辑', 'sys:department:edit', 0,
         'HIDDEN', NULL, NULL, NULL, 2, '部门编辑权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-dict', 'menu-system', 24, 29, '字典管理', NULL, 0,
+        'menu-dict', 'menu-system', 22, 27, '字典管理', NULL, 0,
         'VISIBLE', NULL, '/system/dictionaries', NULL, 5, '字典管理',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-dict-view', 'menu-dict', 25, 26, '字典查看', 'sys:dict:view', 0,
+        'menu-dict-view', 'menu-dict', 23, 24, '字典查看', 'sys:dict:view', 0,
         'HIDDEN', NULL, NULL, NULL, 1, '字典查看权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-dict-edit', 'menu-dict', 27, 28, '字典编辑', 'sys:dict:edit', 0,
+        'menu-dict-edit', 'menu-dict', 25, 26, '字典编辑', 'sys:dict:edit', 0,
         'HIDDEN', NULL, NULL, NULL, 2, '字典编辑权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-log', 'menu-system', 30, 31, '系统日志', 'super', 0,
+        'menu-log', 'menu-system', 28, 29, '系统日志', 'super', 0,
         'VISIBLE', NULL, '/system/logs', NULL, 6, '系统日志',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-storage', NULL, 33, 40, '存储管理', NULL, 0,
+        'menu-storage', NULL, 31, 38, '存储管理', NULL, 0,
         'VISIBLE', NULL, '/storage', NULL, 1, '存储管理根菜单',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-storage-object', 'menu-storage', 34, 39, '存储对象', NULL, 0,
+        'menu-storage-object', 'menu-storage', 32, 37, '存储对象', NULL, 0,
         'VISIBLE', NULL, '/storage/objects', NULL, 1, '存储对象',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-storage-object-view', 'menu-storage-object', 35, 36, '存储对象查看', 'assist:storage:view', 0,
+        'menu-storage-object-view', 'menu-storage-object', 33, 34, '存储对象查看', 'assist:storage:view', 0,
         'HIDDEN', NULL, NULL, NULL, 1, '存储对象查看权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-storage-object-edit', 'menu-storage-object', 37, 38, '存储对象编辑', 'assist:storage:edit', 0,
+        'menu-storage-object-edit', 'menu-storage-object', 35, 36, '存储对象编辑', 'assist:storage:edit', 0,
         'HIDDEN', NULL, NULL, NULL, 2, '存储对象编辑权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-assist', NULL, 41, 46, '辅助工具', NULL, 0,
+        'menu-assist', NULL, 39, 44, '辅助工具', NULL, 0,
         'HIDDEN', NULL, NULL, NULL, 2, '辅助工具权限根节点',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-assist-signature-view', 'menu-assist', 42, 43, '签名查看', 'assist:signature:view', 0,
+        'menu-assist-signature-view', 'menu-assist', 40, 41, '签名查看', 'assist:signature:view', 0,
         'HIDDEN', NULL, NULL, NULL, 1, '签名查看权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        'menu-assist-signature-edit', 'menu-assist', 44, 45, '签名编辑', 'assist:signature:edit', 0,
+        'menu-assist-signature-edit', 'menu-assist', 42, 43, '签名编辑', 'assist:signature:edit', 0,
         'HIDDEN', NULL, NULL, NULL, 2, '签名编辑权限',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     )
@@ -239,7 +234,6 @@ INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
     ('role-super-admin', 'menu-role'),
     ('role-super-admin', 'menu-role-view'),
     ('role-super-admin', 'menu-role-edit'),
-    ('role-super-admin', 'menu-role-manage'),
     ('role-super-admin', 'menu-menu'),
     ('role-super-admin', 'menu-department'),
     ('role-super-admin', 'menu-department-view'),

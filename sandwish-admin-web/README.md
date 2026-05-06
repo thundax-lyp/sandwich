@@ -10,6 +10,9 @@ Sandwich 后台管理前端工程，对接 `sandwish-admin-api`。
 - Ant Design
 - @ant-design/icons
 - react-router-dom
+- TanStack Query
+- Vitest
+- React Testing Library
 
 ## 开发命令
 
@@ -21,6 +24,7 @@ npm run dev
 ```bash
 npm run lint
 npm run format:check
+npm run test
 npm run build
 ```
 
@@ -49,6 +53,7 @@ src/
   main.tsx             React 入口
   layouts/             后台布局
   router/              路由配置
+  query/               服务端状态与请求缓存配置
   pages/               页面入口
   assets/              全局样式等静态资源
 ```

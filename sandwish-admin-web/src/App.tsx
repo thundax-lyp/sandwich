@@ -1,5 +1,7 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
+import { queryClient } from "./query/queryClient";
 import { AppRouter } from "./router";
 
 export default function App() {
@@ -14,7 +16,9 @@ export default function App() {
                 }
             }}
         >
-            <AppRouter />
+            <QueryClientProvider client={queryClient}>
+                <AppRouter />
+            </QueryClientProvider>
         </ConfigProvider>
     );
 }

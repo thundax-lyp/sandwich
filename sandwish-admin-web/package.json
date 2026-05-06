@@ -10,10 +10,13 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier . --write",
-        "format:check": "prettier . --check"
+        "format:check": "prettier . --check",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "dependencies": {
         "@ant-design/icons": "^6.2.2",
+        "@tanstack/react-query": "^5.100.9",
         "antd": "^6.3.7",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
@@ -21,6 +24,9 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
         "@types/react": "^18.3.18",
         "@types/react-dom": "^18.3.5",
         "@vitejs/plugin-react": "^4.3.4",
@@ -29,10 +35,12 @@
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-react-refresh": "^0.5.2",
         "globals": "^17.6.0",
+        "jsdom": "^29.1.1",
         "prettier": "^3.8.3",
         "typescript": "^5.7.2",
         "typescript-eslint": "^8.59.2",
-        "vite": "^5.4.11"
+        "vite": "^5.4.11",
+        "vitest": "^4.1.5"
     },
     "engines": {
         "node": ">=18.0.0"

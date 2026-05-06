@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -54,9 +53,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@Api(tags = "02-01.系统/个人")
-@SysLogger(module = {"系统", "个人"})
-@RequestMapping(value = "/api/sys/personal")
+@Api(tags = "系统/当前用户")
+@SysLogger(module = {"系统", "当前用户"})
+@RequestMapping(value = "/api/sys/current-user")
 @WrappedApiController
 public class PersonalController {
 
@@ -80,7 +79,7 @@ public class PersonalController {
         this.keypairService = keypairService;
     }
 
-    @ApiOperation(value = "当前用户信息", notes = "user")
+    @ApiOperation(value = "当前用户信息", notes = "读取当前登录后台用户的基础资料和登录名")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -100,7 +99,7 @@ public class PersonalController {
                 currentUser, userService.getAccountLoginName(currentUser.getId()));
     }
 
-    @ApiOperation(value = "更新用户信息，包括：name, email, mobile", notes = "user")
+    @ApiOperation(value = "更新当前用户信息", notes = "更新当前登录后台用户的姓名、邮箱和手机号")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -110,7 +109,7 @@ public class PersonalController {
                 dataTypeClass = String.class),
     })
     @SysLogger("更新")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @RequestMapping(value = "info/update", method = RequestMethod.POST)
     public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -121,7 +120,7 @@ public class PersonalController {
                 currentUser, userService.getAccountLoginName(currentUser.getId()));
     }
 
-    @ApiOperation(value = "更新用户密码", notes = "user")
+    @ApiOperation(value = "更新当前用户密码", notes = "校验当前登录后台用户旧密码后更新密码凭据")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -131,7 +130,7 @@ public class PersonalController {
                 dataTypeClass = String.class),
     })
     @SysLogger("更新密码")
-    @RequestMapping(value = "password", method = RequestMethod.POST)
+    @RequestMapping(value = "password/update", method = RequestMethod.POST)
     public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
@@ -159,7 +158,7 @@ public class PersonalController {
         return true;
     }
 
-    @ApiOperation(value = "上传头像", notes = "user")
+    @ApiOperation(value = "上传当前用户头像", notes = "保存当前登录后台用户头像文件并返回头像访问信息")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -187,7 +186,7 @@ public class PersonalController {
         return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
-    @ApiOperation(value = "删除头像", notes = "user")
+    @ApiOperation(value = "删除当前用户头像", notes = "删除当前登录后台用户头像文件并返回头像访问信息")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -207,7 +206,7 @@ public class PersonalController {
         return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }
 
-    @ApiOperation(value = "菜单列表", notes = "user")
+    @ApiOperation(value = "当前用户菜单列表", notes = "按当前登录后台用户角色和访问等级返回可见菜单树列表")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
@@ -230,7 +229,7 @@ public class PersonalController {
             List<Menu> childList = allMenuList == null
                     ? new ArrayList<>()
                     : allMenuList.stream()
-                            .filter(item -> item.isDisplay() && Objects.equals(item.getParentId(), parent.getId()))
+                            .filter(item -> item.isDisplay() && StringUtils.equals(item.getParentId(), menuId(parent)))
                             .collect(Collectors.toList());
 
             menuList.addAll(idx + 1, childList);
@@ -278,7 +277,11 @@ public class PersonalController {
         return menuList;
     }
 
-    @ApiOperation(value = "权限列表", notes = "user")
+    private String menuId(Menu menu) {
+        return menu == null ? null : EntityIdCodec.toValue(menu.getId());
+    }
+
+    @ApiOperation(value = "当前用户权限列表", notes = "返回当前登录后台用户认证上下文中的权限编码集合")
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(

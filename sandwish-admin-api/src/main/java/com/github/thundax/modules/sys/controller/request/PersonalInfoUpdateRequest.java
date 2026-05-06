@@ -13,7 +13,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalInfoUpdateRequest", description = "个人资料更新请求")
+@ApiModel(value = "PersonalInfoUpdateRequest", description = "当前用户资料更新请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalInfoUpdateRequest implements Serializable {

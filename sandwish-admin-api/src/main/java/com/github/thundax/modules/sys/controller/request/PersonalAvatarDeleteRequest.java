@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalAvatarDeleteRequest", description = "个人头像删除请求")
+@ApiModel(value = "PersonalAvatarDeleteRequest", description = "当前用户头像删除请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalAvatarDeleteRequest implements Serializable {}

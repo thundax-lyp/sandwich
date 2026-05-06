@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalAvatarUploadRequest", description = "个人头像上传请求")
+@ApiModel(value = "PersonalAvatarUploadRequest", description = "当前用户头像上传请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalAvatarUploadRequest implements Serializable {

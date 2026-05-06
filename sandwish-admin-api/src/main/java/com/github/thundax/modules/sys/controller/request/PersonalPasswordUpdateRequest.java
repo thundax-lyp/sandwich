@@ -14,7 +14,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalPasswordUpdateRequest", description = "个人密码更新请求")
+@ApiModel(value = "PersonalPasswordUpdateRequest", description = "当前用户密码更新请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalPasswordUpdateRequest implements Serializable {

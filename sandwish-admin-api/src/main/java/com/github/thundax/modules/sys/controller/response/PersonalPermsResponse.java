@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalPermsResponse", description = "个人权限响应")
+@ApiModel(value = "PersonalPermsResponse", description = "当前用户权限响应")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalPermsResponse implements Serializable {

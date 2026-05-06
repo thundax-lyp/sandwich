@@ -58,6 +58,8 @@
 
 ## 6. Hard Rules
 
+当前 Swagger 基线是 Springfox 2.x / Swagger 2 注解体系，Controller 分组继续使用 `@Api(tags = "...")`。`@Tag` 属于 OpenAPI 3 注解体系，只有完成 Swagger 技术栈升级后才能统一切换。新增或修改 Controller 时，`@Api.tags` 应使用稳定业务分组名，例如 `系统/当前用户`，不得使用数字排序前缀。
+
 | Rule ID | Scope | Constraint | Detection | Violation Message |
 | --- | --- | --- | --- | --- |
 | `ANNO_REST_CLASS_BASE_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | REST API 入口类必须声明 `@RestController` 或 `@WrappedApiController`，并声明类级 `@RequestMapping` | ArchUnit / review | `[ANNO_REST_CLASS_BASE_REQUIRED] <class> violates class base annotations required: <missingAnnotations>` |
@@ -68,14 +70,15 @@
 | `ANNO_REQUEST_BODY_VALID_REQUIRED` | REST API 方法中使用 `@RequestBody` 的 `*Request` 参数 | 必须同时声明 `@Valid` | ArchUnit / review | `[ANNO_REQUEST_BODY_VALID_REQUIRED] <class#method> violates request body Valid required: <parameterType>` |
 | `ANNO_REQUEST_MODEL_CLASS_REQUIRED` | `REQUEST_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_REQUEST_MODEL_CLASS_REQUIRED] <class> violates request class annotations required: <foundAnnotations>` |
 | `ANNO_RESPONSE_MODEL_CLASS_REQUIRED` | `RESPONSE_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_RESPONSE_MODEL_CLASS_REQUIRED] <class> violates response class annotations required: <foundAnnotations>` |
+| `ANNO_API_OPERATION_NOTES_REVIEW` | API 方法 `@ApiOperation.notes` | `notes` 应表达接口业务契约，不承载权限编码；权限口径由 `@HasPermission` 或 `@PublicApi` 表达 | review | `[ANNO_API_OPERATION_NOTES_REVIEW] <class#method> violates notes business contract review: <notes>` |
 | `ANNO_MODEL_FIELD_DESCRIPTION_REVIEW` | API Request / Response 字段 | 对外字段应声明 `@ApiModelProperty` 和稳定 JSON 字段名；当前作为人工审阅规则，不作为硬门禁 | review | `[ANNO_MODEL_FIELD_DESCRIPTION_REVIEW] <field> violates field description review: <foundAnnotations>` |
 
 ## 7. Minimal Matrix
 
 | Interface Type | Required | Forbidden |
 | --- | --- | --- |
-| Admin REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
-| Front REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler` |
+| Admin REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码 |
+| Front REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码 |
 | Request Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 | Response Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 

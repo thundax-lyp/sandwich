@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalInfoResponse", description = "个人信息响应")
+@ApiModel(value = "PersonalInfoResponse", description = "当前用户信息响应")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalInfoResponse implements Serializable {

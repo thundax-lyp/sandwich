@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalAvatarResponse", description = "个人头像响应")
+@ApiModel(value = "PersonalAvatarResponse", description = "当前用户头像响应")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalAvatarResponse implements Serializable {

@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(value = "PersonalMenuResponse", description = "个人菜单响应")
+@ApiModel(value = "PersonalMenuResponse", description = "当前用户菜单响应")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PersonalMenuResponse implements Serializable {

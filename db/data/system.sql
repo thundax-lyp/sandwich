@@ -87,6 +87,8 @@ INSERT INTO `sys_role` (
     `update_by` = VALUES(`update_by`),
     `del_flag` = VALUES(`del_flag`);
 
+-- Default navigation menus are permission-backed resources and must be seeded here.
+-- Dashboard is the login landing page, not a menu resource, so it is intentionally not inserted.
 INSERT INTO `sys_menu` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `perms`, `ranks`,
     `display_flag`, `display_params`, `url`, `target`, `priority`, `remarks`,

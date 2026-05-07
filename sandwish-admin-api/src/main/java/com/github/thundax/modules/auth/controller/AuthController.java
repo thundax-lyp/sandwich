@@ -251,7 +251,6 @@ public class AuthController {
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
         log.setRequestParams(AuthInterfaceAssembler.toLogJson(request));
-        log.setSignable(true);
         SysLogUtils.saveLog(log);
     }
 
@@ -266,7 +265,6 @@ public class AuthController {
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
         log.setRequestParams(AuthInterfaceAssembler.toLogJson(loginName));
-        log.setSignable(true);
         SysLogUtils.saveLog(log);
     }
 

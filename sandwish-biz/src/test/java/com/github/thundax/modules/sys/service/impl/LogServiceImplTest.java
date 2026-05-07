@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
@@ -23,7 +22,7 @@ public class LogServiceImplTest {
     @Test
     public void shouldIgnoreBlankId() {
         RecordingLogDao dao = new RecordingLogDao();
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
@@ -34,7 +33,7 @@ public class LogServiceImplTest {
         RecordingLogDao dao = new RecordingLogDao();
         Log expected = log("log-1");
         dao.getResult = expected;
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         assertSame(expected, service.getById(EntityId.of("log-1")));
 
@@ -56,7 +55,7 @@ public class LogServiceImplTest {
         query.setBeginDate(begin);
         query.setEndDate(end);
         PageDTO<Log> page = new PageDTO<>(2, 20, 100);
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         service.page(query, page);
 
@@ -79,7 +78,7 @@ public class LogServiceImplTest {
         PageDTO<Log> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         service.page((LogQuery) null, page);
 
@@ -88,28 +87,23 @@ public class LogServiceImplTest {
     }
 
     @Test
-    public void shouldPrepareAndSignLogBeforeSave() {
+    public void shouldPrepareLogBeforeSave() {
         RecordingLogDao dao = new RecordingLogDao();
-        RecordingSignService signService = new RecordingSignService();
         Log log = new Log();
-        log.setSignable(true);
         log.setType(LogType.EXCEPTION);
-        LogServiceImpl service = new LogServiceImpl(dao, signService);
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         service.add(log);
 
         assertNotNull(log.getId());
         assertEquals(null, log.getCreateDate());
         assertSame(log, dao.inserted);
-        assertEquals(Log.BEAN_NAME, signService.businessType);
-        assertEquals(log.getSignId(), signService.businessId);
-        assertEquals(log.getSignBody(), signService.body);
     }
 
     @Test
     public void shouldBatchInsertAndPrepareEveryLog() {
         RecordingLogDao dao = new RecordingLogDao();
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
         List<Log> logs = new ArrayList<>();
         for (int i = 0; i < 51; i++) {
             logs.add(new Log());
@@ -141,7 +135,7 @@ public class LogServiceImplTest {
         query.setRequestUri("/api");
         query.setBeginDate(begin);
         query.setEndDate(end);
-        LogServiceImpl service = new LogServiceImpl(dao, new RecordingSignService());
+        LogServiceImpl service = new LogServiceImpl(dao);
 
         service.batchDelete(query);
 
@@ -284,28 +278,5 @@ public class LogServiceImplTest {
             this.beginDate = beginDate;
             this.endDate = endDate;
         }
-    }
-
-    private static class RecordingSignService implements SignService {
-
-        private String businessType;
-        private String businessId;
-        private String body;
-
-        @Override
-        public Boolean sign(String businessType, String businessId, String body) {
-            this.businessType = businessType;
-            this.businessId = businessId;
-            this.body = body;
-            return true;
-        }
-
-        @Override
-        public Boolean verifySign(String businessType, String businessId, String body) {
-            return true;
-        }
-
-        @Override
-        public void deleteSign(String businessType, String businessId) {}
     }
 }

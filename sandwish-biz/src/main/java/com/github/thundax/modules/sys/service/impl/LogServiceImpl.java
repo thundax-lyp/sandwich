@@ -5,7 +5,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
@@ -22,11 +21,9 @@ public class LogServiceImpl implements LogService {
 
     private static final int BATCH_INSERT_SIZE = 50;
     private final LogDao dao;
-    private final SignService signService;
 
-    public LogServiceImpl(LogDao dao, SignService signService) {
+    public LogServiceImpl(LogDao dao) {
         this.dao = dao;
-        this.signService = signService;
     }
 
     @Override
@@ -75,10 +72,6 @@ public class LogServiceImpl implements LogService {
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(Log log) {
         log.setId(EntityIdCodec.toDomain(dao.insert(log)));
-
-        if (log.isSignable()) {
-            signService.sign(log.getSignName(), log.getSignId(), log.getSignBody());
-        }
         return log.getId();
     }
 

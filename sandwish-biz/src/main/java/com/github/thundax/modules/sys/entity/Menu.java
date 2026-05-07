@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.entity;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -13,7 +12,6 @@ import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -26,9 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
-    private static final String SIGN_NAME = "Menu";
-
+public class Menu implements Auditable, Sortable, Comparable<Menu> {
     private EntityId id;
 
     private EntityId parentId;
@@ -46,11 +42,6 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    @Override
-    public String getSignId() {
-        return EntityIdCodec.toValue(getId());
-    }
 
     public void setParentId(String parentId) {
         this.parentId = StringUtils.isBlank(parentId) ? null : EntityIdCodec.toDomain(parentId);
@@ -116,25 +107,6 @@ public class Menu implements Auditable, Signable, Sortable, Comparable<Menu> {
             return 1;
         }
         return left.compareTo(right);
-    }
-
-    @Override
-    public String getSignName() {
-        return SIGN_NAME;
-    }
-
-    @Override
-    public String getSignBody() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("name", this.getName());
-        map.put("parentId", EntityIdCodec.toValue(this.getParentId()));
-        map.put("perms", this.getPerms());
-        map.put("ranks", this.getRank().value());
-        map.put("display", this.isDisplay());
-        map.put("url", this.getUrl());
-        map.put("target", this.getTarget());
-
-        return JsonUtils.toJson(map);
     }
 
     public AccessRank getRank() {

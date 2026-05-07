@@ -7,7 +7,6 @@ import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -29,15 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao dao;
-    private final SignService signService;
 
     private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler = new PooledThreadLocal<>();
 
     private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
-    public RoleServiceImpl(RoleDao dao, SignService signService) {
+    public RoleServiceImpl(RoleDao dao) {
         this.dao = dao;
-        this.signService = signService;
     }
 
     public Role getById(EntityId id) {
@@ -92,7 +89,6 @@ public class RoleServiceImpl implements RoleService {
             dao.insertRoleMenu(EntityIdCodec.toValue(role.getId()), role.getMenuIdList());
         }
 
-        signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
         notifyCacheChanged();
     }
 
@@ -109,7 +105,6 @@ public class RoleServiceImpl implements RoleService {
                             .collect(Collectors.toList()));
         }
 
-        signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
         notifyCacheChanged();
     }
 
@@ -118,7 +113,6 @@ public class RoleServiceImpl implements RoleService {
     public int updateStatus(Role role) {
         int result = dao.updateStatus(role);
 
-        signService.sign(role.getSignName(), role.getSignId(), role.getSignBody());
         notifyCacheChanged();
 
         return result;
@@ -141,7 +135,6 @@ public class RoleServiceImpl implements RoleService {
         dao.deleteRoleUser(EntityIdCodec.toValue(id));
         int retVal = dao.deleteById(id);
 
-        signService.deleteSign(role.getSignName(), role.getSignId());
         notifyCacheChanged();
 
         return retVal;

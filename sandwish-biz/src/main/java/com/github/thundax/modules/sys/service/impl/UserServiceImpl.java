@@ -5,7 +5,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -29,17 +28,12 @@ public class UserServiceImpl implements UserService {
     private static final String LEGACY_SUPER_FLAG = "1";
 
     private final UserDao dao;
-    private final SignService signService;
     private final UserIdentityService userIdentityService;
     private final UserCredentialService userCredentialService;
 
     public UserServiceImpl(
-            UserDao dao,
-            SignService signService,
-            UserIdentityService userIdentityService,
-            UserCredentialService userCredentialService) {
+            UserDao dao, UserIdentityService userIdentityService, UserCredentialService userCredentialService) {
         this.dao = dao;
-        this.signService = signService;
         this.userIdentityService = userIdentityService;
         this.userCredentialService = userCredentialService;
     }
@@ -104,7 +98,6 @@ public class UserServiceImpl implements UserService {
                 dao.insertUserRole(EntityIdCodec.toValue(user.getId()), roleIdList);
             }
         }
-        signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         userIdentityService.updateAccountIdentity(user, loginName);
         if (added) {
             userCredentialService.upsertPassword(user, encryptedPassword);
@@ -114,11 +107,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateStatus(User user) {
-        int result = dao.updateStatus(user);
-
-        signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
-
-        return result;
+        return dao.updateStatus(user);
     }
 
     @Override
@@ -136,11 +125,7 @@ public class UserServiceImpl implements UserService {
 
         dao.deleteUserRole(EntityIdCodec.toValue(id));
 
-        int result = dao.deleteById(id);
-
-        signService.deleteSign(user.getSignName(), user.getSignId());
-
-        return result;
+        return dao.deleteById(id);
     }
 
     @Override

@@ -23,16 +23,13 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
 
     private static final String[] NON_AUTO_ID_DATA_OBJECTS = {
         "com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO",
-        "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO",
         "com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
     };
-    private static final String[] LEGACY_TABLE_NAME_DATA_OBJECTS = {
-        "com.github.thundax.modules.assist.persistence.dataobject.SignatureDO"
-    };
+    private static final String[] LEGACY_TABLE_NAME_DATA_OBJECTS = {};
 
     @Test
     public void shouldEnforceDatabaseDataObjectClassAnnotations() {

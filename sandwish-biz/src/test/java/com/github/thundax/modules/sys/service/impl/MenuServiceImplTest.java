@@ -9,7 +9,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
@@ -24,7 +23,7 @@ public class MenuServiceImplTest {
     @Test
     public void shouldIgnoreBlankId() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         assertEquals(null, service.getById((EntityId) null));
         assertEquals(0, dao.getCalls);
@@ -37,7 +36,7 @@ public class MenuServiceImplTest {
         query.setParentId("ROOT");
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(AccessRank.of(3));
-        MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.list(query);
 
@@ -49,7 +48,7 @@ public class MenuServiceImplTest {
     @Test
     public void shouldUseQueryForRankAndParentFilters() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         MenuQuery query = new MenuQuery();
         query.setParentId("parent-1");
@@ -66,7 +65,7 @@ public class MenuServiceImplTest {
         PageDTO<Menu> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
-        MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.page(new MenuQuery(), page);
 
@@ -76,33 +75,28 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldPrepareAndSignMenuBeforeInsert() {
+    public void shouldPrepareMenuBeforeInsert() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        RecordingSignService signService = new RecordingSignService();
         Menu menu = new Menu();
-        MenuServiceImpl service = new MenuServiceImpl(dao, signService);
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.add(menu);
 
         assertNotNull(menu.getId());
         assertEquals(null, menu.getCreateDate());
         assertSame(menu, dao.inserted);
-        assertEquals("Menu", signService.businessType);
-        assertEquals(menu.getSignId(), signService.businessId);
     }
 
     @Test
-    public void shouldPrepareAndSignMenuBeforeUpdate() {
+    public void shouldPrepareMenuBeforeUpdate() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        RecordingSignService signService = new RecordingSignService();
         Menu menu = menu("menu-1");
-        MenuServiceImpl service = new MenuServiceImpl(dao, signService);
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.update(menu);
 
         assertEquals(null, menu.getUpdateDate());
         assertSame(menu, dao.updated);
-        assertEquals("Menu", signService.businessType);
     }
 
     @Test
@@ -110,21 +104,19 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         Menu stored = menu("menu-1");
         dao.getResult = stored;
-        RecordingSignService signService = new RecordingSignService();
-        MenuServiceImpl service = new MenuServiceImpl(dao, signService);
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         int count = service.deleteById(EntityId.of("menu-1"));
 
         assertEquals(1, count);
         assertEquals("menu-1", dao.deletedMenuRoleId);
         assertEquals("menu-1", dao.deletedId);
-        assertEquals("Menu", signService.deletedBusinessType);
     }
 
     @Test
     public void shouldBatchUpdateDisplayFlag() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        MenuServiceImpl service = new MenuServiceImpl(dao, new RecordingSignService());
+        MenuServiceImpl service = new MenuServiceImpl(dao);
 
         int count = service.batchUpdateVisibility(Arrays.asList(menu("m1"), menu("m2")));
 
@@ -226,30 +218,6 @@ public class MenuServiceImplTest {
         @Override
         public void deleteMenuRole(String menuId) {
             this.deletedMenuRoleId = menuId;
-        }
-    }
-
-    private static class RecordingSignService implements SignService {
-
-        private String businessType;
-        private String businessId;
-        private String deletedBusinessType;
-
-        @Override
-        public Boolean sign(String businessType, String businessId, String body) {
-            this.businessType = businessType;
-            this.businessId = businessId;
-            return true;
-        }
-
-        @Override
-        public Boolean verifySign(String businessType, String businessId, String body) {
-            return true;
-        }
-
-        @Override
-        public void deleteSign(String businessType, String businessId) {
-            this.deletedBusinessType = businessType;
         }
     }
 }

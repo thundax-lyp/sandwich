@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
@@ -26,17 +25,14 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     private final UserIdentityService userIdentityService;
     private final UserIdentityDao userIdentityDao;
     private final UserCredentialDao userCredentialDao;
-    private final SignService signService;
 
     public UserCredentialServiceImpl(
             UserIdentityService userIdentityService,
             UserIdentityDao userIdentityDao,
-            UserCredentialDao userCredentialDao,
-            SignService signService) {
+            UserCredentialDao userCredentialDao) {
         this.userIdentityService = userIdentityService;
         this.userIdentityDao = userIdentityDao;
         this.userCredentialDao = userCredentialDao;
-        this.signService = signService;
     }
 
     @Override
@@ -53,7 +49,6 @@ public class UserCredentialServiceImpl implements UserCredentialService {
         if (user == null || user.getId() == null) {
             return;
         }
-        signService.sign(user.getSignName(), user.getSignId(), user.getSignBody());
         UserIdentity accountIdentity =
                 userIdentityService.updateAccountIdentity(user, userIdentityService.getAccountLoginName(user.getId()));
         upsertPasswordCredential(user, accountIdentity, encryptedPassword);

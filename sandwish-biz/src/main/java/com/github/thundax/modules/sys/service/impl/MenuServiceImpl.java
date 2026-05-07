@@ -7,7 +7,6 @@ import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -27,12 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuDao dao;
-    private final SignService signService;
 
     @Autowired
-    public MenuServiceImpl(MenuDao dao, SignService signService) {
+    public MenuServiceImpl(MenuDao dao) {
         this.dao = dao;
-        this.signService = signService;
     }
 
     public Menu getById(EntityId id) {
@@ -84,7 +81,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     private void afterWrite(Menu menu) {
-        signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
         notifyCacheChanged();
     }
 
@@ -92,7 +88,6 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public int updateVisibility(Menu menu) {
         int result = dao.updateVisibility(menu);
-        signService.sign(menu.getSignName(), menu.getSignId(), menu.getSignBody());
         notifyCacheChanged();
         return result;
     }
@@ -113,7 +108,6 @@ public class MenuServiceImpl implements MenuService {
 
         int retVal = dao.deleteById(bean.getId());
 
-        signService.deleteSign(bean.getSignName(), bean.getSignId());
         notifyCacheChanged();
 
         return retVal;

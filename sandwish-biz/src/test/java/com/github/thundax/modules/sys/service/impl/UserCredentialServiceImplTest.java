@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
@@ -42,9 +41,8 @@ public class UserCredentialServiceImplTest {
         UserIdentityService userIdentityService = mock(UserIdentityService.class);
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserCredentialDao userCredentialDao = mock(UserCredentialDao.class);
-        SignService signService = mock(SignService.class);
         UserCredentialServiceImpl service =
-                new UserCredentialServiceImpl(userIdentityService, userIdentityDao, userCredentialDao, signService);
+                new UserCredentialServiceImpl(userIdentityService, userIdentityDao, userCredentialDao);
         EntityId userId = EntityId.of("user-1");
         User user = new User();
         user.setId(userId);
@@ -60,12 +58,10 @@ public class UserCredentialServiceImplTest {
 
         assertEquals("encrypted-new", credential.getCredentialValue());
         verify(userCredentialDao).update(credential);
-        verify(signService).sign(user.getSignName(), user.getSignId(), user.getSignBody());
     }
 
     private UserCredentialServiceImpl newService(UserIdentityDao userIdentityDao, UserCredentialDao userCredentialDao) {
-        return new UserCredentialServiceImpl(
-                mock(UserIdentityService.class), userIdentityDao, userCredentialDao, mock(SignService.class));
+        return new UserCredentialServiceImpl(mock(UserIdentityService.class), userIdentityDao, userCredentialDao);
     }
 
     private UserIdentity accountIdentity(EntityId userId) {

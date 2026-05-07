@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.modules.assist.service.SignService;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -25,7 +24,7 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         RoleQuery query = new RoleQuery();
         query.setStatus(RoleStatus.ENABLED);
-        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.list(query);
 
@@ -35,7 +34,7 @@ public class RoleServiceImplTest {
     @Test
     public void shouldListEnabledRolesWithEnabledStatus() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.listEnabled();
 
@@ -48,7 +47,7 @@ public class RoleServiceImplTest {
         PageDTO<Role> page = new PageDTO<>();
         page.setPageNo(0);
         page.setPageSize(0);
-        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.page(new RoleQuery(), page);
 
@@ -58,12 +57,11 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    public void shouldSaveRoleMenusAndSign() {
+    public void shouldSaveRoleMenus() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        RecordingSignService signService = new RecordingSignService();
         Role role = new Role();
         role.setMenuIdList(Arrays.asList("m1", "m2"));
-        RoleServiceImpl service = new RoleServiceImpl(dao, signService);
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.add(role);
 
@@ -71,7 +69,6 @@ public class RoleServiceImplTest {
         assertSame(role, dao.inserted);
         assertEquals(EntityIdCodec.toValue(role.getId()), dao.deletedRoleMenuId);
         assertEquals(Arrays.asList("m1", "m2"), dao.menuIdList);
-        assertEquals(Role.BEAN_NAME, signService.businessType);
     }
 
     @Test
@@ -79,7 +76,7 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         Role role = role("role-1");
         role.setMenuIdList(Arrays.asList());
-        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.updateUserList(role, Arrays.asList(user("u1"), user("u2")));
 
@@ -91,7 +88,7 @@ public class RoleServiceImplTest {
     public void shouldDeleteRoleRelationsBeforeRole() {
         RecordingRoleDao dao = new RecordingRoleDao();
         dao.getResult = role("role-1");
-        RoleServiceImpl service = new RoleServiceImpl(dao, new RecordingSignService());
+        RoleServiceImpl service = new RoleServiceImpl(dao);
 
         int count = service.deleteById(EntityId.of("role-1"));
 
@@ -210,24 +207,5 @@ public class RoleServiceImplTest {
         public void insertRoleUser(String roleId, List<String> userIdList) {
             this.userIdList = userIdList;
         }
-    }
-
-    private static class RecordingSignService implements SignService {
-
-        private String businessType;
-
-        @Override
-        public Boolean sign(String businessType, String businessId, String body) {
-            this.businessType = businessType;
-            return true;
-        }
-
-        @Override
-        public Boolean verifySign(String businessType, String businessId, String body) {
-            return true;
-        }
-
-        @Override
-        public void deleteSign(String businessType, String businessId) {}
     }
 }

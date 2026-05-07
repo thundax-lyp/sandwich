@@ -1,30 +1,25 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role implements Auditable, Signable, Sortable {
+public class Role implements Auditable, Sortable {
     public static final String BEAN_NAME = "Role";
 
     private EntityId id;
@@ -39,11 +34,6 @@ public class Role implements Auditable, Signable, Sortable {
     private String updateUserId;
 
     private List<String> menuIdList;
-
-    @Override
-    public String getSignId() {
-        return EntityIdCodec.toValue(getId());
-    }
 
     public boolean isAdmin() {
         return RolePrivilege.ADMIN == getPrivilege();
@@ -70,24 +60,5 @@ public class Role implements Auditable, Signable, Sortable {
                 : menuList.stream()
                         .map(menu -> EntityIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getSignName() {
-        return BEAN_NAME;
-    }
-
-    @Override
-    public String getSignBody() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("name", this.getName());
-        map.put("admin", this.isAdmin());
-        map.put("enable", this.isEnable());
-
-        List<String> menuIds = new ArrayList<>(this.getMenuIdList());
-        menuIds.sort(StringUtils::compare);
-        map.put("menus", menuIds);
-
-        return JsonUtils.toJson(map);
     }
 }

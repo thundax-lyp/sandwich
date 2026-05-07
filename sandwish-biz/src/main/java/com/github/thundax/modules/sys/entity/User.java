@@ -1,17 +1,12 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Auditable;
-import com.github.thundax.common.domain.Signable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +20,7 @@ import org.springframework.lang.NonNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Auditable, Signable, Sortable {
+public class User implements Auditable, Sortable {
     public static final String BEAN_NAME = "User";
 
     private EntityId id;
@@ -47,11 +42,6 @@ public class User implements Auditable, Signable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    @Override
-    public String getSignId() {
-        return EntityIdCodec.toValue(getId());
-    }
-
     @NonNull
     public AccessRank getRank() {
         return rank == null ? AccessRank.of(null) : rank;
@@ -71,26 +61,5 @@ public class User implements Auditable, Signable, Sortable {
 
     public boolean isEnable() {
         return UserStatus.ENABLED == getStatus();
-    }
-
-    @Override
-    public String getSignName() {
-        return BEAN_NAME;
-    }
-
-    @Override
-    public String getSignBody() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("departmentId", this.getDepartmentId());
-        map.put("email", this.getEmail());
-        map.put("mobile", this.getMobile());
-        map.put("name", this.getName());
-        map.put("ranks", this.getRank().value());
-
-        map.put("super", this.isSuper());
-        map.put("admin", this.isAdmin());
-        map.put("enable", this.isEnable());
-
-        return JsonUtils.toJson(map);
     }
 }

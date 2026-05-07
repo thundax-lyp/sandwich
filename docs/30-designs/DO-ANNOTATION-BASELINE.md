@@ -10,23 +10,33 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 
 当前扫描结果：
 
-- DO 类总数：15
-- 数据库表映射 DO：12
+- DO 类总数：23
+- 数据库表映射 DO：20
 - Redis-only DO：3
 - DataObject 类：0
 
 数据库表映射 DO 当前为：
 
-- `com.github.thundax.modules.assist.persistence.dataobject.SignatureDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.OAuthAccessTokenDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.OAuthRefreshTokenDO`
 - `com.github.thundax.modules.member.persistence.dataobject.MemberDO`
+- `com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO`
+- `com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO`
 - `com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO`
 - `com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.DictDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.LogDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.MenuDO`
-- `com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.RoleDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.UserCredentialDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.UserDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.UserIdentityDO`
+- `com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO`
 
 Redis-only DO 当前为：
 

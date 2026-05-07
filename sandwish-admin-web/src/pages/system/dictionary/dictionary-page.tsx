@@ -24,7 +24,7 @@ import {
 import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
-import { hasPermission } from "../../../auth/permission-storage";
+import { hasPermission } from "@/auth/permission-storage";
 import {
     addDictionary,
     deleteDictionaries,

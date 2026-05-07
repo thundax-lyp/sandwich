@@ -1,12 +1,5 @@
-import { postJson } from "../../../api/http";
-
-export interface PageResponse<T> {
-    pageNo: number;
-    pageSize: number;
-    totalPage: number;
-    totalCount: number;
-    records: T[];
-}
+import { postJson } from "@/api/http";
+import type { PageResponse } from "@/api/page-response";
 
 export interface DictPageRequest {
     pageNo?: number;

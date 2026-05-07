@@ -9,12 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, Card, Form, Input, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
-import { hasPermission } from "../../../auth/permission-storage";
-import { listDepartments } from "../../../service/department-service";
-import type {
-    DepartmentListRequest,
-    DepartmentResponse
-} from "../../../service/department-service";
+import { hasPermission } from "@/auth/permission-storage";
+import { listDepartments } from "@/service/department-service";
+import type { DepartmentListRequest, DepartmentResponse } from "@/service/department-service";
 
 const { Text, Title } = Typography;
 

@@ -7,6 +7,11 @@ export default defineConfig(({ mode }) => {
 
     return {
         plugins: [react()],
+        resolve: {
+            alias: {
+                "@": "/src"
+            }
+        },
         test: {
             environment: "jsdom",
             globals: true,

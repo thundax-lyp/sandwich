@@ -44,7 +44,7 @@
 - `ADMIN_WEB_PATH_SHARED_COMPONENTS`：共享组件固定放在 `sandwish-admin-web/src/components/`。
 - `ADMIN_WEB_PATH_PAGE_SERVICE`：页面专属 service 固定放在页面目录，命名为 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-service.ts`。
 - `ADMIN_WEB_PATH_SHARED_SERVICE`：跨页面、跨布局或跨路由共享的 service 固定放在 `sandwish-admin-web/src/service/`。
-- `ADMIN_WEB_PATH_API_HELPER`：通用请求能力、响应包装解析、token header、base URL 和 API error 固定放在 `sandwish-admin-web/src/api/`。
+- `ADMIN_WEB_PATH_API_HELPER`：通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 固定放在 `sandwish-admin-web/src/api/`。
 - `ADMIN_WEB_PATH_AUTH`：token、权限和登录会话持久化固定放在 `sandwish-admin-web/src/auth/`。
 - `ADMIN_WEB_PATH_ROUTER`：路由表和路由保护固定放在 `sandwish-admin-web/src/router/`。
 - `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
@@ -60,6 +60,8 @@
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
 - `ADMIN_WEB_LAYER_ROUTER_NO_API_CALL`：`src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
+- `ADMIN_WEB_LAYER_ROOT_ALIAS`：跨根目录引用固定使用 `@/` alias，`@/` 固定指向 `sandwish-admin-web/src/`。
+- `ADMIN_WEB_LAYER_LOCAL_RELATIVE_IMPORT`：同一页面域内部引用固定使用相对路径，例如 page 引用同目录 service 使用 `./dictionary-service`，引用同目录组件使用 `./components/dictionary-editor-modal`。
 
 ### Naming & Placement
 
@@ -86,6 +88,7 @@
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
+- API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
 - 第三方库缺失类型声明、Vite 环境声明和全局前端扩展类型放在 `src/types/`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。
 - 页面专属样式可以暂时放在 `src/assets/main.css`，但 className 必须用页面域前缀隔离。

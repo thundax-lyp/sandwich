@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
 
     private final OAuthRefreshTokenMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public OAuthRefreshTokenDaoImpl(OAuthRefreshTokenMapper mapper) {
         this.mapper = mapper;
@@ -24,7 +26,7 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
 
     @Override
     public OAuthRefreshToken getById(EntityId id) {
-        return OAuthRefreshTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
+        return OAuthRefreshTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
     }
 
     @Override
@@ -46,7 +48,7 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
             String clientId, EntityId userId, OAuthRefreshTokenStatus status) {
         LambdaQueryWrapper<OAuthRefreshTokenDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OAuthRefreshTokenDO::getClientId, clientId);
-        wrapper.eq(OAuthRefreshTokenDO::getUserId, EntityIdCodec.toStringValue(userId));
+        wrapper.eq(OAuthRefreshTokenDO::getUserId, EntityIdCodec.toValue(userId));
         if (status != null) {
             wrapper.eq(OAuthRefreshTokenDO::getStatus, status.value());
         }
@@ -57,6 +59,7 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
     @Override
     public EntityId insert(OAuthRefreshToken refreshToken) {
         OAuthRefreshTokenDO dataObject = OAuthRefreshTokenPersistenceAssembler.toDataObject(refreshToken);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }

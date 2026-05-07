@@ -16,16 +16,16 @@ import lombok.Setter;
 @TableName("auth_session")
 public class AuthSessionDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String sessionId;
 
     private String token;
 
-    private String userId;
+    private Long userId;
 
-    private String identityId;
+    private Long identityId;
 
     private String identityType;
 

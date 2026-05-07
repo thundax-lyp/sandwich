@@ -33,11 +33,11 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
 
         OAuthAccessTokenDO dataObject = OAuthAccessTokenPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("4003", dataObject.getId());
+        assertEquals(Long.valueOf(4003L), dataObject.getId());
         assertEquals("token-id-1", dataObject.getTokenId());
         assertEquals("hash-1", dataObject.getTokenHash());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("1001", dataObject.getUserId());
+        assertEquals(Long.valueOf(1001L), dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals(issuedAt, dataObject.getIssuedAt());
         assertEquals(expireAt, dataObject.getExpireAt());
@@ -47,11 +47,11 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthAccessTokenDataObjectToEntity() {
         OAuthAccessTokenDO dataObject = new OAuthAccessTokenDO();
-        dataObject.setId("4003");
+        dataObject.setId(4003L);
         dataObject.setTokenId("token-id-1");
         dataObject.setTokenHash("hash-1");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId("1001");
+        dataObject.setUserId(1001L);
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setIssuedAt(new Date(1000L));
         dataObject.setExpireAt(new Date(2000L));

@@ -17,11 +17,11 @@ public final class AuthSessionPersistenceAssembler {
             return null;
         }
         AuthSessionDO dataObject = new AuthSessionDO();
-        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setSessionId(entity.getSessionId());
         dataObject.setToken(entity.getToken());
-        dataObject.setUserId(EntityIdCodec.toStringValue(entity.getUserId()));
-        dataObject.setIdentityId(EntityIdCodec.toStringValue(entity.getIdentityId()));
+        dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
+        dataObject.setIdentityId(EntityIdCodec.toValue(entity.getIdentityId()));
         dataObject.setIdentityType(identityTypeValue(entity.getIdentityType()));
         dataObject.setLoginType(entity.getLoginType());
         dataObject.setStatus(statusValue(entity.getStatus()));

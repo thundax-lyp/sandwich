@@ -24,7 +24,7 @@ public final class OAuthClientPersistenceAssembler {
             return null;
         }
         OAuthClientDO dataObject = new OAuthClientDO();
-        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setClientId(entity.getClientId());
         dataObject.setClientSecretHash(entity.getClientSecretHash());
         dataObject.setClientName(entity.getClientName());

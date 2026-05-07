@@ -16,8 +16,8 @@ import lombok.Setter;
 @TableName("auth_oauth_refresh_token")
 public class OAuthRefreshTokenDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String tokenId;
 
@@ -27,7 +27,7 @@ public class OAuthRefreshTokenDO {
 
     private String clientId;
 
-    private String userId;
+    private Long userId;
 
     private Date issuedAt;
 

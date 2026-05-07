@@ -34,10 +34,10 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
 
         OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("4002", dataObject.getId());
+        assertEquals(Long.valueOf(4002L), dataObject.getId());
         assertEquals("code-1", dataObject.getAuthorizationCode());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("1001", dataObject.getUserId());
+        assertEquals(Long.valueOf(1001L), dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals("state-1", dataObject.getState());
         assertEquals("challenge-1", dataObject.getCodeChallenge());
@@ -50,10 +50,10 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthAuthorizationDataObjectToEntity() {
         OAuthAuthorizationDO dataObject = new OAuthAuthorizationDO();
-        dataObject.setId("4002");
+        dataObject.setId(4002L);
         dataObject.setAuthorizationCode("code-1");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId("1001");
+        dataObject.setUserId(1001L);
         dataObject.setRedirectUri("http://127.0.0.1/callback");
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setExpireAt(new Date(2000L));

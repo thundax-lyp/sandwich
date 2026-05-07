@@ -40,7 +40,7 @@ public class OAuthClientPersistenceAssemblerTest {
 
         OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("4001", dataObject.getId());
+        assertEquals(Long.valueOf(4001L), dataObject.getId());
         assertEquals("admin-web", dataObject.getClientId());
         assertEquals("secret-hash", dataObject.getClientSecretHash());
         assertEquals("[\"authorization_code\",\"refresh_token\"]", dataObject.getGrantTypes());
@@ -58,7 +58,7 @@ public class OAuthClientPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthClientDataObjectToEntity() {
         OAuthClientDO dataObject = new OAuthClientDO();
-        dataObject.setId("4001");
+        dataObject.setId(4001L);
         dataObject.setClientId("admin-web");
         dataObject.setClientSecretHash("secret-hash");
         dataObject.setClientName("Admin Web");

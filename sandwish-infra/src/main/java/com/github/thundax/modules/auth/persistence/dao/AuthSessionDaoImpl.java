@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public class AuthSessionDaoImpl implements AuthSessionDao {
 
     private final AuthSessionMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public AuthSessionDaoImpl(AuthSessionMapper mapper) {
         this.mapper = mapper;
@@ -24,7 +26,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
 
     @Override
     public AuthSession getById(EntityId id) {
-        return AuthSessionPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
+        return AuthSessionPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
     }
 
     @Override
@@ -44,7 +46,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
     @Override
     public List<AuthSession> listByUserIdAndStatus(EntityId userId, AuthSessionStatus status) {
         LambdaQueryWrapper<AuthSessionDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AuthSessionDO::getUserId, EntityIdCodec.toStringValue(userId));
+        wrapper.eq(AuthSessionDO::getUserId, EntityIdCodec.toValue(userId));
         if (status != null) {
             wrapper.eq(AuthSessionDO::getStatus, status.value());
         }
@@ -55,6 +57,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
     @Override
     public EntityId insert(AuthSession authSession) {
         AuthSessionDO dataObject = AuthSessionPersistenceAssembler.toDataObject(authSession);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }

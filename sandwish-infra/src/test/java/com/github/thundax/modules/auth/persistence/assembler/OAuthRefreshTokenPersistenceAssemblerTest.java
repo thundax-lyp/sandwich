@@ -31,12 +31,12 @@ public class OAuthRefreshTokenPersistenceAssemblerTest {
 
         OAuthRefreshTokenDO dataObject = OAuthRefreshTokenPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("4004", dataObject.getId());
+        assertEquals(Long.valueOf(4004L), dataObject.getId());
         assertEquals("token-id-1", dataObject.getTokenId());
         assertEquals("hash-1", dataObject.getTokenHash());
         assertEquals("4003", dataObject.getAccessTokenId());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("1001", dataObject.getUserId());
+        assertEquals(Long.valueOf(1001L), dataObject.getUserId());
         assertEquals(issuedAt, dataObject.getIssuedAt());
         assertEquals(expireAt, dataObject.getExpireAt());
         assertEquals("ACTIVE", dataObject.getStatus());
@@ -45,12 +45,12 @@ public class OAuthRefreshTokenPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthRefreshTokenDataObjectToEntity() {
         OAuthRefreshTokenDO dataObject = new OAuthRefreshTokenDO();
-        dataObject.setId("4004");
+        dataObject.setId(4004L);
         dataObject.setTokenId("token-id-1");
         dataObject.setTokenHash("hash-1");
         dataObject.setAccessTokenId("4003");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId("1001");
+        dataObject.setUserId(1001L);
         dataObject.setIssuedAt(new Date(1000L));
         dataObject.setExpireAt(new Date(2000L));
         dataObject.setStatus("used");

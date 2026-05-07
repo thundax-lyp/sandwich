@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.OAuthAccessTokenDao;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.persistence.assembler.OAuthAccessTokenPersistenceAssembler;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 public class OAuthAccessTokenDaoImpl implements OAuthAccessTokenDao {
 
     private final OAuthAccessTokenMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public OAuthAccessTokenDaoImpl(OAuthAccessTokenMapper mapper) {
         this.mapper = mapper;
@@ -22,7 +24,7 @@ public class OAuthAccessTokenDaoImpl implements OAuthAccessTokenDao {
 
     @Override
     public OAuthAccessToken getById(EntityId id) {
-        return OAuthAccessTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
+        return OAuthAccessTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
     }
 
     @Override
@@ -42,6 +44,7 @@ public class OAuthAccessTokenDaoImpl implements OAuthAccessTokenDao {
     @Override
     public EntityId insert(OAuthAccessToken accessToken) {
         OAuthAccessTokenDO dataObject = OAuthAccessTokenPersistenceAssembler.toDataObject(accessToken);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }

@@ -16,8 +16,8 @@ import lombok.Setter;
 @TableName("auth_oauth_client")
 public class OAuthClientDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String clientId;
 

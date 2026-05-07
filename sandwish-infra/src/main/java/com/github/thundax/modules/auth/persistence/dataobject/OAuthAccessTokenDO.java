@@ -16,8 +16,8 @@ import lombok.Setter;
 @TableName("auth_oauth_access_token")
 public class OAuthAccessTokenDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String tokenId;
 
@@ -25,7 +25,7 @@ public class OAuthAccessTokenDO {
 
     private String clientId;
 
-    private String userId;
+    private Long userId;
 
     private String scopes;
 

@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-auth-infra`：改代码，迁移认证域 infra ID 类型
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/AuthSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthClientDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthAuthorizationDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthAccessTokenDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthRefreshTokenDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthSessionPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthClientPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthAuthorizationPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthAccessTokenPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthRefreshTokenPersistenceAssembler.java`
-  - 处理动作：将认证域 infra 层 DO 和 assembler ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-infra -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-code-storage-biz`：改代码，迁移存储域 biz ID 类型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StoredObject.java`

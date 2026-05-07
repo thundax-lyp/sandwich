@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.persistence.assembler.OAuthAuthorizationPersistenceAssembler;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
 
     private final OAuthAuthorizationMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public OAuthAuthorizationDaoImpl(OAuthAuthorizationMapper mapper) {
         this.mapper = mapper;
@@ -22,7 +24,7 @@ public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
 
     @Override
     public OAuthAuthorization getById(EntityId id) {
-        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
+        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
     }
 
     @Override
@@ -35,6 +37,7 @@ public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
     @Override
     public EntityId insert(OAuthAuthorization authorization) {
         OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(authorization);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }

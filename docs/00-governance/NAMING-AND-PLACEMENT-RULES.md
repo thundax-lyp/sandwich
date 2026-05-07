@@ -122,6 +122,8 @@
 - DAO / Mapper 查询、分页、过滤、排序优先下推到数据库
 - DTO 不写复杂业务流程
 - `PersistenceAssembler` 只做 `Entity <-> DO/DataObject` 字段转换，查询条件从 Service DTO 到持久化参数的拆解不回填到 `DO`
+- `CacheDTO` 默认只保存当前缓存对象自己的字段和关联对象 ID，例如 `departmentId`、`roleIds`、`parentId`；不默认嵌套 `DepartmentCacheDTO`、`RoleCacheDTO` 或其他关联对象快照。
+- `CacheDTO` 需要嵌套关联对象时，必须先确认读取收益、陈旧数据接受范围和缓存失效规则，不把普通对象图直接塞进远端缓存载体。
 
 ### Naming & Placement
 

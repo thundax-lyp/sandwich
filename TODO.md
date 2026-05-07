@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-doc-storage-db`：改文档，迁移存储数据库设计 ID 口径
-  - 范围文件：
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-  - 处理动作：将存储域数据库设计中的主键和关系字段调整为雪花 `Long` 口径。
-  - 验收点：`STORAGE-DATABASE-DESIGN.md` 不再声明 UUID 字符串主键默认规则。
-  - 重要度：9/10
-
 - [ ] `snowflake-doc-member-db`：改文档，迁移会员数据库设计 ID 口径
   - 范围文件：
     - `docs/20-database/MEMBER-DATABASE-DESIGN.md`

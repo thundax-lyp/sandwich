@@ -38,8 +38,10 @@
 - 数据库平台以当前项目实际配置为准。
 - 存储引擎优先使用 `InnoDB`。
 - 字符集优先使用 `utf8mb4`。
-- `StoredObjectDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- 独立数据库表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
+- 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `StoredObjectReferenceDO.fileId` 映射数据库列 `file_id`，由装配器转换为 `StoredObjectReference.objectId`。
+- `StoredObjectReferenceDO.fileId` 复用 `assist_storage.id`，引用关系表不单独生成关系 ID。
 - 对象公开生命周期可使用 `object_status` 表达。
 - DAO `deleteById` 使用数据库逻辑删除字段 `del_flag` 收口删除状态；`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
 - DAO get/list/page 查询固定追加 `del_flag = '0'` 条件。
@@ -107,7 +109,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `originalFilename` 是 Entity 派生字段，优先使用显式值，其次由 `name + extendName` 派生。
 - `contentType` 是 Entity 内容类型字段，优先使用显式值，并同步到 `mimeType`。
 - `storage_type` 通过 `StorageType.value()` 写入。
@@ -137,7 +139,7 @@
 
 字段规则：
 
-- `file_id` 来源是 `StoredObject.id`，不生成新 UUID。
+- `file_id` 来源是 `assist_storage.id`，不生成新主键。
 - 同一个对象允许被多个业务资源引用。
 - 引用关系唯一性固定由 `file_id + reference_owner_type + reference_owner_id` 表达。
 - `StoredObjectReferenceDO` 固定不包含创建时间、更新时间和逻辑删除字段。
@@ -175,7 +177,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `upload_id` 由 Service 生成，作为对外会话业务键。
 - `provider_upload_id` 只保存底层存储返回的会话标识，不作为 Sandwich 对外标识。
 - `upload_status` 只能写入 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
@@ -203,7 +205,8 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `upload_id` 来源是 `assist_storage_multipart_upload.upload_id`。
 - `part_number` 从 `1` 开始。
 - 同一 `upload_id` 内 `part_number` 不得重复。
 

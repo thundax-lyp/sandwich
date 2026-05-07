@@ -249,6 +249,9 @@
 
 `sys_dict` 保存系统字典项。
 
+系统枚举类字典固定作为 Java enum 的展示镜像，承载前端筛选、下拉、标签和说明展示所需的 `label`、`priority` 和 `remarks`。
+业务合法值校验仍以代码中的 Java enum 为准，`sys_dict` 不作为业务状态和值域的权威来源。
+
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
 | `id` | `id` | `id` | 是 | 字典项主键 |

@@ -263,6 +263,230 @@ INSERT INTO `sys_dict` (
     (
         'dict-user-status-disabled', 'user_status', '禁用', 'DISABLED', 1, '用户禁用状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-privilege-normal', 'user_privilege', '普通用户', 'NORMAL', 0, '后台普通用户权限',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-privilege-admin', 'user_privilege', '管理员', 'ADMIN', 1, '后台管理员权限',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-privilege-super', 'user_privilege', '超级管理员', 'SUPER', 2, '后台超级管理员权限',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-type-account', 'user_identity_type', '账号', 'ACCOUNT', 0, '账号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-type-mobile', 'user_identity_type', '手机号', 'MOBILE', 1, '手机号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-type-email', 'user_identity_type', '邮箱', 'EMAIL', 2, '邮箱登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-type-wecom', 'user_identity_type', '企业微信', 'WECOM', 3, '企业微信登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-type-github', 'user_identity_type', 'GitHub', 'GITHUB', 4, 'GitHub 登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-status-enabled', 'user_identity_status', '启用', 'ENABLED', 0, '登录标识启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-identity-status-disabled', 'user_identity_status', '禁用', 'DISABLED', 1, '登录标识禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-credential-type-password', 'user_credential_type', '密码', 'PASSWORD', 0, '密码认证凭据',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-credential-status-active', 'user_credential_status', '可用', 'ACTIVE', 0, '认证凭据可用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-credential-status-locked', 'user_credential_status', '锁定', 'LOCKED', 1, '认证凭据锁定状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-credential-status-expired', 'user_credential_status', '过期', 'EXPIRED', 2, '认证凭据过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-user-credential-status-disabled', 'user_credential_status', '禁用', 'DISABLED', 3, '认证凭据禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-role-status-enabled', 'role_status', '启用', 'ENABLED', 0, '角色启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-role-status-disabled', 'role_status', '禁用', 'DISABLED', 1, '角色禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-role-privilege-normal', 'role_privilege', '普通角色', 'NORMAL', 0, '普通角色权限',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-role-privilege-admin', 'role_privilege', '管理员角色', 'ADMIN', 1, '管理员角色权限',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-menu-visibility-visible', 'menu_visibility', '显示', 'VISIBLE', 0, '菜单显示状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-menu-visibility-hidden', 'menu_visibility', '隐藏', 'HIDDEN', 1, '菜单隐藏状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-log-type-access', 'log_type', '访问日志', 'ACCESS', 0, '系统访问日志',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-log-type-exception', 'log_type', '异常日志', 'EXCEPTION', 1, '系统异常日志',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-member-status-enabled', 'member_status', '启用', 'ENABLED', 0, '会员启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-member-status-disabled', 'member_status', '禁用', 'DISABLED', 1, '会员禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-auth-session-status-active', 'auth_session_status', '活跃', 'ACTIVE', 0, '认证会话活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-auth-session-status-logged-out', 'auth_session_status', '已登出', 'LOGGED_OUT', 1, '认证会话登出状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-auth-session-status-invalidated', 'auth_session_status', '已失效', 'INVALIDATED', 2, '认证会话失效状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-auth-session-status-expired', 'auth_session_status', '已过期', 'EXPIRED', 3, '认证会话过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-client-status-enabled', 'oauth_client_status', '启用', 'ENABLED', 0, 'OAuth2 客户端启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-client-status-disabled', 'oauth_client_status', '禁用', 'DISABLED', 1, 'OAuth2 客户端禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-access-token-status-active', 'oauth_access_token_status', '有效', 'ACTIVE', 0, 'OAuth2 访问令牌有效状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-access-token-status-revoked', 'oauth_access_token_status', '已撤销', 'REVOKED', 1, 'OAuth2 访问令牌撤销状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-access-token-status-expired', 'oauth_access_token_status', '已过期', 'EXPIRED', 2, 'OAuth2 访问令牌过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-refresh-token-status-active', 'oauth_refresh_token_status', '有效', 'ACTIVE', 0, 'OAuth2 刷新令牌有效状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-refresh-token-status-used', 'oauth_refresh_token_status', '已使用', 'USED', 1, 'OAuth2 刷新令牌已使用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-refresh-token-status-revoked', 'oauth_refresh_token_status', '已撤销', 'REVOKED', 2, 'OAuth2 刷新令牌撤销状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-oauth-refresh-token-status-expired', 'oauth_refresh_token_status', '已过期', 'EXPIRED', 3, 'OAuth2 刷新令牌过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-storage-type-local-file', 'storage_type', '本地文件', 'LOCAL_FILE', 0, '本地文件存储后端',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-storage-type-oss', 'storage_type', '对象存储', 'OSS', 1, '对象存储后端',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-storage-owner-type-user', 'storage_owner_type', '后台用户', 'USER', 0, '后台用户存储归属',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-storage-owner-type-member', 'storage_owner_type', '前台会员', 'MEMBER', 1, '前台会员存储归属',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-stored-object-status-active', 'stored_object_status', '可用', 'ACTIVE', 0, '存储对象可用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-stored-object-status-deleting', 'stored_object_status', '删除中', 'DELETING', 1, '存储对象删除中状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-stored-object-status-deleted', 'stored_object_status', '已删除', 'DELETED', 2, '存储对象已删除状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-stored-object-reference-status-unreferenced', 'stored_object_reference_status', '未引用', 'UNREFERENCED', 0, '存储对象未引用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-stored-object-reference-status-referenced', 'stored_object_reference_status', '已引用', 'REFERENCED', 1, '存储对象已引用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-multipart-upload-status-initiated', 'multipart_upload_status', '已初始化', 'INITIATED', 0, '分片上传初始化状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-multipart-upload-status-uploading', 'multipart_upload_status', '上传中', 'UPLOADING', 1, '分片上传进行中状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-multipart-upload-status-completed', 'multipart_upload_status', '已完成', 'COMPLETED', 2, '分片上传完成状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-multipart-upload-status-aborted', 'multipart_upload_status', '已中止', 'ABORTED', 3, '分片上传中止状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-async-task-status-idle', 'async_task_status', '空闲', 'IDLE', 0, '异步任务空闲状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-async-task-status-active', 'async_task_status', '执行中', 'ACTIVE', 1, '异步任务执行中状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-async-task-status-suspended', 'async_task_status', '已暂停', 'SUSPENDED', 2, '异步任务暂停状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-async-task-status-success', 'async_task_status', '成功', 'SUCCESS', 3, '异步任务成功状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        'dict-async-task-status-error', 'async_task_status', '失败', 'ERROR', 4, '异步任务失败状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     )
 ON DUPLICATE KEY UPDATE
     `type` = VALUES(`type`),

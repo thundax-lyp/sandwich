@@ -1,4 +1,4 @@
-package com.github.thundax.modules.member.service;
+package com.github.thundax.modules.member.support;
 
 public interface MemberAccessSupport {
 

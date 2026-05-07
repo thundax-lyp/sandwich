@@ -99,8 +99,8 @@
   - 范围文件：
     - `docs/30-designs/RUNBOOK-REMOVE-SIGNATURE-DESIGN.md`
     - `TODO.md`
-  - 处理动作：按 RUNBOOK 执行残留引用扫描、相关模块测试、全量 `mvn install` 和工作区状态检查。
-  - 验收点：`rg` 不再发现未审阅的 Signature 设计残留，相关测试和 `mvn install` 通过，`git status --short` 干净。
+  - 处理动作：按 RUNBOOK 执行残留引用扫描、相关模块测试、全量 `mvn install`、工作区状态检查，并删除本次 RUNBOOK。
+  - 验收点：`rg` 不再发现未审阅的 Signature 设计残留，相关测试和 `mvn install` 通过，`RUNBOOK-REMOVE-SIGNATURE-DESIGN.md` 已删除，`git status --short` 干净。
   - 重要度：9/10
 
 ## 待讨论项

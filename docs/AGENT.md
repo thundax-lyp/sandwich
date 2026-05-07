@@ -75,8 +75,13 @@
 - 任务收口、测试检查、文档同步、小步提交：
   读 `00-governance/TODO-RULES.md`
   再读 `00-governance/how-to/HOW-TO-CLOSE-A-TASK-WITH-TODO-TESTS-AND-COMMIT.md`
+- 一次性复杂任务执行手册、跨模块清理、迁移、删除、重构 RUNBOOK：
+  读 `00-governance/DOCUMENT-RULES.md`
+  再读 `00-governance/TODO-RULES.md`
+  产物固定使用 `docs/30-designs/RUNBOOK-*.md` 和精确到文件的 `TODO.md` 待审阅任务，最后一项通常清理 RUNBOOK 和现场
 - 新增或修改 `HOW-TO` 操作手册：
   读 `00-governance/how-to/HOW-TO-HOW-TO.md`
+  只有用户明确准许新增 `HOW-TO-*` 时才能创建
 - 专项方案、路线图、跨模块设计：
   按需读 `30-designs/`
 

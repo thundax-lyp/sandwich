@@ -53,8 +53,32 @@
 - 文件名不得使用空格
 - `HOW-TO` 文档固定放在 `docs/00-governance/how-to/`
 - `HOW-TO` 文档命名固定为 `HOW-TO-XXX.md`
+- `RUNBOOK` 文档固定放在 `docs/30-designs/`
+- `RUNBOOK` 文档命名固定为 `RUNBOOK-XXX.md`
 
-## 5. Language Rules
+## 5. RUNBOOK And HOW-TO Boundary
+
+`RUNBOOK` 和 `HOW-TO` 固定按用途区分。
+
+`RUNBOOK` 是一次性临时执行手册，用于某一个复杂任务的执行编排。`RUNBOOK` 固定服务于具体任务，不沉淀为长期通用流程。
+
+`RUNBOOK` 通常与一组 `TODO.md` 任务一起出现。伴随 `RUNBOOK` 出现的 `TODO.md` 任务一般精确到文件，并固定放在 `待审阅任务项`，经人工审阅后再执行。
+
+`RUNBOOK` 最后必须被清理。清理 `RUNBOOK` 通常作为伴随 `TODO.md` 任务的最后一项，和残留引用扫描、测试验证、文档收口、工作区状态检查一起完成。
+
+`RUNBOOK` 适用场景：
+
+- 跨模块删除、迁移或重构
+- 涉及代码、测试、文档和收口验证的一次性任务
+- 需要先固定执行顺序、范围边界和验收命令的复杂任务
+
+`HOW-TO` 是长期复用的操作手册，用于沉淀稳定、通用、可反复执行的方法。
+
+AI 不得自行新增 `HOW-TO-*` 文档。只有用户明确准许新增 `HOW-TO-*` 时，AI 才能创建或扩展 `HOW-TO` 文档。
+
+当任务目标是执行某个复杂清理、迁移或改造时，固定优先使用 `RUNBOOK-*`。当任务目标是沉淀长期通用流程，并且用户明确准许新增 `HOW-TO-*` 时，才使用 `HOW-TO-*`。
+
+## 6. Language Rules
 
 - 文档说明内容使用中文
 - 代码定义相关名称使用英文
@@ -72,7 +96,7 @@
 - 不为了“纯中文”而翻译代码概念
 - 不为了“纯英文”而把业务说明改成英文
 
-## 6. Content Principles
+## 7. Content Principles
 
 - 文档必须清晰、明确、可执行
 - 文档必须适合 AI 读取
@@ -88,7 +112,7 @@
 - `docs/50-prompts/` 只保存人工明确触发的生成提示词，不承载工程规则、业务需求或完成清单
 - `docs/60-human/` 只保存人类阅读材料、项目叙事和非实现约束材料，不承载 AI 默认执行规则
 
-## 7. Rule Expression Style
+## 8. Rule Expression Style
 
 - 使用确定性表达
 - 规约条目应该优先使用正向表达，直接说明代码、目录、依赖、接口或文档应该是什么
@@ -98,7 +122,7 @@
 - 需要固定的内容必须明确写成“固定”
 - `Open Items` 为空时明确写 `无`
 
-## 8. Structure Requirements
+## 9. Structure Requirements
 
 需求文档优先采用以下结构：
 
@@ -115,6 +139,14 @@
 
 治理与 `HOW-TO` 文档按对应入口文档要求编写。
 
+`RUNBOOK` 文档至少说明：
+
+- `Purpose`
+- `Scope`
+- `Execution Order`
+- `Verification`
+- `Open Items`
+
 治理文档至少说明：
 
 - `Purpose`
@@ -123,7 +155,7 @@
 - 与其他治理文档的边界
 - `Open Items`
 
-## 9. Cross-Document Linking Rules
+## 10. Cross-Document Linking Rules
 
 - `AGENTS.md` 只写仓库级入口规则。
 - `docs/AGENT.md` 负责 AI 文档加载路由。
@@ -134,7 +166,7 @@
 - 新增稳定规则时，必须同步对应入口文档中的导航关系。
 - 文档之间只链接直接下一级必读入口，不用索引式罗列无关文档。
 
-## 10. TODO And Commit Rules
+## 11. TODO And Commit Rules
 
 - `TODO.md` 是任务执行队列，不是完成清单。
 - 完成记录保留在 commit / PR 中。
@@ -142,6 +174,6 @@
 - 提交格式固定为 `Type(domain): 中文说明`。
 - 已完成 `TODO.md` 项必须删除、拆分或收窄，并与对应文档、代码或测试改动放在同一个 commit。
 
-## 11. Open Items
+## 12. Open Items
 
 无

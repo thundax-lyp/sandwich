@@ -13,8 +13,8 @@
 
 本文件采用二维结构：按 `Path/Layer/Naming` 组织规则，并按 `Hard Rules（门禁）` 与 `Review Rules（AI/人工审阅）` 分区。
 新增规则必须先完成分类归位：先判定 `Hard/Review`，再归入 `Path/Layer/Naming`，禁止新增未分类规则。
-`Hard Rules` 应优先具备 ESLint、TypeScript、测试或架构脚本门禁；暂时没有门禁但可稳定检查的规则可以先列入 Hard，并在后续补门禁。
-无法稳定门禁的语义判断固定放入 `Review Rules`。
+`Hard Rules` 必须能够通过 ESLint、TypeScript、测试或架构脚本稳定门禁。
+暂时没有门禁支撑的语义判断固定放入 `Review Rules`。
 
 ## Scope
 
@@ -41,10 +41,7 @@
 
 - `ADMIN_WEB_PATH_PAGE_SHAPE`：页面固定按 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-page.tsx` 放置。
 - `ADMIN_WEB_PATH_PAGE_COMPONENTS`：页面专属组件固定放在 `sandwish-admin-web/src/pages/<module>/<domain>/components/`。
-- `ADMIN_WEB_PATH_SHARED_COMPONENTS`：共享组件固定放在 `sandwish-admin-web/src/components/`。
 - `ADMIN_WEB_PATH_PAGE_SERVICE`：页面专属 service 固定放在页面目录，命名为 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-service.ts`。
-- `ADMIN_WEB_PATH_SHARED_SERVICE`：跨页面、跨布局或跨路由共享的 service 固定放在 `sandwish-admin-web/src/service/`。
-- `ADMIN_WEB_PATH_API_HELPER`：通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 固定放在 `sandwish-admin-web/src/api/`。
 - `ADMIN_WEB_PATH_AUTH`：token、权限和登录会话持久化固定放在 `sandwish-admin-web/src/auth/`。
 - `ADMIN_WEB_PATH_ROUTER`：路由表和路由保护固定放在 `sandwish-admin-web/src/router/`。
 - `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
@@ -55,13 +52,10 @@
 
 - `ADMIN_WEB_LAYER_PAGE_NO_FETCH`：`src/pages/` 下的页面和组件不得直接调用 `fetch`。
 - `ADMIN_WEB_LAYER_LAYOUT_NO_FETCH`：`src/layouts/` 下的布局不得直接调用 `fetch`。
-- `ADMIN_WEB_LAYER_PAGE_SERVICE_TO_API`：页面 service 可以调用 `src/api/http.ts`，但不直接处理 token、base URL 或响应包装通用规则。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE_SERVICE`：`src/components/` 下的共享组件不得导入页面目录中的 `*-service.ts`。
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
-- `ADMIN_WEB_LAYER_ROUTER_NO_API_CALL`：`src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
-- `ADMIN_WEB_LAYER_ROOT_ALIAS`：跨根目录引用固定使用 `@/` alias，`@/` 固定指向 `sandwish-admin-web/src/`。
-- `ADMIN_WEB_LAYER_LOCAL_RELATIVE_IMPORT`：同一页面域内部引用固定使用相对路径，例如 page 引用同目录 service 使用 `./dictionary-service`，引用同目录组件使用 `./components/dictionary-editor-modal`。
+- `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
 
 ### Naming & Placement
 
@@ -82,6 +76,8 @@
 - 页面目录只承载该页面域直接拥有的文件，不作为跨域共享目录。
 - 页面专属 service 不被其他页面域直接导入；如果出现跨页面复用，应先提升到 `src/service/`。
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
+- 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
+- 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
 - 只服务单个页面域的组件放在页面目录下的 `components/`。
 - 多个页面域复用的组件放在 `src/components/`。
 - 页面专属组件不得从其他页面域目录直接导入。
@@ -104,6 +100,9 @@
 - `auth` 负责 token、权限和登录会话持久化，不承载页面 UI。
 - `router` 负责路由表和路由保护，不承载页面业务交互。
 - `query` 负责 TanStack Query client 基线，不承载业务 query key 拼装策略之外的页面逻辑。
+- 页面 service 可以调用 `src/api/http.ts`，但不直接处理 token、base URL 或响应包装通用规则。
+- `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`，同目录或父级目录内引用可以使用 `./` 或 `../`。
+- `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - 共享组件不得依赖具体页面 service、路由路径、权限字符串或业务页面状态。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 - 权限字符串优先集中在页面或专门 helper 中，不在多个无关组件中重复散落。

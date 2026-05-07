@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `member_member` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `login_name` varchar(128) NOT NULL,
     `login_pass` varchar(255) DEFAULT NULL,
     `email` varchar(512) DEFAULT NULL,

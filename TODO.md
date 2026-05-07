@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-schema-member`：改 SQL，迁移会员 schema ID 类型
-  - 范围文件：
-    - `db/schema/member.sql`
-  - 处理动作：将会员域 schema 中主键和关系字段调整为雪花 `bigint`。
-  - 验收点：`db/schema/member.sql` 中会员主表不再使用 `varchar(64)` 主键。
-  - 重要度：9/10
-
 - [ ] `snowflake-sql-schema-audit`：改 SQL，复核 Audit schema ID 类型
   - 范围文件：
     - `db/schema/audit.sql`

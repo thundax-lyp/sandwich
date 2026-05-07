@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-db-agent`：改 SQL 入口，复核数据库脚本执行规则
-  - 范围文件：
-    - `db/AGENT.md`
-  - 处理动作：复核数据库脚本执行规则与雪花 ID 初始化顺序一致。
-  - 验收点：`db/AGENT.md` 不含 UUID 字符串主键初始化口径。
-  - 重要度：7/10
-
 - [ ] `snowflake-deploy-readme`：改部署说明，复核数据库初始化口径
   - 范围文件：
     - `deploy/sandwish-api/README.md`

@@ -15,6 +15,7 @@
 新增规则必须先完成分类归位：先判定 `Hard/Review`，再归入 `Path/Layer/Naming`，禁止新增未分类规则。
 `Hard Rules` 必须能够通过 ESLint、TypeScript、测试或架构脚本稳定门禁。
 暂时没有门禁支撑的语义判断固定放入 `Review Rules`。
+门禁报错信息必须包含本文件中的规则标签，例如 `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`。
 
 ## Scope
 
@@ -65,6 +66,7 @@
 - `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面专属类型文件固定命名为 `<domain>-types.ts`。
 - `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件固定使用 PascalCase named export。
 - `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
+- `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为，例如 `pageDictionaries`、`addDictionary`、`updateDictionary`、`deleteDictionaries`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
@@ -136,4 +138,3 @@
 
 - 是否把页面专属样式从 `src/assets/main.css` 拆到页面同目录，待页面数量和样式规模增长后再决策。
 - 是否为复杂页面固定引入 `<domain>-hooks.ts`，待出现重复且稳定的页面逻辑后再决策。
-- 是否为本文件中的 Hard Rules 补充专门的前端架构测试或 ESLint import 限制，待规则定稿后执行。

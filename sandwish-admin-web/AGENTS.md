@@ -14,6 +14,18 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 
 - For admin-web naming, placement, service ownership, frontend layering, and default forbidden directories, read:
     - `docs/00-governance/ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`
+- Treat this file as the `sandwish-admin-web` TypeScript architecture entry point.
+- Do not restate full naming, placement, or layer rules here. Keep the rule source in `ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`.
+
+## Architecture Gates
+
+- `npm run lint` is the first admin-web architecture gate.
+- `eslint-plugin-boundaries` enforces import direction and layer dependency rules that can be expressed as ESLint configuration.
+- ESLint core rules enforce simple syntactic gates, including deep relative import bans and page/layout direct `fetch` bans.
+- Local ESLint rules may enforce narrow project-specific naming checks when an existing package cannot express the rule cleanly.
+- ArchUnitTS is the backup architecture gate. Add it only when a rule is important, belongs in `Hard Rules`, and cannot be expressed clearly with ESLint or `eslint-plugin-boundaries`.
+- ESLint and ArchUnitTS violation messages should start with the corresponding rule id from `ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`, for example `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`.
+- Do not create a second admin-web architecture document unless the governance docs are intentionally reorganized first.
 
 ## Auth And Permission Rules
 

@@ -2,10 +2,14 @@ package com.github.thundax.modules.storage.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
+import com.github.thundax.modules.storage.controller.response.MultipartUploadPartResponse;
+import com.github.thundax.modules.storage.controller.response.MultipartUploadSessionResponse;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.controller.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
+import com.github.thundax.modules.storage.entity.MultipartUploadPart;
+import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
@@ -89,6 +93,38 @@ public final class StorageInterfaceAssembler {
         response.setId(businessType);
         response.setParentId("ROOT");
         response.setName(businessType);
+        return response;
+    }
+
+    @NonNull
+    public static MultipartUploadSessionResponse toMultipartSessionResponse(MultipartUploadSession entity) {
+        if (entity == null) {
+            return new MultipartUploadSessionResponse();
+        }
+        MultipartUploadSessionResponse response = new MultipartUploadSessionResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setUploadId(entity.getUploadId());
+        response.setUploadStatus(
+                entity.getUploadStatus() == null
+                        ? null
+                        : entity.getUploadStatus().value());
+        response.setUploadedPartCount(entity.getUploadedPartCount());
+        response.setCreateDate(entity.getCreateDate());
+        return response;
+    }
+
+    @NonNull
+    public static MultipartUploadPartResponse toMultipartPartResponse(MultipartUploadPart entity) {
+        if (entity == null) {
+            return new MultipartUploadPartResponse();
+        }
+        MultipartUploadPartResponse response = new MultipartUploadPartResponse();
+        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setUploadId(entity.getUploadId());
+        response.setPartNumber(entity.getPartNumber());
+        response.setEtag(entity.getEtag());
+        response.setSize(entity.getSize());
+        response.setCreateDate(entity.getCreateDate());
         return response;
     }
 }

@@ -41,11 +41,13 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/storage`
-  - 定义 `StoredObject`、`StoredObjectReference`、枚举、Storage Service、DAO interface 和查询对象。
+  - 定义 `StoredObject`、`StoredObjectReference`、`MultipartUploadSession`、`MultipartUploadPart`、枚举、Storage Service、Multipart Upload Service、DAO interface 和查询对象。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/storage`
   - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao`，并通过 `StoredObjectStore` 适配 `common-oss` 对象存储客户端。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java`
   - 提供后台上传、分页、内容读取、删除和引用管理接口。
+- `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/MultipartUploadController.java`
+  - 提供后台分片上传初始化、分片上传、完成和取消接口。
 - `sandwish-front-api`
   - 当前不提供前台 Storage Controller；前台业务需要文件能力时，通过业务 Service 复用 Storage Service，不复制后台上传入口。
 - `sandwish-admin-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
@@ -261,6 +263,7 @@ Storage 公开入口固定使用资源型路径。
 
 ### 8.6 分片上传
 
+- 分片上传流程由 `MultipartUploadService` 承载，不放入 `StorageService`。
 - 初始化分片上传时必须创建 `MultipartUploadSession`。
 - 一个分片上传会话必须由 `uploadId` 唯一标识。
 - 上传分片时必须校验会话存在且未完成、未取消。
@@ -302,13 +305,13 @@ Storage 公开入口固定使用资源型路径。
 
 ### 9.4 分片上传流程
 
-1. Controller 接收初始化分片上传请求。
-2. Service 创建 `MultipartUploadSession` 并初始化底层后端分片会话。
-3. Controller 按 `uploadId` 接收分片上传请求。
-4. Service 写入底层分片并记录 `MultipartUploadPart`。
-5. Controller 接收完成分片上传请求。
-6. Service 调用底层存储端口完成合并。
-7. Service 创建 `StoredObject` 并将会话状态改为 `COMPLETED`。
+1. `MultipartUploadController` 接收初始化分片上传请求。
+2. `MultipartUploadService` 创建 `MultipartUploadSession` 并初始化底层后端分片会话。
+3. `MultipartUploadController` 按 `uploadId` 接收分片上传请求。
+4. `MultipartUploadService` 写入底层分片并记录 `MultipartUploadPart`。
+5. `MultipartUploadController` 接收完成分片上传请求。
+6. `MultipartUploadService` 调用底层存储端口完成合并。
+7. `MultipartUploadService` 创建 `StoredObject` 并将会话状态改为 `COMPLETED`。
 
 ## 10. Non-Functional Requirements
 

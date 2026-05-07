@@ -32,7 +32,7 @@ import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
@@ -65,7 +65,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthServiceImpl implements AuthService {
+public class AdminAuthServiceImpl implements AdminAuthService {
 
     private static final int CAPTCHA_LENGTH = 4;
     private static final int SMS_VALIDATE_CODE_LENGTH = 6;
@@ -106,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired(required = false)
     private OAuthRefreshTokenDao oauthRefreshTokenDao;
 
-    public AuthServiceImpl(
+    public AdminAuthServiceImpl(
             AuthProperties properties,
             LoginProperties loginProperties,
             LoginFormDao loginFormDao,

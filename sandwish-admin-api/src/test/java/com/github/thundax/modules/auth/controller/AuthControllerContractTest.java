@@ -17,7 +17,7 @@ import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.LoginForm;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class AuthControllerContractTest {
 
     @Test
     public void shouldWrapLoginFormJsonResponseWithApiResponseAdvice() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
         when(authService.createLoginForm()).thenReturn(loginForm());
 
         mockMvc(authService)
@@ -58,7 +58,7 @@ public class AuthControllerContractTest {
         mockSysLogTemplate();
         Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
         String encryptedPassword = Sm2Helper.encrypt("plain-password", keyPair.getPublicKey());
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
         when(authService.validateCaptcha("login-token-1", "1234")).thenReturn(true);
         when(authService.getPrivateKey("login-token-1")).thenReturn(keyPair.getPrivateKey());
         when(authService.authenticatePassword("admin", "plain-password")).thenReturn(user());
@@ -78,7 +78,7 @@ public class AuthControllerContractTest {
 
     @Test
     public void shouldWrapLogoutJsonResponseWithApiResponseAdvice() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
         when(authService.getAccessToken("access-token-1")).thenReturn(accessToken("access-token-1", "mismatch"));
 
         mockMvc(authService)
@@ -94,7 +94,7 @@ public class AuthControllerContractTest {
 
     @Test
     public void shouldWrapTokenVerifyJsonResponseWithApiResponseAdvice() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
         when(authService.queryToken("access-token-1"))
                 .thenReturn(AuthTokenQueryResult.active("access-token-1", (AuthSession) null, user(), "admin"));
 
@@ -113,7 +113,7 @@ public class AuthControllerContractTest {
         assertTrue(AuthController.class.isAnnotationPresent(WrappedApiController.class));
     }
 
-    private MockMvc mockMvc(AuthService authService) {
+    private MockMvc mockMvc(AdminAuthService authService) {
         return MockMvcBuilders.standaloneSetup(new AuthController(authService))
                 .setControllerAdvice(advice)
                 .build();

@@ -11,7 +11,7 @@ import com.github.thundax.modules.assist.controller.request.KeypairPublicKeyRequ
 import com.github.thundax.modules.assist.controller.response.KeypairPublicKeyResponse;
 import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import io.swagger.annotations.Api;
@@ -31,11 +31,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @WrappedApiController
 public class KeypairController {
 
-    private final AuthService authService;
+    private final AdminAuthService authService;
     private final KeypairService keypairService;
 
     @Autowired
-    public KeypairController(AuthService authService, KeypairService keypairService) {
+    public KeypairController(AdminAuthService authService, KeypairService keypairService) {
 
         this.authService = authService;
         this.keypairService = keypairService;

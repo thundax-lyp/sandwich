@@ -109,6 +109,7 @@
 - 后台专用入口不放到 `sandwish-front-api`
 - 前台专用入口不放到 `sandwish-admin-api`
 - 前后台复用业务不复制到两个 API 入口模块
+- 除入口专用认证编排 Service 外，其他 Service interface 和 Service implementation 应归属 `sandwish-biz`；后台登录编排命名为 `AdminAuthService`，前台会员登录编排命名为 `MemberAuthService`
 - 无业务语义的通用能力才进入 `sandwish-common`
 - `persistence` 包段固定保留，用于区分业务侧 DAO interface 与 infra 侧持久化实现
 

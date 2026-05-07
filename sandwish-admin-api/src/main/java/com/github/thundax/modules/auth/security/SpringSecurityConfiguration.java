@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.security;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
@@ -26,14 +26,14 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final SandwishProperties properties;
-    private final AuthService authService;
+    private final AdminAuthService authService;
     private final PermissionService permissionService;
     private final UserService userService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     public SpringSecurityConfiguration(
             SandwishProperties properties,
-            AuthService authService,
+            AdminAuthService authService,
             PermissionService permissionService,
             UserService userService,
             RequestMappingHandlerMapping requestMappingHandlerMapping) {

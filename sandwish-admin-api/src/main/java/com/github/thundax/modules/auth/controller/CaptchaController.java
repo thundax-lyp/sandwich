@@ -7,7 +7,7 @@ import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.controller.response.CaptchaRefreshResponse;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.awt.Color;
@@ -50,10 +50,10 @@ public class CaptchaController {
     private static final int NOISE_LINE_COUNT = 12;
     private static final int MAX_COLOR = 255;
 
-    private final AuthService authService;
+    private final AdminAuthService authService;
 
     @Autowired
-    public CaptchaController(AuthService authService) {
+    public CaptchaController(AdminAuthService authService) {
 
         this.authService = authService;
     }

@@ -17,7 +17,7 @@ import com.github.thundax.modules.sys.entity.User;
 import java.util.List;
 import org.springframework.lang.NonNull;
 
-public interface AuthService {
+public interface AdminAuthService {
 
     LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException;
 

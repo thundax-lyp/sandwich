@@ -31,10 +31,10 @@ import com.github.thundax.modules.auth.entity.enums.OAuthAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
-import com.github.thundax.modules.auth.service.impl.AuthServiceImpl;
+import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -90,7 +90,7 @@ public class AuthPermissionLifecycleTest {
     private TestAuthSessionDao authSessionDao;
     private TestAuthSessionRuntimeDao authSessionRuntimeDao;
     private InMemoryLoginFormDaoImpl loginFormDao;
-    private AuthService authService;
+    private AdminAuthService authService;
     private PermissionService permissionService;
 
     @Before
@@ -117,7 +117,7 @@ public class AuthPermissionLifecycleTest {
                         new PlainPasswordService(),
                         new TestUserCredentialService(),
                         userIdentityService));
-        authService = new AuthServiceImpl(
+        authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
                 loginFormDao,
@@ -456,8 +456,8 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private void inject(AuthService target, String fieldName, Object value) throws Exception {
-        Field field = AuthServiceImpl.class.getDeclaredField(fieldName);
+    private void inject(AdminAuthService target, String fieldName, Object value) throws Exception {
+        Field field = AdminAuthServiceImpl.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(target, value);
     }

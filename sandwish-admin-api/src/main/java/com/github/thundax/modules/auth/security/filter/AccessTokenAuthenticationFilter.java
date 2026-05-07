@@ -6,7 +6,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PermissionSession;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
@@ -38,13 +38,13 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludePatternList = new ArrayList<>();
 
-    private final AuthService authService;
+    private final AdminAuthService authService;
     private final PermissionService permissionService;
     private final UserService userService;
 
     public AccessTokenAuthenticationFilter(
             SandwishProperties.AccessTokenFilterProperties properties,
-            AuthService authService,
+            AdminAuthService authService,
             PermissionService permissionService,
             UserService userService) {
         this(properties.getExcludePath(), authService, permissionService, userService);
@@ -52,7 +52,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
     public AccessTokenAuthenticationFilter(
             List<String> excludePaths,
-            AuthService authService,
+            AdminAuthService authService,
             PermissionService permissionService,
             UserService userService) {
         this.excludePatternList.addAll(excludePaths);

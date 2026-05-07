@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,7 +27,7 @@ public class CaptchaControllerContractTest {
 
     @Test
     public void shouldWrapRefreshCaptchaJsonResponseWithApiResponseAdvice() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
 
         mockMvc(authService)
                 .perform(post("/api/auth/captcha/refresh")
@@ -42,7 +42,7 @@ public class CaptchaControllerContractTest {
 
     @Test
     public void shouldUseJsonUtf8ForCaptchaErrorResponse() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
 
         mockMvc(authService)
                 .perform(get("/api/auth/captcha"))
@@ -53,7 +53,7 @@ public class CaptchaControllerContractTest {
 
     @Test
     public void shouldKeepCaptchaImageResponseUnwrapped() throws Exception {
-        AuthService authService = mock(AuthService.class);
+        AdminAuthService authService = mock(AdminAuthService.class);
         when(authService.getCaptcha("login-token-1")).thenReturn("1234");
 
         MvcResult result = mockMvc(authService)
@@ -74,7 +74,7 @@ public class CaptchaControllerContractTest {
         assertEquals('G', body[3]);
     }
 
-    private MockMvc mockMvc(AuthService authService) {
+    private MockMvc mockMvc(AdminAuthService authService) {
         return MockMvcBuilders.standaloneSetup(new CaptchaController(authService))
                 .setControllerAdvice(advice)
                 .build();

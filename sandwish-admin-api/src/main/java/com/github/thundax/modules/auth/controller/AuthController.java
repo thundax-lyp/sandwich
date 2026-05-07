@@ -30,7 +30,7 @@ import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
-import com.github.thundax.modules.auth.service.AuthService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
@@ -58,10 +58,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @PublicApi
 public class AuthController {
 
-    private final AuthService authService;
+    private final AdminAuthService authService;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AdminAuthService authService) {
 
         this.authService = authService;
     }

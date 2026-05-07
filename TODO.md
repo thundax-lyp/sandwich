@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-data-storage`：改 SQL，迁移存储初始化 ID
-  - 范围文件：
-    - `db/data/storage.sql`
-  - 处理动作：将存储初始化数据中的固定 ID 调整为固定雪花 ID。
-  - 验收点：`db/data/storage.sql` 不再使用字符串数据库主键。
-  - 重要度：8/10
-
 - [ ] `snowflake-sql-data-member`：改 SQL，迁移会员初始化 ID
   - 范围文件：
     - `db/data/member.sql`

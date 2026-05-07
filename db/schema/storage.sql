@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `assist_storage` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `name` varchar(255) NOT NULL,
     `extend_name` varchar(64) DEFAULT NULL,
     `mime_type` varchar(128) DEFAULT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一存储对象主数据表';
 
 CREATE TABLE IF NOT EXISTS `assist_storage_business` (
-    `file_id` varchar(64) NOT NULL,
+    `file_id` bigint NOT NULL,
     `reference_owner_id` varchar(64) NOT NULL,
     `reference_owner_type` varchar(64) NOT NULL,
     `business_params` varchar(1024) DEFAULT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage_business` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='存储对象引用关系表';
 
 CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `upload_id` varchar(64) NOT NULL,
     `owner_id` varchar(64) NOT NULL,
     `owner_type` varchar(64) NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分片上传会话表';
 
 CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload_part` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `upload_id` varchar(64) NOT NULL,
     `part_number` int NOT NULL,
     `etag` varchar(128) NOT NULL,

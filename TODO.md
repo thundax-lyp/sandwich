@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-schema-audit`：改 SQL，复核 Audit schema ID 类型
-  - 范围文件：
-    - `db/schema/audit.sql`
-  - 处理动作：复核 Audit schema 中 `id` / `meta_id` 为 `bigint`，`object_id` 为字符串。
-  - 验收点：`db/schema/audit.sql` 与全局雪花 ID 规则一致。
-  - 重要度：8/10
-
 - [ ] `snowflake-sql-data-system`：改 SQL，迁移系统管理初始化 ID
   - 范围文件：
     - `db/data/system.sql`

@@ -11,13 +11,13 @@
 当前覆盖范围：
 
 - 前台会员主体 `Member`
+- 会员登录标识 `MemberIdentity`
+- 会员认证凭据 `MemberCredential`
 - 会员姓名、性别和基础业务状态
 - 会员生命周期状态
 
 当前不覆盖范围：
 
-- 会员登录标识和认证凭据
-- 会员联系方式登录标识
 - 会员注册与登录行为字段
 - 会员地址、邮编等私密资料
 - 会员 OAuth / 第三方身份绑定
@@ -40,6 +40,8 @@
 ## 5. Core Business Objects
 
 - `Member`：前台会员主体。
+- `MemberIdentity`：前台会员登录标识，支持账号、手机号和邮箱。
+- `MemberCredential`：前台会员认证凭据，首轮支持密码凭据。
 - `MemberGender`：会员性别，固定表达男、女和保密。
 - `MemberStatus`：会员生命周期状态，固定表达待激活、活跃、暂停和关闭。
 - `MemberSecurityContext`：前台会员运行时身份上下文。
@@ -50,11 +52,15 @@
 - 会员数据库表使用 `member_` 业务域前缀。
 - 会员身份上下文不得与后台 `UserAccessHolder` 混用。
 - `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
+- `MemberIdentity(identityType, identityValue)` 必须全局唯一。
+- `MemberCredential` 不得保存明文密码。
 
 ## 7. Functional Requirements
 
 - 系统可以保存会员姓名、性别、生命周期状态、排序值和备注。
 - 系统可以维护会员生命周期状态。
+- 系统可以保存账号、手机号和邮箱三类会员登录标识。
+- 系统可以维护会员密码凭据、失败次数、锁定、过期和最近验证时间。
 - 系统可以分页查询会员列表。
 
 ## 8. Key Flows

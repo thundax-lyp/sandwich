@@ -9,25 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-identity-credential-infra`：新增会员登录标识和凭据持久化
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberIdentityDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberCredentialDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberIdentityMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberCredentialMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberIdentityPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberCredentialPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberIdentityDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberCredentialDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/assembler/MemberIdentityPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/assembler/MemberCredentialPersistenceAssemblerTest.java`
-    - `db/schema/member.sql`
-    - `db/data/system.sql`
-    - `docs/20-database/MEMBER-DATABASE-DESIGN.md`
-  - 处理动作：新增 `member_identity` 和 `member_credential` 的 DO、Mapper、DAO、转换、schema、字典和数据库设计。
-  - 验收点：`member_identity(identity_type, identity_value)` 全局唯一，`member_credential(identity_id, credential_type)` 全局唯一，敏感凭据不保存明文。
-  - 重要度：10/10
-
 - [ ] `member-login-form`：新增前台会员登录表单运行态
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberLoginForm.java`

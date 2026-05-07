@@ -385,6 +385,46 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
+        1000000000000002064, 'member_identity_type', '账号', 'ACCOUNT', 0, '会员账号标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002065, 'member_identity_type', '手机号', 'MOBILE', 1, '会员手机号标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002066, 'member_identity_type', '邮箱', 'EMAIL', 2, '会员邮箱标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002067, 'member_identity_status', '启用', 'ENABLED', 0, '会员标识启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002068, 'member_identity_status', '禁用', 'DISABLED', 1, '会员标识禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002069, 'member_credential_type', '密码', 'PASSWORD', 0, '会员密码凭据',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002070, 'member_credential_status', '活跃', 'ACTIVE', 0, '会员凭据活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002071, 'member_credential_status', '锁定', 'LOCKED', 1, '会员凭据锁定状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002072, 'member_credential_status', '过期', 'EXPIRED', 2, '会员凭据过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002073, 'member_credential_status', '禁用', 'DISABLED', 3, '会员凭据禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
         1000000000000002028, 'auth_session_status', '活跃', 'ACTIVE', 0, '认证会话活跃状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),

@@ -1,0 +1,48 @@
+package com.github.thundax.modules.auth.entity.enums;
+
+import com.github.thundax.common.exception.BizException;
+import java.util.Arrays;
+
+public enum PrincipalCredentialType {
+    USER_PASSWORD(PrincipalType.USER, "PASSWORD"),
+    MEMBER_PASSWORD(PrincipalType.MEMBER, "PASSWORD");
+
+    private final PrincipalType principalType;
+    private final String credentialName;
+
+    PrincipalCredentialType(PrincipalType principalType, String credentialName) {
+        this.principalType = principalType;
+        this.credentialName = credentialName;
+    }
+
+    public String value() {
+        return name();
+    }
+
+    public PrincipalType principalType() {
+        return principalType;
+    }
+
+    public String credentialName() {
+        return credentialName;
+    }
+
+    public boolean isUserCredential() {
+        return PrincipalType.USER == principalType;
+    }
+
+    public boolean isMemberCredential() {
+        return PrincipalType.MEMBER == principalType;
+    }
+
+    public boolean isPassword() {
+        return "PASSWORD".equals(credentialName);
+    }
+
+    public static PrincipalCredentialType from(String value) {
+        return Arrays.stream(values())
+                .filter(item -> item.name().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new BizException("Unknown principal credential type: " + value));
+    }
+}

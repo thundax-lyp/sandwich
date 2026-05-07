@@ -1,0 +1,31 @@
+package com.github.thundax.modules.auth.entity.valueobject;
+
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+public class PrincipalKey {
+    private PrincipalType principalType;
+    private EntityId principalId;
+
+    public static PrincipalKey of(PrincipalType principalType, EntityId principalId) {
+        return new PrincipalKey(principalType, principalId);
+    }
+
+    public boolean isUser() {
+        return PrincipalType.USER == principalType;
+    }
+
+    public boolean isMember() {
+        return PrincipalType.MEMBER == principalType;
+    }
+}

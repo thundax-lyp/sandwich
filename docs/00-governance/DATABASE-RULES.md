@@ -64,15 +64,15 @@
 
 ## Primary Key Rules
 
-- 独立数据库表的 `DO/DataObject` 主键字段固定命名为 `id`，Java 类型固定为 `String`。
-- 独立数据库表的 `DO/DataObject.id` 固定使用 `@TableId(type = IdType.ASSIGN_UUID)`，主键由 MyBatis-Plus 持久化层生成。
-- 明确采用雪花 ID 策略的新业务域，数据库主键固定使用 `bigint`，`DO/DataObject.id` Java 类型固定为 `Long`，主键由业务域对应 ID 生成能力生成。
-- 采用雪花 ID 策略的业务域必须在对应数据库设计文档中明确主键生成规则。
+- 独立数据库表的主键字段固定命名为 `id`，数据库类型固定为 `bigint`。
+- 独立数据库表的 `DO/DataObject` 主键字段固定命名为 `id`，Java 类型固定为 `Long`。
+- 独立数据库表的 `DO/DataObject.id` 固定使用 `@TableId(type = IdType.INPUT)`。
+- 独立数据库表的主键固定由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - DAO `insert` 方法返回持久化后的主键；Service 在 `insert` 后负责把返回主键回填到业务 `Entity`，再继续编排关系表、签名、缓存或响应数据。
 - Service 和 Entity 不负责为数据库主表生成 `id`。
 - 共享主键表、外部业务键主键表、关系表和非数据库 DO 不适用自动主键生成规则；这类表必须显式说明主键来源，并按来源使用 `IdType.INPUT` 或不声明 `@TableId`。
 - 共享主键表的 DO 字段名必须表达主键来源，例如用户扩展表使用 `userId`，存储业务绑定表使用 `storageId`；不得为了复用数据库列名在 DO 中继续声明泛化 `id` 字段。
-- 共享主键表不得用 `ASSIGN_UUID` 生成新主键，避免破坏与主对象的主键一致性。
+- 共享主键表固定复用来源主键，不生成新主键，避免破坏与主对象的主键一致性。
 
 ## Relationship Rules
 

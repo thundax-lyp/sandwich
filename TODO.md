@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-doc-governance`：改文档，固定全局雪花 ID 治理规则
-  - 范围文件：
-    - `docs/00-governance/UNIFIED-ID-DESIGN.md`
-    - `docs/00-governance/DATABASE-RULES.md`
-  - 处理动作：将数据库主键、领域标识、业务编号和 `AuditObjectRef.objectId` 的边界调整为雪花 ID 口径。
-  - 验收点：治理文档明确独立表主键使用雪花 `Long`，`AuditObjectRef.objectId` 仍使用 `String`。
-  - 重要度：10/10
-
 - [ ] `snowflake-doc-system-db`：改文档，迁移系统管理数据库设计 ID 口径
   - 范围文件：
     - `docs/20-database/SYSTEM-DATABASE-DESIGN.md`

@@ -160,8 +160,6 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 ### 6.7 Cache Rule
 
-前台 session cache 固定通过 `MemberSecurityContext` 访问。
-
 后台业务缓存不得把当前用户或 token 隐式藏在全局 key 中；如果缓存内容与当前用户有关，缓存 key 必须显式表达用户维度。
 
 ## 7. Review Checklist
@@ -183,7 +181,7 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 - 在 Service 中直接接收 `HttpServletRequest`
 - 在 DAO / Mapper 中解析 token 或 session
 - 异步任务中直接读取当前线程上下文
-- 登出只清理 Spring Security，不失效 session
+- 前台登出只清理 Spring Security，不撤销 access token
 - 手工设置 `PooledThreadLocal` 后没有清理
 
 ## 9. Open Items

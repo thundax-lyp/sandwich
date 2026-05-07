@@ -12,27 +12,30 @@ import org.apache.ibatis.type.MappedJdbcTypes;
 import org.apache.ibatis.type.MappedTypes;
 
 @MappedTypes(EntityId.class)
-@MappedJdbcTypes(JdbcType.VARCHAR)
+@MappedJdbcTypes(JdbcType.BIGINT)
 public class EntityIdTypeHandler extends BaseTypeHandler<EntityId> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, EntityId parameter, JdbcType jdbcType)
             throws SQLException {
-        ps.setString(i, EntityIdCodec.toValue(parameter));
+        ps.setLong(i, EntityIdCodec.toValue(parameter));
     }
 
     @Override
     public EntityId getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return EntityIdCodec.toDomain(rs.getString(columnName));
+        long value = rs.getLong(columnName);
+        return rs.wasNull() ? null : EntityIdCodec.toDomain(value);
     }
 
     @Override
     public EntityId getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return EntityIdCodec.toDomain(rs.getString(columnIndex));
+        long value = rs.getLong(columnIndex);
+        return rs.wasNull() ? null : EntityIdCodec.toDomain(value);
     }
 
     @Override
     public EntityId getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return EntityIdCodec.toDomain(cs.getString(columnIndex));
+        long value = cs.getLong(columnIndex);
+        return cs.wasNull() ? null : EntityIdCodec.toDomain(value);
     }
 }

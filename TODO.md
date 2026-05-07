@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-mybatis-typehandler`：改代码，迁移 MyBatis ID 类型处理
-  - 范围文件：
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/typehandler/EntityIdTypeHandler.java`
-    - `sandwish-common/sandwish-common-mybatis/src/test/java/com/github/thundax/common/mybatis/typehandler/EntityIdTypeHandlerTest.java`
-  - 处理动作：将 MyBatis `EntityId` 类型处理与雪花 `Long` 主键口径对齐。
-  - 验收点：`mvn -pl sandwish-common-mybatis -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-code-sys-biz`：改代码，迁移系统管理域 biz ID 类型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserDao.java`

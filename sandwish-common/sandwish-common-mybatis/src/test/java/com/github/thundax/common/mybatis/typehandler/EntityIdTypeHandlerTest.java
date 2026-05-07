@@ -18,42 +18,46 @@ public class EntityIdTypeHandlerTest {
     private final EntityIdTypeHandler typeHandler = new EntityIdTypeHandler();
 
     @Test
-    public void shouldWriteEntityIdAsString() throws Exception {
+    public void shouldWriteEntityIdAsLong() throws Exception {
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
 
-        typeHandler.setNonNullParameter(preparedStatement, 1, EntityId.of("user-1"), JdbcType.VARCHAR);
+        typeHandler.setNonNullParameter(preparedStatement, 1, EntityId.of(1001L), JdbcType.BIGINT);
 
-        verify(preparedStatement).setString(1, "user-1");
+        verify(preparedStatement).setLong(1, 1001L);
     }
 
     @Test
     public void shouldReadEntityIdByColumnName() throws Exception {
         ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString("id")).thenReturn("user-1");
+        when(resultSet.getLong("id")).thenReturn(1001L);
+        when(resultSet.wasNull()).thenReturn(false);
 
-        assertEquals(EntityId.of("user-1"), typeHandler.getNullableResult(resultSet, "id"));
+        assertEquals(EntityId.of(1001L), typeHandler.getNullableResult(resultSet, "id"));
     }
 
     @Test
     public void shouldReadEntityIdByColumnIndex() throws Exception {
         ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString(1)).thenReturn("user-1");
+        when(resultSet.getLong(1)).thenReturn(1001L);
+        when(resultSet.wasNull()).thenReturn(false);
 
-        assertEquals(EntityId.of("user-1"), typeHandler.getNullableResult(resultSet, 1));
+        assertEquals(EntityId.of(1001L), typeHandler.getNullableResult(resultSet, 1));
     }
 
     @Test
     public void shouldReadEntityIdFromCallableStatement() throws Exception {
         CallableStatement callableStatement = mock(CallableStatement.class);
-        when(callableStatement.getString(1)).thenReturn("user-1");
+        when(callableStatement.getLong(1)).thenReturn(1001L);
+        when(callableStatement.wasNull()).thenReturn(false);
 
-        assertEquals(EntityId.of("user-1"), typeHandler.getNullableResult(callableStatement, 1));
+        assertEquals(EntityId.of(1001L), typeHandler.getNullableResult(callableStatement, 1));
     }
 
     @Test
-    public void shouldReadBlankValueAsNull() throws Exception {
+    public void shouldReadSqlNullValueAsNull() throws Exception {
         ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString("id")).thenReturn(" ");
+        when(resultSet.getLong("id")).thenReturn(0L);
+        when(resultSet.wasNull()).thenReturn(true);
 
         assertNull(typeHandler.getNullableResult(resultSet, "id"));
     }

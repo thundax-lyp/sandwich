@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
 import { DepartmentPage } from "./pages/system/department/department-page";
+import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
 import { queryClient } from "./query/query-client";
 
 vi.mock("sm-crypto", () => ({
@@ -426,6 +427,92 @@ describe("App", () => {
                 }),
                 method: "POST"
             })
+        );
+    });
+
+    it("renders and filters the dictionary page", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["sys:dict:view", "sys:dict:edit"])
+        );
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/sys/dict/page")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: 0,
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalPage: 1,
+                                totalCount: 2,
+                                records: [
+                                    {
+                                        id: "dict-enabled",
+                                        type: "user_status",
+                                        label: "启用",
+                                        value: "ENABLED",
+                                        priority: 1,
+                                        remarks: "允许登录",
+                                        updateDate: "2026-05-07 09:00:00"
+                                    },
+                                    {
+                                        id: "dict-disabled",
+                                        type: "user_status",
+                                        label: "停用",
+                                        value: "DISABLED",
+                                        priority: 2
+                                    }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <DictionaryPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByRole("heading", { name: "字典管理" })).toBeInTheDocument();
+        expect(await screen.findByText("启用")).toBeInTheDocument();
+        expect(screen.getByText("DISABLED")).toBeInTheDocument();
+
+        await userEvent.type(screen.getByPlaceholderText("字典类型"), "user_status");
+        await userEvent.click(screen.getByRole("button", { name: /查\s*询/ }));
+
+        await waitFor(() =>
+            expect(globalThis.fetch).toHaveBeenLastCalledWith(
+                "/admin-api/api/sys/dict/page",
+                expect.objectContaining({
+                    body: JSON.stringify({
+                        type: "user_status",
+                        pageNo: 1,
+                        pageSize: 10
+                    }),
+                    headers: expect.objectContaining({
+                        "Access-Token": "test-token"
+                    }),
+                    method: "POST"
+                })
+            )
         );
     });
 

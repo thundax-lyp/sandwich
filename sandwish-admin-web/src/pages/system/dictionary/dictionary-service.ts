@@ -1,0 +1,61 @@
+import { postJson } from "../../../api/http";
+
+export interface PageResponse<T> {
+    pageNo: number;
+    pageSize: number;
+    totalPage: number;
+    totalCount: number;
+    records: T[];
+}
+
+export interface DictPageRequest {
+    pageNo?: number;
+    pageSize?: number;
+    type?: string | null;
+    label?: string | null;
+    remarks?: string | null;
+}
+
+export interface DictSaveRequest {
+    id?: string | null;
+    type?: string | null;
+    label?: string | null;
+    value?: string | null;
+    priority?: number | null;
+    remarks?: string | null;
+}
+
+export interface DictResponse {
+    id: string;
+    type: string;
+    label: string;
+    value: string;
+    priority?: number | null;
+    remarks?: string | null;
+    createDate?: string | null;
+    updateDate?: string | null;
+}
+
+export const pageDictionaries = (request: DictPageRequest = {}) => {
+    return postJson<PageResponse<DictResponse>, DictPageRequest>("/sys/dict/page", {
+        body: request
+    });
+};
+
+export const addDictionary = (request: DictSaveRequest) => {
+    return postJson<DictResponse, DictSaveRequest>("/sys/dict/add", {
+        body: request
+    });
+};
+
+export const updateDictionary = (request: DictSaveRequest) => {
+    return postJson<DictResponse, DictSaveRequest>("/sys/dict/update", {
+        body: request
+    });
+};
+
+export const deleteDictionaries = (ids: string[]) => {
+    return postJson<boolean, Array<{ id: string }>>("/sys/dict/delete", {
+        body: ids.map((id) => ({ id }))
+    });
+};

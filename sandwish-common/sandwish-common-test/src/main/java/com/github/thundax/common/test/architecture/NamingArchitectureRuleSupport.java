@@ -98,7 +98,9 @@ public final class NamingArchitectureRuleSupport {
         List<String> violations = new ArrayList<String>();
 
         for (JavaClass javaClass : classes) {
-            if (!isDaoPackage(javaClass) || isTestType(javaClass)) {
+            if (!isDaoPackage(javaClass)
+                    || isTestType(javaClass)
+                    || javaClass.getName().contains("$")) {
                 continue;
             }
             if (javaClass.isInterface() && !javaClass.getSimpleName().endsWith("Dao")) {

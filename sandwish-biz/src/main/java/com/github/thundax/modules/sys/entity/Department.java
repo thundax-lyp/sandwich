@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.entity;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +21,7 @@ public class Department implements Auditable, Sortable {
 
     private EntityId id;
 
-    private String parentId;
+    private Long parentId;
 
     private String name;
     private String shortName;
@@ -34,7 +33,7 @@ public class Department implements Auditable, Sortable {
     private String updateUserId;
 
     public void setParent(Department parent) {
-        this.setParentId(parent == null ? null : EntityIdCodec.toValue(parent.getId()));
+        this.setParentId(parent == null ? null : parent.getId().value());
     }
 
     /**

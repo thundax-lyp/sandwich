@@ -10,13 +10,13 @@ public interface DepartmentDao {
 
     Department getById(EntityId id);
 
-    List<Department> listByIds(List<String> idList);
+    List<Department> listByIds(List<Long> idList);
 
-    List<Department> list(String parentId, String name, String remarks);
+    List<Department> list(Long parentId, String name, String remarks);
 
-    Page<Department> page(String parentId, String name, String remarks, int pageNo, int pageSize);
+    Page<Department> page(Long parentId, String name, String remarks, int pageNo, int pageSize);
 
-    String insert(Department department);
+    Long insert(Department department);
 
     int update(Department department);
 
@@ -24,7 +24,7 @@ public interface DepartmentDao {
 
     int deleteById(EntityId id);
 
-    void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType);
+    void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType);
 
-    boolean isChildOf(String childId, String parentId);
+    boolean isChildOf(Long childId, Long parentId);
 }

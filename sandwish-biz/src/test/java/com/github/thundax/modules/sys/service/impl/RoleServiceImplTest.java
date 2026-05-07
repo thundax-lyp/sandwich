@@ -60,7 +60,7 @@ public class RoleServiceImplTest {
     public void shouldSaveRoleMenus() {
         RecordingRoleDao dao = new RecordingRoleDao();
         Role role = new Role();
-        role.setMenuIdList(Arrays.asList("m1", "m2"));
+        role.setMenuIdList(Arrays.asList(5001L, 5002L));
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.add(role);
@@ -68,43 +68,43 @@ public class RoleServiceImplTest {
         assertNotNull(role.getId());
         assertSame(role, dao.inserted);
         assertEquals(EntityIdCodec.toValue(role.getId()), dao.deletedRoleMenuId);
-        assertEquals(Arrays.asList("m1", "m2"), dao.menuIdList);
+        assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
     }
 
     @Test
     public void shouldUpdateUserListByIds() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        Role role = role("role-1");
+        Role role = role(4001L);
         role.setMenuIdList(Arrays.asList());
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        service.updateUserList(role, Arrays.asList(user("u1"), user("u2")));
+        service.updateUserList(role, Arrays.asList(user(1001L), user(1002L)));
 
-        assertEquals("role-1", dao.deletedRoleUserId);
-        assertEquals(Arrays.asList("u1", "u2"), dao.userIdList);
+        assertEquals(Long.valueOf(4001L), dao.deletedRoleUserId);
+        assertEquals(Arrays.asList(1001L, 1002L), dao.userIdList);
     }
 
     @Test
     public void shouldDeleteRoleRelationsBeforeRole() {
         RecordingRoleDao dao = new RecordingRoleDao();
-        dao.getResult = role("role-1");
+        dao.getResult = role(4001L);
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of("role-1"));
+        int count = service.deleteById(EntityId.of(4001L));
 
         assertEquals(1, count);
-        assertEquals("role-1", dao.deletedRoleMenuId);
-        assertEquals("role-1", dao.deletedRoleUserId);
-        assertEquals("role-1", dao.deletedRoleId);
+        assertEquals(Long.valueOf(4001L), dao.deletedRoleMenuId);
+        assertEquals(Long.valueOf(4001L), dao.deletedRoleUserId);
+        assertEquals(Long.valueOf(4001L), dao.deletedRoleId);
     }
 
-    private static Role role(String id) {
+    private static Role role(Long id) {
         Role role = new Role();
         role.setId(EntityIdCodec.toDomain(id));
         return role;
     }
 
-    private static User user(String id) {
+    private static User user(Long id) {
         User user = new User();
         user.setId(EntityIdCodec.toDomain(id));
         return user;
@@ -116,11 +116,11 @@ public class RoleServiceImplTest {
         private int pageNo;
         private int pageSize;
         private Role inserted;
-        private String deletedRoleMenuId;
-        private String deletedRoleUserId;
-        private String deletedRoleId;
-        private List<String> menuIdList;
-        private List<String> userIdList;
+        private Long deletedRoleMenuId;
+        private Long deletedRoleUserId;
+        private Long deletedRoleId;
+        private List<Long> menuIdList;
+        private List<Long> userIdList;
         private Role getResult;
 
         @Override
@@ -129,7 +129,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<Role> listByIds(List<String> idList) {
+        public List<Role> listByIds(List<Long> idList) {
             return null;
         }
 
@@ -152,9 +152,9 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public String insert(Role role) {
+        public Long insert(Role role) {
             this.inserted = role;
-            return "generated-role-id";
+            return 9004L;
         }
 
         @Override
@@ -179,32 +179,32 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<String> listRoleMenus(String roleId) {
+        public List<Long> listRoleMenus(Long roleId) {
             return null;
         }
 
         @Override
-        public void deleteRoleMenu(String roleId) {
+        public void deleteRoleMenu(Long roleId) {
             this.deletedRoleMenuId = roleId;
         }
 
         @Override
-        public void insertRoleMenu(String roleId, List<String> menuIdList) {
+        public void insertRoleMenu(Long roleId, List<Long> menuIdList) {
             this.menuIdList = menuIdList;
         }
 
         @Override
-        public List<String> listRoleUsers(String roleId) {
+        public List<Long> listRoleUsers(Long roleId) {
             return null;
         }
 
         @Override
-        public void deleteRoleUser(String roleId) {
+        public void deleteRoleUser(Long roleId) {
             this.deletedRoleUserId = roleId;
         }
 
         @Override
-        public void insertRoleUser(String roleId, List<String> userIdList) {
+        public void insertRoleUser(Long roleId, List<Long> userIdList) {
             this.userIdList = userIdList;
         }
     }

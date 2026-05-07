@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-sys-biz`：改代码，迁移系统管理域 biz ID 类型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/RoleDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/MenuDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/DepartmentDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/DictDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Role.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Menu.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Department.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Dict.java`
-  - 处理动作：将系统管理域 biz 层 ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-biz -am test` 通过。
-  - 重要度：10/10
-
 - [ ] `snowflake-code-sys-infra`：改代码，迁移系统管理域 infra ID 类型
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/UserDO.java`

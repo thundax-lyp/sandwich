@@ -9,7 +9,7 @@ public interface StoredObjectDao {
 
     StoredObject getById(EntityId id);
 
-    List<StoredObject> listByIds(List<String> idList);
+    List<StoredObject> listByIds(List<Long> idList);
 
     List<StoredObject> list(
             String mimeType,

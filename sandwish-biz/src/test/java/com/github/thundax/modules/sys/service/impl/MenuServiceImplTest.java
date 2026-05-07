@@ -33,14 +33,14 @@ public class MenuServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuQuery query = new MenuQuery();
-        query.setParentId("ROOT");
+        query.setParentId(0L);
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(AccessRank.of(3));
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.list(query);
 
-        assertEquals("ROOT", dao.parentId);
+        assertEquals(Long.valueOf(0L), dao.parentId);
         assertEquals("VISIBLE", dao.displayFlag);
         assertEquals(Integer.valueOf(3), dao.maxRank);
     }
@@ -51,11 +51,11 @@ public class MenuServiceImplTest {
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         MenuQuery query = new MenuQuery();
-        query.setParentId("parent-1");
+        query.setParentId(5000L);
         query.setMaxRank(AccessRank.of(2));
         service.list(query);
 
-        assertEquals("parent-1", dao.parentId);
+        assertEquals(Long.valueOf(5000L), dao.parentId);
         assertEquals(Integer.valueOf(2), dao.maxRank);
     }
 
@@ -90,7 +90,7 @@ public class MenuServiceImplTest {
     @Test
     public void shouldPrepareMenuBeforeUpdate() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        Menu menu = menu("menu-1");
+        Menu menu = menu(5001L);
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.update(menu);
@@ -102,15 +102,15 @@ public class MenuServiceImplTest {
     @Test
     public void shouldDeleteMenuRoleBeforeDeletingMenu() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        Menu stored = menu("menu-1");
+        Menu stored = menu(5001L);
         dao.getResult = stored;
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of("menu-1"));
+        int count = service.deleteById(EntityId.of(5001L));
 
         assertEquals(1, count);
-        assertEquals("menu-1", dao.deletedMenuRoleId);
-        assertEquals("menu-1", dao.deletedId);
+        assertEquals(Long.valueOf(5001L), dao.deletedMenuRoleId);
+        assertEquals(Long.valueOf(5001L), dao.deletedId);
     }
 
     @Test
@@ -118,13 +118,13 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.batchUpdateVisibility(Arrays.asList(menu("m1"), menu("m2")));
+        int count = service.batchUpdateVisibility(Arrays.asList(menu(5001L), menu(5002L)));
 
         assertEquals(2, count);
         assertEquals(2, dao.displayFlagCalls);
     }
 
-    private static Menu menu(String id) {
+    private static Menu menu(Long id) {
         Menu menu = new Menu();
         menu.setId(EntityIdCodec.toDomain(id));
         return menu;
@@ -134,13 +134,13 @@ public class MenuServiceImplTest {
 
         private Menu getResult;
         private int getCalls;
-        private String parentId;
+        private Long parentId;
         private String displayFlag;
         private Integer maxRank;
         private Menu inserted;
         private Menu updated;
-        private String deletedMenuRoleId;
-        private String deletedId;
+        private Long deletedMenuRoleId;
+        private Long deletedId;
         private int displayFlagCalls;
         private int pageNo;
         private int pageSize;
@@ -152,12 +152,12 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public List<Menu> listByIds(List<String> idList) {
+        public List<Menu> listByIds(List<Long> idList) {
             return null;
         }
 
         @Override
-        public List<Menu> list(String parentId, String displayFlag, Integer maxRank) {
+        public List<Menu> list(Long parentId, String displayFlag, Integer maxRank) {
             this.parentId = parentId;
             this.displayFlag = displayFlag;
             this.maxRank = maxRank;
@@ -166,7 +166,7 @@ public class MenuServiceImplTest {
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Menu> page(
-                String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+                Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
             this.parentId = parentId;
             this.displayFlag = displayFlag;
             this.maxRank = maxRank;
@@ -179,9 +179,9 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public String insert(Menu menu) {
+        public Long insert(Menu menu) {
             this.inserted = menu;
-            return "generated-menu-id";
+            return 9005L;
         }
 
         @Override
@@ -202,10 +202,10 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {}
+        public void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType) {}
 
         @Override
-        public boolean isChildOf(String childId, String parentId) {
+        public boolean isChildOf(Long childId, Long parentId) {
             return false;
         }
 
@@ -216,7 +216,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public void deleteMenuRole(String menuId) {
+        public void deleteMenuRole(Long menuId) {
             this.deletedMenuRoleId = menuId;
         }
     }

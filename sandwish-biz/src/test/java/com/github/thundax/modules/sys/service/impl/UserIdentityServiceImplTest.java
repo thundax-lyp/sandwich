@@ -19,7 +19,7 @@ public class UserIdentityServiceImplTest {
     public void shouldGetIdentityByLoginName() {
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
-        UserIdentity identity = accountIdentity(EntityId.of("user-1"), "tester");
+        UserIdentity identity = accountIdentity(EntityId.of(1001L), "tester");
 
         when(userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, "tester")).thenReturn(identity);
 
@@ -30,7 +30,7 @@ public class UserIdentityServiceImplTest {
     public void shouldGetAccountLoginName() {
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
-        EntityId userId = EntityId.of("user-1");
+        EntityId userId = EntityId.of(1001L);
 
         when(userIdentityDao.getByUserIdAndType(userId, UserIdentityType.ACCOUNT))
                 .thenReturn(accountIdentity(userId, "tester"));
@@ -43,7 +43,7 @@ public class UserIdentityServiceImplTest {
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserIdentityServiceImpl service = new UserIdentityServiceImpl(userIdentityDao);
         User user = new User();
-        user.setId(EntityId.of("user-1"));
+        user.setId(EntityId.of(1001L));
         UserIdentity identity = accountIdentity(user.getId(), "old");
 
         when(userIdentityDao.getByUserIdAndType(user.getId(), UserIdentityType.ACCOUNT))
@@ -58,7 +58,7 @@ public class UserIdentityServiceImplTest {
 
     private UserIdentity accountIdentity(EntityId userId, String loginName) {
         UserIdentity identity = new UserIdentity();
-        identity.setId(EntityId.of("identity-1"));
+        identity.setId(EntityId.of(2001L));
         identity.setUserId(userId);
         identity.setIdentityType(UserIdentityType.ACCOUNT);
         identity.setIdentityValue(loginName);

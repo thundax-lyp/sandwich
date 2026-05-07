@@ -10,13 +10,13 @@ public interface MenuDao {
 
     Menu getById(EntityId id);
 
-    List<Menu> listByIds(List<String> idList);
+    List<Menu> listByIds(List<Long> idList);
 
-    List<Menu> list(String parentId, String displayFlag, Integer maxRank);
+    List<Menu> list(Long parentId, String displayFlag, Integer maxRank);
 
-    Page<Menu> page(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
+    Page<Menu> page(Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
 
-    String insert(Menu menu);
+    Long insert(Menu menu);
 
     int update(Menu menu);
 
@@ -24,11 +24,11 @@ public interface MenuDao {
 
     int deleteById(EntityId id);
 
-    void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType);
+    void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType);
 
-    boolean isChildOf(String childId, String parentId);
+    boolean isChildOf(Long childId, Long parentId);
 
     int updateVisibility(Menu menu);
 
-    void deleteMenuRole(String menuId);
+    void deleteMenuRole(Long menuId);
 }

@@ -29,9 +29,9 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleDao dao;
 
-    private final PooledThreadLocal<Map<String, List<String>>> idUserIdsMapHandler = new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<Long, List<Long>>> idUserIdsMapHandler = new PooledThreadLocal<>();
 
-    private final PooledThreadLocal<Map<String, List<String>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
+    private final PooledThreadLocal<Map<Long, List<Long>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
     public RoleServiceImpl(RoleDao dao) {
         this.dao = dao;
@@ -142,7 +142,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<User> listRoleUsers(Role role) {
-        List<String> userIdList = idUserIdsMapHandler
+        List<Long> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
                         EntityIdCodec.toValue(role.getId()),
@@ -153,7 +153,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Menu> listRoleMenus(Role role) {
-        List<String> menuIdList = idMenuIdsMapHandler
+        List<Long> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
                         EntityIdCodec.toValue(role.getId()),
@@ -162,13 +162,13 @@ public class RoleServiceImpl implements RoleService {
         return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
     }
 
-    private User newUser(String id) {
+    private User newUser(Long id) {
         User user = new User();
         user.setId(EntityIdCodec.toDomain(id));
         return user;
     }
 
-    private Menu newMenu(String id) {
+    private Menu newMenu(Long id) {
         Menu menu = new Menu();
         menu.setId(EntityIdCodec.toDomain(id));
         return menu;

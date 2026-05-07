@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(User user, String loginName, String encryptedPassword, List<String> roleIdList) {
+    public EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList) {
         user.setId(EntityIdCodec.toDomain(dao.insert(user)));
         afterWrite(user, true, loginName, encryptedPassword, roleIdList);
         return user.getId();
@@ -85,13 +85,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(User user, String loginName, List<String> roleIdList) {
+    public void update(User user, String loginName, List<Long> roleIdList) {
         dao.update(user);
         afterWrite(user, false, loginName, null, roleIdList);
     }
 
     private void afterWrite(
-            User user, boolean added, String loginName, String encryptedPassword, List<String> roleIdList) {
+            User user, boolean added, String loginName, String encryptedPassword, List<Long> roleIdList) {
         if (roleIdList != null) {
             dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
             if (!roleIdList.isEmpty()) {
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    private Role newRole(String id) {
+    private Role newRole(Long id) {
         Role role = new Role();
         role.setId(EntityIdCodec.toDomain(id));
         return role;

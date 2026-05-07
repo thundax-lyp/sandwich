@@ -17,9 +17,9 @@ public interface UserService {
 
     PageDTO<User> page(UserQuery query, PageDTO<User> page);
 
-    EntityId add(User user, String loginName, String encryptedPassword, List<String> roleIdList);
+    EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList);
 
-    void update(User user, String loginName, List<String> roleIdList);
+    void update(User user, String loginName, List<Long> roleIdList);
 
     int batchDeleteById(List<EntityId> ids);
 

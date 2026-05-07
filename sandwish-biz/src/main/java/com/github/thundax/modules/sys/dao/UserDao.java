@@ -9,12 +9,12 @@ public interface UserDao {
 
     User getById(EntityId id);
 
-    List<User> listByIds(List<String> idList);
+    List<User> listByIds(List<Long> idList);
 
-    List<User> list(String departmentId, String loginName, String name, String enableFlag, String superFlag);
+    List<User> list(Long departmentId, String loginName, String name, String enableFlag, String superFlag);
 
     Page<User> page(
-            String departmentId,
+            Long departmentId,
             String loginName,
             String name,
             String enableFlag,
@@ -22,7 +22,7 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    String insert(User user);
+    Long insert(User user);
 
     int update(User user);
 
@@ -32,9 +32,9 @@ public interface UserDao {
 
     int updateStatus(User user);
 
-    List<String> listUserRoles(String userId);
+    List<Long> listUserRoles(Long userId);
 
-    void deleteUserRole(String userId);
+    void deleteUserRole(Long userId);
 
-    void insertUserRole(String userId, List<String> roleIdList);
+    void insertUserRole(Long userId, List<Long> roleIdList);
 }

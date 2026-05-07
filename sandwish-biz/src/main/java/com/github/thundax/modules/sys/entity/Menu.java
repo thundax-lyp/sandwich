@@ -47,6 +47,10 @@ public class Menu implements Auditable, Sortable, Comparable<Menu> {
         this.parentId = StringUtils.isBlank(parentId) ? null : EntityIdCodec.toDomain(parentId);
     }
 
+    public void setParentId(Long parentId) {
+        this.parentId = EntityIdCodec.toDomain(parentId);
+    }
+
     public void setParent(Menu parent) {
         this.parentId = parent == null ? null : parent.getId();
     }

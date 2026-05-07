@@ -9,13 +9,13 @@ public interface RoleDao {
 
     Role getById(EntityId id);
 
-    List<Role> listByIds(List<String> idList);
+    List<Role> listByIds(List<Long> idList);
 
     List<Role> list(String enableFlag);
 
     Page<Role> page(String enableFlag, int pageNo, int pageSize);
 
-    String insert(Role role);
+    Long insert(Role role);
 
     int update(Role role);
 
@@ -25,15 +25,15 @@ public interface RoleDao {
 
     int updateStatus(Role role);
 
-    List<String> listRoleMenus(String roleId);
+    List<Long> listRoleMenus(Long roleId);
 
-    void deleteRoleMenu(String roleId);
+    void deleteRoleMenu(Long roleId);
 
-    void insertRoleMenu(String roleId, List<String> menuIdList);
+    void insertRoleMenu(Long roleId, List<Long> menuIdList);
 
-    List<String> listRoleUsers(String roleId);
+    List<Long> listRoleUsers(Long roleId);
 
-    void deleteRoleUser(String roleId);
+    void deleteRoleUser(Long roleId);
 
-    void insertRoleUser(String roleId, List<String> userIdList);
+    void insertRoleUser(Long roleId, List<Long> userIdList);
 }

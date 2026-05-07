@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserQuery {
-    private String departmentId;
+    private Long departmentId;
     private String loginName;
     private String name;
     private UserStatus status;

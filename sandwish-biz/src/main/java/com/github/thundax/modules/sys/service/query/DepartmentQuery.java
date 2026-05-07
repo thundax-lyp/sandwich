@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepartmentQuery {
-    private String parentId;
+    private Long parentId;
     private String name;
     private String remarks;
 }

@@ -26,13 +26,13 @@ public class UserServiceImplTest {
         UserServiceImpl service = new UserServiceImpl(userDao, userIdentityService, userCredentialService);
         User user = new User();
 
-        when(userDao.insert(user)).thenReturn("user-1");
+        when(userDao.insert(user)).thenReturn(1001L);
 
-        EntityId userId = service.add(user, "tester", "encrypted", Arrays.asList("role-1", "role-2"));
+        EntityId userId = service.add(user, "tester", "encrypted", Arrays.asList(4001L, 4002L));
 
-        assertEquals("user-1", EntityIdCodec.toValue(userId));
-        verify(userDao).deleteUserRole("user-1");
-        verify(userDao).insertUserRole("user-1", Arrays.asList("role-1", "role-2"));
+        assertEquals(Long.valueOf(1001L), EntityIdCodec.toValue(userId));
+        verify(userDao).deleteUserRole(1001L);
+        verify(userDao).insertUserRole(1001L, Arrays.asList(4001L, 4002L));
         verify(userIdentityService).updateAccountIdentity(user, "tester");
         verify(userCredentialService).upsertPassword(user, "encrypted");
     }
@@ -44,13 +44,13 @@ public class UserServiceImplTest {
         UserCredentialService userCredentialService = mock(UserCredentialService.class);
         UserServiceImpl service = new UserServiceImpl(userDao, userIdentityService, userCredentialService);
         User user = new User();
-        user.setId(EntityId.of("user-1"));
+        user.setId(EntityId.of(1001L));
 
-        service.update(user, "tester", Collections.singletonList("role-1"));
+        service.update(user, "tester", Collections.singletonList(4001L));
 
         verify(userDao).update(user);
-        verify(userDao).deleteUserRole("user-1");
-        verify(userDao).insertUserRole("user-1", Collections.singletonList("role-1"));
+        verify(userDao).deleteUserRole(1001L);
+        verify(userDao).insertUserRole(1001L, Collections.singletonList(4001L));
         verify(userIdentityService).updateAccountIdentity(user, "tester");
         verify(userCredentialService, never()).upsertPassword(user, null);
     }

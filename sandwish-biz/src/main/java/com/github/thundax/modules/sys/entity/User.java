@@ -25,7 +25,7 @@ public class User implements Auditable, Sortable {
 
     private EntityId id;
 
-    private String departmentId;
+    private Long departmentId;
 
     private String email;
     private String mobile;

@@ -20,13 +20,13 @@ public class MemberServiceImplTest {
     @Test
     public void shouldGetMemberById() {
         RecordingMemberDao dao = new RecordingMemberDao();
-        Member expected = member("m1");
+        Member expected = member(8001L);
         dao.getResult = expected;
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertSame(expected, service.getById(EntityId.of("m1")));
-        assertEquals("m1", dao.id);
+        assertSame(expected, service.getById(EntityId.of(8001L)));
+        assertEquals(Long.valueOf(8001L), dao.id);
     }
 
     @Test
@@ -83,13 +83,13 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        int count = service.batchUpdateStatus(Arrays.asList(member("m1"), member("m2")));
+        int count = service.batchUpdateStatus(Arrays.asList(member(8001L), member(8002L)));
 
         assertEquals(2, count);
         assertEquals(2, dao.enableUpdateCalls);
     }
 
-    private static Member member(String id) {
+    private static Member member(Long id) {
         Member member = new Member();
         member.setId(EntityIdCodec.toDomain(id));
         return member;
@@ -98,7 +98,7 @@ public class MemberServiceImplTest {
     private static class RecordingMemberDao implements MemberDao {
 
         private Member getResult;
-        private String id;
+        private Long id;
         private int getCalls;
         private String enableFlag;
         private String email;
@@ -118,7 +118,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public List<Member> listByIds(List<String> idList) {
+        public List<Member> listByIds(List<Long> idList) {
             return null;
         }
 
@@ -162,7 +162,7 @@ public class MemberServiceImplTest {
         @Override
         public String insert(Member entity) {
             this.inserted = entity;
-            return "generated-member-id";
+            return "9801";
         }
 
         @Override

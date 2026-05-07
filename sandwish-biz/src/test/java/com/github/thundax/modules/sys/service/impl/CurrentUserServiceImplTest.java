@@ -38,7 +38,7 @@ public class CurrentUserServiceImplTest {
                 mock(PasswordService.class),
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
-        List<Menu> menus = Arrays.asList(menu("menu-system", null, "系统管理"), menu("menu-user", "menu-system", "用户管理"));
+        List<Menu> menus = Arrays.asList(menu(5001L, null, "系统管理"), menu(5002L, 5001L, "用户管理"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
         when(menuService.listByIds(anyList())).thenReturn(menus);
@@ -46,9 +46,9 @@ public class CurrentUserServiceImplTest {
         List<Menu> responses = service.listVisibleMenus(superUser());
 
         assertEquals(2, responses.size());
-        assertEquals("menu-system", EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals("menu-user", EntityIdCodec.toValue(responses.get(1).getId()));
-        assertEquals("menu-system", EntityIdCodec.toValue(responses.get(1).getParentId()));
+        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
+        assertEquals(Long.valueOf(5002L), EntityIdCodec.toValue(responses.get(1).getId()));
+        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(1).getParentId()));
     }
 
     @Test
@@ -63,11 +63,11 @@ public class CurrentUserServiceImplTest {
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(
-                menu("menu-system", null, "系统管理"),
-                menu("menu-user", "menu-system", "用户管理"),
-                menu("menu-hidden", null, "隐藏菜单", MenuVisibility.HIDDEN),
-                menu("menu-hidden-child", "menu-hidden", "隐藏子菜单"),
-                menu("menu-orphan", "menu-missing", "散落菜单"));
+                menu(5001L, null, "系统管理"),
+                menu(5002L, 5001L, "用户管理"),
+                menu(5003L, null, "隐藏菜单", MenuVisibility.HIDDEN),
+                menu(5004L, 5003L, "隐藏子菜单"),
+                menu(5005L, 5099L, "散落菜单"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
         when(menuService.listByIds(anyList())).thenReturn(menus);
@@ -75,8 +75,8 @@ public class CurrentUserServiceImplTest {
         List<Menu> responses = service.listVisibleMenus(superUser());
 
         assertEquals(2, responses.size());
-        assertEquals("menu-system", EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals("menu-user", EntityIdCodec.toValue(responses.get(1).getId()));
+        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
+        assertEquals(Long.valueOf(5002L), EntityIdCodec.toValue(responses.get(1).getId()));
     }
 
     @Test
@@ -91,18 +91,16 @@ public class CurrentUserServiceImplTest {
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(
-                menu("menu-root", null, "A-root"),
-                menu("menu-child", "menu-root", "B-child"),
-                menu("menu-grandchild", "menu-child", "C-grandchild"));
+                menu(5010L, null, "A-root"), menu(5011L, 5010L, "B-child"), menu(5012L, 5011L, "C-grandchild"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
 
         List<Menu> responses = service.listVisibleMenus(superUser());
 
         assertEquals(3, responses.size());
-        assertEquals("menu-root", EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals("menu-child", EntityIdCodec.toValue(responses.get(1).getId()));
-        assertEquals("menu-grandchild", EntityIdCodec.toValue(responses.get(2).getId()));
+        assertEquals(Long.valueOf(5010L), EntityIdCodec.toValue(responses.get(0).getId()));
+        assertEquals(Long.valueOf(5011L), EntityIdCodec.toValue(responses.get(1).getId()));
+        assertEquals(Long.valueOf(5012L), EntityIdCodec.toValue(responses.get(2).getId()));
     }
 
     @Test
@@ -155,16 +153,16 @@ public class CurrentUserServiceImplTest {
 
     private User superUser() {
         User user = new User();
-        user.setId(EntityId.of("user-1"));
+        user.setId(EntityId.of(1001L));
         user.setPrivilege(UserPrivilege.SUPER);
         return user;
     }
 
-    private Menu menu(String id, String parentId, String name) {
+    private Menu menu(Long id, Long parentId, String name) {
         return menu(id, parentId, name, MenuVisibility.VISIBLE);
     }
 
-    private Menu menu(String id, String parentId, String name, MenuVisibility visibility) {
+    private Menu menu(Long id, Long parentId, String name, MenuVisibility visibility) {
         Menu menu = new Menu();
         menu.setId(EntityId.of(id));
         menu.setParentId(parentId);

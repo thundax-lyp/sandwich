@@ -31,13 +31,13 @@ public class LogServiceImplTest {
     @Test
     public void shouldGetLogById() {
         RecordingLogDao dao = new RecordingLogDao();
-        Log expected = log("log-1");
+        Log expected = log(7001L);
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        assertSame(expected, service.getById(EntityId.of("log-1")));
+        assertSame(expected, service.getById(EntityId.of(7001L)));
 
-        assertEquals("log-1", dao.id);
+        assertEquals(Long.valueOf(7001L), dao.id);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class LogServiceImplTest {
         assertEquals(end, dao.endDate);
     }
 
-    private static Log log(String id) {
+    private static Log log(Long id) {
         Log log = new Log();
         log.setId(EntityIdCodec.toDomain(id));
         return log;
@@ -158,7 +158,7 @@ public class LogServiceImplTest {
     private static class RecordingLogDao implements LogDao {
 
         private Log getResult;
-        private String id;
+        private Long id;
         private int getCalls;
         private String type;
         private String remoteAddr;
@@ -225,7 +225,7 @@ public class LogServiceImplTest {
         @Override
         public String insert(Log log) {
             this.inserted = log;
-            return "generated-log-id";
+            return "9701";
         }
 
         @Override
@@ -248,7 +248,7 @@ public class LogServiceImplTest {
             }
             List<String> idList = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                idList.add("generated-log-id-" + batchInsertCalls + "-" + i);
+                idList.add(String.valueOf(9700L + batchInsertCalls * 100L + i));
             }
             return idList;
         }

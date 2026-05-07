@@ -24,7 +24,7 @@ public class UserCredentialServiceImplTest {
         UserIdentityDao userIdentityDao = mock(UserIdentityDao.class);
         UserCredentialDao userCredentialDao = mock(UserCredentialDao.class);
         UserCredentialServiceImpl service = newService(userIdentityDao, userCredentialDao);
-        EntityId userId = EntityId.of("user-1");
+        EntityId userId = EntityId.of(1001L);
         UserIdentity identity = accountIdentity(userId);
         UserCredential credential = new UserCredential();
 
@@ -43,7 +43,7 @@ public class UserCredentialServiceImplTest {
         UserCredentialDao userCredentialDao = mock(UserCredentialDao.class);
         UserCredentialServiceImpl service =
                 new UserCredentialServiceImpl(userIdentityService, userIdentityDao, userCredentialDao);
-        EntityId userId = EntityId.of("user-1");
+        EntityId userId = EntityId.of(1001L);
         User user = new User();
         user.setId(userId);
         UserIdentity identity = accountIdentity(userId);
@@ -66,7 +66,7 @@ public class UserCredentialServiceImplTest {
 
     private UserIdentity accountIdentity(EntityId userId) {
         UserIdentity identity = new UserIdentity();
-        identity.setId(EntityId.of("identity-1"));
+        identity.setId(EntityId.of(2001L));
         identity.setUserId(userId);
         identity.setIdentityType(UserIdentityType.ACCOUNT);
         identity.setIdentityValue("tester");

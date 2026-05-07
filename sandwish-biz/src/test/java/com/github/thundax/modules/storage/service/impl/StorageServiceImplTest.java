@@ -33,13 +33,13 @@ public class StorageServiceImplTest {
     @Test
     public void shouldGetStorageById() {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
-        StoredObject expected = storage("s1");
+        StoredObject expected = storage(8101L);
         dao.getResult = expected;
 
         StorageServiceImpl service = storageService(dao);
 
-        assertSame(expected, service.getById(EntityId.of("s1")));
-        assertEquals("s1", dao.id);
+        assertSame(expected, service.getById(EntityId.of(8101L)));
+        assertEquals(Long.valueOf(8101L), dao.id);
     }
 
     @Test
@@ -92,17 +92,17 @@ public class StorageServiceImplTest {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
 
-        int count = service.batchDeleteById(Arrays.asList(EntityId.of("s1"), EntityId.of("s2")));
+        int count = service.batchDeleteById(Arrays.asList(EntityId.of(8101L), EntityId.of(8102L)));
 
         assertEquals(2, count);
-        assertEquals(Arrays.asList("s1", "s2"), dao.deletedIds);
+        assertEquals(Arrays.asList(8101L, 8102L), dao.deletedIds);
     }
 
     @Test
     public void shouldDelegateBusinessOperations() {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
-        List<StoredObjectReference> list = Arrays.asList(storageBusiness("s1"));
+        List<StoredObjectReference> list = Arrays.asList(storageBusiness(8201L));
 
         service.addReferences(list);
         service.removeReferences(StorageOwnerType.USER, "u1");
@@ -114,7 +114,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldAllowPublicStorageAccess() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
-        StoredObject storage = storage("s1");
+        StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
 
         assertTrue(service.canReadContent(storage, null, null));
@@ -123,7 +123,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldAllowPrivateStorageOwnerAccess() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
-        StoredObject storage = storage("s1");
+        StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
@@ -134,7 +134,7 @@ public class StorageServiceImplTest {
     @Test
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
         StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
-        StoredObject storage = storage("s1");
+        StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
@@ -252,13 +252,13 @@ public class StorageServiceImplTest {
         assertNotNull(dao.updatedMultipartSession.getAbortedDate());
     }
 
-    private static StoredObject storage(String id) {
+    private static StoredObject storage(Long id) {
         StoredObject storage = new StoredObject();
         storage.setId(EntityIdCodec.toDomain(id));
         return storage;
     }
 
-    private static StoredObjectReference storageBusiness(String id) {
+    private static StoredObjectReference storageBusiness(Long id) {
         StoredObjectReference storageBusiness = new StoredObjectReference();
         storageBusiness.setId(EntityIdCodec.toDomain(id));
         return storageBusiness;
@@ -295,7 +295,7 @@ public class StorageServiceImplTest {
             implements StoredObjectDao, StoredObjectReferenceDao, MultipartUploadDao {
 
         private StoredObject getResult;
-        private String id;
+        private Long id;
         private String mimeType;
         private String ownerId;
         private String ownerType;
@@ -308,7 +308,7 @@ public class StorageServiceImplTest {
         private int pageNo;
         private int pageSize;
         private StoredObject inserted;
-        private List<String> deletedIds = new java.util.ArrayList<>();
+        private List<Long> deletedIds = new java.util.ArrayList<>();
         private List<StoredObjectReference> businessList;
         private String deletedBusinessKey;
         private MultipartUploadSession insertedMultipartSession;
@@ -326,7 +326,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public List<StoredObject> listByIds(List<String> idList) {
+        public List<StoredObject> listByIds(List<Long> idList) {
             return null;
         }
 
@@ -374,7 +374,7 @@ public class StorageServiceImplTest {
         @Override
         public String insert(StoredObject entity) {
             this.inserted = entity;
-            return "generated-storage-id";
+            return "9101";
         }
 
         @Override
@@ -430,7 +430,7 @@ public class StorageServiceImplTest {
         @Override
         public String insertMultipartSession(MultipartUploadSession session) {
             this.insertedMultipartSession = session;
-            return "generated-session-id";
+            return "9301";
         }
 
         @Override
@@ -447,7 +447,7 @@ public class StorageServiceImplTest {
         @Override
         public String insertMultipartPart(MultipartUploadPart part) {
             this.insertedMultipartPart = part;
-            return "generated-part-id";
+            return "9401";
         }
 
         @Override

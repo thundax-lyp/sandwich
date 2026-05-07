@@ -9,13 +9,13 @@ public interface DictDao {
 
     Dict getById(EntityId id);
 
-    List<Dict> listByIds(List<String> idList);
+    List<Dict> listByIds(List<Long> idList);
 
     List<Dict> list(String type, String label, String remarks);
 
     Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
 
-    String insert(Dict dict);
+    Long insert(Dict dict);
 
     int update(Dict dict);
 

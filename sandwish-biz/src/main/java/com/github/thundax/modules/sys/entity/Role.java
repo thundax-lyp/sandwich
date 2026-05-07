@@ -33,7 +33,7 @@ public class Role implements Auditable, Sortable {
     private String createUserId;
     private String updateUserId;
 
-    private List<String> menuIdList;
+    private List<Long> menuIdList;
 
     public boolean isAdmin() {
         return RolePrivilege.ADMIN == getPrivilege();
@@ -43,14 +43,14 @@ public class Role implements Auditable, Sortable {
         return RoleStatus.ENABLED == getStatus();
     }
 
-    public List<String> getMenuIdList() {
+    public List<Long> getMenuIdList() {
         if (this.menuIdList == null) {
             this.menuIdList = new ArrayList<>();
         }
         return this.menuIdList;
     }
 
-    public void setMenuIdList(List<String> menuIdList) {
+    public void setMenuIdList(List<Long> menuIdList) {
         this.menuIdList = menuIdList;
     }
 

@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuQuery {
-    private String parentId;
+    private Long parentId;
     private MenuVisibility visibility;
     private AccessRank maxRank;
 }

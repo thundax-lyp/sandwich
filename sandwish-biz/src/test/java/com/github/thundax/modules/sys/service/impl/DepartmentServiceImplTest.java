@@ -30,14 +30,14 @@ public class DepartmentServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
         DepartmentQuery query = new DepartmentQuery();
-        query.setParentId("ROOT");
+        query.setParentId(0L);
         query.setName("总部");
         query.setRemarks("备注");
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
         service.list(query);
 
-        assertEquals("ROOT", dao.parentId);
+        assertEquals(Long.valueOf(0L), dao.parentId);
         assertEquals("总部", dao.name);
         assertEquals("备注", dao.remarks);
     }
@@ -73,7 +73,7 @@ public class DepartmentServiceImplTest {
     @Test
     public void shouldPrepareDepartmentBeforeUpdate() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
-        Department department = department("department-1");
+        Department department = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
         service.update(department);
@@ -85,16 +85,16 @@ public class DepartmentServiceImplTest {
     @Test
     public void shouldDeleteStoredDepartment() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
-        dao.getResult = department("department-1");
+        dao.getResult = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of("department-1"));
+        int count = service.deleteById(EntityId.of(6001L));
 
         assertEquals(1, count);
-        assertEquals("department-1", dao.deletedId);
+        assertEquals(Long.valueOf(6001L), dao.deletedId);
     }
 
-    private static Department department(String id) {
+    private static Department department(Long id) {
         Department department = new Department();
         department.setId(EntityIdCodec.toDomain(id));
         return department;
@@ -104,14 +104,14 @@ public class DepartmentServiceImplTest {
 
         private Department getResult;
         private int getCalls;
-        private String parentId;
+        private Long parentId;
         private String name;
         private String remarks;
         private int pageNo;
         private int pageSize;
         private Department inserted;
         private Department updated;
-        private String deletedId;
+        private Long deletedId;
         private int priorityCalls;
 
         @Override
@@ -121,12 +121,12 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public List<Department> listByIds(List<String> idList) {
+        public List<Department> listByIds(List<Long> idList) {
             return null;
         }
 
         @Override
-        public List<Department> list(String parentId, String name, String remarks) {
+        public List<Department> list(Long parentId, String name, String remarks) {
             this.parentId = parentId;
             this.name = name;
             this.remarks = remarks;
@@ -135,7 +135,7 @@ public class DepartmentServiceImplTest {
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Department> page(
-                String parentId, String name, String remarks, int pageNo, int pageSize) {
+                Long parentId, String name, String remarks, int pageNo, int pageSize) {
             this.parentId = parentId;
             this.name = name;
             this.remarks = remarks;
@@ -148,9 +148,9 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public String insert(Department department) {
+        public Long insert(Department department) {
             this.inserted = department;
-            return "generated-department-id";
+            return 9006L;
         }
 
         @Override
@@ -172,10 +172,10 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {}
+        public void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType) {}
 
         @Override
-        public boolean isChildOf(String childId, String parentId) {
+        public boolean isChildOf(Long childId, Long parentId) {
             return false;
         }
     }

@@ -1,9 +1,6 @@
 package com.github.thundax.common.mybatis.typehandler;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -19,50 +16,52 @@ public class StringListJsonTypeHandlerTest {
 
     @Test
     public void shouldWriteStringListAsJson() throws Exception {
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement = JdbcStatementStub.preparedStatement();
 
         typeHandler.setNonNullParameter(preparedStatement, 1, Arrays.asList("admin", "user"), JdbcType.VARCHAR);
 
-        verify(preparedStatement).setString(1, "[\"admin\",\"user\"]");
+        assertEquals(
+                "[\"admin\",\"user\"]",
+                JdbcStatementStub.from(preparedStatement).written("setString", 1));
     }
 
     @Test
     public void shouldWriteEmptyListAsJsonArray() throws Exception {
-        PreparedStatement preparedStatement = mock(PreparedStatement.class);
+        PreparedStatement preparedStatement = JdbcStatementStub.preparedStatement();
 
         typeHandler.setNonNullParameter(preparedStatement, 1, Collections.emptyList(), JdbcType.VARCHAR);
 
-        verify(preparedStatement).setString(1, "[]");
+        assertEquals("[]", JdbcStatementStub.from(preparedStatement).written("setString", 1));
     }
 
     @Test
     public void shouldReadStringListByColumnName() throws Exception {
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString("roles")).thenReturn("[\"admin\",\"user\"]");
+        ResultSet resultSet = JdbcStatementStub.resultSet();
+        JdbcStatementStub.from(resultSet).withValue("roles", "[\"admin\",\"user\"]");
 
         assertEquals(Arrays.asList("admin", "user"), typeHandler.getNullableResult(resultSet, "roles"));
     }
 
     @Test
     public void shouldReadStringListByColumnIndex() throws Exception {
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString(1)).thenReturn("[\"admin\"]");
+        ResultSet resultSet = JdbcStatementStub.resultSet();
+        JdbcStatementStub.from(resultSet).withValue(1, "[\"admin\"]");
 
         assertEquals(Collections.singletonList("admin"), typeHandler.getNullableResult(resultSet, 1));
     }
 
     @Test
     public void shouldReadStringListFromCallableStatement() throws Exception {
-        CallableStatement callableStatement = mock(CallableStatement.class);
-        when(callableStatement.getString(1)).thenReturn("[\"admin\"]");
+        CallableStatement callableStatement = JdbcStatementStub.callableStatement();
+        JdbcStatementStub.from(callableStatement).withValue(1, "[\"admin\"]");
 
         assertEquals(Collections.singletonList("admin"), typeHandler.getNullableResult(callableStatement, 1));
     }
 
     @Test
     public void shouldReadEmptyDatabaseValueAsEmptyList() throws Exception {
-        ResultSet resultSet = mock(ResultSet.class);
-        when(resultSet.getString("roles")).thenReturn(" ");
+        ResultSet resultSet = JdbcStatementStub.resultSet();
+        JdbcStatementStub.from(resultSet).withValue("roles", " ");
 
         assertEquals(Collections.emptyList(), typeHandler.getNullableResult(resultSet, "roles"));
     }

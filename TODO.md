@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-auth-biz`：改代码，迁移认证域 biz ID 类型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthClient.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthAuthorization.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthAccessToken.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthRefreshToken.java`
-  - 处理动作：将认证域 biz 层 ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-biz -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-code-auth-infra`：改代码，迁移认证域 infra ID 类型
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/AuthSessionDO.java`

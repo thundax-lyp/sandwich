@@ -13,6 +13,7 @@
 - 前台会员主体 `Member`
 - 会员登录标识 `MemberIdentity`
 - 会员认证凭据 `MemberCredential`
+- 会员登录前置表单 `MemberLoginForm`
 - 会员姓名、性别和基础业务状态
 - 会员生命周期状态
 
@@ -42,6 +43,7 @@
 - `Member`：前台会员主体。
 - `MemberIdentity`：前台会员登录标识，支持账号、手机号和邮箱。
 - `MemberCredential`：前台会员认证凭据，首轮支持密码凭据。
+- `MemberLoginForm`：前台登录前置临时状态，承载验证码、短信验证码、邮箱验证码和密钥。
 - `MemberGender`：会员性别，固定表达男、女和保密。
 - `MemberStatus`：会员生命周期状态，固定表达待激活、活跃、暂停和关闭。
 - `MemberSecurityContext`：前台会员运行时身份上下文。
@@ -54,6 +56,7 @@
 - `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
 - `MemberIdentity(identityType, identityValue)` 必须全局唯一。
 - `MemberCredential` 不得保存明文密码。
+- `MemberLoginForm` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
 
 ## 7. Functional Requirements
 
@@ -61,6 +64,7 @@
 - 系统可以维护会员生命周期状态。
 - 系统可以保存账号、手机号和邮箱三类会员登录标识。
 - 系统可以维护会员密码凭据、失败次数、锁定、过期和最近验证时间。
+- 系统可以通过 `loginToken` 维护登录前置验证码、短信验证码、邮箱验证码和密码传输密钥。
 - 系统可以分页查询会员列表。
 
 ## 8. Key Flows

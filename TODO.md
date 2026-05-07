@@ -9,21 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-login-form`：新增前台会员登录表单运行态
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberLoginForm.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberLoginFormDao.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberLoginFormDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/dao/MemberLoginFormDaoImplTest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/utils/RsaSessionUtils.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/service/SessionCacheSupport.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/service/impl/SessionCacheSupportImpl.java`
-    - `docs/10-requirements/MEMBER-REQUIREMENTS.md`
-    - `docs/20-database/MEMBER-DATABASE-DESIGN.md`
-  - 处理动作：建立 `MemberLoginForm` Redis / JetCache 运行态，承载 `loginToken`、验证码、短信验证码、邮箱验证码和登录前置密钥。
-  - 验收点：登录前置验证码和密钥均通过 `loginToken` 关联，不依赖 HTTP session。
-  - 重要度：10/10
-
 - [ ] `member-register-api`：实现前台会员注册入口
   - 范围文件：
     - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/RegisterController.java`

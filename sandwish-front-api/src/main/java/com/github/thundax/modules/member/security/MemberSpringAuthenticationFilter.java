@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public static final String DEFAULT_CAPTCHA_PARAM = "validateCode";
+    public static final String DEFAULT_LOGIN_TOKEN_PARAM = "loginToken";
 
     private final RsaSessionUtils rsaSessionUtils;
 
@@ -42,17 +43,17 @@ public class MemberSpringAuthenticationFilter extends UsernamePasswordAuthentica
             password = StringUtils.EMPTY;
         }
 
-        UsernamePasswordAuthenticationToken authRequest =
-                new UsernamePasswordAuthenticationToken(username, decryptPassword(request, password));
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+                username, decryptPassword(request.getParameter(DEFAULT_LOGIN_TOKEN_PARAM), password));
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
         return getAuthenticationManager().authenticate(authRequest);
     }
 
-    private String decryptPassword(HttpServletRequest request, String encryptedValue) {
+    private String decryptPassword(String loginToken, String encryptedValue) {
         if (StringUtils.isEmpty(encryptedValue)) {
             return StringUtils.EMPTY;
         }
-        return rsaSessionUtils.decryptRsaValue(request, encryptedValue);
+        return rsaSessionUtils.decryptRsaValue(loginToken, encryptedValue);
     }
 
     private void writeSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)

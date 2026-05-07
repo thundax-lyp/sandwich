@@ -4,12 +4,12 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.LoginFormDao;
 import com.github.thundax.modules.auth.entity.LoginForm;
-import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
-import com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
@@ -54,8 +54,7 @@ public class LoginFormDaoImpl implements LoginFormDao {
 
     @Override
     public LoginForm getByToken(String loginToken) {
-        LoginFormDO formDO = (LoginFormDO) cache.get(TOKEN_PREFIX + loginToken);
-        LoginForm form = AuthPersistenceAssembler.toEntity(formDO);
+        LoginForm form = toDomain((LoginFormCacheDTO) cache.get(TOKEN_PREFIX + loginToken));
         if (form != null) {
             form.setLoginToken(loginToken);
         }
@@ -115,10 +114,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
             }
         }
 
-        LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
         cache.put(
                 TOKEN_PREFIX + form.getLoginToken(),
-                formDO,
+                toCacheDTO(form),
                 properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2,
                 TimeUnit.SECONDS);
 
@@ -151,10 +149,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
         LoginForm form = getByToken(loginToken);
         if (form != null) {
             form.setCaptcha(captcha);
-            LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
             cache.put(
                     TOKEN_PREFIX + loginToken,
-                    formDO,
+                    toCacheDTO(form),
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2,
                     TimeUnit.SECONDS);
         }
@@ -166,10 +163,9 @@ public class LoginFormDaoImpl implements LoginFormDao {
         if (form != null) {
             form.setMobile(mobile);
             form.setMobileValidateCode(validateCode);
-            LoginFormDO formDO = AuthPersistenceAssembler.toDataObject(form);
             cache.put(
                     TOKEN_PREFIX + loginToken,
-                    formDO,
+                    toCacheDTO(form),
                     properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2,
                     TimeUnit.SECONDS);
         }
@@ -210,5 +206,48 @@ public class LoginFormDaoImpl implements LoginFormDao {
         if (keys.remove(key)) {
             keyIndexCache.put(REFRESH_INDEX_KEY, keys);
         }
+    }
+
+    private static LoginForm toDomain(LoginFormCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        LoginForm form = new LoginForm();
+        form.setLoginToken(cacheDTO.loginToken);
+        form.setRefreshTokenList(cacheDTO.refreshTokenList);
+        form.setCaptcha(cacheDTO.captcha);
+        form.setMobile(cacheDTO.mobile);
+        form.setMobileValidateCode(cacheDTO.mobileValidateCode);
+        form.setExpiredSeconds(cacheDTO.expiredSeconds);
+        form.setCheckCode(cacheDTO.checkCode);
+        form.setPublicKey(cacheDTO.publicKey);
+        form.setPrivateKey(cacheDTO.privateKey);
+        return form;
+    }
+
+    private static LoginFormCacheDTO toCacheDTO(LoginForm form) {
+        LoginFormCacheDTO cacheDTO = new LoginFormCacheDTO();
+        cacheDTO.loginToken = form.getLoginToken();
+        cacheDTO.refreshTokenList = form.getRefreshTokenList();
+        cacheDTO.captcha = form.getCaptcha();
+        cacheDTO.mobile = form.getMobile();
+        cacheDTO.mobileValidateCode = form.getMobileValidateCode();
+        cacheDTO.expiredSeconds = form.getExpiredSeconds();
+        cacheDTO.checkCode = form.getCheckCode();
+        cacheDTO.publicKey = form.getPublicKey();
+        cacheDTO.privateKey = form.getPrivateKey();
+        return cacheDTO;
+    }
+
+    private static class LoginFormCacheDTO implements CacheDTO {
+        private String loginToken;
+        private List<String> refreshTokenList;
+        private String captcha;
+        private String mobile;
+        private String mobileValidateCode;
+        private Integer expiredSeconds;
+        private String checkCode;
+        private String publicKey;
+        private String privateKey;
     }
 }

@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.entity;
 
-import java.io.Serializable;
-
-public class AccessToken implements Serializable {
+public class AccessToken {
 
     public static final int REFRESH_TOKEN_SIZE = 5;
 

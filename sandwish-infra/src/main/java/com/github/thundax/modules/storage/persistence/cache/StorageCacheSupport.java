@@ -4,9 +4,15 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -28,14 +34,14 @@ public class StorageCacheSupport {
     private Cache<String, Object> cache;
 
     public StoredObject getById(String id) {
-        return (StoredObject) cache.get(objectKey(id));
+        return toDomain((StoredObjectCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(StoredObject storage) {
         if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toValue(storage.getId()))) {
             cache.put(
                     objectKey(EntityIdCodec.toValue(storage.getId())),
-                    storage,
+                    toCacheDTO(storage),
                     OBJECT_EXPIRE_SECONDS,
                     TimeUnit.SECONDS);
         }
@@ -65,5 +71,86 @@ public class StorageCacheSupport {
 
     private String versionKey() {
         return CACHE_SECTION + VERSION_KEY;
+    }
+
+    private static StoredObject toDomain(StoredObjectCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        StoredObject storage = new StoredObject();
+        storage.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        storage.setOriginalFilename(cacheDTO.originalFilename);
+        storage.setContentType(cacheDTO.contentType);
+        storage.setName(cacheDTO.name);
+        storage.setExtendName(cacheDTO.extendName);
+        storage.setMimeType(cacheDTO.mimeType);
+        storage.setOwnerId(cacheDTO.ownerId);
+        storage.setOwnerType(cacheDTO.ownerType == null ? null : StorageOwnerType.from(cacheDTO.ownerType));
+        storage.setStorageType(cacheDTO.storageType == null ? null : StorageType.from(cacheDTO.storageType));
+        storage.setBucketName(cacheDTO.bucketName);
+        storage.setObjectKey(cacheDTO.objectKey);
+        storage.setSize(cacheDTO.size);
+        storage.setAccessEndpoint(cacheDTO.accessEndpoint);
+        storage.setObjectStatus(cacheDTO.objectStatus == null ? null : StoredObjectStatus.from(cacheDTO.objectStatus));
+        storage.setReferenceStatus(
+                cacheDTO.referenceStatus == null ? null : StoredObjectReferenceStatus.from(cacheDTO.referenceStatus));
+        storage.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
+        storage.setRemarks(cacheDTO.remarks);
+        storage.setCreateDate(cacheDTO.createDate);
+        storage.setUpdateDate(cacheDTO.updateDate);
+        return storage;
+    }
+
+    private static StoredObjectCacheDTO toCacheDTO(StoredObject storage) {
+        StoredObjectCacheDTO cacheDTO = new StoredObjectCacheDTO();
+        cacheDTO.id = EntityIdCodec.toValue(storage.getId());
+        cacheDTO.originalFilename = storage.getOriginalFilename();
+        cacheDTO.contentType = storage.getContentType();
+        cacheDTO.name = storage.getName();
+        cacheDTO.extendName = storage.getExtendName();
+        cacheDTO.mimeType = storage.getMimeType();
+        cacheDTO.ownerId = storage.getOwnerId();
+        cacheDTO.ownerType =
+                storage.getOwnerType() == null ? null : storage.getOwnerType().value();
+        cacheDTO.storageType = storage.getStorageType() == null
+                ? null
+                : storage.getStorageType().value();
+        cacheDTO.bucketName = storage.getBucketName();
+        cacheDTO.objectKey = storage.getObjectKey();
+        cacheDTO.size = storage.getSize();
+        cacheDTO.accessEndpoint = storage.getAccessEndpoint();
+        cacheDTO.objectStatus = storage.getObjectStatus() == null
+                ? null
+                : storage.getObjectStatus().value();
+        cacheDTO.referenceStatus = storage.getReferenceStatus() == null
+                ? null
+                : storage.getReferenceStatus().value();
+        cacheDTO.priority = storage.getPriority();
+        cacheDTO.remarks = storage.getRemarks();
+        cacheDTO.createDate = storage.getCreateDate();
+        cacheDTO.updateDate = storage.getUpdateDate();
+        return cacheDTO;
+    }
+
+    private static class StoredObjectCacheDTO implements CacheDTO {
+        private String id;
+        private String originalFilename;
+        private String contentType;
+        private String name;
+        private String extendName;
+        private String mimeType;
+        private String ownerId;
+        private String ownerType;
+        private String storageType;
+        private String bucketName;
+        private String objectKey;
+        private Long size;
+        private String accessEndpoint;
+        private String objectStatus;
+        private String referenceStatus;
+        private Integer priority;
+        private String remarks;
+        private Date createDate;
+        private Date updateDate;
     }
 }

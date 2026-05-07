@@ -4,9 +4,14 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,13 +45,13 @@ public class UserCacheSupport {
     private Cache<String, Set<String>> keyIndexCache;
 
     public User getById(String id) {
-        return (User) cache.get(objectKey(id));
+        return toDomain((UserCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(User user) {
         if (user != null && StringUtils.isNotBlank(EntityIdCodec.toValue(user.getId()))) {
             String key = objectKey(EntityIdCodec.toValue(user.getId()));
-            cache.put(key, user, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            cache.put(key, toCacheDTO(user), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
@@ -127,5 +132,67 @@ public class UserCacheSupport {
         if (keys.remove(key)) {
             keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
+    }
+
+    private static User toDomain(UserCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        User user = new User();
+        user.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        user.setDepartmentId(cacheDTO.departmentId);
+        user.setEmail(cacheDTO.email);
+        user.setMobile(cacheDTO.mobile);
+        user.setTel(cacheDTO.tel);
+        user.setName(cacheDTO.name);
+        user.setRank(AccessRankCodec.toDomain(cacheDTO.rank));
+        user.setPrivilege(cacheDTO.privilege == null ? null : UserPrivilege.from(cacheDTO.privilege));
+        user.setStatus(cacheDTO.status == null ? null : UserStatus.from(cacheDTO.status));
+        user.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
+        user.setRemarks(cacheDTO.remarks);
+        user.setCreateDate(cacheDTO.createDate);
+        user.setCreateUserId(cacheDTO.createUserId);
+        user.setUpdateDate(cacheDTO.updateDate);
+        user.setUpdateUserId(cacheDTO.updateUserId);
+        return user;
+    }
+
+    private static UserCacheDTO toCacheDTO(User user) {
+        UserCacheDTO cacheDTO = new UserCacheDTO();
+        cacheDTO.id = EntityIdCodec.toValue(user.getId());
+        cacheDTO.departmentId = user.getDepartmentId();
+        cacheDTO.email = user.getEmail();
+        cacheDTO.mobile = user.getMobile();
+        cacheDTO.tel = user.getTel();
+        cacheDTO.name = user.getName();
+        cacheDTO.rank = AccessRankCodec.toValue(user.getRank());
+        cacheDTO.privilege =
+                user.getPrivilege() == null ? null : user.getPrivilege().value();
+        cacheDTO.status = user.getStatus() == null ? null : user.getStatus().value();
+        cacheDTO.priority = user.getPriority();
+        cacheDTO.remarks = user.getRemarks();
+        cacheDTO.createDate = user.getCreateDate();
+        cacheDTO.createUserId = user.getCreateUserId();
+        cacheDTO.updateDate = user.getUpdateDate();
+        cacheDTO.updateUserId = user.getUpdateUserId();
+        return cacheDTO;
+    }
+
+    private static class UserCacheDTO implements CacheDTO {
+        private String id;
+        private String departmentId;
+        private String email;
+        private String mobile;
+        private String tel;
+        private String name;
+        private Integer rank;
+        private String privilege;
+        private String status;
+        private Integer priority;
+        private String remarks;
+        private Date createDate;
+        private String createUserId;
+        private Date updateDate;
+        private String updateUserId;
     }
 }

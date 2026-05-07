@@ -4,12 +4,12 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
-import com.github.thundax.modules.assist.persistence.assembler.AsyncTaskPersistenceAssembler;
-import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
+import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +21,11 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "assist.asyncTask.";
 
     @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
-    private Cache<String, AsyncTaskDO> cache;
+    private Cache<String, AsyncTaskCacheDTO> cache;
 
     @Override
     public AsyncTask getById(EntityId id) {
-        return AsyncTaskPersistenceAssembler.toEntity(cache.get(cacheKey(id.value())));
+        return toDomain(cache.get(cacheKey(id.value())));
     }
 
     @Override
@@ -58,8 +58,64 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     private void put(AsyncTask asyncTask) {
         cache.put(
                 cacheKey(EntityIdCodec.toValue(asyncTask.getId())),
-                AsyncTaskPersistenceAssembler.toDataObject(asyncTask),
+                toCacheDTO(asyncTask),
                 asyncTask.getExpiredSeconds(),
                 TimeUnit.SECONDS);
+    }
+
+    private static AsyncTask toDomain(AsyncTaskCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        AsyncTask asyncTask = new AsyncTask();
+        asyncTask.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        asyncTask.setTitle(cacheDTO.title);
+        asyncTask.setStatus(cacheDTO.status == null ? null : AsyncTaskStatus.from(cacheDTO.status));
+        asyncTask.setMessage(cacheDTO.message);
+        asyncTask.setData(cacheDTO.data);
+        asyncTask.setPrivate(cacheDTO.isPrivate);
+        asyncTask.setExpiredSeconds(cacheDTO.expiredSeconds);
+        asyncTask.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
+        asyncTask.setRemarks(cacheDTO.remarks);
+        asyncTask.setCreateDate(cacheDTO.createDate);
+        asyncTask.setCreateUserId(cacheDTO.createUserId);
+        asyncTask.setUpdateDate(cacheDTO.updateDate);
+        asyncTask.setUpdateUserId(cacheDTO.updateUserId);
+        return asyncTask;
+    }
+
+    private static AsyncTaskCacheDTO toCacheDTO(AsyncTask asyncTask) {
+        AsyncTaskCacheDTO cacheDTO = new AsyncTaskCacheDTO();
+        cacheDTO.id = EntityIdCodec.toValue(asyncTask.getId());
+        cacheDTO.title = asyncTask.getTitle();
+        cacheDTO.status =
+                asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();
+        cacheDTO.message = asyncTask.getMessage();
+        cacheDTO.data = asyncTask.getData();
+        cacheDTO.isPrivate = asyncTask.getPrivate();
+        cacheDTO.expiredSeconds = asyncTask.getExpiredSeconds();
+        cacheDTO.priority = asyncTask.getPriority();
+        cacheDTO.remarks = asyncTask.getRemarks();
+        cacheDTO.createDate = asyncTask.getCreateDate();
+        cacheDTO.createUserId = asyncTask.getCreateUserId();
+        cacheDTO.updateDate = asyncTask.getUpdateDate();
+        cacheDTO.updateUserId = asyncTask.getUpdateUserId();
+        return cacheDTO;
+    }
+
+    private static class AsyncTaskCacheDTO implements CacheDTO {
+        private String id;
+        private String title;
+        private String status;
+        private String message;
+        private String data;
+        private Boolean isPrivate;
+        private Integer expiredSeconds;
+        private Integer priority;
+        private String remarks;
+        private Date createDate;
+        private String createUserId;
+        private Date updateDate;
+        private String updateUserId;
     }
 }

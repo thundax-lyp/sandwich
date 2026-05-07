@@ -1,11 +1,10 @@
 package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.modules.auth.utils.AuthUtils;
-import java.io.Serializable;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-public class LoginForm implements Serializable {
+public class LoginForm {
 
     public static final int REFRESH_TOKEN_SIZE = 5;
 

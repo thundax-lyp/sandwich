@@ -4,11 +4,10 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.persistence.assembler.AuthPersistenceAssembler;
-import com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -56,8 +55,7 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
     @Override
     public AccessToken getByUserId(String userId) {
-        AccessTokenDO accessTokenDO = (AccessTokenDO) cache.get(USER_ID_PREFIX + userId);
-        AccessToken accessToken = AuthPersistenceAssembler.toEntity(accessTokenDO);
+        AccessToken accessToken = toDomain((AccessTokenCacheDTO) cache.get(USER_ID_PREFIX + userId));
         if (accessToken != null) {
             accessToken.setUserId(userId);
         }
@@ -71,10 +69,10 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
 
         int expiredSeconds = properties.getLoginExpiredSeconds() + SAFETY_SECONDS * 2;
 
-        AccessTokenDO accessTokenDO = AuthPersistenceAssembler.toDataObject(accessToken);
+        AccessTokenCacheDTO cacheDTO = toCacheDTO(accessToken);
         String tokenKey = TOKEN_PREFIX + accessToken.getToken();
         cache.put(tokenKey, accessToken.getUserId(), expiredSeconds, TimeUnit.SECONDS);
-        cache.put(USER_ID_PREFIX + accessToken.getUserId(), accessTokenDO, expiredSeconds, TimeUnit.SECONDS);
+        cache.put(USER_ID_PREFIX + accessToken.getUserId(), cacheDTO, expiredSeconds, TimeUnit.SECONDS);
         rememberTokenKey(tokenKey);
     }
 
@@ -87,9 +85,9 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         if (userId != null) {
             cache.put(tokenKey, userId, expiredSeconds, TimeUnit.SECONDS);
         }
-        AccessTokenDO accessTokenDO = (AccessTokenDO) cache.get(USER_ID_PREFIX + accessToken.getUserId());
-        if (accessTokenDO != null) {
-            cache.put(USER_ID_PREFIX + accessToken.getUserId(), accessTokenDO, expiredSeconds, TimeUnit.SECONDS);
+        AccessTokenCacheDTO cacheDTO = (AccessTokenCacheDTO) cache.get(USER_ID_PREFIX + accessToken.getUserId());
+        if (cacheDTO != null) {
+            cache.put(USER_ID_PREFIX + accessToken.getUserId(), cacheDTO, expiredSeconds, TimeUnit.SECONDS);
         }
     }
 
@@ -139,5 +137,30 @@ public class AccessTokenDaoImpl implements AccessTokenDao {
         if (keys.remove(key)) {
             keyIndexCache.put(TOKEN_INDEX_KEY, keys);
         }
+    }
+
+    private static AccessToken toDomain(AccessTokenCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        AccessToken accessToken = new AccessToken();
+        accessToken.setToken(cacheDTO.token);
+        accessToken.setUserId(cacheDTO.userId);
+        accessToken.setCheckCode(cacheDTO.checkCode);
+        return accessToken;
+    }
+
+    private static AccessTokenCacheDTO toCacheDTO(AccessToken accessToken) {
+        AccessTokenCacheDTO cacheDTO = new AccessTokenCacheDTO();
+        cacheDTO.token = accessToken.getToken();
+        cacheDTO.userId = accessToken.getUserId();
+        cacheDTO.checkCode = accessToken.getCheckCode();
+        return cacheDTO;
+    }
+
+    private static class AccessTokenCacheDTO implements CacheDTO {
+        private String token;
+        private String userId;
+        private String checkCode;
     }
 }

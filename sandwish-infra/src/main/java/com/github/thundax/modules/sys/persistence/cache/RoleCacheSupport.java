@@ -4,9 +4,13 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
+import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,13 +45,13 @@ public class RoleCacheSupport {
     private Cache<String, Set<String>> keyIndexCache;
 
     public Role getById(String id) {
-        return (Role) cache.get(objectKey(id));
+        return toDomain((RoleCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Role role) {
         if (role != null && StringUtils.isNotBlank(EntityIdCodec.toValue(role.getId()))) {
             String key = objectKey(EntityIdCodec.toValue(role.getId()));
-            cache.put(key, role, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            cache.put(key, toCacheDTO(role), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
@@ -149,5 +153,52 @@ public class RoleCacheSupport {
         if (keys.remove(key)) {
             keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
+    }
+
+    private static Role toDomain(RoleCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        Role role = new Role();
+        role.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        role.setName(cacheDTO.name);
+        role.setPrivilege(cacheDTO.privilege == null ? null : RolePrivilege.from(cacheDTO.privilege));
+        role.setStatus(cacheDTO.status == null ? null : RoleStatus.from(cacheDTO.status));
+        role.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
+        role.setRemarks(cacheDTO.remarks);
+        role.setCreateDate(cacheDTO.createDate);
+        role.setCreateUserId(cacheDTO.createUserId);
+        role.setUpdateDate(cacheDTO.updateDate);
+        role.setUpdateUserId(cacheDTO.updateUserId);
+        return role;
+    }
+
+    private static RoleCacheDTO toCacheDTO(Role role) {
+        RoleCacheDTO cacheDTO = new RoleCacheDTO();
+        cacheDTO.id = EntityIdCodec.toValue(role.getId());
+        cacheDTO.name = role.getName();
+        cacheDTO.privilege =
+                role.getPrivilege() == null ? null : role.getPrivilege().value();
+        cacheDTO.status = role.getStatus() == null ? null : role.getStatus().value();
+        cacheDTO.priority = role.getPriority();
+        cacheDTO.remarks = role.getRemarks();
+        cacheDTO.createDate = role.getCreateDate();
+        cacheDTO.createUserId = role.getCreateUserId();
+        cacheDTO.updateDate = role.getUpdateDate();
+        cacheDTO.updateUserId = role.getUpdateUserId();
+        return cacheDTO;
+    }
+
+    private static class RoleCacheDTO implements CacheDTO {
+        private String id;
+        private String name;
+        private String privilege;
+        private String status;
+        private Integer priority;
+        private String remarks;
+        private Date createDate;
+        private String createUserId;
+        private Date updateDate;
+        private String updateUserId;
     }
 }

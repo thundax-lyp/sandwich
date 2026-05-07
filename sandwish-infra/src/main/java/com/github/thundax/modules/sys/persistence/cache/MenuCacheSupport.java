@@ -4,9 +4,13 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
+import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -38,13 +42,13 @@ public class MenuCacheSupport {
     private Cache<String, Set<String>> keyIndexCache;
 
     public Menu getById(String id) {
-        return (Menu) cache.get(objectKey(id));
+        return toDomain((MenuCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Menu menu) {
         if (menu != null && StringUtils.isNotBlank(EntityIdCodec.toValue(menu.getId()))) {
             String key = objectKey(EntityIdCodec.toValue(menu.getId()));
-            cache.put(key, menu, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            cache.put(key, toCacheDTO(menu), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
@@ -104,5 +108,67 @@ public class MenuCacheSupport {
         if (keys.remove(key)) {
             keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
+    }
+
+    private static Menu toDomain(MenuCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        Menu menu = new Menu();
+        menu.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        menu.setParentId(cacheDTO.parentId);
+        menu.setName(cacheDTO.name);
+        menu.setPerms(cacheDTO.perms);
+        menu.setRank(AccessRankCodec.toDomain(cacheDTO.rank));
+        menu.setVisibility(cacheDTO.visibility == null ? null : MenuVisibility.from(cacheDTO.visibility));
+        menu.setDisplayParams(cacheDTO.displayParams);
+        menu.setUrl(cacheDTO.url);
+        menu.setTarget(cacheDTO.target);
+        menu.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
+        menu.setRemarks(cacheDTO.remarks);
+        menu.setCreateDate(cacheDTO.createDate);
+        menu.setCreateUserId(cacheDTO.createUserId);
+        menu.setUpdateDate(cacheDTO.updateDate);
+        menu.setUpdateUserId(cacheDTO.updateUserId);
+        return menu;
+    }
+
+    private static MenuCacheDTO toCacheDTO(Menu menu) {
+        MenuCacheDTO cacheDTO = new MenuCacheDTO();
+        cacheDTO.id = EntityIdCodec.toValue(menu.getId());
+        cacheDTO.parentId = EntityIdCodec.toValue(menu.getParentId());
+        cacheDTO.name = menu.getName();
+        cacheDTO.perms = menu.getPerms();
+        cacheDTO.rank = AccessRankCodec.toValue(menu.getRank());
+        cacheDTO.visibility =
+                menu.getVisibility() == null ? null : menu.getVisibility().value();
+        cacheDTO.displayParams = menu.getDisplayParams();
+        cacheDTO.url = menu.getUrl();
+        cacheDTO.target = menu.getTarget();
+        cacheDTO.priority = menu.getPriority();
+        cacheDTO.remarks = menu.getRemarks();
+        cacheDTO.createDate = menu.getCreateDate();
+        cacheDTO.createUserId = menu.getCreateUserId();
+        cacheDTO.updateDate = menu.getUpdateDate();
+        cacheDTO.updateUserId = menu.getUpdateUserId();
+        return cacheDTO;
+    }
+
+    private static class MenuCacheDTO implements CacheDTO {
+        private String id;
+        private String parentId;
+        private String name;
+        private String perms;
+        private Integer rank;
+        private String visibility;
+        private String displayParams;
+        private String url;
+        private String target;
+        private Integer priority;
+        private String remarks;
+        private Date createDate;
+        private String createUserId;
+        private Date updateDate;
+        private String updateUserId;
     }
 }

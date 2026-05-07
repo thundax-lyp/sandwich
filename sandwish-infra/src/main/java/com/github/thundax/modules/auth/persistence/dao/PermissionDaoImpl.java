@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.auth.dao.PermissionDao;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import java.util.HashSet;
@@ -23,30 +24,30 @@ public class PermissionDaoImpl implements PermissionDao {
     private static final String TOKEN_INDEX_KEY = "tokens";
 
     @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
-    private Cache<String, PermissionSession> cache;
+    private Cache<String, PermissionSessionCacheDTO> cache;
 
     @CreateCache(name = CACHE_SECTION + "keys.", cacheType = CacheType.REMOTE)
     private Cache<String, Set<String>> keyIndexCache;
 
     @Override
     public PermissionSession getByToken(String token) {
-        return cache.get(TOKEN_PREFIX + token);
+        return toDomain(cache.get(TOKEN_PREFIX + token));
     }
 
     @Override
     public void insert(PermissionSession session, int expiredSeconds) {
         Assert.hasText(session.getToken(), "token can not be empty");
         String key = TOKEN_PREFIX + session.getToken();
-        cache.put(key, session, expiredSeconds, TimeUnit.SECONDS);
+        cache.put(key, toCacheDTO(session), expiredSeconds, TimeUnit.SECONDS);
         rememberTokenKey(key);
     }
 
     @Override
     public void touch(String token, int expiredSeconds) {
         String key = TOKEN_PREFIX + token;
-        PermissionSession session = cache.get(key);
-        if (session != null) {
-            cache.put(key, session, expiredSeconds, TimeUnit.SECONDS);
+        PermissionSessionCacheDTO cacheDTO = cache.get(key);
+        if (cacheDTO != null) {
+            cache.put(key, cacheDTO, expiredSeconds, TimeUnit.SECONDS);
         }
     }
 
@@ -84,5 +85,36 @@ public class PermissionDaoImpl implements PermissionDao {
         if (keys.remove(key)) {
             keyIndexCache.put(TOKEN_INDEX_KEY, keys);
         }
+    }
+
+    private static PermissionSession toDomain(PermissionSessionCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        PermissionSession session = new PermissionSession();
+        session.setToken(cacheDTO.token);
+        session.setUserId(cacheDTO.userId);
+        session.setPermissions(cacheDTO.permissions);
+        session.setVersion(cacheDTO.version);
+        session.setTimestamp(cacheDTO.timestamp);
+        return session;
+    }
+
+    private static PermissionSessionCacheDTO toCacheDTO(PermissionSession session) {
+        PermissionSessionCacheDTO cacheDTO = new PermissionSessionCacheDTO();
+        cacheDTO.token = session.getToken();
+        cacheDTO.userId = session.getUserId();
+        cacheDTO.permissions = session.getPermissions();
+        cacheDTO.version = session.getVersion();
+        cacheDTO.timestamp = session.getTimestamp();
+        return cacheDTO;
+    }
+
+    private static class PermissionSessionCacheDTO implements CacheDTO {
+        private String token;
+        private String userId;
+        private Set<String> permissions;
+        private String version;
+        private long timestamp;
     }
 }

@@ -60,13 +60,8 @@
 - 数据库平台以当前项目实际配置为准。
 - 存储引擎优先使用 `InnoDB`。
 - 字符集优先使用 `utf8mb4`。
-- `UserIdentityDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `UserCredentialDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `AuthSessionDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `OAuthClientDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `OAuthAuthorizationDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `OAuthAccessTokenDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
-- `OAuthRefreshTokenDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- 独立数据库表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
+- 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `user_id` 固定引用 `sys_user.id`。
 - `identity_id` 固定引用 `sys_user_identity.id`。
 - 枚举字段使用 `varchar` 存储。
@@ -127,7 +122,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `user_id` 来源是 `sys_user.id`。
 - `identity_type` 固定写入 `ACCOUNT`、`MOBILE` 或 `EMAIL`。
 - `status` 固定写入 `ENABLED` 或 `DISABLED`。
@@ -165,7 +160,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `user_id` 来源是 `sys_user.id`。
 - `identity_id` 来源是 `sys_user_identity.id`。
 - `credential_type` 固定写入 `PASSWORD`。
@@ -214,7 +209,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `session_id` 由 Service 生成，作为认证会话业务标识。
 - `token` 来源是 `AccessToken.token`。
 - `user_id` 来源是 `sys_user.id`。
@@ -261,6 +256,12 @@
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `client_id` 由 Service 生成，作为 OAuth 客户端业务标识。
+- `client_secret_hash` 固定保存客户端密钥哈希。
+
 索引：
 
 - 主键：`pk_auth_oauth_client(id)`
@@ -289,6 +290,13 @@
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `authorization_code` 由 Service 生成，作为 OAuth 授权码业务标识。
+- `client_id` 来源是 `auth_oauth_client.client_id`。
+- `user_id` 来源是 `sys_user.id`。
+
 索引：
 
 - 主键：`pk_auth_oauth_authorization(id)`
@@ -314,6 +322,14 @@
 | `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `token_id` 由 Service 生成，作为 OAuth access token 业务标识。
+- `token_hash` 固定保存 access token 哈希。
+- `client_id` 来源是 `auth_oauth_client.client_id`。
+- `user_id` 来源是 `sys_user.id`。
 
 索引：
 
@@ -341,6 +357,15 @@
 | `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `token_id` 由 Service 生成，作为 OAuth refresh token 业务标识。
+- `token_hash` 固定保存 refresh token 哈希。
+- `access_token_id` 来源是 `auth_oauth_access_token.token_id`。
+- `client_id` 来源是 `auth_oauth_client.client_id`。
+- `user_id` 来源是 `sys_user.id`。
 
 索引：
 

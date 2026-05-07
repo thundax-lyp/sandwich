@@ -28,7 +28,8 @@
 - 数据库平台以当前项目实际配置为准。
 - 存储引擎优先使用 `InnoDB`。
 - 字符集优先使用 `utf8mb4`。
-- `MemberDO.id` 是独立数据库表主键，Java 类型固定为 `String`，使用 `IdType.ASSIGN_UUID`。
+- 独立数据库表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
+- 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - 会员主表使用 `member_` 业务域前缀。
 - 会员主表固定使用 `member_member`。
 - `email`、`mobile` 和 `address` 由持久化类型处理器加密处理。
@@ -86,7 +87,8 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `login_name` 是会员登录业务标识，不作为数据库主键。
 - `enable_flag` 通过 `MemberStatus.value()` 写入。
 - `login_count` 默认值固定为 `0`。
 - `priority` 默认值固定为 `0`。

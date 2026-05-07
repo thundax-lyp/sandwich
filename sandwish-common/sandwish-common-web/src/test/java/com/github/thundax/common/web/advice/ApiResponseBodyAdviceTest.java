@@ -108,6 +108,23 @@ public class ApiResponseBodyAdviceTest {
     }
 
     @Test
+    public void shouldWrapPageBody() throws Exception {
+        PageResponse<Object> body = new PageResponse<>();
+
+        Object result = advice.beforeBodyWrite(
+                body,
+                returnType(WrappedController.class, "page"),
+                MediaType.APPLICATION_JSON,
+                MappingJackson2HttpMessageConverter.class,
+                null,
+                null);
+
+        ApiResponse<?> response = (ApiResponse<?>) result;
+        assertEquals(ApiResponse.SUCCESS_CODE, response.getCode());
+        assertSame(body, response.getData());
+    }
+
+    @Test
     public void shouldKeepUnwrappedControllerBody() throws Exception {
         Object body = 100;
 

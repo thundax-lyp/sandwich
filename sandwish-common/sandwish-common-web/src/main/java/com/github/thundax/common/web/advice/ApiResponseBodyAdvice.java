@@ -3,7 +3,6 @@ package com.github.thundax.common.web.advice;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.response.ApiResponse;
-import com.github.thundax.common.web.response.PageResponse;
 import java.nio.charset.StandardCharsets;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -37,10 +36,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
             response.getHeaders().setContentType(APPLICATION_JSON_UTF8);
         }
 
-        if (!shouldWrap(returnType)
-                || body instanceof ApiResponse
-                || body instanceof String
-                || body instanceof PageResponse) {
+        if (!shouldWrap(returnType) || body instanceof ApiResponse || body instanceof String) {
             return body;
         }
         return ApiResponse.success(body);
@@ -55,9 +51,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         }
 
         Class<?> parameterType = returnType.getParameterType();
-        return !ApiResponse.class.isAssignableFrom(parameterType)
-                && !String.class.isAssignableFrom(parameterType)
-                && !PageResponse.class.isAssignableFrom(parameterType);
+        return !ApiResponse.class.isAssignableFrom(parameterType) && !String.class.isAssignableFrom(parameterType);
     }
 
     private boolean isJsonContent(MediaType selectedContentType) {

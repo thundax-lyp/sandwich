@@ -5,12 +5,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
+import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
@@ -23,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 public class DictControllerContractTest {
 
@@ -52,6 +60,29 @@ public class DictControllerContractTest {
         assertEquals("Enabled", queryCaptor.getValue().getLabel());
         assertEquals("status", queryCaptor.getValue().getType());
         assertEquals("visible", queryCaptor.getValue().getRemarks());
+    }
+
+    @Test
+    public void shouldWrapPageJsonResponseWithApiResponseAdvice() throws Exception {
+        DictService dictService = mock(DictService.class);
+        PageDTO<Dict> page = new PageDTO<>();
+        page.setPageNo(1);
+        page.setPageSize(10);
+        page.setCount(1L);
+        page.setList(Collections.singletonList(dict("d1")));
+        when(dictService.page(any(DictQuery.class), any(PageDTO.class))).thenReturn(page);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new DictController(dictService))
+                .setControllerAdvice(new ApiResponseBodyAdvice())
+                .build();
+
+        mockMvc.perform(post("/api/sys/dict/page")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pageNo\":1,\"pageSize\":10}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
+                .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
+                .andExpect(jsonPath("$.data.records[0].id").value("d1"));
     }
 
     @Test

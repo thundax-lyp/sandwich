@@ -55,7 +55,7 @@ public class SignatureControllerContractTest {
     }
 
     @Test
-    public void shouldNotWrapPageResponseAgain() throws Exception {
+    public void shouldWrapPageResponseWithApiResponseAdvice() throws Exception {
         PageResponse<Object> body = new PageResponse<>();
 
         Object result = advice.beforeBodyWrite(
@@ -66,7 +66,8 @@ public class SignatureControllerContractTest {
                 null,
                 null);
 
-        assertSame(body, result);
+        ApiResponse<?> response = (ApiResponse<?>) result;
+        assertSame(body, response.getData());
     }
 
     private SignatureController controller(SignatureService signatureService) {

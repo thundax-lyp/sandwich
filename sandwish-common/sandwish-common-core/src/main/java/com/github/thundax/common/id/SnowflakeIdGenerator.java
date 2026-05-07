@@ -43,7 +43,7 @@ public class SnowflakeIdGenerator implements IdGenerator {
 
         lastTimestamp = timestamp;
         long id = ((timestamp - CUSTOM_EPOCH) << TIMESTAMP_SHIFT) | (workerId << WORKER_ID_SHIFT) | sequence;
-        return EntityId.of(String.valueOf(id));
+        return EntityId.of(id);
     }
 
     protected long currentTimeMillis() {

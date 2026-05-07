@@ -29,6 +29,11 @@ public class ServiceDaoBoundaryArchitectureTest extends AbstractArchitectureTest
     }
 
     @Test
+    public void shouldNotDeclareAuthServicesInBusinessModule() {
+        LayerArchitectureRuleSupport.assertBusinessModuleSourceDoesNotDeclareAuthServices();
+    }
+
+    @Test
     public void shouldRejectLayerPublicApiMethodsUsedOnlyByTests() {
         LayerArchitectureRuleSupport.assertLayerPublicApiMethodsAreNotTestOnly();
     }

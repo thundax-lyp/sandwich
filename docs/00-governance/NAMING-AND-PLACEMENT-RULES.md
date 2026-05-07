@@ -54,6 +54,7 @@
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 - `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，并下沉到对应业务模块的 `controller/request` 与 `controller/response` 包；不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
 - `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
+- `PATH_AUTH_SERVICE_API_ONLY`：入口认证编排 Service 固定归属 API 入口模块，后台命名为 `AdminAuthService` / `AdminAuthServiceImpl`，前台命名为 `MemberAuthService` / `MemberAuthServiceImpl`；`sandwish-biz` 不得声明 `*AuthService` 或 `*AuthServiceImpl`。
 
 ### Layer
 
@@ -78,6 +79,7 @@
 - `NAME_CONTROLLER`：Controller 命名以 `Controller` 结尾
 - `NAME_SERVICE`：Service 命名以 `Service` 结尾
 - `NAME_SERVICE_IMPL`：Service 实现命名以 `ServiceImpl` 结尾
+- `NAME_API_SERVICE_AUTH_ONLY`：`sandwish-admin-api` 和 `sandwish-front-api` 中只有入口认证编排类型允许使用 `Service` / `ServiceImpl` 后缀，且名称必须以 `AuthService` / `AuthServiceImpl` 结尾；其他业务 Service 固定归属 `sandwish-biz`。
 - `NAME_DAO`：DAO interface 命名固定以 `Dao` 结尾
 - `NAME_DAO_IMPL`：DAO implementation 命名固定以 `DaoImpl` 结尾
 - `NAME_MAPPER`：Mapper 命名以 `Mapper` 结尾

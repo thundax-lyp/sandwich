@@ -1,6 +1,6 @@
 package com.github.thundax.modules.member.service;
 
-public interface MemberAccessService {
+public interface MemberAccessSupport {
 
     String getCurrentMemberId();
 

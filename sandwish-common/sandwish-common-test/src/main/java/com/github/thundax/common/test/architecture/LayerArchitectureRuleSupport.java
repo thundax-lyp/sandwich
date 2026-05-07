@@ -154,6 +154,36 @@ public final class LayerArchitectureRuleSupport {
                 violations.isEmpty());
     }
 
+    public static void assertApiModuleSourceDeclaresOnlyAuthServices(String apiModule) {
+        Path sourceRoot = ArchitectureSourceSupport.repositoryRoot()
+                .resolve(apiModule)
+                .resolve("src/main/java/com/github/thundax/modules");
+        List<String> violations = new ArrayList<String>();
+
+        collectServiceSourceViolations(sourceRoot, true, violations);
+
+        assertTrue(
+                "API modules may only declare entry-specific *AuthService or *AuthServiceImpl source files. "
+                        + "Other Service types belong in sandwish-biz. Violations: "
+                        + violations,
+                violations.isEmpty());
+    }
+
+    public static void assertBusinessModuleSourceDoesNotDeclareAuthServices() {
+        Path sourceRoot = ArchitectureSourceSupport.repositoryRoot()
+                .resolve("sandwish-biz")
+                .resolve("src/main/java/com/github/thundax/modules");
+        List<String> violations = new ArrayList<String>();
+
+        collectServiceSourceViolations(sourceRoot, false, violations);
+
+        assertTrue(
+                "*AuthService and *AuthServiceImpl are entry-specific authentication orchestrators and must stay "
+                        + "in sandwish-admin-api or sandwish-front-api. Violations: "
+                        + violations,
+                violations.isEmpty());
+    }
+
     public static void assertLayerPublicApiMethodsAreNotTestOnly() {
         assertLayerPublicApiMethodsAreNotTestOnly(Collections.emptySet());
     }
@@ -288,6 +318,34 @@ public final class LayerArchitectureRuleSupport {
                 || javaClass.getSimpleName().equals("BaseServiceImpl")
                 || javaClass.getSimpleName().endsWith("BaseService")
                 || javaClass.getSimpleName().endsWith("BaseServiceImpl");
+    }
+
+    private static void collectServiceSourceViolations(
+            Path sourceRoot, boolean allowOnlyAuthServices, List<String> violations) {
+        if (!Files.exists(sourceRoot)) {
+            return;
+        }
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().endsWith(".java"))
+                    .forEach(path -> collectServiceSourceViolation(path, allowOnlyAuthServices, violations));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void collectServiceSourceViolation(
+            Path path, boolean allowOnlyAuthServices, List<String> violations) {
+        String fileName = path.getFileName().toString();
+        String className = fileName.substring(0, fileName.length() - ".java".length());
+        boolean serviceType = className.endsWith("Service") || className.endsWith("ServiceImpl");
+        boolean authServiceType = className.endsWith("AuthService") || className.endsWith("AuthServiceImpl");
+        if (allowOnlyAuthServices && serviceType && !authServiceType) {
+            violations.add(ArchitectureSourceSupport.repositoryPath(ArchitectureSourceSupport.repositoryRoot(), path));
+        }
+        if (!allowOnlyAuthServices && authServiceType) {
+            violations.add(ArchitectureSourceSupport.repositoryPath(ArchitectureSourceSupport.repositoryRoot(), path));
+        }
     }
 
     private static List<SourceFile> sources(String sourceRoot) {

@@ -2,7 +2,7 @@ package com.github.thundax.modules.member.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-public interface SessionCacheService {
+public interface SessionCacheSupport {
 
     <T> T get(String sessionId, String key, Class<T> clazz);
 

@@ -6,14 +6,14 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.thread.PooledThreadLocal;
-import com.github.thundax.modules.member.service.SessionCacheService;
+import com.github.thundax.modules.member.service.SessionCacheSupport;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SessionCacheServiceImpl implements SessionCacheService {
+public class SessionCacheSupportImpl implements SessionCacheSupport {
 
     private static final String CACHE_KEY_FORMAT = Constants.CACHE_PREFIX + "admin.session.%s.%s";
 

@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.utils;
 
 import com.github.thundax.common.utils.RSAUtils;
-import com.github.thundax.modules.member.service.SessionCacheService;
+import com.github.thundax.modules.member.service.SessionCacheSupport;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.stereotype.Component;
@@ -12,10 +12,10 @@ public class RsaSessionUtils {
     private static final String CACHE_RSA_MODULUS = "rsa_modulus";
     private static final String CACHE_RSA_PRIVATE_EXPONENT = "rsa_private_exponent";
 
-    private final SessionCacheService sessionCacheService;
+    private final SessionCacheSupport sessionCacheSupport;
 
-    public RsaSessionUtils(SessionCacheService sessionCacheService) {
-        this.sessionCacheService = sessionCacheService;
+    public RsaSessionUtils(SessionCacheSupport sessionCacheSupport) {
+        this.sessionCacheSupport = sessionCacheSupport;
     }
 
     public String updateRsaKey(HttpServletRequest request) {
@@ -23,9 +23,9 @@ public class RsaSessionUtils {
 
         HttpSession session = request.getSession(true);
 
-        sessionCacheService.put(
+        sessionCacheSupport.put(
                 session.getId(), CACHE_RSA_MODULUS, keyPair.getModulus(), session.getMaxInactiveInterval());
-        sessionCacheService.put(
+        sessionCacheSupport.put(
                 session.getId(),
                 CACHE_RSA_PRIVATE_EXPONENT,
                 keyPair.getPrivateKeyExponent(),
@@ -37,8 +37,8 @@ public class RsaSessionUtils {
     public String decryptRsaValue(HttpServletRequest request, String encryptedValue) {
         HttpSession session = request.getSession(true);
 
-        String modulus = sessionCacheService.get(session.getId(), CACHE_RSA_MODULUS, String.class);
-        String privateExponent = sessionCacheService.get(session.getId(), CACHE_RSA_PRIVATE_EXPONENT, String.class);
+        String modulus = sessionCacheSupport.get(session.getId(), CACHE_RSA_MODULUS, String.class);
+        String privateExponent = sessionCacheSupport.get(session.getId(), CACHE_RSA_PRIVATE_EXPONENT, String.class);
 
         RSAUtils.ReadableKeyPair keyPair = new RSAUtils.ReadableKeyPair(null, modulus, null, privateExponent);
         return RSAUtils.decryptBase64(encryptedValue, keyPair);

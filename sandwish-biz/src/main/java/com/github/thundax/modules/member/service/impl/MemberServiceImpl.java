@@ -44,14 +44,8 @@ public class MemberServiceImpl implements MemberService {
     public List<Member> list(MemberQuery query) {
         return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
-                query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
-                query == null ? null : query.getRemarks(),
-                query == null ? null : query.getBeginRegisterDate(),
-                query == null ? null : query.getEndRegisterDate(),
-                query == null ? null : query.getBeginLoginDate(),
-                query == null ? null : query.getEndLoginDate(),
-                query == null ? null : query.getMobile());
+                query == null ? null : query.getRemarks());
     }
 
     @Override
@@ -59,14 +53,8 @@ public class MemberServiceImpl implements MemberService {
         PageDTO<Member> normalizedPage = normalizePage(page);
         IPage<Member> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
-                query == null ? null : query.getEmail(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
-                query == null ? null : query.getBeginRegisterDate(),
-                query == null ? null : query.getEndRegisterDate(),
-                query == null ? null : query.getBeginLoginDate(),
-                query == null ? null : query.getEndLoginDate(),
-                query == null ? null : query.getMobile(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         normalizedPage.setPageNo((int) dataPage.getCurrent());
@@ -74,18 +62,6 @@ public class MemberServiceImpl implements MemberService {
         normalizedPage.setCount(dataPage.getTotal());
         normalizedPage.setList(dataPage.getRecords());
         return normalizedPage;
-    }
-
-    @Override
-    public Member getByLoginName(String loginName) {
-        List<Member> members = dao.listByLoginName(loginName);
-        return members == null || members.isEmpty() ? null : members.get(0);
-    }
-
-    @Override
-    public Member getByEmail(String email) {
-        List<Member> members = dao.listByEmail(email);
-        return members == null || members.isEmpty() ? null : members.get(0);
     }
 
     @Override
@@ -99,12 +75,6 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(rollbackFor = Exception.class)
     public void update(Member member) {
         dao.update(member);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updateLoginInfo(Member member) {
-        dao.updateLoginInfo(member);
     }
 
     @Override
@@ -135,12 +105,6 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(rollbackFor = Exception.class)
     public int batchDeleteById(List<EntityId> ids) {
         return batchOperate(ids, this::deleteById);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePassword(Member member) {
-        dao.updateLoginPass(member);
     }
 
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {

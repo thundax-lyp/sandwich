@@ -27,15 +27,7 @@ public interface MemberService {
 
     int batchDeleteById(List<EntityId> ids);
 
-    Member getByLoginName(String loginName);
-
-    Member getByEmail(String email);
-
-    void updateLoginInfo(Member member);
-
     void updateInfo(Member member);
-
-    void updatePassword(Member member);
 
     int updateStatus(Member member);
 

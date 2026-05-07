@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import org.junit.Test;
@@ -14,38 +15,50 @@ import org.junit.Test;
 public class MemberPersistenceAssemblerTest {
 
     @Test
-    public void shouldReadEnableFlagAsDomainValue() {
+    public void shouldReadStatusAsDomainValue() {
         MemberDO dataObject = new MemberDO();
-        dataObject.setEnableFlag("ENABLED");
+        dataObject.setStatus("ACTIVE");
 
         Member entity = MemberPersistenceAssembler.toEntity(dataObject);
 
-        assertSame(MemberStatus.ENABLED, entity.getStatus());
+        assertSame(MemberStatus.ACTIVE, entity.getStatus());
     }
 
     @Test
-    public void shouldRejectLegacyEnableFlagValue() {
+    public void shouldRejectLegacyStatusValue() {
         MemberDO dataObject = new MemberDO();
-        dataObject.setEnableFlag("1");
+        dataObject.setStatus("1");
 
         try {
             MemberPersistenceAssembler.toEntity(dataObject);
-            fail("Legacy enable flag value must be rejected");
+            fail("Legacy status value must be rejected");
         } catch (BizException expected) {
             assertEquals("Unknown member status: 1", expected.getMessage());
         }
     }
 
     @Test
-    public void shouldWriteDomainValueToEnableFlag() {
+    public void shouldWriteDomainValueToStatus() {
         Member entity = new Member();
         entity.setId(EntityId.of(5001L));
-        entity.setStatus(MemberStatus.DISABLED);
+        entity.setStatus(MemberStatus.SUSPENDED);
 
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
 
         assertEquals(Long.valueOf(5001L), dataObject.getId());
-        assertEquals("DISABLED", dataObject.getEnableFlag());
+        assertEquals("SUSPENDED", dataObject.getStatus());
+    }
+
+    @Test
+    public void shouldMapGenderAtPersistenceBoundary() {
+        MemberDO dataObject = new MemberDO();
+        dataObject.setGender("PRIVATE");
+
+        Member entity = MemberPersistenceAssembler.toEntity(dataObject);
+
+        assertSame(MemberGender.PRIVATE, entity.getGender());
+        entity.setGender(MemberGender.FEMALE);
+        assertEquals("FEMALE", MemberPersistenceAssembler.toDataObject(entity).getGender());
     }
 
     @Test

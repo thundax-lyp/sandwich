@@ -1,10 +1,8 @@
 package com.github.thundax.modules.member.persistence.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.thundax.common.persistence.typehandler.DefaultEncryptTypeHandler;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,35 +19,10 @@ public class MemberDO {
     @TableId(type = IdType.INPUT)
     private Long id;
 
-    private String loginName;
-
-    private String loginPass;
-
-    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
-    private String email;
-
     private String name;
     private String gender;
 
-    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
-    private String mobile;
-
-    @TableField(typeHandler = DefaultEncryptTypeHandler.class)
-    private String address;
-
-    private String zipcode;
-
-    private String enableFlag;
-
-    private String registerIp;
-
-    private Date registerDate;
-
-    private String lastLoginIp;
-
-    private Date lastLoginDate;
-
-    private int loginCount;
+    private String status;
 
     private Integer priority;
     private String remarks;

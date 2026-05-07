@@ -11,12 +11,15 @@
 当前覆盖范围：
 
 - 前台会员主体 `Member`
-- 会员登录名、密码、联系方式和基础资料
-- 会员启用状态
-- 会员注册与登录行为字段
+- 会员姓名、性别和基础业务状态
+- 会员生命周期状态
 
 当前不覆盖范围：
 
+- 会员登录标识和认证凭据
+- 会员联系方式登录标识
+- 会员注册与登录行为字段
+- 会员地址、邮编等私密资料
 - 会员 OAuth / 第三方身份绑定
 - 会员等级、积分、权益和订单关系
 - 会员实名认证资料
@@ -37,7 +40,8 @@
 ## 5. Core Business Objects
 
 - `Member`：前台会员主体。
-- `MemberStatus`：会员状态，固定表达启用和禁用。
+- `MemberGender`：会员性别，固定表达男、女和保密。
+- `MemberStatus`：会员生命周期状态，固定表达待激活、活跃、暂停和关闭。
 - `MemberSecurityContext`：前台会员运行时身份上下文。
 
 ## 6. Global Constraints
@@ -45,15 +49,12 @@
 - 会员主表固定为 `member_member`。
 - 会员数据库表使用 `member_` 业务域前缀。
 - 会员身份上下文不得与后台 `UserAccessHolder` 混用。
-- 会员敏感联系方式字段由持久化层加密类型处理器处理。
-- 密码字段不得保存明文。
+- `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
 
 ## 7. Functional Requirements
 
-- 系统可以保存会员登录名、密码、邮箱、姓名、性别、手机号、地址和邮编。
-- 系统可以启用或禁用会员。
-- 系统可以记录会员注册 IP、注册时间、最后登录 IP、最后登录时间和登录次数。
-- 系统可以通过登录名、邮箱和手机号查询会员。
+- 系统可以保存会员姓名、性别、生命周期状态、排序值和备注。
+- 系统可以维护会员生命周期状态。
 - 系统可以分页查询会员列表。
 
 ## 8. Key Flows
@@ -64,12 +65,6 @@
 2. DAO implementation 将 `Member` 转换为 `MemberDO`。
 3. Mapper 持久化到 `member_member`。
 4. DAO implementation 将持久化结果转换回 `Member`。
-
-### 8.2 Member Login Info Update
-
-1. 会员认证流程完成身份校验。
-2. Service 更新最后登录 IP、最后登录时间和登录次数。
-3. DAO implementation 更新 `member_member` 的登录行为字段。
 
 ## 9. Non-Functional Requirements
 

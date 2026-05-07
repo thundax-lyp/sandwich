@@ -18,7 +18,11 @@
 
 当前不覆盖范围：
 
-- 会员第三方登录标识表
+- 会员登录标识表
+- 会员认证凭据表
+- 会员认证会话和 token 表
+- 会员联系方式登录依据
+- 会员地址、邮编等私密资料
 - 会员实名认证表
 - 会员等级、积分和权益表
 - 会员操作审计表
@@ -32,8 +36,6 @@
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - 会员主表使用 `member_` 业务域前缀。
 - 会员主表固定使用 `member_member`。
-- `email`、`mobile` 和 `address` 由持久化类型处理器加密处理。
-- `login_pass` 不保存明文。
 - DAO list/page 查询固定追加 `del_flag = '0'` 条件。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
@@ -41,11 +43,7 @@
 
 - 会员主表固定为 `member_member`。
 - 主键字段固定为 `id`。
-- 登录名字段固定为 `login_name`。
-- 密码字段固定为 `login_pass`。
-- 会员状态字段固定为 `enable_flag`。
-- 注册行为字段固定为 `register_ip` 和 `register_date`。
-- 最近登录行为字段固定为 `last_login_ip`、`last_login_date` 和 `login_count`。
+- 会员状态字段固定为 `status`。
 - 审计字段固定为 `create_date`、`create_by`、`update_date`、`update_by`。
 - 逻辑删除字段固定为 `del_flag`。
 
@@ -59,25 +57,14 @@
 
 ### 6.1 member_member
 
-`member_member` 保存前台会员主体资料和必要登录行为字段。
+`member_member` 保存前台会员主体必要业务数据。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
 | `id` | `id` | `id` | 是 | 会员主键 |
-| `login_name` | `loginName` | `loginName` | 是 | 登录名 |
-| `login_pass` | `loginPass` | `loginPass` | 否 | 密码哈希 |
-| `email` | `email` | `email` | 否 | 邮箱 |
 | `name` | `name` | `name` | 否 | 姓名 |
 | `gender` | `gender` | `gender` | 否 | 性别 |
-| `mobile` | `mobile` | `mobile` | 否 | 手机号 |
-| `address` | `address` | `address` | 否 | 地址 |
-| `zipcode` | `zipcode` | `zipcode` | 否 | 邮编 |
-| `enable_flag` | `enableFlag` | `status` | 是 | 会员状态 |
-| `register_ip` | `registerIp` | `registerIp` | 否 | 注册 IP |
-| `register_date` | `registerDate` | `registerDate` | 否 | 注册时间 |
-| `last_login_ip` | `lastLoginIp` | `lastLoginIp` | 否 | 最近登录 IP |
-| `last_login_date` | `lastLoginDate` | `lastLoginDate` | 否 | 最近登录时间 |
-| `login_count` | `loginCount` | `loginCount` | 是 | 登录次数 |
+| `status` | `status` | `status` | 是 | 会员生命周期状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
@@ -88,19 +75,17 @@
 字段规则：
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `login_name` 是会员登录业务标识，不作为数据库主键。
-- `enable_flag` 通过 `MemberStatus.value()` 写入。
-- `login_count` 默认值固定为 `0`。
+- `gender` 通过 `MemberGender.value()` 写入。
+- `gender` 固定使用状态值：`MALE`、`FEMALE`、`PRIVATE`。
+- `status` 通过 `MemberStatus.value()` 写入。
+- `status` 固定使用状态值：`PENDING`、`ACTIVE`、`SUSPENDED`、`CLOSED`。
 - `priority` 默认值固定为 `0`。
 - `del_flag` 默认值固定为 `'0'`，`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
 
 索引设计：
 
 - 主键：`pk_member_member(id)`
-- 唯一索引：`uk_member_member_login_name(login_name)`
-- 普通索引：`idx_member_member_status(enable_flag, priority, create_date)`
-- 普通索引：`idx_member_member_email(email)`
-- 普通索引：`idx_member_member_mobile(mobile)`
+- 普通索引：`idx_member_member_status(status, priority, create_date)`
 - 普通索引：`idx_member_member_del_flag(del_flag)`
 
 ## 7. Relationship Rules
@@ -120,7 +105,7 @@
 ## 9. Query Model Rules
 
 - `list/page` 查询固定过滤 `del_flag = '0'`。
-- 会员列表默认按 `priority` 和 `email` 升序。
+- 会员列表默认按 `priority` 和 `name` 升序。
 - `pageNo` / `pageSize` 由 Service 校验，DAO implementation 只按已校验参数执行分页。
 
 ## 10. Open Items

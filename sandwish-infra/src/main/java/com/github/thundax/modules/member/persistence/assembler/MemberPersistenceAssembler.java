@@ -2,6 +2,7 @@ package com.github.thundax.modules.member.persistence.assembler;
 
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import java.util.ArrayList;
@@ -17,20 +18,9 @@ public final class MemberPersistenceAssembler {
         }
         MemberDO dataObject = new MemberDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setLoginName(entity.getLoginName());
-        dataObject.setLoginPass(entity.getLoginPass());
-        dataObject.setEmail(entity.getEmail());
         dataObject.setName(entity.getName());
-        dataObject.setGender(entity.getGender());
-        dataObject.setMobile(entity.getMobile());
-        dataObject.setAddress(entity.getAddress());
-        dataObject.setZipcode(entity.getZipcode());
-        dataObject.setEnableFlag(statusValue(entity.getStatus()));
-        dataObject.setRegisterIp(entity.getRegisterIp());
-        dataObject.setRegisterDate(entity.getRegisterDate());
-        dataObject.setLastLoginIp(entity.getLastLoginIp());
-        dataObject.setLastLoginDate(entity.getLastLoginDate());
-        dataObject.setLoginCount(entity.getLoginCount());
+        dataObject.setGender(genderValue(entity.getGender()));
+        dataObject.setStatus(statusValue(entity.getStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -46,20 +36,9 @@ public final class MemberPersistenceAssembler {
         }
         Member entity = new Member();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setLoginName(dataObject.getLoginName());
-        entity.setLoginPass(dataObject.getLoginPass());
-        entity.setEmail(dataObject.getEmail());
         entity.setName(dataObject.getName());
-        entity.setGender(dataObject.getGender());
-        entity.setMobile(dataObject.getMobile());
-        entity.setAddress(dataObject.getAddress());
-        entity.setZipcode(dataObject.getZipcode());
-        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
-        entity.setRegisterIp(dataObject.getRegisterIp());
-        entity.setRegisterDate(dataObject.getRegisterDate());
-        entity.setLastLoginIp(dataObject.getLastLoginIp());
-        entity.setLastLoginDate(dataObject.getLastLoginDate());
-        entity.setLoginCount(dataObject.getLoginCount());
+        entity.setGender(genderFrom(dataObject.getGender()));
+        entity.setStatus(statusFrom(dataObject.getStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -90,5 +69,13 @@ public final class MemberPersistenceAssembler {
 
     private static MemberStatus statusFrom(String status) {
         return status == null ? null : MemberStatus.from(status);
+    }
+
+    private static String genderValue(MemberGender gender) {
+        return gender == null ? null : gender.value();
+    }
+
+    private static MemberGender genderFrom(String gender) {
+        return gender == null ? null : MemberGender.from(gender);
     }
 }

@@ -11,7 +11,6 @@ import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 
@@ -42,26 +41,16 @@ public class MemberServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberQuery query = new MemberQuery();
-        Date begin = new Date(1000L);
-        Date end = new Date(2000L);
-        query.setStatus(MemberStatus.ENABLED);
-        query.setEmail("a@example.com");
+        query.setStatus(MemberStatus.ACTIVE);
         query.setName("alice");
         query.setRemarks("remark");
-        query.setBeginRegisterDate(begin);
-        query.setEndRegisterDate(end);
-        query.setMobile("13800000000");
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
         service.list(query);
 
-        assertEquals("ENABLED", dao.enableFlag);
-        assertEquals("a@example.com", dao.email);
+        assertEquals("ACTIVE", dao.status);
         assertEquals("alice", dao.name);
         assertEquals("remark", dao.remarks);
-        assertEquals(query.getBeginRegisterDate(), dao.beginRegisterDate);
-        assertEquals(query.getEndRegisterDate(), dao.endRegisterDate);
-        assertEquals("13800000000", dao.mobile);
     }
 
     @Test
@@ -79,14 +68,14 @@ public class MemberServiceImplTest {
     }
 
     @Test
-    public void shouldBatchEnableFlagUpdate() {
+    public void shouldBatchStatusUpdate() {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
         int count = service.batchUpdateStatus(Arrays.asList(member(8001L), member(8002L)));
 
         assertEquals(2, count);
-        assertEquals(2, dao.enableUpdateCalls);
+        assertEquals(2, dao.statusUpdateCalls);
     }
 
     private static Member member(Long id) {
@@ -100,15 +89,11 @@ public class MemberServiceImplTest {
         private Member getResult;
         private Long id;
         private int getCalls;
-        private String enableFlag;
-        private String email;
+        private String status;
         private String name;
         private String remarks;
-        private Date beginRegisterDate;
-        private Date endRegisterDate;
-        private String mobile;
         private Member inserted;
-        private int enableUpdateCalls;
+        private int statusUpdateCalls;
 
         @Override
         public Member getById(EntityId id) {
@@ -123,39 +108,16 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public List<Member> list(
-                String enableFlag,
-                String email,
-                String name,
-                String remarks,
-                Date beginRegisterDate,
-                Date endRegisterDate,
-                Date beginLoginDate,
-                Date endLoginDate,
-                String mobile) {
-            this.enableFlag = enableFlag;
-            this.email = email;
+        public List<Member> list(String status, String name, String remarks) {
+            this.status = status;
             this.name = name;
             this.remarks = remarks;
-            this.beginRegisterDate = beginRegisterDate;
-            this.endRegisterDate = endRegisterDate;
-            this.mobile = mobile;
             return null;
         }
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> page(
-                String enableFlag,
-                String email,
-                String name,
-                String remarks,
-                Date beginRegisterDate,
-                Date endRegisterDate,
-                Date beginLoginDate,
-                Date endLoginDate,
-                String mobile,
-                int pageNo,
-                int pageSize) {
+                String status, String name, String remarks, int pageNo, int pageSize) {
             return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
         }
 
@@ -181,27 +143,11 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public List<Member> listByLoginName(String loginName) {
-            return null;
-        }
-
-        @Override
-        public List<Member> listByEmail(String email) {
-            return null;
-        }
-
-        @Override
-        public void updateLoginInfo(Member member) {}
-
-        @Override
         public void updateInfo(Member member) {}
 
         @Override
-        public void updateLoginPass(Member member) {}
-
-        @Override
         public int updateStatus(Member member) {
-            this.enableUpdateCalls++;
+            this.statusUpdateCalls++;
             return 1;
         }
     }

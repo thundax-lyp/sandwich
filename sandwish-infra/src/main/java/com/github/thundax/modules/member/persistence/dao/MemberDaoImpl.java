@@ -12,7 +12,6 @@ import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import com.github.thundax.modules.member.persistence.mapper.MemberMapper;
-import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -41,53 +40,14 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> list(
-            String enableFlag,
-            String email,
-            String name,
-            String remarks,
-            Date beginRegisterDate,
-            Date endRegisterDate,
-            Date beginLoginDate,
-            Date endLoginDate,
-            String mobile) {
-        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(
-                enableFlag,
-                email,
-                name,
-                remarks,
-                beginRegisterDate,
-                endRegisterDate,
-                beginLoginDate,
-                endLoginDate,
-                mobile)));
+    public List<Member> list(String status, String name, String remarks) {
+        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status, name, remarks)));
     }
 
     @Override
-    public Page<Member> page(
-            String enableFlag,
-            String email,
-            String name,
-            String remarks,
-            Date beginRegisterDate,
-            Date endRegisterDate,
-            Date beginLoginDate,
-            Date endLoginDate,
-            String mobile,
-            int pageNo,
-            int pageSize) {
-        Page<MemberDO> dataObjectPage = mapper.selectPage(
-                new Page<>(pageNo, pageSize),
-                buildListWrapper(
-                        enableFlag,
-                        email,
-                        name,
-                        remarks,
-                        beginRegisterDate,
-                        endRegisterDate,
-                        beginLoginDate,
-                        endLoginDate,
-                        mobile));
+    public Page<Member> page(String status, String name, String remarks, int pageNo, int pageSize) {
+        Page<MemberDO> dataObjectPage =
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(status, name, remarks));
         Page<Member> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -115,11 +75,7 @@ public class MemberDaoImpl implements MemberDao {
                 buildIdUpdateWrapper(dataObject)
                         .set(MemberDO::getName, dataObject.getName())
                         .set(MemberDO::getGender, dataObject.getGender())
-                        .set(MemberDO::getMobile, dataObject.getMobile())
-                        .set(MemberDO::getAddress, dataObject.getAddress())
-                        .set(MemberDO::getEmail, dataObject.getEmail())
-                        .set(MemberDO::getZipcode, dataObject.getZipcode())
-                        .set(MemberDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(MemberDO::getStatus, dataObject.getStatus())
                         .set(MemberDO::getPriority, dataObject.getPriority())
                         .set(MemberDO::getRemarks, dataObject.getRemarks()));
     }
@@ -137,54 +93,19 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> listByLoginName(String loginName) {
-        LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberDO::getLoginName, loginName);
-        return MemberPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
-    }
-
-    @Override
-    public List<Member> listByEmail(String email) {
-        LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberDO::getEmail, email);
-        return MemberPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
-    }
-
-    @Override
-    public void updateLoginInfo(Member member) {
-        MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
-        mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(MemberDO::getLastLoginIp, dataObject.getLastLoginIp())
-                        .set(MemberDO::getLastLoginDate, dataObject.getLastLoginDate())
-                        .set(MemberDO::getLoginCount, dataObject.getLoginCount()));
-    }
-
-    @Override
     public void updateInfo(Member member) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
         mapper.update(
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(MemberDO::getName, dataObject.getName())
-                        .set(MemberDO::getGender, dataObject.getGender())
-                        .set(MemberDO::getMobile, dataObject.getMobile())
-                        .set(MemberDO::getAddress, dataObject.getAddress())
-                        .set(MemberDO::getZipcode, dataObject.getZipcode()));
-    }
-
-    @Override
-    public void updateLoginPass(Member member) {
-        MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
-        mapper.update(null, buildIdUpdateWrapper(dataObject).set(MemberDO::getLoginPass, dataObject.getLoginPass()));
+                        .set(MemberDO::getGender, dataObject.getGender()));
     }
 
     @Override
     public int updateStatus(Member member) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(member);
-        return mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(MemberDO::getEnableFlag, dataObject.getEnableFlag()));
+        return mapper.update(null, buildIdUpdateWrapper(dataObject).set(MemberDO::getStatus, dataObject.getStatus()));
     }
 
     private LambdaUpdateWrapper<MemberDO> buildIdUpdateWrapper(MemberDO dataObject) {
@@ -193,23 +114,11 @@ public class MemberDaoImpl implements MemberDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<MemberDO> buildListWrapper(
-            String enableFlag,
-            String email,
-            String name,
-            String remarks,
-            Date beginRegisterDate,
-            Date endRegisterDate,
-            Date beginLoginDate,
-            Date endLoginDate,
-            String mobile) {
+    private LambdaQueryWrapper<MemberDO> buildListWrapper(String status, String name, String remarks) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-        if (StringUtils.isNotBlank(enableFlag)) {
-            wrapper.eq(MemberDO::getEnableFlag, enableFlag);
-        }
-        if (StringUtils.isNotBlank(email)) {
-            wrapper.like(MemberDO::getEmail, email);
+        if (StringUtils.isNotBlank(status)) {
+            wrapper.eq(MemberDO::getStatus, status);
         }
         if (StringUtils.isNotBlank(name)) {
             wrapper.like(MemberDO::getName, name);
@@ -217,16 +126,7 @@ public class MemberDaoImpl implements MemberDao {
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like(MemberDO::getRemarks, remarks);
         }
-        if (beginRegisterDate != null && endRegisterDate != null) {
-            wrapper.between(MemberDO::getRegisterDate, beginRegisterDate, endRegisterDate);
-        }
-        if (beginLoginDate != null && endLoginDate != null) {
-            wrapper.between(MemberDO::getLastLoginDate, beginLoginDate, endLoginDate);
-        }
-        if (StringUtils.isNotBlank(mobile)) {
-            wrapper.eq(MemberDO::getMobile, mobile);
-        }
-        wrapper.orderByAsc(MemberDO::getPriority, MemberDO::getEmail);
+        wrapper.orderByAsc(MemberDO::getPriority, MemberDO::getName);
         return wrapper;
     }
 }

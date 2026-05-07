@@ -5,7 +5,6 @@ import com.github.thundax.common.utils.encrypt.Md5Helper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Collections;
-import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,20 +38,12 @@ public class MemberSpringAuthenticationProvider implements AuthenticationProvide
         if (member == null) {
             throw new BadCredentialsException("用户名或密码错误。");
         }
-        if (!member.isEnable()) {
-            throw new DisabledException("用户已禁用，请联系管理员。");
+        if (!member.isActive()) {
+            throw new DisabledException("会员状态不可用，请联系管理员。");
         }
         if (!Md5Helper.encrypt(defaultPassword).equals(Md5Helper.encrypt(password))) {
             throw new BadCredentialsException("用户名或密码错误。");
         }
-
-        member.setLastLoginDate(new Date());
-        if (member.getLoginName() != null) {
-            member.setLoginCount(member.getLoginCount() + 1);
-        } else {
-            member.setLoginCount(0);
-        }
-        memberService.updateLoginInfo(member);
 
         return new UsernamePasswordAuthenticationToken(
                 new MemberSpringPrincipal(member),

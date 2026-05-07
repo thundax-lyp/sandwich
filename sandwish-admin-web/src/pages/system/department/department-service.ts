@@ -1,4 +1,4 @@
-import { postJson } from "../api/http";
+import { postJson } from "@/api/http";
 
 export interface DepartmentListRequest {
     parentId?: string | null;

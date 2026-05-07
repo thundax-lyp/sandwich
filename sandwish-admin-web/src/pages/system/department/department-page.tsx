@@ -10,8 +10,8 @@ import { Alert, Button, Card, Form, Input, Space, Table, Tag, Typography } from 
 import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { listDepartments } from "@/service/department-service";
-import type { DepartmentListRequest, DepartmentResponse } from "@/service/department-service";
+import { listDepartments } from "./department-service";
+import type { DepartmentListRequest, DepartmentResponse } from "./department-service";
 
 const { Text, Title } = Typography;
 

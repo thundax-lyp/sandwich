@@ -73,7 +73,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             if (isSnowflakeIdDataObject(javaClass)) {
                 assertTableId(javaClass, "id", "", IdType.INPUT, Long.class);
             } else {
-                assertTableId(javaClass, "id", "", IdType.ASSIGN_UUID, String.class);
+                fail(javaClass.getFullName() + " must be registered as snowflake or non-auto id data object");
             }
         }
     }

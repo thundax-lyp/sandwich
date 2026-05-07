@@ -74,7 +74,7 @@
 ## 9. Non-Functional Requirements
 
 - 会员主表使用 `InnoDB` 和 `utf8mb4`。
-- 会员主键使用 MyBatis-Plus `IdType.ASSIGN_UUID`。
+- 会员主键使用雪花 `Long`。
 - 会员列表查询固定过滤 `del_flag = '0'`。
 - 会员资料持久化规则必须与 `MEMBER-DATABASE-DESIGN.md` 保持一致。
 

@@ -10,7 +10,7 @@ INSERT INTO `auth_oauth_client` (
     `status`, `contact`, `remark`,
     `create_date`, `create_by`, `update_date`, `update_by`
 ) VALUES (
-    'oauth-client-admin-web', 'sandwich-admin-web', 'CHANGE_ME_CLIENT_SECRET_HASH', 'Sandwich Admin Web', 'CONFIDENTIAL',
+    1000000000000010001, 'sandwich-admin-web', 'CHANGE_ME_CLIENT_SECRET_HASH', 'Sandwich Admin Web', 'CONFIDENTIAL',
     '["authorization_code","refresh_token"]',
     '["openid","profile","user.read"]',
     '["http://127.0.0.1:5173/login/oauth2/code/sandwich"]',

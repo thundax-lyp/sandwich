@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-data-auth`：改 SQL，迁移认证初始化 ID
-  - 范围文件：
-    - `db/data/auth.sql`
-  - 处理动作：将认证初始化数据中的固定 ID 调整为固定雪花 ID。
-  - 验收点：`db/data/auth.sql` 不再使用字符串数据库主键。
-  - 重要度：9/10
-
 - [ ] `snowflake-sql-data-storage`：改 SQL，迁移存储初始化 ID
   - 范围文件：
     - `db/data/storage.sql`

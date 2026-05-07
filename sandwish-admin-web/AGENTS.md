@@ -10,23 +10,10 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 - Server state: TanStack Query.
 - Tests: Vitest + Testing Library.
 
-## Core Conventions
+## Required Docs
 
-- Keep source file names in kebab-case, for example `current-user-service.ts`.
-- Prefer arrow functions for most frontend methods.
-- Prefer `export const XxxPage = () => {}` for React components.
-
-## File And Code Style
-
-- Organize pages as `src/pages/<module>/<domain>/<domain-page>.tsx`.
-- Put domain-specific page components under `src/pages/<module>/<domain>/components/`.
-- Put shared frontend components under `src/components/`.
-- Keep React components as named arrow-function exports.
-- Keep shared API access in `src/api/` or `src/service/`.
-- Keep page-specific API access next to the page as `src/pages/<module>/<domain>/<domain>-service.ts`.
-- Do not call `fetch` directly from pages or layouts.
-- Keep auth token and permission persistence in `src/auth/`.
-- Use TypeScript interfaces for request and response shapes when the shape is shared or crosses file boundaries.
+- For admin-web naming, placement, service ownership, frontend layering, and default forbidden directories, read:
+    - `docs/00-governance/ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`
 
 ## Auth And Permission Rules
 

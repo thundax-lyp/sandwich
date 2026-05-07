@@ -425,6 +425,50 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
+        1000000000000002074, 'member_auth_session_status', '活跃', 'ACTIVE', 0, '会员认证会话活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002075, 'member_auth_session_status', '已登出', 'LOGGED_OUT', 1, '会员认证会话登出状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002076, 'member_auth_session_status', '已失效', 'INVALIDATED', 2, '会员认证会话失效状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002077, 'member_auth_session_status', '已过期', 'EXPIRED', 3, '会员认证会话过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002078, 'member_access_token_status', '活跃', 'ACTIVE', 0, '会员访问 token 活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002079, 'member_access_token_status', '已撤销', 'REVOKED', 1, '会员访问 token 撤销状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002080, 'member_access_token_status', '已过期', 'EXPIRED', 2, '会员访问 token 过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002081, 'member_refresh_token_status', '活跃', 'ACTIVE', 0, '会员刷新 token 活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002082, 'member_refresh_token_status', '已使用', 'USED', 1, '会员刷新 token 已使用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002083, 'member_refresh_token_status', '已撤销', 'REVOKED', 2, '会员刷新 token 撤销状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002084, 'member_refresh_token_status', '已过期', 'EXPIRED', 3, '会员刷新 token 过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
         1000000000000002028, 'auth_session_status', '活跃', 'ACTIVE', 0, '认证会话活跃状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),

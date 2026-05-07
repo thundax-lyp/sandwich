@@ -9,25 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-token-model`：新增会员认证会话与 token 模型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberAuthSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberAccessToken.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberRefreshToken.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberAuthSessionStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberAccessTokenStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberRefreshTokenStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberAuthSessionDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberAuthSessionRuntimeDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberAccessTokenDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberRefreshTokenDao.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/member/entity/MemberCredentialTest.java`
-    - `db/data/system.sql`
-    - `docs/10-requirements/MEMBER-REQUIREMENTS.md`
-  - 处理动作：建立会员登录后的认证会话、access token 和 refresh token 业务模型。
-  - 验收点：登录成功可创建认证会话、访问 token 和刷新 token，状态枚举对齐后台认证生命周期。
-  - 重要度：10/10
-
 - [ ] `member-token-infra`：新增会员认证会话与 token 持久化
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberAuthSessionDO.java`

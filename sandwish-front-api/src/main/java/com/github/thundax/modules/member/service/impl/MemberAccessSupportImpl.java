@@ -11,14 +11,4 @@ public class MemberAccessSupportImpl implements MemberAccessSupport {
     public String getCurrentMemberId() {
         return MemberSecurityContext.getCurrentMemberId();
     }
-
-    @Override
-    public Object getSessionCache(String name) {
-        return MemberSecurityContext.getSessionCache(name);
-    }
-
-    @Override
-    public void setSessionCache(String name, Object value) {
-        MemberSecurityContext.setSessionCache(name, value);
-    }
 }

@@ -1,7 +1,11 @@
 package com.github.thundax.modules.member.assembler;
 
+import com.github.thundax.modules.member.controller.response.MemberLoginFormResponse;
 import com.github.thundax.modules.member.controller.response.MemberLoginStatusResponse;
+import com.github.thundax.modules.member.controller.response.MemberTokenResponse;
+import com.github.thundax.modules.member.entity.MemberLoginForm;
 import com.github.thundax.modules.member.security.MemberSpringPrincipal;
+import com.github.thundax.modules.member.service.result.MemberTokenResult;
 import org.springframework.lang.NonNull;
 
 public final class MemberLoginInterfaceAssembler {
@@ -30,6 +34,29 @@ public final class MemberLoginInterfaceAssembler {
         MemberLoginStatusResponse response = new MemberLoginStatusResponse();
         response.setLoggedIn(false);
         response.setMessage("退出成功");
+        return response;
+    }
+
+    public static MemberLoginFormResponse toLoginFormResponse(MemberLoginForm form) {
+        MemberLoginFormResponse response = new MemberLoginFormResponse();
+        response.setLoginToken(form.getLoginToken());
+        response.setRefreshTokenList(form.getRefreshTokenList());
+        response.setCaptcha(form.getCaptcha());
+        response.setExpiredSeconds(form.getExpiredSeconds());
+        response.setCheckCode(form.getCheckCode());
+        response.setPublicKey(form.getPublicKey());
+        return response;
+    }
+
+    public static MemberTokenResponse toTokenResponse(MemberTokenResult result) {
+        MemberTokenResponse response = new MemberTokenResponse();
+        response.setMemberId(
+                result.getMemberId() == null
+                        ? null
+                        : String.valueOf(result.getMemberId().value()));
+        response.setAccessToken(result.getAccessToken());
+        response.setRefreshToken(result.getRefreshToken());
+        response.setExpiresIn(result.getExpiresIn());
         return response;
     }
 }

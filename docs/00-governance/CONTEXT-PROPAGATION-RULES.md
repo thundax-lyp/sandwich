@@ -4,14 +4,14 @@
 
 本文档定义 Sandwich 请求上下文透传的统一规则。
 
-目标是固定后台用户、后台 token、前台会员、Session 缓存和线程上下文在请求入口、业务编排、持久化访问和异步执行中的建立方式、读取方式、清理方式与审阅口径。
+目标是固定后台用户、后台 token、前台会员 token 和线程上下文在请求入口、业务编排、持久化访问和异步执行中的建立方式、读取方式、清理方式与审阅口径。
 
 ## 2. Scope
 
 当前范围：
 
 - 后台请求基于 access token 建立 `UserAccessHolder`
-- 前台请求基于 Spring Security 建立 `MemberSecurityContext`
+- 前台请求基于 member access token 建立 `MemberSecurityContext`
 - Controller、Service、DAO、Mapper 对当前用户或会员上下文的读取边界
 - `PooledThreadLocal` 在请求结束后的清理边界
 - 异步任务、线程池、定时任务等非标准入口的上下文要求
@@ -55,8 +55,7 @@ Sandwich 当前存在两类运行时身份上下文：
 1. 前台认证过滤器完成会员认证。
 2. Spring Security `Authentication` 保存 `MemberSpringPrincipal`。
 3. 后续前台链路通过 `MemberSecurityContext.getPrincipal()` 或 `MemberSecurityContext.getCurrentMemberId()` 读取。
-4. 前台 session cache 通过 `MemberSecurityContext.getSessionCache(...)` 与 `setSessionCache(...)` 访问。
-5. 登出时清理 `SecurityContextHolder` 并失效当前 session。
+4. 登出时按 access token 撤销认证态。
 
 ## 5. Module Mapping
 
@@ -85,8 +84,6 @@ Sandwich 当前存在两类运行时身份上下文：
 - 后台当前用户：`UserAccessHolder`
 - 后台当前 token：`UserAccessHolder`
 - 前台当前会员：`MemberSecurityContext`
-- 前台当前 session cache：`MemberSecurityContext`
-
 不得在 Controller、Service、DAO 或 Mapper 中重新解析 token、session、cookie 来绕过上述上下文入口。
 
 ### 6.2 Entry Rule
@@ -104,7 +101,7 @@ Sandwich 当前存在两类运行时身份上下文：
 
 - 会员认证通过后才能写入 Spring Security `Authentication`
 - 受保护前台路径不得绕过 Spring Security 读取会员身份
-- 登出必须同时清理 `SecurityContextHolder` 和当前 session
+- 登出必须撤销 access token，不依赖 HTTP session
 
 ### 6.3 Controller Rule
 

@@ -24,7 +24,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
 
     @Override
     public AuthSession getById(EntityId id) {
-        return AuthSessionPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+        return AuthSessionPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
     @Override
     public List<AuthSession> listByUserIdAndStatus(EntityId userId, AuthSessionStatus status) {
         LambdaQueryWrapper<AuthSessionDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AuthSessionDO::getUserId, EntityIdCodec.toValue(userId));
+        wrapper.eq(AuthSessionDO::getUserId, EntityIdCodec.toStringValue(userId));
         if (status != null) {
             wrapper.eq(AuthSessionDO::getStatus, status.value());
         }
@@ -53,10 +53,10 @@ public class AuthSessionDaoImpl implements AuthSessionDao {
     }
 
     @Override
-    public String insert(AuthSession authSession) {
+    public EntityId insert(AuthSession authSession) {
         AuthSessionDO dataObject = AuthSessionPersistenceAssembler.toDataObject(authSession);
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

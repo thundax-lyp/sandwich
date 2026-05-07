@@ -35,7 +35,7 @@ public interface StoredObjectDao {
             int pageNo,
             int pageSize);
 
-    String insert(StoredObject entity);
+    EntityId insert(StoredObject entity);
 
     int update(StoredObject entity);
 

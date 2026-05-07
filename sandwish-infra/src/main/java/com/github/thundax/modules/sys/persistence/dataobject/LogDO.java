@@ -16,10 +16,10 @@ import lombok.Setter;
 @TableName("sys_log")
 public class LogDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
-    private String userId;
+    private Long userId;
 
     private String type;
 

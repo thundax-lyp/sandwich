@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.persistence.assembler.RolePersistenceAssembler;
@@ -34,6 +35,7 @@ public class RoleDaoImpl implements RoleDao {
     private final UserRoleMapper userRoleMapper;
     private final RoleCacheSupport cacheSupport;
     private final UserCacheSupport userCacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public RoleDaoImpl(
             RoleMapper mapper,
@@ -60,10 +62,10 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> listByIds(List<String> idList) {
+    public List<Role> listByIds(List<Long> idList) {
         List<Role> roleList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
             Role role = cacheSupport.getById(id);
             if (role == null) {
                 uncachedIdList.add(id);
@@ -96,8 +98,9 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public String insert(Role entity) {
+    public EntityId insert(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         mapper.update(
                 null,
@@ -105,7 +108,7 @@ public class RoleDaoImpl implements RoleDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -149,8 +152,8 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<String> listRoleMenus(String roleId) {
-        List<String> menuIds = cacheSupport.getRoleMenuIds(roleId);
+    public List<Long> listRoleMenus(Long roleId) {
+        List<Long> menuIds = cacheSupport.getRoleMenuIds(roleId);
         if (menuIds == null) {
             LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(MenuRoleDO::getRoleId, roleId);
@@ -163,7 +166,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public void deleteRoleMenu(String roleId) {
+    public void deleteRoleMenu(Long roleId) {
         LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MenuRoleDO::getRoleId, roleId);
         menuRoleMapper.delete(wrapper);
@@ -171,16 +174,16 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public void insertRoleMenu(String roleId, List<String> menuIdList) {
-        for (String menuId : menuIdList) {
+    public void insertRoleMenu(Long roleId, List<Long> menuIdList) {
+        for (Long menuId : menuIdList) {
             menuRoleMapper.insert(RolePersistenceAssembler.toMenuRoleDataObject(roleId, menuId));
         }
         removeRoleCaches(roleId);
     }
 
     @Override
-    public List<String> listRoleUsers(String roleId) {
-        List<String> userIds = cacheSupport.getRoleUserIds(roleId);
+    public List<Long> listRoleUsers(Long roleId) {
+        List<Long> userIds = cacheSupport.getRoleUserIds(roleId);
         if (userIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRoleDO::getRoleId, roleId);
@@ -193,7 +196,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public void deleteRoleUser(String roleId) {
+    public void deleteRoleUser(Long roleId) {
         LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserRoleDO::getRoleId, roleId);
         userRoleMapper.delete(wrapper);
@@ -201,8 +204,8 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public void insertRoleUser(String roleId, List<String> userIdList) {
-        for (String userId : userIdList) {
+    public void insertRoleUser(Long roleId, List<Long> userIdList) {
+        for (Long userId : userIdList) {
             userRoleMapper.insert(RolePersistenceAssembler.toUserRoleDataObject(userId, roleId));
         }
         removeRoleCaches(roleId);
@@ -224,7 +227,7 @@ public class RoleDaoImpl implements RoleDao {
         return wrapper;
     }
 
-    private void removeRoleCaches(String roleId) {
+    private void removeRoleCaches(Long roleId) {
         cacheSupport.removeById(roleId);
         cacheSupport.removeRoleUserIds(roleId);
         cacheSupport.removeRoleMenuIds(roleId);

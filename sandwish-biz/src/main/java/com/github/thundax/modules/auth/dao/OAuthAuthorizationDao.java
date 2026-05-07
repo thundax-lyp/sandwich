@@ -9,7 +9,7 @@ public interface OAuthAuthorizationDao {
 
     OAuthAuthorization getByAuthorizationCode(String authorizationCode);
 
-    String insert(OAuthAuthorization authorization);
+    EntityId insert(OAuthAuthorization authorization);
 
     int updateUsed(OAuthAuthorization authorization);
 

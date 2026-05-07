@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO;
 import java.util.Arrays;
@@ -19,10 +19,10 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         Date issuedAt = new Date(1000L);
         Date expireAt = new Date(2000L);
         OAuthAuthorization entity = new OAuthAuthorization();
-        entity.setId(EntityIdCodec.toDomain("authorization-1"));
+        entity.setId(EntityId.of(4002L));
         entity.setAuthorizationCode("code-1");
         entity.setClientId("admin-web");
-        entity.setUserId(EntityIdCodec.toDomain("user-1"));
+        entity.setUserId(EntityId.of(1001L));
         entity.setRedirectUri("http://127.0.0.1/callback");
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
         entity.setState("state-1");
@@ -34,10 +34,10 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
 
         OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("authorization-1", dataObject.getId());
+        assertEquals("4002", dataObject.getId());
         assertEquals("code-1", dataObject.getAuthorizationCode());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("user-1", dataObject.getUserId());
+        assertEquals("1001", dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals("state-1", dataObject.getState());
         assertEquals("challenge-1", dataObject.getCodeChallenge());
@@ -50,10 +50,10 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthAuthorizationDataObjectToEntity() {
         OAuthAuthorizationDO dataObject = new OAuthAuthorizationDO();
-        dataObject.setId("authorization-1");
+        dataObject.setId("4002");
         dataObject.setAuthorizationCode("code-1");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId("user-1");
+        dataObject.setUserId("1001");
         dataObject.setRedirectUri("http://127.0.0.1/callback");
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setExpireAt(new Date(2000L));
@@ -61,7 +61,7 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
 
         OAuthAuthorization entity = OAuthAuthorizationPersistenceAssembler.toEntity(dataObject);
 
-        assertEquals("authorization-1", entity.getId().value());
+        assertEquals(Long.valueOf(4002L), entity.getId().value());
         assertEquals("code-1", entity.getAuthorizationCode());
         assertEquals("admin-web", entity.getClientId());
         assertTrue(entity.getScopes().contains("openid"));

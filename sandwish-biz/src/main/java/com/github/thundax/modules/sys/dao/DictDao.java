@@ -15,7 +15,7 @@ public interface DictDao {
 
     Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
 
-    Long insert(Dict dict);
+    EntityId insert(Dict dict);
 
     int update(Dict dict);
 

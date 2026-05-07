@@ -45,7 +45,7 @@ public class UserIdentityServiceImpl implements UserIdentityService {
             identity.setIdentityType(UserIdentityType.ACCOUNT);
             identity.setIdentityValue(loginName);
             identity.setStatus(UserIdentityStatus.ENABLED);
-            identity.setId(EntityId.of(userIdentityDao.insert(identity)));
+            identity.setId(userIdentityDao.insert(identity));
             return identity;
         }
 

@@ -44,19 +44,19 @@ public class UserCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public User getById(String id) {
+    public User getById(Long id) {
         return toDomain((UserCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(User user) {
-        if (user != null && StringUtils.isNotBlank(EntityIdCodec.toValue(user.getId()))) {
+        if (user != null && EntityIdCodec.toValue(user.getId()) != null) {
             String key = objectKey(EntityIdCodec.toValue(user.getId()));
             cache.put(key, toCacheDTO(user), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
-    public void removeById(String id) {
+    public void removeById(Long id) {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
@@ -73,17 +73,17 @@ public class UserCacheSupport {
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getUserRoleIds(String userId) {
-        return (List<String>) cache.get(userRoleIdsKey(userId));
+    public List<Long> getUserRoleIds(Long userId) {
+        return (List<Long>) cache.get(userRoleIdsKey(userId));
     }
 
-    public void putUserRoleIds(String userId, List<String> roleIds) {
+    public void putUserRoleIds(Long userId, List<Long> roleIds) {
         String key = userRoleIdsKey(userId);
         cache.put(key, roleIds);
         rememberKey(key);
     }
 
-    public void removeUserRoleIds(String userId) {
+    public void removeUserRoleIds(Long userId) {
         String key = userRoleIdsKey(userId);
         cache.remove(key);
         forgetKey(key);
@@ -102,11 +102,11 @@ public class UserCacheSupport {
         cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
-    private String objectKey(String id) {
+    private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
 
-    private String userRoleIdsKey(String userId) {
+    private String userRoleIdsKey(Long userId) {
         return CACHE_SECTION + ROLES_PREFIX + userId;
     }
 
@@ -179,8 +179,8 @@ public class UserCacheSupport {
     }
 
     private static class UserCacheDTO implements CacheDTO {
-        private String id;
-        private String departmentId;
+        private Long id;
+        private Long departmentId;
         private String email;
         private String mobile;
         private String tel;

@@ -96,7 +96,7 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(StoredObject storage) {
-        storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
+        storage.setId(dao.insert(storage));
         return storage.getId();
     }
 
@@ -185,7 +185,7 @@ public class StorageServiceImpl implements StorageService {
         session.setUploadedPartCount(0);
         session.setCreateDate(now);
         session.setUpdateDate(now);
-        session.setId(EntityIdCodec.toDomain(multipartUploadDao.insertMultipartSession(session)));
+        session.setId(multipartUploadDao.insertMultipartSession(session));
         return session;
     }
 
@@ -204,7 +204,7 @@ public class StorageServiceImpl implements StorageService {
         }
 
         part.setCreateDate(new Date());
-        part.setId(EntityIdCodec.toDomain(multipartUploadDao.insertMultipartPart(part)));
+        part.setId(multipartUploadDao.insertMultipartPart(part));
 
         session.setUploadStatus(MultipartUploadStatus.UPLOADING);
         session.setUploadedPartCount(multipartUploadDao.countMultipartParts(session.getUploadId()));
@@ -221,7 +221,7 @@ public class StorageServiceImpl implements StorageService {
         validateMultipartParts(session, parts);
 
         StoredObject storage = toCompletedStorage(session, object);
-        storage.setId(EntityIdCodec.toDomain(dao.insert(storage)));
+        storage.setId(dao.insert(storage));
 
         Date now = new Date();
         session.setUploadStatus(MultipartUploadStatus.COMPLETED);

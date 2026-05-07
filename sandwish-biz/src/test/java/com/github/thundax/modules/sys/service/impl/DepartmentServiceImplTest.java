@@ -148,9 +148,9 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public Long insert(Department department) {
+        public EntityId insert(Department department) {
             this.inserted = department;
-            return 9006L;
+            return EntityId.of(9006L);
         }
 
         @Override

@@ -16,7 +16,7 @@ public interface MenuDao {
 
     Page<Menu> page(Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
 
-    Long insert(Menu menu);
+    EntityId insert(Menu menu);
 
     int update(Menu menu);
 

@@ -17,7 +17,7 @@ public class UserRoleDO {
 
     // Database primary key is (user_id, role_id); MyBatis-Plus BaseMapper requires one TableId.
     @TableId(type = IdType.INPUT)
-    private String userId;
+    private Long userId;
 
-    private String roleId;
+    private Long roleId;
 }

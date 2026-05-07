@@ -26,7 +26,7 @@ public class UserServiceImplTest {
         UserServiceImpl service = new UserServiceImpl(userDao, userIdentityService, userCredentialService);
         User user = new User();
 
-        when(userDao.insert(user)).thenReturn(1001L);
+        when(userDao.insert(user)).thenReturn(EntityId.of(1001L));
 
         EntityId userId = service.add(user, "tester", "encrypted", Arrays.asList(4001L, 4002L));
 

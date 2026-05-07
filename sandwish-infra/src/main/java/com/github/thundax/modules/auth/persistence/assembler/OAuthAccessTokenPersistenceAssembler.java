@@ -24,11 +24,11 @@ public final class OAuthAccessTokenPersistenceAssembler {
             return null;
         }
         OAuthAccessTokenDO dataObject = new OAuthAccessTokenDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setTokenId(entity.getTokenId());
         dataObject.setTokenHash(entity.getTokenHash());
         dataObject.setClientId(entity.getClientId());
-        dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
+        dataObject.setUserId(EntityIdCodec.toStringValue(entity.getUserId()));
         dataObject.setScopes(writeStringSet(entity.getScopes()));
         dataObject.setIssuedAt(entity.getIssuedAt());
         dataObject.setExpireAt(entity.getExpireAt());

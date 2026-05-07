@@ -33,7 +33,7 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     @Override
     public List<StoredObjectReference> listReferences(StoredObject entity) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StoredObjectReferenceDO::getFileId, EntityIdCodec.toValue(entity.getId()));
+        wrapper.eq(StoredObjectReferenceDO::getFileId, EntityIdCodec.toStringValue(entity.getId()));
         return StoragePersistenceAssembler.toBusinessEntityList(mapper.selectList(wrapper));
     }
 

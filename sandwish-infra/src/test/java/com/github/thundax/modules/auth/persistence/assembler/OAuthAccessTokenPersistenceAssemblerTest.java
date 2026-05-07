@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.enums.OAuthAccessTokenStatus;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthAccessTokenDO;
@@ -21,11 +21,11 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
         Date issuedAt = new Date(1000L);
         Date expireAt = new Date(2000L);
         OAuthAccessToken entity = new OAuthAccessToken();
-        entity.setId(EntityIdCodec.toDomain("access-token-1"));
+        entity.setId(EntityId.of(4003L));
         entity.setTokenId("token-id-1");
         entity.setTokenHash("hash-1");
         entity.setClientId("admin-web");
-        entity.setUserId(EntityIdCodec.toDomain("user-1"));
+        entity.setUserId(EntityId.of(1001L));
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(expireAt);
@@ -33,11 +33,11 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
 
         OAuthAccessTokenDO dataObject = OAuthAccessTokenPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("access-token-1", dataObject.getId());
+        assertEquals("4003", dataObject.getId());
         assertEquals("token-id-1", dataObject.getTokenId());
         assertEquals("hash-1", dataObject.getTokenHash());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals("user-1", dataObject.getUserId());
+        assertEquals("1001", dataObject.getUserId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals(issuedAt, dataObject.getIssuedAt());
         assertEquals(expireAt, dataObject.getExpireAt());
@@ -47,11 +47,11 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthAccessTokenDataObjectToEntity() {
         OAuthAccessTokenDO dataObject = new OAuthAccessTokenDO();
-        dataObject.setId("access-token-1");
+        dataObject.setId("4003");
         dataObject.setTokenId("token-id-1");
         dataObject.setTokenHash("hash-1");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId("user-1");
+        dataObject.setUserId("1001");
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setIssuedAt(new Date(1000L));
         dataObject.setExpireAt(new Date(2000L));
@@ -59,7 +59,7 @@ public class OAuthAccessTokenPersistenceAssemblerTest {
 
         OAuthAccessToken entity = OAuthAccessTokenPersistenceAssembler.toEntity(dataObject);
 
-        assertEquals("access-token-1", entity.getId().value());
+        assertEquals(Long.valueOf(4003L), entity.getId().value());
         assertEquals("token-id-1", entity.getTokenId());
         assertEquals("hash-1", entity.getTokenHash());
         assertTrue(entity.getScopes().contains("openid"));

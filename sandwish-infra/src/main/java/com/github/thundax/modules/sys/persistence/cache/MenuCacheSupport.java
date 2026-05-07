@@ -41,19 +41,19 @@ public class MenuCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public Menu getById(String id) {
+    public Menu getById(Long id) {
         return toDomain((MenuCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Menu menu) {
-        if (menu != null && StringUtils.isNotBlank(EntityIdCodec.toValue(menu.getId()))) {
+        if (menu != null && EntityIdCodec.toValue(menu.getId()) != null) {
             String key = objectKey(EntityIdCodec.toValue(menu.getId()));
             cache.put(key, toCacheDTO(menu), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
-    public void removeById(String id) {
+    public void removeById(Long id) {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
@@ -82,7 +82,7 @@ public class MenuCacheSupport {
         cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
-    private String objectKey(String id) {
+    private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
 
@@ -155,8 +155,8 @@ public class MenuCacheSupport {
     }
 
     private static class MenuCacheDTO implements CacheDTO {
-        private String id;
-        private String parentId;
+        private Long id;
+        private Long parentId;
         private String name;
         private String perms;
         private Integer rank;

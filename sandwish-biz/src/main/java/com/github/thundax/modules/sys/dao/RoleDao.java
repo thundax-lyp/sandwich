@@ -15,7 +15,7 @@ public interface RoleDao {
 
     Page<Role> page(String enableFlag, int pageNo, int pageSize);
 
-    Long insert(Role role);
+    EntityId insert(Role role);
 
     int update(Role role);
 

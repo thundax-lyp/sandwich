@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 public class LogDaoImpl implements LogDao {
 
     private final LogMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public LogDaoImpl(LogMapper mapper) {
         this.mapper = mapper;
@@ -31,7 +34,11 @@ public class LogDaoImpl implements LogDao {
 
     @Override
     public List<Log> listByIds(List<String> idList) {
-        return LogPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
+        List<Long> longIdList = new ArrayList<>();
+        for (String id : idList) {
+            longIdList.add(Long.valueOf(id));
+        }
+        return LogPersistenceAssembler.toEntityList(mapper.selectBatchIds(longIdList));
     }
 
     @Override
@@ -71,10 +78,11 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public String insert(Log entity) {
+    public EntityId insert(Log entity) {
         LogDO dataObject = LogPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -88,11 +96,12 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public List<String> batchInsert(List<Log> list) {
-        List<String> idList = new ArrayList<>();
+    public List<EntityId> batchInsert(List<Log> list) {
+        List<EntityId> idList = new ArrayList<>();
         for (LogDO dataObject : LogPersistenceAssembler.toDataObjectList(list)) {
+            dataObject.setId(idGenerator.nextId().value());
             mapper.insert(dataObject);
-            idList.add(dataObject.getId());
+            idList.add(EntityIdCodec.toDomain(dataObject.getId()));
         }
         return idList;
     }

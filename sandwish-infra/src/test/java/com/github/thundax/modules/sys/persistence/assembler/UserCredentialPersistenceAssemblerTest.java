@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
@@ -21,9 +21,9 @@ public class UserCredentialPersistenceAssemblerTest {
         Date expiresAt = new Date(2000L);
         Date lastVerifiedAt = new Date(3000L);
         UserCredential entity = new UserCredential();
-        entity.setId(EntityIdCodec.toDomain("credential-1"));
-        entity.setUserId(EntityIdCodec.toDomain("user-1"));
-        entity.setIdentityId(EntityIdCodec.toDomain("identity-1"));
+        entity.setId(EntityId.of(3001L));
+        entity.setUserId(EntityId.of(1001L));
+        entity.setIdentityId(EntityId.of(2001L));
         entity.setCredentialType(UserCredentialType.PASSWORD);
         entity.setCredentialValue("encrypted");
         entity.setStatus(UserCredentialStatus.LOCKED);
@@ -36,9 +36,9 @@ public class UserCredentialPersistenceAssemblerTest {
 
         UserCredentialDO dataObject = UserCredentialPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("credential-1", dataObject.getId());
-        assertEquals("user-1", dataObject.getUserId());
-        assertEquals("identity-1", dataObject.getIdentityId());
+        assertEquals(Long.valueOf(3001L), dataObject.getId());
+        assertEquals(Long.valueOf(1001L), dataObject.getUserId());
+        assertEquals(Long.valueOf(2001L), dataObject.getIdentityId());
         assertEquals("PASSWORD", dataObject.getCredentialType());
         assertEquals("encrypted", dataObject.getCredentialValue());
         assertEquals("LOCKED", dataObject.getStatus());
@@ -53,18 +53,18 @@ public class UserCredentialPersistenceAssemblerTest {
     @Test
     public void shouldMapCredentialDataObjectToEntityAndNormalizeNullCounters() {
         UserCredentialDO dataObject = new UserCredentialDO();
-        dataObject.setId("credential-1");
-        dataObject.setUserId("user-1");
-        dataObject.setIdentityId("identity-1");
+        dataObject.setId(3001L);
+        dataObject.setUserId(1001L);
+        dataObject.setIdentityId(2001L);
         dataObject.setCredentialType("password");
         dataObject.setCredentialValue("encrypted");
         dataObject.setStatus("active");
 
         UserCredential entity = UserCredentialPersistenceAssembler.toEntity(dataObject);
 
-        assertEquals("credential-1", entity.getId().value());
-        assertEquals("user-1", entity.getUserId().value());
-        assertEquals("identity-1", entity.getIdentityId().value());
+        assertEquals(Long.valueOf(3001L), entity.getId().value());
+        assertEquals(Long.valueOf(1001L), entity.getUserId().value());
+        assertEquals(Long.valueOf(2001L), entity.getIdentityId().value());
         assertSame(UserCredentialType.PASSWORD, entity.getCredentialType());
         assertEquals("encrypted", entity.getCredentialValue());
         assertSame(UserCredentialStatus.ACTIVE, entity.getStatus());

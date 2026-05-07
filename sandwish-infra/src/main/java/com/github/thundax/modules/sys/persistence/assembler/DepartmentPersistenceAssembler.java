@@ -57,7 +57,7 @@ public final class DepartmentPersistenceAssembler {
         return entities;
     }
 
-    public static DepartmentDO toParentUpdateDataObject(String id, String parentId) {
+    public static DepartmentDO toParentUpdateDataObject(Long id, Long parentId) {
         DepartmentDO dataObject = new DepartmentDO();
         dataObject.setId(id);
         dataObject.setParentId(parentId);

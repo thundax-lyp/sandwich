@@ -3,7 +3,7 @@ package com.github.thundax.modules.storage.store;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.model.ObjectStorageWriteResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -30,13 +30,13 @@ public class ObjectStorageStoredObjectStoreTest {
         assertEquals("bucket-a", object.getBucketName());
         assertEquals(storage.getPathName(), object.getObjectKey());
         assertEquals(Long.valueOf(5L), object.getSize());
-        assertEquals("/content/s1/content", object.getAccessEndpoint());
+        assertEquals("/content/5001/content", object.getAccessEndpoint());
         assertTrue(client.exists(object.getObjectKey()));
     }
 
     private StoredObject storage() {
         StoredObject storage = new StoredObject();
-        storage.setId(EntityIdCodec.toDomain("s1"));
+        storage.setId(EntityId.of(5001L));
         storage.setExtendName("txt");
         storage.setCreateDate(new Date());
         return storage;

@@ -18,10 +18,10 @@ import lombok.Setter;
 @TableName(value = "sys_user", autoResultMap = true)
 public class UserDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
-    private String departmentId;
+    private Long departmentId;
 
     @TableField(typeHandler = DefaultEncryptTypeHandler.class)
     private String email;

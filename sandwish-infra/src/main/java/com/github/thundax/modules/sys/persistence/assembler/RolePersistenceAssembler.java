@@ -64,11 +64,11 @@ public final class RolePersistenceAssembler {
         return entities;
     }
 
-    public static MenuRoleDO toMenuRoleDataObject(String roleId, String menuId) {
+    public static MenuRoleDO toMenuRoleDataObject(Long roleId, Long menuId) {
         return new MenuRoleDO(roleId, menuId);
     }
 
-    public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {
+    public static UserRoleDO toUserRoleDataObject(Long userId, Long roleId) {
         return new UserRoleDO(userId, roleId);
     }
 

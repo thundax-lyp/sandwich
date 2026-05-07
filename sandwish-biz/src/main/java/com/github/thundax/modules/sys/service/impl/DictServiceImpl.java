@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.DictDao;
@@ -79,7 +78,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(Dict dict) {
-        dict.setId(EntityIdCodec.toDomain(dao.insert(dict)));
+        dict.setId(dao.insert(dict));
         return dict.getId();
     }
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Repository;
 public class UserIdentityDaoImpl implements UserIdentityDao {
 
     private final UserIdentityMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public UserIdentityDaoImpl(UserIdentityMapper mapper) {
         this.mapper = mapper;
@@ -56,10 +58,11 @@ public class UserIdentityDaoImpl implements UserIdentityDao {
     }
 
     @Override
-    public String insert(UserIdentity userIdentity) {
+    public EntityId insert(UserIdentity userIdentity) {
         UserIdentityDO dataObject = UserIdentityPersistenceAssembler.toDataObject(userIdentity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

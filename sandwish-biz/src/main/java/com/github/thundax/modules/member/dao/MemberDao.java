@@ -36,7 +36,7 @@ public interface MemberDao {
             int pageNo,
             int pageSize);
 
-    String insert(Member entity);
+    EntityId insert(Member entity);
 
     int update(Member entity);
 

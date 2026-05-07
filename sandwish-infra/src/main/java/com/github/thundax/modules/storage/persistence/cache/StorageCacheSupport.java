@@ -38,9 +38,9 @@ public class StorageCacheSupport {
     }
 
     public void putById(StoredObject storage) {
-        if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toValue(storage.getId()))) {
+        if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toStringValue(storage.getId()))) {
             cache.put(
-                    objectKey(EntityIdCodec.toValue(storage.getId())),
+                    objectKey(EntityIdCodec.toStringValue(storage.getId())),
                     toCacheDTO(storage),
                     OBJECT_EXPIRE_SECONDS,
                     TimeUnit.SECONDS);
@@ -103,7 +103,7 @@ public class StorageCacheSupport {
 
     private static StoredObjectCacheDTO toCacheDTO(StoredObject storage) {
         StoredObjectCacheDTO cacheDTO = new StoredObjectCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(storage.getId());
+        cacheDTO.id = EntityIdCodec.toStringValue(storage.getId());
         cacheDTO.originalFilename = storage.getOriginalFilename();
         cacheDTO.contentType = storage.getContentType();
         cacheDTO.name = storage.getName();

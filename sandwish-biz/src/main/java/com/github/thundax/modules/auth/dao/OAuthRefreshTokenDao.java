@@ -16,7 +16,7 @@ public interface OAuthRefreshTokenDao {
     List<OAuthRefreshToken> listByClientIdAndUserIdAndStatus(
             String clientId, EntityId userId, OAuthRefreshTokenStatus status);
 
-    String insert(OAuthRefreshToken refreshToken);
+    EntityId insert(OAuthRefreshToken refreshToken);
 
     int updateStatus(OAuthRefreshToken refreshToken);
 }

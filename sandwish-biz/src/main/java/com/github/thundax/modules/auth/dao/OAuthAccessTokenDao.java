@@ -11,7 +11,7 @@ public interface OAuthAccessTokenDao {
 
     OAuthAccessToken getByTokenHash(String tokenHash);
 
-    String insert(OAuthAccessToken accessToken);
+    EntityId insert(OAuthAccessToken accessToken);
 
     int updateStatus(OAuthAccessToken accessToken);
 }

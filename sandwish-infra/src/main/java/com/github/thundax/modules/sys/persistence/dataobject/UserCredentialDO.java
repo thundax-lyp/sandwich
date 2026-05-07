@@ -16,12 +16,12 @@ import lombok.Setter;
 @TableName("sys_user_credential")
 public class UserCredentialDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
-    private String userId;
+    private Long userId;
 
-    private String identityId;
+    private Long identityId;
 
     private String credentialType;
 

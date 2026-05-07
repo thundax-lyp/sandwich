@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
@@ -25,10 +26,11 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
-    private static final String ROOT_ID = "ROOT";
+    private static final Long ROOT_ID = 0L;
 
     private final DepartmentMapper mapper;
     private final DepartmentCacheSupport cacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public DepartmentDaoImpl(DepartmentMapper mapper, DepartmentCacheSupport cacheSupport) {
         this.mapper = mapper;
@@ -48,10 +50,10 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<Department> listByIds(List<String> idList) {
+    public List<Department> listByIds(List<Long> idList) {
         List<Department> departmentList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
             Department department = cacheSupport.getById(id);
             if (department == null) {
                 uncachedIdList.add(id);
@@ -72,13 +74,13 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<Department> list(String parentId, String name, String remarks) {
+    public List<Department> list(Long parentId, String name, String remarks) {
         return DepartmentPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(parentId, name, remarks)));
     }
 
     @Override
-    public Page<Department> page(String parentId, String name, String remarks, int pageNo, int pageSize) {
+    public Page<Department> page(Long parentId, String name, String remarks, int pageNo, int pageSize) {
         IPage<DepartmentDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, name, remarks));
         Page<Department> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -88,8 +90,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public String insert(Department entity) {
+    public EntityId insert(Department entity) {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
         entity.setParentId(dataObject.getParentId());
         dataObject.setLft(newPosition);
@@ -103,7 +106,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -112,7 +115,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(
@@ -150,12 +153,12 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {
+    public void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType) {
         DepartmentDO fromNode = getTreeNode(fromId);
         DepartmentDO toNode = getTreeNode(toId);
 
         int newPosition;
-        String newParentId;
+        Long newParentId;
         if (moveType == TreeNodeMoveType.AFTER) {
             newPosition = toNode.getRgt() + 1;
             newParentId = toNode.getParentId();
@@ -185,7 +188,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public boolean isChildOf(String childId, String parentId) {
+    public boolean isChildOf(Long childId, Long parentId) {
         DepartmentDO child = getTreeNode(childId);
         DepartmentDO parent = getTreeNode(parentId);
         return child != null && parent != null && child.getLft() > parent.getLft() && child.getRgt() < parent.getRgt();
@@ -193,7 +196,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     private Integer allocateInsertPosition(DepartmentDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), ROOT_ID)) {
+        if (node.getParentId() != null && !ROOT_ID.equals(node.getParentId())) {
             DepartmentDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -205,7 +208,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         return maxRgt + 1;
     }
 
-    private void moveNodeToParent(DepartmentDO oldNode, String parentId) {
+    private void moveNodeToParent(DepartmentDO oldNode, Long parentId) {
         Integer newPosition = getInsertPosition(parentId);
         moveTreeRgts(newPosition, treeSpan(oldNode));
         moveTreeLfts(newPosition, treeSpan(oldNode));
@@ -218,8 +221,8 @@ public class DepartmentDaoImpl implements DepartmentDao {
         moveTreeLfts(oldNode.getLft(), -treeSpan(oldNode));
     }
 
-    private Integer getInsertPosition(String parentId) {
-        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, ROOT_ID)) {
+    private Integer getInsertPosition(Long parentId) {
+        if (parentId != null && !ROOT_ID.equals(parentId)) {
             DepartmentDO parent = getTreeNode(parentId);
             return parent.getRgt();
         }
@@ -230,7 +233,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         return maxRgt + 1;
     }
 
-    private DepartmentDO getTreeNode(String id) {
+    private DepartmentDO getTreeNode(Long id) {
         return mapper.selectById(id);
     }
 
@@ -272,11 +275,11 @@ public class DepartmentDaoImpl implements DepartmentDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<DepartmentDO> buildListWrapper(String parentId, String name, String remarks) {
+    private LambdaQueryWrapper<DepartmentDO> buildListWrapper(Long parentId, String name, String remarks) {
         LambdaQueryWrapper<DepartmentDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-        if (StringUtils.isNotBlank(parentId)) {
-            if (StringUtils.equals(parentId, ROOT_ID)) {
+        if (parentId != null) {
+            if (ROOT_ID.equals(parentId)) {
                 wrapper.isNull(DepartmentDO::getParentId);
             } else {
                 wrapper.eq(DepartmentDO::getParentId, parentId);
@@ -293,10 +296,13 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     private static void normalizeParentId(DepartmentDO node) {
-        if (node != null
-                && (StringUtils.isBlank(node.getParentId()) || StringUtils.equals(node.getParentId(), ROOT_ID))) {
+        if (node != null && (node.getParentId() == null || ROOT_ID.equals(node.getParentId()))) {
             node.setParentId(null);
         }
+    }
+
+    private static boolean equalsLong(Long left, Long right) {
+        return left == null ? right == null : left.equals(right);
     }
 
     private static int treeSpan(DepartmentDO node) {

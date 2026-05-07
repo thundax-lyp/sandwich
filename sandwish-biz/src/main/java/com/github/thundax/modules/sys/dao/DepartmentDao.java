@@ -16,7 +16,7 @@ public interface DepartmentDao {
 
     Page<Department> page(Long parentId, String name, String remarks, int pageNo, int pageSize);
 
-    Long insert(Department department);
+    EntityId insert(Department department);
 
     int update(Department department);
 

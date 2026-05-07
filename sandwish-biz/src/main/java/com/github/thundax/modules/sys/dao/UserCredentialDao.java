@@ -16,7 +16,7 @@ public interface UserCredentialDao {
 
     List<UserCredential> listByUserIdAndStatus(EntityId userId, UserCredentialStatus status);
 
-    String insert(UserCredential userCredential);
+    EntityId insert(UserCredential userCredential);
 
     int update(UserCredential userCredential);
 

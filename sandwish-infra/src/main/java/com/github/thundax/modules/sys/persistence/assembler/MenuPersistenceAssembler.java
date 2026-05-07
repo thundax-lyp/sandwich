@@ -69,7 +69,7 @@ public final class MenuPersistenceAssembler {
         return entities;
     }
 
-    public static MenuDO toParentUpdateDataObject(String id, String parentId) {
+    public static MenuDO toParentUpdateDataObject(Long id, Long parentId) {
         MenuDO dataObject = new MenuDO();
         dataObject.setId(id);
         dataObject.setParentId(parentId);

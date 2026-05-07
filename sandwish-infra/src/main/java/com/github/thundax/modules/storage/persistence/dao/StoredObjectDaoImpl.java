@@ -40,7 +40,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public StoredObject getById(EntityId id) {
-        StoredObject storage = cacheSupport.getById(id.value());
+        StoredObject storage = cacheSupport.getById(String.valueOf(id.value()));
         if (storage != null) {
             return storage;
         }
@@ -54,11 +54,11 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     }
 
     @Override
-    public List<StoredObject> listByIds(List<String> idList) {
+    public List<StoredObject> listByIds(List<Long> idList) {
         List<StoredObject> storageList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
-            StoredObject storage = cacheSupport.getById(id);
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
+            StoredObject storage = cacheSupport.getById(String.valueOf(id));
             if (storage == null) {
                 uncachedIdList.add(id);
             } else {
@@ -135,7 +135,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     }
 
     @Override
-    public String insert(StoredObject entity) {
+    public EntityId insert(StoredObject entity) {
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
@@ -144,7 +144,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -166,7 +166,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus())
                         .set(StoredObjectDO::getPriority, dataObject.getPriority())
                         .set(StoredObjectDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
+        cacheSupport.removeById(EntityIdCodec.toStringValue(entity.getId()));
         return count;
     }
 
@@ -178,7 +178,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(DEL_FLAG_COLUMN, "1")
                         .eq("id", id.value())
                         .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG));
-        cacheSupport.removeById(id.value());
+        cacheSupport.removeById(String.valueOf(id.value()));
         return count;
     }
 
@@ -197,7 +197,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         int count = mapper.update(
                 null,
                 buildIdUpdateWrapper(dataObject).set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus()));
-        cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
+        cacheSupport.removeById(EntityIdCodec.toStringValue(storage.getId()));
         return count;
     }
 
@@ -208,7 +208,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(StoredObjectDO::getReferenceStatus, dataObject.getReferenceStatus()));
-        cacheSupport.removeById(EntityIdCodec.toValue(storage.getId()));
+        cacheSupport.removeById(EntityIdCodec.toStringValue(storage.getId()));
         return count;
     }
 

@@ -17,7 +17,7 @@ public class MenuRoleDO {
 
     // Database primary key is (role_id, menu_id); MyBatis-Plus BaseMapper requires one TableId.
     @TableId(type = IdType.INPUT)
-    private String roleId;
+    private Long roleId;
 
-    private String menuId;
+    private Long menuId;
 }

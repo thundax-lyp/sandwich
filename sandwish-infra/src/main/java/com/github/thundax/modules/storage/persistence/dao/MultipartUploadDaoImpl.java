@@ -2,6 +2,8 @@ package com.github.thundax.modules.storage.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -26,10 +28,10 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     }
 
     @Override
-    public String insertMultipartSession(MultipartUploadSession session) {
+    public EntityId insertMultipartSession(MultipartUploadSession session) {
         MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(session);
         sessionMapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -65,10 +67,10 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     }
 
     @Override
-    public String insertMultipartPart(MultipartUploadPart part) {
+    public EntityId insertMultipartPart(MultipartUploadPart part) {
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(part);
         partMapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

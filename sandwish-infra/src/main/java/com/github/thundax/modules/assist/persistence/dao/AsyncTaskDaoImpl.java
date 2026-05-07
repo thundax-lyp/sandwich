@@ -25,7 +25,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     @Override
     public AsyncTask getById(EntityId id) {
-        return toDomain(cache.get(cacheKey(id.value())));
+        return toDomain(cache.get(cacheKey(String.valueOf(id.value()))));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     @Override
     public void deleteById(EntityId id) {
-        cache.remove(cacheKey(EntityIdCodec.toValue(id)));
+        cache.remove(cacheKey(EntityIdCodec.toStringValue(id)));
     }
 
     private String cacheKey(String id) {
@@ -57,7 +57,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private void put(AsyncTask asyncTask) {
         cache.put(
-                cacheKey(EntityIdCodec.toValue(asyncTask.getId())),
+                cacheKey(EntityIdCodec.toStringValue(asyncTask.getId())),
                 toCacheDTO(asyncTask),
                 asyncTask.getExpiredSeconds(),
                 TimeUnit.SECONDS);
@@ -86,7 +86,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private static AsyncTaskCacheDTO toCacheDTO(AsyncTask asyncTask) {
         AsyncTaskCacheDTO cacheDTO = new AsyncTaskCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(asyncTask.getId());
+        cacheDTO.id = EntityIdCodec.toStringValue(asyncTask.getId());
         cacheDTO.title = asyncTask.getTitle();
         cacheDTO.status =
                 asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();

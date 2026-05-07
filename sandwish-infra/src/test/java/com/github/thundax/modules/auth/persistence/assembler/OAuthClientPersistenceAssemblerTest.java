@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO;
@@ -20,7 +20,7 @@ public class OAuthClientPersistenceAssemblerTest {
         Date createDate = new Date(1000L);
         Date updateDate = new Date(2000L);
         OAuthClient entity = new OAuthClient();
-        entity.setId(EntityIdCodec.toDomain("client-db-1"));
+        entity.setId(EntityId.of(4001L));
         entity.setClientId("admin-web");
         entity.setClientSecretHash("secret-hash");
         entity.setClientName("Admin Web");
@@ -40,7 +40,7 @@ public class OAuthClientPersistenceAssemblerTest {
 
         OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("client-db-1", dataObject.getId());
+        assertEquals("4001", dataObject.getId());
         assertEquals("admin-web", dataObject.getClientId());
         assertEquals("secret-hash", dataObject.getClientSecretHash());
         assertEquals("[\"authorization_code\",\"refresh_token\"]", dataObject.getGrantTypes());
@@ -58,7 +58,7 @@ public class OAuthClientPersistenceAssemblerTest {
     @Test
     public void shouldMapOAuthClientDataObjectToEntity() {
         OAuthClientDO dataObject = new OAuthClientDO();
-        dataObject.setId("client-db-1");
+        dataObject.setId("4001");
         dataObject.setClientId("admin-web");
         dataObject.setClientSecretHash("secret-hash");
         dataObject.setClientName("Admin Web");
@@ -72,7 +72,7 @@ public class OAuthClientPersistenceAssemblerTest {
 
         OAuthClient entity = OAuthClientPersistenceAssembler.toEntity(dataObject);
 
-        assertEquals("client-db-1", entity.getId().value());
+        assertEquals(Long.valueOf(4001L), entity.getId().value());
         assertEquals("admin-web", entity.getClientId());
         assertTrue(entity.supportsGrantType("authorization_code"));
         assertTrue(entity.supportsScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile"))));

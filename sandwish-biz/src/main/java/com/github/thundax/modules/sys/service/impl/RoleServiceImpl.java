@@ -71,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(Role role) {
-        role.setId(EntityIdCodec.toDomain(dao.insert(role)));
+        role.setId(dao.insert(role));
         afterWrite(role);
         return role.getId();
     }

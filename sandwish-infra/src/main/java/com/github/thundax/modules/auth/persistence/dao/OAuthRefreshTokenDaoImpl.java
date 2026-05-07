@@ -24,7 +24,7 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
 
     @Override
     public OAuthRefreshToken getById(EntityId id) {
-        return OAuthRefreshTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+        return OAuthRefreshTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
             String clientId, EntityId userId, OAuthRefreshTokenStatus status) {
         LambdaQueryWrapper<OAuthRefreshTokenDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OAuthRefreshTokenDO::getClientId, clientId);
-        wrapper.eq(OAuthRefreshTokenDO::getUserId, EntityIdCodec.toValue(userId));
+        wrapper.eq(OAuthRefreshTokenDO::getUserId, EntityIdCodec.toStringValue(userId));
         if (status != null) {
             wrapper.eq(OAuthRefreshTokenDO::getStatus, status.value());
         }
@@ -55,10 +55,10 @@ public class OAuthRefreshTokenDaoImpl implements OAuthRefreshTokenDao {
     }
 
     @Override
-    public String insert(OAuthRefreshToken refreshToken) {
+    public EntityId insert(OAuthRefreshToken refreshToken) {
         OAuthRefreshTokenDO dataObject = OAuthRefreshTokenPersistenceAssembler.toDataObject(refreshToken);
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

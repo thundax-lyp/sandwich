@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import com.alicp.jetcache.Cache;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
@@ -48,11 +48,11 @@ public class AuthSessionRuntimeDaoImplTest {
 
     private AuthSession session() {
         AuthSession session = new AuthSession();
-        session.setId(EntityIdCodec.toDomain("session-db-1"));
+        session.setId(EntityId.of(4005L));
         session.setSessionId("session-1");
         session.setToken("token-1");
-        session.setUserId(EntityIdCodec.toDomain("u1"));
-        session.setIdentityId(EntityIdCodec.toDomain("identity-1"));
+        session.setUserId(EntityId.of(1001L));
+        session.setIdentityId(EntityId.of(2001L));
         session.setIdentityType(UserIdentityType.ACCOUNT);
         session.setLoginType("PASSWORD");
         session.setStatus(AuthSessionStatus.ACTIVE);

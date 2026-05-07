@@ -34,13 +34,13 @@ public interface LogDao {
             int pageNo,
             int pageSize);
 
-    String insert(Log log);
+    EntityId insert(Log log);
 
     int update(Log log);
 
     int deleteById(EntityId id);
 
-    List<String> batchInsert(List<Log> list);
+    List<EntityId> batchInsert(List<Log> list);
 
     int batchDelete(String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate);
 }

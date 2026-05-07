@@ -223,9 +223,9 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public String insert(Log log) {
+        public EntityId insert(Log log) {
             this.inserted = log;
-            return "9701";
+            return EntityId.of(9701L);
         }
 
         @Override
@@ -239,16 +239,16 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public List<String> batchInsert(List<Log> list) {
+        public List<EntityId> batchInsert(List<Log> list) {
             this.batchInsertCalls++;
             if (batchInsertCalls == 1) {
                 firstBatchSize = list.size();
             } else {
                 secondBatchSize = list.size();
             }
-            List<String> idList = new ArrayList<>();
+            List<EntityId> idList = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                idList.add(String.valueOf(9700L + batchInsertCalls * 100L + i));
+                idList.add(EntityId.of(9700L + batchInsertCalls * 100L + i));
             }
             return idList;
         }

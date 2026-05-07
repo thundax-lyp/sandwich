@@ -38,7 +38,7 @@ public class StoredObjectDaoImplTest {
         StoredObjectMapper mapper = mock(StoredObjectMapper.class);
         StoredObjectReferenceMapper referenceMapper = mock(StoredObjectReferenceMapper.class);
         StoredObjectDaoImpl dao = dao(mapper, referenceMapper);
-        when(referenceMapper.selectObjs(any())).thenReturn(Arrays.<Object>asList("s1", "s2"));
+        when(referenceMapper.selectObjs(any())).thenReturn(Arrays.<Object>asList("5001", "s2"));
         when(mapper.selectList(any())).thenReturn(Collections.<StoredObjectDO>emptyList());
 
         dao.list("image/png", "owner-1", "USER", "ACTIVE", "REFERENCED", "biz-1", "ARTICLE", "avatar", "profile");
@@ -63,7 +63,7 @@ public class StoredObjectDaoImplTest {
         assertParamsContain(
                 storageWrapper,
                 "0",
-                "s1",
+                "5001",
                 "s2",
                 "image/png",
                 "owner-1",

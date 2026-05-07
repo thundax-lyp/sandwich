@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList) {
-        user.setId(EntityIdCodec.toDomain(dao.insert(user)));
+        user.setId(dao.insert(user));
         afterWrite(user, true, loginName, encryptedPassword, roleIdList);
         return user.getId();
     }

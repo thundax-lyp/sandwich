@@ -179,9 +179,9 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public Long insert(Menu menu) {
+        public EntityId insert(Menu menu) {
             this.inserted = menu;
-            return 9005L;
+            return EntityId.of(9005L);
         }
 
         @Override

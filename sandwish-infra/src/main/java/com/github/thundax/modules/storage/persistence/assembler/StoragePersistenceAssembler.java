@@ -26,7 +26,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObjectDO dataObject = new StoredObjectDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -123,7 +123,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
-        dataObject.setFileId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setFileId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setReferenceOwnerId(entity.getBusinessId());
         dataObject.setReferenceOwnerType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
@@ -171,7 +171,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadSessionDO dataObject = new MultipartUploadSessionDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setUploadId(entity.getUploadId());
         dataObject.setOwnerId(entity.getOwnerId());
         dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
@@ -225,7 +225,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadPartDO dataObject = new MultipartUploadPartDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setUploadId(entity.getUploadId());
         dataObject.setPartNumber(entity.getPartNumber());
         dataObject.setEtag(entity.getEtag());

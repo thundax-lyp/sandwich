@@ -22,7 +22,7 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    Long insert(User user);
+    EntityId insert(User user);
 
     int update(User user);
 

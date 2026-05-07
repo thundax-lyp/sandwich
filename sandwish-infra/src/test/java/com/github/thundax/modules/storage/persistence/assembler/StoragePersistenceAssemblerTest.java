@@ -5,7 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -106,18 +106,18 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldMapBusinessReferenceStatus() {
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
-        dataObject.setFileId("s1");
+        dataObject.setFileId("5001");
         dataObject.setReferenceOwnerId("owner-1");
         dataObject.setReferenceOwnerType("USER");
         dataObject.setReferenceStatus("REFERENCED");
 
         StoredObjectReference entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
-        assertEquals("s1", entity.getId().value());
+        assertEquals(Long.valueOf(5001L), entity.getId().value());
         assertEquals("owner-1", entity.getOwnerId());
         assertEquals("USER", entity.getOwnerType().value());
         assertEquals(
-                "s1", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
+                "5001", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
         assertEquals(
                 "owner-1",
                 StoragePersistenceAssembler.toBusinessDataObject(entity).getReferenceOwnerId());
@@ -147,7 +147,7 @@ public class StoragePersistenceAssemblerTest {
         Date completedDate = new Date(3000L);
         Date abortedDate = new Date(4000L);
         MultipartUploadSession entity = new MultipartUploadSession();
-        entity.setId(EntityIdCodec.toDomain("ms1"));
+        entity.setId(EntityId.of(5002L));
         entity.setUploadId("upload-1");
         entity.setOwnerId("u1");
         entity.setOwnerType(StorageOwnerType.USER);
@@ -170,13 +170,13 @@ public class StoragePersistenceAssemblerTest {
         MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(entity);
         MultipartUploadSession restored = StoragePersistenceAssembler.toMultipartSessionEntity(dataObject);
 
-        assertEquals("ms1", dataObject.getId());
+        assertEquals("5002", dataObject.getId());
         assertEquals("upload-1", dataObject.getUploadId());
         assertEquals("USER", dataObject.getOwnerType());
         assertEquals("OSS", dataObject.getStorageType());
         assertEquals("UPLOADING", dataObject.getUploadStatus());
         assertEquals(Integer.valueOf(2), dataObject.getUploadedPartCount());
-        assertEquals("ms1", restored.getId().value());
+        assertEquals(Long.valueOf(5002L), restored.getId().value());
         assertSame(StorageOwnerType.USER, restored.getOwnerType());
         assertSame(StorageType.OSS, restored.getStorageType());
         assertSame(MultipartUploadStatus.UPLOADING, restored.getUploadStatus());
@@ -204,7 +204,7 @@ public class StoragePersistenceAssemblerTest {
     public void shouldMapMultipartPartFields() {
         Date createDate = new Date(1000L);
         MultipartUploadPart entity = new MultipartUploadPart();
-        entity.setId(EntityIdCodec.toDomain("mp1"));
+        entity.setId(EntityId.of(5003L));
         entity.setUploadId("upload-1");
         entity.setPartNumber(1);
         entity.setEtag("etag-1");
@@ -214,13 +214,13 @@ public class StoragePersistenceAssemblerTest {
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(entity);
         MultipartUploadPart restored = StoragePersistenceAssembler.toMultipartPartEntity(dataObject);
 
-        assertEquals("mp1", dataObject.getId());
+        assertEquals("5003", dataObject.getId());
         assertEquals("upload-1", dataObject.getUploadId());
         assertEquals(Integer.valueOf(1), dataObject.getPartNumber());
         assertEquals("etag-1", dataObject.getEtag());
         assertEquals(Long.valueOf(128L), dataObject.getSize());
         assertEquals(createDate, dataObject.getCreateDate());
-        assertEquals("mp1", restored.getId().value());
+        assertEquals(Long.valueOf(5003L), restored.getId().value());
         assertEquals("upload-1", restored.getUploadId());
         assertEquals(Integer.valueOf(1), restored.getPartNumber());
         assertEquals("etag-1", restored.getEtag());

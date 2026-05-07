@@ -75,7 +75,7 @@ public final class UserPersistenceAssembler {
         return entities;
     }
 
-    public static UserRoleDO toUserRoleDataObject(String userId, String roleId) {
+    public static UserRoleDO toUserRoleDataObject(Long userId, Long roleId) {
         return new UserRoleDO(userId, roleId);
     }
 

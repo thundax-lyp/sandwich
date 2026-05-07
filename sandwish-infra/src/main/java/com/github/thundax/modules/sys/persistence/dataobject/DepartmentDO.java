@@ -16,10 +16,10 @@ import lombok.Setter;
 @TableName("sys_department")
 public class DepartmentDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
-    private String parentId;
+    private Long parentId;
 
     private Integer lft;
 

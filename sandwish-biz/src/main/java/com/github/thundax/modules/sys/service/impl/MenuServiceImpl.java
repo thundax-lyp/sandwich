@@ -68,7 +68,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public EntityId add(Menu menu) {
-        menu.setId(EntityIdCodec.toDomain(dao.insert(menu)));
+        menu.setId(dao.insert(menu));
         afterWrite(menu);
         return menu.getId();
     }

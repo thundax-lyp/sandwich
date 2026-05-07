@@ -16,12 +16,12 @@ public final class OAuthRefreshTokenPersistenceAssembler {
             return null;
         }
         OAuthRefreshTokenDO dataObject = new OAuthRefreshTokenDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setTokenId(entity.getTokenId());
         dataObject.setTokenHash(entity.getTokenHash());
         dataObject.setAccessTokenId(entity.getAccessTokenId());
         dataObject.setClientId(entity.getClientId());
-        dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
+        dataObject.setUserId(EntityIdCodec.toStringValue(entity.getUserId()));
         dataObject.setIssuedAt(entity.getIssuedAt());
         dataObject.setExpireAt(entity.getExpireAt());
         dataObject.setStatus(statusValue(entity.getStatus()));

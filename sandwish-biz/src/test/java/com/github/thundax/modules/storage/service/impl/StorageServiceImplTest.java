@@ -372,9 +372,9 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public String insert(StoredObject entity) {
+        public EntityId insert(StoredObject entity) {
             this.inserted = entity;
-            return "9101";
+            return EntityId.of(9101L);
         }
 
         @Override
@@ -428,9 +428,9 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public String insertMultipartSession(MultipartUploadSession session) {
+        public EntityId insertMultipartSession(MultipartUploadSession session) {
             this.insertedMultipartSession = session;
-            return "9301";
+            return EntityId.of(9301L);
         }
 
         @Override
@@ -445,9 +445,9 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public String insertMultipartPart(MultipartUploadPart part) {
+        public EntityId insertMultipartPart(MultipartUploadPart part) {
             this.insertedMultipartPart = part;
-            return "9401";
+            return EntityId.of(9401L);
         }
 
         @Override

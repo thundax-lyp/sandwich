@@ -39,19 +39,19 @@ public class DictCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public Dict getById(String id) {
+    public Dict getById(Long id) {
         return toDomain((DictCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Dict dict) {
-        if (dict != null && StringUtils.isNotBlank(EntityIdCodec.toValue(dict.getId()))) {
+        if (dict != null && EntityIdCodec.toValue(dict.getId()) != null) {
             String key = objectKey(EntityIdCodec.toValue(dict.getId()));
             cache.put(key, toCacheDTO(dict), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
-    public void removeById(String id) {
+    public void removeById(Long id) {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
@@ -80,7 +80,7 @@ public class DictCacheSupport {
         cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
-    private String objectKey(String id) {
+    private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
 
@@ -142,7 +142,7 @@ public class DictCacheSupport {
     }
 
     private static class DictCacheDTO implements CacheDTO {
-        private String id;
+        private Long id;
         private String type;
         private String label;
         private String value;

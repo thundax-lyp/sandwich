@@ -6,6 +6,7 @@ import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public final class LogPersistenceAssembler {
 
@@ -17,7 +18,7 @@ public final class LogPersistenceAssembler {
         }
         LogDO dataObject = new LogDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setUserId(entity.getUserId());
+        dataObject.setUserId(StringUtils.isBlank(entity.getUserId()) ? null : Long.valueOf(entity.getUserId()));
         dataObject.setType(typeValue(entity.getType()));
         dataObject.setLogDate(entity.getLogDate());
         dataObject.setTitle(entity.getTitle());
@@ -35,7 +36,7 @@ public final class LogPersistenceAssembler {
         }
         Log entity = new Log();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setUserId(dataObject.getUserId());
+        entity.setUserId(dataObject.getUserId() == null ? null : String.valueOf(dataObject.getUserId()));
         entity.setType(typeFrom(dataObject.getType()));
         entity.setLogDate(dataObject.getLogDate());
         entity.setTitle(dataObject.getTitle());

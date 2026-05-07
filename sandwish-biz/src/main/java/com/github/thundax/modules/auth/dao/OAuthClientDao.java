@@ -12,7 +12,7 @@ public interface OAuthClientDao {
 
     OAuthClient getByClientIdAndStatus(String clientId, OAuthClientStatus status);
 
-    String insert(OAuthClient client);
+    EntityId insert(OAuthClient client);
 
     int update(OAuthClient client);
 }

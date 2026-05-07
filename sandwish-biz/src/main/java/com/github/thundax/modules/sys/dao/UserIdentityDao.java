@@ -16,7 +16,7 @@ public interface UserIdentityDao {
 
     List<UserIdentity> listByUserIdAndStatus(EntityId userId, UserIdentityStatus status);
 
-    String insert(UserIdentity userIdentity);
+    EntityId insert(UserIdentity userIdentity);
 
     int update(UserIdentity userIdentity);
 

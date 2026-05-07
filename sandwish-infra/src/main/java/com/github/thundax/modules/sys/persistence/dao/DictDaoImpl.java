@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssembler;
@@ -25,6 +27,7 @@ public class DictDaoImpl implements DictDao {
 
     private final DictMapper mapper;
     private final DictCacheSupport cacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public DictDaoImpl(DictMapper mapper, DictCacheSupport cacheSupport) {
         this.mapper = mapper;
@@ -44,10 +47,10 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public List<Dict> listByIds(List<String> idList) {
+    public List<Dict> listByIds(List<Long> idList) {
         List<Dict> dictList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
             Dict dict = cacheSupport.getById(id);
             if (dict == null) {
                 uncachedIdList.add(id);
@@ -82,8 +85,9 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public String insert(Dict entity) {
+    public EntityId insert(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         mapper.update(
                 null,
@@ -91,7 +95,7 @@ public class DictDaoImpl implements DictDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

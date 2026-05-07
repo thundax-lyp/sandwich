@@ -152,9 +152,9 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public Long insert(Role role) {
+        public EntityId insert(Role role) {
             this.inserted = role;
-            return 9004L;
+            return EntityId.of(9004L);
         }
 
         @Override

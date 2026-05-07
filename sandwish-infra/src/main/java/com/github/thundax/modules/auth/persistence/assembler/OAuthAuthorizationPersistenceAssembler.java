@@ -23,10 +23,10 @@ public final class OAuthAuthorizationPersistenceAssembler {
             return null;
         }
         OAuthAuthorizationDO dataObject = new OAuthAuthorizationDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
         dataObject.setAuthorizationCode(entity.getAuthorizationCode());
         dataObject.setClientId(entity.getClientId());
-        dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
+        dataObject.setUserId(EntityIdCodec.toStringValue(entity.getUserId()));
         dataObject.setRedirectUri(entity.getRedirectUri());
         dataObject.setScopes(writeStringSet(entity.getScopes()));
         dataObject.setState(entity.getState());

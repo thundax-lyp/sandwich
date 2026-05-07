@@ -23,7 +23,7 @@ public class OAuthClientDaoImpl implements OAuthClientDao {
 
     @Override
     public OAuthClient getById(EntityId id) {
-        return OAuthClientPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+        return OAuthClientPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
     }
 
     @Override
@@ -44,10 +44,10 @@ public class OAuthClientDaoImpl implements OAuthClientDao {
     }
 
     @Override
-    public String insert(OAuthClient client) {
+    public EntityId insert(OAuthClient client) {
         OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(client);
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

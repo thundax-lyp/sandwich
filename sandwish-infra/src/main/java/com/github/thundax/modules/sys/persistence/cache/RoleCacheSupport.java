@@ -44,19 +44,19 @@ public class RoleCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public Role getById(String id) {
+    public Role getById(Long id) {
         return toDomain((RoleCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Role role) {
-        if (role != null && StringUtils.isNotBlank(EntityIdCodec.toValue(role.getId()))) {
+        if (role != null && EntityIdCodec.toValue(role.getId()) != null) {
             String key = objectKey(EntityIdCodec.toValue(role.getId()));
             cache.put(key, toCacheDTO(role), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
-    public void removeById(String id) {
+    public void removeById(Long id) {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
@@ -73,34 +73,34 @@ public class RoleCacheSupport {
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getRoleUserIds(String roleId) {
-        return (List<String>) cache.get(roleUserIdsKey(roleId));
+    public List<Long> getRoleUserIds(Long roleId) {
+        return (List<Long>) cache.get(roleUserIdsKey(roleId));
     }
 
-    public void putRoleUserIds(String roleId, List<String> userIds) {
+    public void putRoleUserIds(Long roleId, List<Long> userIds) {
         String key = roleUserIdsKey(roleId);
         cache.put(key, userIds);
         rememberKey(key);
     }
 
-    public void removeRoleUserIds(String roleId) {
+    public void removeRoleUserIds(Long roleId) {
         String key = roleUserIdsKey(roleId);
         cache.remove(key);
         forgetKey(key);
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getRoleMenuIds(String roleId) {
-        return (List<String>) cache.get(roleMenuIdsKey(roleId));
+    public List<Long> getRoleMenuIds(Long roleId) {
+        return (List<Long>) cache.get(roleMenuIdsKey(roleId));
     }
 
-    public void putRoleMenuIds(String roleId, List<String> menuIds) {
+    public void putRoleMenuIds(Long roleId, List<Long> menuIds) {
         String key = roleMenuIdsKey(roleId);
         cache.put(key, menuIds);
         rememberKey(key);
     }
 
-    public void removeRoleMenuIds(String roleId) {
+    public void removeRoleMenuIds(Long roleId) {
         String key = roleMenuIdsKey(roleId);
         cache.remove(key);
         forgetKey(key);
@@ -119,15 +119,15 @@ public class RoleCacheSupport {
         cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
-    private String objectKey(String id) {
+    private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
 
-    private String roleUserIdsKey(String roleId) {
+    private String roleUserIdsKey(Long roleId) {
         return CACHE_SECTION + USERS_PREFIX + roleId;
     }
 
-    private String roleMenuIdsKey(String roleId) {
+    private String roleMenuIdsKey(Long roleId) {
         return CACHE_SECTION + MENUS_PREFIX + roleId;
     }
 
@@ -190,7 +190,7 @@ public class RoleCacheSupport {
     }
 
     private static class RoleCacheDTO implements CacheDTO {
-        private String id;
+        private Long id;
         private String name;
         private String privilege;
         private String status;

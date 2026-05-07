@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
@@ -70,7 +69,7 @@ public class UserCredentialServiceImpl implements UserCredentialService {
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
             credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            credential.setId(EntityIdCodec.toDomain(userCredentialDao.insert(credential)));
+            credential.setId(userCredentialDao.insert(credential));
             return;
         }
 

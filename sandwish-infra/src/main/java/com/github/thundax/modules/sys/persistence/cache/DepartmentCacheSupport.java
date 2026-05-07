@@ -39,19 +39,19 @@ public class DepartmentCacheSupport {
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
-    public Department getById(String id) {
+    public Department getById(Long id) {
         return toDomain((DepartmentCacheDTO) cache.get(objectKey(id)));
     }
 
     public void putById(Department department) {
-        if (department != null && StringUtils.isNotBlank(EntityIdCodec.toValue(department.getId()))) {
+        if (department != null && EntityIdCodec.toValue(department.getId()) != null) {
             String key = objectKey(EntityIdCodec.toValue(department.getId()));
             cache.put(key, toCacheDTO(department), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
-    public void removeById(String id) {
+    public void removeById(Long id) {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
@@ -80,7 +80,7 @@ public class DepartmentCacheSupport {
         cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
-    private String objectKey(String id) {
+    private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
 
@@ -142,8 +142,8 @@ public class DepartmentCacheSupport {
     }
 
     private static class DepartmentCacheDTO implements CacheDTO {
-        private String id;
-        private String parentId;
+        private Long id;
+        private Long parentId;
         private String name;
         private String shortName;
         private Integer priority;

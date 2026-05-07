@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-sys-infra`：改代码，迁移系统管理域 infra ID 类型
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/UserDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/RoleDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/MenuDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/DepartmentDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/DictDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/RolePersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/MenuPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/DepartmentPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/DictPersistenceAssembler.java`
-  - 处理动作：将系统管理域 infra 层 DO 和 assembler ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-infra -am test` 通过。
-  - 重要度：10/10
-
 - [ ] `snowflake-code-auth-biz`：改代码，迁移认证域 biz ID 类型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java`

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
@@ -38,6 +39,7 @@ public class UserDaoImpl implements UserDao {
     private final UserRoleMapper userRoleMapper;
     private final UserCacheSupport cacheSupport;
     private final RoleCacheSupport roleCacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public UserDaoImpl(
             UserMapper mapper,
@@ -62,10 +64,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> listByIds(List<String> idList) {
+    public List<User> listByIds(List<Long> idList) {
         List<User> userList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
             User user = cacheSupport.getById(id);
             if (user == null) {
                 uncachedIdList.add(id);
@@ -84,14 +86,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> list(String departmentId, String loginName, String name, String enableFlag, String superFlag) {
+    public List<User> list(Long departmentId, String loginName, String name, String enableFlag, String superFlag) {
         return UserPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(departmentId, loginName, name, enableFlag, superFlag)));
     }
 
     @Override
     public Page<User> page(
-            String departmentId,
+            Long departmentId,
             String loginName,
             String name,
             String enableFlag,
@@ -107,8 +109,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public String insert(User entity) {
+    public EntityId insert(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         mapper.update(
                 null,
@@ -116,7 +119,7 @@ public class UserDaoImpl implements UserDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         removeUserCaches(dataObject.getId());
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -166,8 +169,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<String> listUserRoles(String userId) {
-        List<String> roleIds = cacheSupport.getUserRoleIds(userId);
+    public List<Long> listUserRoles(Long userId) {
+        List<Long> roleIds = cacheSupport.getUserRoleIds(userId);
         if (roleIds == null) {
             LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRoleDO::getUserId, userId);
@@ -180,7 +183,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteUserRole(String userId) {
+    public void deleteUserRole(Long userId) {
         LambdaQueryWrapper<UserRoleDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(UserRoleDO::getUserId, userId);
         userRoleMapper.delete(wrapper);
@@ -188,8 +191,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void insertUserRole(String userId, List<String> roleIdList) {
-        for (String roleId : roleIdList) {
+    public void insertUserRole(Long userId, List<Long> roleIdList) {
+        for (Long roleId : roleIdList) {
             userRoleMapper.insert(UserPersistenceAssembler.toUserRoleDataObject(userId, roleId));
         }
         removeUserCaches(userId);
@@ -202,10 +205,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     private QueryWrapper<UserDO> buildListWrapper(
-            String departmentId, String loginName, String name, String enableFlag, String superFlag) {
+            Long departmentId, String loginName, String name, String enableFlag, String superFlag) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
         wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
-        if (StringUtils.isNotBlank(departmentId)) {
+        if (departmentId != null) {
             wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
         }
         if (StringUtils.isNotBlank(loginName)) {
@@ -224,7 +227,7 @@ public class UserDaoImpl implements UserDao {
         return wrapper;
     }
 
-    private void removeUserCaches(String userId) {
+    private void removeUserCaches(Long userId) {
         cacheSupport.removeById(userId);
         cacheSupport.removeUserRoleIds(userId);
     }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Repository;
 public class UserCredentialDaoImpl implements UserCredentialDao {
 
     private final UserCredentialMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public UserCredentialDaoImpl(UserCredentialMapper mapper) {
         this.mapper = mapper;
@@ -56,10 +58,11 @@ public class UserCredentialDaoImpl implements UserCredentialDao {
     }
 
     @Override
-    public String insert(UserCredential userCredential) {
+    public EntityId insert(UserCredential userCredential) {
         UserCredentialDO dataObject = UserCredentialPersistenceAssembler.toDataObject(userCredential);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

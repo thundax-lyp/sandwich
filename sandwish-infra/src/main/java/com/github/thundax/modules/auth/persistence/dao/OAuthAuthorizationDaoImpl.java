@@ -22,7 +22,7 @@ public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
 
     @Override
     public OAuthAuthorization getById(EntityId id) {
-        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+        return OAuthAuthorizationPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
     }
 
     @Override
@@ -33,10 +33,10 @@ public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
     }
 
     @Override
-    public String insert(OAuthAuthorization authorization) {
+    public EntityId insert(OAuthAuthorization authorization) {
         OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(authorization);
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

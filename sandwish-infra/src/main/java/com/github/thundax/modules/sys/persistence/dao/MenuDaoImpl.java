@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -27,11 +28,12 @@ public class MenuDaoImpl implements MenuDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
-    private static final String ROOT_ID = "ROOT";
+    private static final Long ROOT_ID = 0L;
 
     private final MenuMapper mapper;
     private final MenuRoleMapper menuRoleMapper;
     private final MenuCacheSupport cacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public MenuDaoImpl(MenuMapper mapper, MenuRoleMapper menuRoleMapper, MenuCacheSupport cacheSupport) {
         this.mapper = mapper;
@@ -52,10 +54,10 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> listByIds(List<String> idList) {
+    public List<Menu> listByIds(List<Long> idList) {
         List<Menu> menuList = new ArrayList<>();
-        List<String> uncachedIdList = new ArrayList<>();
-        for (String id : idList) {
+        List<Long> uncachedIdList = new ArrayList<>();
+        for (Long id : idList) {
             Menu menu = cacheSupport.getById(id);
             if (menu == null) {
                 uncachedIdList.add(id);
@@ -75,13 +77,13 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> list(String parentId, String displayFlag, Integer maxRank) {
+    public List<Menu> list(Long parentId, String displayFlag, Integer maxRank) {
         return MenuPersistenceAssembler.toEntityList(
                 mapper.selectList(buildListWrapper(parentId, displayFlag, maxRank)));
     }
 
     @Override
-    public Page<Menu> page(String parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+    public Page<Menu> page(Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
         IPage<MenuDO> dataObjectPage =
                 mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, displayFlag, maxRank));
         Page<Menu> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
@@ -91,8 +93,9 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public String insert(Menu entity) {
+    public EntityId insert(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
         entity.setParentId(dataObject.getParentId());
         dataObject.setLft(newPosition);
@@ -106,7 +109,7 @@ public class MenuDaoImpl implements MenuDao {
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -115,7 +118,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(dataObject.getParentId());
-        if (oldNode != null && !StringUtils.equals(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(
@@ -157,12 +160,12 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public void moveTreeNode(String fromId, String toId, TreeNodeMoveType moveType) {
+    public void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType) {
         MenuDO fromNode = getTreeNode(fromId);
         MenuDO toNode = getTreeNode(toId);
 
         int newPosition;
-        String newParentId;
+        Long newParentId;
         if (moveType == TreeNodeMoveType.AFTER) {
             newPosition = toNode.getRgt() + 1;
             newParentId = toNode.getParentId();
@@ -192,7 +195,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public boolean isChildOf(String childId, String parentId) {
+    public boolean isChildOf(Long childId, Long parentId) {
         MenuDO child = getTreeNode(childId);
         MenuDO parent = getTreeNode(parentId);
         return child != null && parent != null && child.getLft() > parent.getLft() && child.getRgt() < parent.getRgt();
@@ -208,7 +211,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public void deleteMenuRole(String menuId) {
+    public void deleteMenuRole(Long menuId) {
         LambdaQueryWrapper<MenuRoleDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MenuRoleDO::getMenuId, menuId);
         menuRoleMapper.delete(wrapper);
@@ -216,7 +219,7 @@ public class MenuDaoImpl implements MenuDao {
 
     private Integer allocateInsertPosition(MenuDO node) {
         normalizeParentId(node);
-        if (StringUtils.isNotBlank(node.getParentId()) && !StringUtils.equals(node.getParentId(), ROOT_ID)) {
+        if (node.getParentId() != null && !ROOT_ID.equals(node.getParentId())) {
             MenuDO parent = getTreeNode(node.getParentId());
             return parent.getRgt();
         }
@@ -228,7 +231,7 @@ public class MenuDaoImpl implements MenuDao {
         return maxRgt + 1;
     }
 
-    private void moveNodeToParent(MenuDO oldNode, String parentId) {
+    private void moveNodeToParent(MenuDO oldNode, Long parentId) {
         Integer newPosition = getInsertPosition(parentId);
         moveTreeRgts(newPosition, treeSpan(oldNode));
         moveTreeLfts(newPosition, treeSpan(oldNode));
@@ -241,8 +244,8 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeLfts(oldNode.getLft(), -treeSpan(oldNode));
     }
 
-    private Integer getInsertPosition(String parentId) {
-        if (StringUtils.isNotBlank(parentId) && !StringUtils.equals(parentId, ROOT_ID)) {
+    private Integer getInsertPosition(Long parentId) {
+        if (parentId != null && !ROOT_ID.equals(parentId)) {
             MenuDO parent = getTreeNode(parentId);
             return parent.getRgt();
         }
@@ -253,7 +256,7 @@ public class MenuDaoImpl implements MenuDao {
         return maxRgt + 1;
     }
 
-    private MenuDO getTreeNode(String id) {
+    private MenuDO getTreeNode(Long id) {
         return mapper.selectById(id);
     }
 
@@ -295,11 +298,11 @@ public class MenuDaoImpl implements MenuDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<MenuDO> buildListWrapper(String parentId, String displayFlag, Integer maxRank) {
+    private LambdaQueryWrapper<MenuDO> buildListWrapper(Long parentId, String displayFlag, Integer maxRank) {
         LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (parentId != null) {
-            if (StringUtils.equals(parentId, ROOT_ID)) {
+            if (ROOT_ID.equals(parentId)) {
                 wrapper.isNull(MenuDO::getParentId);
             } else {
                 wrapper.eq(MenuDO::getParentId, parentId);
@@ -316,10 +319,13 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     private static void normalizeParentId(MenuDO node) {
-        if (node != null
-                && (StringUtils.isBlank(node.getParentId()) || StringUtils.equals(node.getParentId(), ROOT_ID))) {
+        if (node != null && (node.getParentId() == null || ROOT_ID.equals(node.getParentId()))) {
             node.setParentId(null);
         }
+    }
+
+    private static boolean equalsLong(Long left, Long right) {
+        return left == null ? right == null : left.equals(right);
     }
 
     private static int treeSpan(MenuDO node) {

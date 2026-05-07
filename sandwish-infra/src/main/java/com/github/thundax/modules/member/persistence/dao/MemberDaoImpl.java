@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
@@ -33,7 +34,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> listByIds(List<String> idList) {
+    public List<Member> listByIds(List<Long> idList) {
         return MemberPersistenceAssembler.toEntityList(mapper.selectBatchIds(idList));
     }
 
@@ -92,7 +93,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public String insert(Member entity) {
+    public EntityId insert(Member entity) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         mapper.insert(dataObject);
         mapper.update(
@@ -100,7 +101,7 @@ public class MemberDaoImpl implements MemberDao {
                 new UpdateWrapper<MemberDO>()
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

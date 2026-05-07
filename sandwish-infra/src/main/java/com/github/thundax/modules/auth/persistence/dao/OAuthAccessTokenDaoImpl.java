@@ -22,7 +22,7 @@ public class OAuthAccessTokenDaoImpl implements OAuthAccessTokenDao {
 
     @Override
     public OAuthAccessToken getById(EntityId id) {
-        return OAuthAccessTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+        return OAuthAccessTokenPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toStringValue(id)));
     }
 
     @Override
@@ -40,10 +40,10 @@ public class OAuthAccessTokenDaoImpl implements OAuthAccessTokenDao {
     }
 
     @Override
-    public String insert(OAuthAccessToken accessToken) {
+    public EntityId insert(OAuthAccessToken accessToken) {
         OAuthAccessTokenDO dataObject = OAuthAccessTokenPersistenceAssembler.toDataObject(accessToken);
         mapper.insert(dataObject);
-        return dataObject.getId();
+        return EntityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

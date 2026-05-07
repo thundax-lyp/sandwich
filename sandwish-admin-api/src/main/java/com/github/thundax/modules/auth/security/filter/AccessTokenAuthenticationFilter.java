@@ -6,7 +6,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PermissionSession;
-import com.github.thundax.modules.auth.filter.ResponseBodyWrapper;
 import com.github.thundax.modules.auth.service.AuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;

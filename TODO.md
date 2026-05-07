@@ -9,24 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-register-api`：实现前台会员注册入口
-  - 范围文件：
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/RegisterController.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/request/MemberAccountRegisterRequest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/request/MemberMobileRegisterRequest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/request/MemberEmailRegisterRequest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/request/MemberRegisterSmsCodeRequest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/request/MemberRegisterEmailCodeRequest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/response/MemberRegisterResponse.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/assembler/MemberRegisterInterfaceAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberRegistrationService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberRegistrationServiceImpl.java`
-    - `sandwish-front-api/src/test/java/com/github/thundax/modules/member/controller/RegisterControllerContractTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberRegistrationServiceImplTest.java`
-  - 处理动作：实现账号密码注册、手机号注册、邮箱注册和注册验证码发送入口。
-  - 验收点：注册请求固定要求 `name`，注册后 `Member.status = ACTIVE`，账号密码注册校验图形验证码并解密传输密码，手机号和邮箱注册发送验证码前必须校验图形验证码。
-  - 重要度：10/10
-
 - [ ] `member-token-model`：新增会员认证会话与 token 模型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberAuthSession.java`

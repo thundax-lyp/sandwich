@@ -28,8 +28,8 @@ public final class DepartmentInterfaceAssembler {
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
-        if (StringUtils.isNotEmpty(entity.getParentId())) {
-            response.setParentId(entity.getParentId());
+        if (entity.getParentId() != null) {
+            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         }
         response.setName(entity.getName());
         response.setShortName(entity.getShortName());
@@ -45,8 +45,8 @@ public final class DepartmentInterfaceAssembler {
 
         DepartmentResponse response = new DepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        if (StringUtils.isNotBlank(entity.getParentId())) {
-            response.setParentId(entity.getParentId());
+        if (entity.getParentId() != null) {
+            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         }
         response.setName(entity.getName());
         response.setShortName(entity.getShortName());
@@ -69,8 +69,8 @@ public final class DepartmentInterfaceAssembler {
             entity.setPriority(request.getPriority());
         }
         entity.setRemarks(request.getRemarks());
-        if (StringUtils.isNotEmpty(request.getParentId())) {
-            entity.setParentId(request.getParentId());
+        if (request.getParentId() != null) {
+            entity.setParentId(EntityIdCodec.toDomain(request.getParentId()));
         }
         entity.setName(request.getName());
         entity.setShortName(request.getShortName());
@@ -84,7 +84,7 @@ public final class DepartmentInterfaceAssembler {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(node.getParentId());
             }
         }
         return StringUtils.join(names, "/");

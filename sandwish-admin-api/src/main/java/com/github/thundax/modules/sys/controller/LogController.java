@@ -69,7 +69,7 @@ public class LogController {
     }
 
     private LogResponse toResponse(Log log) {
-        User user = userService.getById(EntityIdCodec.toDomain(log.getUserId()));
+        User user = userService.getById(EntityIdCodec.toDomain(Long.valueOf(log.getUserId())));
         Department department =
                 user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         return LogInterfaceAssembler.toResponse(

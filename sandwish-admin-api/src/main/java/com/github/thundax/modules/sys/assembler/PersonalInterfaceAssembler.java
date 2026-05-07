@@ -75,7 +75,7 @@ public final class PersonalInterfaceAssembler {
     }
 
     private static String readAvatarUrl(User entity) {
-        String id = entity == null ? null : EntityIdCodec.toValue(entity.getId());
+        String id = entity == null ? null : EntityIdCodec.toStringValue(entity.getId());
         if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;
         }

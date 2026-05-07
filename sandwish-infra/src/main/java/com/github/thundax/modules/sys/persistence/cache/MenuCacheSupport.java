@@ -116,7 +116,7 @@ public class MenuCacheSupport {
         }
         Menu menu = new Menu();
         menu.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        menu.setParentId(cacheDTO.parentId);
+        menu.setParentId(EntityIdCodec.toDomain(cacheDTO.parentId));
         menu.setName(cacheDTO.name);
         menu.setPerms(cacheDTO.perms);
         menu.setRank(AccessRankCodec.toDomain(cacheDTO.rank));

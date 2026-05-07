@@ -58,8 +58,8 @@ public final class RoleInterfaceAssembler {
 
         RoleMenuResponse response = new RoleMenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        String parentId = EntityIdCodec.toValue(entity.getParentId());
-        if (StringUtils.isNotBlank(parentId)) {
+        Long parentId = EntityIdCodec.toValue(entity.getParentId());
+        if (parentId != null) {
             response.setParentId(parentId);
         }
         response.setName(entity.getName());
@@ -86,8 +86,8 @@ public final class RoleInterfaceAssembler {
     public static RoleUserTreeNodeResponse toDepartmentTreeNode(String id, Department entity) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
         response.setId(id);
-        if (StringUtils.isNotBlank(entity.getParentId())) {
-            response.setParentId(idPrefix(entity.getParentId()));
+        if (entity.getParentId() != null) {
+            response.setParentId(idPrefix(EntityIdCodec.toValue(entity.getParentId())));
         }
         response.setName(entity.getName());
         return response;
@@ -101,7 +101,7 @@ public final class RoleInterfaceAssembler {
             Department department,
             Function<EntityId, Department> departmentLoader) {
         RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
+        response.setId(String.valueOf(EntityIdCodec.toValue(entity.getId())));
         response.setParentId(departmentIdPrefix + entity.getDepartmentId());
         response.setName(entity.getName());
         response.setUser(toUserResponse(entity, loginName, department, departmentLoader));
@@ -150,7 +150,7 @@ public final class RoleInterfaceAssembler {
         return response;
     }
 
-    private static String idPrefix(String id) {
+    private static String idPrefix(Long id) {
         return "DEPARTMENT_" + id;
     }
 
@@ -161,7 +161,7 @@ public final class RoleInterfaceAssembler {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(node.getParentId());
             }
         }
         return StringUtils.join(names, "/");

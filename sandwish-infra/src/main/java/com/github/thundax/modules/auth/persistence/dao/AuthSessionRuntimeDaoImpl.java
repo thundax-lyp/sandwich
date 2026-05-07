@@ -85,11 +85,11 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
 
     private static AuthSessionCacheDTO toCacheDTO(AuthSession authSession) {
         AuthSessionCacheDTO cacheDTO = new AuthSessionCacheDTO();
-        cacheDTO.id = EntityIdCodec.toStringValue(authSession.getId());
+        cacheDTO.id = EntityIdCodec.toValue(authSession.getId());
         cacheDTO.sessionId = authSession.getSessionId();
         cacheDTO.token = authSession.getToken();
-        cacheDTO.userId = EntityIdCodec.toStringValue(authSession.getUserId());
-        cacheDTO.identityId = EntityIdCodec.toStringValue(authSession.getIdentityId());
+        cacheDTO.userId = EntityIdCodec.toValue(authSession.getUserId());
+        cacheDTO.identityId = EntityIdCodec.toValue(authSession.getIdentityId());
         cacheDTO.identityType = authSession.getIdentityType() == null
                 ? null
                 : authSession.getIdentityType().value();
@@ -109,11 +109,11 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
     }
 
     private static class AuthSessionCacheDTO implements CacheDTO {
-        private String id;
+        private Long id;
         private String sessionId;
         private String token;
-        private String userId;
-        private String identityId;
+        private Long userId;
+        private Long identityId;
         private String identityType;
         private String loginType;
         private String status;

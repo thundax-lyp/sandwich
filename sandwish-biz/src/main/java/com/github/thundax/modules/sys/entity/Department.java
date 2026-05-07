@@ -21,7 +21,7 @@ public class Department implements Auditable, Sortable {
 
     private EntityId id;
 
-    private Long parentId;
+    private EntityId parentId;
 
     private String name;
     private String shortName;
@@ -31,10 +31,6 @@ public class Department implements Auditable, Sortable {
     private Date updateDate;
     private String createUserId;
     private String updateUserId;
-
-    public void setParent(Department parent) {
-        this.setParentId(parent == null ? null : parent.getId().value());
-    }
 
     /**
      * 获取显示名称。如果存在简称，则显示简称；如果没有简称，则显示全名

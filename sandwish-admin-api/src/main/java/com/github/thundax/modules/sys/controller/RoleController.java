@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -93,7 +92,7 @@ public class RoleController {
     public RoleResponse get(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(Role.BEAN_NAME, request.getId());
+            throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
         return toResponse(bean);
     }
@@ -133,7 +132,7 @@ public class RoleController {
         if (entity.getId() != null) {
             Role bean = roleService.getById(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(Role.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
+                throw new InsertBeanExistException(Role.BEAN_NAME, entity.getId());
             }
         }
 
@@ -158,7 +157,7 @@ public class RoleController {
 
         Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(Role.BEAN_NAME, request.getId());
+            throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
 
         Role entity = RoleInterfaceAssembler.toEntity(bean, request);
@@ -184,7 +183,7 @@ public class RoleController {
         for (RoleStatusRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Role.BEAN_NAME, request.getId());
+                throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
             beanList.add(bean);
@@ -214,7 +213,7 @@ public class RoleController {
         for (RolePriorityRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Role.BEAN_NAME, request.getId());
+                throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             bean.setPriority(request.getPriority() == null ? 0 : request.getPriority());
             beanList.add(bean);
@@ -244,7 +243,7 @@ public class RoleController {
         for (RoleIdRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Role.BEAN_NAME, request.getId());
+                throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             beanList.add(bean);
         }
@@ -316,7 +315,7 @@ public class RoleController {
     public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(Role.BEAN_NAME, request.getId());
+            throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
 
         return roleService.listRoleUsers(bean).stream()
@@ -348,7 +347,7 @@ public class RoleController {
         return true;
     }
 
-    private User newUser(String id) {
+    private User newUser(Long id) {
         User user = new User();
         user.setId(EntityIdCodec.toDomain(id));
         return user;
@@ -369,7 +368,7 @@ public class RoleController {
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {
         Role roleBean = roleService.getById(EntityIdCodec.toDomain(request.getRoleId()));
         if (roleBean == null) {
-            throw new NullBeanException(Role.BEAN_NAME, request.getRoleId());
+            throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getRoleId()));
         }
 
         if (request.getUsers() == null || request.getUsers().isEmpty()) {
@@ -379,7 +378,7 @@ public class RoleController {
         for (RoleUserRequest userRequest : request.getUsers()) {
             User userBean = userService.getById(EntityIdCodec.toDomain(userRequest.getId()));
             if (userBean == null) {
-                throw new NullBeanException(User.BEAN_NAME, userRequest.getId());
+                throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(userRequest.getId()));
             }
         }
     }
@@ -389,13 +388,13 @@ public class RoleController {
             return;
         }
         for (RoleMenuRequest request : requestList) {
-            if (request == null || StringUtils.isBlank(request.getId())) {
+            if (request == null || request.getId() == null) {
                 throw new InvalidParameterException("menus.id");
 
             } else {
                 Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(MENU_NAME, request.getId());
+                    throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
                 }
             }
         }

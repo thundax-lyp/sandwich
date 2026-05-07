@@ -13,7 +13,7 @@ public class MemberSpringPrincipal implements Serializable {
     }
 
     public MemberSpringPrincipal(Member member) {
-        this.id = EntityIdCodec.toValue(member.getId());
+        this.id = EntityIdCodec.toStringValue(member.getId());
     }
 
     public String getId() {

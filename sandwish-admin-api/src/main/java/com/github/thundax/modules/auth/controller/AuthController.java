@@ -122,7 +122,7 @@ public class AuthController {
 
         authService.deleteLoginForm(request.getLoginToken());
 
-        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toValue(user.getId()));
+        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toStringValue(user.getId()));
         if (accessToken != null) {
             authService.deleteAccessToken(accessToken);
         }
@@ -256,7 +256,7 @@ public class AuthController {
 
     private void writeLog(HttpServletRequest currentRequest, String title, User user, String loginName) {
         Log log = new Log();
-        log.setUserId(EntityIdCodec.toValue(user.getId()));
+        log.setUserId(EntityIdCodec.toStringValue(user.getId()));
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
         log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
@@ -269,7 +269,7 @@ public class AuthController {
     }
 
     private AuthAccessTokenResponse loginSuccess(User user, String loginName, String logTitle) {
-        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toValue(user.getId()));
+        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toStringValue(user.getId()));
         if (accessToken != null) {
             authService.deleteAccessToken(accessToken);
         }
@@ -277,6 +277,6 @@ public class AuthController {
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         writeLog(currentRequest, logTitle, user, loginName);
         return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.createAccessToken(EntityIdCodec.toValue(user.getId()), loginName));
+                authService.createAccessToken(EntityIdCodec.toStringValue(user.getId()), loginName));
     }
 }

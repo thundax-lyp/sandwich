@@ -30,6 +30,6 @@ public class StorageConverter {
         }
 
         String objectId = StringUtils.removeEnd(StringUtils.substringAfter(previewUrl, contentPath), "/content");
-        return storageService.getById(EntityIdCodec.toDomain(objectId));
+        return storageService.getById(EntityIdCodec.toDomain(Long.valueOf(objectId)));
     }
 }

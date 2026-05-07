@@ -17,13 +17,6 @@ public class EntityIdCodecTest {
     }
 
     @Test
-    public void shouldConvertNumericStringToEntityId() {
-        EntityId entityId = EntityIdCodec.toDomain("1001");
-
-        assertEquals(EntityId.of(1001L), entityId);
-    }
-
-    @Test
     public void shouldConvertEntityIdToLong() {
         assertEquals(Long.valueOf(1001L), EntityIdCodec.toValue(EntityId.of(1001L)));
         assertNull(EntityIdCodec.toValue(null));

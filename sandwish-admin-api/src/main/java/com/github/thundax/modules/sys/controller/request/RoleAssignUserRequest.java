@@ -23,7 +23,7 @@ public class RoleAssignUserRequest implements Serializable {
     @JsonProperty("id")
     @Size(max = 64, message = "\"角色ID\"长度不能超过64")
     @NotEmpty(message = "\"角色ID\"不能为空")
-    private String roleId;
+    private Long roleId;
 
     @ApiModelProperty(name = "users", value = "用户列表")
     @JsonProperty("users")

@@ -93,7 +93,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private static AsyncTaskCacheDTO toCacheDTO(AsyncTask asyncTask) {
         AsyncTaskCacheDTO cacheDTO = new AsyncTaskCacheDTO();
-        cacheDTO.id = EntityIdCodec.toStringValue(asyncTask.getId());
+        cacheDTO.id = EntityIdCodec.toValue(asyncTask.getId());
         cacheDTO.title = asyncTask.getTitle();
         cacheDTO.status =
                 asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();
@@ -111,7 +111,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     }
 
     private static class AsyncTaskCacheDTO implements CacheDTO {
-        private String id;
+        private Long id;
         private String title;
         private String status;
         private String message;

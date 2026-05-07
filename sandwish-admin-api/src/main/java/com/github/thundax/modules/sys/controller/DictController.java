@@ -150,7 +150,7 @@ public class DictController {
         for (DictIdRequest request : RequestListHelper.present(list)) {
             Dict bean = dictService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException("Dict", request.getId());
+                throw new NullBeanException("Dict", EntityIdCodec.toDomain(request.getId()));
             }
             beanList.add(bean);
         }

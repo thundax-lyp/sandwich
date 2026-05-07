@@ -93,7 +93,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         UserAccessHolder.currentUserId(accessToken.getUserId(), token);
         try {
-            User currentUser = userService.getById(EntityIdCodec.toDomain(accessToken.getUserId()));
+            User currentUser = userService.getById(EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
             if (currentUser.getId() == null || !currentUser.isEnable()) {
                 writeError(response);
                 return;

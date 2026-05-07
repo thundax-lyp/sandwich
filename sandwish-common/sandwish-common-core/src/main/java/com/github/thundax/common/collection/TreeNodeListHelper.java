@@ -11,9 +11,9 @@ public final class TreeNodeListHelper {
 
     private TreeNodeListHelper() {}
 
-    public static <T> List<T> remove(
-            @NonNull List<T> nodeList, @NonNull TreeNodeSupport<T> support, @NonNull Set<String> excludeIds) {
-        Set<String> ids =
+    public static <T, ID> List<T> remove(
+            @NonNull List<T> nodeList, @NonNull TreeNodeSupport<T, ID> support, @NonNull Set<ID> excludeIds) {
+        Set<ID> ids =
                 new HashSet<>(nodeList.stream().map(node -> support.getId(node)).collect(Collectors.toList()));
 
         int size = 0;
@@ -23,13 +23,13 @@ public final class TreeNodeListHelper {
             Iterator<T> iterator = nodeList.iterator();
             while (iterator.hasNext()) {
                 T node = iterator.next();
-                String id = support.getId(node);
+                ID id = support.getId(node);
                 if (excludeIds.contains(id)) {
                     iterator.remove();
                     ids.remove(id);
 
                 } else {
-                    String parentId = support.getParentId(node);
+                    ID parentId = support.getParentId(node);
                     if (!support.isRoot(node) && !ids.contains(parentId)) {
                         iterator.remove();
                         ids.remove(id);
@@ -41,11 +41,11 @@ public final class TreeNodeListHelper {
         return nodeList;
     }
 
-    public interface TreeNodeSupport<T> {
+    public interface TreeNodeSupport<T, ID> {
 
-        String getId(T node);
+        ID getId(T node);
 
-        String getParentId(T node);
+        ID getParentId(T node);
 
         boolean isRoot(T node);
     }

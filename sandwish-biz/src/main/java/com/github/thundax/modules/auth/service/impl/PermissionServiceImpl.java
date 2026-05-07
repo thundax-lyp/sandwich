@@ -101,7 +101,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private Set<String> loadPermissions(String userId) {
-        User user = userService.getById(EntityIdCodec.toDomain(userId));
+        User user = userService.getById(EntityIdCodec.toDomain(Long.valueOf(userId)));
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();

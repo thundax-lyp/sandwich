@@ -126,7 +126,7 @@ public class StorageController {
     @ApiOperation(value = "读取存储对象内容", notes = "assist:storage:view")
     @HasPermission("assist:storage:view")
     @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
-    public void content(@PathVariable("id") String id, HttpServletResponse response) throws IOException {
+    public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
         StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
         if (storage == null) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
@@ -165,7 +165,7 @@ public class StorageController {
         for (StorageIdRequest request : RequestListHelper.present(list)) {
             StoredObject storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
             if (storage == null) {
-                throw new NullBeanException("StoredObject", request.getId());
+                throw new NullBeanException("StoredObject", EntityIdCodec.toDomain(request.getId()));
             }
             storageList.add(storage);
         }

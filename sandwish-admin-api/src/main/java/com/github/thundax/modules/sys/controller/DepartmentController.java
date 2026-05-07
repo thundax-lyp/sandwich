@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
@@ -32,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,7 +65,7 @@ public class DepartmentController {
     public DepartmentResponse get(@Valid @RequestBody DepartmentIdRequest request) throws ApiException {
         Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(Department.BEAN_NAME, request.getId());
+            throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
         return DepartmentInterfaceAssembler.toResponse(bean, departmentService::getById);
     }
@@ -105,12 +105,12 @@ public class DepartmentController {
         if (entity.getId() != null) {
             Department bean = departmentService.getById(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(Department.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
+                throw new InsertBeanExistException(Department.BEAN_NAME, entity.getId());
             }
         }
 
-        if (StringUtils.isNotEmpty(entity.getParentId())) {
-            Department parent = departmentService.getById(EntityIdCodec.toDomain(entity.getParentId()));
+        if (entity.getParentId() != null) {
+            Department parent = departmentService.getById(entity.getParentId());
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -138,7 +138,7 @@ public class DepartmentController {
             throw new InvalidParameterException("id");
         }
 
-        if (StringUtils.isNotEmpty(request.getParentId())) {
+        if (request.getParentId() != null) {
             Department parent = departmentService.getById(EntityIdCodec.toDomain(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
@@ -168,7 +168,7 @@ public class DepartmentController {
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
             Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Department.BEAN_NAME, request.getId());
+                throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             beanList.add(bean);
         }
@@ -196,26 +196,27 @@ public class DepartmentController {
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
         List<Department> beanList = departmentService.listAll();
 
-        Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, DepartmentIdRequest::getId));
-        beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
+        Set<EntityId> excludeIds =
+                new HashSet<>(RequestListHelper.map(excludeList, request -> EntityIdCodec.toDomain(request.getId())));
+        beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         TreeNodeListHelper.remove(
                 beanList,
-                new TreeNodeListHelper.TreeNodeSupport<Department>() {
+                new TreeNodeListHelper.TreeNodeSupport<Department, EntityId>() {
 
                     @Override
-                    public String getId(Department entity) {
-                        return EntityIdCodec.toValue(entity.getId());
+                    public EntityId getId(Department entity) {
+                        return entity.getId();
                     }
 
                     @Override
-                    public String getParentId(Department entity) {
+                    public EntityId getParentId(Department entity) {
                         return entity.getParentId();
                     }
 
                     @Override
                     public boolean isRoot(Department entity) {
-                        return StringUtils.isBlank(entity.getParentId());
+                        return entity.getParentId() == null;
                     }
                 },
                 excludeIds);
@@ -239,16 +240,19 @@ public class DepartmentController {
     public Boolean move(@Valid @RequestBody DepartmentMoveRequest request) throws ApiException {
         Department fromBean = departmentService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
-            throw new NullBeanException(Department.BEAN_NAME, request.getFromNodeId());
+            throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getFromNodeId()));
         }
 
         Department toBean = departmentService.getById(EntityIdCodec.toDomain(request.getToNodeId()));
         if (toBean == null) {
-            throw new NullBeanException(Department.BEAN_NAME, request.getToNodeId());
+            throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
         if (toBean.equals(fromBean) || departmentService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(Department.BEAN_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(
+                    Department.BEAN_NAME,
+                    EntityIdCodec.toDomain(request.getFromNodeId()),
+                    EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
         departmentService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

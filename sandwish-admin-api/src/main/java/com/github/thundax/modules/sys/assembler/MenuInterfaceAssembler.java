@@ -8,7 +8,6 @@ import com.github.thundax.modules.sys.controller.response.MenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public final class MenuInterfaceAssembler {
@@ -25,8 +24,8 @@ public final class MenuInterfaceAssembler {
         response.setCreateDate(entity.getCreateDate());
         response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
-        String parentId = EntityIdCodec.toValue(entity.getParentId());
-        if (StringUtils.isNotEmpty(parentId)) {
+        Long parentId = EntityIdCodec.toValue(entity.getParentId());
+        if (parentId != null) {
             response.setParentId(parentId);
         }
         response.setName(entity.getName());
@@ -67,8 +66,8 @@ public final class MenuInterfaceAssembler {
             entity.setPriority(request.getPriority());
         }
         entity.setRemarks(request.getRemarks());
-        if (StringUtils.isNotEmpty(request.getParentId())) {
-            entity.setParentId(request.getParentId());
+        if (request.getParentId() != null) {
+            entity.setParentId(EntityIdCodec.toDomain(request.getParentId()));
         }
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());

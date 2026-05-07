@@ -39,25 +39,25 @@ public class DepartmentControllerContractTest {
         DepartmentService departmentService = mock(DepartmentService.class);
         DepartmentController controller = new DepartmentController(departmentService);
         when(departmentService.listAll())
-                .thenReturn(new ArrayList<>(Arrays.asList(
-                        department("root", null), department("child", "root"), department("peer", null))));
+                .thenReturn(
+                        new ArrayList<>(Arrays.asList(department(1L, null), department(2L, 1L), department(3L, null))));
 
-        List<DepartmentResponse> responses = controller.tree(Collections.singletonList(idRequest("root")));
+        List<DepartmentResponse> responses = controller.tree(Collections.singletonList(idRequest(1L)));
 
         assertEquals(1, responses.size());
-        assertEquals("peer", responses.get(0).getId());
+        assertEquals(Long.valueOf(3L), responses.get(0).getId());
     }
 
     @Test
     public void shouldMapInsideLastMoveType() throws Exception {
         DepartmentService departmentService = mock(DepartmentService.class);
         DepartmentController controller = new DepartmentController(departmentService);
-        Department from = department("from", null);
-        Department to = department("to", null);
-        when(departmentService.getById(EntityId.of("from"))).thenReturn(from);
-        when(departmentService.getById(EntityId.of("to"))).thenReturn(to);
+        Department from = department(1L, null);
+        Department to = department(2L, null);
+        when(departmentService.getById(EntityId.of(1L))).thenReturn(from);
+        when(departmentService.getById(EntityId.of(2L))).thenReturn(to);
 
-        Boolean moved = controller.move(moveRequest("from", "to", DepartmentMoveRequest.TYPE_INSIDE_LAST));
+        Boolean moved = controller.move(moveRequest(1L, 2L, DepartmentMoveRequest.TYPE_INSIDE_LAST));
 
         assertEquals(Boolean.TRUE, moved);
         verify(departmentService).moveTreeNode(from, to, TreeNodeMoveType.INSIDE_LAST);
@@ -67,25 +67,25 @@ public class DepartmentControllerContractTest {
     public void shouldRejectMovingNodeIntoItsDescendant() throws Exception {
         DepartmentService departmentService = mock(DepartmentService.class);
         DepartmentController controller = new DepartmentController(departmentService);
-        Department from = department("from", null);
-        Department to = department("to", "from");
-        when(departmentService.getById(EntityId.of("from"))).thenReturn(from);
-        when(departmentService.getById(EntityId.of("to"))).thenReturn(to);
+        Department from = department(1L, null);
+        Department to = department(2L, 1L);
+        when(departmentService.getById(EntityId.of(1L))).thenReturn(from);
+        when(departmentService.getById(EntityId.of(2L))).thenReturn(to);
         when(departmentService.isChildOf(to, from)).thenReturn(true);
 
-        controller.move(moveRequest("from", "to", DepartmentMoveRequest.TYPE_INSIDE));
+        controller.move(moveRequest(1L, 2L, DepartmentMoveRequest.TYPE_INSIDE));
 
         verify(departmentService, never())
                 .moveTreeNode(any(Department.class), any(Department.class), any(TreeNodeMoveType.class));
     }
 
-    private DepartmentIdRequest idRequest(String id) {
+    private DepartmentIdRequest idRequest(Long id) {
         DepartmentIdRequest request = new DepartmentIdRequest();
         request.setId(id);
         return request;
     }
 
-    private DepartmentMoveRequest moveRequest(String fromNodeId, String toNodeId, String type) {
+    private DepartmentMoveRequest moveRequest(Long fromNodeId, Long toNodeId, String type) {
         DepartmentMoveRequest request = new DepartmentMoveRequest();
         request.setFromNodeId(fromNodeId);
         request.setToNodeId(toNodeId);
@@ -93,11 +93,11 @@ public class DepartmentControllerContractTest {
         return request;
     }
 
-    private Department department(String id, String parentId) {
+    private Department department(Long id, Long parentId) {
         Department department = new Department();
         department.setId(EntityId.of(id));
-        department.setParentId(parentId);
-        department.setName(id);
+        department.setParentId(EntityId.ofNullable(parentId));
+        department.setName(String.valueOf(id));
         return department;
     }
 }

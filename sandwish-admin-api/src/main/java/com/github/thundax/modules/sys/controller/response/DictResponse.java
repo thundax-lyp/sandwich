@@ -20,7 +20,7 @@ public class DictResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "字典ID")
     @JsonProperty("id")
-    private String id;
+    private Long id;
 
     @ApiModelProperty(name = "priority", value = "排序数")
     @JsonProperty("priority")

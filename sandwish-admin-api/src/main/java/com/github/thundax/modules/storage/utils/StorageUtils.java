@@ -1,7 +1,5 @@
 package com.github.thundax.modules.storage.utils;
 
-import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,8 +41,7 @@ public final class StorageUtils {
             extendName = ALLOW_CONTENT_TYPES.get(StringUtils.lowerCase(file.getContentType()));
         }
 
-        if (StringUtils.isBlank(EntityIdCodec.toValue(storage.getId()))) {
-            storage.setId(EntityIdCodec.toDomain(UuidHelper.compact()));
+        if (storage.getId() == null) {
             storage.setCreateDate(new Date());
         }
 

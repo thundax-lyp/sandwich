@@ -44,7 +44,7 @@ public class AsyncTaskControllerContractTest {
         AsyncTaskService asyncTaskService = mock(AsyncTaskService.class);
         AsyncTaskController controller = new AsyncTaskController(asyncTaskService);
 
-        AsyncTaskResponse response = controller.get(idRequest("missing"));
+        AsyncTaskResponse response = controller.get(idRequest(404L));
 
         assertNull(response.getId());
     }
@@ -53,15 +53,15 @@ public class AsyncTaskControllerContractTest {
     public void shouldReturnPublicTaskResponse() throws Exception {
         AsyncTaskService asyncTaskService = mock(AsyncTaskService.class);
         AsyncTaskController controller = new AsyncTaskController(asyncTaskService);
-        AsyncTask task = task("task-1");
+        AsyncTask task = task(1001L);
         task.setStatus(AsyncTaskStatus.SUCCESS);
         task.setMessage("done");
         task.setData("{\"ok\":true}");
-        when(asyncTaskService.getById(EntityId.of("task-1"))).thenReturn(task);
+        when(asyncTaskService.getById(EntityId.of(1001L))).thenReturn(task);
 
-        AsyncTaskResponse response = controller.get(idRequest("task-1"));
+        AsyncTaskResponse response = controller.get(idRequest(1001L));
 
-        assertEquals("task-1", response.getId());
+        assertEquals(Long.valueOf(1001L), response.getId());
         assertEquals("SUCCESS", response.getStatus());
         assertEquals("done", response.getMessage());
         assertEquals("{\"ok\":true}", response.getData());
@@ -71,30 +71,30 @@ public class AsyncTaskControllerContractTest {
     public void shouldRejectPrivateTaskWhenCurrentUserDoesNotOwnIt() throws Exception {
         AsyncTaskService asyncTaskService = mock(AsyncTaskService.class);
         AsyncTaskController controller = new AsyncTaskController(asyncTaskService);
-        AsyncTask task = task("task-1");
+        AsyncTask task = task(1001L);
         task.setPrivate(true);
-        task.setCreateUserId("owner-1");
-        when(asyncTaskService.getById(EntityId.of("task-1"))).thenReturn(task);
-        UserAccessHolder.currentUserId("other-user", "token-1");
-        mockCurrentUser("other-user");
+        task.setCreateUserId("2001");
+        when(asyncTaskService.getById(EntityId.of(1001L))).thenReturn(task);
+        UserAccessHolder.currentUserId("2002", "token-1");
+        mockCurrentUser(2002L);
 
-        controller.get(idRequest("task-1"));
+        controller.get(idRequest(1001L));
     }
 
-    private AsyncTaskIdRequest idRequest(String id) {
+    private AsyncTaskIdRequest idRequest(Long id) {
         AsyncTaskIdRequest request = new AsyncTaskIdRequest();
         request.setId(id);
         return request;
     }
 
-    private AsyncTask task(String id) {
+    private AsyncTask task(Long id) {
         AsyncTask task = new AsyncTask();
         task.setId(EntityId.of(id));
-        task.setTitle(id);
+        task.setTitle(String.valueOf(id));
         return task;
     }
 
-    private void mockCurrentUser(String userId) {
+    private void mockCurrentUser(Long userId) {
         User currentUser = new User();
         currentUser.setId(EntityId.of(userId));
         UserService userService = mock(UserService.class);

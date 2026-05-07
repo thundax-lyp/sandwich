@@ -77,34 +77,34 @@ public class StorageControllerContractTest {
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.content("missing", response);
+        controller.content(404L, response);
 
         assertEquals(404, response.getStatus());
-        verify(storageService).getById(EntityIdCodec.toDomain("missing"));
+        verify(storageService).getById(EntityIdCodec.toDomain(404L));
     }
 
     @Test
     public void shouldReturnForbiddenWhenCurrentUserCannotReadContent() throws Exception {
-        StoredObject storage = storage("s1");
+        StoredObject storage = storage(1001L);
         StorageService storageService = mock(StorageService.class);
-        when(storageService.getById(EntityIdCodec.toDomain("s1"))).thenReturn(storage);
+        when(storageService.getById(EntityIdCodec.toDomain(1001L))).thenReturn(storage);
         when(storageService.canReadContent(storage, StorageOwnerType.USER, null))
                 .thenReturn(false);
         StorageController controller =
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.content("s1", response);
+        controller.content(1001L, response);
 
         assertEquals(403, response.getStatus());
     }
 
     @Test
     public void shouldStreamContentWhenReadable() throws Exception {
-        StoredObject storage = storage("s1");
+        StoredObject storage = storage(1001L);
         StorageService storageService = mock(StorageService.class);
         StoredObjectStore objectStore = mock(StoredObjectStore.class);
-        when(storageService.getById(EntityIdCodec.toDomain("s1"))).thenReturn(storage);
+        when(storageService.getById(EntityIdCodec.toDomain(1001L))).thenReturn(storage);
         when(storageService.canReadContent(storage, StorageOwnerType.USER, null))
                 .thenReturn(true);
         when(objectStore.exists(storage)).thenReturn(true);
@@ -112,7 +112,7 @@ public class StorageControllerContractTest {
         StorageController controller = controller(storageService, mock(StorageConverter.class), objectStore);
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        controller.content("s1", response);
+        controller.content(1001L, response);
 
         assertEquals(200, response.getStatus());
         assertEquals("text/plain", response.getContentType());
@@ -128,7 +128,7 @@ public class StorageControllerContractTest {
         return new StorageController(properties, storageService, storageConverter, objectStore);
     }
 
-    private StoredObject storage(String id) {
+    private StoredObject storage(Long id) {
         StoredObject storage = new StoredObject();
         storage.setId(EntityIdCodec.toDomain(id));
         storage.setMimeType("text/plain");

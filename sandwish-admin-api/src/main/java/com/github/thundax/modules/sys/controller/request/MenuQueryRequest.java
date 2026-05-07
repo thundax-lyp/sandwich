@@ -20,7 +20,7 @@ public class MenuQueryRequest implements Serializable {
     @ApiModelProperty(name = "parentId", value = "父节点ID，为\"ROOT\"则查询跟节点")
     @JsonProperty("parentId")
     @Size(max = 64, message = "\"父节点ID\"长度不能超过 64")
-    private String parentId;
+    private Long parentId;
 
     @ApiModelProperty(name = "display", value = "显示/隐藏")
     @JsonProperty("display")

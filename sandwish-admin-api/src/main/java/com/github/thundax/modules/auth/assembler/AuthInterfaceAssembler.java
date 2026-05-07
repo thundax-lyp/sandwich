@@ -149,7 +149,9 @@ public final class AuthInterfaceAssembler {
     }
 
     private static String userId(User user) {
-        return user == null || user.getId() == null ? null : user.getId().value();
+        return user == null || user.getId() == null
+                ? null
+                : String.valueOf(user.getId().value());
     }
 
     private static String scope(Set<String> scopes) {

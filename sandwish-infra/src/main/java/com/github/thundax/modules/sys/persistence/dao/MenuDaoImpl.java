@@ -97,7 +97,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         dataObject.setLft(newPosition);
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
@@ -117,7 +117,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }

@@ -114,7 +114,7 @@ public class DepartmentCacheSupport {
         }
         Department department = new Department();
         department.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        department.setParentId(cacheDTO.parentId);
+        department.setParentId(EntityIdCodec.toDomain(cacheDTO.parentId));
         department.setName(cacheDTO.name);
         department.setShortName(cacheDTO.shortName);
         department.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
@@ -129,7 +129,7 @@ public class DepartmentCacheSupport {
     private static DepartmentCacheDTO toCacheDTO(Department department) {
         DepartmentCacheDTO cacheDTO = new DepartmentCacheDTO();
         cacheDTO.id = EntityIdCodec.toValue(department.getId());
-        cacheDTO.parentId = department.getParentId();
+        cacheDTO.parentId = EntityIdCodec.toValue(department.getParentId());
         cacheDTO.name = department.getName();
         cacheDTO.shortName = department.getShortName();
         cacheDTO.priority = department.getPriority();

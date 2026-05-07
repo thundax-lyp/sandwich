@@ -14,7 +14,8 @@ public class UserAccessHolder {
 
     @NonNull
     public static User currentUser() {
-        User user = SpringContextHolder.getBean(UserService.class).getById(EntityIdCodec.toDomain(currentUserId()));
+        User user = SpringContextHolder.getBean(UserService.class)
+                .getById(EntityIdCodec.toDomain(Long.valueOf(currentUserId())));
         if (user != null) {
             return user;
         }

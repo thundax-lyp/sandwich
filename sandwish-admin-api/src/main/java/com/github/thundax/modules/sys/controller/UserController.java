@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,7 +120,7 @@ public class UserController {
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, request.getId());
+            throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
         return toResponse(bean);
     }
@@ -188,13 +189,13 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
-        List<String> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
+        List<Long> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
         String encryptedPassword = passwordService.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
             User bean = userService.getById(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(User.BEAN_NAME, EntityIdCodec.toValue(entity.getId()));
+                throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
             }
         }
 
@@ -232,7 +233,7 @@ public class UserController {
 
         User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, request.getId());
+            throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
         User currentUser = UserAccessHolder.currentUser();
         // 非超管用户无权限开启/关闭管理员
@@ -248,7 +249,7 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
-        List<String> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
+        List<Long> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
 
         userService.update(entity, request.getLoginName(), roleIdList);
 
@@ -328,7 +329,7 @@ public class UserController {
         for (UserStatusRequest request : RequestListHelper.present(list)) {
             User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(User.BEAN_NAME, request.getId());
+                throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
@@ -365,7 +366,7 @@ public class UserController {
         for (UserIdRequest request : RequestListHelper.present(list)) {
             User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(User.BEAN_NAME, request.getId());
+                throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
@@ -458,10 +459,10 @@ public class UserController {
     private UserQuery readQuery(UserQueryRequest request) throws ApiException {
         UserQuery query = UserInterfaceAssembler.toQuery(request);
 
-        if (StringUtils.isNotBlank(request.getDepartmentId())) {
+        if (request.getDepartmentId() != null) {
             Department department = departmentService.getById(EntityIdCodec.toDomain(request.getDepartmentId()));
             if (department == null) {
-                throw new NullBeanException(Department.BEAN_NAME, request.getDepartmentId());
+                throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getDepartmentId()));
             }
 
             query.setDepartmentId(EntityIdCodec.toValue(department.getId()));
@@ -471,13 +472,13 @@ public class UserController {
     }
 
     private void validateDepartment(UserDepartmentRequest request) throws ApiException {
-        if (request == null || StringUtils.isBlank(request.getId())) {
+        if (request == null || request.getId() == null) {
             throw new InvalidParameterException("department.id");
 
         } else {
             Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Department.BEAN_NAME, request.getId());
+                throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
         }
     }
@@ -487,13 +488,13 @@ public class UserController {
             return;
         }
         for (UserRoleRequest request : requestList) {
-            if (request == null || StringUtils.isBlank(request.getId())) {
+            if (request == null || request.getId() == null) {
                 throw new InvalidParameterException("roles.id");
 
             } else {
                 Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(Role.BEAN_NAME, request.getId());
+                    throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
                 }
             }
         }
@@ -517,7 +518,7 @@ public class UserController {
         return page;
     }
 
-    private boolean isLoginNameAvailable(String loginName, String id) {
+    private boolean isLoginNameAvailable(String loginName, Long id) {
         if (StringUtils.isBlank(loginName)) {
             return true;
         }
@@ -526,7 +527,7 @@ public class UserController {
             return true;
         }
 
-        return StringUtils.equals(EntityIdCodec.toValue(identity.getUserId()), id);
+        return Objects.equals(EntityIdCodec.toValue(identity.getUserId()), id);
     }
 
     private UserResponse toResponse(User user) {

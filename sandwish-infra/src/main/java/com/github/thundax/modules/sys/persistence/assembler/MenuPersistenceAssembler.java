@@ -41,7 +41,7 @@ public final class MenuPersistenceAssembler {
         }
         Menu entity = new Menu();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));

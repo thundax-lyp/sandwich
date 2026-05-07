@@ -22,16 +22,9 @@ public class EntityIdTest {
         EntityId.of(0L);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldRejectNonNumericStringValue() {
-        EntityId.of("user-1");
-    }
-
     @Test
-    public void shouldReturnNullForNullableEmptyValue() {
+    public void shouldReturnNullForNullableValue() {
         assertNull(EntityId.ofNullable((Long) null));
-        assertNull(EntityId.ofNullable(""));
-        assertNull(EntityId.ofNullable(" "));
     }
 
     @Test

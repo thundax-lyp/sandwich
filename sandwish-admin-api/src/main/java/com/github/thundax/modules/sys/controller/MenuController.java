@@ -7,6 +7,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.MoveTreeNodeException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
@@ -34,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,7 +69,7 @@ public class MenuController {
     public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
         Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(MENU_NAME, request.getId());
+            throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
         }
         return MenuInterfaceAssembler.toResponse(bean);
     }
@@ -109,7 +109,7 @@ public class MenuController {
         if (entity.getId() != null) {
             Menu bean = menuService.getById(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(MENU_NAME, EntityIdCodec.toValue(entity.getId()));
+                throw new InsertBeanExistException(MENU_NAME, entity.getId());
             }
         }
 
@@ -142,7 +142,7 @@ public class MenuController {
             throw new InvalidParameterException("id");
         }
 
-        if (StringUtils.isNotEmpty(request.getParentId())) {
+        if (request.getParentId() != null) {
             Menu parent = menuService.getById(EntityIdCodec.toDomain(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
@@ -172,7 +172,7 @@ public class MenuController {
         for (MenuDisplayRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(MENU_NAME, request.getId());
+                throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             bean.setVisibility(
                     Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
@@ -203,7 +203,7 @@ public class MenuController {
         for (MenuIdRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(MENU_NAME, request.getId());
+                throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
             }
             beanList.add(bean);
         }
@@ -230,21 +230,22 @@ public class MenuController {
     public List<MenuResponse> tree(@Valid @RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.list(new MenuQuery());
 
-        Set<String> excludeIds = new HashSet<>(RequestListHelper.map(excludeList, MenuIdRequest::getId));
-        beanList.removeIf(bean -> excludeIds.contains(EntityIdCodec.toValue(bean.getId())));
+        Set<EntityId> excludeIds =
+                new HashSet<>(RequestListHelper.map(excludeList, request -> EntityIdCodec.toDomain(request.getId())));
+        beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         TreeNodeListHelper.remove(
                 beanList,
-                new TreeNodeListHelper.TreeNodeSupport<Menu>() {
+                new TreeNodeListHelper.TreeNodeSupport<Menu, EntityId>() {
 
                     @Override
-                    public String getId(Menu menu) {
-                        return EntityIdCodec.toValue(menu.getId());
+                    public EntityId getId(Menu menu) {
+                        return menu.getId();
                     }
 
                     @Override
-                    public String getParentId(Menu menu) {
-                        return EntityIdCodec.toValue(menu.getParentId());
+                    public EntityId getParentId(Menu menu) {
+                        return menu.getParentId();
                     }
 
                     @Override
@@ -273,16 +274,19 @@ public class MenuController {
     public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
         Menu fromBean = menuService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
         if (fromBean == null) {
-            throw new NullBeanException(MENU_NAME, request.getFromNodeId());
+            throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getFromNodeId()));
         }
 
         Menu toBean = menuService.getById(EntityIdCodec.toDomain(request.getToNodeId()));
         if (toBean == null) {
-            throw new NullBeanException(MENU_NAME, request.getToNodeId());
+            throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
         if (toBean.equals(fromBean) || menuService.isChildOf(toBean, fromBean)) {
-            throw new MoveTreeNodeException(MENU_NAME, request.getFromNodeId(), request.getToNodeId());
+            throw new MoveTreeNodeException(
+                    MENU_NAME,
+                    EntityIdCodec.toDomain(request.getFromNodeId()),
+                    EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
         menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));

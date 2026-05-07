@@ -48,8 +48,8 @@ public final class UserInterfaceAssembler {
         response.setName(entity.getName());
         response.setEmail(entity.getEmail());
         response.setMobile(entity.getMobile());
-        response.setAvatar(
-                UserController.getAvatarUrl(EntityIdCodec.toValue(entity.getId()), UserAccessHolder.currentToken()));
+        response.setAvatar(UserController.getAvatarUrl(
+                EntityIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()));
         response.setSuperAdmin(entity.isSuper());
         response.setAdmin(entity.isAdmin());
         response.setEnable(entity.isEnable());
@@ -72,8 +72,8 @@ public final class UserInterfaceAssembler {
 
         UserDepartmentResponse response = new UserDepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
-        if (StringUtils.isNotBlank(entity.getParentId())) {
-            response.setParentId(entity.getParentId());
+        if (entity.getParentId() != null) {
+            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         }
         response.setName(entity.getName());
         response.setNamePath(namePath(entity, departmentLoader));
@@ -95,7 +95,7 @@ public final class UserInterfaceAssembler {
     @NonNull
     public static UserQuery toQuery(@NonNull UserQueryRequest request) {
         UserQuery query = new UserQuery();
-        query.setDepartmentId(emptyToNull(request.getDepartmentId()));
+        query.setDepartmentId(request.getDepartmentId());
         query.setLoginName(emptyToNull(request.getLoginName()));
         query.setName(emptyToNull(request.getName()));
         if (request.getEnable() != null) {
@@ -125,7 +125,7 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
-    public static List<String> toRoleIdList(@NonNull UserSaveRequest request) {
+    public static List<Long> toRoleIdList(@NonNull UserSaveRequest request) {
         return request.getRoleList() == null
                 ? new ArrayList<>()
                 : request.getRoleList().stream().map(role -> role.getId()).collect(Collectors.toList());
@@ -138,7 +138,7 @@ public final class UserInterfaceAssembler {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(node.getParentId());
             }
         }
         return StringUtils.join(names, "/");

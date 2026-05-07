@@ -20,7 +20,7 @@ public class LogResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "日志ID")
     @JsonProperty("id")
-    private String id;
+    private Long id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

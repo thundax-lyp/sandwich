@@ -22,5 +22,5 @@ public class UserDepartmentRequest implements Serializable {
     @JsonProperty("id")
     @NotEmpty(message = "部门ID不能为空")
     @Size(max = 64, message = "部门ID长度不能超过64")
-    private String id;
+    private Long id;
 }

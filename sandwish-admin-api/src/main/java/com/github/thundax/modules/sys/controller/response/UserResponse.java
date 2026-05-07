@@ -21,7 +21,7 @@ public class UserResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "用户ID")
     @JsonProperty("id")
-    private String id;
+    private Long id;
 
     @ApiModelProperty(name = "priority", value = "排序数")
     @JsonProperty("priority")

@@ -26,7 +26,7 @@ public class UserSaveRequest implements Serializable {
     @ApiModelProperty(name = "id", value = "用户ID")
     @JsonProperty("id")
     @Size(max = 64, message = "ID长度不能超过64")
-    private String id;
+    private Long id;
 
     @ApiModelProperty(name = "priority", value = "排序数", example = "0")
     @JsonProperty("priority")

@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-api-boundary`：改代码，迁移 API 边界 ID 类型
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/**/*.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/**/*.java`
-  - 处理动作：将前后台 API Request、Response 和 assembler 中的 ID 类型与雪花 `Long` 口径对齐。
-  - 验收点：`mvn -pl sandwish-admin-api,sandwish-front-api -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-final-close`：全局雪花 ID 迁移收口
   - 范围文件：
     - `TODO.md`

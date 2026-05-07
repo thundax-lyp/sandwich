@@ -33,7 +33,7 @@ public class UserQueryRequest implements Serializable {
     @ApiModelProperty(name = "departmentId", value = "部门ID")
     @JsonProperty("departmentId")
     @Size(max = 64, message = "\"部门ID\"长度不能超过64")
-    private String departmentId;
+    private Long departmentId;
 
     @ApiModelProperty(name = "loginName", value = "登录名，模糊查询")
     @JsonProperty("loginName")

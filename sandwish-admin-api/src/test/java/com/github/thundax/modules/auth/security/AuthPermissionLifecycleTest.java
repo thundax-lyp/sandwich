@@ -140,7 +140,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldCreateTouchAndReleasePermissionSessionWithAccessToken() {
-        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessToken accessToken = authService.createAccessToken("1", "tester");
 
         Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
         Assert.assertNotNull(authSessionDao.getByToken(accessToken.getToken()));
@@ -175,11 +175,11 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldInvalidateSessionByUserId() {
-        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessToken accessToken = authService.createAccessToken("1", "tester");
 
-        authService.invalidateSessionsByUserId(EntityIdCodec.toDomain("u1"), "PASSWORD_RESET");
+        authService.invalidateSessionsByUserId(EntityIdCodec.toDomain(1L), "PASSWORD_RESET");
 
-        Assert.assertNull(accessTokenDao.getByUserId("u1"));
+        Assert.assertNull(accessTokenDao.getByUserId("1"));
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
         Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
         Assert.assertEquals(
@@ -192,7 +192,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldQueryTokenActiveStateAndUserinfo() {
-        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessToken accessToken = authService.createAccessToken("1", "tester");
 
         AuthTokenQueryResult result = authService.queryToken(accessToken.getToken());
 
@@ -209,12 +209,12 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         OAuthRefreshToken refreshToken = new OAuthRefreshToken();
-        refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
+        refreshToken.setId(EntityIdCodec.toDomain(2001L));
         refreshToken.setTokenId("refresh-token-1");
         refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
-        refreshToken.setUserId(EntityIdCodec.toDomain("u1"));
+        refreshToken.setUserId(EntityIdCodec.toDomain(1L));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
@@ -254,7 +254,7 @@ public class AuthPermissionLifecycleTest {
                 "state-1",
                 codeChallenge,
                 "S256",
-                "u1",
+                "1",
                 true);
 
         Assert.assertTrue(decision.isApproved());
@@ -300,12 +300,12 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         OAuthRefreshToken refreshToken = new OAuthRefreshToken();
-        refreshToken.setId(EntityIdCodec.toDomain("refresh-db-1"));
+        refreshToken.setId(EntityIdCodec.toDomain(2001L));
         refreshToken.setTokenId("refresh-token-1");
         refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
-        refreshToken.setUserId(EntityIdCodec.toDomain("u1"));
+        refreshToken.setUserId(EntityIdCodec.toDomain(1L));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
@@ -339,7 +339,7 @@ public class AuthPermissionLifecycleTest {
         String smsCode = authService.createSmsValidateCode(form.getLoginToken(), "13800000000");
 
         Assert.assertEquals(
-                "u1",
+                Long.valueOf(1L),
                 EntityIdCodec.toValue(authService
                         .authenticateSms(form.getLoginToken(), "13800000000", smsCode)
                         .getId()));
@@ -348,18 +348,18 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
 
         Assert.assertEquals(
-                "u1",
+                Long.valueOf(1L),
                 EntityIdCodec.toValue(
                         authService.authenticateWecom("wecom-code").getId()));
         Assert.assertEquals(
-                "u1",
+                Long.valueOf(1L),
                 EntityIdCodec.toValue(
                         authService.authenticateGithub("github-code").getId()));
     }
 
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
-        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessToken accessToken = authService.createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -374,7 +374,7 @@ public class AuthPermissionLifecycleTest {
         filter.doFilter(request, response, chain);
 
         Assert.assertEquals(
-                "u1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+                "1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
@@ -384,7 +384,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
-        AccessToken accessToken = authService.createAccessToken("u1", "tester");
+        AccessToken accessToken = authService.createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -396,7 +396,7 @@ public class AuthPermissionLifecycleTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {
-            Assert.assertEquals("u1", UserAccessHolder.currentUserId());
+            Assert.assertEquals("1", UserAccessHolder.currentUserId());
             Assert.assertEquals(accessToken.getToken(), UserAccessHolder.currentToken());
         });
 
@@ -480,8 +480,8 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(OAuthClient client) {
-            return "oauth-client-1";
+        public EntityId insert(OAuthClient client) {
+            return EntityId.of(3001L);
         }
 
         @Override
@@ -491,7 +491,7 @@ public class AuthPermissionLifecycleTest {
 
         private OAuthClient client() {
             OAuthClient client = new OAuthClient();
-            client.setId(EntityIdCodec.toDomain("oauth-client-1"));
+            client.setId(EntityIdCodec.toDomain(3001L));
             client.setClientId("admin-web");
             client.setClientName("Admin Web");
             client.setClientSecretHash("secret");
@@ -526,11 +526,11 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(OAuthAccessToken accessToken) {
-            accessToken.setId(EntityIdCodec.toDomain("oauth-access-db-1"));
+        public EntityId insert(OAuthAccessToken accessToken) {
+            accessToken.setId(EntityIdCodec.toDomain(4001L));
             this.current = accessToken;
             this.inserted = accessToken;
-            return "oauth-access-db-1";
+            return accessToken.getId();
         }
 
         @Override
@@ -555,10 +555,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(OAuthAuthorization authorization) {
-            authorization.setId(EntityIdCodec.toDomain("authorization-db-1"));
+        public EntityId insert(OAuthAuthorization authorization) {
+            authorization.setId(EntityIdCodec.toDomain(5001L));
             this.current = authorization;
-            return "authorization-db-1";
+            return authorization.getId();
         }
 
         @Override
@@ -604,10 +604,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(OAuthRefreshToken refreshToken) {
-            refreshToken.setId(EntityIdCodec.toDomain("refresh-db-2"));
+        public EntityId insert(OAuthRefreshToken refreshToken) {
+            refreshToken.setId(EntityIdCodec.toDomain(2002L));
             this.inserted = refreshToken;
-            return "refresh-db-2";
+            return refreshToken.getId();
         }
 
         @Override
@@ -645,10 +645,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(AuthSession authSession) {
-            authSession.setId(EntityId.of("session-1"));
+        public EntityId insert(AuthSession authSession) {
+            authSession.setId(EntityId.of(7001L));
             this.session = authSession;
-            return "session-1";
+            return authSession.getId();
         }
 
         @Override
@@ -756,8 +756,8 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(UserIdentity userIdentity) {
-            return "identity-1";
+        public EntityId insert(UserIdentity userIdentity) {
+            return EntityId.of(8001L);
         }
 
         @Override
@@ -772,8 +772,8 @@ public class AuthPermissionLifecycleTest {
 
         private UserIdentity identity() {
             UserIdentity identity = new UserIdentity();
-            identity.setId(EntityId.of("identity-1"));
-            identity.setUserId(EntityId.of("u1"));
+            identity.setId(EntityId.of(8001L));
+            identity.setUserId(EntityId.of(1L));
             identity.setIdentityType(UserIdentityType.ACCOUNT);
             identity.setIdentityValue("tester");
             identity.setStatus(UserIdentityStatus.ENABLED);
@@ -803,8 +803,8 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public String insert(UserCredential userCredential) {
-            return "credential-1";
+        public EntityId insert(UserCredential userCredential) {
+            return EntityId.of(9001L);
         }
 
         @Override
@@ -824,9 +824,9 @@ public class AuthPermissionLifecycleTest {
 
         private UserCredential credential() {
             UserCredential credential = new UserCredential();
-            credential.setId(EntityId.of("credential-1"));
-            credential.setUserId(EntityId.of("u1"));
-            credential.setIdentityId(EntityId.of("identity-1"));
+            credential.setId(EntityId.of(9001L));
+            credential.setUserId(EntityId.of(1L));
+            credential.setIdentityId(EntityId.of(8001L));
             credential.setCredentialType(UserCredentialType.PASSWORD);
             credential.setCredentialValue("secret");
             credential.setStatus(UserCredentialStatus.ACTIVE);
@@ -873,12 +873,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId add(User entity, String loginName, String encryptedPassword, List<String> roleIdList) {
-            return EntityId.of("user-id");
+        public EntityId add(User entity, String loginName, String encryptedPassword, List<Long> roleIdList) {
+            return EntityId.of(1L);
         }
 
         @Override
-        public void update(User entity, String loginName, List<String> roleIdList) {}
+        public void update(User entity, String loginName, List<Long> roleIdList) {}
 
         public int deleteById(EntityId id) {
             return 1;
@@ -890,7 +890,7 @@ public class AuthPermissionLifecycleTest {
 
         private User user() {
             User user = new User();
-            user.setId(EntityIdCodec.toDomain("u1"));
+            user.setId(EntityIdCodec.toDomain(1L));
             user.setStatus(UserStatus.ENABLED);
             user.setPrivilege(UserPrivilege.SUPER);
             user.setRank(AccessRank.of(0));
@@ -902,7 +902,7 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public UserIdentity getByLoginName(String loginName) {
-            return updateAccountIdentity(new TestUserService().getById(EntityId.of("u1")), loginName);
+            return updateAccountIdentity(new TestUserService().getById(EntityId.of(1L)), loginName);
         }
 
         @Override
@@ -913,7 +913,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public UserIdentity updateAccountIdentity(User user, String loginName) {
             UserIdentity identity = new UserIdentity();
-            identity.setId(EntityId.of("identity-1"));
+            identity.setId(EntityId.of(8001L));
             identity.setUserId(user.getId());
             identity.setIdentityType(UserIdentityType.ACCOUNT);
             identity.setIdentityValue(loginName);
@@ -970,7 +970,7 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public EntityId add(Menu entity) {
-            return EntityId.of("menu-id");
+            return EntityId.of(6001L);
         }
 
         @Override
@@ -986,7 +986,7 @@ public class AuthPermissionLifecycleTest {
 
         private List<Menu> menus() {
             Menu menu = new Menu();
-            menu.setId(EntityIdCodec.toDomain("m1"));
+            menu.setId(EntityIdCodec.toDomain(6001L));
             menu.setPerms("sys:role,sys:user:view");
             menu.setName("system");
             menu.setRank(AccessRank.of(0));
@@ -1024,7 +1024,7 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        private com.github.thundax.modules.sys.entity.Role role(String id) {
+        private com.github.thundax.modules.sys.entity.Role role(Long id) {
             com.github.thundax.modules.sys.entity.Role role = new com.github.thundax.modules.sys.entity.Role();
             role.setId(EntityIdCodec.toDomain(id));
             return role;
@@ -1054,7 +1054,7 @@ public class AuthPermissionLifecycleTest {
 
         @Override
         public EntityId add(com.github.thundax.modules.sys.entity.Role entity) {
-            return EntityId.of("role-id");
+            return EntityId.of(10001L);
         }
 
         @Override

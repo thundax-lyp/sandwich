@@ -62,7 +62,7 @@ public class AuthControllerContractTest {
         when(authService.validateCaptcha("login-token-1", "1234")).thenReturn(true);
         when(authService.getPrivateKey("login-token-1")).thenReturn(keyPair.getPrivateKey());
         when(authService.authenticatePassword("admin", "plain-password")).thenReturn(user());
-        when(authService.createAccessToken("user-1", "admin")).thenReturn(accessToken("access-token-1", "mismatch"));
+        when(authService.createAccessToken("1", "admin")).thenReturn(accessToken("access-token-1", "mismatch"));
 
         mockMvc(authService)
                 .perform(post("/api/auth/login")
@@ -130,14 +130,14 @@ public class AuthControllerContractTest {
 
     private User user() {
         User user = new User();
-        user.setId(EntityId.of("user-1"));
+        user.setId(EntityId.of(1L));
         return user;
     }
 
     private AccessToken accessToken(String token, String checkCode) {
         AccessToken accessToken = new AccessToken();
         accessToken.setToken(token);
-        accessToken.setUserId("user-1");
+        accessToken.setUserId("1");
         accessToken.setCheckCode(checkCode);
         return accessToken;
     }

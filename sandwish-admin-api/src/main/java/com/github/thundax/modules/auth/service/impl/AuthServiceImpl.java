@@ -388,7 +388,7 @@ public class AuthServiceImpl implements AuthService {
         current.markUsed(now);
         oauthRefreshTokenDao.updateStatus(current);
 
-        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(current.getUserId()));
         String nextRefreshToken = createOAuthRefreshToken(accessToken, clientId, now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken);
     }
@@ -431,7 +431,7 @@ public class AuthServiceImpl implements AuthService {
         OAuthAuthorization authorization = new OAuthAuthorization();
         authorization.setAuthorizationCode(UuidHelper.compact());
         authorization.setClientId(clientId);
-        authorization.setUserId(EntityIdCodec.toDomain(userId));
+        authorization.setUserId(EntityIdCodec.toDomain(Long.valueOf(userId)));
         authorization.setRedirectUri(redirectUri);
         authorization.setScopes(toScopeSet(scopes));
         authorization.setState(state);
@@ -441,7 +441,7 @@ public class AuthServiceImpl implements AuthService {
         authorization.setExpireAt(new Date(now.getTime() + 300000L));
         authorization.setCreateDate(now);
         authorization.setUpdateDate(now);
-        authorization.setId(EntityIdCodec.toDomain(oauthAuthorizationDao.insert(authorization)));
+        authorization.setId(oauthAuthorizationDao.insert(authorization));
         result.setAuthorizationCode(authorization.getAuthorizationCode());
         return result;
     }
@@ -485,7 +485,7 @@ public class AuthServiceImpl implements AuthService {
         }
         authorization.markUsed(now);
         oauthAuthorizationDao.updateUsed(authorization);
-        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(authorization.getUserId()));
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(authorization.getUserId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, authorization, now);
         String refreshToken =
                 oauthRefreshTokenDao == null ? null : createOAuthRefreshToken(accessToken, client.getClientId(), now);
@@ -506,7 +506,7 @@ public class AuthServiceImpl implements AuthService {
         current.markUsed(now);
         oauthRefreshTokenDao.updateStatus(current);
 
-        AccessToken accessToken = createAccessToken(EntityIdCodec.toValue(current.getUserId()));
+        AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(current.getUserId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, current, now);
         String nextRefreshToken = createOAuthRefreshToken(accessToken, client.getClientId(), now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken, oauthAccessToken);
@@ -662,7 +662,7 @@ public class AuthServiceImpl implements AuthService {
         }
         UserIdentity identity = getAccountIdentity(loginName);
         if (identity == null
-                || !StringUtils.equals(accessToken.getUserId(), EntityIdCodec.toValue(identity.getUserId()))) {
+                || !StringUtils.equals(accessToken.getUserId(), EntityIdCodec.toStringValue(identity.getUserId()))) {
             return;
         }
 
@@ -680,7 +680,7 @@ public class AuthServiceImpl implements AuthService {
         authSession.setExpireAt(new Date(now.getTime() + properties.getLoginExpiredSeconds() * 1000L));
         authSession.setCreateDate(now);
         authSession.setUpdateDate(now);
-        authSession.setId(EntityIdCodec.toDomain(authSessionDao.insert(authSession)));
+        authSession.setId(authSessionDao.insert(authSession));
         authSessionRuntimeDao.insert(authSession, runtimeExpiredSeconds());
     }
 
@@ -759,13 +759,13 @@ public class AuthServiceImpl implements AuthService {
         entity.setTokenHash(tokenHash(refreshToken));
         entity.setAccessTokenId(accessToken.getToken());
         entity.setClientId(clientId);
-        entity.setUserId(EntityIdCodec.toDomain(accessToken.getUserId()));
+        entity.setUserId(EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + refreshTokenTtlSeconds(clientId) * 1000L));
         entity.setStatus(OAuthRefreshTokenStatus.ACTIVE);
         entity.setCreateDate(issuedAt);
         entity.setUpdateDate(issuedAt);
-        entity.setId(EntityIdCodec.toDomain(oauthRefreshTokenDao.insert(entity)));
+        entity.setId(oauthRefreshTokenDao.insert(entity));
         return refreshToken;
     }
 
@@ -785,7 +785,7 @@ public class AuthServiceImpl implements AuthService {
         entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
         entity.setCreateDate(issuedAt);
         entity.setUpdateDate(issuedAt);
-        entity.setId(EntityIdCodec.toDomain(oauthAccessTokenDao.insert(entity)));
+        entity.setId(oauthAccessTokenDao.insert(entity));
         return token;
     }
 
@@ -804,7 +804,7 @@ public class AuthServiceImpl implements AuthService {
         entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
         entity.setCreateDate(issuedAt);
         entity.setUpdateDate(issuedAt);
-        entity.setId(EntityIdCodec.toDomain(oauthAccessTokenDao.insert(entity)));
+        entity.setId(oauthAccessTokenDao.insert(entity));
         return token;
     }
 

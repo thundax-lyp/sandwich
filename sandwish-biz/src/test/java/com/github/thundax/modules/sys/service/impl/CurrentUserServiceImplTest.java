@@ -165,7 +165,7 @@ public class CurrentUserServiceImplTest {
     private Menu menu(Long id, Long parentId, String name, MenuVisibility visibility) {
         Menu menu = new Menu();
         menu.setId(EntityId.of(id));
-        menu.setParentId(parentId);
+        menu.setParentId(EntityId.ofNullable(parentId));
         menu.setName(name);
         menu.setVisibility(visibility);
         return menu;

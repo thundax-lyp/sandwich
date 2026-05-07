@@ -69,7 +69,7 @@ public class DictControllerContractTest {
         page.setPageNo(1);
         page.setPageSize(10);
         page.setCount(1L);
-        page.setList(Collections.singletonList(dict("d1")));
+        page.setList(Collections.singletonList(dict(1L)));
         when(dictService.page(any(DictQuery.class), any(PageDTO.class))).thenReturn(page);
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new DictController(dictService))
@@ -82,22 +82,22 @@ public class DictControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
-                .andExpect(jsonPath("$.data.records[0].id").value("d1"));
+                .andExpect(jsonPath("$.data.records[0].id").value(1));
     }
 
     @Test
     public void shouldBatchDeleteExistingDicts() throws Exception {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
-        when(dictService.getById(EntityIdCodec.toDomain("d1"))).thenReturn(dict("d1"));
-        when(dictService.getById(EntityIdCodec.toDomain("d2"))).thenReturn(dict("d2"));
+        when(dictService.getById(EntityIdCodec.toDomain(1L))).thenReturn(dict(1L));
+        when(dictService.getById(EntityIdCodec.toDomain(2L))).thenReturn(dict(2L));
 
-        Boolean deleted = controller.delete(Arrays.asList(idRequest("d1"), idRequest("d2")));
+        Boolean deleted = controller.delete(Arrays.asList(idRequest(1L), idRequest(2L)));
 
         ArgumentCaptor<List> idsCaptor = ArgumentCaptor.forClass(List.class);
         verify(dictService).batchDeleteById(idsCaptor.capture());
         assertEquals(Boolean.TRUE, deleted);
-        assertEquals(Arrays.asList(EntityIdCodec.toDomain("d1"), EntityIdCodec.toDomain("d2")), idsCaptor.getValue());
+        assertEquals(Arrays.asList(EntityIdCodec.toDomain(1L), EntityIdCodec.toDomain(2L)), idsCaptor.getValue());
     }
 
     @Test(expected = InvalidParameterException.class)
@@ -107,18 +107,18 @@ public class DictControllerContractTest {
         controller.delete(Collections.emptyList());
     }
 
-    private DictIdRequest idRequest(String id) {
+    private DictIdRequest idRequest(Long id) {
         DictIdRequest request = new DictIdRequest();
         request.setId(id);
         return request;
     }
 
-    private Dict dict(String id) {
+    private Dict dict(Long id) {
         Dict dict = new Dict();
         dict.setId(EntityId.of(id));
         dict.setType("status");
-        dict.setLabel(id);
-        dict.setValue(id);
+        dict.setLabel(String.valueOf(id));
+        dict.setValue(String.valueOf(id));
         return dict;
     }
 }

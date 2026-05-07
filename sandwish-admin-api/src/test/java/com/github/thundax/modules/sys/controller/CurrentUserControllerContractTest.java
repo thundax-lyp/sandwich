@@ -68,13 +68,13 @@ public class CurrentUserControllerContractTest {
     public void shouldReturnVisibleMenusFromCurrentUserService() {
         UserService userService = mock(UserService.class);
         CurrentUserService currentUserService = mock(CurrentUserService.class);
-        List<Menu> menus = Arrays.asList(menu("menu-system", null, "系统管理"), menu("menu-user", "menu-system", "用户管理"));
+        List<Menu> menus = Arrays.asList(menu(10L, null, "系统管理"), menu(11L, 10L, "用户管理"));
         User currentUser = superUser();
 
-        when(userService.getById(EntityId.of("user-1"))).thenReturn(currentUser);
+        when(userService.getById(EntityId.of(1L))).thenReturn(currentUser);
         when(currentUserService.listVisibleMenus(currentUser)).thenReturn(menus);
         mockApplicationContext(userService);
-        UserAccessHolder.currentUserId("user-1", "token-1");
+        UserAccessHolder.currentUserId("1", "token-1");
 
         CurrentUserController controller = new CurrentUserController(
                 currentUserService, mock(UserIdentityService.class), mock(KeypairService.class));
@@ -82,9 +82,9 @@ public class CurrentUserControllerContractTest {
         List<PersonalMenuResponse> responses = controller.menus();
 
         assertEquals(2, responses.size());
-        assertEquals("menu-system", responses.get(0).getId());
-        assertEquals("menu-user", responses.get(1).getId());
-        assertEquals("menu-system", responses.get(1).getParentId());
+        assertEquals(Long.valueOf(10L), responses.get(0).getId());
+        assertEquals(Long.valueOf(11L), responses.get(1).getId());
+        assertEquals(Long.valueOf(10L), responses.get(1).getParentId());
     }
 
     private void assertMapping(RequestMapping mapping, String value) {
@@ -105,15 +105,15 @@ public class CurrentUserControllerContractTest {
 
     private User superUser() {
         User user = new User();
-        user.setId(EntityId.of("user-1"));
+        user.setId(EntityId.of(1L));
         user.setPrivilege(UserPrivilege.SUPER);
         return user;
     }
 
-    private Menu menu(String id, String parentId, String name) {
+    private Menu menu(Long id, Long parentId, String name) {
         Menu menu = new Menu();
         menu.setId(EntityId.of(id));
-        menu.setParentId(parentId);
+        menu.setParentId(EntityId.ofNullable(parentId));
         menu.setName(name);
         return menu;
     }

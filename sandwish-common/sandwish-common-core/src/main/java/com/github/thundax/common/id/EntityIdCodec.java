@@ -11,10 +11,6 @@ public final class EntityIdCodec {
         return EntityId.ofNullable(value);
     }
 
-    public static EntityId toDomain(String value) {
-        return EntityId.ofNullable(value);
-    }
-
     public static Long toValue(EntityId entityId) {
         return entityId == null ? null : entityId.value();
     }

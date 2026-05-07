@@ -146,7 +146,7 @@ public class CurrentUserController {
 
         try {
             AvatarUtils.saveAvatar(
-                    EntityIdCodec.toValue(currentUser.getId()),
+                    EntityIdCodec.toStringValue(currentUser.getId()),
                     request.getAvatar().getInputStream());
         } catch (IOException e) {
             throw new ApiException(e.getMessage());
@@ -169,7 +169,7 @@ public class CurrentUserController {
     public PersonalAvatarResponse deleteAvatar() {
         User currentUser = UserAccessHolder.currentUser();
 
-        AvatarUtils.deleteAvatar(EntityIdCodec.toValue(currentUser.getId()));
+        AvatarUtils.deleteAvatar(EntityIdCodec.toStringValue(currentUser.getId()));
 
         return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }

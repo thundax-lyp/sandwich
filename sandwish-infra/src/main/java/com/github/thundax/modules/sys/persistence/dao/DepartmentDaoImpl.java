@@ -94,7 +94,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         dataObject.setLft(newPosition);
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
@@ -114,7 +114,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         DepartmentDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }

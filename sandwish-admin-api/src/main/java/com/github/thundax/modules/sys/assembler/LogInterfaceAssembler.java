@@ -95,7 +95,7 @@ public final class LogInterfaceAssembler {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());
-                node = departmentLoader.apply(EntityIdCodec.toDomain(node.getParentId()));
+                node = departmentLoader.apply(node.getParentId());
             }
         }
         return StringUtils.join(names, "/");

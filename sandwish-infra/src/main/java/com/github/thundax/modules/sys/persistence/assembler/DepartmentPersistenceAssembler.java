@@ -16,7 +16,7 @@ public final class DepartmentPersistenceAssembler {
         }
         DepartmentDO dataObject = new DepartmentDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setParentId(entity.getParentId());
+        dataObject.setParentId(EntityIdCodec.toValue(entity.getParentId()));
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
@@ -34,7 +34,7 @@ public final class DepartmentPersistenceAssembler {
         }
         Department entity = new Department();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setParentId(dataObject.getParentId());
+        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));

@@ -103,7 +103,7 @@ public class StorageCacheSupport {
 
     private static StoredObjectCacheDTO toCacheDTO(StoredObject storage) {
         StoredObjectCacheDTO cacheDTO = new StoredObjectCacheDTO();
-        cacheDTO.id = EntityIdCodec.toStringValue(storage.getId());
+        cacheDTO.id = EntityIdCodec.toValue(storage.getId());
         cacheDTO.originalFilename = storage.getOriginalFilename();
         cacheDTO.contentType = storage.getContentType();
         cacheDTO.name = storage.getName();
@@ -133,7 +133,7 @@ public class StorageCacheSupport {
     }
 
     private static class StoredObjectCacheDTO implements CacheDTO {
-        private String id;
+        private Long id;
         private String originalFilename;
         private String contentType;
         private String name;

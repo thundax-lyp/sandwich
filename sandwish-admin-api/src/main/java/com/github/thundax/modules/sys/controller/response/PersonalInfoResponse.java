@@ -18,7 +18,7 @@ public class PersonalInfoResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "用户ID")
     @JsonProperty("id")
-    private String id;
+    private Long id;
 
     @ApiModelProperty(name = "loginName", value = "登录名")
     @JsonProperty("loginName")

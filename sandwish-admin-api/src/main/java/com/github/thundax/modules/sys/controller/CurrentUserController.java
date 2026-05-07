@@ -8,7 +8,7 @@ import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
-import com.github.thundax.modules.auth.service.KeypairService;
+import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
@@ -47,16 +47,16 @@ public class CurrentUserController {
 
     private final CurrentUserService currentUserService;
     private final UserIdentityService userIdentityService;
-    private final KeypairService keypairService;
+    private final AdminAuthService authService;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
             UserIdentityService userIdentityService,
-            KeypairService keypairService) {
+            AdminAuthService authService) {
 
         this.currentUserService = currentUserService;
         this.userIdentityService = userIdentityService;
-        this.keypairService = keypairService;
+        this.authService = authService;
     }
 
     @ApiOperation(value = "当前用户信息", notes = "读取当前登录后台用户的基础资料和登录名")
@@ -114,7 +114,7 @@ public class CurrentUserController {
     public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
-        String privateKey = keypairService.getPrivateKey(request.getToken());
+        String privateKey = authService.getPrivateKey(request.getToken());
         String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
         String oldPassword = Sm2Helper.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);

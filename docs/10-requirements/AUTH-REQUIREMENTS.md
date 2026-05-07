@@ -69,7 +69,7 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、前台会员认证运行态模型、登录临时密钥、认证枚举、DAO 契约和通用认证支撑 Service。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、后台登录表单运行态、前台会员认证运行态模型、认证枚举、DAO 契约和通用认证支撑 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
@@ -250,6 +250,7 @@
 - 登录表单固定用于承载 `loginToken`、验证码、短信验证码、SM2 公私钥和短期校验码。
 - 登录表单不是认证会话。
 - 登录表单过期不等于访问 token 过期。
+- 后台密码类接口需要加密传输时，固定复用 `LoginForm` 的 SM2 密钥，不再提供独立 keypair API。
 
 ### 5.7 AccessToken
 

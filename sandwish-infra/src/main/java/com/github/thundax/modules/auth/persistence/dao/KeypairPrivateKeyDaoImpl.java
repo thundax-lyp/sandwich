@@ -1,10 +1,10 @@
-package com.github.thundax.modules.assist.persistence.dao;
+package com.github.thundax.modules.auth.persistence.dao;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
-import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
+import com.github.thundax.modules.auth.dao.KeypairPrivateKeyDao;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 

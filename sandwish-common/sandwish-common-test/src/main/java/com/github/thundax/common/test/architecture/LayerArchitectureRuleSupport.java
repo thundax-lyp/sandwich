@@ -163,7 +163,8 @@ public final class LayerArchitectureRuleSupport {
         collectServiceSourceViolations(sourceRoot, true, violations);
 
         assertTrue(
-                "API modules may only declare entry-specific *AuthService, *RegistrationService or implementation "
+                "API modules may only declare entry-specific *AuthService, *RegistrationService, "
+                        + "PermissionService or implementation "
                         + "source files. "
                         + "Other Service types belong in sandwish-biz. Violations: "
                         + violations,
@@ -179,7 +180,8 @@ public final class LayerArchitectureRuleSupport {
         collectServiceSourceViolations(sourceRoot, false, violations);
 
         assertTrue(
-                "*AuthService, *RegistrationService and their implementations are entry-specific orchestrators "
+                "*AuthService, *RegistrationService, PermissionService and their implementations are "
+                        + "entry-specific orchestrators "
                         + "and must stay in sandwish-admin-api or sandwish-front-api. Violations: "
                         + violations,
                 violations.isEmpty());
@@ -361,7 +363,9 @@ public final class LayerArchitectureRuleSupport {
         return className.endsWith("AuthService")
                 || className.endsWith("AuthServiceImpl")
                 || className.endsWith("RegistrationService")
-                || className.endsWith("RegistrationServiceImpl");
+                || className.endsWith("RegistrationServiceImpl")
+                || className.endsWith("PermissionService")
+                || className.endsWith("PermissionServiceImpl");
     }
 
     private static List<SourceFile> sources(String sourceRoot) {

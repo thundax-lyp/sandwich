@@ -1,4 +1,4 @@
-package com.github.thundax.modules.assist.dao;
+package com.github.thundax.modules.auth.dao;
 
 public interface KeypairPrivateKeyDao {
 

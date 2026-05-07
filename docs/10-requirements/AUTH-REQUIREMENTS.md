@@ -69,7 +69,7 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、前台会员认证运行态模型、认证枚举、DAO 契约和通用认证支撑 Service。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、前台会员认证运行态模型、登录临时密钥、认证枚举、DAO 契约和通用认证支撑 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
@@ -77,7 +77,7 @@
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现后台用户主体、登录标识和认证凭据 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
-  - 提供后台登录、刷新、验证码、登出、session command、OAuth2 和 token 认证入口适配。
+  - 提供后台登录、刷新、验证码、登出、session command、OAuth2、token 认证入口适配和后台权限会话适配 Service。
 - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth`
   - 提供前台会员登录、注册、验证码、刷新、登出和 token 认证入口适配。
 
@@ -271,6 +271,7 @@
 - 有效请求必须 touch `PermissionSession`。
 - 登出或 token 删除时必须释放 `PermissionSession`。
 - `PermissionSession` 不替代 `AuthSession` 的审计职责。
+- `PermissionSession` 运行态模型和 DAO 归属 `biz.modules.auth`，后台权限会话适配 Service 归属 `sandwish-admin-api` 的 `auth.service`。
 
 ### 5.9 OAuthClient
 

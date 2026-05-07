@@ -1,4 +1,4 @@
-package com.github.thundax.modules.assist.service;
+package com.github.thundax.modules.auth.service;
 
 public interface KeypairService {
 

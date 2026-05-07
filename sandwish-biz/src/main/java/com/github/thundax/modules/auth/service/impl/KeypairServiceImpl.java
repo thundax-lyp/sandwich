@@ -1,9 +1,9 @@
-package com.github.thundax.modules.assist.service.impl;
+package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
-import com.github.thundax.modules.assist.dao.KeypairPrivateKeyDao;
-import com.github.thundax.modules.assist.service.KeypairService;
 import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.dao.KeypairPrivateKeyDao;
+import com.github.thundax.modules.auth.service.KeypairService;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.modules.assist.service.KeypairService;
+import com.github.thundax.modules.auth.service.KeypairService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;

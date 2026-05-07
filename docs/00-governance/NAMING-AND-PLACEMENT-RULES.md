@@ -55,7 +55,7 @@
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 - `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，并下沉到对应业务模块的 `controller/request` 与 `controller/response` 包；不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
 - `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
-- `PATH_ENTRY_SERVICE_API_ONLY`：入口认证、注册编排 Service 固定归属 API 入口模块；后台登录编排命名为 `AdminAuthService` / `AdminAuthServiceImpl`，前台会员登录编排命名为 `MemberAuthService` / `MemberAuthServiceImpl`，前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；`sandwish-biz` 不得声明 `*AuthService`、`*RegistrationService` 或对应 `*ServiceImpl`。
+- `PATH_ENTRY_SERVICE_API_ONLY`：入口认证、注册编排 Service 固定归属 API 入口模块；后台登录编排命名为 `AdminAuthService` / `AdminAuthServiceImpl`，前台会员登录编排命名为 `MemberAuthService` / `MemberAuthServiceImpl`，前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；后台权限会话适配 Service 固定归属 `sandwish-admin-api` 的 `auth.service`；`sandwish-biz` 不得声明 `*AuthService`、`*RegistrationService` 或对应 `*ServiceImpl`。
 
 ### Layer
 
@@ -80,7 +80,7 @@
 - `NAME_CONTROLLER`：Controller 命名以 `Controller` 结尾
 - `NAME_SERVICE`：Service 命名以 `Service` 结尾
 - `NAME_SERVICE_IMPL`：Service 实现命名以 `ServiceImpl` 结尾
-- `NAME_API_SERVICE_ENTRY_ONLY`：`sandwish-admin-api` 和 `sandwish-front-api` 中只有入口认证、注册编排类型允许使用 `Service` / `ServiceImpl` 后缀，且名称必须以 `AuthService`、`RegistrationService` 或对应 `ServiceImpl` 结尾；其他业务 Service 固定归属 `sandwish-biz`。
+- `NAME_API_SERVICE_ENTRY_ONLY`：`sandwish-admin-api` 和 `sandwish-front-api` 中只有入口认证、注册编排和后台权限会话适配类型允许使用 `Service` / `ServiceImpl` 后缀，且名称必须以 `AuthService`、`RegistrationService`、`PermissionService` 或对应 `ServiceImpl` 结尾；其他业务 Service 固定归属 `sandwish-biz`。
 - `NAME_DAO`：DAO interface 命名固定以 `Dao` 结尾
 - `NAME_DAO_IMPL`：DAO implementation 命名固定以 `DaoImpl` 结尾
 - `NAME_MAPPER`：Mapper 命名以 `Mapper` 结尾
@@ -112,7 +112,7 @@
 - 后台专用入口不放到 `sandwish-front-api`
 - 前台专用入口不放到 `sandwish-admin-api`
 - 前后台复用业务不复制到两个 API 入口模块
-- 除入口专用认证、注册编排 Service 外，其他 Service interface 和 Service implementation 应归属 `sandwish-biz`；后台登录编排命名为 `AdminAuthService`，前台会员登录编排命名为 `MemberAuthService`，前台会员注册编排命名为 `MemberRegistrationService`
+- 除入口专用认证、注册编排和后台权限会话适配 Service 外，其他 Service interface 和 Service implementation 应归属 `sandwish-biz`；后台登录编排命名为 `AdminAuthService`，后台权限会话适配命名为 `PermissionService`，前台会员登录编排命名为 `MemberAuthService`，前台会员注册编排命名为 `MemberRegistrationService`
 - 无业务语义的通用能力才进入 `sandwish-common`
 - `persistence` 包段固定保留，用于区分业务侧 DAO interface 与 infra 侧持久化实现
 

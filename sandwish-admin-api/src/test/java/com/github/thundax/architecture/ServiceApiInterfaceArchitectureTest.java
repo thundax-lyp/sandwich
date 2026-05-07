@@ -15,7 +15,7 @@ public class ServiceApiInterfaceArchitectureTest extends AbstractArchitectureTes
     }
 
     @Test
-    public void shouldOnlyDeclareAuthServicesInApiModule() {
-        LayerArchitectureRuleSupport.assertApiModuleSourceDeclaresOnlyAuthServices("sandwish-admin-api");
+    public void shouldOnlyDeclareEntryServicesInApiModule() {
+        LayerArchitectureRuleSupport.assertApiModuleSourceDeclaresOnlyEntryServices("sandwish-admin-api");
     }
 }

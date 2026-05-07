@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证、OAuth2 授权和多登录方式的业务需求边界。
+本文档定义 Sandwich 后台认证、前台会员认证、OAuth2 授权和多登录方式的业务需求边界。
 
 `Auth` 负责后台登录表单、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
 
@@ -32,7 +32,6 @@
 
 当前不覆盖范围：
 
-- 前台会员登录体系。
 - MFA 二次认证。
 - 完整 OIDC discovery、JWKS 和动态客户端注册。
 - Spring Security 权限整改。
@@ -65,18 +64,22 @@
 
 `OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、过期和失效状态。
 
+前台会员认证运行态也归属 `auth` 认证模型。`MemberLoginForm`、`MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken` 保留 `Member` 前缀，用于区分后台用户认证模型和前台会员认证模型。
+
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、认证枚举、DAO 契约和认证 Service 编排。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、前台会员认证运行态模型、认证枚举、DAO 契约和通用认证支撑 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
-  - 实现认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
+  - 实现后台认证运行态、前台会员认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现后台用户主体、登录标识和认证凭据 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
   - 提供后台登录、刷新、验证码、登出、session command、OAuth2 和 token 认证入口适配。
+- `sandwish-front-api/src/main/java/com/github/thundax/modules/auth`
+  - 提供前台会员登录、注册、验证码、刷新、登出和 token 认证入口适配。
 
 ## 5. Core Business Objects
 
@@ -222,7 +225,23 @@
 - 自然过期固定将 `AuthSession.status` 更新为 `EXPIRED`。
 - `AuthSession` 不保存权限集合。
 
-### 5.5 LoginForm
+### 5.5 Front Member Auth Runtime
+
+前台会员认证运行态对象归属 auth 域：
+
+- `MemberLoginForm`：前台登录前置临时状态，承载验证码、短信验证码、邮箱验证码和密码传输密钥。
+- `MemberAuthSession`：前台会员认证会话事实。
+- `MemberAccessToken`：前台会员 API 请求访问 token。
+- `MemberRefreshToken`：前台会员刷新 token。
+
+固定约束：
+
+- `MemberLoginForm` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
+- 前台 API 登录成功后必须创建 `MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken`。
+- 前台会员认证运行态使用 `member_` 物理表名前缀，但 Java 模型、DAO 契约和持久化实现归属 `modules.auth`。
+- `MemberAccessToken` 和 `MemberRefreshToken` 固定只保存 token hash，不保存 token 明文。
+
+### 5.6 LoginForm
 
 `LoginForm` 是后台登录表单临时状态。
 
@@ -232,7 +251,7 @@
 - 登录表单不是认证会话。
 - 登录表单过期不等于访问 token 过期。
 
-### 5.6 AccessToken
+### 5.7 AccessToken
 
 `AccessToken` 是后台请求访问 token。
 
@@ -242,7 +261,7 @@
 - `AccessToken` 必须能定位后台 `User`。
 - token 删除时必须释放权限会话并更新认证会话状态。
 
-### 5.7 PermissionSession
+### 5.8 PermissionSession
 
 `PermissionSession` 是后台权限集合缓存。
 
@@ -253,7 +272,7 @@
 - 登出或 token 删除时必须释放 `PermissionSession`。
 - `PermissionSession` 不替代 `AuthSession` 的审计职责。
 
-### 5.8 OAuthClient
+### 5.9 OAuthClient
 
 `OAuthClient` 是 OAuth2 客户端配置。
 
@@ -280,7 +299,7 @@
 - 禁用客户端不得发起授权、换 token 或刷新 token。
 - 请求的 `grantType`、`scope` 和 `redirectUri` 必须在客户端配置范围内。
 
-### 5.9 OAuthAuthorization
+### 5.10 OAuthAuthorization
 
 `OAuthAuthorization` 是 OAuth2 授权请求和授权码事实。
 
@@ -307,7 +326,7 @@
 - 授权范围必须是 `OAuthClient.scopes` 的子集。
 - `S256` PKCE challenge 必须使用 code verifier 的 SHA-256 Base64Url 摘要。
 
-### 5.10 OAuthAccessToken
+### 5.11 OAuthAccessToken
 
 `OAuthAccessToken` 是 OAuth2 access token 事实。
 
@@ -336,7 +355,7 @@
 - introspection 必须同时校验 token 状态、过期时间和用户启用状态。
 - revoke access token 后 introspection 必须返回 `active=false`。
 
-### 5.11 OAuthRefreshToken
+### 5.12 OAuthRefreshToken
 
 `OAuthRefreshToken` 是 refresh token 事实。
 

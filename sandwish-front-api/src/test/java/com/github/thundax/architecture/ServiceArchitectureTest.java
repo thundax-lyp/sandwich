@@ -7,7 +7,7 @@ import org.junit.Test;
 public class ServiceArchitectureTest extends AbstractArchitectureTest {
 
     @Test
-    public void shouldOnlyDeclareAuthServicesInApiModule() {
-        LayerArchitectureRuleSupport.assertApiModuleSourceDeclaresOnlyAuthServices("sandwish-front-api");
+    public void shouldOnlyDeclareEntryServicesInApiModule() {
+        LayerArchitectureRuleSupport.assertApiModuleSourceDeclaresOnlyEntryServices("sandwish-front-api");
     }
 }

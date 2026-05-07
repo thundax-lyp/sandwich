@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 前台会员的最小业务需求边界。
 
-本文档用于支撑 `Member` 主体、会员登录状态、会员资料和会员数据库设计的后续治理。数据库设计见 [`../20-database/MEMBER-DATABASE-DESIGN.md`](../20-database/MEMBER-DATABASE-DESIGN.md)。
+本文档用于支撑 `Member` 主体、会员资料和会员数据库设计的后续治理。数据库设计见 [`../20-database/MEMBER-DATABASE-DESIGN.md`](../20-database/MEMBER-DATABASE-DESIGN.md)。
 
 ## 2. Scope
 
@@ -13,13 +13,12 @@
 - 前台会员主体 `Member`
 - 会员登录标识 `MemberIdentity`
 - 会员认证凭据 `MemberCredential`
-- 会员登录前置表单 `MemberLoginForm`
-- 会员认证会话和 token 模型
 - 会员姓名、性别和基础业务状态
 - 会员生命周期状态
 
 当前不覆盖范围：
 
+- 前台会员登录表单、认证会话和 token 运行态，归属 `AUTH-REQUIREMENTS.md`
 - 会员注册与登录行为字段
 - 会员地址、邮编等私密资料
 - 会员 OAuth / 第三方身份绑定
@@ -37,20 +36,15 @@
 
 - `sandwish-biz`：承载 `Member`、`MemberService` 和 `MemberDao`。
 - `sandwish-infra`：承载 `MemberDO`、`MemberMapper`、`MemberDaoImpl` 和 `MemberPersistenceAssembler`。
-- `sandwish-front-api`：承载会员登录状态入口和前台会员上下文适配。
+- `sandwish-front-api`：承载非认证类前台会员业务入口；会员登录、注册和认证上下文适配归属 `modules.auth`。
 
 ## 5. Core Business Objects
 
 - `Member`：前台会员主体。
 - `MemberIdentity`：前台会员登录标识，支持账号、手机号和邮箱。
 - `MemberCredential`：前台会员认证凭据，首轮支持密码凭据。
-- `MemberLoginForm`：前台登录前置临时状态，承载验证码、短信验证码、邮箱验证码和密钥。
-- `MemberAuthSession`：前台会员认证会话事实。
-- `MemberAccessToken`：前台 API 请求访问 token。
-- `MemberRefreshToken`：前台刷新 token。
 - `MemberGender`：会员性别，固定表达男、女和保密。
 - `MemberStatus`：会员生命周期状态，固定表达待激活、活跃、暂停和关闭。
-- `MemberSecurityContext`：前台会员运行时身份上下文。
 
 ## 6. Global Constraints
 
@@ -60,8 +54,7 @@
 - `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
 - `MemberIdentity(identityType, identityValue)` 必须全局唯一。
 - `MemberCredential` 不得保存明文密码。
-- `MemberLoginForm` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
-- 前台 API 登录成功后必须创建 `MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken`。
+- 前台会员认证运行态固定归属 auth 域，保留 `Member*` 类型名前缀以区分后台用户认证模型。
 
 ## 7. Functional Requirements
 
@@ -69,8 +62,6 @@
 - 系统可以维护会员生命周期状态。
 - 系统可以保存账号、手机号和邮箱三类会员登录标识。
 - 系统可以维护会员密码凭据、失败次数、锁定、过期和最近验证时间。
-- 系统可以通过 `loginToken` 维护登录前置验证码、短信验证码、邮箱验证码和密码传输密钥。
-- 系统可以维护会员认证会话、访问 token、刷新 token 及其生命周期状态。
 - 系统可以分页查询会员列表。
 
 ## 8. Key Flows

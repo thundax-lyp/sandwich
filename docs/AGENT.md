@@ -27,15 +27,15 @@
   再读 `10-requirements/SYSTEM-REQUIREMENTS.md`
 - 后台系统管理数据库、用户主体表、角色表、菜单表、部门表、字典表、系统日志表、用户角色关系、角色菜单关系：
   再读 `20-database/SYSTEM-DATABASE-DESIGN.md`
-- 后台认证、登录标识、认证凭据、token、OAuth2、认证会话：
+- 后台认证、前台会员认证运行态、登录标识、认证凭据、token、OAuth2、认证会话：
   再读 `10-requirements/AUTH-REQUIREMENTS.md`
-- 后台认证数据库、登录标识表、认证凭据表、认证会话表、OAuth2 表：
+- 后台认证数据库、前台会员认证运行态表、登录标识表、认证凭据表、认证会话表、OAuth2 表：
   再读 `20-database/AUTH-DATABASE-DESIGN.md`
 - 存储对象、对象引用、分片上传、对象存储适配：
   再读 `10-requirements/STORAGE-REQUIREMENTS.md`
 - 存储数据库、存储对象表、对象引用表、分片上传表：
   再读 `20-database/STORAGE-DATABASE-DESIGN.md`
-- 前台会员、会员主表、会员登录信息、会员资料：
+- 前台会员、会员主表、会员资料：
   再读 `10-requirements/MEMBER-REQUIREMENTS.md`
 - 前台会员数据库、会员主表：
   再读 `20-database/MEMBER-DATABASE-DESIGN.md`

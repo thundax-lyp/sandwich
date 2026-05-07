@@ -13,38 +13,22 @@
 - `member_member`
 - `member_identity`
 - `member_credential`
-- `member_auth_session`
-- `member_access_token`
-- `member_refresh_token`
 - `MemberDO`
 - `MemberIdentityDO`
 - `MemberCredentialDO`
-- `MemberAuthSessionDO`
-- `MemberAccessTokenDO`
-- `MemberRefreshTokenDO`
 - `MemberMapper`
 - `MemberIdentityMapper`
 - `MemberCredentialMapper`
-- `MemberAuthSessionMapper`
-- `MemberAccessTokenMapper`
-- `MemberRefreshTokenMapper`
 - `MemberDaoImpl`
 - `MemberIdentityDaoImpl`
 - `MemberCredentialDaoImpl`
-- `MemberAuthSessionDaoImpl`
-- `MemberAuthSessionRuntimeDaoImpl`
-- `MemberAccessTokenDaoImpl`
-- `MemberRefreshTokenDaoImpl`
 - `MemberPersistenceAssembler`
 - `MemberIdentityPersistenceAssembler`
 - `MemberCredentialPersistenceAssembler`
-- `MemberAuthSessionPersistenceAssembler`
-- `MemberAccessTokenPersistenceAssembler`
-- `MemberRefreshTokenPersistenceAssembler`
 
 当前不覆盖范围：
 
-- 会员认证会话和 token 表
+- 会员认证会话和 token 表，归属 `AUTH-DATABASE-DESIGN.md`
 - 会员地址、邮编等私密资料
 - 会员登录表单，`MemberLoginForm` 只使用 Redis / JetCache 运行态，不建立数据库表
 - 会员实名认证表
@@ -78,9 +62,6 @@
 | `member_member` | `MemberDO` | `MemberMapper` | `Member` |
 | `member_identity` | `MemberIdentityDO` | `MemberIdentityMapper` | `MemberIdentity` |
 | `member_credential` | `MemberCredentialDO` | `MemberCredentialMapper` | `MemberCredential` |
-| `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
-| `member_access_token` | `MemberAccessTokenDO` | `MemberAccessTokenMapper` | `MemberAccessToken` |
-| `member_refresh_token` | `MemberRefreshTokenDO` | `MemberRefreshTokenMapper` | `MemberRefreshToken` |
 
 ## 6. Table Design
 

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
+本文档定义 Sandwich 后台认证、前台会员认证运行态、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
 
 本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
 
@@ -19,9 +19,15 @@
 - `auth_oauth_authorization`
 - `auth_oauth_access_token`
 - `auth_oauth_refresh_token`
+- `member_auth_session`
+- `member_access_token`
+- `member_refresh_token`
 - `UserIdentityDO`
 - `UserCredentialDO`
 - `AuthSessionDO`
+- `MemberAuthSessionDO`
+- `MemberAccessTokenDO`
+- `MemberRefreshTokenDO`
 - `OAuthClientDO`
 - `OAuthAuthorizationDO`
 - `OAuthAccessTokenDO`
@@ -29,6 +35,9 @@
 - `UserIdentityMapper`
 - `UserCredentialMapper`
 - `AuthSessionMapper`
+- `MemberAuthSessionMapper`
+- `MemberAccessTokenMapper`
+- `MemberRefreshTokenMapper`
 - `OAuthClientMapper`
 - `OAuthAuthorizationMapper`
 - `OAuthAccessTokenMapper`
@@ -36,6 +45,10 @@
 - `UserIdentityDaoImpl`
 - `UserCredentialDaoImpl`
 - `AuthSessionDaoImpl`
+- `MemberAuthSessionDaoImpl`
+- `MemberAuthSessionRuntimeDaoImpl`
+- `MemberAccessTokenDaoImpl`
+- `MemberRefreshTokenDaoImpl`
 - `OAuthClientDaoImpl`
 - `OAuthAuthorizationDaoImpl`
 - `OAuthAccessTokenDaoImpl`
@@ -43,6 +56,9 @@
 - `UserIdentityPersistenceAssembler`
 - `UserCredentialPersistenceAssembler`
 - `AuthSessionPersistenceAssembler`
+- `MemberAuthSessionPersistenceAssembler`
+- `MemberAccessTokenPersistenceAssembler`
+- `MemberRefreshTokenPersistenceAssembler`
 - `OAuthClientPersistenceAssembler`
 - `OAuthAuthorizationPersistenceAssembler`
 - `OAuthAccessTokenPersistenceAssembler`
@@ -50,7 +66,7 @@
 
 当前不覆盖范围：
 
-- 前台会员登录表。
+- 前台会员登录表单，`MemberLoginForm` 只使用 Redis / JetCache 运行态，不建立数据库表。
 - MFA 凭据表。
 - 认证审计日志表。
 - 生产数据变更脚本。
@@ -82,6 +98,9 @@
 - OAuth 授权表固定为 `auth_oauth_authorization`。
 - OAuth access token 表固定为 `auth_oauth_access_token`。
 - OAuth refresh token 表固定为 `auth_oauth_refresh_token`。
+- 前台会员认证会话表固定为 `member_auth_session`。
+- 前台会员 access token 表固定为 `member_access_token`。
+- 前台会员 refresh token 表固定为 `member_refresh_token`。
 - 主键字段固定为 `id`。
 - 后台用户主键字段固定为 `user_id`。
 - 登录标识主键字段固定为 `identity_id`。
@@ -101,6 +120,9 @@
 | `sys_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
 | `sys_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
+| `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
+| `member_access_token` | `MemberAccessTokenDO` | `MemberAccessTokenMapper` | `MemberAccessToken` |
+| `member_refresh_token` | `MemberRefreshTokenDO` | `MemberRefreshTokenMapper` | `MemberRefreshToken` |
 | `auth_oauth_client` | `OAuthClientDO` | `OAuthClientMapper` | `OAuthClient` |
 | `auth_oauth_authorization` | `OAuthAuthorizationDO` | `OAuthAuthorizationMapper` | `OAuthAuthorization` |
 | `auth_oauth_access_token` | `OAuthAccessTokenDO` | `OAuthAccessTokenMapper` | `OAuthAccessToken` |

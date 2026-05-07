@@ -24,6 +24,7 @@
 - React 页面、布局、组件和路由
 - 页面专属 service、共享 service 和通用 API helper
 - TypeScript request / response / view model 类型
+- 全局 TypeScript 类型声明
 - 页面专属样式和全局样式归属
 - 前端测试文件放置与命名
 
@@ -47,6 +48,7 @@
 - `ADMIN_WEB_PATH_AUTH`：token、权限和登录会话持久化固定放在 `sandwish-admin-web/src/auth/`。
 - `ADMIN_WEB_PATH_ROUTER`：路由表和路由保护固定放在 `sandwish-admin-web/src/router/`。
 - `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
+- `ADMIN_WEB_PATH_GLOBAL_TYPES`：第三方库声明、环境声明和真正跨页面共享的全局前端类型固定放在 `sandwish-admin-web/src/types/`。
 - `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑固定放在 `sandwish-admin-web/src/test/`。
 
 ### Layer
@@ -84,6 +86,8 @@
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
+- 第三方库缺失类型声明、Vite 环境声明和全局前端扩展类型放在 `src/types/`。
+- `src/types/` 不承载页面专属 request / response / form values / table record 类型。
 - 页面专属样式可以暂时放在 `src/assets/main.css`，但 className 必须用页面域前缀隔离。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。
@@ -108,6 +112,7 @@
 - `<domain>` 使用页面域名，例如 `dictionary`、`department`、`login`。
 - TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。
 - TypeScript interface 响应类型命名优先沿用后端模型语义，例如 `DictResponse`。
+- `src/types/` 下的声明文件固定使用 kebab-case，并以 `.d.ts` 结尾，例如 `sm-crypto.d.ts`。
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
 - 普通方法和变量使用 camelCase。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。

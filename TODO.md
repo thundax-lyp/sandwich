@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-member-assist`：改代码，迁移会员和辅助域 ID 类型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberPersistenceAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/AsyncTask.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dataobject/AsyncTaskDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/assembler/AsyncTaskPersistenceAssembler.java`
-  - 处理动作：将会员和辅助域 ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-biz,sandwish-infra -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-code-api-boundary`：改代码，迁移 API 边界 ID 类型
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/**/*.java`

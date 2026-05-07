@@ -3,6 +3,7 @@ package com.github.thundax.modules.assist.persistence.assembler;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO;
@@ -23,10 +24,12 @@ public class AsyncTaskPersistenceAssemblerTest {
     @Test
     public void shouldWriteEnumStatusValue() {
         AsyncTask entity = new AsyncTask();
+        entity.setId(EntityId.of(6001L));
         entity.setStatus(AsyncTaskStatus.SUCCESS);
 
         AsyncTaskDO dataObject = AsyncTaskPersistenceAssembler.toDataObject(entity);
 
+        assertEquals(Long.valueOf(6001L), dataObject.getId());
         assertEquals("SUCCESS", dataObject.getStatus());
     }
 

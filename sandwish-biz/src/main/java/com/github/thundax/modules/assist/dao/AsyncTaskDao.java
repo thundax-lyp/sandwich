@@ -7,7 +7,7 @@ public interface AsyncTaskDao {
 
     AsyncTask getById(EntityId id);
 
-    void insert(AsyncTask asyncTask);
+    EntityId insert(AsyncTask asyncTask);
 
     void update(AsyncTask asyncTask);
 

@@ -18,8 +18,8 @@ import lombok.Setter;
 @TableName(value = "member_member", autoResultMap = true)
 public class MemberDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String loginName;
 

@@ -35,6 +35,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthRefreshTokenDO",
+        "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO",

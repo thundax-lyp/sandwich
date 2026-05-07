@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
@@ -38,10 +39,12 @@ public class MemberPersistenceAssemblerTest {
     @Test
     public void shouldWriteDomainValueToEnableFlag() {
         Member entity = new Member();
+        entity.setId(EntityId.of(5001L));
         entity.setStatus(MemberStatus.DISABLED);
 
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
 
+        assertEquals(Long.valueOf(5001L), dataObject.getId());
         assertEquals("DISABLED", dataObject.getEnableFlag());
     }
 

@@ -16,7 +16,7 @@ public final class MemberPersistenceAssembler {
             return null;
         }
         MemberDO dataObject = new MemberDO();
-        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setLoginName(entity.getLoginName());
         dataObject.setLoginPass(entity.getLoginPass());
         dataObject.setEmail(entity.getEmail());

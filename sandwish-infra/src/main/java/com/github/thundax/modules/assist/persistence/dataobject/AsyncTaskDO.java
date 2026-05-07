@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AsyncTaskDO {
 
-    private String id;
+    private Long id;
     private String title;
     private String status;
     private String message;

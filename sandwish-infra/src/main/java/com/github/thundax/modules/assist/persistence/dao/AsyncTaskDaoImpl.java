@@ -7,6 +7,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
@@ -23,13 +24,18 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
     private Cache<String, AsyncTaskCacheDTO> cache;
 
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
+
     @Override
     public AsyncTask getById(EntityId id) {
         return toDomain(cache.get(cacheKey(String.valueOf(id.value()))));
     }
 
     @Override
-    public void insert(AsyncTask asyncTask) {
+    public EntityId insert(AsyncTask asyncTask) {
+        if (asyncTask.getId() == null) {
+            asyncTask.setId(idGenerator.nextId());
+        }
         Date now = new Date();
         String currentUserId = UserAccessHolder.currentUserId();
         asyncTask.setCreateDate(now);
@@ -37,6 +43,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         asyncTask.setUpdateDate(now);
         asyncTask.setUpdateUserId(currentUserId);
         put(asyncTask);
+        return asyncTask.getId();
     }
 
     @Override

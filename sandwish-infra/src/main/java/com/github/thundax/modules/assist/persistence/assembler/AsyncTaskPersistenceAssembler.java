@@ -14,7 +14,7 @@ public final class AsyncTaskPersistenceAssembler {
             return null;
         }
         AsyncTaskDO dataObject = new AsyncTaskDO();
-        dataObject.setId(EntityIdCodec.toStringValue(entity.getId()));
+        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setTitle(entity.getTitle());
         dataObject.setStatus(entity.getStatus().value());
         dataObject.setMessage(entity.getMessage());

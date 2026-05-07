@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
@@ -23,6 +24,7 @@ public class MemberDaoImpl implements MemberDao {
     private static final String NORMAL_DEL_FLAG = "0";
 
     private final MemberMapper mapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public MemberDaoImpl(MemberMapper mapper) {
         this.mapper = mapper;
@@ -95,6 +97,7 @@ public class MemberDaoImpl implements MemberDao {
     @Override
     public EntityId insert(Member entity) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         mapper.update(
                 null,

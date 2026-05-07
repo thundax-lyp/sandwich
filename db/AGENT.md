@@ -25,12 +25,14 @@ db/
 │   ├── system.sql
 │   ├── auth.sql
 │   ├── storage.sql
-│   └── member.sql
+│   ├── member.sql
+│   └── audit.sql
 └── data/
     ├── system.sql
     ├── auth.sql
     ├── storage.sql
-    └── member.sql
+    ├── member.sql
+    └── audit.sql
 ```
 
 - `schema/`: DDL scripts only.
@@ -44,6 +46,7 @@ db/
 - `Auth`: `schema/auth.sql`, `data/auth.sql`
 - `Storage`: `schema/storage.sql`, `data/storage.sql`
 - `Member`: `schema/member.sql`, `data/member.sql`
+- `Audit`: `schema/audit.sql`, `data/audit.sql`
 
 ## 4. Execution Order
 
@@ -57,6 +60,8 @@ db/
 6. `db/data/storage.sql`
 7. `db/schema/member.sql`
 8. `db/data/member.sql`
+9. `db/schema/audit.sql`
+10. `db/data/audit.sql`
 
 执行原则：
 

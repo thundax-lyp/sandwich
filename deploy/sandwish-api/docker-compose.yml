@@ -103,6 +103,8 @@ services:
       - ../../db/data/storage.sql:/docker-entrypoint-initdb.d/06-data-storage.sql:ro
       - ../../db/schema/member.sql:/docker-entrypoint-initdb.d/07-schema-member.sql:ro
       - ../../db/data/member.sql:/docker-entrypoint-initdb.d/08-data-member.sql:ro
+      - ../../db/schema/audit.sql:/docker-entrypoint-initdb.d/09-schema-audit.sql:ro
+      - ../../db/data/audit.sql:/docker-entrypoint-initdb.d/10-data-audit.sql:ro
     networks:
       - backend
 

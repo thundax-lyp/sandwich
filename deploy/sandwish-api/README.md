@@ -97,6 +97,8 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 6. `db/data/storage.sql`
 7. `db/schema/member.sql`
 8. `db/data/member.sql`
+9. `db/schema/audit.sql`
+10. `db/data/audit.sql`
 
 初始化只在 `sandwish-mysql-data` volume 为空时自动执行。若需要重新初始化本地数据，先停止服务并删除该 volume。
 

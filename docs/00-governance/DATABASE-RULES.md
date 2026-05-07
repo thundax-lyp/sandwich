@@ -36,7 +36,7 @@
 ## Naming
 
 - 表名、字段名、索引名必须与现有数据库风格保持一致
-- 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`、`member_`
+- 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`、`member_`、`audit_`
 - 新增表、数据库脚本和 `DO/DataObject` 不使用 `tb_` 前缀
 - 关系表后缀必须显式表达语义
 - 审计字段固定使用 `create_date` / `create_by` / `update_date` / `update_by`
@@ -66,6 +66,8 @@
 
 - 独立数据库表的 `DO/DataObject` 主键字段固定命名为 `id`，Java 类型固定为 `String`。
 - 独立数据库表的 `DO/DataObject.id` 固定使用 `@TableId(type = IdType.ASSIGN_UUID)`，主键由 MyBatis-Plus 持久化层生成。
+- 明确采用雪花 ID 策略的新业务域，数据库主键固定使用 `bigint`，`DO/DataObject.id` Java 类型固定为 `Long`，主键由业务域对应 ID 生成能力生成。
+- 采用雪花 ID 策略的业务域必须在对应数据库设计文档中明确主键生成规则。
 - DAO `insert` 方法返回持久化后的主键；Service 在 `insert` 后负责把返回主键回填到业务 `Entity`，再继续编排关系表、签名、缓存或响应数据。
 - Service 和 Entity 不负责为数据库主表生成 `id`。
 - 共享主键表、外部业务键主键表、关系表和非数据库 DO 不适用自动主键生成规则；这类表必须显式说明主键来源，并按来源使用 `IdType.INPUT` 或不声明 `@TableId`。

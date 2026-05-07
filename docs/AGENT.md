@@ -39,6 +39,10 @@
   再读 `10-requirements/MEMBER-REQUIREMENTS.md`
 - 前台会员数据库、会员主表：
   再读 `20-database/MEMBER-DATABASE-DESIGN.md`
+- 数据审计、审计元数据、审计日志、审计快照、审计对象坐标：
+  再读 `10-requirements/AUDIT-REQUIREMENTS.md`
+- 数据审计数据库、审计元数据表、审计日志表：
+  再读 `20-database/AUDIT-DATABASE-DESIGN.md`
 - 需要解释架构意图、规则冲突、分层取舍、小步提交意图或 AI 误改风险：
   读 `00-governance/ARCHITECTURE-INTENT.md`
 - 新增类、改类名、改目录、判断模块归属：

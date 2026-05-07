@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-schema-auth`：改 SQL，迁移认证 schema ID 类型
-  - 范围文件：
-    - `db/schema/auth.sql`
-  - 处理动作：将认证域 schema 中主键和关系字段调整为雪花 `bigint`。
-  - 验收点：`db/schema/auth.sql` 中认证主表不再使用 `varchar(64)` 主键。
-  - 重要度：9/10
-
 - [ ] `snowflake-sql-schema-storage`：改 SQL，迁移存储 schema ID 类型
   - 范围文件：
     - `db/schema/storage.sql`

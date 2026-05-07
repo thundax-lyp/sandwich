@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS `auth_session` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `session_id` varchar(64) NOT NULL,
     `token` varchar(255) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
-    `identity_id` varchar(64) NOT NULL,
+    `user_id` bigint NOT NULL,
+    `identity_id` bigint NOT NULL,
     `identity_type` varchar(16) NOT NULL,
     `login_type` varchar(16) NOT NULL,
     `status` varchar(16) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `auth_session` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台认证会话审计表';
 
 CREATE TABLE IF NOT EXISTS `auth_oauth_client` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `client_id` varchar(64) NOT NULL,
     `client_secret_hash` varchar(255) NOT NULL,
     `client_name` varchar(128) NOT NULL,
@@ -47,10 +47,10 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_client` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2客户端表';
 
 CREATE TABLE IF NOT EXISTS `auth_oauth_authorization` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `authorization_code` varchar(128) NOT NULL,
     `client_id` varchar(64) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
+    `user_id` bigint NOT NULL,
     `redirect_uri` varchar(512) NOT NULL,
     `scopes` text NOT NULL,
     `state` varchar(255) DEFAULT NULL,
@@ -69,11 +69,11 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_authorization` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2授权码表';
 
 CREATE TABLE IF NOT EXISTS `auth_oauth_access_token` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `token_id` varchar(64) NOT NULL,
     `token_hash` varchar(255) NOT NULL,
     `client_id` varchar(64) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
+    `user_id` bigint NOT NULL,
     `scopes` text NOT NULL,
     `issued_at` datetime(3) NOT NULL,
     `expire_at` datetime(3) NOT NULL,
@@ -89,12 +89,12 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_access_token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2访问令牌表';
 
 CREATE TABLE IF NOT EXISTS `auth_oauth_refresh_token` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `token_id` varchar(64) NOT NULL,
     `token_hash` varchar(255) NOT NULL,
     `access_token_id` varchar(64) NOT NULL,
     `client_id` varchar(64) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
+    `user_id` bigint NOT NULL,
     `issued_at` datetime(3) NOT NULL,
     `expire_at` datetime(3) NOT NULL,
     `status` varchar(16) NOT NULL,

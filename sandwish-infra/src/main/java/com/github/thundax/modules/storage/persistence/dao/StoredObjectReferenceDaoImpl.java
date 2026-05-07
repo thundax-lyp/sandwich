@@ -2,15 +2,15 @@ package com.github.thundax.modules.storage.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -24,16 +24,21 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
 
     @Override
     public List<String> listReferenceOwnerTypes() {
-        return toStringList(mapper.selectObjs(new QueryWrapper<StoredObjectReferenceDO>()
-                .select("business_type")
-                .groupBy("business_type")
-                .orderByAsc("business_type")));
+        return mapper
+                .selectObjs(new QueryWrapper<StoredObjectReferenceDO>()
+                        .select("business_type")
+                        .groupBy("business_type")
+                        .orderByAsc("business_type"))
+                .stream()
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<StoredObjectReference> listReferences(StoredObject entity) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StoredObjectReferenceDO::getFileId, EntityIdCodec.toStringValue(entity.getId()));
+        wrapper.eq(StoredObjectReferenceDO::getFileId, entity.getId().value());
         return StoragePersistenceAssembler.toBusinessEntityList(mapper.selectList(wrapper));
     }
 
@@ -51,7 +56,7 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     @Override
     public void deleteByObjectId(String id) {
         LambdaQueryWrapper<StoredObjectReferenceDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StoredObjectReferenceDO::getFileId, id);
+        wrapper.eq(StoredObjectReferenceDO::getFileId, Long.valueOf(id));
         mapper.delete(wrapper);
     }
 
@@ -61,18 +66,5 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
         wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerType, referenceOwnerType);
         wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerId, referenceOwnerId);
         return mapper.delete(wrapper);
-    }
-
-    private List<String> toStringList(List<Object> objects) {
-        List<String> values = new ArrayList<>();
-        if (objects == null) {
-            return values;
-        }
-        for (Object object : objects) {
-            if (object != null) {
-                values.add(String.valueOf(object));
-            }
-        }
-        return values;
     }
 }

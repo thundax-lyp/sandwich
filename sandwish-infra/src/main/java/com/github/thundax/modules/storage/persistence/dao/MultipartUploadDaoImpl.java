@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
@@ -21,6 +22,7 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
 
     private final MultipartUploadSessionMapper sessionMapper;
     private final MultipartUploadPartMapper partMapper;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public MultipartUploadDaoImpl(MultipartUploadSessionMapper sessionMapper, MultipartUploadPartMapper partMapper) {
         this.sessionMapper = sessionMapper;
@@ -30,6 +32,7 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     @Override
     public EntityId insertMultipartSession(MultipartUploadSession session) {
         MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(session);
+        dataObject.setId(idGenerator.nextId().value());
         sessionMapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -69,6 +72,7 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     @Override
     public EntityId insertMultipartPart(MultipartUploadPart part) {
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(part);
+        dataObject.setId(idGenerator.nextId().value());
         partMapper.insert(dataObject);
         return EntityIdCodec.toDomain(dataObject.getId());
     }

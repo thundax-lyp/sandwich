@@ -16,8 +16,8 @@ import lombok.Setter;
 @TableName("assist_storage_multipart_upload")
 public class MultipartUploadSessionDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String uploadId;
 

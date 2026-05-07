@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
@@ -17,6 +18,8 @@ import com.github.thundax.modules.storage.persistence.mapper.StoredObjectMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
@@ -25,11 +28,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
-    private static final String NO_MATCH_ID = "__no_matching_storage__";
+    private static final Long NO_MATCH_ID = -1L;
 
     private final StoredObjectMapper mapper;
     private final StoredObjectReferenceMapper businessMapper;
     private final StorageCacheSupport cacheSupport;
+    private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     public StoredObjectDaoImpl(
             StoredObjectMapper mapper, StoredObjectReferenceMapper businessMapper, StorageCacheSupport cacheSupport) {
@@ -137,13 +141,14 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     @Override
     public EntityId insert(StoredObject entity) {
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
+        dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         mapper.update(
                 null,
                 new UpdateWrapper<StoredObjectDO>()
                         .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
                         .eq("id", dataObject.getId()));
-        cacheSupport.removeById(dataObject.getId());
+        cacheSupport.removeById(String.valueOf(dataObject.getId()));
         return EntityIdCodec.toDomain(dataObject.getId());
     }
 
@@ -184,11 +189,16 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public List<String> listMimeTypes() {
-        return toStringList(mapper.selectObjs(new QueryWrapper<StoredObjectDO>()
-                .select("mime_type")
-                .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                .groupBy("mime_type")
-                .orderByAsc("mime_type")));
+        return mapper
+                .selectObjs(new QueryWrapper<StoredObjectDO>()
+                        .select("mime_type")
+                        .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .groupBy("mime_type")
+                        .orderByAsc("mime_type"))
+                .stream()
+                .filter(Objects::nonNull)
+                .map(String::valueOf)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -230,7 +240,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String remarks) {
         LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-        List<String> storageIds = findStorageIdsByBusiness(referenceOwnerId, referenceOwnerType);
+        List<Long> storageIds = findStorageIdsByBusiness(referenceOwnerId, referenceOwnerType);
         if (storageIds != null && storageIds.isEmpty()) {
             wrapper.eq(StoredObjectDO::getId, NO_MATCH_ID);
         } else if (storageIds != null) {
@@ -262,7 +272,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         return wrapper;
     }
 
-    private List<String> findStorageIdsByBusiness(String referenceOwnerId, String referenceOwnerType) {
+    private List<Long> findStorageIdsByBusiness(String referenceOwnerId, String referenceOwnerType) {
         if (StringUtils.isBlank(referenceOwnerId) && StringUtils.isBlank(referenceOwnerType)) {
             return null;
         }
@@ -273,19 +283,9 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         if (StringUtils.isNotBlank(referenceOwnerType)) {
             wrapper.eq(StoredObjectReferenceDO::getReferenceOwnerType, referenceOwnerType);
         }
-        return toStringList(businessMapper.selectObjs(wrapper.select(StoredObjectReferenceDO::getFileId)));
-    }
-
-    private List<String> toStringList(List<Object> objects) {
-        List<String> values = new ArrayList<>();
-        if (objects == null) {
-            return values;
-        }
-        for (Object object : objects) {
-            if (object != null) {
-                values.add(String.valueOf(object));
-            }
-        }
-        return values;
+        return businessMapper.selectObjs(wrapper.select(StoredObjectReferenceDO::getFileId)).stream()
+                .filter(Objects::nonNull)
+                .map(object -> Long.valueOf(String.valueOf(object)))
+                .collect(Collectors.toList());
     }
 }

@@ -35,6 +35,9 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthRefreshTokenDO",
+        "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
+        "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
+        "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO",
         "com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO",
         "com.github.thundax.modules.sys.persistence.dataobject.DictDO",
         "com.github.thundax.modules.sys.persistence.dataobject.LogDO",
@@ -85,8 +88,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
                 storageBusinessDO.tryGetField("id").isPresent());
         JavaField fileIdField = storageBusinessDO.getField("fileId");
         assertEquals(
-                storageBusinessDO.getFullName() + ".fileId must be String",
-                String.class.getName(),
+                storageBusinessDO.getFullName() + ".fileId must be Long",
+                Long.class.getName(),
                 fileIdField.getRawType().getFullName());
         assertFalse(
                 storageBusinessDO.getFullName() + ".fileId must not be single-column TableId",

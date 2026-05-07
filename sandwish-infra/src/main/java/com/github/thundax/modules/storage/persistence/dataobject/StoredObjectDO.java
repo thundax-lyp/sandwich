@@ -16,8 +16,8 @@ import lombok.Setter;
 @TableName("assist_storage")
 public class StoredObjectDO {
 
-    @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(type = IdType.INPUT)
+    private Long id;
 
     private String name;
 

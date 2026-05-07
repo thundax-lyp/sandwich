@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-storage-infra`：改代码，迁移存储域 infra ID 类型
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StoredObjectDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StoredObjectReferenceDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/MultipartUploadSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/MultipartUploadPartDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java`
-  - 处理动作：将存储域 infra 层 DO 和 assembler ID 类型迁移到雪花 `Long`。
-  - 验收点：`mvn -pl sandwish-infra -am test` 通过。
-  - 重要度：9/10
-
 - [ ] `snowflake-code-member-assist`：改代码，迁移会员和辅助域 ID 类型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java`

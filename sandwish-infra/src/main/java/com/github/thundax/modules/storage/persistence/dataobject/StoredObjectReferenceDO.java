@@ -13,7 +13,7 @@ import lombok.Setter;
 @TableName("assist_storage_business")
 public class StoredObjectReferenceDO {
 
-    private String fileId;
+    private Long fileId;
 
     private String referenceOwnerId;
 

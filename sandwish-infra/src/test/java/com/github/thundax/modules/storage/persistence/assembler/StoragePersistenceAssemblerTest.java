@@ -106,7 +106,7 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldMapBusinessReferenceStatus() {
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
-        dataObject.setFileId("5001");
+        dataObject.setFileId(5001L);
         dataObject.setReferenceOwnerId("owner-1");
         dataObject.setReferenceOwnerType("USER");
         dataObject.setReferenceStatus("REFERENCED");
@@ -117,7 +117,8 @@ public class StoragePersistenceAssemblerTest {
         assertEquals("owner-1", entity.getOwnerId());
         assertEquals("USER", entity.getOwnerType().value());
         assertEquals(
-                "5001", StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
+                Long.valueOf(5001L),
+                StoragePersistenceAssembler.toBusinessDataObject(entity).getFileId());
         assertEquals(
                 "owner-1",
                 StoragePersistenceAssembler.toBusinessDataObject(entity).getReferenceOwnerId());
@@ -170,7 +171,7 @@ public class StoragePersistenceAssemblerTest {
         MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(entity);
         MultipartUploadSession restored = StoragePersistenceAssembler.toMultipartSessionEntity(dataObject);
 
-        assertEquals("5002", dataObject.getId());
+        assertEquals(Long.valueOf(5002L), dataObject.getId());
         assertEquals("upload-1", dataObject.getUploadId());
         assertEquals("USER", dataObject.getOwnerType());
         assertEquals("OSS", dataObject.getStorageType());
@@ -214,7 +215,7 @@ public class StoragePersistenceAssemblerTest {
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(entity);
         MultipartUploadPart restored = StoragePersistenceAssembler.toMultipartPartEntity(dataObject);
 
-        assertEquals("5003", dataObject.getId());
+        assertEquals(Long.valueOf(5003L), dataObject.getId());
         assertEquals("upload-1", dataObject.getUploadId());
         assertEquals(Integer.valueOf(1), dataObject.getPartNumber());
         assertEquals("etag-1", dataObject.getEtag());

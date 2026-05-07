@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-data-audit`：改 SQL，复核 Audit 初始化脚本
-  - 范围文件：
-    - `db/data/audit.sql`
-  - 处理动作：复核 Audit 初始化脚本不需要固定主键种子。
-  - 验收点：`db/data/audit.sql` 与 Audit 无固定种子规则一致。
-  - 重要度：6/10
-
 - [ ] `snowflake-db-agent`：改 SQL 入口，复核数据库脚本执行规则
   - 范围文件：
     - `db/AGENT.md`

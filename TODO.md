@@ -9,26 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-identity-credential-biz`：新增会员登录标识和凭据业务模型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberIdentity.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/MemberCredential.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberIdentityType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberIdentityStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberCredentialType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberCredentialStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberIdentityDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberCredentialDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberIdentityService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberCredentialService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberIdentityServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberCredentialServiceImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberIdentityServiceImplTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberCredentialServiceImplTest.java`
-  - 处理动作：对照后台 `UserIdentity` 和 `UserCredential` 建立会员登录标识与认证凭据业务模型。
-  - 验收点：支持 `ACCOUNT`、`MOBILE`、`EMAIL` 标识和 `PASSWORD` 凭据，凭据状态、失败次数、锁定、过期和最近验证时间具备业务方法。
-  - 重要度：10/10
-
 - [ ] `member-identity-credential-infra`：新增会员登录标识和凭据持久化
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberIdentityDO.java`

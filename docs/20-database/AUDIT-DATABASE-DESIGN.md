@@ -35,6 +35,7 @@
 - Audit 自身表主键固定使用雪花 ID。
 - Audit 自身表主键数据库类型固定为 `bigint`。
 - Audit 自身 `DO/DataObject.id` Java 类型固定为 `Long`。
+- Audit 自身表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `audit_meta.object_id` 和 `audit_log.object_id` 固定使用字符串表达被审计对象标识。
 - `audit_meta.version` 和 `audit_log.version` 表达审计版本。
 - `audit_meta.version` 固定只表达审计版本，业务对象 `version` 固定由业务对象表保存。
@@ -87,7 +88,7 @@
 
 字段规则：
 
-- `id` 由雪花 ID 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `object_type + object_id` 固定唯一。
 - `version` 从 `1` 开始，随每条成功审计日志递增。
 - `last_log_id` 固定指向同一个 `AuditObjectRef` 的最后一条 `audit_log.id`。
@@ -131,8 +132,8 @@
 
 字段规则：
 
-- `id` 由雪花 ID 生成。
-- `meta_id` 关联 `audit_meta.id`。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `meta_id` 复用 `audit_meta.id`。
 - `object_type` / `object_id` 冗余保存，用于按对象查询和保证日志证据自包含。
 - `previous_version` 在对象第一条审计日志中固定为 `0`。
 - `idempotency_key` 固定唯一。
@@ -167,6 +168,7 @@
 - `sandwish-infra` 固定承载 `AuditMetaDO`、`AuditLogDO`、Mapper、DAO implementation 和 `PersistenceAssembler`。
 - `AuditObjectRef` 是值对象，不单独持久化为表。
 - `AuditMetaDO.id` 和 `AuditLogDO.id` 固定使用 `Long`。
+- `AuditLogDO.metaId` 固定使用 `Long`，复用 `AuditMetaDO.id`。
 - `AuditMetaDO.objectId` 和 `AuditLogDO.objectId` 固定使用 `String`。
 - `AuditLogDO` 只提供 insert 和 query 持久化能力。
 - `AuditMetaDO` 只允许创建和推进版本，不承载业务对象状态。

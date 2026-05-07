@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-doc-audit-db`：改文档，复核 Audit 数据库设计 ID 口径
-  - 范围文件：
-    - `docs/20-database/AUDIT-DATABASE-DESIGN.md`
-  - 处理动作：复核 Audit 自身 `Long id` 和 `object_id` 字符串坐标的数据库设计口径。
-  - 验收点：`AUDIT-DATABASE-DESIGN.md` 与全局雪花 ID 规则一致。
-  - 重要度：8/10
-
 - [ ] `snowflake-sql-schema-system`：改 SQL，迁移系统管理 schema ID 类型
   - 范围文件：
     - `db/schema/system.sql`

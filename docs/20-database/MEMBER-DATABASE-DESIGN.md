@@ -13,18 +13,34 @@
 - `member_member`
 - `member_identity`
 - `member_credential`
+- `member_auth_session`
+- `member_access_token`
+- `member_refresh_token`
 - `MemberDO`
 - `MemberIdentityDO`
 - `MemberCredentialDO`
+- `MemberAuthSessionDO`
+- `MemberAccessTokenDO`
+- `MemberRefreshTokenDO`
 - `MemberMapper`
 - `MemberIdentityMapper`
 - `MemberCredentialMapper`
+- `MemberAuthSessionMapper`
+- `MemberAccessTokenMapper`
+- `MemberRefreshTokenMapper`
 - `MemberDaoImpl`
 - `MemberIdentityDaoImpl`
 - `MemberCredentialDaoImpl`
+- `MemberAuthSessionDaoImpl`
+- `MemberAuthSessionRuntimeDaoImpl`
+- `MemberAccessTokenDaoImpl`
+- `MemberRefreshTokenDaoImpl`
 - `MemberPersistenceAssembler`
 - `MemberIdentityPersistenceAssembler`
 - `MemberCredentialPersistenceAssembler`
+- `MemberAuthSessionPersistenceAssembler`
+- `MemberAccessTokenPersistenceAssembler`
+- `MemberRefreshTokenPersistenceAssembler`
 
 当前不覆盖范围：
 
@@ -62,6 +78,9 @@
 | `member_member` | `MemberDO` | `MemberMapper` | `Member` |
 | `member_identity` | `MemberIdentityDO` | `MemberIdentityMapper` | `MemberIdentity` |
 | `member_credential` | `MemberCredentialDO` | `MemberCredentialMapper` | `MemberCredential` |
+| `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
+| `member_access_token` | `MemberAccessTokenDO` | `MemberAccessTokenMapper` | `MemberAccessToken` |
+| `member_refresh_token` | `MemberRefreshTokenDO` | `MemberRefreshTokenMapper` | `MemberRefreshToken` |
 
 ## 6. Table Design
 

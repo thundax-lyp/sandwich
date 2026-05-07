@@ -9,30 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `member-token-infra`：新增会员认证会话与 token 持久化
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberAuthSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberAccessTokenDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberRefreshTokenDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberAuthSessionMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberAccessTokenMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberRefreshTokenMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberAuthSessionPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberAccessTokenPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberRefreshTokenPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberAuthSessionDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberAuthSessionRuntimeDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberAccessTokenDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberRefreshTokenDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/assembler/MemberAuthSessionPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/assembler/MemberAccessTokenPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/member/persistence/assembler/MemberRefreshTokenPersistenceAssemblerTest.java`
-    - `db/schema/member.sql`
-    - `docs/20-database/MEMBER-DATABASE-DESIGN.md`
-  - 处理动作：新增 `member_auth_session`、`member_access_token` 和 `member_refresh_token` 的持久化与运行态实现。
-  - 验收点：token 值唯一，认证会话和 token 可按 `memberId`、`sessionId`、`status` 查询和更新。
-  - 重要度：10/10
-
 - [ ] `member-auth-api`：实现前台 token 登录、刷新、登出和登录状态
   - 范围文件：
     - `sandwish-front-api/src/main/java/com/github/thundax/modules/member/controller/LoginController.java`

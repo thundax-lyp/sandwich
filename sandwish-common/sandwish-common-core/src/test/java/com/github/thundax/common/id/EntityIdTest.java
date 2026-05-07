@@ -9,29 +9,34 @@ import org.junit.Test;
 public class EntityIdTest {
 
     @Test
-    public void shouldCreateEntityIdFromNonBlankValue() {
-        EntityId id = EntityId.of("user-1");
+    public void shouldCreateEntityIdFromPositiveLongValue() {
+        EntityId id = EntityId.of(1001L);
 
-        assertEquals("user-1", id.value());
-        assertEquals("user-1", id.toString());
-        assertEquals(String.class, id.type());
+        assertEquals(Long.valueOf(1001L), id.value());
+        assertEquals("1001", id.toString());
+        assertEquals(Long.class, id.type());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldRejectBlankValue() {
-        EntityId.of(" ");
+    public void shouldRejectZeroValue() {
+        EntityId.of(0L);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldRejectNonNumericStringValue() {
+        EntityId.of("user-1");
     }
 
     @Test
-    public void shouldReturnNullForNullableBlankValue() {
-        assertNull(EntityId.ofNullable(null));
+    public void shouldReturnNullForNullableEmptyValue() {
+        assertNull(EntityId.ofNullable((Long) null));
         assertNull(EntityId.ofNullable(""));
         assertNull(EntityId.ofNullable(" "));
     }
 
     @Test
     public void shouldCompareByTypeAndValue() {
-        assertEquals(EntityId.of("id-1"), EntityId.of("id-1"));
-        assertNotEquals(EntityId.of("id-1"), EntityId.of("id-2"));
+        assertEquals(EntityId.of(1001L), EntityId.of(1001L));
+        assertNotEquals(EntityId.of(1001L), EntityId.of(1002L));
     }
 }

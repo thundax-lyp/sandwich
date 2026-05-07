@@ -10,32 +10,45 @@ import org.junit.Test;
 public class EntityIdCodecTest {
 
     @Test
-    public void shouldConvertStringToEntityId() {
-        EntityId entityId = EntityIdCodec.toDomain("user-1");
+    public void shouldConvertLongToEntityId() {
+        EntityId entityId = EntityIdCodec.toDomain(1001L);
 
-        assertEquals(EntityId.of("user-1"), entityId);
+        assertEquals(EntityId.of(1001L), entityId);
     }
 
     @Test
-    public void shouldConvertEntityIdToString() {
-        assertEquals("user-1", EntityIdCodec.toValue(EntityId.of("user-1")));
+    public void shouldConvertNumericStringToEntityId() {
+        EntityId entityId = EntityIdCodec.toDomain("1001");
+
+        assertEquals(EntityId.of(1001L), entityId);
+    }
+
+    @Test
+    public void shouldConvertEntityIdToLong() {
+        assertEquals(Long.valueOf(1001L), EntityIdCodec.toValue(EntityId.of(1001L)));
         assertNull(EntityIdCodec.toValue(null));
     }
 
     @Test
-    public void shouldConvertStringListToEntityIdList() {
-        List<EntityId> ids = EntityIdCodec.toDomains(Arrays.asList("user-1", null, " "));
-
-        assertEquals(EntityId.of("user-1"), ids.get(0));
-        assertNull(ids.get(1));
-        assertNull(ids.get(2));
+    public void shouldConvertEntityIdToStringValue() {
+        assertEquals("1001", EntityIdCodec.toStringValue(EntityId.of(1001L)));
+        assertNull(EntityIdCodec.toStringValue(null));
     }
 
     @Test
-    public void shouldConvertEntityIdListToStringList() {
-        List<String> values = EntityIdCodec.toValues(Arrays.asList(EntityId.of("user-1"), null));
+    public void shouldConvertLongListToEntityIdList() {
+        List<EntityId> ids = EntityIdCodec.toDomains(Arrays.asList(1001L, null, 1002L));
 
-        assertEquals("user-1", values.get(0));
+        assertEquals(EntityId.of(1001L), ids.get(0));
+        assertNull(ids.get(1));
+        assertEquals(EntityId.of(1002L), ids.get(2));
+    }
+
+    @Test
+    public void shouldConvertEntityIdListToLongList() {
+        List<Long> values = EntityIdCodec.toValues(Arrays.asList(EntityId.of(1001L), null));
+
+        assertEquals(Long.valueOf(1001L), values.get(0));
         assertNull(values.get(1));
     }
 

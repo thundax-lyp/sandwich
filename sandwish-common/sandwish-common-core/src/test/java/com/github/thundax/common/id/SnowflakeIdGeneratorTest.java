@@ -32,7 +32,7 @@ public class SnowflakeIdGeneratorTest {
         EntityId first = generator.nextId();
         EntityId second = generator.nextId();
 
-        assertEquals(Long.parseLong(first.value()) + 1L, Long.parseLong(second.value()));
+        assertEquals(Long.valueOf(first.value() + 1L), second.value());
     }
 
     private static class FixedTimeSnowflakeIdGenerator extends SnowflakeIdGenerator {

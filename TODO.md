@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-code-common-id-model`：改代码，迁移 common ID 领域模型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/BaseId.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/BaseLongId.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/BaseStringId.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/EntityId.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/EntityIdCodec.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/EntityIdTest.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/id/EntityIdCodecTest.java`
-  - 处理动作：将 `EntityId` 领域标识模型迁移到雪花 `Long` 口径。
-  - 验收点：`EntityId` 与 `EntityIdCodec` 测试通过。
-  - 重要度：10/10
-
 - [ ] `snowflake-code-common-generator`：改代码，迁移 common ID 生成器
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/IdGenerator.java`

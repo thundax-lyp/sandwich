@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-deploy-readme`：改部署说明，复核数据库初始化口径
-  - 范围文件：
-    - `deploy/sandwish-api/README.md`
-  - 处理动作：复核部署说明中的数据库初始化顺序和固定种子说明。
-  - 验收点：部署说明与雪花 ID SQL 基线一致。
-  - 重要度：7/10
-
 - [ ] `snowflake-code-common-id-model`：改代码，迁移 common ID 领域模型
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/id/BaseId.java`

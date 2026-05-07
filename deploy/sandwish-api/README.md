@@ -102,6 +102,8 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 
 初始化只在 `sandwish-mysql-data` volume 为空时自动执行。若需要重新初始化本地数据，先停止服务并删除该 volume。
 
+初始化数据中的数据库主键使用固定雪花 ID，业务键保持对应业务值。
+
 ## Default Account
 
 - 默认部门：`GitHub`

@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-schema-system`：改 SQL，迁移系统管理 schema ID 类型
-  - 范围文件：
-    - `db/schema/system.sql`
-  - 处理动作：将系统管理域 schema 中主键和关系字段调整为雪花 `bigint`。
-  - 验收点：`db/schema/system.sql` 中系统管理主表不再使用 `varchar(64)` 主键。
-  - 重要度：10/10
-
 - [ ] `snowflake-sql-schema-auth`：改 SQL，迁移认证 schema ID 类型
   - 范围文件：
     - `db/schema/auth.sql`

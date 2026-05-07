@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `sys_department` (
-    `id` varchar(64) NOT NULL,
-    `parent_id` varchar(64) DEFAULT NULL,
+    `id` bigint NOT NULL,
+    `parent_id` bigint DEFAULT NULL,
     `lft` int NOT NULL,
     `rgt` int NOT NULL,
     `name` varchar(128) NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `sys_department` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台部门表';
 
 CREATE TABLE IF NOT EXISTS `sys_user` (
-    `id` varchar(64) NOT NULL,
-    `department_id` varchar(64) DEFAULT NULL,
+    `id` bigint NOT NULL,
+    `department_id` bigint DEFAULT NULL,
     `email` varchar(512) DEFAULT NULL,
     `mobile` varchar(512) DEFAULT NULL,
     `tel` varchar(64) DEFAULT NULL,
@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户主体表';
 
 CREATE TABLE IF NOT EXISTS `sys_user_identity` (
-    `id` varchar(64) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
+    `user_id` bigint NOT NULL,
     `identity_type` varchar(16) NOT NULL,
     `identity_value` varchar(255) NOT NULL,
     `status` varchar(16) NOT NULL,
@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS `sys_user_identity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户登录标识表';
 
 CREATE TABLE IF NOT EXISTS `sys_user_credential` (
-    `id` varchar(64) NOT NULL,
-    `user_id` varchar(64) NOT NULL,
-    `identity_id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
+    `user_id` bigint NOT NULL,
+    `identity_id` bigint NOT NULL,
     `credential_type` varchar(32) NOT NULL,
     `credential_value` varchar(1024) NOT NULL,
     `status` varchar(16) NOT NULL,
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `sys_user_credential` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户认证凭据表';
 
 CREATE TABLE IF NOT EXISTS `sys_role` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `name` varchar(128) NOT NULL,
     `admin_flag` char(1) NOT NULL DEFAULT '0',
     `enable_flag` varchar(16) NOT NULL DEFAULT 'ENABLED',
@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS `sys_role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台角色表';
 
 CREATE TABLE IF NOT EXISTS `sys_menu` (
-    `id` varchar(64) NOT NULL,
-    `parent_id` varchar(64) DEFAULT NULL,
+    `id` bigint NOT NULL,
+    `parent_id` bigint DEFAULT NULL,
     `lft` int NOT NULL,
     `rgt` int NOT NULL,
     `name` varchar(128) NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台菜单表';
 
 CREATE TABLE IF NOT EXISTS `sys_dict` (
-    `id` varchar(64) NOT NULL,
+    `id` bigint NOT NULL,
     `type` varchar(128) NOT NULL,
     `label` varchar(128) NOT NULL,
     `value` varchar(255) NOT NULL,
@@ -135,8 +135,8 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统字典表';
 
 CREATE TABLE IF NOT EXISTS `sys_log` (
-    `id` varchar(64) NOT NULL,
-    `user_id` varchar(64) DEFAULT NULL,
+    `id` bigint NOT NULL,
+    `user_id` bigint DEFAULT NULL,
     `type` varchar(32) DEFAULT NULL,
     `log_date` datetime(3) NOT NULL,
     `title` varchar(255) DEFAULT NULL,
@@ -152,16 +152,16 @@ CREATE TABLE IF NOT EXISTS `sys_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台系统日志表';
 
 CREATE TABLE IF NOT EXISTS `sys_user_role` (
-    `user_id` varchar(64) NOT NULL,
-    `role_id` varchar(64) NOT NULL,
+    `user_id` bigint NOT NULL,
+    `role_id` bigint NOT NULL,
     PRIMARY KEY (`user_id`, `role_id`),
     UNIQUE KEY `uk_sys_user_role` (`user_id`, `role_id`),
     KEY `idx_sys_user_role_role` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关系表';
 
 CREATE TABLE IF NOT EXISTS `sys_role_menu` (
-    `role_id` varchar(64) NOT NULL,
-    `menu_id` varchar(64) NOT NULL,
+    `role_id` bigint NOT NULL,
+    `menu_id` bigint NOT NULL,
     PRIMARY KEY (`role_id`, `menu_id`),
     UNIQUE KEY `uk_sys_role_menu` (`role_id`, `menu_id`),
     KEY `idx_sys_role_menu_menu` (`menu_id`)

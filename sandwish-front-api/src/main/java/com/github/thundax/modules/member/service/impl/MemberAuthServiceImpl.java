@@ -172,7 +172,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (session != null) {
             session.logout(now);
             memberAuthSessionDao.update(session);
-            memberAuthSessionRuntimeDao.remove(session.getSessionId());
+            memberAuthSessionRuntimeDao.deleteBySessionId(session.getSessionId());
         }
     }
 
@@ -203,7 +203,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (session.getId() == null) {
             session.setId(memberAuthSessionDao.insert(session));
         }
-        memberAuthSessionRuntimeDao.put(session, session.remainingSeconds(now));
+        memberAuthSessionRuntimeDao.insert(session, session.remainingSeconds(now));
 
         String accessTokenValue = UuidHelper.compact();
         MemberAccessToken accessToken = new MemberAccessToken();

@@ -22,14 +22,14 @@ public class MemberIdentityServiceImplTest {
         dao.identityResult = expected;
         MemberIdentityServiceImpl service = new MemberIdentityServiceImpl(dao);
 
-        assertSame(expected, service.getByAccount("alice"));
+        assertSame(expected, service.getByIdentity(MemberIdentityType.ACCOUNT, "alice"));
         assertEquals(MemberIdentityType.ACCOUNT, dao.identityType);
         assertEquals("alice", dao.identityValue);
 
-        service.getByMobile("13800138000");
+        service.getByIdentity(MemberIdentityType.MOBILE, "13800138000");
         assertEquals(MemberIdentityType.MOBILE, dao.identityType);
 
-        service.getByEmail("a@example.com");
+        service.getByIdentity(MemberIdentityType.EMAIL, "a@example.com");
         assertEquals(MemberIdentityType.EMAIL, dao.identityType);
     }
 

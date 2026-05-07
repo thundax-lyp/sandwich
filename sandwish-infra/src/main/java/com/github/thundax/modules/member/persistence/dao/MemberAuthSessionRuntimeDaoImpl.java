@@ -31,7 +31,7 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
     }
 
     @Override
-    public void put(MemberAuthSession authSession, int expireSeconds) {
+    public void insert(MemberAuthSession authSession, int expireSeconds) {
         Assert.notNull(authSession, "authSession can not be null");
         Assert.hasText(authSession.getSessionId(), "sessionId can not be empty");
         if (expireSeconds <= 0) {
@@ -42,7 +42,7 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
     }
 
     @Override
-    public void remove(String sessionId) {
+    public void deleteBySessionId(String sessionId) {
         cache.remove(SESSION_PREFIX + sessionId);
     }
 

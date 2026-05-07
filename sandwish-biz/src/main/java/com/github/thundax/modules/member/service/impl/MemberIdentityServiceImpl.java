@@ -1,6 +1,5 @@
 package com.github.thundax.modules.member.service.impl;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.dao.MemberIdentityDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.MemberIdentity;
@@ -27,27 +26,6 @@ public class MemberIdentityServiceImpl implements MemberIdentityService {
             return null;
         }
         return memberIdentityDao.getByIdentity(identityType, identityValue);
-    }
-
-    @Override
-    public MemberIdentity getByAccount(String account) {
-        return getByIdentity(MemberIdentityType.ACCOUNT, account);
-    }
-
-    @Override
-    public MemberIdentity getByMobile(String mobile) {
-        return getByIdentity(MemberIdentityType.MOBILE, mobile);
-    }
-
-    @Override
-    public MemberIdentity getByEmail(String email) {
-        return getByIdentity(MemberIdentityType.EMAIL, email);
-    }
-
-    @Override
-    public String getAccountIdentityValue(EntityId memberId) {
-        MemberIdentity identity = memberIdentityDao.getByMemberIdAndType(memberId, MemberIdentityType.ACCOUNT);
-        return identity == null ? null : identity.getIdentityValue();
     }
 
     @Override

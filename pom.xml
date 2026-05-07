@@ -43,6 +43,8 @@
         <cxf.version>3.4.0</cxf.version>
         <swagger.version>2.9.2</swagger.version>
         <lombok.version>1.16.22</lombok.version>
+        <mockito.version>3.12.4</mockito.version>
+        <byte-buddy.version>1.11.13</byte-buddy.version>
         <archunit.version>1.4.1</archunit.version>
         <jetcache.version>2.5.16</jetcache.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
@@ -115,6 +117,16 @@
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit-junit4</artifactId>
                 <version>${archunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>

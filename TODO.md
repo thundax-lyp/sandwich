@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-sql-data-system`：改 SQL，迁移系统管理初始化 ID
-  - 范围文件：
-    - `db/data/system.sql`
-  - 处理动作：将系统管理初始化数据中的固定 ID 调整为固定雪花 ID。
-  - 验收点：`db/data/system.sql` 不再使用 `user-*`、`role-*`、`menu-*` 等字符串主键。
-  - 重要度：10/10
-
 - [ ] `snowflake-sql-data-auth`：改 SQL，迁移认证初始化 ID
   - 范围文件：
     - `db/data/auth.sql`

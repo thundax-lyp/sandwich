@@ -95,4 +95,12 @@
   - 验收点：文档统计和待办项与删除后的代码状态一致。
   - 重要度：7/10
 
+- [ ] `signature-cleanup`：清理 Signature 删除后的现场
+  - 范围文件：
+    - `docs/30-designs/RUNBOOK-REMOVE-SIGNATURE-DESIGN.md`
+    - `TODO.md`
+  - 处理动作：按 RUNBOOK 执行残留引用扫描、相关模块测试、全量 `mvn install` 和工作区状态检查。
+  - 验收点：`rg` 不再发现未审阅的 Signature 设计残留，相关测试和 `mvn install` 通过，`git status --short` 干净。
+  - 重要度：9/10
+
 ## 待讨论项

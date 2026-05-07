@@ -120,7 +120,6 @@ String auditObjectId = EntityIdCodec.toStringValue(entity.getId());
 
 ## 9. Migration Rules
 
-- 全项目数据库主键迁移固定按 `RUNBOOK-GLOBAL-SNOWFLAKE-ID-MIGRATION.md` 执行
 - 数据库、代码、文档必须先统一“这是主键、业务编号还是领域标识”
 - 新增 ID 类型应先从一个明确业务对象开始，不做大范围抽象预留
 

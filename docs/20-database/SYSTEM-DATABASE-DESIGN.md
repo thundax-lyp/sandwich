@@ -40,7 +40,8 @@
 ## 3. Database Rules
 
 - 数据库平台以当前项目实际配置为准。
-- 主体表主键 Java 类型固定为 `String`，使用 MyBatis-Plus `IdType.ASSIGN_UUID`。
+- 主体表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
+- 主体表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - 关系表使用来源主键作为联合关系字段，不单独生成关系 ID。
 - `sys_user.email` 和 `sys_user.mobile` 使用持久化加密 typeHandler。
 - `sys_user.ranks` 和 `sys_menu.ranks` 映射领域 `AccessRank rank`。
@@ -111,7 +112,7 @@
 
 字段规则：
 
-- `id` 由 MyBatis-Plus `IdType.ASSIGN_UUID` 生成。
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `email` 和 `mobile` 使用 `DefaultEncryptTypeHandler`。
 - `ranks` 通过 `AccessRankCodec` 与 `AccessRank` 转换。
 - `super_flag` 和 `admin_flag` 共同转换为 `UserPrivilege`。
@@ -135,6 +136,12 @@
 | `identity_type` | `identityType` | `identityType` | 是 | 标识类型 |
 | `identity_value` | `identityValue` | `identityValue` | 是 | 标识值 |
 | `status` | `status` | `status` | 是 | 标识状态 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `user_id` 复用 `sys_user.id`。
+- `identity_value` 是登录标识业务值，不作为数据库主键。
 
 索引：
 
@@ -161,6 +168,13 @@
 | `expires_at` | `expiresAt` | `expiresAt` | 否 | 过期时间 |
 | `last_verified_at` | `lastVerifiedAt` | `lastVerifiedAt` | 否 | 最近验证时间 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `user_id` 复用 `sys_user.id`。
+- `identity_id` 复用 `sys_user_identity.id`。
+- `credential_value` 是凭据密文，不作为数据库主键。
+
 索引：
 
 - 主键：`pk_sys_user_credential(id)`
@@ -183,6 +197,10 @@
 | `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 
 索引：
 
@@ -213,6 +231,11 @@
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `parent_id` 复用 `sys_menu.id`。
+
 索引：
 
 - 主键：`pk_sys_menu(id)`
@@ -238,6 +261,11 @@
 | `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `parent_id` 复用 `sys_department.id`。
 
 索引：
 
@@ -265,6 +293,11 @@
 | `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `type` / `value` 是字典业务键，不作为数据库主键。
+
 索引：
 
 - 主键：`pk_sys_dict(id)`
@@ -287,6 +320,11 @@
 | `request_uri` | `requestUri` | `requestUri` | 否 | 请求路径 |
 | `request_params` | `requestParams` | `requestParams` | 否 | 请求参数摘要 |
 
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `user_id` 复用 `sys_user.id`。
+
 索引：
 
 - 主键：`pk_sys_log(id)`
@@ -303,6 +341,12 @@
 | `user_id` | `userId` | 是 | 用户 ID |
 | `role_id` | `roleId` | 是 | 角色 ID |
 
+字段规则：
+
+- `user_id` 复用 `sys_user.id`。
+- `role_id` 复用 `sys_role.id`。
+- 关系表使用联合主键，不单独生成 `id`。
+
 索引：
 
 - 联合唯一索引：`uk_sys_user_role(user_id, role_id)`
@@ -316,6 +360,12 @@
 | --- | --- | --- | --- |
 | `role_id` | `roleId` | 是 | 角色 ID |
 | `menu_id` | `menuId` | 是 | 菜单 ID |
+
+字段规则：
+
+- `role_id` 复用 `sys_role.id`。
+- `menu_id` 复用 `sys_menu.id`。
+- 关系表使用联合主键，不单独生成 `id`。
 
 索引：
 

@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `snowflake-doc-system-db`：改文档，迁移系统管理数据库设计 ID 口径
-  - 范围文件：
-    - `docs/20-database/SYSTEM-DATABASE-DESIGN.md`
-  - 处理动作：将系统管理域数据库设计中的主键和关系字段调整为雪花 `Long` 口径。
-  - 验收点：`SYSTEM-DATABASE-DESIGN.md` 不再声明 UUID 字符串主键默认规则。
-  - 重要度：10/10
-
 - [ ] `snowflake-doc-auth-db`：改文档，迁移认证数据库设计 ID 口径
   - 范围文件：
     - `docs/20-database/AUTH-DATABASE-DESIGN.md`

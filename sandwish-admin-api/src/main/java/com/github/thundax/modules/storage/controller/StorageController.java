@@ -1,4 +1,4 @@
-package com.github.thundax.modules.assist.controller;
+package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.exception.ApiException;
@@ -12,13 +12,13 @@ import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
-import com.github.thundax.modules.assist.assembler.StorageInterfaceAssembler;
-import com.github.thundax.modules.assist.controller.request.StorageIdRequest;
-import com.github.thundax.modules.assist.controller.request.StoragePageRequest;
-import com.github.thundax.modules.assist.controller.response.StorageResponse;
-import com.github.thundax.modules.assist.controller.response.StorageTreeNodeResponse;
-import com.github.thundax.modules.assist.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
+import com.github.thundax.modules.storage.controller.request.StorageIdRequest;
+import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
+import com.github.thundax.modules.storage.controller.response.StorageResponse;
+import com.github.thundax.modules.storage.controller.response.StorageTreeNodeResponse;
+import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
@@ -52,8 +52,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-@Api(tags = "辅助/存储")
-@RequestMapping(value = "/api/assist/storage")
+@Api(tags = "存储")
+@RequestMapping(value = "/api/storage")
 @RestController
 public class StorageController {
 
@@ -74,8 +74,8 @@ public class StorageController {
         this.storedObjectStore = storedObjectStore;
     }
 
-    @ApiOperation(value = "分页查询存储资源", notes = "assist:storage:view")
-    @HasPermission("assist:storage:view")
+    @ApiOperation(value = "分页查询存储资源", notes = "storage:storage:view")
+    @HasPermission("storage:storage:view")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -88,8 +88,8 @@ public class StorageController {
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
     }
 
-    @ApiOperation(value = "上传存储资源", notes = "assist:storage:edit")
-    @HasPermission("assist:storage:edit")
+    @ApiOperation(value = "上传存储资源", notes = "storage:storage:edit")
+    @HasPermission("storage:storage:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -123,8 +123,8 @@ public class StorageController {
         return response;
     }
 
-    @ApiOperation(value = "读取存储对象内容", notes = "assist:storage:view")
-    @HasPermission("assist:storage:view")
+    @ApiOperation(value = "读取存储对象内容", notes = "storage:storage:view")
+    @HasPermission("storage:storage:view")
     @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
     public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
         StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
@@ -153,8 +153,8 @@ public class StorageController {
         }
     }
 
-    @ApiOperation(value = "删除存储资源", notes = "assist:storage:edit")
-    @HasPermission("assist:storage:edit")
+    @ApiOperation(value = "删除存储资源", notes = "storage:storage:edit")
+    @HasPermission("storage:storage:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
@@ -178,8 +178,8 @@ public class StorageController {
         return true;
     }
 
-    @ApiOperation(value = "获取业务类型树", notes = "assist:storage:view")
-    @HasPermission("assist:storage:view")
+    @ApiOperation(value = "获取业务类型树", notes = "storage:storage:view")
+    @HasPermission("storage:storage:view")
     @RequestMapping(value = "treeData", method = RequestMethod.POST)
     @WrappedApiResponse
     public List<StorageTreeNodeResponse> treeData() {

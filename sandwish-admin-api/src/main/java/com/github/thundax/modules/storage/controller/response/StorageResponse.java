@@ -1,4 +1,4 @@
-package com.github.thundax.modules.assist.controller.response;
+package com.github.thundax.modules.storage.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

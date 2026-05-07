@@ -1,4 +1,4 @@
-package com.github.thundax.modules.assist.controller;
+package com.github.thundax.modules.storage.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,9 +11,9 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.response.PageResponse;
-import com.github.thundax.modules.assist.controller.request.StoragePageRequest;
-import com.github.thundax.modules.assist.controller.response.StorageResponse;
-import com.github.thundax.modules.assist.controller.response.StorageUploadResponse;
+import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
+import com.github.thundax.modules.storage.controller.response.StorageResponse;
+import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;

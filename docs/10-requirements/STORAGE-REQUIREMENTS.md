@@ -44,7 +44,7 @@
   - 定义 `StoredObject`、`StoredObjectReference`、枚举、Storage Service、DAO interface 和查询对象。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/storage`
   - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao`，并通过 `StoredObjectStore` 适配 `common-oss` 对象存储客户端。
-- `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/StorageController.java`
+- `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java`
   - 提供后台上传、分页、内容读取、删除和引用管理接口。
 - `sandwish-front-api`
   - 当前不提供前台 Storage Controller；前台业务需要文件能力时，通过业务 Service 复用 Storage Service，不复制后台上传入口。

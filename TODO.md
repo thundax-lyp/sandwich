@@ -11,12 +11,4 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-principal-verification`：执行迁移验收和残留引用扫描
-  - 范围文件：
-    - `docs/30-designs/RUNBOOK-AUTH-PRINCIPAL-MIGRATION.md`
-    - `TODO.md`
-  - 处理动作：按 RUNBOOK 执行残留引用扫描和 Maven 测试，收窄或删除已完成 TODO
-  - 验收点：`rg "UserIdentity|UserCredential|MemberIdentity|MemberCredential" sandwish-biz sandwish-admin-api sandwish-front-api sandwish-infra docs` 仅剩明确允许的历史说明，相关 Maven 测试通过
-  - 重要度：8/10
-
 ## 待讨论项

@@ -42,7 +42,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     @Override
     public PreAuthSession getById(PreAuthSessionId id) throws InvalidTokenException {
         PreAuthSession session = preAuthSessionDao.getById(id);
-        if (session == null) {
+        if (session == null || session.isExpired()) {
             throw new InvalidTokenException();
         }
         return session;

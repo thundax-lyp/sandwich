@@ -95,6 +95,10 @@ public class PreAuthSession implements Serializable {
         items.put(name, new PreAuthSessionValue(value, expiredAt));
     }
 
+    public boolean isExpired() {
+        return expiredAt <= System.currentTimeMillis();
+    }
+
     public PreAuthSessionToken getRefreshToken() {
         return refreshTokens.get(0).getToken();
     }

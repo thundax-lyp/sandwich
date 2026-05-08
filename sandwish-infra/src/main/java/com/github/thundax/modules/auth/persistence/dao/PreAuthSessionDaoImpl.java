@@ -99,11 +99,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
         String sessionKey = SESSION_PREFIX + session.getId().asString();
         cache.put(sessionKey, session, seconds + SAFETY_SECONDS, TimeUnit.SECONDS);
         redis().zadd(ACTIVE_SESSION_KEY, session.getExpiredAt(), session.getId().asString());
-        cache.put(
-                TOKEN_PREFIX + session.getToken().asString(),
-                session.getId().asString(),
-                seconds + SAFETY_SECONDS,
-                TimeUnit.SECONDS);
+        cache.put(TOKEN_PREFIX + session.getToken().asString(), session.getId().asString(), seconds, TimeUnit.SECONDS);
         for (RefreshTokenValue refreshToken : session.refreshTokenValues()) {
             long refreshTokenSeconds = ttlSeconds(refreshToken.getExpiredAt());
             if (refreshTokenSeconds <= 0) {
@@ -112,7 +108,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
             cache.put(
                     REFRESH_TOKEN_PREFIX + refreshToken.getToken().asString(),
                     session.getId().asString(),
-                    refreshTokenSeconds + SAFETY_SECONDS,
+                    refreshTokenSeconds,
                     TimeUnit.SECONDS);
         }
     }

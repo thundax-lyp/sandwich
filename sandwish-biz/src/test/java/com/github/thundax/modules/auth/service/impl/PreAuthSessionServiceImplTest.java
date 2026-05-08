@@ -110,6 +110,20 @@ public class PreAuthSessionServiceImplTest {
         assertNull(session.findValue(CAPTCHA_ITEM));
     }
 
+    @Test(expected = InvalidTokenException.class)
+    public void shouldRejectExpiredPreAuthSessionById() throws Exception {
+        PreAuthSessionToken refreshToken = PreAuthSessionToken.of("refresh-token-1");
+        PreAuthSession session = PreAuthSession.restore(
+                PreAuthSessionId.of("session-1"),
+                PreAuthSessionToken.of("token-1"),
+                java.util.Collections.singletonList(
+                        RefreshTokenValue.of(refreshToken, System.currentTimeMillis() - 1L)),
+                System.currentTimeMillis() - 1L);
+        preAuthSessionDao.insert(session);
+
+        service.getById(session.getId());
+    }
+
     @Test
     public void shouldCreatePreAuthSessionWithHexSnowflakeId() {
         PreAuthSession session = PreAuthSession.create(60);

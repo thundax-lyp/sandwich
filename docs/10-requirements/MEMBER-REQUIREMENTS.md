@@ -4,20 +4,19 @@
 
 本文档定义 Sandwich 前台会员的最小业务需求边界。
 
-本文档用于支撑 `Member` 主体、会员资料和会员数据库设计的后续治理。数据库设计见 [`../20-database/MEMBER-DATABASE-DESIGN.md`](../20-database/MEMBER-DATABASE-DESIGN.md)。
+本文档用于支撑 `Member` 主体、会员资料和会员数据库设计的后续治理。会员登录标识、认证凭据、登录表单、认证会话和 token 运行态归属 Auth。数据库设计见 [`../20-database/MEMBER-DATABASE-DESIGN.md`](../20-database/MEMBER-DATABASE-DESIGN.md)。
 
 ## 2. Scope
 
 当前覆盖范围：
 
 - 前台会员主体 `Member`
-- 会员登录标识 `MemberIdentity`
-- 会员认证凭据 `MemberCredential`
 - 会员姓名、性别和基础业务状态
 - 会员生命周期状态
 
 当前不覆盖范围：
 
+- 前台会员登录标识和认证凭据，归属 `AUTH-REQUIREMENTS.md` 的 `PrincipalIdentity` / `PrincipalCredential`
 - 前台会员登录表单、认证会话和 token 运行态，归属 `AUTH-REQUIREMENTS.md`
 - 会员注册与登录行为字段
 - 会员地址、邮编等私密资料
@@ -32,6 +31,8 @@
 
 后台 `User` 用于管理端登录、权限和审计。前台 `Member` 用于前台 API 登录态、前台资料和前台业务归属。
 
+`Member` 不承载登录标识和认证凭据。前台会员登录标识固定由 `PrincipalIdentity` 承载，`PrincipalKey.principalType=MEMBER`，`principalId=Member.id`。前台会员认证凭据固定由 `PrincipalCredential` 承载。
+
 ## 4. Module Mapping
 
 - `sandwish-biz`：承载 `Member`、`MemberService` 和 `MemberDao`。
@@ -41,8 +42,6 @@
 ## 5. Core Business Objects
 
 - `Member`：前台会员主体。
-- `MemberIdentity`：前台会员登录标识，支持账号、手机号和邮箱。
-- `MemberCredential`：前台会员认证凭据，首轮支持密码凭据。
 - `MemberGender`：会员性别，固定表达男、女和保密。
 - `MemberStatus`：会员生命周期状态，固定表达待激活、活跃、暂停和关闭。
 
@@ -52,16 +51,12 @@
 - 会员数据库表使用 `member_` 业务域前缀。
 - 会员身份上下文不得与后台 `UserAccessHolder` 混用。
 - `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
-- `MemberIdentity(identityType, identityValue)` 必须全局唯一。
-- `MemberCredential` 不得保存明文密码。
 - 前台会员认证运行态固定归属 auth 域，保留 `Member*` 类型名前缀以区分后台用户认证模型。
 
 ## 7. Functional Requirements
 
 - 系统可以保存会员姓名、性别、生命周期状态、排序值和备注。
 - 系统可以维护会员生命周期状态。
-- 系统可以保存账号、手机号和邮箱三类会员登录标识。
-- 系统可以维护会员密码凭据、失败次数、锁定、过期和最近验证时间。
 - 系统可以分页查询会员列表。
 
 ## 8. Key Flows

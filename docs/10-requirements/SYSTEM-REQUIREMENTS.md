@@ -4,15 +4,13 @@
 
 本文档定义 Sandwich 后台系统管理域的业务需求边界。
 
-`System` 对应代码中的 `com.github.thundax.modules.sys`，负责后台用户主体、登录标识、认证凭据、角色、菜单、部门、字典和系统日志。认证登录流程由 `AUTH-REQUIREMENTS.md` 定义；`System` 只提供认证所需的用户资料、身份资料和凭据资料。
+`System` 对应代码中的 `com.github.thundax.modules.sys`，负责后台用户主体、角色、菜单、部门、字典和系统日志。认证登录流程、登录标识和认证凭据由 `AUTH-REQUIREMENTS.md` 定义；`System` 只提供认证所需的后台用户主体资料。
 
 ## 2. Scope
 
 当前覆盖范围：
 
 - 后台用户主体管理。
-- 后台用户登录标识管理。
-- 后台用户认证凭据管理。
 - 角色管理。
 - 角色用户关系维护。
 - 角色菜单关系维护。
@@ -24,6 +22,7 @@
 当前不覆盖范围：
 
 - 后台登录、token、OAuth2 和认证会话流程。
+- 登录标识和认证凭据模型。
 - 前台会员体系。
 - 多租户组织模型。
 - 服务端页面和标签库。
@@ -36,8 +35,8 @@
 后台认证链路中：
 
 - `User` 是后台用户主体。
-- `UserIdentity` 是后台登录标识。
-- `UserCredential` 是后台认证凭据。
+- `PrincipalIdentity` 是后台登录标识，归属 `Auth`。
+- `PrincipalCredential` 是后台认证凭据，归属 `Auth`。
 - `AuthSession`、`AccessToken`、`OAuthAccessToken` 和 `OAuthRefreshToken` 归属 `Auth`。
 
 后台授权链路中：
@@ -55,7 +54,7 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
-  - 定义 `User`、`UserIdentity`、`UserCredential`、`Role`、`Menu`、`Department`、`Dict`、`Log`、枚举、值对象、DAO interface、Service 和查询对象。
+  - 定义 `User`、`Role`、`Menu`、`Department`、`Dict`、`Log`、枚举、值对象、DAO interface、Service 和查询对象。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现 sys DAO，维护 DO、Mapper、缓存和持久化装配器。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys`
@@ -87,78 +86,11 @@
 
 - `User` 不承载角色列表；用户角色通过 `sys_user_role` 动态读取。
 - `User` 不承载认证行为数据，例如注册 IP、最近登录时间、最近登录 IP 和登录次数。
-- `User.loginName` 只作为用户保存和修改账号的输入，正式登录标识由 `UserIdentity.identityValue` 承载。
-- `User.loginPass` 只作为用户保存和重置密码的输入，正式认证凭据由 `UserCredential.credentialValue` 承载。
+- `User.loginName` 只作为用户保存和修改账号的输入，正式登录标识由 `PrincipalIdentity.identityValue` 承载。
+- `User.loginPass` 只作为用户保存和重置密码的输入，正式认证凭据由 `PrincipalCredential.credentialValue` 承载。
 - `User.status = DISABLED` 时，该后台用户全部后台登录方式不可用。
 
-### 5.2 UserIdentity
-
-`UserIdentity` 是后台用户登录标识。
-
-核心字段：
-
-- `id`：登录标识 ID。
-- `userId`：后台用户 ID。
-- `identityType`：登录标识类型。
-- `identityValue`：登录标识值。
-- `status`：登录标识状态。
-
-固定标识类型：
-
-- `ACCOUNT`
-- `MOBILE`
-- `EMAIL`
-
-固定状态：
-
-- `ENABLED`
-- `DISABLED`
-
-固定约束：
-
-- `identityType + identityValue` 必须唯一定位一个登录标识。
-- 修改后台账号固定更新 `ACCOUNT` 类型 `UserIdentity`。
-- `UserIdentity` 不保存密码哈希。
-- `UserIdentity` 不承载通用审计字段。
-
-### 5.3 UserCredential
-
-`UserCredential` 是后台用户认证凭据。
-
-核心字段：
-
-- `id`：认证凭据 ID。
-- `userId`：后台用户 ID。
-- `identityId`：登录标识 ID。
-- `credentialType`：凭据类型。
-- `credentialValue`：凭据值。
-- `status`：凭据状态。
-- `needChangePassword`：是否需要强制改密。
-- `failedCount`：连续失败次数。
-- `failedLimit`：最大允许连续失败次数。
-- `lockedUntil`：锁定截止时间。
-- `expiresAt`：过期时间。
-- `lastVerifiedAt`：最近验证时间。
-
-固定凭据类型：
-
-- `PASSWORD`
-
-固定状态：
-
-- `ACTIVE`
-- `LOCKED`
-- `EXPIRED`
-- `DISABLED`
-
-固定约束：
-
-- 密码哈希固定保存到 `credentialValue`。
-- 登录失败次数和锁定状态固定保存在 `UserCredential` 维度。
-- `identityId + credentialType` 必须唯一定位一个认证凭据。
-- `UserCredential` 不承载通用审计字段。
-
-### 5.4 Role
+### 5.2 Role
 
 `Role` 是后台授权角色。
 
@@ -180,7 +112,7 @@
 - 角色与菜单关系通过 `sys_role_menu` 维护。
 - 用户与角色关系通过 `sys_user_role` 维护。
 
-### 5.5 Menu
+### 5.3 Menu
 
 `Menu` 是后台菜单和权限资源。
 
@@ -208,7 +140,7 @@
 - 访问等级使用统一 `AccessRank`，不区分 `UserRank` 和 `MenuRank`。
 - 显示状态使用 `MenuVisibility` 表达。
 
-### 5.6 Department
+### 5.4 Department
 
 `Department` 是后台组织部门。
 
@@ -229,7 +161,7 @@
 - 部门显示名称优先使用 `shortName`，没有简称时使用 `name`。
 - 用户通过 `departmentId` 归属部门。
 
-### 5.7 Dict
+### 5.5 Dict
 
 `Dict` 是系统字典项。
 
@@ -251,7 +183,7 @@
 - 系统枚举类字典不得替代 Java enum 的业务合法值校验；代码中的 enum 仍是业务状态和值域的权威来源。
 - 字典修订号由字典持久化状态派生，用于前端或缓存判断字典是否变化。
 
-### 5.8 Log
+### 5.6 Log
 
 `Log` 是后台系统日志。
 
@@ -288,11 +220,11 @@
 - Service `add` 方法必须返回新建主实体的 `EntityId`。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
 - `UserService` 固定承载后台用户主体、用户角色关系和用户主事务入口，不公开登录标识读取、账号名读取、密码凭据读取和密码凭据更新方法。
-- `UserIdentityService` 固定承载后台用户登录标识读取和 `ACCOUNT` 标识写入。
-- `UserCredentialService` 固定承载后台用户认证凭据读取和 `PASSWORD` 凭据写入。
+- `PrincipalIdentityService` 固定承载后台用户登录标识读取和 `USER_ACCOUNT` 标识写入。
+- `PrincipalCredentialService` 固定承载后台用户认证凭据读取和 `USER_PASSWORD` 凭据写入。
 - Service `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
-- `UserIdentity` 和 `UserCredential` 属于 System 用户模型，认证使用方式由 Auth 编排。
+- `PrincipalIdentity` 和 `PrincipalCredential` 属于 Auth 认证模型，System 只在用户保存、登录名修改和密码重置流程中调用对应 Service 维护认证资料。
 - `AccessRank` 是用户和菜单共用的访问等级值对象。
 - 角色、菜单、用户、部门和字典的排序使用 `priority`。
 - 后台系统管理 API 固定归属 `sandwish-admin-api`。
@@ -302,10 +234,10 @@
 ### 7.1 用户管理
 
 - 支持读取、列表、分页、新增、更新、启停、批量删除、上传头像和删除头像。
-- 新增用户时必须创建或更新 `ACCOUNT` 类型 `UserIdentity`。
-- 新增用户设置初始密码时必须创建 `PASSWORD` 类型 `UserCredential`。
-- 修改登录名时必须更新 `ACCOUNT` 类型 `UserIdentity`。
-- 重置密码时必须更新 `PASSWORD` 类型 `UserCredential`。
+- 新增用户时必须创建或更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 新增用户设置初始密码时必须创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 修改登录名时必须更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 重置密码时必须更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
 - 更新用户角色时必须重写 `sys_user_role` 关系。
 - 查询用户角色时必须通过 `sys_user_role` 读取。
 
@@ -358,15 +290,15 @@
 1. Controller 接收用户保存请求。
 2. InterfaceAssembler 转换入口参数。
 3. Service 保存 `User` 主体。
-4. Service 创建 `ACCOUNT` 类型 `UserIdentity`。
-5. Service 创建 `PASSWORD` 类型 `UserCredential`。
+4. Service 创建 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+5. Service 创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
 6. Service 写入 `sys_user_role` 关系。
 
 ### 8.2 修改用户登录名
 
 1. Controller 接收用户更新请求。
 2. Service 更新 `User` 主体资料。
-3. Service 更新 `ACCOUNT` 类型 `UserIdentity.identityValue`。
+3. Service 更新 `USER_ACCOUNT` 类型 `PrincipalIdentity.identityValue`。
 4. Service 按请求重写用户角色关系。
 
 ### 8.3 角色授权菜单

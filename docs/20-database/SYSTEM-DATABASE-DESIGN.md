@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 后台系统管理域的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `SYSTEM-REQUIREMENTS.md` 的后台系统模型为基础，固定 `sys` 拥有的用户、登录标识、认证凭据、角色、菜单、部门、字典和日志的目标持久化设计。认证会话、访问 token、OAuth2 client、authorization、access token 和 refresh token 的数据库设计见 `AUTH-DATABASE-DESIGN.md`。
+本文档以 `SYSTEM-REQUIREMENTS.md` 的后台系统模型为基础，固定 `sys` 拥有的用户、角色、菜单、部门、字典和日志的目标持久化设计。登录标识、认证凭据、认证会话、访问 token、OAuth2 client、authorization、access token 和 refresh token 的数据库设计见 `AUTH-DATABASE-DESIGN.md`。
 
 建表 SQL 见 [`../../db/schema/system.sql`](../../db/schema/system.sql)，初始化脚本见 [`../../db/data/system.sql`](../../db/data/system.sql)。
 
@@ -13,8 +13,6 @@
 当前覆盖范围：
 
 - `sys_user`
-- `sys_user_identity`
-- `sys_user_credential`
 - `sys_role`
 - `sys_menu`
 - `sys_department`
@@ -34,6 +32,8 @@
 - `auth_oauth_authorization`
 - `auth_oauth_access_token`
 - `auth_oauth_refresh_token`
+- `auth_principal_identity`
+- `auth_principal_credential`
 - 前台会员表
 - 生产数据变更脚本
 
@@ -58,8 +58,6 @@
 ## 4. Naming Rules
 
 - 后台用户表固定为 `sys_user`。
-- 后台登录标识表固定为 `sys_user_identity`。
-- 后台认证凭据表固定为 `sys_user_credential`。
 - 角色表固定为 `sys_role`。
 - 菜单表固定为 `sys_menu`。
 - 部门表固定为 `sys_department`。
@@ -75,8 +73,6 @@
 | Table | DO | Mapper | Entity |
 | --- | --- | --- | --- |
 | `sys_user` | `UserDO` | `UserMapper` | `User` |
-| `sys_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
-| `sys_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
 | `sys_role` | `RoleDO` | `RoleMapper` | `Role` |
 | `sys_menu` | `MenuDO` | `MenuMapper` | `Menu` |
 | `sys_department` | `DepartmentDO` | `DepartmentMapper` | `Department` |
@@ -125,63 +121,7 @@
 - 普通索引：`idx_sys_user_department(department_id)`
 - 普通索引：`idx_sys_user_status(enable_flag, priority, create_date)`
 
-### 6.2 sys_user_identity
-
-`sys_user_identity` 保存后台用户登录标识。
-
-| Column | DO Field | Entity Field | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | `id` | `id` | 是 | 登录标识主键 |
-| `user_id` | `userId` | `userId` | 是 | 用户 ID |
-| `identity_type` | `identityType` | `identityType` | 是 | 标识类型 |
-| `identity_value` | `identityValue` | `identityValue` | 是 | 标识值 |
-| `status` | `status` | `status` | 是 | 标识状态 |
-
-字段规则：
-
-- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `user_id` 复用 `sys_user.id`。
-- `identity_value` 是登录标识业务值，不作为数据库主键。
-
-索引：
-
-- 主键：`pk_sys_user_identity(id)`
-- 联合唯一索引：`uk_sys_user_identity_type_value(identity_type, identity_value)`
-- 普通索引：`idx_sys_user_identity_user(user_id, status)`
-
-### 6.3 sys_user_credential
-
-`sys_user_credential` 保存后台用户认证凭据。
-
-| Column | DO Field | Entity Field | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | `id` | `id` | 是 | 凭据主键 |
-| `user_id` | `userId` | `userId` | 是 | 用户 ID |
-| `identity_id` | `identityId` | `identityId` | 是 | 登录标识 ID |
-| `credential_type` | `credentialType` | `credentialType` | 是 | 凭据类型 |
-| `credential_value` | `credentialValue` | `credentialValue` | 是 | 凭据值 |
-| `status` | `status` | `status` | 是 | 凭据状态 |
-| `need_change_password` | `needChangePassword` | `needChangePassword` | 是 | 是否强制改密 |
-| `failed_count` | `failedCount` | `failedCount` | 是 | 连续失败次数 |
-| `failed_limit` | `failedLimit` | `failedLimit` | 是 | 最大连续失败次数 |
-| `locked_until` | `lockedUntil` | `lockedUntil` | 否 | 锁定截止时间 |
-| `expires_at` | `expiresAt` | `expiresAt` | 否 | 过期时间 |
-| `last_verified_at` | `lastVerifiedAt` | `lastVerifiedAt` | 否 | 最近验证时间 |
-
-字段规则：
-
-- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `user_id` 复用 `sys_user.id`。
-- `identity_id` 复用 `sys_user_identity.id`。
-- `credential_value` 是凭据密文，不作为数据库主键。
-
-索引：
-
-- 主键：`pk_sys_user_credential(id)`
-- 联合唯一索引：`uk_sys_user_credential_identity_type(identity_id, credential_type)`
-- 普通索引：`idx_sys_user_credential_user(user_id, status)`
-
-### 6.4 sys_role
+### 6.2 sys_role
 
 `sys_role` 保存后台角色。
 
@@ -207,7 +147,7 @@
 - 主键：`pk_sys_role(id)`
 - 普通索引：`idx_sys_role_status(enable_flag, priority, create_date)`
 
-### 6.5 sys_menu
+### 6.3 sys_menu
 
 `sys_menu` 保存后台菜单和权限资源。
 
@@ -243,7 +183,7 @@
 - 普通索引：`idx_sys_menu_nested(lft, rgt)`
 - 普通索引：`idx_sys_menu_display(display_flag, ranks)`
 
-### 6.6 sys_department
+### 6.4 sys_department
 
 `sys_department` 保存后台部门树。
 
@@ -273,7 +213,7 @@
 - 普通索引：`idx_sys_department_parent(parent_id, priority)`
 - 普通索引：`idx_sys_department_nested(lft, rgt)`
 
-### 6.7 sys_dict
+### 6.5 sys_dict
 
 `sys_dict` 保存系统字典项。
 
@@ -303,7 +243,7 @@
 - 主键：`pk_sys_dict(id)`
 - 普通索引：`idx_sys_dict_type(type, priority, create_date)`
 
-### 6.8 sys_log
+### 6.6 sys_log
 
 `sys_log` 保存后台系统日志。
 
@@ -332,7 +272,7 @@
 - 普通索引：`idx_sys_log_user(user_id, log_date)`
 - 普通索引：`idx_sys_log_type(type, log_date)`
 
-### 6.9 sys_user_role
+### 6.7 sys_user_role
 
 `sys_user_role` 保存用户和角色关系。
 
@@ -352,7 +292,7 @@
 - 联合唯一索引：`uk_sys_user_role(user_id, role_id)`
 - 普通索引：`idx_sys_user_role_role(role_id)`
 
-### 6.10 sys_role_menu
+### 6.8 sys_role_menu
 
 `sys_role_menu` 保存角色和菜单关系。
 
@@ -375,9 +315,6 @@
 ## 7. Relationship Rules
 
 - `sys_user.department_id` 引用 `sys_department.id`。
-- `sys_user_identity.user_id` 引用 `sys_user.id`。
-- `sys_user_credential.user_id` 引用 `sys_user.id`。
-- `sys_user_credential.identity_id` 引用 `sys_user_identity.id`。
 - `sys_user_role.user_id` 引用 `sys_user.id`。
 - `sys_user_role.role_id` 引用 `sys_role.id`。
 - `sys_role_menu.role_id` 引用 `sys_role.id`。

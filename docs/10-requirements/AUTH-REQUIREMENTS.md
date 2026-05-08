@@ -6,7 +6,7 @@
 
 `Auth` 负责后台登录表单、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
 
-后台用户主体、登录标识和认证凭据的系统管理需求见 [`SYSTEM-REQUIREMENTS.md`](./SYSTEM-REQUIREMENTS.md)。本文档只定义这些资料在认证流程中的使用规则。
+后台用户主体管理需求见 [`SYSTEM-REQUIREMENTS.md`](./SYSTEM-REQUIREMENTS.md)。登录标识和认证凭据归属 `Auth`，本文档定义这些资料在认证流程中的使用规则。
 
 统一认证业务结构固定以 `Principal*` 模型描述后台用户认证和前台会员认证的共性。`Principal*` 不替代 `User`、`Member` 或入口安全上下文，只用于在 `auth` 域内统一表达认证主体、登录标识、认证凭据和 token 运行态。
 
@@ -44,13 +44,13 @@
 
 后台认证目标模型固定为：
 
-`User -> UserIdentity -> UserCredential -> AuthSession`
+`User -> PrincipalIdentity -> PrincipalCredential -> AuthSession`
 
 `User` 归属 `sys` 用户主体，承载后台用户资料、组织关系、权限等级、启停状态和审计字段。
 
-`UserIdentity` 归属 `sys` 用户模型，承载后台登录标识。一个 `User` 可以绑定多个 `UserIdentity`。
+`PrincipalIdentity` 归属 `auth` 认证模型，承载后台用户和前台会员的登录标识。一个 `PrincipalKey` 可以绑定多个 `PrincipalIdentity`。
 
-`UserCredential` 归属 `sys` 用户模型，承载后台认证凭据。一个 `User` 可以绑定多个 `UserCredential`。
+`PrincipalCredential` 归属 `auth` 认证模型，承载后台用户和前台会员的认证凭据。一个 `PrincipalIdentity` 可以绑定多个 `PrincipalCredential`。
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
@@ -87,7 +87,7 @@
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
   - 定义 `AuthSession`、OAuth2 模型、token 模型、`Principal*` 统一认证结构、后台登录表单运行态、前台会员认证运行态模型、认证枚举、DAO 契约和可复用认证业务 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
-  - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
+  - 定义后台 `User` 主体、用户保存流程和用户资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
   - 实现后台认证运行态、前台会员认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
@@ -123,26 +123,31 @@
 - `User` 不等于认证凭据。
 - `User` 不承载注册 IP、最近登录时间、最近登录 IP、登录次数等认证行为数据；认证行为通过认证会话与系统日志落地。
 - `User.status` 禁用时，该用户全部后台登录方式不可用。
-- `User.loginName` 可作为后台用户创建和账户身份初始化输入，认证语义固定由 `UserIdentity.identityValue` 承载。
-- `User.loginPass` 可作为后台用户创建和密码凭据初始化输入，认证语义固定由 `UserCredential.credentialValue` 承载。
+- `User.loginName` 可作为后台用户创建和账户身份初始化输入，认证语义固定由 `PrincipalIdentity.identityValue` 承载。
+- `User.loginPass` 可作为后台用户创建和密码凭据初始化输入，认证语义固定由 `PrincipalCredential.credentialValue` 承载。
 
-### 5.2 UserIdentity
+### 5.2 PrincipalIdentity
 
-`UserIdentity` 是后台登录标识。
+`PrincipalIdentity` 是统一认证主体登录标识。
 
 核心字段：
 
 - `id`：登录标识 ID。
-- `userId`：关联后台用户 ID。
+- `principalKey`：认证主体坐标，由 `principalType` 和 `principalId` 组成。
 - `identityType`：登录标识类型。
 - `identityValue`：登录标识值。
 - `status`：登录标识状态。
 
 固定标识类型：
 
-- `ACCOUNT`：后台账号。
-- `MOBILE`：后台手机号。
-- `EMAIL`：后台邮箱。
+- `USER_ACCOUNT`：后台账号。
+- `USER_MOBILE`：后台手机号。
+- `USER_EMAIL`：后台邮箱。
+- `USER_WECOM`：后台企业微信身份。
+- `USER_GITHUB`：后台 GitHub 身份。
+- `MEMBER_ACCOUNT`：前台会员账号。
+- `MEMBER_MOBILE`：前台会员手机号。
+- `MEMBER_EMAIL`：前台会员邮箱。
 
 固定状态：
 
@@ -151,20 +156,19 @@
 
 固定约束：
 
-- `identityType + identityValue` 必须唯一定位一个 `UserIdentity`。
-- 禁用 `UserIdentity` 只影响该登录方式，不等于禁用 `User`。
-- 修改后台账号固定更新 `ACCOUNT` 类型 `UserIdentity`。
-- `UserIdentity` 不保存密码哈希。
-- `UserIdentity` 不承载通用审计字段。
+- `identityType + identityValue` 必须唯一定位一个 `PrincipalIdentity`。
+- 禁用 `PrincipalIdentity` 只影响该登录方式，不等于禁用 `User`。
+- 修改后台账号固定更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- `PrincipalIdentity` 不保存密码哈希。
+- `PrincipalIdentity` 不承载通用审计字段。
 
-### 5.3 UserCredential
+### 5.3 PrincipalCredential
 
-`UserCredential` 是后台认证凭据。
+`PrincipalCredential` 是统一认证主体认证凭据。
 
 核心字段：
 
 - `id`：认证凭据 ID。
-- `userId`：关联后台用户 ID。
 - `identityId`：关联登录标识 ID。
 - `credentialType`：凭据类型。
 - `credentialValue`：凭据值。
@@ -178,7 +182,8 @@
 
 固定凭据类型：
 
-- `PASSWORD`：后台密码凭据。
+- `USER_PASSWORD`：后台密码凭据。
+- `MEMBER_PASSWORD`：前台会员密码凭据。
 
 固定状态：
 
@@ -189,13 +194,13 @@
 
 固定约束：
 
-- 密码哈希固定保存到 `UserCredential.credentialValue`。
-- 登录失败次数固定保存到 `UserCredential.failedCount`。
-- 凭据锁定固定发生在 `UserCredential` 维度，不发生在 `User` 维度。
-- 密码过期固定使用 `UserCredential.expiresAt` 表达。
-- 首次登录或重置密码后的强制改密固定使用 `UserCredential.needChangePassword` 表达。
+- 密码哈希固定保存到 `PrincipalCredential.credentialValue`。
+- 登录失败次数固定保存到 `PrincipalCredential.failedCount`。
+- 凭据锁定固定发生在 `PrincipalCredential` 维度，不发生在 `User` 维度。
+- 密码过期固定使用 `PrincipalCredential.expiresAt` 表达。
+- 首次登录或重置密码后的强制改密固定使用 `PrincipalCredential.needChangePassword` 表达。
 - `identityId + credentialType` 必须唯一定位一个认证凭据。
-- `UserCredential` 不承载通用审计字段，只保存凭据认证策略所需状态。
+- `PrincipalCredential` 不承载通用审计字段，只保存凭据认证策略所需状态。
 
 ### 5.4 AuthSession
 
@@ -404,9 +409,9 @@
 
 ## 6. Global Constraints
 
-- 后台认证固定以 `UserIdentity + UserCredential` 完成登录校验。
-- 后台账号密码登录固定先解析 `UserIdentity`，再校验 `UserCredential`。
-- 短信、企业微信和 GitHub 登录固定通过独立 provider 解析外部身份，再映射到 `UserIdentity`。
+- 后台认证固定以 `PrincipalIdentity + PrincipalCredential` 完成登录校验。
+- 后台账号密码登录固定先解析 `PrincipalIdentity`，再校验 `PrincipalCredential`。
+- 短信、企业微信和 GitHub 登录固定通过独立 provider 解析外部身份，再映射到 `PrincipalIdentity`。
 - OAuth2 客户端密钥校验固定通过 Service 完成。
 - OAuth2 authorization code 和 refresh token 必须一次性消费或状态流转，避免重放。
 - token verify、introspection 和 userinfo 固定只返回可公开的 token/session/user 信息。
@@ -415,8 +420,8 @@
 - Service 固定承接认证流程、状态校验、失败次数写回、锁定和会话创建。
 - DAO 固定承接持久化访问，不承载认证业务流程。
 - `User.loginName` 和 `User.loginPass` 仅允许作为用户创建、资料维护和认证模型初始化来源。
-- 新增用户时必须创建默认 `ACCOUNT` 类型 `UserIdentity`。
-- 设置或重置密码时必须创建或更新 `PASSWORD` 类型 `UserCredential`。
+- 新增用户时必须创建默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 设置或重置密码时必须创建或更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
 - 后台用户锁定语义应该收敛到凭据维度锁定。
 - 后台认证模型不得改变前台会员登录语义。
 
@@ -441,26 +446,26 @@
 
 ### 7.3 身份解析
 
-- 后台账号密码登录固定使用 `ACCOUNT` 类型解析登录名。
-- `UserIdentity` 不存在时必须按用户名密码错误处理。
-- `UserIdentity.status = DISABLED` 时必须拒绝登录。
-- `UserIdentity.userId` 对应 `User` 不存在时必须拒绝登录。
+- 后台账号密码登录固定使用 `USER_ACCOUNT` 类型解析登录名。
+- `PrincipalIdentity` 不存在时必须按用户名密码错误处理。
+- `PrincipalIdentity.status = DISABLED` 时必须拒绝登录。
+- `PrincipalIdentity.principalKey` 对应 `User` 不存在时必须拒绝登录。
 - `User.status` 非启用状态时必须拒绝登录。
 
 ### 7.4 密码凭据校验
 
-- 解析身份后必须按 `identityId + PASSWORD` 读取 `UserCredential`。
-- `UserCredential` 不存在时必须按用户名密码错误处理。
-- `UserCredential.status = DISABLED` 时必须拒绝登录。
-- `UserCredential.status = LOCKED` 时必须拒绝登录。
-- `UserCredential.status = EXPIRED` 时必须拒绝登录。
-- `UserCredential.lockedUntil` 未到期时必须拒绝登录。
+- 解析身份后必须按 `identityId + USER_PASSWORD` 读取 `PrincipalCredential`。
+- `PrincipalCredential` 不存在时必须按用户名密码错误处理。
+- `PrincipalCredential.status = DISABLED` 时必须拒绝登录。
+- `PrincipalCredential.status = LOCKED` 时必须拒绝登录。
+- `PrincipalCredential.status = EXPIRED` 时必须拒绝登录。
+- `PrincipalCredential.lockedUntil` 未到期时必须拒绝登录。
 - 密码验证必须使用 `PasswordHelper`。
 - 密码验证成功后必须清零 `failedCount`。
 - 密码验证成功后必须清空锁定状态。
 - 密码验证成功后必须记录 `lastVerifiedAt`。
 - 密码验证失败后必须递增 `failedCount`。
-- 密码验证失败达到 `failedLimit` 时必须锁定该 `UserCredential`。
+- 密码验证失败达到 `failedLimit` 时必须锁定该 `PrincipalCredential`。
 
 ### 7.5 访问 token
 
@@ -531,19 +536,19 @@
 
 ### 7.13 用户保存联动
 
-- 新增后台用户时必须创建 `ACCOUNT` 类型 `UserIdentity`。
-- 新增后台用户并设置初始密码时必须创建 `PASSWORD` 类型 `UserCredential`。
-- 修改后台登录名时必须更新 `ACCOUNT` 类型 `UserIdentity`。
-- 重置后台用户密码时必须更新 `PASSWORD` 类型 `UserCredential`。
-- 禁用后台用户时不删除 `UserIdentity` 和 `UserCredential`。
+- 新增后台用户时必须创建 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 新增后台用户并设置初始密码时必须创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 修改后台登录名时必须更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 重置后台用户密码时必须更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 禁用后台用户时不删除 `PrincipalIdentity` 和 `PrincipalCredential`。
 - 禁用某个登录标识时不禁用 `User`。
 - 禁用某个认证凭据时不禁用 `User`。
 
 ### 7.14 认证模型初始化
 
-- 新增后台用户时应该从 `User.loginName` 初始化 `ACCOUNT` 类型 `UserIdentity`。
-- 新增或重置后台用户密码时应该从加密后的密码初始化 `PASSWORD` 类型 `UserCredential`。
-- 密码认证应该读取 `UserCredential.credentialValue`。
+- 新增后台用户时应该从 `User.loginName` 初始化 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 新增或重置后台用户密码时应该从加密后的密码初始化 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 密码认证应该读取 `PrincipalCredential.credentialValue`。
 - 后台认证主锁定语义应该落在凭据维度。
 
 ## 8. Key Flows
@@ -554,9 +559,9 @@
 2. `AuthController` 校验 `loginToken` 和验证码。
 3. `AuthController` 使用登录表单私钥解密密码。
 4. `AuthController` 调用认证 Service 执行登录校验。
-5. 认证 Service 按 `ACCOUNT + loginName` 读取 `UserIdentity`。
+5. 认证 Service 按 `USER_ACCOUNT + loginName` 读取 `PrincipalIdentity`。
 6. 认证 Service 读取并校验 `User` 状态。
-7. 认证 Service 按 `identityId + PASSWORD` 读取 `UserCredential`。
+7. 认证 Service 按 `identityId + USER_PASSWORD` 读取 `PrincipalCredential`。
 8. 认证 Service 校验凭据状态、锁定和过期。
 9. 认证 Service 使用 `PasswordHelper` 校验密码。
 10. 密码错误时写回凭据失败次数。
@@ -590,15 +595,15 @@
 ### 8.4 后台用户创建流程
 
 1. 用户 Service 保存 `User` 主体。
-2. 用户 Service 创建默认 `ACCOUNT` 类型 `UserIdentity`。
-3. 用户 Service 创建默认 `PASSWORD` 类型 `UserCredential`。
+2. 用户 Service 创建默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+3. 用户 Service 创建默认 `USER_PASSWORD` 类型 `PrincipalCredential`。
 4. 用户 Service 保存用户角色关系。
 
 ### 8.5 后台密码重置流程
 
 1. 用户 Service 校验目标 `User` 存在。
-2. 用户 Service 定位默认 `ACCOUNT` 类型 `UserIdentity`。
-3. 用户 Service 更新或创建 `PASSWORD` 类型 `UserCredential`。
+2. 用户 Service 定位默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+3. 用户 Service 更新或创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
 4. 用户 Service 将失败次数和锁定状态清零。
 5. 用户 Service 按策略设置 `needChangePassword`。
 
@@ -633,7 +638,7 @@
 
 1. Controller 接收短信、企业微信或 GitHub 登录请求。
 2. Service 调用对应 provider 校验外部身份。
-3. Service 将外部身份映射到 `UserIdentity`。
+3. Service 将外部身份映射到 `PrincipalIdentity`。
 4. Service 校验 `User` 状态。
 5. 登录成功后复用统一 token 和 session 创建流程。
 

@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-principal-document-sync`：同步 Auth Principal 文档口径
-  - 范围文件：
-    - `docs/10-requirements/AUTH-REQUIREMENTS.md`
-    - `docs/10-requirements/MEMBER-REQUIREMENTS.md`
-    - `docs/10-requirements/SYSTEM-REQUIREMENTS.md`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-    - `docs/20-database/MEMBER-DATABASE-DESIGN.md`
-    - `docs/20-database/SYSTEM-DATABASE-DESIGN.md`
-    - `docs/30-designs/DO-ANNOTATION-BASELINE.md`
-  - 处理动作：将旧 Identity / Credential 文档描述收敛为 Principal Auth 模型口径
-  - 验收点：文档中不再把 `UserIdentity` / `UserCredential` / `MemberIdentity` / `MemberCredential` 描述为目标模型
-  - 重要度：8/10
-
 - [ ] `auth-principal-verification`：执行迁移验收和残留引用扫描
   - 范围文件：
     - `docs/30-designs/RUNBOOK-AUTH-PRINCIPAL-MIGRATION.md`

@@ -4,16 +4,14 @@
 
 本文档定义 Sandwich 后台认证、前台会员认证运行态、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `AUTH-REQUIREMENTS.md` 的后台认证模型为基础，固定 sys 拥有的 `UserIdentity`、`UserCredential` 和 auth 拥有的 `AuthSession` 的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
+本文档以 `AUTH-REQUIREMENTS.md` 的后台认证和前台会员认证模型为基础，固定 `auth` 拥有的 `PrincipalIdentity`、`PrincipalCredential`、认证会话、token 和 OAuth2 模型的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
 
-后台系统管理域的完整 sys 表设计见 [`SYSTEM-DATABASE-DESIGN.md`](./SYSTEM-DATABASE-DESIGN.md)。本文档保留 `UserIdentity` 与 `UserCredential` 是为了说明认证流程依赖的 sys 认证前置资料。
+后台系统管理域的完整 sys 表设计见 [`SYSTEM-DATABASE-DESIGN.md`](./SYSTEM-DATABASE-DESIGN.md)。登录标识和认证凭据固定由本文档的 Principal 表承载。
 
 ## 2. Scope
 
 当前覆盖范围：
 
-- `sys_user_identity`
-- `sys_user_credential`
 - `auth_principal_identity`
 - `auth_principal_credential`
 - `auth_session`
@@ -24,8 +22,6 @@
 - `member_auth_session`
 - `member_access_token`
 - `member_refresh_token`
-- `UserIdentityDO`
-- `UserCredentialDO`
 - `PrincipalIdentityDO`
 - `PrincipalCredentialDO`
 - `AuthSessionDO`
@@ -36,8 +32,6 @@
 - `OAuthAuthorizationDO`
 - `OAuthAccessTokenDO`
 - `OAuthRefreshTokenDO`
-- `UserIdentityMapper`
-- `UserCredentialMapper`
 - `PrincipalIdentityMapper`
 - `PrincipalCredentialMapper`
 - `AuthSessionMapper`
@@ -48,8 +42,6 @@
 - `OAuthAuthorizationMapper`
 - `OAuthAccessTokenMapper`
 - `OAuthRefreshTokenMapper`
-- `UserIdentityDaoImpl`
-- `UserCredentialDaoImpl`
 - `PrincipalIdentityDaoImpl`
 - `PrincipalCredentialDaoImpl`
 - `AuthSessionDaoImpl`
@@ -61,8 +53,6 @@
 - `OAuthAuthorizationDaoImpl`
 - `OAuthAccessTokenDaoImpl`
 - `OAuthRefreshTokenDaoImpl`
-- `UserIdentityPersistenceAssembler`
-- `UserCredentialPersistenceAssembler`
 - `PrincipalIdentityPersistenceAssembler`
 - `PrincipalCredentialPersistenceAssembler`
 - `AuthSessionPersistenceAssembler`
@@ -88,8 +78,7 @@
 - 字符集优先使用 `utf8mb4`。
 - 独立数据库表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `user_id` 固定引用 `sys_user.id`。
-- `identity_id` 固定引用 `sys_user_identity.id`。
+- `identity_id` 固定引用 `auth_principal_identity.id`。
 - `principal_type + principal_id` 固定表达统一认证主体业务坐标。
 - `auth_principal_identity.identity_id` 不作为外部字段存在，统一登录标识主键仍使用 `id`。
 - `auth_principal_credential.identity_id` 固定引用 `auth_principal_identity.id`。
@@ -104,8 +93,6 @@
 
 ## 4. Naming Rules
 
-- 登录标识表固定为 `sys_user_identity`。
-- 认证凭据表固定为 `sys_user_credential`。
 - 统一认证主体登录标识表固定为 `auth_principal_identity`。
 - 统一认证主体凭据表固定为 `auth_principal_credential`。
 - 认证会话表固定为 `auth_session`。
@@ -117,7 +104,6 @@
 - 前台会员 access token 表固定为 `member_access_token`。
 - 前台会员 refresh token 表固定为 `member_refresh_token`。
 - 主键字段固定为 `id`。
-- 后台用户主键字段固定为 `user_id`。
 - 统一认证主体类型字段固定为 `principal_type`。
 - 统一认证主体 ID 字段固定为 `principal_id`。
 - 登录标识主键字段固定为 `identity_id`。
@@ -134,8 +120,6 @@
 
 | Table | DO | Mapper | Entity |
 | --- | --- | --- | --- |
-| `sys_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
-| `sys_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
 | `auth_principal_identity` | `PrincipalIdentityDO` | `PrincipalIdentityMapper` | `PrincipalIdentity` |
 | `auth_principal_credential` | `PrincipalCredentialDO` | `PrincipalCredentialMapper` | `PrincipalCredential` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
@@ -149,84 +133,9 @@
 
 ## 6. Table Design
 
-### 6.1 sys_user_identity
+### 6.1 auth_principal_identity
 
-`sys_user_identity` 保存后台用户登录标识。
-
-| Column | DO Field | Entity Field | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | `id` | `id` | 是 | 登录标识主键 |
-| `user_id` | `userId` | `userId` | 是 | 后台用户 ID |
-| `identity_type` | `identityType` | `identityType` | 是 | 登录标识类型 |
-| `identity_value` | `identityValue` | `identityValue` | 是 | 登录标识值 |
-| `status` | `status` | `status` | 是 | 登录标识状态 |
-
-字段规则：
-
-- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `user_id` 来源是 `sys_user.id`。
-- `identity_type` 固定写入 `ACCOUNT`、`MOBILE` 或 `EMAIL`。
-- `status` 固定写入 `ENABLED` 或 `DISABLED`。
-- `identity_value` 必须保存规范化后的登录标识值。
-- `ACCOUNT` 类型 `identity_value` 初始化来源是后台用户保存请求中的 `loginName`。
-- `MOBILE` 类型 `identity_value` 初始化来源是 `sys_user.mobile` 或显式移动端登录标识写入。
-- `EMAIL` 类型 `identity_value` 初始化来源是 `sys_user.email` 或显式邮箱登录标识写入。
-- `sys_user_identity` 不保存通用审计字段。
-
-索引：
-
-- 主键：`pk_sys_user_identity(id)`
-- 联合唯一索引：`uk_sys_user_identity_type_value(identity_type, identity_value)`
-- 普通索引：`idx_sys_user_identity_user(user_id, status)`
-- 普通索引：`idx_sys_user_identity_user_type(user_id, identity_type)`
-
-### 6.2 sys_user_credential
-
-`sys_user_credential` 保存后台用户认证凭据。
-
-| Column | DO Field | Entity Field | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | `id` | `id` | 是 | 认证凭据主键 |
-| `user_id` | `userId` | `userId` | 是 | 后台用户 ID |
-| `identity_id` | `identityId` | `identityId` | 是 | 登录标识 ID |
-| `credential_type` | `credentialType` | `credentialType` | 是 | 凭据类型 |
-| `credential_value` | `credentialValue` | `credentialValue` | 是 | 凭据值 |
-| `status` | `status` | `status` | 是 | 凭据状态 |
-| `need_change_password` | `needChangePassword` | `needChangePassword` | 是 | 是否需要强制改密 |
-| `failed_count` | `failedCount` | `failedCount` | 是 | 连续失败次数 |
-| `failed_limit` | `failedLimit` | `failedLimit` | 是 | 最大允许连续失败次数 |
-| `locked_until` | `lockedUntil` | `lockedUntil` | 否 | 锁定截止时间 |
-| `expires_at` | `expiresAt` | `expiresAt` | 否 | 过期时间 |
-| `last_verified_at` | `lastVerifiedAt` | `lastVerifiedAt` | 否 | 最近验证时间 |
-
-字段规则：
-
-- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `user_id` 来源是 `sys_user.id`。
-- `identity_id` 来源是 `sys_user_identity.id`。
-- `credential_type` 固定写入 `PASSWORD`。
-- `credential_value` 固定保存密码哈希。
-- `credential_value` 不保存密码明文。
-- `status` 固定写入 `ACTIVE`、`LOCKED`、`EXPIRED` 或 `DISABLED`。
-- `need_change_password` 固定使用 `tinyint(1)` 或项目既有等价写法。
-- `failed_count` 默认值固定为 `0`。
-- `failed_limit` 默认值固定来自后台登录配置。
-- `locked_until` 为空时，非锁定状态不受时间锁限制。
-- `expires_at` 为空时，凭据不过期。
-- `PASSWORD` 类型凭据初始化来源是后台用户保存请求中的加密后密码。
-- `sys_user_credential` 不保存通用审计字段。
-
-索引：
-
-- 主键：`pk_sys_user_credential(id)`
-- 联合唯一索引：`uk_sys_user_credential_identity_type(identity_id, credential_type)`
-- 普通索引：`idx_sys_user_credential_user(user_id, status)`
-- 普通索引：`idx_sys_user_credential_identity_status(identity_id, status)`
-- 普通索引：`idx_sys_user_credential_locked(locked_until)`
-
-### 6.3 auth_principal_identity
-
-`auth_principal_identity` 保存统一认证主体登录标识。该表是 `sys_user_identity` 与 `member_identity` 的目标统一结构，旧表在迁移完成前兼容保留。
+`auth_principal_identity` 保存统一认证主体登录标识。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -254,9 +163,9 @@
 - 普通索引：`idx_auth_principal_identity_principal(principal_type, principal_id, status)`
 - 普通索引：`idx_auth_principal_identity_principal_type(principal_type, principal_id, identity_type)`
 
-### 6.4 auth_principal_credential
+### 6.2 auth_principal_credential
 
-`auth_principal_credential` 保存统一认证主体认证凭据。该表是 `sys_user_credential` 与 `member_credential` 的目标统一结构，旧表在迁移完成前兼容保留。
+`auth_principal_credential` 保存统一认证主体认证凭据。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -293,7 +202,7 @@
 - 普通索引：`idx_auth_principal_credential_identity_status(identity_id, status)`
 - 普通索引：`idx_auth_principal_credential_locked(locked_until)`
 
-### 6.5 auth_session
+### 6.3 auth_session
 
 `auth_session` 保存后台认证会话审计事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
 
@@ -323,7 +232,7 @@
 - `session_id` 由 Service 生成，作为认证会话业务标识。
 - `token` 来源是 `AccessToken.token`。
 - `user_id` 来源是 `sys_user.id`。
-- `identity_id` 来源是 `sys_user_identity.id`。
+- `identity_id` 来源是 `auth_principal_identity.id`。
 - `identity_type` 固定写入登录时使用的标识类型。
 - `login_type` 固定写入 `PASSWORD`。
 - `status` 固定写入 `ACTIVE`、`LOGGED_OUT`、`INVALIDATED` 或 `EXPIRED`。
@@ -342,7 +251,7 @@
 - 普通索引：`idx_auth_session_identity(identity_id, identity_type)`
 - 普通索引：`idx_auth_session_expire(status, expire_at)`
 
-### 6.6 auth_oauth_client
+### 6.4 auth_oauth_client
 
 `auth_oauth_client` 保存 OAuth2 客户端配置。
 
@@ -377,7 +286,7 @@
 - 主键：`pk_auth_oauth_client(id)`
 - 唯一索引：`uk_auth_oauth_client_client_id(client_id)`
 
-### 6.7 auth_oauth_authorization
+### 6.5 auth_oauth_authorization
 
 `auth_oauth_authorization` 保存 OAuth2 授权请求和授权码事实。
 
@@ -413,7 +322,7 @@
 - 唯一索引：`uk_auth_oauth_authorization_code(authorization_code)`
 - 普通索引：`idx_auth_oauth_authorization_client_user(client_id, user_id, expire_at)`
 
-### 6.8 auth_oauth_access_token
+### 6.6 auth_oauth_access_token
 
 `auth_oauth_access_token` 保存 OAuth2 access token 事实。
 
@@ -448,7 +357,7 @@
 - 唯一索引：`uk_auth_oauth_access_token_hash(token_hash)`
 - 普通索引：`idx_auth_oauth_access_token_client_user(client_id, user_id, status)`
 
-### 6.9 auth_oauth_refresh_token
+### 6.7 auth_oauth_refresh_token
 
 `auth_oauth_refresh_token` 保存 refresh token 事实。
 
@@ -486,11 +395,11 @@
 
 ## 7. Relationship Rules
 
-- `sys_user_identity.user_id` 引用 `sys_user.id`。
-- `sys_user_credential.user_id` 引用 `sys_user.id`。
-- `sys_user_credential.identity_id` 引用 `sys_user_identity.id`。
+- `auth_principal_identity.principal_type + principal_id` 表达统一认证主体业务坐标。
+- `auth_principal_credential.principal_type + principal_id` 表达统一认证主体业务坐标。
+- `auth_principal_credential.identity_id` 引用 `auth_principal_identity.id`。
 - `auth_session.user_id` 引用 `sys_user.id`。
-- `auth_session.identity_id` 引用 `sys_user_identity.id`。
+- `auth_session.identity_id` 引用 `auth_principal_identity.id`。
 - `auth_session.token` 引用访问 token 存储中的 token 值。
 - `auth_oauth_authorization.client_id` 引用 `auth_oauth_client.client_id`。
 - `auth_oauth_authorization.user_id` 引用 `sys_user.id`。
@@ -499,30 +408,30 @@
 - `auth_oauth_refresh_token.client_id` 引用 `auth_oauth_client.client_id`。
 - `auth_oauth_refresh_token.user_id` 引用 `sys_user.id`。
 - 当前项目不强制数据库外键。
-- 用户创建时，Service 必须先保存 `sys_user`，再保存 `sys_user_identity` 和 `sys_user_credential`。
-- 修改登录名时，Service 必须更新 `ACCOUNT` 类型 `sys_user_identity`。
-- 重置密码时，Service 必须更新 `PASSWORD` 类型 `sys_user_credential`。
+- 用户创建时，Service 必须先保存 `sys_user`，再保存 `auth_principal_identity` 和 `auth_principal_credential`。
+- 修改登录名时，Service 必须更新 `USER_ACCOUNT` 类型 `auth_principal_identity`。
+- 重置密码时，Service 必须更新 `USER_PASSWORD` 类型 `auth_principal_credential`。
 - 删除 token 或登出时，Service 必须更新对应 `auth_session` 状态。
 
 ## 8. Persistence Rules
 
-- `UserIdentityMapper` 固定继承 `BaseMapper<UserIdentityDO>`。
-- `UserCredentialMapper` 固定继承 `BaseMapper<UserCredentialDO>`。
+- `PrincipalIdentityMapper` 固定继承 `BaseMapper<PrincipalIdentityDO>`。
+- `PrincipalCredentialMapper` 固定继承 `BaseMapper<PrincipalCredentialDO>`。
 - `AuthSessionMapper` 固定继承 `BaseMapper<AuthSessionDO>`。
 - `OAuthClientMapper` 固定继承 `BaseMapper<OAuthClientDO>`。
 - `OAuthAuthorizationMapper` 固定继承 `BaseMapper<OAuthAuthorizationDO>`。
 - `OAuthAccessTokenMapper` 固定继承 `BaseMapper<OAuthAccessTokenDO>`。
 - `OAuthRefreshTokenMapper` 固定继承 `BaseMapper<OAuthRefreshTokenDO>`。
 - Mapper interface 不新增注解 SQL、Mapper XML 或 SQL Provider。
-- `UserIdentityDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
-- `UserCredentialDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `PrincipalIdentityDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `PrincipalCredentialDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `AuthSessionDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `OAuthClientDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `OAuthAuthorizationDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `OAuthAccessTokenDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `OAuthRefreshTokenDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
-- `UserIdentityPersistenceAssembler` 只负责 `UserIdentity <-> UserIdentityDO` 转换。
-- `UserCredentialPersistenceAssembler` 只负责 `UserCredential <-> UserCredentialDO` 转换。
+- `PrincipalIdentityPersistenceAssembler` 只负责 `PrincipalIdentity <-> PrincipalIdentityDO` 转换。
+- `PrincipalCredentialPersistenceAssembler` 只负责 `PrincipalCredential <-> PrincipalCredentialDO` 转换。
 - `AuthSessionPersistenceAssembler` 只负责 `AuthSession <-> AuthSessionDO` 转换。
 - `OAuthClientPersistenceAssembler` 只负责 `OAuthClient <-> OAuthClientDO` 转换。
 - `OAuthAuthorizationPersistenceAssembler` 只负责 `OAuthAuthorization <-> OAuthAuthorizationDO` 转换。
@@ -536,19 +445,19 @@
 
 ## 9. Query Model Rules
 
-`UserIdentityDao` 固定支持以下查询：
+`PrincipalIdentityDao` 固定支持以下查询：
 
 - 按 `id` 查询。
 - 按 `identityType + identityValue` 查询。
-- 按 `userId + identityType` 查询。
-- 按 `userId + status` 查询。
+- 按 `principalKey + identityType` 查询。
+- 按 `principalKey + status` 查询。
 
-`UserCredentialDao` 固定支持以下查询：
+`PrincipalCredentialDao` 固定支持以下查询：
 
 - 按 `id` 查询。
 - 按 `identityId + credentialType` 查询。
-- 按 `userId + credentialType` 查询。
-- 按 `userId + status` 查询。
+- 按 `principalKey + credentialType` 查询。
+- 按 `principalKey + status` 查询。
 - 写回失败次数、锁定状态和最近验证时间。
 
 `AuthSessionDao` 固定支持以下查询：
@@ -598,14 +507,14 @@
 
 ## 10. Initialization Rules
 
-- `sys_user_identity(ACCOUNT)` 初始化来源是后台用户保存请求中的 `loginName`。
-- `sys_user_identity(MOBILE)` 初始化来源是 `sys_user.mobile` 或显式移动端登录标识写入。
-- `sys_user_identity(EMAIL)` 初始化来源是 `sys_user.email` 或显式邮箱登录标识写入。
-- `sys_user_credential(PASSWORD)` 初始化来源是后台用户保存请求中的加密后密码。
-- 必须保证一个可登录后台用户至少拥有一个 `ACCOUNT` 类型 `UserIdentity`。
-- 必须保证一个可登录后台用户至少拥有一个 `PASSWORD` 类型 `UserCredential`。
-- 密码认证应该读取 `sys_user_credential.credential_value`。
-- 后台认证主锁定语义应该落在 `UserCredential` 维度。
+- `auth_principal_identity(USER_ACCOUNT)` 初始化来源是后台用户保存请求中的 `loginName`。
+- `auth_principal_identity(USER_MOBILE)` 初始化来源是 `sys_user.mobile` 或显式移动端登录标识写入。
+- `auth_principal_identity(USER_EMAIL)` 初始化来源是 `sys_user.email` 或显式邮箱登录标识写入。
+- `auth_principal_credential(USER_PASSWORD)` 初始化来源是后台用户保存请求中的加密后密码。
+- 必须保证一个可登录后台用户至少拥有一个 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 必须保证一个可登录后台用户至少拥有一个 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 密码认证应该读取 `auth_principal_credential.credential_value`。
+- 后台认证主锁定语义应该落在 `PrincipalCredential` 维度。
 
 ## 11. Open Items
 

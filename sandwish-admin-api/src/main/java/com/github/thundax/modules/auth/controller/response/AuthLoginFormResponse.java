@@ -24,9 +24,9 @@ public class AuthLoginFormResponse implements Serializable {
     @JsonProperty("refreshToken")
     private String refreshToken;
 
-    @ApiModelProperty(name = "expireSeconds", value = "超时时间，单位：秒。")
-    @JsonProperty("expireSeconds")
-    private Integer expireSeconds;
+    @ApiModelProperty(name = "expiredAt", value = "过期时间戳，单位：毫秒。")
+    @JsonProperty("expiredAt")
+    private Long expiredAt;
 
     @ApiModelProperty(name = "publicKey", value = "公钥")
     @JsonProperty("publicKey")

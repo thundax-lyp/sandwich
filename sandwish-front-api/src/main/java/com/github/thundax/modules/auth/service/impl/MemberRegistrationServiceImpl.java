@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -10,12 +11,15 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
+import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
@@ -28,7 +32,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberRegistrationServiceImpl implements MemberRegistrationService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+    private static final String CAPTCHA_ITEM = "CAPTCHA";
+    private static final String SMS_MOBILE_ITEM = "SMS_MOBILE";
+    private static final String SMS_VALIDATE_CODE_ITEM = "SMS_VALIDATE_CODE";
+    private static final String EMAIL_ITEM = "EMAIL";
+    private static final String EMAIL_VALIDATE_CODE_ITEM = "EMAIL_VALIDATE_CODE";
+    private static final String PRIVATE_KEY_ITEM = "privateKey";
+    private static final String MEMBER_PRIVATE_KEY_SEPARATOR = ":";
 
+    private final AuthProperties authProperties;
     private final MemberService memberService;
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
@@ -40,6 +52,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
             PreAuthSessionService preAuthSessionService) {
+        this.authProperties = authProperties;
         this.memberService = memberService;
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
@@ -54,29 +67,36 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(name, "name");
         requireText(account, "account");
         requireText(encryptedPassword, "password");
-        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateCaptcha(token, captcha)) {
             throw new ApiException("图形验证码错误");
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_ACCOUNT, account);
 
-        String password = preAuthSessionService.decryptRsaValue(PrincipalType.MEMBER, loginToken, encryptedPassword);
+        String password = decryptRsaValue(token, encryptedPassword);
         requireText(password, "password");
 
         Member member = createMember(name);
         PrincipalIdentity identity = updateIdentity(member, PrincipalIdentityType.MEMBER_ACCOUNT, account);
         upsertPassword(member, identity, PasswordHelper.encrypt(password));
-        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
+        preAuthSessionService.release(requireSessionId(token));
         return member.getId();
     }
 
     @Override
     public void sendRegisterSmsCode(String loginToken, String mobile, String captcha) throws ApiException {
         requireText(mobile, "mobile");
-        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateCaptcha(token, captcha)) {
             throw new ApiException("图形验证码错误");
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        preAuthSessionService.createSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile);
+        String validateCode = PreAuthCodeHelper.generateSmsCode();
+        PreAuthSessionId sessionId = requireSessionId(token);
+        long expiredAt = preAuthSessionService.getById(sessionId).getExpiredAt();
+        preAuthSessionService.upsertValue(sessionId, SMS_MOBILE_ITEM, mobile, expiredAt);
+        preAuthSessionService.upsertValue(sessionId, SMS_VALIDATE_CODE_ITEM, validateCode, expiredAt);
+        preAuthSessionService.upsertValue(sessionId, CAPTCHA_ITEM, null, 0L);
     }
 
     @Override
@@ -85,25 +105,32 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             throws ApiException {
         requireText(name, "name");
         requireText(mobile, "mobile");
-        if (!preAuthSessionService.validateSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile, validateCode)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateSmsValidateCode(token, mobile, validateCode)) {
             throw new ApiException("短信验证码错误");
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
+        preAuthSessionService.release(requireSessionId(token));
         return member.getId();
     }
 
     @Override
     public void sendRegisterEmailCode(String loginToken, String email, String captcha) throws ApiException {
         requireText(email, "email");
-        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateCaptcha(token, captcha)) {
             throw new ApiException("图形验证码错误");
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
-        preAuthSessionService.createEmailValidateCode(PrincipalType.MEMBER, loginToken, email);
+        String validateCode = PreAuthCodeHelper.generateEmailCode();
+        PreAuthSessionId sessionId = requireSessionId(token);
+        long expiredAt = preAuthSessionService.getById(sessionId).getExpiredAt();
+        preAuthSessionService.upsertValue(sessionId, EMAIL_ITEM, email, expiredAt);
+        preAuthSessionService.upsertValue(sessionId, EMAIL_VALIDATE_CODE_ITEM, validateCode, expiredAt);
+        preAuthSessionService.upsertValue(sessionId, CAPTCHA_ITEM, null, 0L);
     }
 
     @Override
@@ -112,14 +139,15 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             throws ApiException {
         requireText(name, "name");
         requireText(email, "email");
-        if (!preAuthSessionService.validateEmailValidateCode(PrincipalType.MEMBER, loginToken, email, validateCode)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateEmailValidateCode(token, email, validateCode)) {
             throw new ApiException("邮箱验证码错误");
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_EMAIL, email);
-        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
+        preAuthSessionService.release(requireSessionId(token));
         return member.getId();
     }
 
@@ -189,5 +217,58 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         if (StringUtils.isBlank(value)) {
             throw new ApiException(field + "不能为空");
         }
+    }
+
+    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) throws ApiException {
+        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
+                && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
+            return true;
+        }
+        return StringUtils.equals(captcha, preAuthSessionService.findValue(requireSessionId(token), CAPTCHA_ITEM));
+    }
+
+    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
+            throws ApiException {
+        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
+                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
+            return true;
+        }
+        PreAuthSessionId sessionId = requireSessionId(token);
+        return StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_MOBILE_ITEM), mobile)
+                && StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_VALIDATE_CODE_ITEM), validateCode);
+    }
+
+    private boolean validateEmailValidateCode(PreAuthSessionToken token, String email, String validateCode)
+            throws ApiException {
+        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
+                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
+            return true;
+        }
+        PreAuthSessionId sessionId = requireSessionId(token);
+        return StringUtils.equals(preAuthSessionService.findValue(sessionId, EMAIL_ITEM), email)
+                && StringUtils.equals(
+                        preAuthSessionService.findValue(sessionId, EMAIL_VALIDATE_CODE_ITEM), validateCode);
+    }
+
+    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
+        String privateKey = preAuthSessionService.findValue(requireSessionId(token), PRIVATE_KEY_ITEM);
+        if (StringUtils.isBlank(privateKey)) {
+            throw new ApiException("登录表单密钥已失效");
+        }
+        String[] privateKeyParts = StringUtils.split(privateKey, MEMBER_PRIVATE_KEY_SEPARATOR);
+        if (privateKeyParts == null || privateKeyParts.length != 2) {
+            throw new ApiException("登录表单密钥已失效");
+        }
+        RSAUtils.ReadableKeyPair keyPair =
+                new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
+        return RSAUtils.decryptBase64(encryptedValue, keyPair);
+    }
+
+    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(token);
+        if (sessionId == null) {
+            throw new ApiException("登录表单已失效");
+        }
+        return sessionId;
     }
 }

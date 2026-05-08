@@ -3,12 +3,14 @@ package com.github.thundax.modules.auth.assembler;
 import com.github.thundax.modules.auth.controller.response.MemberLoginFormResponse;
 import com.github.thundax.modules.auth.controller.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.auth.controller.response.MemberTokenResponse;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import org.springframework.lang.NonNull;
 
 public final class MemberLoginInterfaceAssembler {
+    private static final String PUBLIC_KEY_ITEM = "publicKey";
+
     private MemberLoginInterfaceAssembler() {}
 
     @NonNull
@@ -37,12 +39,12 @@ public final class MemberLoginInterfaceAssembler {
         return response;
     }
 
-    public static MemberLoginFormResponse toLoginFormResponse(PreAuthSessionDTO session) {
+    public static MemberLoginFormResponse toLoginFormResponse(PreAuthSession session) {
         MemberLoginFormResponse response = new MemberLoginFormResponse();
-        response.setLoginToken(session.getLoginToken());
-        response.setRefreshTokenList(session.getRefreshTokenList());
-        response.setExpiredSeconds(session.getExpiredSeconds());
-        response.setPublicKey(session.getPublicKey());
+        response.setLoginToken(session.getToken().asString());
+        response.setRefreshToken(session.getRefreshToken().asString());
+        response.setExpiredAt(session.getExpiredAt());
+        response.setPublicKey(session.findValue(PUBLIC_KEY_ITEM));
         return response;
     }
 

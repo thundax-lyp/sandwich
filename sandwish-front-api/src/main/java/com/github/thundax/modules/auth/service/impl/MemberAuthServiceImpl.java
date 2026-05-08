@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
+import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.MemberAccessTokenDao;
@@ -12,28 +13,40 @@ import com.github.thundax.modules.auth.dao.MemberRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.MemberAccessToken;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.MemberRefreshToken;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.MemberAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.MemberRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
+import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 public class MemberAuthServiceImpl implements MemberAuthService {
+
+    private static final int CAPTCHA_EXPIRED_SECONDS = 60;
+    private static final int REFRESH_TOKEN_GRACE_SECONDS = 60;
+    private static final String CAPTCHA_ITEM = "CAPTCHA";
+    private static final String SMS_MOBILE_ITEM = "SMS_MOBILE";
+    private static final String SMS_VALIDATE_CODE_ITEM = "SMS_VALIDATE_CODE";
+    private static final String PUBLIC_KEY_ITEM = "publicKey";
+    private static final String PRIVATE_KEY_ITEM = "privateKey";
+    private static final String MEMBER_PRIVATE_KEY_SEPARATOR = ":";
 
     private final AuthProperties authProperties;
     private final PreAuthSessionService preAuthSessionService;
@@ -64,28 +77,45 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public PreAuthSessionDTO createPreAuthSession() throws ApiException {
-        return preAuthSessionService.createPreAuthSession(PrincipalType.MEMBER);
+    public PreAuthSession createPreAuthSession() throws ApiException {
+        if (preAuthSessionService.count() > authProperties.getMaxLoginCount()) {
+            throw new ApiException("登录请求过多");
+        }
+        PreAuthSession session = preAuthSessionService.create(authProperties.getLoginExpiredSeconds());
+        writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
+        RSAUtils.ReadableKeyPair keyPair = RSAUtils.generateKeyPair();
+        preAuthSessionService.upsertValue(
+                session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt());
+        preAuthSessionService.upsertValue(
+                session.getId(), PRIVATE_KEY_ITEM, memberPrivateKeyValue(keyPair), session.getExpiredAt());
+        return preAuthSessionService.getById(session.getId());
     }
 
     @Override
-    public PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException {
-        return preAuthSessionService.refreshPreAuthSession(PrincipalType.MEMBER, refreshToken);
+    public PreAuthSession refreshPreAuthSession(String refreshToken) throws ApiException {
+        PreAuthSessionId sessionId = requireSessionIdByRefreshToken(refreshToken);
+        PreAuthSession session = preAuthSessionService.refresh(
+                sessionId, authProperties.getLoginExpiredSeconds(), REFRESH_TOKEN_GRACE_SECONDS);
+        writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
+        return session;
     }
 
     @Override
     public String createCaptcha(String loginToken) throws ApiException {
-        return preAuthSessionService.createCaptcha(PrincipalType.MEMBER, loginToken);
+        String captcha = PreAuthCodeHelper.generateCaptcha();
+        writeCaptcha(requireSessionIdByToken(loginToken), captcha);
+        return captcha;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginAccount(String loginToken, String account, String encryptedPassword, String captcha)
             throws ApiException {
-        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateCaptcha(token, captcha)) {
             throw new ApiException("图形验证码错误");
         }
-        String password = preAuthSessionService.decryptRsaValue(PrincipalType.MEMBER, loginToken, encryptedPassword);
+        String password = decryptRsaValue(token, encryptedPassword);
         PrincipalIdentity principalIdentity;
         try {
             principalIdentity = principalAuthService.authenticatePassword(
@@ -98,18 +128,19 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new ApiException("用户名或密码错误");
         }
         Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
-        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
+        preAuthSessionService.release(requireSessionIdByToken(loginToken));
         return createTokenResult(member, principalIdentity, "ACCOUNT");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginSms(String loginToken, String mobile, String validateCode) throws ApiException {
-        if (!preAuthSessionService.validateSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile, validateCode)) {
+        PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
+        if (!validateSmsValidateCode(token, mobile, validateCode)) {
             throw new ApiException("短信验证码错误");
         }
         PrincipalIdentity identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
+        preAuthSessionService.release(requireSessionIdByToken(loginToken));
         return createTokenResult(requireActiveMember(identity.getPrincipalKey().getPrincipalId()), identity, "SMS");
     }
 
@@ -224,6 +255,68 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new ApiException("用户名或密码错误");
         }
         return identity;
+    }
+
+    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) throws ApiException {
+        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
+                && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
+            return true;
+        }
+        return StringUtils.equals(captcha, preAuthSessionService.findValue(requireSessionId(token), CAPTCHA_ITEM));
+    }
+
+    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
+            throws ApiException {
+        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
+                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
+            return true;
+        }
+        PreAuthSessionId sessionId = requireSessionId(token);
+        return StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_MOBILE_ITEM), mobile)
+                && StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_VALIDATE_CODE_ITEM), validateCode);
+    }
+
+    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
+        String privateKey = preAuthSessionService.findValue(requireSessionId(token), PRIVATE_KEY_ITEM);
+        if (StringUtils.isBlank(privateKey)) {
+            throw new ApiException("登录表单密钥已失效");
+        }
+        String[] privateKeyParts = StringUtils.split(privateKey, MEMBER_PRIVATE_KEY_SEPARATOR);
+        if (privateKeyParts == null || privateKeyParts.length != 2) {
+            throw new ApiException("登录表单密钥已失效");
+        }
+        RSAUtils.ReadableKeyPair keyPair =
+                new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
+        return RSAUtils.decryptBase64(encryptedValue, keyPair);
+    }
+
+    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) throws ApiException {
+        preAuthSessionService.upsertValue(
+                sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L);
+    }
+
+    private String memberPrivateKeyValue(RSAUtils.ReadableKeyPair keyPair) {
+        return keyPair.getModulus() + MEMBER_PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent();
+    }
+
+    private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
+        return requireSessionId(PreAuthSessionToken.of(token));
+    }
+
+    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(token);
+        if (sessionId == null) {
+            throw new ApiException("登录表单已失效");
+        }
+        return sessionId;
+    }
+
+    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) throws ApiException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByRefreshToken(PreAuthSessionToken.of(refreshToken));
+        if (sessionId == null) {
+            throw new ApiException("登录表单已失效");
+        }
+        return sessionId;
     }
 
     private String tokenHash(String token) {

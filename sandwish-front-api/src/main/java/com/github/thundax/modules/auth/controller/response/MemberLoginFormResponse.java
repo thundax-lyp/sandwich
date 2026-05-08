@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import java.io.Serializable;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,9 +14,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberLoginFormResponse implements Serializable {
     private String loginToken;
-    private List<String> refreshTokenList;
+    private String refreshToken;
     private String captcha;
-    private Integer expiredSeconds;
+    private Long expiredAt;
     private String checkCode;
     private String publicKey;
 }

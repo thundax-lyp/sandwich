@@ -1,46 +1,28 @@
 package com.github.thundax.modules.auth.service;
 
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
-import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
-import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
-import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 
 public interface PreAuthSessionService {
 
-    PreAuthSessionDTO createPreAuthSession(PrincipalType principalType)
-            throws TooManyLoginRequestException, TooManyOnlineUserException, ApiException;
+    int count();
 
-    PreAuthSessionDTO refreshPreAuthSession(PrincipalType principalType, String refreshToken)
-            throws InvalidTokenException, ApiException;
+    PreAuthSession create(int expiredSeconds);
 
-    void releasePreAuthSession(PrincipalType principalType, String loginToken);
+    PreAuthSessionId findIdByToken(PreAuthSessionToken token);
 
-    String createCaptcha(PrincipalType principalType, String loginToken) throws InvalidTokenException, ApiException;
+    PreAuthSessionId findIdByRefreshToken(PreAuthSessionToken refreshToken);
 
-    String getCaptcha(PrincipalType principalType, String loginToken)
-            throws InvalidTokenException, InvalidCaptchaException, ApiException;
+    PreAuthSession getById(PreAuthSessionId id) throws InvalidTokenException;
 
-    boolean validateCaptcha(PrincipalType principalType, String loginToken, String captcha)
-            throws InvalidTokenException, InvalidCaptchaException, ApiException;
+    PreAuthSession refresh(PreAuthSessionId id, int expiredSeconds, int refreshTokenGraceSeconds)
+            throws InvalidTokenException;
 
-    String createSmsValidateCode(PrincipalType principalType, String loginToken, String mobile)
-            throws InvalidTokenException, ApiException;
+    void release(PreAuthSessionId id);
 
-    String getSmsValidateCode(PrincipalType principalType, String loginToken)
-            throws InvalidTokenException, InvalidCaptchaException, ApiException;
+    void upsertValue(PreAuthSessionId id, String name, String value, long expiredAt) throws InvalidTokenException;
 
-    boolean validateSmsValidateCode(PrincipalType principalType, String loginToken, String mobile, String validateCode)
-            throws InvalidTokenException, InvalidCaptchaException, ApiException;
-
-    String createEmailValidateCode(PrincipalType principalType, String loginToken, String email) throws ApiException;
-
-    boolean validateEmailValidateCode(PrincipalType principalType, String loginToken, String email, String validateCode)
-            throws ApiException;
-
-    String getPrivateKey(PrincipalType principalType, String loginToken) throws InvalidTokenException, ApiException;
-
-    String decryptRsaValue(PrincipalType principalType, String loginToken, String encryptedValue) throws ApiException;
+    String findValue(PreAuthSessionId id, String name) throws InvalidTokenException;
 }

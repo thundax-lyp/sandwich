@@ -16,11 +16,10 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.service.AdminAuthService;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.sys.entity.User;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -41,15 +40,18 @@ public class AuthControllerContractTest {
     @Test
     public void shouldWrapPreAuthSessionJsonResponseWithApiResponseAdvice() throws Exception {
         AdminAuthService authService = mock(AdminAuthService.class);
-        when(authService.createPreAuthSession()).thenReturn(preAuthSession());
+        PreAuthSession session = preAuthSession();
+        when(authService.createPreAuthSession()).thenReturn(session);
 
         mockMvc(authService)
                 .perform(post("/api/auth/form").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
-                .andExpect(jsonPath("$.data.loginToken").value("login-token-1"))
-                .andExpect(jsonPath("$.data.refreshToken").value("refresh-token-1"))
+                .andExpect(
+                        jsonPath("$.data.loginToken").value(session.getToken().asString()))
+                .andExpect(jsonPath("$.data.refreshToken")
+                        .value(session.getRefreshToken().asString()))
                 .andExpect(jsonPath("$.data.publicKey").value("public-key-1"));
     }
 
@@ -119,12 +121,9 @@ public class AuthControllerContractTest {
                 .build();
     }
 
-    private PreAuthSessionDTO preAuthSession() {
-        PreAuthSessionDTO session = new PreAuthSessionDTO();
-        session.setLoginToken("login-token-1");
-        session.setRefreshTokenList(Collections.singletonList("refresh-token-1"));
-        session.setExpiredSeconds(300);
-        session.setPublicKey("public-key-1");
+    private PreAuthSession preAuthSession() {
+        PreAuthSession session = PreAuthSession.create(300);
+        session.upsertValue("publicKey", "public-key-1", System.currentTimeMillis() + 300000L);
         return session;
     }
 

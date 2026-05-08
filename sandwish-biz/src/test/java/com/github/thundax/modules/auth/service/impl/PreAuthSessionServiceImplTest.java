@@ -8,18 +8,11 @@ import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.i18n.I18nMessages;
-import com.github.thundax.modules.auth.config.AuthProperties;
-import com.github.thundax.modules.auth.dao.AccessTokenDao;
-import com.github.thundax.modules.auth.dao.LoginFormDao;
-import com.github.thundax.modules.auth.dao.MemberLoginFormDao;
-import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.LoginForm;
-import com.github.thundax.modules.auth.entity.MemberLoginForm;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
-import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
-import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
-import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
+import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PreAuthSession.RefreshTokenValue;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -29,287 +22,193 @@ import org.junit.Test;
 import org.springframework.context.support.StaticMessageSource;
 
 public class PreAuthSessionServiceImplTest {
+    private static final String CAPTCHA_ITEM = "CAPTCHA";
 
-    private AuthProperties properties;
-    private RecordingLoginFormDao loginFormDao;
-    private RecordingMemberLoginFormDao memberLoginFormDao;
-    private RecordingAccessTokenDao accessTokenDao;
+    private RecordingPreAuthSessionDao preAuthSessionDao;
     private PreAuthSessionServiceImpl service;
 
     @BeforeClass
     public static void setUpMessages() {
         StaticMessageSource messageSource = new StaticMessageSource();
         messageSource.addMessage("common.exception.invalid-token", Locale.getDefault(), "invalid token");
-        messageSource.addMessage("auth.exception.invalid-captcha", Locale.getDefault(), "invalid captcha");
-        messageSource.addMessage("auth.exception.too-many-login-request", Locale.getDefault(), "too many login");
-        messageSource.addMessage("auth.exception.too-many-online-user", Locale.getDefault(), "too many online");
         new I18nMessages(messageSource);
     }
 
     @Before
     public void setUp() {
-        properties = new AuthProperties();
-        properties.setLoginExpiredSeconds(60);
-        loginFormDao = new RecordingLoginFormDao();
-        memberLoginFormDao = new RecordingMemberLoginFormDao();
-        accessTokenDao = new RecordingAccessTokenDao();
-        service = new PreAuthSessionServiceImpl(properties, loginFormDao, accessTokenDao, memberLoginFormDao);
+        preAuthSessionDao = new RecordingPreAuthSessionDao();
+        service = new PreAuthSessionServiceImpl(preAuthSessionDao);
     }
 
     @Test
-    public void shouldCreateLoginFormWhenCapacityAvailable() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
+    public void shouldCreatePreAuthSessionWithIndexes() {
+        PreAuthSession session = service.create(60);
 
-        assertNotNull(session.getLoginToken());
-        assertEquals(Integer.valueOf(60), session.getExpiredSeconds());
-        assertEquals(1, session.getRefreshTokenList().size());
-        assertNotNull(session.getPublicKey());
-        assertNotNull(loginFormDao.getByToken(session.getLoginToken()).getPrivateKey());
-        assertEquals(
-                4, loginFormDao.getByToken(session.getLoginToken()).getCaptcha().length());
-    }
-
-    @Test(expected = TooManyLoginRequestException.class)
-    public void shouldRejectLoginFormWhenPreAuthCapacityFull() throws Exception {
-        properties.setMaxLoginCount(0);
-        loginFormDao.count = 1;
-
-        service.createPreAuthSession(PrincipalType.USER);
-    }
-
-    @Test(expected = TooManyOnlineUserException.class)
-    public void shouldRejectLoginFormWhenOnlineCapacityFull() throws Exception {
-        properties.setMaxOnlineCount(0);
-        accessTokenDao.count = 1;
-
-        service.createPreAuthSession(PrincipalType.USER);
+        assertNotNull(session.getId());
+        assertNotNull(session.getToken());
+        assertNotNull(session.getRefreshToken());
+        assertTrue(session.getExpiredAt() > System.currentTimeMillis());
+        assertEquals(session.getId(), service.findIdByToken(session.getToken()));
+        assertEquals(session.getId(), service.findIdByRefreshToken(session.getRefreshToken()));
+        assertEquals(session, preAuthSessionDao.getById(session.getId()));
     }
 
     @Test
-    public void shouldRefreshLoginForm() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
-        String oldLoginToken = session.getLoginToken();
-        String refreshToken = session.getRefreshTokenList().get(0);
+    public void shouldRefreshPreAuthSessionById() throws Exception {
+        PreAuthSession session = service.create(60);
+        PreAuthSessionToken oldToken = session.getToken();
+        PreAuthSessionToken oldRefreshToken = session.getRefreshToken();
 
-        PreAuthSessionDTO refreshed = service.refreshPreAuthSession(PrincipalType.USER, refreshToken);
+        PreAuthSession refreshed = service.refresh(session.getId(), 60, 60);
 
-        assertNotEquals(oldLoginToken, refreshed.getLoginToken());
-        assertEquals(2, refreshed.getRefreshTokenList().size());
-        assertNotNull(loginFormDao.getByToken(refreshed.getLoginToken()));
+        assertEquals(session.getId(), refreshed.getId());
+        assertNotEquals(oldToken, refreshed.getToken());
+        assertNotEquals(oldRefreshToken, refreshed.getRefreshToken());
+        assertNull(service.findIdByToken(oldToken));
+        assertEquals(session.getId(), service.findIdByToken(refreshed.getToken()));
+        assertEquals(session.getId(), service.findIdByRefreshToken(refreshed.getRefreshToken()));
+        assertEquals(session.getId(), service.findIdByRefreshToken(oldRefreshToken));
+        assertEquals(2, refreshed.refreshTokenValues().size());
+        assertEquals(oldRefreshToken, refreshed.refreshTokenValues().get(1).getToken());
+        assertTrue(refreshed.refreshTokenValues().get(1).getExpiredAt() <= System.currentTimeMillis() + 60000L);
     }
 
     @Test(expected = InvalidTokenException.class)
-    public void shouldRejectInvalidRefreshToken() throws Exception {
-        service.refreshPreAuthSession(PrincipalType.USER, "missing-refresh-token");
+    public void shouldRejectMissingSessionWhenRefreshing() throws Exception {
+        PreAuthSession session = service.create(60);
+        service.release(session.getId());
+
+        service.refresh(session.getId(), 60, 60);
     }
 
     @Test
-    public void shouldCreateAndValidateCaptcha() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
+    public void shouldReleasePreAuthSessionById() {
+        PreAuthSession session = service.create(60);
 
-        String captcha = service.createCaptcha(PrincipalType.USER, session.getLoginToken());
+        service.release(session.getId());
 
-        assertEquals(captcha, service.getCaptcha(PrincipalType.USER, session.getLoginToken()));
-        assertTrue(service.validateCaptcha(PrincipalType.USER, session.getLoginToken(), captcha));
-    }
-
-    @Test(expected = InvalidCaptchaException.class)
-    public void shouldRejectNullCaptcha() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
-        loginFormDao.getByToken(session.getLoginToken()).setCaptcha("null");
-
-        service.getCaptcha(PrincipalType.USER, session.getLoginToken());
+        assertNull(preAuthSessionDao.getById(session.getId()));
+        assertNull(service.findIdByToken(session.getToken()));
+        assertNull(service.findIdByRefreshToken(session.getRefreshToken()));
     }
 
     @Test
-    public void shouldCreateAndValidateSmsCodeAndClearCaptcha() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
+    public void shouldUpsertAndFindPreAuthSessionValue() throws Exception {
+        PreAuthSession session = service.create(60);
 
-        String code = service.createSmsValidateCode(PrincipalType.USER, session.getLoginToken(), "13800000000");
+        service.upsertValue(session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() + 60000L);
 
-        assertNull(loginFormDao.getByToken(session.getLoginToken()).getCaptcha());
-        assertEquals(code, service.getSmsValidateCode(PrincipalType.USER, session.getLoginToken()));
-        assertTrue(service.validateSmsValidateCode(PrincipalType.USER, session.getLoginToken(), "13800000000", code));
+        assertEquals("2345", service.findValue(session.getId(), CAPTCHA_ITEM));
     }
 
     @Test
-    public void shouldReturnPrivateKey() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.USER);
-        LoginForm form = loginFormDao.getByToken(session.getLoginToken());
+    public void shouldReturnNullWhenPreAuthSessionValueExpired() {
+        PreAuthSession session = PreAuthSession.create(60);
 
-        assertEquals(form.getPrivateKey(), service.getPrivateKey(PrincipalType.USER, session.getLoginToken()));
+        session.upsertValue(CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L);
+
+        assertNull(session.findValue(CAPTCHA_ITEM));
     }
 
     @Test
-    public void shouldCreateAndRefreshPreAuthSessionForMember() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.MEMBER);
-        String oldLoginToken = session.getLoginToken();
+    public void shouldCreatePreAuthSessionWithHexSnowflakeId() {
+        PreAuthSession session = PreAuthSession.create(60);
 
-        PreAuthSessionDTO refreshed = service.refreshPreAuthSession(
-                PrincipalType.MEMBER, session.getRefreshTokenList().get(0));
-
-        assertNotEquals(oldLoginToken, refreshed.getLoginToken());
-        assertEquals(2, refreshed.getRefreshTokenList().size());
-        assertNotNull(memberLoginFormDao.getByToken(refreshed.getLoginToken()));
+        assertTrue(session.getId().asString().matches("[0-9a-f]+"));
+        assertTrue(session.getToken().asString().matches("[0-9a-f]+"));
+        assertTrue(session.getRefreshToken().asString().matches("[0-9a-f]+"));
+        assertEquals(1, session.refreshTokenValues().size());
     }
 
     @Test
-    public void shouldStoreCodesInPreAuthSessionForMember() throws Exception {
-        PreAuthSessionDTO session = service.createPreAuthSession(PrincipalType.MEMBER);
+    public void shouldKeepLatestFiveRefreshTokensWhenRefreshed() {
+        PreAuthSession session = PreAuthSession.create(60);
 
-        String captcha = service.createCaptcha(PrincipalType.MEMBER, session.getLoginToken());
-        assertTrue(service.validateCaptcha(PrincipalType.MEMBER, session.getLoginToken(), captcha));
+        for (int idx = 0; idx < 5; idx++) {
+            session.refresh(60, 60);
+        }
 
-        String smsCode = service.createSmsValidateCode(PrincipalType.MEMBER, session.getLoginToken(), "13800000000");
-        String emailCode =
-                service.createEmailValidateCode(PrincipalType.MEMBER, session.getLoginToken(), "member@example.com");
-
-        assertTrue(
-                service.validateSmsValidateCode(PrincipalType.MEMBER, session.getLoginToken(), "13800000000", smsCode));
-        assertTrue(service.validateEmailValidateCode(
-                PrincipalType.MEMBER, session.getLoginToken(), "member@example.com", emailCode));
+        assertEquals(5, session.refreshTokenValues().size());
+        assertEquals(
+                session.getRefreshToken(), session.refreshTokenValues().get(0).getToken());
     }
 
-    private static class RecordingLoginFormDao implements LoginFormDao {
-        private final Map<String, LoginForm> forms = new HashMap<>();
-        private final Map<String, LoginForm> refreshForms = new HashMap<>();
-        private int count;
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldRejectNonPositiveExpiredSeconds() {
+        PreAuthSession.create(0);
+    }
+
+    private static class RecordingPreAuthSessionDao implements PreAuthSessionDao {
+        private final Map<String, PreAuthSession> sessions = new HashMap<>();
+        private final Map<String, String> tokenIndex = new HashMap<>();
+        private final Map<String, String> refreshTokenIndex = new HashMap<>();
 
         @Override
         public int count() {
-            return count == 0 ? forms.size() : count;
+            return sessions.size();
         }
 
         @Override
-        public LoginForm getByToken(String loginToken) {
-            return forms.get(loginToken);
+        public PreAuthSession getById(PreAuthSessionId id) {
+            return id == null ? null : sessions.get(id.asString());
         }
 
         @Override
-        public LoginForm getByRefreshToken(String refreshToken) {
-            return refreshForms.get(refreshToken);
+        public PreAuthSessionId getIdByToken(PreAuthSessionToken token) {
+            return token == null ? null : PreAuthSessionId.ofNullable(tokenIndex.get(token.asString()));
         }
 
         @Override
-        public void insert(LoginForm form) {
-            forms.put(form.getLoginToken(), form);
-            for (String refreshToken : form.getRefreshTokenList()) {
-                refreshForms.put(refreshToken, form);
+        public PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken) {
+            return refreshToken == null
+                    ? null
+                    : PreAuthSessionId.ofNullable(refreshTokenIndex.get(refreshToken.asString()));
+        }
+
+        @Override
+        public void insert(PreAuthSession session) {
+            put(session);
+        }
+
+        @Override
+        public void update(PreAuthSession session) {
+            PreAuthSession oldSession = getById(session.getId());
+            if (oldSession != null) {
+                removeIndexesBySessionId(session.getId());
+            }
+            put(session);
+        }
+
+        @Override
+        public void deleteById(PreAuthSessionId id) {
+            PreAuthSession session = sessions.remove(id.asString());
+            if (session != null) {
+                removeIndexes(session);
             }
         }
 
-        @Override
-        public void deleteByToken(String loginToken) {
-            forms.remove(loginToken);
-        }
-
-        @Override
-        public boolean tokenExists(String loginToken) {
-            return forms.containsKey(loginToken);
-        }
-
-        @Override
-        public void updateCaptcha(String token, String captcha) {
-            forms.get(token).setCaptcha(captcha);
-        }
-
-        @Override
-        public void updateSmsValidateCode(String token, String mobile, String validateCode) {
-            LoginForm form = forms.get(token);
-            form.setMobile(mobile);
-            form.setMobileValidateCode(validateCode);
-        }
-    }
-
-    private static class RecordingAccessTokenDao implements AccessTokenDao {
-        private int count;
-
-        @Override
-        public int count() {
-            return count;
-        }
-
-        @Override
-        public String getUidByToken(String token) {
-            return null;
-        }
-
-        @Override
-        public AccessToken getByUserId(String userId) {
-            return null;
-        }
-
-        @Override
-        public void insert(AccessToken accessToken) {}
-
-        @Override
-        public void active(AccessToken accessToken) {}
-
-        @Override
-        public void deleteByToken(String token) {}
-    }
-
-    private static class RecordingMemberLoginFormDao implements MemberLoginFormDao {
-        private final Map<String, MemberLoginForm> forms = new HashMap<>();
-        private final Map<String, MemberLoginForm> refreshForms = new HashMap<>();
-
-        @Override
-        public int count() {
-            return forms.size();
-        }
-
-        @Override
-        public MemberLoginForm getByToken(String loginToken) {
-            return forms.get(loginToken);
-        }
-
-        @Override
-        public MemberLoginForm getByRefreshToken(String refreshToken) {
-            return refreshForms.get(refreshToken);
-        }
-
-        @Override
-        public void insert(MemberLoginForm form) {
-            forms.put(form.getLoginToken(), form);
-            for (String refreshToken : form.getRefreshTokenList()) {
-                refreshForms.put(refreshToken, form);
+        private void put(PreAuthSession session) {
+            sessions.put(session.getId().asString(), session);
+            tokenIndex.put(session.getToken().asString(), session.getId().asString());
+            long now = System.currentTimeMillis();
+            for (RefreshTokenValue refreshToken : session.refreshTokenValues()) {
+                if (refreshToken.getExpiredAt() > now) {
+                    refreshTokenIndex.put(
+                            refreshToken.getToken().asString(), session.getId().asString());
+                }
             }
         }
 
-        @Override
-        public void deleteByToken(String loginToken) {
-            forms.remove(loginToken);
+        private void removeIndexes(PreAuthSession session) {
+            tokenIndex.remove(session.getToken().asString());
+            for (RefreshTokenValue refreshToken : session.refreshTokenValues()) {
+                refreshTokenIndex.remove(refreshToken.getToken().asString());
+            }
         }
 
-        @Override
-        public boolean tokenExists(String loginToken) {
-            return forms.containsKey(loginToken);
-        }
-
-        @Override
-        public void updateCaptcha(String loginToken, String captcha) {
-            forms.get(loginToken).setCaptcha(captcha);
-        }
-
-        @Override
-        public void updateSmsValidateCode(String loginToken, String mobile, String validateCode) {
-            MemberLoginForm form = forms.get(loginToken);
-            form.setMobile(mobile);
-            form.setMobileValidateCode(validateCode);
-        }
-
-        @Override
-        public void updateEmailValidateCode(String loginToken, String email, String validateCode) {
-            MemberLoginForm form = forms.get(loginToken);
-            form.setEmail(email);
-            form.setEmailValidateCode(validateCode);
-        }
-
-        @Override
-        public void updateKeyPair(String loginToken, String publicKey, String privateKey) {
-            MemberLoginForm form = forms.get(loginToken);
-            form.setPublicKey(publicKey);
-            form.setPrivateKey(privateKey);
+        private void removeIndexesBySessionId(PreAuthSessionId id) {
+            tokenIndex.entrySet().removeIf(entry -> id.asString().equals(entry.getValue()));
+            refreshTokenIndex.entrySet().removeIf(entry -> id.asString().equals(entry.getValue()));
         }
     }
 }

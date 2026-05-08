@@ -7,6 +7,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
+import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
@@ -21,6 +22,7 @@ import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
@@ -28,17 +30,20 @@ import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
+import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
+import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -47,6 +52,7 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
+import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.Date;
@@ -63,6 +69,13 @@ import org.springframework.stereotype.Service;
 public class AdminAuthServiceImpl implements AdminAuthService {
 
     private static final int SESSION_RUNTIME_SAFETY_SECONDS = 10;
+    private static final int CAPTCHA_EXPIRED_SECONDS = 60;
+    private static final int REFRESH_TOKEN_GRACE_SECONDS = 60;
+    private static final String CAPTCHA_ITEM = "CAPTCHA";
+    private static final String SMS_MOBILE_ITEM = "SMS_MOBILE";
+    private static final String SMS_VALIDATE_CODE_ITEM = "SMS_VALIDATE_CODE";
+    private static final String PUBLIC_KEY_ITEM = "publicKey";
+    private static final String PRIVATE_KEY_ITEM = "privateKey";
 
     private final AuthProperties properties;
     private final LoginProperties loginProperties;
@@ -117,74 +130,103 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public PreAuthSessionDTO createPreAuthSession() throws ApiException {
-        return preAuthSessionService.createPreAuthSession(PrincipalType.USER);
+    public PreAuthSession createPreAuthSession() throws ApiException {
+        if (preAuthSessionService.count() > properties.getMaxLoginCount()) {
+            throw new TooManyLoginRequestException();
+        }
+        if (accessTokenDao.count() > properties.getMaxOnlineCount()) {
+            throw new TooManyOnlineUserException();
+        }
+        PreAuthSession session = preAuthSessionService.create(properties.getLoginExpiredSeconds());
+        writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
+        Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
+        if (keyPair != null) {
+            preAuthSessionService.upsertValue(
+                    session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt());
+            preAuthSessionService.upsertValue(
+                    session.getId(), PRIVATE_KEY_ITEM, keyPair.getPrivateKey(), session.getExpiredAt());
+        }
+        return preAuthSessionService.getById(session.getId());
     }
 
     @Override
-    public PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException {
-        return preAuthSessionService.refreshPreAuthSession(PrincipalType.USER, refreshToken);
+    public PreAuthSession refreshPreAuthSession(String refreshToken) throws ApiException {
+        PreAuthSessionId sessionId = requireSessionIdByRefreshToken(refreshToken);
+        PreAuthSession session = preAuthSessionService.refresh(
+                sessionId, properties.getLoginExpiredSeconds(), REFRESH_TOKEN_GRACE_SECONDS);
+        writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
+        return session;
     }
 
     @Override
     public void releasePreAuthSession(String loginToken) {
-        preAuthSessionService.releasePreAuthSession(PrincipalType.USER, loginToken);
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(loginToken));
+        if (sessionId != null) {
+            preAuthSessionService.release(sessionId);
+        }
     }
 
     @Override
     public String createCaptcha(String loginToken) throws InvalidTokenException {
-        try {
-            return preAuthSessionService.createCaptcha(PrincipalType.USER, loginToken);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
-        }
+        String captcha = PreAuthCodeHelper.generateCaptcha();
+        writeCaptcha(requireSessionIdByToken(loginToken), captcha);
+        return captcha;
     }
 
     @Override
     public String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
-        try {
-            return preAuthSessionService.getCaptcha(PrincipalType.USER, loginToken);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
+        String captcha = preAuthSessionService.findValue(requireSessionIdByToken(loginToken), CAPTCHA_ITEM);
+        if (StringUtils.isEmpty(captcha)) {
+            throw new InvalidCaptchaException();
         }
+        return captcha;
     }
 
     @Override
     public boolean validateCaptcha(String loginToken, String captcha)
             throws InvalidTokenException, InvalidCaptchaException {
-        try {
-            return preAuthSessionService.validateCaptcha(PrincipalType.USER, loginToken, captcha);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
+        if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
+                && StringUtils.equals(properties.getWhiteCaptcha(), captcha)) {
+            return true;
         }
+        return StringUtils.equals(captcha, getCaptcha(loginToken));
     }
 
     @Override
     public String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException {
-        try {
-            return preAuthSessionService.createSmsValidateCode(PrincipalType.USER, loginToken, mobile);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
-        }
+        PreAuthSession session = preAuthSessionService.getById(requireSessionIdByToken(loginToken));
+        String validateCode = PreAuthCodeHelper.generateSmsCode();
+        preAuthSessionService.upsertValue(session.getId(), SMS_MOBILE_ITEM, mobile, session.getExpiredAt());
+        preAuthSessionService.upsertValue(
+                session.getId(), SMS_VALIDATE_CODE_ITEM, validateCode, session.getExpiredAt());
+        preAuthSessionService.upsertValue(session.getId(), CAPTCHA_ITEM, null, 0L);
+        return validateCode;
     }
 
     @Override
     public String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
-        try {
-            return preAuthSessionService.getSmsValidateCode(PrincipalType.USER, loginToken);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
+        String validateCode =
+                preAuthSessionService.findValue(requireSessionIdByToken(loginToken), SMS_VALIDATE_CODE_ITEM);
+        if (StringUtils.isEmpty(validateCode)) {
+            throw new InvalidCaptchaException();
         }
+        return validateCode;
     }
 
     @Override
     public boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
             throws InvalidTokenException, InvalidCaptchaException {
-        try {
-            return preAuthSessionService.validateSmsValidateCode(PrincipalType.USER, loginToken, mobile, validateCode);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
+        if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
+                && StringUtils.equals(properties.getWhiteCaptcha(), validateCode)) {
+            return true;
         }
+        PreAuthSessionId sessionId = requireSessionIdByToken(loginToken);
+        String savedMobile = preAuthSessionService.findValue(sessionId, SMS_MOBILE_ITEM);
+        String savedValidateCode = preAuthSessionService.findValue(sessionId, SMS_VALIDATE_CODE_ITEM);
+        if (StringUtils.isEmpty(savedMobile) || StringUtils.isEmpty(savedValidateCode)) {
+            throw new InvalidCaptchaException();
+        }
+        return StringUtils.equals(savedMobile, mobile) && StringUtils.equals(savedValidateCode, validateCode);
     }
 
     @Override
@@ -528,11 +570,32 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public String getPrivateKey(String loginToken) throws InvalidTokenException {
-        try {
-            return preAuthSessionService.getPrivateKey(PrincipalType.USER, loginToken);
-        } catch (ApiException e) {
-            throw new IllegalStateException(e);
+        String privateKey = preAuthSessionService.findValue(requireSessionIdByToken(loginToken), PRIVATE_KEY_ITEM);
+        if (StringUtils.isBlank(privateKey)) {
+            throw new InvalidTokenException();
         }
+        return privateKey;
+    }
+
+    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) throws InvalidTokenException {
+        preAuthSessionService.upsertValue(
+                sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L);
+    }
+
+    private PreAuthSessionId requireSessionIdByToken(String token) throws InvalidTokenException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        if (sessionId == null) {
+            throw new InvalidTokenException();
+        }
+        return sessionId;
+    }
+
+    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) throws InvalidTokenException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByRefreshToken(PreAuthSessionToken.of(refreshToken));
+        if (sessionId == null) {
+            throw new InvalidTokenException();
+        }
+        return sessionId;
     }
 
     private User authenticateIdentity(PrincipalIdentityType identityType, String identityValue) throws ApiException {

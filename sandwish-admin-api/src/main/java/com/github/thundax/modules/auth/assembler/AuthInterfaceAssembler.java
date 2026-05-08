@@ -11,7 +11,7 @@ import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoRespons
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -25,18 +25,20 @@ import java.util.StringJoiner;
 import org.springframework.lang.NonNull;
 
 public final class AuthInterfaceAssembler {
+    private static final String PUBLIC_KEY_ITEM = "publicKey";
+
     private AuthInterfaceAssembler() {}
 
     @NonNull
-    public static AuthLoginFormResponse toLoginFormResponse(PreAuthSessionDTO session) {
+    public static AuthLoginFormResponse toLoginFormResponse(PreAuthSession session) {
         if (session == null) {
             return new AuthLoginFormResponse();
         }
         AuthLoginFormResponse response = new AuthLoginFormResponse();
-        response.setLoginToken(session.getLoginToken());
-        response.setRefreshToken(session.getRefreshTokenList().get(0));
-        response.setExpireSeconds(session.getExpiredSeconds());
-        response.setPublicKey(session.getPublicKey());
+        response.setLoginToken(session.getToken().asString());
+        response.setRefreshToken(session.getRefreshToken().asString());
+        response.setExpiredAt(session.getExpiredAt());
+        response.setPublicKey(session.findValue(PUBLIC_KEY_ITEM));
         return response;
     }
 

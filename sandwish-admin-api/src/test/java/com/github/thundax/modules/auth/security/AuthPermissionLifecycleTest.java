@@ -25,6 +25,7 @@ import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
+import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
@@ -44,7 +45,6 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
@@ -56,9 +56,8 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
-import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
-import com.github.thundax.modules.auth.testsupport.InMemoryMemberLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
+import com.github.thundax.modules.auth.testsupport.InMemoryPreAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
@@ -93,7 +92,6 @@ public class AuthPermissionLifecycleTest {
     private InMemoryPermissionDaoImpl permissionDao;
     private TestAuthSessionDao authSessionDao;
     private TestAuthSessionRuntimeDao authSessionRuntimeDao;
-    private InMemoryLoginFormDaoImpl loginFormDao;
     private AdminAuthService authService;
     private PermissionService permissionService;
 
@@ -101,14 +99,13 @@ public class AuthPermissionLifecycleTest {
     public void setUp() {
         accessTokenDao = new InMemoryAccessTokenDaoImpl();
         permissionDao = new InMemoryPermissionDaoImpl();
-        loginFormDao = new InMemoryLoginFormDaoImpl();
         authSessionDao = new TestAuthSessionDao();
         authSessionRuntimeDao = new TestAuthSessionRuntimeDao();
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
-        PreAuthSessionService preAuthSessionService = new PreAuthSessionServiceImpl(
-                authProperties, loginFormDao, accessTokenDao, new InMemoryMemberLoginFormDaoImpl());
+        PreAuthSessionService preAuthSessionService =
+                new PreAuthSessionServiceImpl(new InMemoryPreAuthSessionDaoImpl());
 
         TestUserService userService = new TestUserService();
         TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
@@ -339,13 +336,14 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
-        PreAuthSessionDTO session = authService.createPreAuthSession();
-        String smsCode = authService.createSmsValidateCode(session.getLoginToken(), "13800000000");
+        PreAuthSession session = authService.createPreAuthSession();
+        String loginToken = session.getToken().asString();
+        String smsCode = authService.createSmsValidateCode(loginToken, "13800000000");
 
         Assert.assertEquals(
                 Long.valueOf(1L),
                 EntityIdCodec.toValue(authService
-                        .authenticateSms(session.getLoginToken(), "13800000000", smsCode)
+                        .authenticateSms(loginToken, "13800000000", smsCode)
                         .getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");

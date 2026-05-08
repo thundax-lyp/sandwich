@@ -32,6 +32,24 @@ CREATE TABLE IF NOT EXISTS `auth_principal_credential` (
     KEY `idx_auth_principal_credential_locked` (`locked_until`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一认证主体凭据表';
 
+CREATE TABLE IF NOT EXISTS `auth_principal_login_event` (
+    `id` varchar(64) NOT NULL,
+    `principal_type` varchar(32) DEFAULT NULL,
+    `principal_id` bigint DEFAULT NULL,
+    `client_id` varchar(64) NOT NULL,
+    `event_type` varchar(32) NOT NULL,
+    `authentication_method` varchar(32) NOT NULL,
+    `identity_type` varchar(32) DEFAULT NULL,
+    `occurred_at` datetime(3) NOT NULL,
+    `ip` varchar(64) DEFAULT NULL,
+    `user_agent` varchar(512) DEFAULT NULL,
+    `reason` varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_auth_principal_login_event_principal_time` (`principal_type`, `principal_id`, `occurred_at`),
+    KEY `idx_auth_principal_login_event_client_time` (`client_id`, `occurred_at`),
+    KEY `idx_auth_principal_login_event_type_time` (`event_type`, `occurred_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一认证登录事件表';
+
 CREATE TABLE IF NOT EXISTS `auth_session` (
     `id` bigint NOT NULL,
     `token` varchar(255) NOT NULL,

@@ -11,24 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `principal-login-event-model`：新增主体登录事件审计模型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalLoginEvent.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/valueobject/PrincipalLoginEventId.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/codec/PrincipalLoginEventIdCodec.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalLoginEventType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalAuthenticationMethod.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/PrincipalLoginEventDao.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/PrincipalLoginEventDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/PrincipalLoginEventMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/PrincipalLoginEventPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PrincipalLoginEventDaoImpl.java`
-    - `db/schema/auth.sql`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-  - 处理动作：新增 `PrincipalLoginEvent` DB 审计事实、枚举、DAO 和 schema。
-  - 验收点：`auth_principal_login_event` 表结构和 DAO 映射完整，`Open Items` 中固定 reason 已进入枚举或常量。
-  - 重要度：9/10
-
 - [ ] `principal-login-event-write`：认证链路写入主体登录事件
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java`

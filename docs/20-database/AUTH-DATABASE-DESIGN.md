@@ -99,6 +99,7 @@
 | --- | --- | --- | --- |
 | `auth_principal_identity` | `PrincipalIdentityDO` | `PrincipalIdentityMapper` | `PrincipalIdentity` |
 | `auth_principal_credential` | `PrincipalCredentialDO` | `PrincipalCredentialMapper` | `PrincipalCredential` |
+| `auth_principal_login_event` | `PrincipalLoginEventDO` | `PrincipalLoginEventMapper` | `PrincipalLoginEvent` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
 | `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
 | `auth_oauth_client` | `OAuthClientDO` | `OAuthClientMapper` | `OAuthClient` |
@@ -175,7 +176,41 @@
 - 普通索引：`idx_auth_principal_credential_identity_status(identity_id, status)`
 - 普通索引：`idx_auth_principal_credential_locked(locked_until)`
 
-### 6.3 auth_session
+### 6.3 auth_principal_login_event
+
+`auth_principal_login_event` 保存统一认证登录事件审计事实。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | 登录事件主键 |
+| `principal_type` | `principalType` | `principalKey.principalType` | 否 | 主体类型 |
+| `principal_id` | `principalId` | `principalKey.principalId` | 否 | 主体 ID |
+| `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
+| `event_type` | `eventType` | `eventType` | 是 | 登录事件类型 |
+| `authentication_method` | `authenticationMethod` | `authenticationMethod` | 是 | 认证方式 |
+| `identity_type` | `identityType` | `identityType` | 否 | 登录标识类型 |
+| `occurred_at` | `occurredAt` | `occurredAt` | 是 | 发生时间 |
+| `ip` | `ip` | `ip` | 否 | 请求 IP |
+| `user_agent` | `userAgent` | `userAgent` | 否 | 请求 User-Agent |
+| `reason` | `reason` | `reason` | 否 | 固定原因值 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成十六进制字符串。
+- `principal_type + principal_id` 登录失败且无法识别主体时允许为空。
+- `client_id` 来源是认证入口对应客户端。
+- `event_type` 固定写入 `LOGIN_SUCCESS`、`LOGIN_FAILED`、`LOGOUT`、`TOKEN_REFRESH` 或 `OAUTH_AUTHORIZED`。
+- `authentication_method` 固定写入 `PASSWORD`、`SMS_CODE`、`EMAIL_CODE`、`GITHUB`、`WECOM`、`OAUTH_CODE` 或 `REFRESH_TOKEN`。
+- `reason` 使用 `PrincipalLoginEvent` 固定原因常量，不记录异常堆栈。
+
+索引：
+
+- 主键：`pk_auth_principal_login_event(id)`
+- 普通索引：`idx_auth_principal_login_event_principal_time(principal_type, principal_id, occurred_at)`
+- 普通索引：`idx_auth_principal_login_event_client_time(client_id, occurred_at)`
+- 普通索引：`idx_auth_principal_login_event_type_time(event_type, occurred_at)`
+
+### 6.4 auth_session
 
 `auth_session` 保存后台认证会话事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
 
@@ -219,7 +254,7 @@
 - 普通索引：`idx_auth_session_identity(identity_id, identity_type)`
 - 普通索引：`idx_auth_session_expire(status, expire_at)`
 
-### 6.4 auth_oauth_client
+### 6.5 auth_oauth_client
 
 `auth_oauth_client` 保存 OAuth2 客户端配置。
 
@@ -254,7 +289,7 @@
 - 主键：`pk_auth_oauth_client(id)`
 - 唯一索引：`uk_auth_oauth_client_client_id(client_id)`
 
-### 6.5 auth_oauth_authorization
+### 6.6 auth_oauth_authorization
 
 `auth_oauth_authorization` 保存 OAuth2 授权请求和授权码事实。
 

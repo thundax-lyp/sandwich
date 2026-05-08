@@ -30,16 +30,12 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
     };
     private static final String[] SNOWFLAKE_ID_DATA_OBJECTS = {
         "com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.OAuthAccessTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.OAuthRefreshTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.MemberAccessTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO",
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.MemberRefreshTokenDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO",

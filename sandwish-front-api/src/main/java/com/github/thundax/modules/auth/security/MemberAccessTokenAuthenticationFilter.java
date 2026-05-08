@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
-import com.github.thundax.modules.auth.entity.MemberAccessToken;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import java.io.IOException;
 import java.util.Collections;
@@ -30,11 +30,11 @@ public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter 
             throws ServletException, IOException {
         String accessToken = resolveAccessToken(request);
         if (StringUtils.isNotBlank(accessToken)) {
-            MemberAccessToken token = memberAuthService.getValidAccessToken(accessToken);
+            PrincipalAccessToken token = memberAuthService.getValidAccessToken(accessToken);
             if (token != null) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        new MemberSpringPrincipal(
-                                String.valueOf(token.getMemberId().value())),
+                        new MemberSpringPrincipal(String.valueOf(
+                                token.getPrincipalKey().getPrincipalId().value())),
                         null,
                         Collections.singletonList(new SimpleGrantedAuthority(MEMBER_PERMISSION)));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

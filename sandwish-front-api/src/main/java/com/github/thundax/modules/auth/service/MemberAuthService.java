@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.modules.auth.entity.MemberAccessToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 
 public interface MemberAuthService {
@@ -22,5 +22,5 @@ public interface MemberAuthService {
 
     void logout(String accessToken) throws ApiException;
 
-    MemberAccessToken getValidAccessToken(String accessToken);
+    PrincipalAccessToken getValidAccessToken(String accessToken);
 }

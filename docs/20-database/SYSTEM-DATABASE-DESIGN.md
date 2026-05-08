@@ -30,8 +30,6 @@
 - `auth_session`
 - `auth_oauth_client`
 - `auth_oauth_authorization`
-- `auth_oauth_access_token`
-- `auth_oauth_refresh_token`
 - `auth_principal_identity`
 - `auth_principal_credential`
 - 前台会员表

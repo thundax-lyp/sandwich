@@ -323,31 +323,19 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002078, 'member_access_token_status', '活跃', 'ACTIVE', 0, '会员访问 token 活跃状态',
+        1000000000000002078, 'principal_token_status', '活跃', 'ACTIVE', 0, '统一主体 token 活跃状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002079, 'member_access_token_status', '已撤销', 'REVOKED', 1, '会员访问 token 撤销状态',
+        1000000000000002079, 'principal_token_status', '已使用', 'USED', 1, '统一主体 refresh token 已使用状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002080, 'member_access_token_status', '已过期', 'EXPIRED', 2, '会员访问 token 过期状态',
+        1000000000000002080, 'principal_token_status', '已撤销', 'REVOKED', 2, '统一主体 token 撤销状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002081, 'member_refresh_token_status', '活跃', 'ACTIVE', 0, '会员刷新 token 活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002082, 'member_refresh_token_status', '已使用', 'USED', 1, '会员刷新 token 已使用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002083, 'member_refresh_token_status', '已撤销', 'REVOKED', 2, '会员刷新 token 撤销状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002084, 'member_refresh_token_status', '已过期', 'EXPIRED', 3, '会员刷新 token 过期状态',
+        1000000000000002081, 'principal_token_status', '已过期', 'EXPIRED', 3, '统一主体 token 过期状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (

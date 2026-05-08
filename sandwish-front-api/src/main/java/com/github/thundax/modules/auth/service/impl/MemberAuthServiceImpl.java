@@ -6,21 +6,22 @@ import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
-import com.github.thundax.modules.auth.dao.MemberAccessTokenDao;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionDao;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionRuntimeDao;
-import com.github.thundax.modules.auth.dao.MemberRefreshTokenDao;
-import com.github.thundax.modules.auth.entity.MemberAccessToken;
+import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
-import com.github.thundax.modules.auth.entity.MemberRefreshToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
-import com.github.thundax.modules.auth.entity.enums.MemberAccessTokenStatus;
-import com.github.thundax.modules.auth.entity.enums.MemberRefreshTokenStatus;
+import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
@@ -47,6 +48,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private static final String PUBLIC_KEY_ITEM = "publicKey";
     private static final String PRIVATE_KEY_ITEM = "privateKey";
     private static final String MEMBER_PRIVATE_KEY_SEPARATOR = ":";
+    private static final String MEMBER_CLIENT_ID = "member-api";
 
     private final AuthProperties authProperties;
     private final PreAuthSessionService preAuthSessionService;
@@ -54,8 +56,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private final PrincipalAuthService principalAuthService;
     private final MemberAuthSessionDao memberAuthSessionDao;
     private final MemberAuthSessionRuntimeDao memberAuthSessionRuntimeDao;
-    private final MemberAccessTokenDao memberAccessTokenDao;
-    private final MemberRefreshTokenDao memberRefreshTokenDao;
+    private final PrincipalAccessTokenDao principalAccessTokenDao;
+    private final PrincipalRefreshTokenDao principalRefreshTokenDao;
 
     public MemberAuthServiceImpl(
             AuthProperties authProperties,
@@ -64,16 +66,16 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             PrincipalAuthService principalAuthService,
             MemberAuthSessionDao memberAuthSessionDao,
             MemberAuthSessionRuntimeDao memberAuthSessionRuntimeDao,
-            MemberAccessTokenDao memberAccessTokenDao,
-            MemberRefreshTokenDao memberRefreshTokenDao) {
+            PrincipalAccessTokenDao principalAccessTokenDao,
+            PrincipalRefreshTokenDao principalRefreshTokenDao) {
         this.authProperties = authProperties;
         this.preAuthSessionService = preAuthSessionService;
         this.memberService = memberService;
         this.principalAuthService = principalAuthService;
         this.memberAuthSessionDao = memberAuthSessionDao;
         this.memberAuthSessionRuntimeDao = memberAuthSessionRuntimeDao;
-        this.memberAccessTokenDao = memberAccessTokenDao;
-        this.memberRefreshTokenDao = memberRefreshTokenDao;
+        this.principalAccessTokenDao = principalAccessTokenDao;
+        this.principalRefreshTokenDao = principalRefreshTokenDao;
     }
 
     @Override
@@ -147,14 +149,14 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult refreshAccessToken(String refreshToken) throws ApiException {
-        MemberRefreshToken oldRefreshToken = memberRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
+        PrincipalRefreshToken oldRefreshToken = principalRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
         Date now = new Date();
         if (oldRefreshToken == null || !oldRefreshToken.canRefresh(now)) {
             throw new ApiException("refreshToken已失效");
         }
         oldRefreshToken.markUsed(now);
-        memberRefreshTokenDao.update(oldRefreshToken);
-        Member member = requireActiveMember(oldRefreshToken.getMemberId());
+        principalRefreshTokenDao.updateStatus(oldRefreshToken);
+        Member member = requireActiveMember(oldRefreshToken.getPrincipalKey().getPrincipalId());
         MemberAuthSession session = memberAuthSessionDao.getBySessionId(oldRefreshToken.getSessionId());
         return createTokenResult(member, session, "REFRESH");
     }
@@ -162,13 +164,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void logout(String accessToken) throws ApiException {
-        MemberAccessToken token = memberAccessTokenDao.getByTokenHash(tokenHash(accessToken));
+        PrincipalAccessToken token = principalAccessTokenDao.getByTokenHash(tokenHash(accessToken));
         if (token == null) {
             throw new ApiException("accessToken已失效");
         }
         Date now = new Date();
         token.revoke(now);
-        memberAccessTokenDao.update(token);
+        principalAccessTokenDao.updateStatus(token);
         MemberAuthSession session = memberAuthSessionDao.getBySessionId(token.getSessionId());
         if (session != null) {
             session.logout(now);
@@ -178,8 +180,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public MemberAccessToken getValidAccessToken(String accessToken) {
-        MemberAccessToken token = memberAccessTokenDao.getByTokenHash(tokenHash(accessToken));
+    public PrincipalAccessToken getValidAccessToken(String accessToken) {
+        PrincipalAccessToken token = principalAccessTokenDao.getByTokenHash(tokenHash(accessToken));
         return token != null && token.canAccess(new Date()) ? token : null;
     }
 
@@ -205,31 +207,32 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             session.setId(memberAuthSessionDao.insert(session));
         }
         memberAuthSessionRuntimeDao.insert(session, session.remainingSeconds(now));
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, member.getId());
 
         String accessTokenValue = UuidHelper.compact();
-        MemberAccessToken accessToken = new MemberAccessToken();
+        PrincipalAccessToken accessToken = new PrincipalAccessToken();
         accessToken.setTokenId(UuidHelper.compact());
         accessToken.setTokenHash(tokenHash(accessTokenValue));
+        accessToken.setClientId(MEMBER_CLIENT_ID);
         accessToken.setSessionId(session.getSessionId());
-        accessToken.setMemberId(member.getId());
+        accessToken.setPrincipalKey(principalKey);
         accessToken.setIssuedAt(now);
         accessToken.setExpireAt(expireAt);
-        accessToken.setStatus(MemberAccessTokenStatus.ACTIVE);
-        accessToken.setCreateDate(now);
-        memberAccessTokenDao.insert(accessToken);
+        accessToken.setStatus(PrincipalTokenStatus.ACTIVE);
+        principalAccessTokenDao.insert(accessToken);
 
         String refreshTokenValue = UuidHelper.compact();
-        MemberRefreshToken refreshToken = new MemberRefreshToken();
+        PrincipalRefreshToken refreshToken = new PrincipalRefreshToken();
         refreshToken.setTokenId(UuidHelper.compact());
         refreshToken.setTokenHash(tokenHash(refreshTokenValue));
         refreshToken.setAccessTokenId(accessToken.getTokenId());
+        refreshToken.setClientId(MEMBER_CLIENT_ID);
         refreshToken.setSessionId(session.getSessionId());
-        refreshToken.setMemberId(member.getId());
+        refreshToken.setPrincipalKey(principalKey);
         refreshToken.setIssuedAt(now);
         refreshToken.setExpireAt(new Date(now.getTime() + authProperties.getLoginExpiredSeconds() * 2L * 1000L));
-        refreshToken.setStatus(MemberRefreshTokenStatus.ACTIVE);
-        refreshToken.setCreateDate(now);
-        memberRefreshTokenDao.insert(refreshToken);
+        refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
+        principalRefreshTokenDao.insert(refreshToken);
 
         MemberTokenResult result = new MemberTokenResult();
         result.setMemberId(member.getId());

@@ -15,29 +15,28 @@ import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionRe
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
-import com.github.thundax.modules.auth.dao.OAuthAccessTokenDao;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
-import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
-import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
-import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
-import com.github.thundax.modules.auth.entity.enums.OAuthAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
-import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
@@ -205,38 +204,38 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldRefreshAccessTokenAndRotateRefreshToken() throws Exception {
-        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
-        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        TestPrincipalRefreshTokenDao refreshTokenDao = new TestPrincipalRefreshTokenDao();
+        inject(authService, "principalRefreshTokenDao", refreshTokenDao);
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
-        OAuthRefreshToken refreshToken = new OAuthRefreshToken();
+        PrincipalRefreshToken refreshToken = new PrincipalRefreshToken();
         refreshToken.setId(EntityIdCodec.toDomain(2001L));
         refreshToken.setTokenId("refresh-token-1");
         refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
-        refreshToken.setUserId(EntityIdCodec.toDomain(1L));
+        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
-        refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
+        refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
 
         AuthTokenRefreshResult result = authService.refreshAccessToken("admin-web", "plain-refresh-token");
 
         Assert.assertNotNull(result.getAccessToken().getToken());
         Assert.assertNotNull(result.getRefreshToken());
-        Assert.assertEquals(OAuthRefreshTokenStatus.USED, refreshToken.getStatus());
-        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.USED, refreshToken.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
     }
 
     @Test
     public void shouldAuthorizeApproveExchangeAndRevokeAuthorizationCode() throws Exception {
         TestOAuthAuthorizationDao authorizationDao = new TestOAuthAuthorizationDao();
-        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
-        TestOAuthAccessTokenDao accessTokenDao = new TestOAuthAccessTokenDao();
+        TestPrincipalRefreshTokenDao refreshTokenDao = new TestPrincipalRefreshTokenDao();
+        TestPrincipalAccessTokenDao accessTokenDao = new TestPrincipalAccessTokenDao();
         inject(authService, "oauthAuthorizationDao", authorizationDao);
-        inject(authService, "oauthAccessTokenDao", accessTokenDao);
-        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        inject(authService, "principalAccessTokenDao", accessTokenDao);
+        inject(authService, "principalRefreshTokenDao", refreshTokenDao);
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         OAuth2AuthorizationViewResult view = authService.authorizeOAuth2(
@@ -276,8 +275,8 @@ public class AuthPermissionLifecycleTest {
         Assert.assertNotNull(token.getRefreshToken());
         Assert.assertNotNull(token.getOauthAccessToken());
         Assert.assertTrue(authorizationDao.current.isUsed());
-        Assert.assertEquals(OAuthAccessTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
-        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
         AuthTokenQueryResult queryResult = authService.queryToken(token.getOauthAccessToken());
         Assert.assertTrue(queryResult.isActive());
         OAuth2IntrospectionResponse introspection = AuthInterfaceAssembler.toIntrospectionResponse(queryResult);
@@ -294,31 +293,31 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldExchangeRefreshTokenGrantAndRotateOAuthTokens() throws Exception {
-        TestOAuthAccessTokenDao accessTokenDao = new TestOAuthAccessTokenDao();
-        TestOAuthRefreshTokenDao refreshTokenDao = new TestOAuthRefreshTokenDao();
-        inject(authService, "oauthAccessTokenDao", accessTokenDao);
-        inject(authService, "oauthRefreshTokenDao", refreshTokenDao);
+        TestPrincipalAccessTokenDao accessTokenDao = new TestPrincipalAccessTokenDao();
+        TestPrincipalRefreshTokenDao refreshTokenDao = new TestPrincipalRefreshTokenDao();
+        inject(authService, "principalAccessTokenDao", accessTokenDao);
+        inject(authService, "principalRefreshTokenDao", refreshTokenDao);
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
-        OAuthRefreshToken refreshToken = new OAuthRefreshToken();
+        PrincipalRefreshToken refreshToken = new PrincipalRefreshToken();
         refreshToken.setId(EntityIdCodec.toDomain(2001L));
         refreshToken.setTokenId("refresh-token-1");
         refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
         refreshToken.setAccessTokenId("old-access-token");
         refreshToken.setClientId("admin-web");
-        refreshToken.setUserId(EntityIdCodec.toDomain(1L));
+        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
-        refreshToken.setStatus(OAuthRefreshTokenStatus.ACTIVE);
+        refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
 
         AuthTokenRefreshResult result = authService.exchangeOAuth2Token(
                 "admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token");
 
-        Assert.assertEquals(OAuthRefreshTokenStatus.USED, refreshToken.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.USED, refreshToken.getStatus());
         Assert.assertNotNull(result.getOauthAccessToken());
-        Assert.assertEquals(OAuthAccessTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
-        Assert.assertEquals(OAuthRefreshTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
+        Assert.assertEquals(PrincipalTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
     }
 
     @Test
@@ -521,28 +520,34 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private static class TestOAuthAccessTokenDao implements OAuthAccessTokenDao {
+    private static class TestPrincipalAccessTokenDao implements PrincipalAccessTokenDao {
 
-        private OAuthAccessToken current;
-        private OAuthAccessToken inserted;
+        private PrincipalAccessToken current;
+        private PrincipalAccessToken inserted;
 
         @Override
-        public OAuthAccessToken getById(EntityId id) {
+        public PrincipalAccessToken getById(EntityId id) {
             return current;
         }
 
         @Override
-        public OAuthAccessToken getByTokenId(String tokenId) {
+        public PrincipalAccessToken getByTokenId(String tokenId) {
             return current != null && current.getTokenId().equals(tokenId) ? current : null;
         }
 
         @Override
-        public OAuthAccessToken getByTokenHash(String tokenHash) {
+        public PrincipalAccessToken getByTokenHash(String tokenHash) {
             return current != null && current.getTokenHash().equals(tokenHash) ? current : null;
         }
 
         @Override
-        public EntityId insert(OAuthAccessToken accessToken) {
+        public List<PrincipalAccessToken> listByPrincipalKeyAndClientIdAndStatus(
+                PrincipalKey principalKey, String clientId, PrincipalTokenStatus status) {
+            return current == null ? Collections.emptyList() : Collections.singletonList(current);
+        }
+
+        @Override
+        public EntityId insert(PrincipalAccessToken accessToken) {
             accessToken.setId(EntityIdCodec.toDomain(4001L));
             this.current = accessToken;
             this.inserted = accessToken;
@@ -550,7 +555,7 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public int updateStatus(OAuthAccessToken accessToken) {
+        public int updateStatus(PrincipalAccessToken accessToken) {
             this.current = accessToken;
             return 1;
         }
@@ -593,41 +598,41 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private static class TestOAuthRefreshTokenDao implements OAuthRefreshTokenDao {
+    private static class TestPrincipalRefreshTokenDao implements PrincipalRefreshTokenDao {
 
-        private OAuthRefreshToken current;
-        private OAuthRefreshToken inserted;
+        private PrincipalRefreshToken current;
+        private PrincipalRefreshToken inserted;
 
         @Override
-        public OAuthRefreshToken getById(EntityId id) {
+        public PrincipalRefreshToken getById(EntityId id) {
             return current;
         }
 
         @Override
-        public OAuthRefreshToken getByTokenId(String tokenId) {
+        public PrincipalRefreshToken getByTokenId(String tokenId) {
             return current;
         }
 
         @Override
-        public OAuthRefreshToken getByTokenHash(String tokenHash) {
+        public PrincipalRefreshToken getByTokenHash(String tokenHash) {
             return current != null && current.getTokenHash().equals(tokenHash) ? current : null;
         }
 
         @Override
-        public List<OAuthRefreshToken> listByClientIdAndUserIdAndStatus(
-                String clientId, EntityId userId, OAuthRefreshTokenStatus status) {
+        public List<PrincipalRefreshToken> listByPrincipalKeyAndClientIdAndStatus(
+                PrincipalKey principalKey, String clientId, PrincipalTokenStatus status) {
             return current == null ? Collections.emptyList() : Collections.singletonList(current);
         }
 
         @Override
-        public EntityId insert(OAuthRefreshToken refreshToken) {
+        public EntityId insert(PrincipalRefreshToken refreshToken) {
             refreshToken.setId(EntityIdCodec.toDomain(2002L));
             this.inserted = refreshToken;
             return refreshToken.getId();
         }
 
         @Override
-        public int updateStatus(OAuthRefreshToken refreshToken) {
+        public int updateStatus(PrincipalRefreshToken refreshToken) {
             this.current = refreshToken;
             return 1;
         }

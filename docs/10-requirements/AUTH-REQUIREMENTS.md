@@ -54,7 +54,7 @@
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
-`AccessToken` 继续承载后台访问 token。`OAuthAccessToken` 承载 OAuth2 access token 事实。`OAuthRefreshToken` 承载 refresh token 事实。`AuthSession` 固定不替代 token 的传输职责。
+`AccessToken` 继续承载后台权限会话入口 token。`PrincipalAccessToken` 承载后台、前台会员和 OAuth2 access token 运行态。`PrincipalRefreshToken` 承载后台、前台会员和 OAuth2 refresh token 运行态。`AuthSession` 固定不替代 token 的传输职责。
 
 `PermissionSession` 继续承载权限集合缓存。`AuthSession` 固定不承载权限集合。
 
@@ -62,11 +62,7 @@
 
 `OAuthAuthorization` 归属 `auth` 认证模型，承载 OAuth2 授权请求、授权码、PKCE 参数、授权范围、决策状态和一次性消费状态。
 
-`OAuthAccessToken` 归属 `auth` 认证模型，承载 OAuth2 access token、客户端、用户、授权范围、过期和失效状态。
-
-`OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、过期和失效状态。
-
-前台会员认证运行态也归属 `auth` 认证模型。`MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken` 保留 `Member` 前缀，用于区分后台用户认证模型和前台会员认证模型。
+前台会员认证运行态也归属 `auth` 认证模型。`MemberAuthSession` 保留 `Member` 前缀，用于表达前台会员会话事实；前台会员访问 token 和 refresh token 统一由 `PrincipalAccessToken` / `PrincipalRefreshToken` 表达。
 
 后台和前台认证的共性结构固定为：
 
@@ -251,14 +247,14 @@
 前台会员认证运行态对象归属 auth 域：
 
 - `MemberAuthSession`：前台会员认证会话事实。
-- `MemberAccessToken`：前台会员 API 请求访问 token。
-- `MemberRefreshToken`：前台会员刷新 token。
+- `PrincipalAccessToken`：前台会员 API 请求访问 token。
+- `PrincipalRefreshToken`：前台会员刷新 token。
 
 固定约束：
 
-- 前台 API 登录成功后必须创建 `MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken`。
-- 前台会员认证运行态使用 `member_` 物理表名前缀，但 Java 模型、DAO 契约和持久化实现归属 `modules.auth`。
-- `MemberAccessToken` 和 `MemberRefreshToken` 固定只保存 token hash，不保存 token 明文。
+- 前台 API 登录成功后必须创建 `MemberAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken`。
+- 前台会员 token 固定使用 `PrincipalKey(MEMBER, memberId)` 定位主体。
+- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 固定只保存 token hash，不保存 token 明文。
 
 ### 5.6 PreAuthSession
 
@@ -354,17 +350,18 @@
 - 授权范围必须是 `OAuthClient.scopes` 的子集。
 - `S256` PKCE challenge 必须使用 code verifier 的 SHA-256 Base64Url 摘要。
 
-### 5.11 OAuthAccessToken
+### 5.11 PrincipalAccessToken
 
-`OAuthAccessToken` 是 OAuth2 access token 事实。
+`PrincipalAccessToken` 是统一 access token 运行态。
 
 核心字段：
 
-- `id`：access token 主键。
+- `id`：access token 运行态标识。
 - `tokenId`：token 标识。
 - `tokenHash`：token 哈希。
 - `clientId`：客户端标识。
-- `userId`：用户标识。
+- `sessionId`：会话标识。
+- `principalKey`：主体坐标。
 - `scopes`：授权范围集合。
 - `issuedAt`：签发时间。
 - `expireAt`：过期时间。
@@ -378,23 +375,25 @@
 
 固定约束：
 
-- OAuth2 access token 只保存哈希，不保存明文。
-- OAuth2 access token 哈希必须使用 SHA-256 Base64Url 摘要。
+- access token 只保存哈希，不保存明文。
+- access token 哈希必须使用 SHA-256 Base64Url 摘要。
 - introspection 必须同时校验 token 状态、过期时间和用户启用状态。
 - revoke access token 后 introspection 必须返回 `active=false`。
+- token 运行态固定进入 Redis / JetCache，不建立数据库表。
 
-### 5.12 OAuthRefreshToken
+### 5.12 PrincipalRefreshToken
 
-`OAuthRefreshToken` 是 refresh token 事实。
+`PrincipalRefreshToken` 是统一 refresh token 运行态。
 
 核心字段：
 
-- `id`：refresh token 主键。
+- `id`：refresh token 运行态标识。
 - `tokenId`：token 标识。
 - `tokenHash`：token 哈希。
 - `accessTokenId`：关联访问 token 标识。
 - `clientId`：客户端标识。
-- `userId`：用户标识。
+- `sessionId`：会话标识。
+- `principalKey`：主体坐标。
 - `issuedAt`：签发时间。
 - `expireAt`：过期时间。
 - `status`：token 状态。
@@ -411,6 +410,7 @@
 - refresh token 只保存哈希，不保存明文。
 - refresh token refresh 成功后必须轮换或标记原 token 已使用。
 - refresh token 失效必须同步阻断后续访问 token 刷新。
+- token 运行态固定进入 Redis / JetCache，不建立数据库表。
 
 ## 6. Global Constraints
 

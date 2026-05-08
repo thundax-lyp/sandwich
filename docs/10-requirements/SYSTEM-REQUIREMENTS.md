@@ -37,7 +37,7 @@
 - `User` 是后台用户主体。
 - `PrincipalIdentity` 是后台登录标识，归属 `Auth`。
 - `PrincipalCredential` 是后台认证凭据，归属 `Auth`。
-- `AuthSession`、`AccessToken`、`OAuthAccessToken` 和 `OAuthRefreshToken` 归属 `Auth`。
+- `AuthSession`、`AccessToken`、`PrincipalAccessToken` 和 `PrincipalRefreshToken` 归属 `Auth`。
 
 后台授权链路中：
 

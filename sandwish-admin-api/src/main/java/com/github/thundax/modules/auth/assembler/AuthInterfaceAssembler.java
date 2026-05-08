@@ -10,8 +10,8 @@ import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionRe
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -99,11 +99,11 @@ public final class AuthInterfaceAssembler {
         response.setActive(true);
         response.setSubject(userId(result.getUser()));
         response.setUsername(result.getUsername());
-        OAuthAccessToken oauthAccessToken = result.getOauthAccessToken();
-        if (oauthAccessToken != null) {
-            response.setClientId(oauthAccessToken.getClientId());
-            response.setScope(scope(oauthAccessToken.getScopes()));
-            response.setExpiresAt(epochSeconds(oauthAccessToken.getExpireAt()));
+        PrincipalAccessToken principalAccessToken = result.getPrincipalAccessToken();
+        if (principalAccessToken != null) {
+            response.setClientId(principalAccessToken.getClientId());
+            response.setScope(scope(principalAccessToken.getScopes()));
+            response.setExpiresAt(epochSeconds(principalAccessToken.getExpireAt()));
             response.setTokenType("Bearer");
         }
         if (result.getSession() != null) {

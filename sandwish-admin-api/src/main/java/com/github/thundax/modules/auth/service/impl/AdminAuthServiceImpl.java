@@ -12,27 +12,27 @@ import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.AccessTokenDao;
 import com.github.thundax.modules.auth.dao.AuthSessionDao;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
-import com.github.thundax.modules.auth.dao.OAuthAccessTokenDao;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
-import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
-import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
-import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
-import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
@@ -98,13 +98,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private OAuthAuthorizationDao oauthAuthorizationDao;
 
     @Autowired(required = false)
-    private OAuthAccessTokenDao oauthAccessTokenDao;
+    private PrincipalAccessTokenDao principalAccessTokenDao;
 
     @Autowired(required = false)
     private OAuthClientDao oauthClientDao;
 
     @Autowired(required = false)
-    private OAuthRefreshTokenDao oauthRefreshTokenDao;
+    private PrincipalRefreshTokenDao principalRefreshTokenDao;
 
     public AdminAuthServiceImpl(
             AuthProperties properties,
@@ -311,17 +311,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     private AuthTokenQueryResult queryOAuthAccessToken(String token) {
-        if (oauthAccessTokenDao == null) {
+        if (principalAccessTokenDao == null) {
             return null;
         }
-        OAuthAccessToken accessToken = oauthAccessTokenDao.getByTokenHash(tokenHash(token));
+        PrincipalAccessToken accessToken = principalAccessTokenDao.getByTokenHash(tokenHash(token));
         if (accessToken == null) {
             return null;
         }
-        if (!accessToken.isIntrospectionActive(new Date())) {
+        if (!accessToken.canAccess(new Date())) {
             return AuthTokenQueryResult.inactive(token);
         }
-        User user = userService.getById(accessToken.getUserId());
+        User user = userService.getById(accessToken.getPrincipalKey().getPrincipalId());
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
@@ -330,18 +330,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
-        if (oauthRefreshTokenDao == null) {
+        if (principalRefreshTokenDao == null) {
             throw new ApiException("refresh token 未配置");
         }
-        OAuthRefreshToken current = oauthRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
+        PrincipalRefreshToken current = principalRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
         Date now = new Date();
         if (current == null || !current.canRefresh(now) || !StringUtils.equals(clientId, current.getClientId())) {
             throw new InvalidTokenException();
         }
         current.markUsed(now);
-        oauthRefreshTokenDao.updateStatus(current);
+        principalRefreshTokenDao.updateStatus(current);
 
-        AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(current.getUserId()));
+        AccessToken accessToken = createAccessToken(
+                EntityIdCodec.toStringValue(current.getPrincipalKey().getPrincipalId()));
         String nextRefreshToken = createOAuthRefreshToken(accessToken, clientId, now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken);
     }
@@ -440,16 +441,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         oauthAuthorizationDao.updateUsed(authorization);
         AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(authorization.getUserId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, authorization, now);
-        String refreshToken =
-                oauthRefreshTokenDao == null ? null : createOAuthRefreshToken(accessToken, client.getClientId(), now);
+        String refreshToken = principalRefreshTokenDao == null
+                ? null
+                : createOAuthRefreshToken(accessToken, client.getClientId(), now);
         return new AuthTokenRefreshResult(accessToken, refreshToken, oauthAccessToken);
     }
 
     private AuthTokenRefreshResult refreshOAuth2Token(OAuthClient client, String refreshToken) throws ApiException {
-        if (oauthRefreshTokenDao == null) {
+        if (principalRefreshTokenDao == null) {
             throw new ApiException("refresh token 未配置");
         }
-        OAuthRefreshToken current = oauthRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
+        PrincipalRefreshToken current = principalRefreshTokenDao.getByTokenHash(tokenHash(refreshToken));
         Date now = new Date();
         if (current == null
                 || !current.canRefresh(now)
@@ -457,9 +459,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new InvalidTokenException();
         }
         current.markUsed(now);
-        oauthRefreshTokenDao.updateStatus(current);
+        principalRefreshTokenDao.updateStatus(current);
 
-        AccessToken accessToken = createAccessToken(EntityIdCodec.toStringValue(current.getUserId()));
+        AccessToken accessToken = createAccessToken(
+                EntityIdCodec.toStringValue(current.getPrincipalKey().getPrincipalId()));
         String oauthAccessToken = createOAuthAccessToken(accessToken, client, current, now);
         String nextRefreshToken = createOAuthRefreshToken(accessToken, client.getClientId(), now);
         return new AuthTokenRefreshResult(accessToken, nextRefreshToken, oauthAccessToken);
@@ -478,19 +481,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         validateOAuthClientSecret(clientId, clientSecret);
         Date now = new Date();
         boolean revoked = false;
-        if (oauthAccessTokenDao != null) {
-            OAuthAccessToken accessToken = oauthAccessTokenDao.getByTokenHash(tokenHash(token));
+        if (principalAccessTokenDao != null) {
+            PrincipalAccessToken accessToken = principalAccessTokenDao.getByTokenHash(tokenHash(token));
             if (accessToken != null && accessToken.isActive()) {
                 accessToken.revoke(now);
-                oauthAccessTokenDao.updateStatus(accessToken);
+                principalAccessTokenDao.updateStatus(accessToken);
                 revoked = true;
             }
         }
-        if (oauthRefreshTokenDao != null) {
-            OAuthRefreshToken refreshToken = oauthRefreshTokenDao.getByTokenHash(tokenHash(token));
+        if (principalRefreshTokenDao != null) {
+            PrincipalRefreshToken refreshToken = principalRefreshTokenDao.getByTokenHash(tokenHash(token));
             if (refreshToken != null && refreshToken.isActive()) {
                 refreshToken.revoke(now);
-                oauthRefreshTokenDao.updateStatus(refreshToken);
+                principalRefreshTokenDao.updateStatus(refreshToken);
                 revoked = true;
             }
         }
@@ -717,57 +720,54 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     private String createOAuthRefreshToken(AccessToken accessToken, String clientId, Date issuedAt) {
         String refreshToken = UuidHelper.compact();
-        OAuthRefreshToken entity = new OAuthRefreshToken();
+        PrincipalRefreshToken entity = new PrincipalRefreshToken();
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(refreshToken));
         entity.setAccessTokenId(accessToken.getToken());
         entity.setClientId(clientId);
-        entity.setUserId(EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
+        entity.setPrincipalKey(
+                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId()))));
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + refreshTokenTtlSeconds(clientId) * 1000L));
-        entity.setStatus(OAuthRefreshTokenStatus.ACTIVE);
-        entity.setCreateDate(issuedAt);
-        entity.setUpdateDate(issuedAt);
-        entity.setId(oauthRefreshTokenDao.insert(entity));
+        entity.setStatus(PrincipalTokenStatus.ACTIVE);
+        entity.setId(principalRefreshTokenDao.insert(entity));
         return refreshToken;
     }
 
     private String createOAuthAccessToken(
             AccessToken accessToken, OAuthClient client, OAuthAuthorization authorization, Date issuedAt) {
-        if (oauthAccessTokenDao == null) {
+        if (principalAccessTokenDao == null) {
             return accessToken.getToken();
         }
         String token = UuidHelper.compact();
-        OAuthAccessToken entity = new OAuthAccessToken();
+        PrincipalAccessToken entity = new PrincipalAccessToken();
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(token));
         entity.setClientId(client.getClientId());
-        entity.setUserId(authorization.getUserId());
+        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, authorization.getUserId()));
         entity.setScopes(authorization.getScopes());
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
-        entity.setCreateDate(issuedAt);
-        entity.setUpdateDate(issuedAt);
-        entity.setId(oauthAccessTokenDao.insert(entity));
+        entity.setStatus(PrincipalTokenStatus.ACTIVE);
+        entity.setId(principalAccessTokenDao.insert(entity));
         return token;
     }
 
     private String createOAuthAccessToken(
-            AccessToken accessToken, OAuthClient client, OAuthRefreshToken refreshToken, Date issuedAt) {
-        if (oauthAccessTokenDao == null) {
+            AccessToken accessToken, OAuthClient client, PrincipalRefreshToken refreshToken, Date issuedAt) {
+        if (principalAccessTokenDao == null) {
             return accessToken.getToken();
         }
         String token = UuidHelper.compact();
-        OAuthAccessToken entity = new OAuthAccessToken();
+        PrincipalAccessToken entity = new PrincipalAccessToken();
         entity.setTokenId(UuidHelper.compact());
         entity.setTokenHash(tokenHash(token));
         entity.setClientId(client.getClientId());
-        entity.setUserId(refreshToken.getUserId());
+        entity.setPrincipalKey(refreshToken.getPrincipalKey());
         entity.setIssuedAt(issuedAt);
         entity.setExpireAt(new Date(issuedAt.getTime() + accessTokenTtlSeconds(client) * 1000L));
-        entity.setCreateDate(issuedAt);
-        entity.setUpdateDate(issuedAt);
-        entity.setId(oauthAccessTokenDao.insert(entity));
+        entity.setStatus(PrincipalTokenStatus.ACTIVE);
+        entity.setId(principalAccessTokenDao.insert(entity));
         return token;
     }
 

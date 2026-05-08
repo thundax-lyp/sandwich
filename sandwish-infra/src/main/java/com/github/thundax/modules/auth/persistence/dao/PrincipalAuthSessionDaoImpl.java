@@ -70,16 +70,15 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         if (cacheDTO == null) {
             return null;
         }
-        PrincipalAuthSession session = new PrincipalAuthSession();
-        session.setId(PrincipalAuthSessionIdCodec.toDomain(cacheDTO.id));
-        session.setPrincipalKey(PrincipalKey.of(
-                PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
-        session.setClientId(cacheDTO.clientId);
-        session.setValues(toEntityValues(cacheDTO.values));
-        session.setIssuedAt(cacheDTO.issuedAt);
-        session.setLastAccessTime(cacheDTO.lastAccessTime);
-        session.setExpireAt(cacheDTO.expireAt);
-        return session;
+        return PrincipalAuthSession.restore(
+                PrincipalAuthSessionIdCodec.toDomain(cacheDTO.id),
+                PrincipalKey.of(
+                        PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)),
+                cacheDTO.clientId,
+                toEntityValues(cacheDTO.values),
+                cacheDTO.issuedAt,
+                cacheDTO.lastAccessTime,
+                cacheDTO.expireAt);
     }
 
     private static PrincipalAuthSessionCacheDTO toCacheDTO(PrincipalAuthSession session) {
@@ -95,37 +94,21 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         return cacheDTO;
     }
 
-    private static Map<String, PrincipalAuthSession.PrincipalAuthSessionValue> toEntityValues(
-            Map<String, PrincipalAuthSessionValueCacheDTO> cacheValues) {
-        Map<String, PrincipalAuthSession.PrincipalAuthSessionValue> values = new LinkedHashMap<>();
+    private static Map<String, Object> toEntityValues(Map<String, Object> cacheValues) {
+        Map<String, Object> values = new LinkedHashMap<>();
         if (cacheValues == null) {
             return values;
         }
-        for (Map.Entry<String, PrincipalAuthSessionValueCacheDTO> entry : cacheValues.entrySet()) {
-            PrincipalAuthSessionValueCacheDTO value = entry.getValue();
-            values.put(
-                    entry.getKey(),
-                    value == null
-                            ? null
-                            : new PrincipalAuthSession.PrincipalAuthSessionValue(value.value, value.expiredAt));
-        }
+        values.putAll(cacheValues);
         return values;
     }
 
-    private static Map<String, PrincipalAuthSessionValueCacheDTO> toCacheValues(
-            Map<String, PrincipalAuthSession.PrincipalAuthSessionValue> entityValues) {
-        Map<String, PrincipalAuthSessionValueCacheDTO> values = new LinkedHashMap<>();
+    private static Map<String, Object> toCacheValues(Map<String, Object> entityValues) {
+        Map<String, Object> values = new LinkedHashMap<>();
         if (entityValues == null) {
             return values;
         }
-        for (Map.Entry<String, PrincipalAuthSession.PrincipalAuthSessionValue> entry : entityValues.entrySet()) {
-            PrincipalAuthSession.PrincipalAuthSessionValue value = entry.getValue();
-            values.put(
-                    entry.getKey(),
-                    value == null
-                            ? null
-                            : new PrincipalAuthSessionValueCacheDTO(value.getValue(), value.getExpiredAt()));
-        }
+        values.putAll(entityValues);
         return values;
     }
 
@@ -134,21 +117,9 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         private String principalType;
         private Long principalId;
         private String clientId;
-        private Map<String, PrincipalAuthSessionValueCacheDTO> values = new LinkedHashMap<>();
+        private Map<String, Object> values = new LinkedHashMap<>();
         private Date issuedAt;
         private Date lastAccessTime;
         private Date expireAt;
-    }
-
-    private static class PrincipalAuthSessionValueCacheDTO implements CacheDTO {
-        private Object value;
-        private Date expiredAt;
-
-        private PrincipalAuthSessionValueCacheDTO() {}
-
-        private PrincipalAuthSessionValueCacheDTO(Object value, Date expiredAt) {
-            this.value = value;
-            this.expiredAt = expiredAt;
-        }
     }
 }

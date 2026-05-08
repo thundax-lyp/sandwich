@@ -648,7 +648,14 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void touch(PrincipalAuthSessionId id, Date accessTime, int expireSeconds) {
             if (session != null && session.getId().equals(id)) {
-                session.setLastAccessTime(accessTime);
+                session = PrincipalAuthSession.restore(
+                        session.getId(),
+                        session.getPrincipalKey(),
+                        session.getClientId(),
+                        session.getValues(),
+                        session.getIssuedAt(),
+                        accessTime,
+                        session.getExpireAt());
                 touchCount++;
             }
         }
@@ -667,14 +674,14 @@ public class AuthPermissionLifecycleTest {
 
     private PrincipalAuthSession principalAuthSession(PrincipalAuthSessionId id, String clientId) {
         Date now = new Date();
-        PrincipalAuthSession session = new PrincipalAuthSession();
-        session.setId(id);
-        session.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
-        session.setClientId(clientId);
-        session.setIssuedAt(now);
-        session.setLastAccessTime(now);
-        session.setExpireAt(new Date(now.getTime() + 60000L));
-        return session;
+        return PrincipalAuthSession.restore(
+                id,
+                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)),
+                clientId,
+                null,
+                now,
+                now,
+                new Date(now.getTime() + 60000L));
     }
 
     private static class TestUserService implements UserService {

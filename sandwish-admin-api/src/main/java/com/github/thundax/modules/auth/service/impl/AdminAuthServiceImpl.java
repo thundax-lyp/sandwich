@@ -5,10 +5,8 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
-import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
@@ -64,7 +62,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     private static final int SESSION_RUNTIME_SAFETY_SECONDS = 10;
     private static final String ADMIN_CLIENT_ID = "admin-api";
-    private final SnowflakeIdGenerator sessionIdGenerator = new SnowflakeIdGenerator();
 
     private final AuthProperties properties;
     private final LoginProperties loginProperties;
@@ -154,8 +151,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 new LinkedHashSet<>(),
                 now,
                 properties.getLoginExpiredSeconds());
-        PrincipalAuthSession session = createPrincipalAuthSession(
+        PrincipalAuthSession session = PrincipalAuthSession.create(
                 accessToken.getPrincipalKey(), ADMIN_CLIENT_ID, now, properties.getLoginExpiredSeconds());
+        principalAuthSessionDao.insert(session, runtimeExpiredSeconds(properties.getLoginExpiredSeconds()));
         accessToken.setSessionId(session.getId());
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
         permissionService.createPermissions(token, userId);
@@ -490,8 +488,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         authorization.markUsed(now);
         oauthAuthorizationDao.updateUsed(authorization);
-        PrincipalAuthSession session = createPrincipalAuthSession(
-                authorization.getPrincipalKey(), client.getClientId(), now, accessTokenTtlSeconds(client));
+        long accessTokenTtlSeconds = accessTokenTtlSeconds(client);
+        PrincipalAuthSession session = PrincipalAuthSession.create(
+                authorization.getPrincipalKey(), client.getClientId(), now, accessTokenTtlSeconds);
+        principalAuthSessionDao.insert(session, runtimeExpiredSeconds(accessTokenTtlSeconds));
         AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, authorization, session, now);
         String refreshToken = principalRefreshTokenDao == null
                 ? null
@@ -751,19 +751,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new BannedAccountException();
         }
         return user;
-    }
-
-    private PrincipalAuthSession createPrincipalAuthSession(
-            PrincipalKey principalKey, String clientId, Date now, long ttlSeconds) {
-        PrincipalAuthSession session = new PrincipalAuthSession();
-        session.setId(PrincipalAuthSessionIdCodec.nextId(sessionIdGenerator));
-        session.setPrincipalKey(principalKey);
-        session.setClientId(clientId);
-        session.setIssuedAt(now);
-        session.setLastAccessTime(now);
-        session.setExpireAt(new Date(now.getTime() + ttlSeconds * 1000L));
-        principalAuthSessionDao.insert(session, runtimeExpiredSeconds(ttlSeconds));
-        return session;
     }
 
     private PrincipalAuthSession getActivePrincipalAuthSession(PrincipalAccessToken accessToken, Date now) {

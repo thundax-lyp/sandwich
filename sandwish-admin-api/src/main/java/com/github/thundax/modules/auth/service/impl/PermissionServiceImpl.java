@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
+    private static final String SESSION_VALUE_PERMISSIONS = "PERMISSIONS";
     private static final int SAFETY_SECONDS = 10;
 
     private final PrincipalAccessTokenDao principalAccessTokenDao;
@@ -60,10 +61,7 @@ public class PermissionServiceImpl implements PermissionService {
             return Collections.emptySet();
         }
         Set<String> permissions = loadPermissions(userId);
-        session.getValues()
-                .put(
-                        PrincipalAuthSession.VALUE_PERMISSIONS,
-                        new PrincipalAuthSession.PrincipalAuthSessionValue(permissions, session.getExpireAt()));
+        session.getValues().put(SESSION_VALUE_PERMISSIONS, permissions);
         principalAuthSessionDao.insert(session, expiredSeconds(session));
         return permissions;
     }
@@ -74,12 +72,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (session == null) {
             return null;
         }
-        PrincipalAuthSession.PrincipalAuthSessionValue value =
-                session.getValues().get(PrincipalAuthSession.VALUE_PERMISSIONS);
-        if (value == null || isExpired(value.getExpiredAt())) {
-            return null;
-        }
-        return toPermissionSet(value.getValue());
+        return toPermissionSet(session.getValues().get(SESSION_VALUE_PERMISSIONS));
     }
 
     @Override
@@ -129,10 +122,6 @@ public class PermissionServiceImpl implements PermissionService {
             return null;
         }
         return session;
-    }
-
-    private boolean isExpired(Date expiredAt) {
-        return expiredAt != null && !expiredAt.after(new Date());
     }
 
     private Set<String> toPermissionSet(Object value) {

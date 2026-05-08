@@ -2,9 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
@@ -42,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberAuthServiceImpl implements MemberAuthService {
 
     private static final String MEMBER_CLIENT_ID = "member-api";
-    private final SnowflakeIdGenerator sessionIdGenerator = new SnowflakeIdGenerator();
 
     private final AuthProperties authProperties;
     private final MemberService memberService;
@@ -235,13 +232,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     private MemberTokenResult createTokenResult(Member member) {
         Date now = new Date();
-        PrincipalAuthSession session = new PrincipalAuthSession();
-        session.setId(PrincipalAuthSessionIdCodec.nextId(sessionIdGenerator));
-        session.setPrincipalKey(PrincipalKey.of(PrincipalType.MEMBER, member.getId()));
-        session.setClientId(MEMBER_CLIENT_ID);
-        session.setIssuedAt(now);
-        session.setLastAccessTime(now);
-        session.setExpireAt(new Date(now.getTime() + authProperties.getLoginExpiredSeconds() * 1000L));
+        PrincipalAuthSession session = PrincipalAuthSession.create(
+                PrincipalKey.of(PrincipalType.MEMBER, member.getId()),
+                MEMBER_CLIENT_ID,
+                now,
+                authProperties.getLoginExpiredSeconds());
         return createTokenResult(member, session);
     }
 

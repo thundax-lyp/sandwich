@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 public class PrincipalAuthSessionDaoImplTest {
+    private static final String SAMPLE_VALUE_NAME = "SAMPLE";
 
     @Test
     public void shouldStoreTouchAndDeletePrincipalAuthSessionById() throws Exception {
@@ -38,7 +39,7 @@ public class PrincipalAuthSessionDaoImplTest {
         assertEquals("admin-api", stored.getClientId());
         assertEquals(
                 new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")),
-                stored.getValues().get(PrincipalAuthSession.VALUE_PERMISSIONS).getValue());
+                stored.getValues().get(SAMPLE_VALUE_NAME));
         assertEquals(Long.valueOf(70L), cache.getTtlSeconds(sessionKey("fa1")));
 
         Date accessTime = new Date(3000L);
@@ -54,19 +55,16 @@ public class PrincipalAuthSessionDaoImplTest {
     }
 
     private PrincipalAuthSession session() {
-        PrincipalAuthSession session = new PrincipalAuthSession();
-        session.setId(PrincipalAuthSessionId.of("fa1"));
-        session.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)));
-        session.setClientId("admin-api");
-        session.getValues()
-                .put(
-                        PrincipalAuthSession.VALUE_PERMISSIONS,
-                        new PrincipalAuthSession.PrincipalAuthSessionValue(
-                                new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")), null));
-        session.setIssuedAt(new Date(1000L));
-        session.setLastAccessTime(new Date(1000L));
-        session.setExpireAt(new Date(60000L));
-        return session;
+        Map<String, Object> values = new HashMap<>();
+        values.put(SAMPLE_VALUE_NAME, new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")));
+        return PrincipalAuthSession.restore(
+                PrincipalAuthSessionId.of("fa1"),
+                PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)),
+                "admin-api",
+                values,
+                new Date(1000L),
+                new Date(1000L),
+                new Date(60000L));
     }
 
     private String sessionKey(String sessionId) {

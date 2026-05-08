@@ -5,6 +5,7 @@ import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,8 @@ public final class MemberAuthSessionPersistenceAssembler {
         }
         MemberAuthSessionDO dataObject = new MemberAuthSessionDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setSessionId(entity.getSessionId());
-        dataObject.setMemberId(EntityIdCodec.toValue(entity.getMemberId()));
+        dataObject.setPrincipalType(principalTypeValue(entity.getPrincipalKey()));
+        dataObject.setPrincipalId(principalIdValue(entity.getPrincipalKey()));
         dataObject.setIdentityId(EntityIdCodec.toValue(entity.getIdentityId()));
         dataObject.setIdentityType(identityTypeValue(entity.getIdentityType()));
         dataObject.setLoginType(entity.getLoginType());
@@ -39,8 +40,9 @@ public final class MemberAuthSessionPersistenceAssembler {
         }
         MemberAuthSession entity = new MemberAuthSession();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setSessionId(dataObject.getSessionId());
-        entity.setMemberId(EntityIdCodec.toDomain(dataObject.getMemberId()));
+        entity.setPrincipalKey(PrincipalKey.of(
+                PrincipalType.from(dataObject.getPrincipalType()),
+                EntityIdCodec.toDomain(dataObject.getPrincipalId())));
         entity.setIdentityId(EntityIdCodec.toDomain(dataObject.getIdentityId()));
         entity.setIdentityType(identityTypeFrom(dataObject.getIdentityType()));
         entity.setLoginType(dataObject.getLoginType());
@@ -76,5 +78,15 @@ public final class MemberAuthSessionPersistenceAssembler {
             return PrincipalIdentityType.from(identityType);
         }
         return PrincipalIdentityType.from(PrincipalType.MEMBER, identityType);
+    }
+
+    private static String principalTypeValue(PrincipalKey principalKey) {
+        return principalKey == null || principalKey.getPrincipalType() == null
+                ? null
+                : principalKey.getPrincipalType().value();
+    }
+
+    private static Long principalIdValue(PrincipalKey principalKey) {
+        return principalKey == null ? null : EntityIdCodec.toValue(principalKey.getPrincipalId());
     }
 }

@@ -3,15 +3,14 @@ package com.github.thundax.modules.auth.dao;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.List;
 
 public interface MemberAuthSessionDao {
 
     MemberAuthSession getById(EntityId id);
 
-    MemberAuthSession getBySessionId(String sessionId);
-
-    List<MemberAuthSession> listByMemberIdAndStatus(EntityId memberId, MemberAuthSessionStatus status);
+    List<MemberAuthSession> listByPrincipalKeyAndStatus(PrincipalKey principalKey, MemberAuthSessionStatus status);
 
     EntityId insert(MemberAuthSession authSession);
 

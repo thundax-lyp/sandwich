@@ -1,12 +1,13 @@
 package com.github.thundax.modules.auth.dao;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 
 public interface MemberAuthSessionRuntimeDao {
 
-    MemberAuthSession getBySessionId(String sessionId);
+    MemberAuthSession getById(EntityId id);
 
     void insert(MemberAuthSession authSession, int expireSeconds);
 
-    void deleteBySessionId(String sessionId);
+    void deleteById(EntityId id);
 }

@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS `auth_principal_credential` (
 
 CREATE TABLE IF NOT EXISTS `auth_session` (
     `id` bigint NOT NULL,
-    `session_id` varchar(64) NOT NULL,
     `token` varchar(255) NOT NULL,
-    `user_id` bigint NOT NULL,
+    `principal_type` varchar(16) NOT NULL,
+    `principal_id` bigint NOT NULL,
     `identity_id` bigint NOT NULL,
     `identity_type` varchar(16) NOT NULL,
     `login_type` varchar(16) NOT NULL,
@@ -47,17 +47,16 @@ CREATE TABLE IF NOT EXISTS `auth_session` (
     `logout_at` datetime(3) DEFAULT NULL,
     `invalidate_reason` varchar(128) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_auth_session_session_id` (`session_id`),
     UNIQUE KEY `uk_auth_session_token` (`token`),
-    KEY `idx_auth_session_user_status` (`user_id`, `status`),
+    KEY `idx_auth_session_principal_status` (`principal_type`, `principal_id`, `status`),
     KEY `idx_auth_session_identity` (`identity_id`, `identity_type`),
     KEY `idx_auth_session_expire` (`status`, `expire_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台认证会话审计表';
 
 CREATE TABLE IF NOT EXISTS `member_auth_session` (
     `id` bigint NOT NULL,
-    `session_id` varchar(64) NOT NULL,
-    `member_id` bigint NOT NULL,
+    `principal_type` varchar(16) NOT NULL,
+    `principal_id` bigint NOT NULL,
     `identity_id` bigint DEFAULT NULL,
     `identity_type` varchar(16) DEFAULT NULL,
     `login_type` varchar(32) DEFAULT NULL,
@@ -68,8 +67,7 @@ CREATE TABLE IF NOT EXISTS `member_auth_session` (
     `logout_at` datetime(3) DEFAULT NULL,
     `invalidate_reason` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_member_auth_session_session` (`session_id`),
-    KEY `idx_member_auth_session_member` (`member_id`, `status`),
+    KEY `idx_member_auth_session_principal` (`principal_type`, `principal_id`, `status`),
     KEY `idx_member_auth_session_status` (`status`, `last_access_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='前台会员认证会话审计表';
 

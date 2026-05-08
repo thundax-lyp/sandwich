@@ -8,6 +8,7 @@ import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionDao;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.assembler.MemberAuthSessionPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO;
 import com.github.thundax.modules.auth.persistence.mapper.MemberAuthSessionMapper;
@@ -29,16 +30,13 @@ public class MemberAuthSessionDaoImpl implements MemberAuthSessionDao {
     }
 
     @Override
-    public MemberAuthSession getBySessionId(String sessionId) {
+    public List<MemberAuthSession> listByPrincipalKeyAndStatus(
+            PrincipalKey principalKey, MemberAuthSessionStatus status) {
         LambdaQueryWrapper<MemberAuthSessionDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberAuthSessionDO::getSessionId, sessionId);
-        return MemberAuthSessionPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
-    }
-
-    @Override
-    public List<MemberAuthSession> listByMemberIdAndStatus(EntityId memberId, MemberAuthSessionStatus status) {
-        LambdaQueryWrapper<MemberAuthSessionDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MemberAuthSessionDO::getMemberId, EntityIdCodec.toValue(memberId));
+        wrapper.eq(
+                MemberAuthSessionDO::getPrincipalType,
+                principalKey.getPrincipalType().value());
+        wrapper.eq(MemberAuthSessionDO::getPrincipalId, EntityIdCodec.toValue(principalKey.getPrincipalId()));
         if (status != null) {
             wrapper.eq(MemberAuthSessionDO::getStatus, status.value());
         }

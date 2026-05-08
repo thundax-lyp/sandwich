@@ -18,8 +18,8 @@ public class MemberAuthSessionDO {
     @TableId(type = IdType.INPUT)
     private Long id;
 
-    private String sessionId;
-    private Long memberId;
+    private String principalType;
+    private Long principalId;
     private Long identityId;
     private String identityType;
     private String loginType;

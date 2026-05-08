@@ -1,25 +1,26 @@
 package com.github.thundax.modules.auth.dao;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.List;
 
 public interface PrincipalAccessTokenDao {
 
-    PrincipalAccessToken getById(EntityId id);
+    PrincipalAccessToken getById(PrincipalAccessTokenId id);
 
-    PrincipalAccessToken getByTokenId(String tokenId);
+    PrincipalAccessToken getByTokenCode(PrincipalAccessTokenCode tokenCode);
 
-    PrincipalAccessToken getByTokenHash(String tokenHash);
+    PrincipalAccessToken getByToken(String token);
 
     List<PrincipalAccessToken> listByPrincipalKeyAndClientIdAndStatus(
             PrincipalKey principalKey, String clientId, PrincipalTokenStatus status);
 
     int countByClientIdAndStatus(String clientId, PrincipalTokenStatus status);
 
-    EntityId insert(PrincipalAccessToken accessToken);
+    PrincipalAccessTokenId insert(PrincipalAccessToken accessToken, String token);
 
     int updateStatus(PrincipalAccessToken accessToken);
 }

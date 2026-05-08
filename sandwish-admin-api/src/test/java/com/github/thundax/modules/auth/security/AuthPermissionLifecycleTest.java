@@ -10,6 +10,8 @@ import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
+import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
+import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
@@ -22,7 +24,6 @@ import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
-import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -35,18 +36,20 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenId;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
-import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
-import com.github.thundax.modules.auth.service.impl.PreAuthSessionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
@@ -55,7 +58,6 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
-import com.github.thundax.modules.auth.testsupport.InMemoryPreAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
@@ -104,9 +106,6 @@ public class AuthPermissionLifecycleTest {
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
-        PreAuthSessionService preAuthSessionService =
-                new PreAuthSessionServiceImpl(new InMemoryPreAuthSessionDaoImpl());
-
         TestUserService userService = new TestUserService();
         TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
         TestPrincipalCredentialService principalCredentialService = new TestPrincipalCredentialService();
@@ -123,7 +122,6 @@ public class AuthPermissionLifecycleTest {
         authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
-                preAuthSessionService,
                 authSessionDao,
                 authSessionRuntimeDao,
                 permissionService,
@@ -213,16 +211,16 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         PrincipalRefreshToken refreshToken = new PrincipalRefreshToken();
-        refreshToken.setId(EntityIdCodec.toDomain(2001L));
-        refreshToken.setTokenId("refresh-token-1");
-        refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
-        refreshToken.setAccessTokenId("old-access-token");
+        refreshToken.setId(PrincipalRefreshTokenIdCodec.toDomain("2001"));
+        refreshToken.setTokenCode(PrincipalRefreshTokenCode.of("refresh-token-1"));
+        refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
         refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
+        refreshTokenDao.currentToken = "plain-refresh-token";
 
         AuthTokenRefreshResult result = authService.refreshAccessToken("admin-web", "plain-refresh-token");
 
@@ -304,16 +302,16 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         PrincipalRefreshToken refreshToken = new PrincipalRefreshToken();
-        refreshToken.setId(EntityIdCodec.toDomain(2001L));
-        refreshToken.setTokenId("refresh-token-1");
-        refreshToken.setTokenHash(Sha256Helper.hashBase64Url("plain-refresh-token"));
-        refreshToken.setAccessTokenId("old-access-token");
+        refreshToken.setId(PrincipalRefreshTokenIdCodec.toDomain("2001"));
+        refreshToken.setTokenCode(PrincipalRefreshTokenCode.of("refresh-token-1"));
+        refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
         refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
+        refreshTokenDao.currentToken = "plain-refresh-token";
 
         AuthTokenRefreshResult result = authService.exchangeOAuth2Token(
                 "admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token");
@@ -339,15 +337,9 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
-        PreAuthSession session = authService.createPreAuthSession();
-        String loginToken = session.getToken().asString();
-        String smsCode = authService.createSmsValidateCode(loginToken, "13800000000");
-
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(authService
-                        .authenticateSms(loginToken, "13800000000", smsCode)
-                        .getId()));
+                EntityIdCodec.toValue(authService.authenticateSms("13800000000").getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");
         inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
@@ -530,20 +522,21 @@ public class AuthPermissionLifecycleTest {
 
         private PrincipalAccessToken current;
         private PrincipalAccessToken inserted;
+        private String currentToken;
 
         @Override
-        public PrincipalAccessToken getById(EntityId id) {
+        public PrincipalAccessToken getById(PrincipalAccessTokenId id) {
             return current;
         }
 
         @Override
-        public PrincipalAccessToken getByTokenId(String tokenId) {
-            return current != null && current.getTokenId().equals(tokenId) ? current : null;
+        public PrincipalAccessToken getByTokenCode(PrincipalAccessTokenCode tokenCode) {
+            return current != null && current.getTokenCode().equals(tokenCode) ? current : null;
         }
 
         @Override
-        public PrincipalAccessToken getByTokenHash(String tokenHash) {
-            return current != null && current.getTokenHash().equals(tokenHash) ? current : null;
+        public PrincipalAccessToken getByToken(String token) {
+            return current != null && currentToken != null && currentToken.equals(token) ? current : null;
         }
 
         @Override
@@ -558,10 +551,11 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId insert(PrincipalAccessToken accessToken) {
-            accessToken.setId(EntityIdCodec.toDomain(4001L));
+        public PrincipalAccessTokenId insert(PrincipalAccessToken accessToken, String token) {
+            accessToken.setId(PrincipalAccessTokenIdCodec.toDomain("4001"));
             this.current = accessToken;
             this.inserted = accessToken;
+            this.currentToken = token;
             return accessToken.getId();
         }
 
@@ -613,20 +607,21 @@ public class AuthPermissionLifecycleTest {
 
         private PrincipalRefreshToken current;
         private PrincipalRefreshToken inserted;
+        private String currentToken;
 
         @Override
-        public PrincipalRefreshToken getById(EntityId id) {
+        public PrincipalRefreshToken getById(PrincipalRefreshTokenId id) {
             return current;
         }
 
         @Override
-        public PrincipalRefreshToken getByTokenId(String tokenId) {
+        public PrincipalRefreshToken getByTokenCode(PrincipalRefreshTokenCode tokenCode) {
             return current;
         }
 
         @Override
-        public PrincipalRefreshToken getByTokenHash(String tokenHash) {
-            return current != null && current.getTokenHash().equals(tokenHash) ? current : null;
+        public PrincipalRefreshToken getByToken(String token) {
+            return current != null && currentToken != null && currentToken.equals(token) ? current : null;
         }
 
         @Override
@@ -636,9 +631,10 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId insert(PrincipalRefreshToken refreshToken) {
-            refreshToken.setId(EntityIdCodec.toDomain(2002L));
+        public PrincipalRefreshTokenId insert(PrincipalRefreshToken refreshToken, String token) {
+            refreshToken.setId(PrincipalRefreshTokenIdCodec.toDomain("2002"));
             this.inserted = refreshToken;
+            this.currentToken = token;
             return refreshToken.getId();
         }
 
@@ -659,17 +655,12 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public AuthSession getBySessionId(String sessionId) {
-            return session;
-        }
-
-        @Override
         public AuthSession getByToken(String token) {
             return session != null && session.getToken().equals(token) ? session : null;
         }
 
         @Override
-        public List<AuthSession> listByUserIdAndStatus(EntityId userId, AuthSessionStatus status) {
+        public List<AuthSession> listByPrincipalKeyAndStatus(PrincipalKey principalKey, AuthSessionStatus status) {
             if (session == null || (status != null && session.getStatus() != status)) {
                 return Collections.emptyList();
             }
@@ -750,9 +741,8 @@ public class AuthPermissionLifecycleTest {
         private AuthSession copy(AuthSession source) {
             AuthSession target = new AuthSession();
             target.setId(source.getId());
-            target.setSessionId(source.getSessionId());
             target.setToken(source.getToken());
-            target.setUserId(source.getUserId());
+            target.setPrincipalKey(source.getPrincipalKey());
             target.setIdentityId(source.getIdentityId());
             target.setIdentityType(source.getIdentityType());
             target.setLoginType(source.getLoginType());

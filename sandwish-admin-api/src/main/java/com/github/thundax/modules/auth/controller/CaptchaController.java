@@ -7,7 +7,11 @@ import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.controller.response.CaptchaRefreshResponse;
-import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.awt.Color;
@@ -46,16 +50,18 @@ public class CaptchaController {
     private static final int DEFAULT_CAPTCHA_HEIGHT = 80;
     private static final int MAX_CAPTCHA_WIDTH = 480;
     private static final int MAX_CAPTCHA_HEIGHT = 320;
+    private static final String CAPTCHA_ITEM = "CAPTCHA";
+    private static final int CAPTCHA_EXPIRED_SECONDS = 60;
 
     private static final int NOISE_LINE_COUNT = 12;
     private static final int MAX_COLOR = 255;
 
-    private final AdminAuthService authService;
+    private final PreAuthSessionService preAuthSessionService;
 
     @Autowired
-    public CaptchaController(AdminAuthService authService) {
+    public CaptchaController(PreAuthSessionService preAuthSessionService) {
 
-        this.authService = authService;
+        this.preAuthSessionService = preAuthSessionService;
     }
 
     @ApiOperation(value = "图形验证码")
@@ -68,43 +74,12 @@ public class CaptchaController {
         }
 
         try {
-            String captcha = authService.getCaptcha(loginToken);
+            String captcha = getCaptcha(loginToken);
             writeImage(request, response, captcha);
 
         } catch (ApiException e) {
             writeResponse(response, -1, e.getMessage());
         }
-
-        /*
-        String captcha = request.getParameter("captcha");
-        if (StringUtils.isNotBlank(captcha)) {
-            //validate captcha
-            try {
-                String savedCaptcha = authService.getCaptcha(loginToken);
-                if (StringUtils.equals(savedCaptcha, captcha)) {
-                    writeResponse(response, 0, "success");
-
-                } else {
-                    writeResponse(response, 1, "bad captcha");
-                }
-
-            } catch (ApiException e) {
-                writeResponse(response, -1, e.getMessage());
-            }
-
-        } else {
-            //write captcha image
-            try {
-                captcha = authService.createCaptcha(loginToken);
-                writeImage(request, response, captcha);
-
-            } catch (ApiException e) {
-                e.printStackTrace();
-                writeResponse(response, -1, e.getMessage());
-            }
-
-        }
-        */
     }
 
     @ApiOperation(value = "刷新图形验证码")
@@ -116,7 +91,7 @@ public class CaptchaController {
             throw new InvalidParameterException("loginToken");
         }
 
-        authService.createCaptcha(request.getLoginToken());
+        createCaptcha(request.getLoginToken());
 
         return CaptchaInterfaceAssembler.toRefreshResponse(true);
     }
@@ -127,6 +102,32 @@ public class CaptchaController {
         response.getWriter().print("{\"code\":" + code + ",\"message\":\"" + message + "\"}");
     }
 
+    private String createCaptcha(String loginToken) throws ApiException {
+        String captcha = PreAuthCodeHelper.generateCaptcha();
+        preAuthSessionService.upsertValue(
+                requireSessionIdByToken(loginToken),
+                CAPTCHA_ITEM,
+                captcha,
+                System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L);
+        return captcha;
+    }
+
+    private String getCaptcha(String loginToken) throws ApiException {
+        String captcha = preAuthSessionService.findValue(requireSessionIdByToken(loginToken), CAPTCHA_ITEM);
+        if (StringUtils.isEmpty(captcha)) {
+            throw new InvalidCaptchaException();
+        }
+        return captcha;
+    }
+
+    private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        if (sessionId == null) {
+            throw new InvalidParameterException("loginToken");
+        }
+        return sessionId;
+    }
+
     private void writeImage(HttpServletRequest request, HttpServletResponse response, String captcha)
             throws IOException {
 
@@ -135,9 +136,6 @@ public class CaptchaController {
         response.setDateHeader("Expires", 0);
         response.setContentType(MediaType.IMAGE_PNG_VALUE);
 
-        /*
-         * 得到参数高，宽，都为数字时，则使用设置高宽，否则使用默认值
-         */
         int width = DEFAULT_CAPTCHA_WIDTH;
         int height = DEFAULT_CAPTCHA_HEIGHT;
 
@@ -160,10 +158,8 @@ public class CaptchaController {
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 透明底上保留轻量干扰线，避免前端容器背景被图片盖住。
         drawNoise(graphics, width, height);
 
-        // 画字符
         drawCharacter(graphics, width, height, captcha);
 
         graphics.dispose();

@@ -10,6 +10,8 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.Date;
@@ -30,7 +32,7 @@ public class AuthSessionRuntimeDaoImplTest {
         dao.insert(session, 70);
 
         AuthSession stored = dao.getByToken("token-1");
-        assertEquals("session-1", stored.getSessionId());
+        assertEquals(EntityId.of(4005L), stored.getId());
         assertSame(AuthSessionStatus.ACTIVE, stored.getStatus());
         assertEquals(Long.valueOf(70L), cache.getTtlSeconds(runtimeKey("token-1")));
 
@@ -49,9 +51,8 @@ public class AuthSessionRuntimeDaoImplTest {
     private AuthSession session() {
         AuthSession session = new AuthSession();
         session.setId(EntityId.of(4005L));
-        session.setSessionId("session-1");
         session.setToken("token-1");
-        session.setUserId(EntityId.of(1001L));
+        session.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)));
         session.setIdentityId(EntityId.of(2001L));
         session.setIdentityType(PrincipalIdentityType.USER_ACCOUNT);
         session.setLoginType("PASSWORD");

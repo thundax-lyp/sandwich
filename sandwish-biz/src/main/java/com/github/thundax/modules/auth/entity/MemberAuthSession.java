@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MemberAuthSession {
     private EntityId id;
-    private String sessionId;
-    private EntityId memberId;
+    private PrincipalKey principalKey;
     private EntityId identityId;
     private PrincipalIdentityType identityType;
     private String loginType;

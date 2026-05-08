@@ -11,6 +11,7 @@ import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
@@ -64,9 +65,9 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         }
         AuthSession authSession = new AuthSession();
         authSession.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        authSession.setSessionId(cacheDTO.sessionId);
         authSession.setToken(cacheDTO.token);
-        authSession.setUserId(EntityIdCodec.toDomain(cacheDTO.userId));
+        authSession.setPrincipalKey(PrincipalKey.of(
+                PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
         authSession.setIdentityId(EntityIdCodec.toDomain(cacheDTO.identityId));
         authSession.setIdentityType(identityTypeFrom(cacheDTO.identityType));
         authSession.setLoginType(cacheDTO.loginType);
@@ -82,9 +83,11 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
     private static AuthSessionCacheDTO toCacheDTO(AuthSession authSession) {
         AuthSessionCacheDTO cacheDTO = new AuthSessionCacheDTO();
         cacheDTO.id = EntityIdCodec.toValue(authSession.getId());
-        cacheDTO.sessionId = authSession.getSessionId();
         cacheDTO.token = authSession.getToken();
-        cacheDTO.userId = EntityIdCodec.toValue(authSession.getUserId());
+        cacheDTO.principalType =
+                authSession.getPrincipalKey().getPrincipalType().value();
+        cacheDTO.principalId =
+                EntityIdCodec.toValue(authSession.getPrincipalKey().getPrincipalId());
         cacheDTO.identityId = EntityIdCodec.toValue(authSession.getIdentityId());
         cacheDTO.identityType = authSession.getIdentityType() == null
                 ? null
@@ -112,9 +115,9 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
 
     private static class AuthSessionCacheDTO implements CacheDTO {
         private Long id;
-        private String sessionId;
         private String token;
-        private Long userId;
+        private String principalType;
+        private Long principalId;
         private Long identityId;
         private String identityType;
         private String loginType;

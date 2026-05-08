@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.assembler;
 
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
@@ -108,7 +109,8 @@ public final class AuthInterfaceAssembler {
             response.setTokenType("Bearer");
         }
         if (result.getSession() != null) {
-            response.setSessionId(result.getSession().getSessionId());
+            response.setSessionId(
+                    EntityIdCodec.toStringValue(result.getSession().getId()));
         }
         return response;
     }

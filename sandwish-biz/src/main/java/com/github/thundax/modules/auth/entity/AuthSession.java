@@ -3,24 +3,21 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * 后台认证会话。
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthSession {
     private EntityId id;
-    private String sessionId;
     private String token;
-    private EntityId userId;
+    private PrincipalKey principalKey;
     private EntityId identityId;
     private PrincipalIdentityType identityType;
     private String loginType;

@@ -1,8 +1,10 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenId;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +16,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrincipalRefreshToken {
-    private EntityId id;
-    private String tokenId;
-    private String tokenHash;
-    private String accessTokenId;
+    private PrincipalRefreshTokenId id;
+    private PrincipalRefreshTokenCode tokenCode;
+    private PrincipalAccessTokenId accessTokenId;
     private String clientId;
     private String sessionId;
     private PrincipalKey principalKey;
@@ -29,15 +30,15 @@ public class PrincipalRefreshToken {
         return isActive() && !isExpired(now);
     }
 
-    public void markUsed(Date now) {
+    public void markUsed() {
         status = PrincipalTokenStatus.USED;
     }
 
-    public void revoke(Date now) {
+    public void revoke() {
         status = PrincipalTokenStatus.REVOKED;
     }
 
-    public void expire(Date now) {
+    public void expire() {
         status = PrincipalTokenStatus.EXPIRED;
     }
 

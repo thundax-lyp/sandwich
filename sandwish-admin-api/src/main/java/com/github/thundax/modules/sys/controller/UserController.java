@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityId;
@@ -22,8 +23,10 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
@@ -85,13 +88,14 @@ public class UserController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+    private static final String PRIVATE_KEY_ITEM = "privateKey";
 
     private final UserService userService;
     private final DepartmentService departmentService;
     private final RoleService roleService;
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
-    private final AdminAuthService authService;
+    private final PreAuthSessionService preAuthSessionService;
 
     @Autowired
     public UserController(
@@ -100,14 +104,14 @@ public class UserController {
             RoleService roleService,
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
-            AdminAuthService authService) {
+            PreAuthSessionService preAuthSessionService) {
 
         this.userService = userService;
         this.departmentService = departmentService;
         this.roleService = roleService;
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
-        this.authService = authService;
+        this.preAuthSessionService = preAuthSessionService;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
@@ -180,7 +184,7 @@ public class UserController {
     @WrappedApiResponse
     public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
-        String password = Sm2Helper.decrypt(request.getLoginPass(), authService.getPrivateKey(request.getToken()));
+        String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
@@ -224,7 +228,7 @@ public class UserController {
     public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password = Sm2Helper.decrypt(request.getLoginPass(), authService.getPrivateKey(request.getToken()));
+            String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }
@@ -584,6 +588,18 @@ public class UserController {
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
         principalCredentialService.update(credential);
+    }
+
+    private String getPrivateKey(String token) throws InvalidTokenException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        if (sessionId == null) {
+            throw new InvalidTokenException();
+        }
+        String privateKey = preAuthSessionService.findValue(sessionId, PRIVATE_KEY_ITEM);
+        if (StringUtils.isBlank(privateKey)) {
+            throw new InvalidTokenException();
+        }
+        return privateKey;
     }
 
     public static String getAvatarUrl(String userId, String token) {

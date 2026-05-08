@@ -5,13 +5,16 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
+import com.github.thundax.common.utils.encrypt.Sha256Helper;
+import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -34,7 +37,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
 
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "PRINCIPAL_ACCESS_TOKEN_";
     private static final String TOKEN_HASH_PREFIX = CACHE_SECTION + "HASH_";
-    private static final String TOKEN_ID_PREFIX = CACHE_SECTION + "TOKEN_ID_";
+    private static final String TOKEN_CODE_PREFIX = CACHE_SECTION + "TOKEN_CODE_";
     private static final String PRINCIPAL_INDEX_PREFIX = CACHE_SECTION + "PRINCIPAL_";
     private static final String CLIENT_INDEX_PREFIX = CACHE_SECTION + "CLIENT_";
     private static final int SAFETY_SECONDS = 5;
@@ -51,28 +54,26 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
     }
 
     @Override
-    public PrincipalAccessToken getById(EntityId id) {
+    public PrincipalAccessToken getById(PrincipalAccessTokenId id) {
         if (id == null) {
             return null;
         }
-        String tokenHash = (String) cache.get(TOKEN_ID_PREFIX + EntityIdCodec.toStringValue(id));
+        String tokenHash = (String) cache.get(TOKEN_CODE_PREFIX + PrincipalAccessTokenIdCodec.toValue(id));
         return getByTokenHash(tokenHash);
     }
 
     @Override
-    public PrincipalAccessToken getByTokenId(String tokenId) {
-        if (StringUtils.isBlank(tokenId)) {
+    public PrincipalAccessToken getByTokenCode(PrincipalAccessTokenCode tokenCode) {
+        if (tokenCode == null) {
             return null;
         }
-        String tokenHash = (String) cache.get(TOKEN_ID_PREFIX + tokenId);
+        String tokenHash = (String) cache.get(TOKEN_CODE_PREFIX + tokenCode.value());
         return getByTokenHash(tokenHash);
     }
 
     @Override
-    public PrincipalAccessToken getByTokenHash(String tokenHash) {
-        return StringUtils.isBlank(tokenHash)
-                ? null
-                : toEntity((PrincipalAccessTokenCacheDTO) cache.get(TOKEN_HASH_PREFIX + tokenHash));
+    public PrincipalAccessToken getByToken(String token) {
+        return getByTokenHash(tokenHash(token));
     }
 
     @Override
@@ -105,53 +106,58 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
     }
 
     @Override
-    public EntityId insert(PrincipalAccessToken accessToken) {
+    public PrincipalAccessTokenId insert(PrincipalAccessToken accessToken, String token) {
         Assert.notNull(accessToken, "accessToken can not be null");
-        Assert.notNull(accessToken.getTokenId(), "tokenId can not be null");
-        Assert.notNull(accessToken.getTokenHash(), "tokenHash can not be null");
+        Assert.hasText(token, "token can not be blank");
+        Assert.notNull(accessToken.getTokenCode(), "tokenCode can not be null");
         Assert.notNull(accessToken.getPrincipalKey(), "principalKey can not be null");
         Assert.notNull(accessToken.getExpireAt(), "expireAt can not be null");
         Assert.notNull(accessToken.getStatus(), "status can not be null");
         if (accessToken.getId() == null) {
-            accessToken.setId(idGenerator.nextId());
+            accessToken.setId(PrincipalAccessTokenIdCodec.nextId(idGenerator));
         }
-        putToken(accessToken);
+        putToken(accessToken, tokenHash(token));
         return accessToken.getId();
     }
 
     @Override
     public int updateStatus(PrincipalAccessToken accessToken) {
         Assert.notNull(accessToken, "accessToken can not be null");
-        PrincipalAccessToken oldToken = getByTokenHash(accessToken.getTokenHash());
+        String tokenHash = tokenHashById(accessToken.getId());
+        PrincipalAccessToken oldToken = getByTokenHash(tokenHash);
         if (oldToken != null) {
             removeIndex(oldToken);
         }
         Assert.notNull(accessToken.getExpireAt(), "expireAt can not be null");
         Assert.notNull(accessToken.getStatus(), "status can not be null");
-        putToken(accessToken);
+        Assert.hasText(tokenHash, "tokenHash can not be blank");
+        putToken(accessToken, tokenHash);
         return 1;
     }
 
-    private void putToken(PrincipalAccessToken accessToken) {
+    private PrincipalAccessToken getByTokenHash(String tokenHash) {
+        return StringUtils.isBlank(tokenHash)
+                ? null
+                : toEntity((PrincipalAccessTokenCacheDTO) cache.get(TOKEN_HASH_PREFIX + tokenHash));
+    }
+
+    private void putToken(PrincipalAccessToken accessToken, String tokenHash) {
         long seconds = remainingSeconds(accessToken);
+        cache.put(TOKEN_HASH_PREFIX + tokenHash, toCacheDTO(accessToken), seconds + SAFETY_SECONDS, TimeUnit.SECONDS);
+        cache.put(TOKEN_CODE_PREFIX + accessToken.getTokenCode().value(), tokenHash, seconds, TimeUnit.SECONDS);
         cache.put(
-                TOKEN_HASH_PREFIX + accessToken.getTokenHash(),
-                toCacheDTO(accessToken),
-                seconds + SAFETY_SECONDS,
-                TimeUnit.SECONDS);
-        cache.put(TOKEN_ID_PREFIX + accessToken.getTokenId(), accessToken.getTokenHash(), seconds, TimeUnit.SECONDS);
-        cache.put(
-                TOKEN_ID_PREFIX + EntityIdCodec.toStringValue(accessToken.getId()),
-                accessToken.getTokenHash(),
+                TOKEN_CODE_PREFIX + PrincipalAccessTokenIdCodec.toValue(accessToken.getId()),
+                tokenHash,
                 seconds,
                 TimeUnit.SECONDS);
-        redis().zadd(principalIndexKey(accessToken), accessToken.getExpireAt().getTime(), accessToken.getTokenHash());
-        redis().zadd(clientIndexKey(accessToken), accessToken.getExpireAt().getTime(), accessToken.getTokenHash());
+        redis().zadd(principalIndexKey(accessToken), accessToken.getExpireAt().getTime(), tokenHash);
+        redis().zadd(clientIndexKey(accessToken), accessToken.getExpireAt().getTime(), tokenHash);
     }
 
     private void removeIndex(PrincipalAccessToken accessToken) {
-        redis().zrem(principalIndexKey(accessToken), accessToken.getTokenHash());
-        redis().zrem(clientIndexKey(accessToken), accessToken.getTokenHash());
+        String tokenHash = tokenHashById(accessToken.getId());
+        redis().zrem(principalIndexKey(accessToken), tokenHash);
+        redis().zrem(clientIndexKey(accessToken), tokenHash);
     }
 
     private long remainingSeconds(PrincipalAccessToken accessToken) {
@@ -165,6 +171,14 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
 
     private void removeExpired(String indexKey) {
         redis().zremrangebyscore(indexKey, 0, System.currentTimeMillis());
+    }
+
+    private String tokenHashById(PrincipalAccessTokenId id) {
+        return id == null ? null : (String) cache.get(TOKEN_CODE_PREFIX + PrincipalAccessTokenIdCodec.toValue(id));
+    }
+
+    private String tokenHash(String token) {
+        return StringUtils.isBlank(token) ? null : Sha256Helper.hashBase64Url(token);
     }
 
     private String principalIndexKey(PrincipalAccessToken accessToken) {
@@ -214,9 +228,8 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
             return null;
         }
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
-        accessToken.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        accessToken.setTokenId(cacheDTO.tokenId);
-        accessToken.setTokenHash(cacheDTO.tokenHash);
+        accessToken.setId(PrincipalAccessTokenIdCodec.toDomain(cacheDTO.id));
+        accessToken.setTokenCode(PrincipalAccessTokenCode.ofNullable(cacheDTO.tokenCode));
         accessToken.setClientId(cacheDTO.clientId);
         accessToken.setSessionId(cacheDTO.sessionId);
         accessToken.setPrincipalKey(PrincipalKey.of(
@@ -230,9 +243,10 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
 
     private static PrincipalAccessTokenCacheDTO toCacheDTO(PrincipalAccessToken accessToken) {
         PrincipalAccessTokenCacheDTO cacheDTO = new PrincipalAccessTokenCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(accessToken.getId());
-        cacheDTO.tokenId = accessToken.getTokenId();
-        cacheDTO.tokenHash = accessToken.getTokenHash();
+        cacheDTO.id = PrincipalAccessTokenIdCodec.toValue(accessToken.getId());
+        cacheDTO.tokenCode = accessToken.getTokenCode() == null
+                ? null
+                : accessToken.getTokenCode().value();
         cacheDTO.clientId = accessToken.getClientId();
         cacheDTO.sessionId = accessToken.getSessionId();
         cacheDTO.principalType =
@@ -248,9 +262,8 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
     }
 
     private static class PrincipalAccessTokenCacheDTO implements CacheDTO {
-        private Long id;
-        private String tokenId;
-        private String tokenHash;
+        private String id;
+        private String tokenCode;
         private String clientId;
         private String sessionId;
         private String principalType;

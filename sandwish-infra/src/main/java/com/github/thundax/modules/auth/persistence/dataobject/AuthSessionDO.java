@@ -19,11 +19,11 @@ public class AuthSessionDO {
     @TableId(type = IdType.INPUT)
     private Long id;
 
-    private String sessionId;
-
     private String token;
 
-    private Long userId;
+    private String principalType;
+
+    private Long principalId;
 
     private Long identityId;
 

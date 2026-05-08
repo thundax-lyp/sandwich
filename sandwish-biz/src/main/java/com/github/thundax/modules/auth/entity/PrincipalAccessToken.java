@@ -1,7 +1,8 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -16,9 +17,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrincipalAccessToken {
-    private EntityId id;
-    private String tokenId;
-    private String tokenHash;
+    private PrincipalAccessTokenId id;
+    private PrincipalAccessTokenCode tokenCode;
     private String clientId;
     private String sessionId;
     private PrincipalKey principalKey;
@@ -31,11 +31,11 @@ public class PrincipalAccessToken {
         return isActive() && !isExpired(now);
     }
 
-    public void revoke(Date now) {
+    public void revoke() {
         status = PrincipalTokenStatus.REVOKED;
     }
 
-    public void expire(Date now) {
+    public void expire() {
         status = PrincipalTokenStatus.EXPIRED;
     }
 

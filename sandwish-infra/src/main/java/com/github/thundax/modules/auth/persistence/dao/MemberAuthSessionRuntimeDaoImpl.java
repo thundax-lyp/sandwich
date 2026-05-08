@@ -5,12 +5,14 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
@@ -27,24 +29,27 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
     private Cache<String, MemberAuthSessionCacheDTO> cache;
 
     @Override
-    public MemberAuthSession getBySessionId(String sessionId) {
-        return toDomain(cache.get(SESSION_PREFIX + sessionId));
+    public MemberAuthSession getById(EntityId id) {
+        return toDomain(cache.get(sessionKey(id)));
     }
 
     @Override
     public void insert(MemberAuthSession authSession, int expireSeconds) {
         Assert.notNull(authSession, "authSession can not be null");
-        Assert.hasText(authSession.getSessionId(), "sessionId can not be empty");
+        Assert.notNull(authSession.getId(), "id can not be null");
         if (expireSeconds <= 0) {
             return;
         }
-        cache.put(
-                SESSION_PREFIX + authSession.getSessionId(), toCacheDTO(authSession), expireSeconds, TimeUnit.SECONDS);
+        cache.put(sessionKey(authSession.getId()), toCacheDTO(authSession), expireSeconds, TimeUnit.SECONDS);
     }
 
     @Override
-    public void deleteBySessionId(String sessionId) {
-        cache.remove(SESSION_PREFIX + sessionId);
+    public void deleteById(EntityId id) {
+        cache.remove(sessionKey(id));
+    }
+
+    private String sessionKey(EntityId id) {
+        return SESSION_PREFIX + EntityIdCodec.toStringValue(id);
     }
 
     private static MemberAuthSession toDomain(MemberAuthSessionCacheDTO cacheDTO) {
@@ -53,8 +58,8 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
         }
         MemberAuthSession authSession = new MemberAuthSession();
         authSession.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        authSession.setSessionId(cacheDTO.sessionId);
-        authSession.setMemberId(EntityIdCodec.toDomain(cacheDTO.memberId));
+        authSession.setPrincipalKey(PrincipalKey.of(
+                PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
         authSession.setIdentityId(EntityIdCodec.toDomain(cacheDTO.identityId));
         authSession.setIdentityType(identityTypeFrom(cacheDTO.identityType));
         authSession.setLoginType(cacheDTO.loginType);
@@ -70,8 +75,10 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
     private static MemberAuthSessionCacheDTO toCacheDTO(MemberAuthSession authSession) {
         MemberAuthSessionCacheDTO cacheDTO = new MemberAuthSessionCacheDTO();
         cacheDTO.id = EntityIdCodec.toValue(authSession.getId());
-        cacheDTO.sessionId = authSession.getSessionId();
-        cacheDTO.memberId = EntityIdCodec.toValue(authSession.getMemberId());
+        cacheDTO.principalType =
+                authSession.getPrincipalKey().getPrincipalType().value();
+        cacheDTO.principalId =
+                EntityIdCodec.toValue(authSession.getPrincipalKey().getPrincipalId());
         cacheDTO.identityId = EntityIdCodec.toValue(authSession.getIdentityId());
         cacheDTO.identityType = authSession.getIdentityType() == null
                 ? null
@@ -99,8 +106,8 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
 
     private static class MemberAuthSessionCacheDTO implements CacheDTO {
         private Long id;
-        private String sessionId;
-        private Long memberId;
+        private String principalType;
+        private Long principalId;
         private Long identityId;
         private String identityType;
         private String loginType;

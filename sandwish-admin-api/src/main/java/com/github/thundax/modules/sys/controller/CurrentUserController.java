@@ -11,8 +11,10 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -36,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,18 +52,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @WrappedApiController
 public class CurrentUserController {
 
+    private static final String PRIVATE_KEY_ITEM = "privateKey";
+
     private final CurrentUserService currentUserService;
     private final PrincipalIdentityService principalIdentityService;
-    private final AdminAuthService authService;
+    private final PreAuthSessionService preAuthSessionService;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
             PrincipalIdentityService principalIdentityService,
-            AdminAuthService authService) {
+            PreAuthSessionService preAuthSessionService) {
 
         this.currentUserService = currentUserService;
         this.principalIdentityService = principalIdentityService;
-        this.authService = authService;
+        this.preAuthSessionService = preAuthSessionService;
     }
 
     @ApiOperation(value = "当前用户信息", notes = "读取当前登录后台用户的基础资料和登录名")
@@ -116,7 +121,7 @@ public class CurrentUserController {
     public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
-        String privateKey = authService.getPrivateKey(request.getToken());
+        String privateKey = getPrivateKey(request.getToken());
         String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
         String oldPassword = Sm2Helper.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);
@@ -220,5 +225,17 @@ public class CurrentUserController {
         PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
                 PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private String getPrivateKey(String token) throws InvalidTokenException {
+        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        if (sessionId == null) {
+            throw new InvalidTokenException();
+        }
+        String privateKey = preAuthSessionService.findValue(sessionId, PRIVATE_KEY_ITEM);
+        if (StringUtils.isBlank(privateKey)) {
+            throw new InvalidTokenException();
+        }
+        return privateKey;
     }
 }

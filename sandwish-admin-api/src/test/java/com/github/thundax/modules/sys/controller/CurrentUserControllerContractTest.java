@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
-import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
@@ -77,7 +77,7 @@ public class CurrentUserControllerContractTest {
         UserAccessHolder.currentUserId("1", "token-1");
 
         CurrentUserController controller = new CurrentUserController(
-                currentUserService, mock(PrincipalIdentityService.class), mock(AdminAuthService.class));
+                currentUserService, mock(PrincipalIdentityService.class), mock(PreAuthSessionService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 

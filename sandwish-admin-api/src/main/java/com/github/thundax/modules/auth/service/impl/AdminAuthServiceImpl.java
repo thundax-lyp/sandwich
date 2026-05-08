@@ -428,8 +428,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         authorization.setCodeChallengeMethod(codeChallengeMethod);
         authorization.setIssuedAt(now);
         authorization.setExpireAt(new Date(now.getTime() + 300000L));
-        authorization.setCreateDate(now);
-        authorization.setUpdateDate(now);
         authorization.setId(oauthAuthorizationDao.insert(authorization));
         result.setAuthorizationCode(authorization.getAuthorizationCode());
         return result;
@@ -676,8 +674,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         authSession.setIssuedAt(now);
         authSession.setLastAccessTime(now);
         authSession.setExpireAt(new Date(now.getTime() + properties.getLoginExpiredSeconds() * 1000L));
-        authSession.setCreateDate(now);
-        authSession.setUpdateDate(now);
         authSession.setId(authSessionDao.insert(authSession));
         authSessionRuntimeDao.insert(authSession, runtimeExpiredSeconds());
         return authSession;

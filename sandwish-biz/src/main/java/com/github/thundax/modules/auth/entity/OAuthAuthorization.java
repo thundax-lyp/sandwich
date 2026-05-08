@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -17,7 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuthAuthorization implements Auditable {
+public class OAuthAuthorization {
     private EntityId id;
     private String authorizationCode;
     private String clientId;
@@ -30,10 +29,6 @@ public class OAuthAuthorization implements Auditable {
     private Date issuedAt;
     private Date expireAt;
     private boolean used;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isExpired(Date now) {
         return expireAt != null && now != null && !expireAt.after(now);
@@ -45,6 +40,5 @@ public class OAuthAuthorization implements Auditable {
 
     public void markUsed(Date updateTime) {
         this.used = true;
-        this.updateDate = updateTime;
     }
 }

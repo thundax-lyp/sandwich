@@ -63,9 +63,7 @@ public class MemberAuthSessionDaoImpl implements MemberAuthSessionDao {
                         .set(MemberAuthSessionDO::getStatus, dataObject.getStatus())
                         .set(MemberAuthSessionDO::getLastAccessTime, dataObject.getLastAccessTime())
                         .set(MemberAuthSessionDO::getLogoutAt, dataObject.getLogoutAt())
-                        .set(MemberAuthSessionDO::getInvalidateReason, dataObject.getInvalidateReason())
-                        .set(MemberAuthSessionDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(MemberAuthSessionDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(MemberAuthSessionDO::getInvalidateReason, dataObject.getInvalidateReason()));
     }
 
     @Override

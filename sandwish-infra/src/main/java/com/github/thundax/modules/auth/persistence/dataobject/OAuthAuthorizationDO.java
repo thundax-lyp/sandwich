@@ -40,12 +40,4 @@ public class OAuthAuthorizationDO {
     private Date expireAt;
 
     private boolean used;
-
-    private Date createDate;
-
-    private String createBy;
-
-    private Date updateDate;
-
-    private String updateBy;
 }

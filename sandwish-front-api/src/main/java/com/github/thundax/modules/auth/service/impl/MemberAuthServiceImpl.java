@@ -202,7 +202,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         session.setIssuedAt(now);
         session.setLastAccessTime(now);
         session.setExpireAt(expireAt);
-        session.setCreateDate(now);
         if (session.getId() == null) {
             session.setId(memberAuthSessionDao.insert(session));
         }

@@ -76,10 +76,6 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         authSession.setExpireAt(cacheDTO.expireAt);
         authSession.setLogoutAt(cacheDTO.logoutAt);
         authSession.setInvalidateReason(cacheDTO.invalidateReason);
-        authSession.setCreateDate(cacheDTO.createDate);
-        authSession.setCreateUserId(cacheDTO.createUserId);
-        authSession.setUpdateDate(cacheDTO.updateDate);
-        authSession.setUpdateUserId(cacheDTO.updateUserId);
         return authSession;
     }
 
@@ -101,10 +97,6 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         cacheDTO.expireAt = authSession.getExpireAt();
         cacheDTO.logoutAt = authSession.getLogoutAt();
         cacheDTO.invalidateReason = authSession.getInvalidateReason();
-        cacheDTO.createDate = authSession.getCreateDate();
-        cacheDTO.createUserId = authSession.getCreateUserId();
-        cacheDTO.updateDate = authSession.getUpdateDate();
-        cacheDTO.updateUserId = authSession.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -132,9 +124,5 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         private Date expireAt;
         private Date logoutAt;
         private String invalidateReason;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

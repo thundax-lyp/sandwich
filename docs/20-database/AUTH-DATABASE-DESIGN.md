@@ -91,7 +91,7 @@
 - 会话标识字段固定为 `session_id`。
 - 访问 token 字段固定为 `token`。
 - 状态字段固定为 `status`。
-- 审计字段固定为 `create_date`、`create_by`、`update_date`、`update_by`。
+- 配置类表使用 `create_date`、`create_by`、`update_date`、`update_by`；会话事实和授权码事实不使用通用审计字段。
 
 ## 5. Table Mapping
 
@@ -177,7 +177,7 @@
 
 ### 6.3 auth_session
 
-`auth_session` 保存后台认证会话审计事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
+`auth_session` 保存后台认证会话事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
 
 | Column | DO Field | Entity Field | Required | Description |
 | --- | --- | --- | --- | --- |
@@ -194,11 +194,6 @@
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
 | `logout_at` | `logoutAt` | `logoutAt` | 否 | 登出时间 |
 | `invalidate_reason` | `invalidateReason` | `invalidateReason` | 否 | 失效原因 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
-
 字段规则：
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
@@ -277,10 +272,6 @@
 | `issued_at` | `issuedAt` | `issuedAt` | 是 | 签发时间 |
 | `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
 | `used` | `used` | `used` | 是 | 是否已消费 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 

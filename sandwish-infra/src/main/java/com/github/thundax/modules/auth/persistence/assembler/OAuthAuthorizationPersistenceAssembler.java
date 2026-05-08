@@ -35,10 +35,6 @@ public final class OAuthAuthorizationPersistenceAssembler {
         dataObject.setIssuedAt(entity.getIssuedAt());
         dataObject.setExpireAt(entity.getExpireAt());
         dataObject.setUsed(entity.isUsed());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
         return dataObject;
     }
 
@@ -59,10 +55,6 @@ public final class OAuthAuthorizationPersistenceAssembler {
         entity.setIssuedAt(dataObject.getIssuedAt());
         entity.setExpireAt(dataObject.getExpireAt());
         entity.setUsed(dataObject.isUsed());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
         return entity;
     }
 

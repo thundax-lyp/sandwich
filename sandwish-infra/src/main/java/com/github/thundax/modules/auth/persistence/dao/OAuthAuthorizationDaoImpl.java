@@ -46,11 +46,7 @@ public class OAuthAuthorizationDaoImpl implements OAuthAuthorizationDao {
     public int updateUsed(OAuthAuthorization authorization) {
         OAuthAuthorizationDO dataObject = OAuthAuthorizationPersistenceAssembler.toDataObject(authorization);
         return mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(OAuthAuthorizationDO::isUsed, dataObject.isUsed())
-                        .set(OAuthAuthorizationDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OAuthAuthorizationDO::getUpdateBy, dataObject.getUpdateBy()));
+                null, buildIdUpdateWrapper(dataObject).set(OAuthAuthorizationDO::isUsed, dataObject.isUsed()));
     }
 
     @Override

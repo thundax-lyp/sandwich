@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -14,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberAuthSession implements Auditable {
+public class MemberAuthSession {
     private EntityId id;
     private String sessionId;
     private EntityId memberId;
@@ -27,10 +26,6 @@ public class MemberAuthSession implements Auditable {
     private Date expireAt;
     private Date logoutAt;
     private String invalidateReason;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isActive() {
         return MemberAuthSessionStatus.ACTIVE == status;

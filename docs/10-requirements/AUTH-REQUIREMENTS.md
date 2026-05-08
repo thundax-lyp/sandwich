@@ -200,7 +200,7 @@
 
 ### 5.4 AuthSession
 
-`AuthSession` 是后台认证会话事实，分为 Redis 运行态和数据库审计态。
+`AuthSession` 是后台认证会话事实，分为 Redis 运行态和数据库持久化事实。
 
 核心字段：
 
@@ -231,10 +231,10 @@
 
 固定约束：
 
-- 每次后台登录成功必须创建新的 `AuthSession` 数据库审计记录。
+- 每次后台登录成功必须创建新的 `AuthSession` 数据库事实记录。
 - 每次后台登录成功必须写入对应 `AuthSession` Redis 运行态快照。
 - Redis 运行态固定承载活跃会话快照、最近访问时间和 TTL。
-- 数据库审计态固定承载登录事实、最终最近访问时间、登出、失效和过期状态。
+- 数据库持久化事实固定承载登录事实、最终最近访问时间、登出、失效和过期状态。
 - 请求 token 有效且刷新访问态时，必须 touch 对应 Redis 运行态 `AuthSession.lastAccessTime`。
 - 正常请求不得逐次更新数据库 `auth_session.last_access_time`。
 - 主动登出固定将 `AuthSession.status` 更新为 `LOGGED_OUT`。
@@ -293,7 +293,7 @@
 - 登录成功后必须创建 `PermissionSession`。
 - 有效请求必须 touch `PermissionSession`。
 - 登出或 token 删除时必须释放 `PermissionSession`。
-- `PermissionSession` 不替代 `AuthSession` 的审计职责。
+- `PermissionSession` 不替代 `AuthSession` 的会话事实职责。
 - `PermissionSession` 运行态模型和 DAO 归属 `biz.modules.auth`，后台权限会话适配 Service 归属 `sandwish-admin-api` 的 `auth.service`。
 
 ### 5.9 OAuthClient
@@ -579,7 +579,7 @@
 13. 登录成功后创建 `PrincipalAccessToken`。
 14. 登录成功后创建 `PrincipalRefreshToken`。
 15. 登录成功后创建 `PermissionSession`。
-16. 登录成功后创建数据库审计态 `AuthSession`。
+16. 登录成功后创建数据库持久化事实 `AuthSession`。
 17. 登录成功后写入 Redis 运行态 `AuthSession`。
 18. `AuthController` 返回 token 和 refresh token 响应。
 

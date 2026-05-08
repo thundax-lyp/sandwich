@@ -31,10 +31,6 @@ public final class AuthSessionPersistenceAssembler {
         dataObject.setExpireAt(entity.getExpireAt());
         dataObject.setLogoutAt(entity.getLogoutAt());
         dataObject.setInvalidateReason(entity.getInvalidateReason());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
         return dataObject;
     }
 
@@ -56,10 +52,6 @@ public final class AuthSessionPersistenceAssembler {
         entity.setExpireAt(dataObject.getExpireAt());
         entity.setLogoutAt(dataObject.getLogoutAt());
         entity.setInvalidateReason(dataObject.getInvalidateReason());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
         return entity;
     }
 

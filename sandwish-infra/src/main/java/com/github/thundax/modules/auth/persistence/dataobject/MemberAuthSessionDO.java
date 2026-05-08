@@ -29,8 +29,4 @@ public class MemberAuthSessionDO {
     private Date expireAt;
     private Date logoutAt;
     private String invalidateReason;
-    private Date createDate;
-    private String createBy;
-    private Date updateDate;
-    private String updateBy;
 }

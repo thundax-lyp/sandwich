@@ -66,7 +66,7 @@
 
 当前不覆盖范围：
 
-- 前台会员登录表单，`MemberLoginForm` 只使用 Redis / JetCache 运行态，不建立数据库表。
+- `PreAuthSession` 只使用 Redis / JetCache 运行态，不建立数据库表。
 - MFA 凭据表。
 - 认证审计日志表。
 - 生产数据变更脚本。
@@ -513,8 +513,8 @@
 - `auth_principal_credential(USER_PASSWORD)` 初始化来源是后台用户保存请求中的加密后密码。
 - 必须保证一个可登录后台用户至少拥有一个 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
 - 必须保证一个可登录后台用户至少拥有一个 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 密码认证应该读取 `auth_principal_credential.credential_value`。
-- 后台认证主锁定语义应该落在 `PrincipalCredential` 维度。
+- 密码认证必须读取 `auth_principal_credential.credential_value`。
+- 后台认证主锁定语义必须落在 `PrincipalCredential` 维度。
 
 ## 11. Open Items
 

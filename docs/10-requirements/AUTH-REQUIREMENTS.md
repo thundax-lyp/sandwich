@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 后台认证、前台会员认证、OAuth2 授权和多登录方式的业务需求边界。
 
-`Auth` 负责后台登录表单、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
+`Auth` 负责预认证会话、验证码、密码认证、短信登录、第三方登录适配、登录标识解析、认证凭据状态流转、访问 token 生命周期、refresh token 生命周期、OAuth2 client、authorization、token verify、introspection、userinfo 和认证会话审计。后台认证固定区分用户主体、登录标识、认证凭据、访问 token、refresh token 和登录会话。
 
 后台用户主体管理需求见 [`SYSTEM-REQUIREMENTS.md`](./SYSTEM-REQUIREMENTS.md)。登录标识和认证凭据归属 `Auth`，本文档定义这些资料在认证流程中的使用规则。
 
@@ -18,7 +18,7 @@
 - 后台短信登录。
 - 后台企业微信登录。
 - 后台 GitHub 登录。
-- 后台登录表单和验证码。
+- 预认证会话和验证码。
 - 后台访问 token 创建、校验、续期和删除。
 - 后台 refresh token 创建、校验、轮换和失效。
 - 后台权限会话创建、touch 和释放。
@@ -66,7 +66,7 @@
 
 `OAuthRefreshToken` 归属 `auth` 认证模型，承载 refresh token、关联访问 token、客户端、用户、过期和失效状态。
 
-前台会员认证运行态也归属 `auth` 认证模型。`MemberLoginForm`、`MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken` 保留 `Member` 前缀，用于区分后台用户认证模型和前台会员认证模型。
+前台会员认证运行态也归属 `auth` 认证模型。`MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken` 保留 `Member` 前缀，用于区分后台用户认证模型和前台会员认证模型。
 
 后台和前台认证的共性结构固定为：
 
@@ -79,13 +79,13 @@
 - `Principal*` 是 auth 域内部统一结构描述，不作为公开 HTTP Request / Response。
 - `PrincipalKey.principalType + principalId` 必须唯一定位业务主体；后台固定为 `USER + User.id`，前台固定为 `MEMBER + Member.id`。
 - 后台上下文仍由 `UserAccessHolder` 建立和读取，前台上下文仍由 `MemberSecurityContext` 建立和读取。
-- API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话和响应装配适配；可复用的认证业务流程优先收敛到 `sandwish-biz` 的 `AuthService`。
-- `AuthService` 进入 `sandwish-biz` 后不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
+- API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话、验证码图片输出和响应装配适配；可复用的认证业务流程固定收敛到 `sandwish-biz` 的 auth Service。
+- `sandwish-biz` 的 auth Service 不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
 
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、`Principal*` 统一认证结构、后台登录表单运行态、前台会员认证运行态模型、认证枚举、DAO 契约和可复用认证业务 Service。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、`Principal*` 统一认证结构、`PreAuthSession` 运行态、前台会员认证运行态模型、认证枚举、DAO 契约和可复用认证业务 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、用户保存流程和用户资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
@@ -250,28 +250,33 @@
 
 前台会员认证运行态对象归属 auth 域：
 
-- `MemberLoginForm`：前台登录前置临时状态，承载验证码、短信验证码、邮箱验证码和密码传输密钥。
 - `MemberAuthSession`：前台会员认证会话事实。
 - `MemberAccessToken`：前台会员 API 请求访问 token。
 - `MemberRefreshToken`：前台会员刷新 token。
 
 固定约束：
 
-- `MemberLoginForm` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
 - 前台 API 登录成功后必须创建 `MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken`。
 - 前台会员认证运行态使用 `member_` 物理表名前缀，但 Java 模型、DAO 契约和持久化实现归属 `modules.auth`。
 - `MemberAccessToken` 和 `MemberRefreshToken` 固定只保存 token hash，不保存 token 明文。
 
-### 5.6 LoginForm
+### 5.6 PreAuthSession
 
-`LoginForm` 是后台登录表单临时状态。
+`PreAuthSession` 是登录前的临时状态容器，归属 `auth` 域。
 
 固定约束：
 
-- 登录表单固定用于承载 `loginToken`、验证码、短信验证码、SM2 公私钥和短期校验码。
-- 登录表单不是认证会话。
-- 登录表单过期不等于访问 token 过期。
-- 后台密码类接口需要加密传输时，固定复用 `LoginForm` 的 SM2 密钥，不再提供独立 keypair API。
+- `PreAuthSession` 固定用于承载 `loginToken`、refresh token、验证码、短信验证码、邮箱验证码、密码传输密钥和登录前短期校验数据。
+- `PreAuthSession` 是临时存储容器，不按 admin/front 拆分模型。
+- `PreAuthSession` 通过 `PrincipalType` 区分 `USER` 和 `MEMBER` 登录前状态。
+- `PreAuthSession` 不是认证会话，不替代 `AuthSession` 或 `MemberAuthSession`。
+- `PreAuthSession` 过期不等于访问 token 过期。
+- `PreAuthSession` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
+- 创建 `PreAuthSession` 前必须校验登录前会话容量和登录后在线容量。
+- 同时登录前会话数量达到容量限制时必须拒绝创建。
+- 登录后在线用户数量达到容量限制时必须拒绝创建。
+- 登录成功后必须释放对应 `PreAuthSession`。
+- 密码类接口需要加密传输时，固定复用 `PreAuthSession` 中的传输密钥，不提供独立 keypair API。
 
 ### 5.7 AccessToken
 
@@ -415,33 +420,35 @@
 - OAuth2 客户端密钥校验固定通过 Service 完成。
 - OAuth2 authorization code 和 refresh token 必须一次性消费或状态流转，避免重放。
 - token verify、introspection 和 userinfo 固定只返回可公开的 token/session/user 信息。
+- Controller 固定只承接 HTTP 参数、入口安全上下文、第三方入口适配、验证码图片输出和响应装配。
 - Controller 不直接访问 DAO / Mapper。
-- Controller 不直接写回凭据失败次数。
+- Controller 不直接校验验证码、解密密码或写回凭据失败次数。
 - Service 固定承接认证流程、状态校验、失败次数写回、锁定和会话创建。
 - DAO 固定承接持久化访问，不承载认证业务流程。
 - `User.loginName` 和 `User.loginPass` 仅允许作为用户创建、资料维护和认证模型初始化来源。
 - 新增用户时必须创建默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
 - 设置或重置密码时必须创建或更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 后台用户锁定语义应该收敛到凭据维度锁定。
+- 后台用户锁定语义必须收敛到凭据维度锁定。
 - 后台认证模型不得改变前台会员登录语义。
 
 ## 7. Functional Requirements
 
-### 7.1 登录表单
+### 7.1 预认证会话
 
-- 后台登录前必须创建 `LoginForm`。
-- 登录表单必须生成 `loginToken`。
-- 登录表单必须生成验证码。
-- 登录表单必须生成 SM2 密钥对。
-- 登录表单数量超过限制时必须拒绝创建。
+- 登录前必须创建 `PreAuthSession`。
+- `PreAuthSession` 必须生成 `loginToken`。
+- `PreAuthSession` 必须生成 refresh token。
+- `PreAuthSession` 必须按登录方式生成验证码、短信验证码、邮箱验证码或密码传输密钥。
+- `PreAuthSession` 数量超过限制时必须拒绝创建。
 - 在线用户数量超过限制时必须拒绝创建。
-- 刷新登录表单时必须校验 refresh token。
+- 刷新 `PreAuthSession` 时必须校验 refresh token。
+- 登录成功后必须释放 `PreAuthSession`。
 
 ### 7.2 验证码
 
 - 后台账号密码登录必须校验验证码。
 - 验证码不存在时必须返回明确错误。
-- 登录表单无效或过期时必须返回 token 错误。
+- `PreAuthSession` 无效或过期时必须返回 token 错误。
 - 白名单验证码启用时必须按配置放行。
 
 ### 7.3 身份解析
@@ -546,19 +553,19 @@
 
 ### 7.14 认证模型初始化
 
-- 新增后台用户时应该从 `User.loginName` 初始化 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 新增或重置后台用户密码时应该从加密后的密码初始化 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 密码认证应该读取 `PrincipalCredential.credentialValue`。
-- 后台认证主锁定语义应该落在凭据维度。
+- 新增后台用户时必须从 `User.loginName` 初始化 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- 新增或重置后台用户密码时必须从加密后的密码初始化 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- 密码认证必须读取 `PrincipalCredential.credentialValue`。
+- 后台认证主锁定语义必须落在凭据维度。
 
 ## 8. Key Flows
 
 ### 8.1 后台账号密码登录流程
 
 1. `AuthController.login` 接收登录请求。
-2. `AuthController` 校验 `loginToken` 和验证码。
-3. `AuthController` 使用登录表单私钥解密密码。
-4. `AuthController` 调用认证 Service 执行登录校验。
+2. `AuthController` 调用认证 Service 执行登录校验。
+3. 认证 Service 校验 `loginToken` 和验证码。
+4. 认证 Service 使用 `PreAuthSession` 中的传输密钥解密密码。
 5. 认证 Service 按 `USER_ACCOUNT + loginName` 读取 `PrincipalIdentity`。
 6. 认证 Service 读取并校验 `User` 状态。
 7. 认证 Service 按 `identityId + USER_PASSWORD` 读取 `PrincipalCredential`。
@@ -566,11 +573,12 @@
 9. 认证 Service 使用 `PasswordHelper` 校验密码。
 10. 密码错误时写回凭据失败次数。
 11. 密码正确时清零凭据失败状态。
-12. 登录成功后创建 `AccessToken`。
-13. 登录成功后创建 `PermissionSession`。
-14. 登录成功后创建数据库审计态 `AuthSession`。
-15. 登录成功后写入 Redis 运行态 `AuthSession`。
-16. `AuthController` 返回 token 响应。
+12. 登录成功后释放 `PreAuthSession`。
+13. 登录成功后创建 `AccessToken`。
+14. 登录成功后创建 `PermissionSession`。
+15. 登录成功后创建数据库审计态 `AuthSession`。
+16. 登录成功后写入 Redis 运行态 `AuthSession`。
+17. `AuthController` 返回 token 响应。
 
 ### 8.2 后台请求认证流程
 

@@ -202,12 +202,14 @@ public class AuthPermissionLifecycleTest {
         refreshToken.setTokenCode(PrincipalRefreshTokenCode.of("refresh-token-1"));
         refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
+        refreshToken.setSessionId(PrincipalAuthSessionId.of("oauth-session-1"));
         refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
         refreshTokenDao.currentToken = "plain-refresh-token";
+        principalAuthSessionDao.insert(principalAuthSession(refreshToken.getSessionId(), "admin-web"), 60);
 
         AuthTokenRefreshResult result = authService.refreshAccessToken("admin-web", "plain-refresh-token");
 
@@ -293,12 +295,14 @@ public class AuthPermissionLifecycleTest {
         refreshToken.setTokenCode(PrincipalRefreshTokenCode.of("refresh-token-1"));
         refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
+        refreshToken.setSessionId(PrincipalAuthSessionId.of("oauth-session-2"));
         refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
         refreshTokenDao.current = refreshToken;
         refreshTokenDao.currentToken = "plain-refresh-token";
+        principalAuthSessionDao.insert(principalAuthSession(refreshToken.getSessionId(), "admin-web"), 60);
 
         AuthTokenRefreshResult result = authService.exchangeOAuth2Token(
                 "admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token");
@@ -664,6 +668,18 @@ public class AuthPermissionLifecycleTest {
         private int getTouchCount() {
             return touchCount;
         }
+    }
+
+    private PrincipalAuthSession principalAuthSession(PrincipalAuthSessionId id, String clientId) {
+        Date now = new Date();
+        PrincipalAuthSession session = new PrincipalAuthSession();
+        session.setId(id);
+        session.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+        session.setClientId(clientId);
+        session.setIssuedAt(now);
+        session.setLastAccessTime(now);
+        session.setExpireAt(new Date(now.getTime() + 60000L));
+        return session;
     }
 
     private static class TestUserService implements UserService {

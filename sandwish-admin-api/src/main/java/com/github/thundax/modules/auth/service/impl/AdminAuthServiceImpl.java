@@ -123,7 +123,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 new LinkedHashSet<>(),
                 now,
                 properties.getLoginExpiredSeconds());
-        PrincipalAuthSession session = createPrincipalAuthSession(accessToken.getPrincipalKey(), ADMIN_CLIENT_ID, now);
+        PrincipalAuthSession session = createPrincipalAuthSession(
+                accessToken.getPrincipalKey(), ADMIN_CLIENT_ID, now, properties.getLoginExpiredSeconds());
         accessToken.setSessionId(session.getId());
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
         permissionService.createSession(token, userId);
@@ -230,11 +231,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (!accessToken.canAccess(new Date())) {
             return AuthTokenQueryResult.inactive(token);
         }
+        PrincipalAuthSession session = getActivePrincipalAuthSession(accessToken, new Date());
+        if (session == null) {
+            return AuthTokenQueryResult.inactive(token);
+        }
         User user = userService.getById(accessToken.getPrincipalKey().getPrincipalId());
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, accessToken, user, getAccountLoginName(user.getId()));
+        return AuthTokenQueryResult.active(token, accessToken, session, user, getAccountLoginName(user.getId()));
     }
 
     @Override
@@ -349,7 +354,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         authorization.markUsed(now);
         oauthAuthorizationDao.updateUsed(authorization);
-        AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, authorization, now);
+        PrincipalAuthSession session = createPrincipalAuthSession(
+                authorization.getPrincipalKey(), client.getClientId(), now, accessTokenTtlSeconds(client));
+        AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, authorization, session, now);
         String refreshToken = principalRefreshTokenDao == null
                 ? null
                 : createPrincipalRefreshToken(oauthAccessToken.getPrincipalAccessToken(), client.getClientId(), now);
@@ -370,7 +377,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         current.markUsed();
         principalRefreshTokenDao.updateStatus(current);
 
-        AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, current, now);
+        PrincipalAuthSession session = getActivePrincipalAuthSession(current, now);
+        if (session == null) {
+            throw new InvalidTokenException();
+        }
+        AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, current, session, now);
         String nextRefreshToken =
                 createPrincipalRefreshToken(oauthAccessToken.getPrincipalAccessToken(), client.getClientId(), now);
         return new AuthTokenRefreshResult(oauthAccessToken, nextRefreshToken, oauthAccessToken.getToken());
@@ -394,6 +405,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             if (accessToken != null && accessToken.isActive()) {
                 accessToken.revoke();
                 principalAccessTokenDao.updateStatus(accessToken);
+                principalAuthSessionDao.deleteById(accessToken.getSessionId());
                 revoked = true;
             }
         }
@@ -402,6 +414,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             if (refreshToken != null && refreshToken.isActive()) {
                 refreshToken.revoke();
                 principalRefreshTokenDao.updateStatus(refreshToken);
+                principalAuthSessionDao.deleteById(refreshToken.getSessionId());
                 revoked = true;
             }
         }
@@ -504,15 +517,16 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return user;
     }
 
-    private PrincipalAuthSession createPrincipalAuthSession(PrincipalKey principalKey, String clientId, Date now) {
+    private PrincipalAuthSession createPrincipalAuthSession(
+            PrincipalKey principalKey, String clientId, Date now, long ttlSeconds) {
         PrincipalAuthSession session = new PrincipalAuthSession();
         session.setId(PrincipalAuthSessionIdCodec.nextId(sessionIdGenerator));
         session.setPrincipalKey(principalKey);
         session.setClientId(clientId);
         session.setIssuedAt(now);
         session.setLastAccessTime(now);
-        session.setExpireAt(new Date(now.getTime() + properties.getLoginExpiredSeconds() * 1000L));
-        principalAuthSessionDao.insert(session, runtimeExpiredSeconds());
+        session.setExpireAt(new Date(now.getTime() + ttlSeconds * 1000L));
+        principalAuthSessionDao.insert(session, runtimeExpiredSeconds(ttlSeconds));
         return session;
     }
 
@@ -521,6 +535,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return null;
         }
         PrincipalAuthSession session = principalAuthSessionDao.getById(accessToken.getSessionId());
+        if (session == null || session.isExpired(now)) {
+            return null;
+        }
+        return session;
+    }
+
+    private PrincipalAuthSession getActivePrincipalAuthSession(PrincipalRefreshToken refreshToken, Date now) {
+        if (refreshToken == null || refreshToken.getSessionId() == null) {
+            return null;
+        }
+        PrincipalAuthSession session = principalAuthSessionDao.getById(refreshToken.getSessionId());
         if (session == null || session.isExpired(now)) {
             return null;
         }
@@ -554,7 +579,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     private int runtimeExpiredSeconds() {
-        return properties.getLoginExpiredSeconds() + SESSION_RUNTIME_SAFETY_SECONDS;
+        return runtimeExpiredSeconds(properties.getLoginExpiredSeconds());
+    }
+
+    private int runtimeExpiredSeconds(long ttlSeconds) {
+        return (int) ttlSeconds + SESSION_RUNTIME_SAFETY_SECONDS;
     }
 
     private String createPrincipalRefreshToken(PrincipalAccessToken accessToken, String clientId, Date issuedAt) {
@@ -573,7 +602,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     private AuthAccessTokenResult createOAuthAccessToken(
-            OAuthClient client, OAuthAuthorization authorization, Date issuedAt) {
+            OAuthClient client, OAuthAuthorization authorization, PrincipalAuthSession session, Date issuedAt) {
         String token = UuidHelper.compact();
         PrincipalAccessToken entity = buildPrincipalAccessToken(
                 token,
@@ -582,12 +611,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 authorization.getScopes(),
                 issuedAt,
                 accessTokenTtlSeconds(client));
+        entity.setSessionId(session.getId());
         entity.setId(requirePrincipalAccessTokenDao().insert(entity, token));
         return new AuthAccessTokenResult(token, null, entity);
     }
 
     private AuthAccessTokenResult createOAuthAccessToken(
-            OAuthClient client, PrincipalRefreshToken refreshToken, Date issuedAt) {
+            OAuthClient client, PrincipalRefreshToken refreshToken, PrincipalAuthSession session, Date issuedAt) {
         String token = UuidHelper.compact();
         PrincipalAccessToken entity = buildPrincipalAccessToken(
                 token,
@@ -596,6 +626,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 new LinkedHashSet<>(),
                 issuedAt,
                 accessTokenTtlSeconds(client));
+        entity.setSessionId(session.getId());
         entity.setId(requirePrincipalAccessTokenDao().insert(entity, token));
         return new AuthAccessTokenResult(token, null, entity);
     }

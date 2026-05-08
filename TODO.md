@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `oauth-auth-session`：OAuth2 令牌交换接入 PrincipalAuthSession
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/AuthControllerContractTest.java`
-  - 处理动作：authorization code exchange 创建 `PrincipalAuthSession`，OAuth refresh token 沿用旧 session。
-  - 验收点：OAuth access token introspection 同时判断 token 和 `PrincipalAuthSession`。
-  - 重要度：9/10
-
 - [ ] `principal-login-event-model`：新增主体登录事件审计模型
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalLoginEvent.java`

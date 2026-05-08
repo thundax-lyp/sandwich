@@ -34,10 +34,20 @@ public class AuthTokenQueryResult {
 
     public static AuthTokenQueryResult active(
             String token, PrincipalAccessToken principalAccessToken, User user, String username) {
+        return active(token, principalAccessToken, null, user, username);
+    }
+
+    public static AuthTokenQueryResult active(
+            String token,
+            PrincipalAccessToken principalAccessToken,
+            PrincipalAuthSession session,
+            User user,
+            String username) {
         AuthTokenQueryResult result = new AuthTokenQueryResult();
         result.setActive(true);
         result.setToken(token);
         result.setPrincipalAccessToken(principalAccessToken);
+        result.setSession(session);
         result.setUser(user);
         result.setUsername(username);
         return result;

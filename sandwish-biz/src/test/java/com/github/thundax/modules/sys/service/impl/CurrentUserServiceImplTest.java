@@ -3,13 +3,14 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.UserCredential;
@@ -24,6 +25,7 @@ import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class CurrentUserServiceImplTest {
 
@@ -35,7 +37,6 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(PasswordService.class),
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(menu(5001L, null, "系统管理"), menu(5002L, 5001L, "用户管理"));
@@ -59,7 +60,6 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(PasswordService.class),
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(
@@ -87,7 +87,6 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(PasswordService.class),
                 mock(UserCredentialService.class),
                 mock(UserIdentityService.class));
         List<Menu> menus = Arrays.asList(
@@ -111,7 +110,6 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 mock(MenuService.class),
-                mock(PasswordService.class),
                 mock(UserCredentialService.class),
                 userIdentityService);
         User currentUser = superUser();
@@ -130,25 +128,23 @@ public class CurrentUserServiceImplTest {
     public void shouldValidateOldPasswordAndUpdatePasswordCredential() throws Exception {
         UserService userService = mock(UserService.class);
         UserCredentialService userCredentialService = mock(UserCredentialService.class);
-        PasswordService passwordService = mock(PasswordService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
                 userService,
                 mock(RoleService.class),
                 mock(MenuService.class),
-                passwordService,
                 userCredentialService,
                 mock(UserIdentityService.class));
         User currentUser = superUser();
         UserCredential credential = new UserCredential();
-        credential.setCredentialValue("encrypted-old");
+        credential.setCredentialValue(PasswordHelper.encrypt("OldPass1$"));
 
         when(userCredentialService.getPasswordCredential(currentUser.getId())).thenReturn(credential);
-        when(passwordService.validate("OldPass1$", "encrypted-old")).thenReturn(true);
-        when(passwordService.encrypt("NewPass1$")).thenReturn("encrypted-new");
 
         service.updatePassword(currentUser, "OldPass1$", "NewPass1$");
 
-        verify(userCredentialService).upsertPassword(currentUser, "encrypted-new");
+        ArgumentCaptor<String> encryptedPasswordCaptor = ArgumentCaptor.forClass(String.class);
+        verify(userCredentialService).upsertPassword(eq(currentUser), encryptedPasswordCaptor.capture());
+        assertEquals(true, PasswordHelper.validate("NewPass1$", encryptedPasswordCaptor.getValue()));
     }
 
     private User superUser() {

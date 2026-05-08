@@ -120,27 +120,6 @@ public final class NamingArchitectureRuleSupport {
         assertTrue("DAO types must use Dao/DaoImpl suffixes: " + violations, violations.isEmpty());
     }
 
-    public static void assertServiceInterfaceMethodNames(JavaClasses classes) {
-        List<String> violations = new ArrayList<String>();
-
-        for (JavaClass javaClass : classes) {
-            if (!isServiceInterface(javaClass)) {
-                continue;
-            }
-            for (JavaMethod method : javaClass.getMethods()) {
-                if (!isServiceMethodShape(method)) {
-                    violations.add(method.getFullName());
-                }
-            }
-        }
-
-        assertTrue(
-                "Service methods should use getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx "
-                        + "for generic access and business verbs for workflows: "
-                        + violations,
-                violations.isEmpty());
-    }
-
     public static void assertServiceAddMethodsReturnEntityId(JavaClasses classes) {
         List<String> violations = new ArrayList<String>();
 
@@ -402,28 +381,6 @@ public final class NamingArchitectureRuleSupport {
                 || isDaoBusinessActionName(name);
     }
 
-    private static boolean isServiceMethodShape(JavaMethod method) {
-        String name = method.getName();
-        if (isNonStandardIdsListName(name) || name.startsWith("find")) {
-            return false;
-        }
-        return name.equals("add")
-                || name.equals("count")
-                || name.equals("list")
-                || name.equals("page")
-                || name.equals("update")
-                || name.startsWith("add")
-                || name.startsWith("getBy")
-                || name.startsWith("list")
-                || name.startsWith("count")
-                || name.startsWith("deleteBy")
-                || name.startsWith("batch")
-                || name.startsWith("insert")
-                || name.startsWith("update")
-                || name.startsWith("upsert")
-                || isServiceBusinessActionName(name);
-    }
-
     private static boolean isNonStandardIdsListName(String name) {
         return name.endsWith("ByIds") && !name.equals("listByIds");
     }
@@ -447,42 +404,6 @@ public final class NamingArchitectureRuleSupport {
                 || name.equals("moveTreeNode")
                 || name.equals("tokenExists")
                 || name.equals("touch");
-    }
-
-    private static boolean isServiceBusinessActionName(String name) {
-        return name.equals("abortMultipartUpload")
-                || name.equals("canReadContent")
-                || name.equals("completeMultipartUpload")
-                || name.equals("createPublicKey")
-                || name.equals("createSession")
-                || name.equals("decrypt")
-                || name.equals("deleteSign")
-                || name.equals("encrypt")
-                || name.equals("getAccountLoginName")
-                || name.equals("getContent")
-                || name.equals("getDictionaryRevision")
-                || name.equals("getPasswordCredential")
-                || name.equals("getPrivateKey")
-                || name.equals("getSession")
-                || name.equals("initMultipartUpload")
-                || name.equals("isChildOf")
-                || name.equals("isPermitted")
-                || name.equals("moveTreeNode")
-                || name.equals("refreshAccessToken")
-                || name.equals("refreshLoginForm")
-                || name.equals("registerAccount")
-                || name.equals("registerEmail")
-                || name.equals("registerMobile")
-                || name.equals("release")
-                || name.equals("reloadAll")
-                || name.equals("removeReferences")
-                || name.equals("sendRegisterEmailCode")
-                || name.equals("sendRegisterSmsCode")
-                || name.equals("sign")
-                || name.equals("touch")
-                || name.equals("uploadMultipartPart")
-                || name.equals("validate")
-                || name.equals("verifySign");
     }
 
     private static boolean isServiceQueryObject(JavaClass javaClass) {

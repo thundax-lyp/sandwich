@@ -455,7 +455,7 @@
 - `UserCredential.status = LOCKED` 时必须拒绝登录。
 - `UserCredential.status = EXPIRED` 时必须拒绝登录。
 - `UserCredential.lockedUntil` 未到期时必须拒绝登录。
-- 密码验证必须使用现有 `PasswordService`。
+- 密码验证必须使用 `PasswordHelper`。
 - 密码验证成功后必须清零 `failedCount`。
 - 密码验证成功后必须清空锁定状态。
 - 密码验证成功后必须记录 `lastVerifiedAt`。
@@ -494,7 +494,7 @@
 
 - OAuth2 授权和换 token 前必须校验 `OAuthClient` 存在。
 - 禁用客户端必须拒绝授权和换 token。
-- 客户端密钥必须通过 `PasswordService` 或等价哈希校验服务校验。
+- 客户端密钥必须通过固定哈希 Helper 校验。
 - 请求的授权类型、scope 和 redirect uri 必须落在客户端配置范围内。
 
 ### 7.9 OAuth2 authorization
@@ -558,7 +558,7 @@
 6. 认证 Service 读取并校验 `User` 状态。
 7. 认证 Service 按 `identityId + PASSWORD` 读取 `UserCredential`。
 8. 认证 Service 校验凭据状态、锁定和过期。
-9. 认证 Service 使用 `PasswordService` 校验密码。
+9. 认证 Service 使用 `PasswordHelper` 校验密码。
 10. 密码错误时写回凭据失败次数。
 11. 密码正确时清零凭据失败状态。
 12. 登录成功后创建 `AccessToken`。

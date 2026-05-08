@@ -2,8 +2,6 @@ package com.github.thundax.autoconfigure;
 
 import com.github.thundax.common.jasypt.JasyptStringEncryptor;
 import com.github.thundax.modules.auth.config.AuthProperties;
-import com.github.thundax.modules.auth.service.PasswordService;
-import com.github.thundax.modules.auth.service.impl.Sm3PasswordServiceImpl;
 import com.github.thundax.modules.sys.aop.SysLogPointcutAdvisor;
 import com.github.thundax.modules.utils.AvatarUtils;
 import org.jasypt.encryption.StringEncryptor;
@@ -25,11 +23,6 @@ public class SandwishConfiguration {
     @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
         return new JasyptStringEncryptor();
-    }
-
-    @Bean
-    public PasswordService passwordService() {
-        return new Sm3PasswordServiceImpl();
     }
 
     @Bean

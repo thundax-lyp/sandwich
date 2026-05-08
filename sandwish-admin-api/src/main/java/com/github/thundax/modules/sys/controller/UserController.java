@@ -16,7 +16,7 @@ import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.auth.service.AdminAuthService;
-import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
@@ -84,7 +84,6 @@ public class UserController {
     private final UserCredentialService userCredentialService;
     private final UserIdentityService userIdentityService;
     private final AdminAuthService authService;
-    private final PasswordService passwordService;
 
     @Autowired
     public UserController(
@@ -93,8 +92,7 @@ public class UserController {
             RoleService roleService,
             UserCredentialService userCredentialService,
             UserIdentityService userIdentityService,
-            AdminAuthService authService,
-            PasswordService passwordService) {
+            AdminAuthService authService) {
 
         this.userService = userService;
         this.departmentService = departmentService;
@@ -102,7 +100,6 @@ public class UserController {
         this.userCredentialService = userCredentialService;
         this.userIdentityService = userIdentityService;
         this.authService = authService;
-        this.passwordService = passwordService;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
@@ -190,7 +187,7 @@ public class UserController {
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
         List<Long> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
-        String encryptedPassword = passwordService.encrypt(request.getLoginPass());
+        String encryptedPassword = PasswordHelper.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
             User bean = userService.getById(entity.getId());
@@ -253,7 +250,7 @@ public class UserController {
         userService.update(entity, request.getLoginName(), roleIdList);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            userCredentialService.upsertPassword(entity, passwordService.encrypt(request.getLoginPass()));
+            userCredentialService.upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()));
         }
 
         return toResponse(entity);

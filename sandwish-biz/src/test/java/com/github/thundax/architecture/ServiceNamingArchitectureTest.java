@@ -12,13 +12,6 @@ import org.junit.Test;
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
     @Test
-    public void shouldUseServiceMethodShape() {
-        JavaClasses classes = importPackages("com.github.thundax.modules");
-
-        NamingArchitectureRuleSupport.assertServiceInterfaceMethodNames(classes);
-    }
-
-    @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
 

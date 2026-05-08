@@ -15,17 +15,20 @@ import com.github.thundax.modules.auth.entity.MemberAccessToken;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.MemberLoginForm;
 import com.github.thundax.modules.auth.entity.MemberRefreshToken;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.MemberAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.MemberRefreshTokenStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.MemberAuthService;
-import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberCredential;
 import com.github.thundax.modules.member.entity.MemberIdentity;
 import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
-import com.github.thundax.modules.member.service.MemberCredentialService;
 import com.github.thundax.modules.member.service.MemberIdentityService;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.ArrayList;
@@ -46,9 +49,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private final AuthProperties authProperties;
     private final MemberLoginFormDao memberLoginFormDao;
     private final MemberIdentityService memberIdentityService;
-    private final MemberCredentialService memberCredentialService;
     private final MemberService memberService;
-    private final PasswordService passwordService;
+    private final PrincipalAuthService principalAuthService;
     private final MemberAuthSessionDao memberAuthSessionDao;
     private final MemberAuthSessionRuntimeDao memberAuthSessionRuntimeDao;
     private final MemberAccessTokenDao memberAccessTokenDao;
@@ -58,9 +60,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             AuthProperties authProperties,
             MemberLoginFormDao memberLoginFormDao,
             MemberIdentityService memberIdentityService,
-            MemberCredentialService memberCredentialService,
             MemberService memberService,
-            PasswordService passwordService,
+            PrincipalAuthService principalAuthService,
             MemberAuthSessionDao memberAuthSessionDao,
             MemberAuthSessionRuntimeDao memberAuthSessionRuntimeDao,
             MemberAccessTokenDao memberAccessTokenDao,
@@ -68,9 +69,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         this.authProperties = authProperties;
         this.memberLoginFormDao = memberLoginFormDao;
         this.memberIdentityService = memberIdentityService;
-        this.memberCredentialService = memberCredentialService;
         this.memberService = memberService;
-        this.passwordService = passwordService;
+        this.principalAuthService = principalAuthService;
         this.memberAuthSessionDao = memberAuthSessionDao;
         this.memberAuthSessionRuntimeDao = memberAuthSessionRuntimeDao;
         this.memberAccessTokenDao = memberAccessTokenDao;
@@ -121,17 +121,22 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     public MemberTokenResult loginAccount(String loginToken, String account, String encryptedPassword, String captcha)
             throws ApiException {
         validateCaptcha(loginToken, captcha);
-        MemberIdentity identity = requireIdentity(MemberIdentityType.ACCOUNT, account);
-        MemberCredential credential = memberCredentialService.getPasswordCredential(identity.getMemberId());
-        if (credential == null || !credential.isActive()) {
-            throw new ApiException("用户名或密码错误");
-        }
         String password = decryptPassword(loginToken, encryptedPassword);
-        if (!passwordService.validate(password, credential.getCredentialValue())) {
+        PrincipalIdentity principalIdentity;
+        try {
+            principalIdentity = principalAuthService.authenticatePassword(
+                    PrincipalIdentityType.MEMBER_ACCOUNT,
+                    account,
+                    PrincipalCredentialType.MEMBER_PASSWORD,
+                    password,
+                    PrincipalPasswordPolicyDTO.disabled());
+        } catch (InvalidPasswordException e) {
             throw new ApiException("用户名或密码错误");
         }
+        Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
+        MemberIdentity identity = requireIdentity(MemberIdentityType.ACCOUNT, account);
         memberLoginFormDao.deleteByToken(loginToken);
-        return createTokenResult(requireActiveMember(identity.getMemberId()), identity, "ACCOUNT");
+        return createTokenResult(member, identity, "ACCOUNT");
     }
 
     @Override

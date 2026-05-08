@@ -7,7 +7,7 @@ import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.MemberLoginFormDao;
 import com.github.thundax.modules.auth.entity.MemberLoginForm;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
-import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.MemberIdentity;
 import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
@@ -34,21 +34,18 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     private final MemberIdentityService memberIdentityService;
     private final MemberCredentialService memberCredentialService;
     private final MemberLoginFormDao memberLoginFormDao;
-    private final PasswordService passwordService;
 
     public MemberRegistrationServiceImpl(
             AuthProperties authProperties,
             MemberService memberService,
             MemberIdentityService memberIdentityService,
             MemberCredentialService memberCredentialService,
-            MemberLoginFormDao memberLoginFormDao,
-            PasswordService passwordService) {
+            MemberLoginFormDao memberLoginFormDao) {
         this.authProperties = authProperties;
         this.memberService = memberService;
         this.memberIdentityService = memberIdentityService;
         this.memberCredentialService = memberCredentialService;
         this.memberLoginFormDao = memberLoginFormDao;
-        this.passwordService = passwordService;
     }
 
     @Override
@@ -67,7 +64,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
         Member member = createMember(name);
         MemberIdentity identity = memberIdentityService.updateIdentity(member, MemberIdentityType.ACCOUNT, account);
-        memberCredentialService.upsertPassword(member, identity, passwordService.encrypt(password));
+        memberCredentialService.upsertPassword(member, identity, PasswordHelper.encrypt(password));
         memberLoginFormDao.deleteByToken(loginToken);
         return member.getId();
     }

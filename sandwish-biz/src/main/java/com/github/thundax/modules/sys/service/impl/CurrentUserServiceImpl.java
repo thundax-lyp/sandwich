@@ -4,7 +4,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
-import com.github.thundax.modules.auth.service.PasswordService;
+import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -31,7 +31,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private final UserService userService;
     private final RoleService roleService;
     private final MenuService menuService;
-    private final PasswordService passwordService;
     private final UserCredentialService userCredentialService;
     private final UserIdentityService userIdentityService;
 
@@ -39,13 +38,11 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             UserService userService,
             RoleService roleService,
             MenuService menuService,
-            PasswordService passwordService,
             UserCredentialService userCredentialService,
             UserIdentityService userIdentityService) {
         this.userService = userService;
         this.roleService = roleService;
         this.menuService = menuService;
-        this.passwordService = passwordService;
         this.userCredentialService = userCredentialService;
         this.userIdentityService = userIdentityService;
     }
@@ -70,11 +67,11 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         }
 
         UserCredential credential = userCredentialService.getPasswordCredential(currentUser.getId());
-        if (credential == null || !passwordService.validate(oldPassword, credential.getCredentialValue())) {
+        if (credential == null || !PasswordHelper.validate(oldPassword, credential.getCredentialValue())) {
             throw new InvalidPasswordException();
         }
 
-        userCredentialService.upsertPassword(currentUser, passwordService.encrypt(password));
+        userCredentialService.upsertPassword(currentUser, PasswordHelper.encrypt(password));
     }
 
     @Override

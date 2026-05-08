@@ -24,17 +24,22 @@ import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
+import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
-import com.github.thundax.modules.auth.service.PasswordService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
@@ -42,10 +47,8 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
-import com.github.thundax.modules.sys.dao.UserCredentialDao;
 import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
 import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
@@ -82,9 +85,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private final AuthSessionDao authSessionDao;
     private final AuthSessionRuntimeDao authSessionRuntimeDao;
     private final UserIdentityDao userIdentityDao;
-    private final UserCredentialDao userCredentialDao;
-    private final PasswordService passwordService;
     private final PermissionService permissionService;
+    private final PrincipalAuthService principalAuthService;
     private final UserService userService;
     private final UserIdentityService userIdentityService;
 
@@ -114,9 +116,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             AuthSessionDao authSessionDao,
             AuthSessionRuntimeDao authSessionRuntimeDao,
             UserIdentityDao userIdentityDao,
-            UserCredentialDao userCredentialDao,
-            PasswordService passwordService,
             PermissionService permissionService,
+            PrincipalAuthService principalAuthService,
             UserService userService,
             UserIdentityService userIdentityService) {
         this.properties = properties;
@@ -126,9 +127,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         this.authSessionDao = authSessionDao;
         this.authSessionRuntimeDao = authSessionRuntimeDao;
         this.userIdentityDao = userIdentityDao;
-        this.userCredentialDao = userCredentialDao;
-        this.passwordService = passwordService;
         this.permissionService = permissionService;
+        this.principalAuthService = principalAuthService;
         this.userService = userService;
         this.userIdentityService = userIdentityService;
     }
@@ -557,28 +557,25 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public User authenticatePassword(String loginName, String plainPassword) throws ApiException {
-        UserIdentity identity = getAccountIdentity(loginName);
-        if (identity == null) {
+        PrincipalIdentity identity;
+        try {
+            identity = principalAuthService.authenticatePassword(
+                    PrincipalIdentityType.USER_ACCOUNT,
+                    loginName,
+                    PrincipalCredentialType.USER_PASSWORD,
+                    plainPassword,
+                    passwordPolicy());
+        } catch (InvalidPasswordException e) {
             throw new InvalidUsernamePasswordException();
         }
-        if (!identity.isEnabled()) {
-            throw new ApiException("登录方式已被禁用");
-        }
 
-        User user = userService.getById(identity.getUserId());
+        User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
         if (!user.isEnable()) {
             throw new BannedAccountException();
         }
-
-        UserCredential credential =
-                userCredentialDao.getByIdentityIdAndType(identity.getId(), UserCredentialType.PASSWORD);
-        if (credential == null) {
-            throw new InvalidUsernamePasswordException();
-        }
-        validateCredential(credential, plainPassword);
         return user;
     }
 
@@ -831,7 +828,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new ApiException("OAuth2 client 未配置");
         }
         OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
-        if (client == null || !passwordService.validate(clientSecret, client.getClientSecretHash())) {
+        if (client == null
+                || !StringUtils.equals(Sha256Helper.hashBase64Url(clientSecret), client.getClientSecretHash())) {
             throw new ApiException("OAuth2 client secret invalid");
         }
         return client;
@@ -874,50 +872,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return Sha256Helper.hashBase64Url(token);
     }
 
-    private void validateCredential(UserCredential credential, String plainPassword) throws ApiException {
-        Date now = new Date();
-        if (credential.isLocked(now)) {
-            throw new ApiException("帐号已被锁定，请等待（" + lockedExpireSeconds(credential, now) + "）秒后自动解锁!");
-        }
-        if (credential.isExpired(now)) {
-            throw new ApiException("认证凭据已过期");
-        }
-        if (!credential.isActive()) {
-            throw new ApiException("认证凭据不可用");
-        }
-
-        if (passwordService.validate(plainPassword, credential.getCredentialValue())) {
-            credential.markVerified(now);
-            userCredentialDao.updateVerifyState(credential);
-            return;
-        }
-
-        if (!loginProperties.getEnable()) {
-            throw new InvalidUsernamePasswordException();
-        }
-
-        if (credential.getFailedLimit() <= 0) {
-            credential.setFailedLimit(loginProperties.getMaxFailCount());
-        }
-        Date lockedUntil = new Date(now.getTime() + loginProperties.getLockTime() * 1000L);
-        credential.markFailed(lockedUntil);
-        userCredentialDao.updateVerifyState(credential);
-        if (credential.isLocked(now)) {
-            throw new ApiException("帐号已被锁定，请等待（" + loginProperties.getLockTime() + "）秒后自动解锁!");
-        }
-        String message = "密码输入错误"
-                + credential.getFailedLimit()
-                + "次后将被锁定，剩余"
-                + (credential.getFailedLimit() - credential.getFailedCount())
-                + "次";
-        throw new ApiException(message);
-    }
-
-    private long lockedExpireSeconds(UserCredential credential, Date now) {
-        if (credential.getLockedUntil() == null) {
-            return loginProperties.getLockTime();
-        }
-        long remaining = (credential.getLockedUntil().getTime() - now.getTime()) / 1000L;
-        return Math.max(remaining, 0L);
+    private PrincipalPasswordPolicyDTO passwordPolicy() {
+        return new PrincipalPasswordPolicyDTO(
+                loginProperties.getEnable(), loginProperties.getMaxFailCount(), loginProperties.getLockTime());
     }
 }

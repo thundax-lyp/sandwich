@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-principal-session-model`：新增主体认证会话运行态模型
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalAuthSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/valueobject/PrincipalAuthSessionId.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/codec/PrincipalAuthSessionIdCodec.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/PrincipalAuthSessionDao.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PrincipalAuthSessionDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/dao/PrincipalAuthSessionDaoImplTest.java`
-  - 处理动作：按 RUNBOOK 新增 `PrincipalAuthSession`、`PrincipalAuthSessionId`、Redis DAO 和测试。
-  - 验收点：`PrincipalAuthSession` 只进 Redis，包含 `values`，不持有 token，DAO 测试覆盖 insert/get/touch/delete。
-  - 重要度：10/10
-
 - [ ] `auth-token-session-id`：将 token 的 sessionId 升级为 PrincipalAuthSessionId
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalAccessToken.java`

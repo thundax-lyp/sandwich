@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `admin-auth-session`：后台认证接入 PrincipalAuthSession
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/result/AuthTokenQueryResult.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/assembler/AuthInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/filter/AccessTokenAuthenticationFilter.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java`
-  - 处理动作：后台登录、token 查询、登出和踢下线改为通过 access token 的 `sessionId` 读取 `PrincipalAuthSession`。
-  - 验收点：admin 登录创建 `PrincipalAuthSession`，token 校验同时判断 token 和 session，旧 `AuthSessionDao` 不再被 admin 主链路调用。
-  - 重要度：10/10
-
 - [ ] `member-auth-session`：前台会员认证接入 PrincipalAuthSession
   - 范围文件：
     - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java`

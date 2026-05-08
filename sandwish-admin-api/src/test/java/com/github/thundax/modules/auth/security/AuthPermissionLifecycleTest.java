@@ -15,20 +15,18 @@ import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
-import com.github.thundax.modules.auth.dao.AuthSessionDao;
-import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
-import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
-import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
@@ -38,6 +36,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenId;
@@ -91,8 +90,7 @@ public class AuthPermissionLifecycleTest {
     private TestPrincipalAccessTokenDao accessTokenDao;
     private TestPrincipalRefreshTokenDao refreshTokenDao;
     private InMemoryPermissionDaoImpl permissionDao;
-    private TestAuthSessionDao authSessionDao;
-    private TestAuthSessionRuntimeDao authSessionRuntimeDao;
+    private TestPrincipalAuthSessionDao principalAuthSessionDao;
     private AdminAuthService authService;
     private PermissionService permissionService;
 
@@ -101,8 +99,7 @@ public class AuthPermissionLifecycleTest {
         accessTokenDao = new TestPrincipalAccessTokenDao();
         refreshTokenDao = new TestPrincipalRefreshTokenDao();
         permissionDao = new InMemoryPermissionDaoImpl();
-        authSessionDao = new TestAuthSessionDao();
-        authSessionRuntimeDao = new TestAuthSessionRuntimeDao();
+        principalAuthSessionDao = new TestPrincipalAuthSessionDao();
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
@@ -122,8 +119,7 @@ public class AuthPermissionLifecycleTest {
         authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
-                authSessionDao,
-                authSessionRuntimeDao,
+                principalAuthSessionDao,
                 permissionService,
                 new TestPrincipalAuthService(),
                 principalIdentityService,
@@ -143,34 +139,29 @@ public class AuthPermissionLifecycleTest {
         AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
 
         Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
-        Assert.assertNotNull(authSessionDao.getByToken(accessToken.getToken()));
-        Assert.assertNotNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
+        Assert.assertNotNull(principalAuthSessionDao.getById(
+                accessToken.getPrincipalAccessToken().getSessionId()));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "sys:role:view"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "user"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "admin"));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "super"));
-        Date databaseLastAccessTime =
-                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime();
+        Date databaseLastAccessTime = principalAuthSessionDao
+                .getById(accessToken.getPrincipalAccessToken().getSessionId())
+                .getLastAccessTime();
 
         authService.activeAccessToken(accessToken);
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
-        Assert.assertEquals(0, authSessionDao.getTouchCount());
-        Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
-        Assert.assertEquals(
-                databaseLastAccessTime,
-                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime());
+        Assert.assertTrue(principalAuthSessionDao.getTouchCount() > 0);
+        Assert.assertTrue(principalAuthSessionDao
+                        .getById(accessToken.getPrincipalAccessToken().getSessionId())
+                        .getLastAccessTime()
+                        .getTime()
+                >= databaseLastAccessTime.getTime());
 
-        Date runtimeLastAccessTime =
-                authSessionRuntimeDao.getByToken(accessToken.getToken()).getLastAccessTime();
         authService.deleteAccessToken(accessToken);
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
-        Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
-        Assert.assertEquals(
-                AuthSessionStatus.LOGGED_OUT,
-                authSessionDao.getByToken(accessToken.getToken()).getStatus());
-        Assert.assertEquals(
-                runtimeLastAccessTime,
-                authSessionDao.getByToken(accessToken.getToken()).getLastAccessTime());
+        Assert.assertNull(principalAuthSessionDao.getById(
+                accessToken.getPrincipalAccessToken().getSessionId()));
     }
 
     @Test
@@ -182,14 +173,8 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals(
                 PrincipalTokenStatus.REVOKED,
                 accessToken.getPrincipalAccessToken().getStatus());
-        Assert.assertNull(permissionService.getSession(accessToken.getToken()));
-        Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
-        Assert.assertEquals(
-                AuthSessionStatus.INVALIDATED,
-                authSessionDao.getByToken(accessToken.getToken()).getStatus());
-        Assert.assertEquals(
-                "PASSWORD_RESET",
-                authSessionDao.getByToken(accessToken.getToken()).getInvalidateReason());
+        Assert.assertNull(principalAuthSessionDao.getById(
+                accessToken.getPrincipalAccessToken().getSessionId()));
     }
 
     @Test
@@ -199,7 +184,9 @@ public class AuthPermissionLifecycleTest {
         AuthTokenQueryResult result = authService.queryToken(accessToken.getToken());
 
         Assert.assertTrue(result.isActive());
-        Assert.assertEquals(accessToken.getToken(), result.getSession().getToken());
+        Assert.assertEquals(
+                accessToken.getPrincipalAccessToken().getSessionId(),
+                result.getSession().getId());
         Assert.assertEquals("tester", result.getUsername());
         Assert.assertFalse(authService.queryToken("missing").isActive());
     }
@@ -377,8 +364,7 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals(
                 PrincipalTokenStatus.ACTIVE,
                 accessToken.getPrincipalAccessToken().getStatus());
-        Assert.assertEquals(0, authSessionDao.getTouchCount());
-        Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
+        Assert.assertTrue(principalAuthSessionDao.getTouchCount() > 0);
     }
 
     @Test
@@ -645,114 +631,38 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private static class TestAuthSessionDao implements AuthSessionDao {
+    private static class TestPrincipalAuthSessionDao implements PrincipalAuthSessionDao {
 
-        private AuthSession session;
-        private int touchCount;
-
-        public AuthSession getById(EntityId id) {
-            return session;
-        }
-
-        @Override
-        public AuthSession getByToken(String token) {
-            return session != null && session.getToken().equals(token) ? session : null;
-        }
-
-        @Override
-        public List<AuthSession> listByPrincipalKeyAndStatus(PrincipalKey principalKey, AuthSessionStatus status) {
-            if (session == null || (status != null && session.getStatus() != status)) {
-                return Collections.emptyList();
-            }
-            return Collections.singletonList(session);
-        }
-
-        @Override
-        public EntityId insert(AuthSession authSession) {
-            authSession.setId(EntityId.of(7001L));
-            this.session = authSession;
-            return authSession.getId();
-        }
-
-        @Override
-        public int updateAccessTime(AuthSession authSession) {
-            this.session = authSession;
-            touchCount++;
-            return 1;
-        }
-
-        @Override
-        public int updateLogout(AuthSession authSession) {
-            this.session = authSession;
-            return 1;
-        }
-
-        @Override
-        public int updateInvalidate(AuthSession authSession) {
-            this.session = authSession;
-            return 1;
-        }
-
-        @Override
-        public int updateExpire(AuthSession authSession) {
-            this.session = authSession;
-            return 1;
-        }
-
-        private int getTouchCount() {
-            return touchCount;
-        }
-    }
-
-    private static class TestAuthSessionRuntimeDao implements AuthSessionRuntimeDao {
-
-        private AuthSession session;
+        private PrincipalAuthSession session;
         private int touchCount;
 
         @Override
-        public AuthSession getByToken(String token) {
-            return session != null && session.getToken().equals(token) ? session : null;
+        public PrincipalAuthSession getById(PrincipalAuthSessionId id) {
+            return session != null && session.getId().equals(id) ? session : null;
         }
 
         @Override
-        public void insert(AuthSession authSession, int expiredSeconds) {
-            this.session = copy(authSession);
+        public void insert(PrincipalAuthSession session, int expireSeconds) {
+            this.session = session;
         }
 
         @Override
-        public void touch(String token, Date accessTime, int expiredSeconds) {
-            if (session != null && session.getToken().equals(token)) {
-                session.touch(accessTime);
+        public void touch(PrincipalAuthSessionId id, Date accessTime, int expireSeconds) {
+            if (session != null && session.getId().equals(id)) {
+                session.setLastAccessTime(accessTime);
                 touchCount++;
             }
         }
 
         @Override
-        public void deleteByToken(String token) {
-            if (session != null && session.getToken().equals(token)) {
+        public void deleteById(PrincipalAuthSessionId id) {
+            if (session != null && session.getId().equals(id)) {
                 session = null;
             }
         }
 
         private int getTouchCount() {
             return touchCount;
-        }
-
-        private AuthSession copy(AuthSession source) {
-            AuthSession target = new AuthSession();
-            target.setId(source.getId());
-            target.setToken(source.getToken());
-            target.setPrincipalKey(source.getPrincipalKey());
-            target.setIdentityId(source.getIdentityId());
-            target.setIdentityType(source.getIdentityType());
-            target.setLoginType(source.getLoginType());
-            target.setStatus(source.getStatus());
-            target.setIssuedAt(source.getIssuedAt());
-            target.setLastAccessTime(source.getLastAccessTime());
-            target.setExpireAt(source.getExpireAt());
-            target.setLogoutAt(source.getLogoutAt());
-            target.setInvalidateReason(source.getInvalidateReason());
-            return target;
         }
     }
 

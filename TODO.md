@@ -11,12 +11,4 @@
 
 ## 待审阅任务项
 
-- [ ] `login-form-migration-verification`：执行登录表单迁移验收和 RUNBOOK 收口
-  - 范围文件：
-    - `docs/30-designs/RUNBOOK-LOGIN-FORM-BIZ-MIGRATION.md`
-    - `TODO.md`
-  - 处理动作：执行残留引用扫描和 Maven 测试，删除或收窄已完成 TODO，并清理 RUNBOOK
-  - 验收点：入口模块生产代码无登录表单 DAO 直连，全量 Maven 测试通过，工作区干净
-  - 重要度：8/10
-
 ## 待讨论项

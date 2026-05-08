@@ -144,6 +144,8 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         private Object value;
         private Date expiredAt;
 
+        private PrincipalAuthSessionValueCacheDTO() {}
+
         private PrincipalAuthSessionValueCacheDTO(Object value, Date expiredAt) {
             this.value = value;
             this.expiredAt = expiredAt;

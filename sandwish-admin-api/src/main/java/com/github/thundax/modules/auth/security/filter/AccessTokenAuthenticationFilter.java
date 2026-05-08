@@ -4,7 +4,6 @@ import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
@@ -16,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -98,15 +98,15 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            PermissionSession session = permissionService.getSession(token);
-            if (session == null) {
-                session = permissionService.createSession(token, accessToken.getUserId());
+            Set<String> permissions = permissionService.getPermissions(token);
+            if (permissions == null) {
+                permissions = permissionService.createPermissions(token, accessToken.getUserId());
             }
 
             authService.activeAccessToken(accessToken);
             SecurityContextHolder.getContext()
                     .setAuthentication(new UsernamePasswordAuthenticationToken(
-                            accessToken.getUserId(), token, toAuthorities(session.getPermissions())));
+                            accessToken.getUserId(), token, toAuthorities(permissions)));
 
             filterChain.doFilter(request, response);
         } finally {

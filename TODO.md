@@ -11,20 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `permission-session-merge`：将 PermissionSession 合并进 PrincipalAuthSession.values
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PermissionSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/PermissionDao.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/PermissionService.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/PermissionServiceImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PermissionDaoImpl.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/filter/AccessTokenAuthenticationFilter.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalAuthSession.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PrincipalAuthSessionDaoImpl.java`
-  - 处理动作：把 admin 权限集合写入 `PrincipalAuthSession.values["PERMISSIONS"]`，删除独立 `PermissionSession` 存活职责。
-  - 验收点：权限读取来自 `PrincipalAuthSession.values`，`PermissionDao` 和 `PermissionDaoImpl` 不再存在。
-  - 重要度：9/10
-
 - [ ] `legacy-auth-session-delete`：删除旧 AuthSession 和 MemberAuthSession 链路
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java`

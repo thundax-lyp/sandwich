@@ -8,96 +8,83 @@ import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.U
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
-import com.github.thundax.modules.auth.config.AuthProperties;
-import com.github.thundax.modules.auth.dao.PermissionDao;
-import com.github.thundax.modules.auth.entity.PermissionSession;
+import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
+import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 @Service
-@EnableConfigurationProperties(AuthProperties.class)
 public class PermissionServiceImpl implements PermissionService {
 
     private static final int SAFETY_SECONDS = 10;
 
-    private final PermissionDao permissionDao;
-    private final AuthProperties properties;
+    private final PrincipalAccessTokenDao principalAccessTokenDao;
+    private final PrincipalAuthSessionDao principalAuthSessionDao;
     private final UserService userService;
     private final CurrentUserService currentUserService;
     private final PermissionMatcher permissionMatcher = new PrefixPermissionMatcher();
 
     public PermissionServiceImpl(
-            PermissionDao permissionDao,
-            AuthProperties properties,
+            PrincipalAccessTokenDao principalAccessTokenDao,
+            PrincipalAuthSessionDao principalAuthSessionDao,
             UserService userService,
             CurrentUserService currentUserService) {
-        this.permissionDao = permissionDao;
-        this.properties = properties;
+        this.principalAccessTokenDao = principalAccessTokenDao;
+        this.principalAuthSessionDao = principalAuthSessionDao;
         this.userService = userService;
         this.currentUserService = currentUserService;
     }
 
     @Override
-    public PermissionSession createSession(String token, String userId) {
+    public Set<String> createPermissions(String token, String userId) {
         Assert.hasText(token, "token can not be empty");
         Assert.hasText(userId, "userId can not be empty");
 
-        PermissionSession session = new PermissionSession();
-        session.setToken(token);
-        session.setUserId(userId);
-        session.setPermissions(loadPermissions(userId));
-        session.setVersion(UUID.randomUUID().toString());
-        session.setTimestamp(System.currentTimeMillis());
-
-        permissionDao.insert(session, expiredSeconds());
-
-        return session;
-    }
-
-    @Override
-    public PermissionSession getSession(String token) {
-        PermissionSession session = permissionDao.getByToken(token);
-        if (session != null) {
-            touch(token);
+        PrincipalAuthSession session = getActiveSession(token);
+        if (session == null) {
+            return Collections.emptySet();
         }
-        return session;
+        Set<String> permissions = loadPermissions(userId);
+        session.getValues()
+                .put(
+                        PrincipalAuthSession.VALUE_PERMISSIONS,
+                        new PrincipalAuthSession.PrincipalAuthSessionValue(permissions, session.getExpireAt()));
+        principalAuthSessionDao.insert(session, expiredSeconds(session));
+        return permissions;
     }
 
     @Override
-    public void touch(String token) {
-        if (StringUtils.isNotBlank(token)) {
-            permissionDao.touch(token, expiredSeconds());
+    public Set<String> getPermissions(String token) {
+        PrincipalAuthSession session = getActiveSession(token);
+        if (session == null) {
+            return null;
         }
-    }
-
-    @Override
-    public void release(String token) {
-        if (StringUtils.isNotBlank(token)) {
-            permissionDao.deleteByToken(token);
+        PrincipalAuthSession.PrincipalAuthSessionValue value =
+                session.getValues().get(PrincipalAuthSession.VALUE_PERMISSIONS);
+        if (value == null || isExpired(value.getExpiredAt())) {
+            return null;
         }
-    }
-
-    @Override
-    public void reloadAll() {
-        permissionDao.deleteAll();
+        return toPermissionSet(value.getValue());
     }
 
     @Override
     public boolean isPermitted(String token, String permission) {
-        PermissionSession session = getSession(token);
-        return session != null && permissionMatcher.matches(session.getPermissions(), permission);
+        return permissionMatcher.matches(getPermissions(token), permission);
     }
 
     private Set<String> loadPermissions(String userId) {
@@ -129,7 +116,39 @@ public class PermissionServiceImpl implements PermissionService {
         return permissions;
     }
 
-    private int expiredSeconds() {
-        return properties.getLoginExpiredSeconds() + SAFETY_SECONDS;
+    private PrincipalAuthSession getActiveSession(String token) {
+        if (StringUtils.isBlank(token)) {
+            return null;
+        }
+        PrincipalAccessToken accessToken = principalAccessTokenDao.getByToken(token);
+        if (accessToken == null || accessToken.getSessionId() == null || !accessToken.canAccess(new Date())) {
+            return null;
+        }
+        PrincipalAuthSession session = principalAuthSessionDao.getById(accessToken.getSessionId());
+        if (session == null || session.isExpired(new Date())) {
+            return null;
+        }
+        return session;
+    }
+
+    private boolean isExpired(Date expiredAt) {
+        return expiredAt != null && !expiredAt.after(new Date());
+    }
+
+    private Set<String> toPermissionSet(Object value) {
+        if (!(value instanceof Collection)) {
+            return null;
+        }
+        Set<String> permissions = new HashSet<>();
+        for (Object item : (Collection<?>) value) {
+            if (item != null) {
+                permissions.add(String.valueOf(item));
+            }
+        }
+        return permissions;
+    }
+
+    private int expiredSeconds(PrincipalAuthSession session) {
+        return session.remainingSeconds(new Date()) + SAFETY_SECONDS;
     }
 }

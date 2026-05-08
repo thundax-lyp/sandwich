@@ -158,7 +158,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 accessToken.getPrincipalKey(), ADMIN_CLIENT_ID, now, properties.getLoginExpiredSeconds());
         accessToken.setSessionId(session.getId());
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
-        permissionService.createSession(token, userId);
+        permissionService.createPermissions(token, userId);
         String refreshToken = createPrincipalRefreshToken(accessToken, ADMIN_CLIENT_ID, now);
         if (StringUtils.isNotBlank(loginName)) {
             writeLoginEvent(
@@ -220,7 +220,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public void activeAccessToken(AuthAccessTokenResult accessToken) {
-        permissionService.touch(accessToken.getToken());
         touchPrincipalAuthSession(accessToken.getPrincipalAccessToken());
     }
 
@@ -239,7 +238,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             principalAccessToken.revoke();
             requirePrincipalAccessTokenDao().updateStatus(principalAccessToken);
         }
-        permissionService.release(accessToken.getToken());
         deletePrincipalAuthSession(principalAccessToken);
         if (principalAccessToken != null) {
             writeLoginEvent(
@@ -813,7 +811,6 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             requirePrincipalAccessTokenDao().updateStatus(principalAccessToken);
             principalAuthSessionDao.deleteById(principalAccessToken.getSessionId());
         }
-        permissionService.release(token);
     }
 
     private void writeLoginEvent(

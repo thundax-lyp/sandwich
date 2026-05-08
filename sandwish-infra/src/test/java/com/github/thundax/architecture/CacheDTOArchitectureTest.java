@@ -5,12 +5,11 @@ import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.assist.persistence.dao.AsyncTaskDaoImpl;
-import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.persistence.dao.AuthSessionRuntimeDaoImpl;
-import com.github.thundax.modules.auth.persistence.dao.PermissionDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PreAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PrincipalAccessTokenDaoImpl;
+import com.github.thundax.modules.auth.persistence.dao.PrincipalAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PrincipalRefreshTokenDaoImpl;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
@@ -34,16 +33,15 @@ public class CacheDTOArchitectureTest {
         DictCacheSupport.class,
         StorageCacheSupport.class,
         PrincipalAccessTokenDaoImpl.class,
+        PrincipalAuthSessionDaoImpl.class,
         PrincipalRefreshTokenDaoImpl.class,
         AuthSessionRuntimeDaoImpl.class,
-        PermissionDaoImpl.class,
         PreAuthSessionDaoImpl.class,
         AsyncTaskDaoImpl.class
     };
 
     @Test
     public void shouldKeepDomainObjectsOutOfJdkSerializationContract() {
-        assertFalse(Serializable.class.isAssignableFrom(PermissionSession.class));
         assertFalse(Serializable.class.isAssignableFrom(PreAuthSession.class));
     }
 

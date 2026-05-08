@@ -56,7 +56,6 @@ import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
-import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
@@ -89,7 +88,6 @@ public class AuthPermissionLifecycleTest {
 
     private TestPrincipalAccessTokenDao accessTokenDao;
     private TestPrincipalRefreshTokenDao refreshTokenDao;
-    private InMemoryPermissionDaoImpl permissionDao;
     private TestPrincipalAuthSessionDao principalAuthSessionDao;
     private AdminAuthService authService;
     private PermissionService permissionService;
@@ -98,7 +96,6 @@ public class AuthPermissionLifecycleTest {
     public void setUp() throws Exception {
         accessTokenDao = new TestPrincipalAccessTokenDao();
         refreshTokenDao = new TestPrincipalRefreshTokenDao();
-        permissionDao = new InMemoryPermissionDaoImpl();
         principalAuthSessionDao = new TestPrincipalAuthSessionDao();
 
         AuthProperties authProperties = new AuthProperties();
@@ -107,8 +104,8 @@ public class AuthPermissionLifecycleTest {
         TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
         TestPrincipalCredentialService principalCredentialService = new TestPrincipalCredentialService();
         permissionService = new PermissionServiceImpl(
-                permissionDao,
-                authProperties,
+                accessTokenDao,
+                principalAuthSessionDao,
                 userService,
                 new CurrentUserServiceImpl(
                         userService,
@@ -135,10 +132,10 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
-    public void shouldCreateTouchAndReleasePermissionSessionWithAccessToken() {
+    public void shouldCreateTouchAndReleasePermissionValuesWithAccessToken() {
         AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
 
-        Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertNotNull(permissionService.getPermissions(accessToken.getToken()));
         Assert.assertNotNull(principalAuthSessionDao.getById(
                 accessToken.getPrincipalAccessToken().getSessionId()));
         Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "sys:role:view"));
@@ -150,7 +147,6 @@ public class AuthPermissionLifecycleTest {
                 .getLastAccessTime();
 
         authService.activeAccessToken(accessToken);
-        Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertTrue(principalAuthSessionDao.getTouchCount() > 0);
         Assert.assertTrue(principalAuthSessionDao
                         .getById(accessToken.getPrincipalAccessToken().getSessionId())
@@ -159,7 +155,7 @@ public class AuthPermissionLifecycleTest {
                 >= databaseLastAccessTime.getTime());
 
         authService.deleteAccessToken(accessToken);
-        Assert.assertNull(permissionService.getSession(accessToken.getToken()));
+        Assert.assertNull(permissionService.getPermissions(accessToken.getToken()));
         Assert.assertNull(principalAuthSessionDao.getById(
                 accessToken.getPrincipalAccessToken().getSessionId()));
     }
@@ -364,7 +360,6 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals(
                 "1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
-        Assert.assertTrue(permissionDao.getTouchCount() > 0);
         Assert.assertEquals(
                 PrincipalTokenStatus.ACTIVE,
                 accessToken.getPrincipalAccessToken().getStatus());

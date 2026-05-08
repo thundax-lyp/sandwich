@@ -3,23 +3,25 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
-import com.github.thundax.modules.sys.service.UserCredentialService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
@@ -37,8 +39,8 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(UserCredentialService.class),
-                mock(UserIdentityService.class));
+                mock(PrincipalIdentityService.class),
+                mock(PrincipalCredentialService.class));
         List<Menu> menus = Arrays.asList(menu(5001L, null, "系统管理"), menu(5002L, 5001L, "用户管理"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
@@ -60,8 +62,8 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(UserCredentialService.class),
-                mock(UserIdentityService.class));
+                mock(PrincipalIdentityService.class),
+                mock(PrincipalCredentialService.class));
         List<Menu> menus = Arrays.asList(
                 menu(5001L, null, "系统管理"),
                 menu(5002L, 5001L, "用户管理"),
@@ -87,8 +89,8 @@ public class CurrentUserServiceImplTest {
                 userService,
                 mock(RoleService.class),
                 menuService,
-                mock(UserCredentialService.class),
-                mock(UserIdentityService.class));
+                mock(PrincipalIdentityService.class),
+                mock(PrincipalCredentialService.class));
         List<Menu> menus = Arrays.asList(
                 menu(5010L, null, "A-root"), menu(5011L, 5010L, "B-child"), menu(5012L, 5011L, "C-grandchild"));
 
@@ -105,16 +107,20 @@ public class CurrentUserServiceImplTest {
     @Test
     public void shouldUpdateCurrentUserInfo() {
         UserService userService = mock(UserService.class);
-        UserIdentityService userIdentityService = mock(UserIdentityService.class);
+        PrincipalIdentityService principalIdentityService = mock(PrincipalIdentityService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
                 userService,
                 mock(RoleService.class),
                 mock(MenuService.class),
-                mock(UserCredentialService.class),
-                userIdentityService);
+                principalIdentityService,
+                mock(PrincipalCredentialService.class));
         User currentUser = superUser();
+        PrincipalIdentity identity = accountIdentity(currentUser.getId(), "tester");
 
-        when(userIdentityService.getAccountLoginName(currentUser.getId())).thenReturn("tester");
+        when(principalIdentityService.getByPrincipalKeyAndType(
+                        org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.eq(PrincipalIdentityType.USER_ACCOUNT)))
+                .thenReturn(identity);
 
         User updated = service.updateInfo(currentUser, "New Name", "new@example.com", "13800138000");
 
@@ -127,24 +133,42 @@ public class CurrentUserServiceImplTest {
     @Test
     public void shouldValidateOldPasswordAndUpdatePasswordCredential() throws Exception {
         UserService userService = mock(UserService.class);
-        UserCredentialService userCredentialService = mock(UserCredentialService.class);
+        PrincipalIdentityService principalIdentityService = mock(PrincipalIdentityService.class);
+        PrincipalCredentialService principalCredentialService = mock(PrincipalCredentialService.class);
         CurrentUserServiceImpl service = new CurrentUserServiceImpl(
                 userService,
                 mock(RoleService.class),
                 mock(MenuService.class),
-                userCredentialService,
-                mock(UserIdentityService.class));
+                principalIdentityService,
+                principalCredentialService);
         User currentUser = superUser();
-        UserCredential credential = new UserCredential();
+        PrincipalIdentity identity = accountIdentity(currentUser.getId(), "tester");
+        PrincipalCredential credential = new PrincipalCredential();
+        credential.setIdentityId(identity.getId());
         credential.setCredentialValue(PasswordHelper.encrypt("OldPass1$"));
 
-        when(userCredentialService.getPasswordCredential(currentUser.getId())).thenReturn(credential);
+        when(principalIdentityService.getByPrincipalKeyAndType(
+                        org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.eq(PrincipalIdentityType.USER_ACCOUNT)))
+                .thenReturn(identity);
+        when(principalCredentialService.getByIdentityIdAndType(identity.getId(), PrincipalCredentialType.USER_PASSWORD))
+                .thenReturn(credential);
 
         service.updatePassword(currentUser, "OldPass1$", "NewPass1$");
 
-        ArgumentCaptor<String> encryptedPasswordCaptor = ArgumentCaptor.forClass(String.class);
-        verify(userCredentialService).upsertPassword(eq(currentUser), encryptedPasswordCaptor.capture());
-        assertEquals(true, PasswordHelper.validate("NewPass1$", encryptedPasswordCaptor.getValue()));
+        ArgumentCaptor<PrincipalCredential> credentialCaptor = ArgumentCaptor.forClass(PrincipalCredential.class);
+        verify(principalCredentialService).update(credentialCaptor.capture());
+        assertEquals(
+                true,
+                PasswordHelper.validate("NewPass1$", credentialCaptor.getValue().getCredentialValue()));
+    }
+
+    private PrincipalIdentity accountIdentity(EntityId userId, String loginName) {
+        PrincipalIdentity identity = new PrincipalIdentity();
+        identity.setId(EntityId.of(2001L));
+        identity.setType(PrincipalIdentityType.USER_ACCOUNT);
+        identity.setIdentityValue(loginName);
+        return identity;
     }
 
     private User superUser() {

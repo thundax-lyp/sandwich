@@ -27,11 +27,11 @@ public enum PrincipalCredentialType {
         return credentialName;
     }
 
-    public boolean isUserCredential() {
+    public boolean isUserPrincipal() {
         return PrincipalType.USER == principalType;
     }
 
-    public boolean isMemberCredential() {
+    public boolean isMemberPrincipal() {
         return PrincipalType.MEMBER == principalType;
     }
 

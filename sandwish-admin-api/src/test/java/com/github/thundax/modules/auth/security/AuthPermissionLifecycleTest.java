@@ -26,12 +26,15 @@ import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.OAuthRefreshToken;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
@@ -39,6 +42,8 @@ import com.github.thundax.modules.auth.security.filter.AccessTokenAuthentication
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
@@ -52,23 +57,13 @@ import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import com.github.thundax.modules.sys.dao.UserCredentialDao;
-import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
-import com.github.thundax.modules.sys.entity.UserIdentity;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialStatus;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityStatus;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
-import com.github.thundax.modules.sys.service.UserCredentialService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -111,7 +106,8 @@ public class AuthPermissionLifecycleTest {
         authProperties.setLoginExpiredSeconds(60);
 
         TestUserService userService = new TestUserService();
-        TestUserIdentityService userIdentityService = new TestUserIdentityService();
+        TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
+        TestPrincipalCredentialService principalCredentialService = new TestPrincipalCredentialService();
         permissionService = new PermissionServiceImpl(
                 permissionDao,
                 authProperties,
@@ -120,8 +116,8 @@ public class AuthPermissionLifecycleTest {
                         userService,
                         new TestRoleService(),
                         new TestMenuService(),
-                        new TestUserCredentialService(),
-                        userIdentityService));
+                        principalIdentityService,
+                        principalCredentialService));
         authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
@@ -129,11 +125,10 @@ public class AuthPermissionLifecycleTest {
                 accessTokenDao,
                 authSessionDao,
                 authSessionRuntimeDao,
-                new TestUserIdentityDao(),
                 permissionService,
                 new TestPrincipalAuthService(),
-                userService,
-                userIdentityService);
+                principalIdentityService,
+                userService);
     }
 
     @After
@@ -752,107 +747,6 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private static class TestUserIdentityDao implements UserIdentityDao {
-
-        public UserIdentity getById(EntityId id) {
-            return identity();
-        }
-
-        @Override
-        public UserIdentity getByIdentity(UserIdentityType identityType, String identityValue) {
-            return identity();
-        }
-
-        @Override
-        public UserIdentity getByUserIdAndType(EntityId userId, UserIdentityType identityType) {
-            return identity();
-        }
-
-        @Override
-        public List<UserIdentity> listByUserIdAndStatus(EntityId userId, UserIdentityStatus status) {
-            return Collections.singletonList(identity());
-        }
-
-        @Override
-        public EntityId insert(UserIdentity userIdentity) {
-            return EntityId.of(8001L);
-        }
-
-        @Override
-        public int update(UserIdentity userIdentity) {
-            return 1;
-        }
-
-        @Override
-        public int updateStatus(UserIdentity userIdentity) {
-            return 1;
-        }
-
-        private UserIdentity identity() {
-            UserIdentity identity = new UserIdentity();
-            identity.setId(EntityId.of(8001L));
-            identity.setUserId(EntityId.of(1L));
-            identity.setIdentityType(UserIdentityType.ACCOUNT);
-            identity.setIdentityValue("tester");
-            identity.setStatus(UserIdentityStatus.ENABLED);
-            return identity;
-        }
-    }
-
-    private static class TestUserCredentialDao implements UserCredentialDao {
-
-        public UserCredential getById(EntityId id) {
-            return credential();
-        }
-
-        @Override
-        public UserCredential getByIdentityIdAndType(EntityId identityId, UserCredentialType credentialType) {
-            return credential();
-        }
-
-        @Override
-        public UserCredential getByUserIdAndType(EntityId userId, UserCredentialType credentialType) {
-            return credential();
-        }
-
-        @Override
-        public List<UserCredential> listByUserIdAndStatus(EntityId userId, UserCredentialStatus status) {
-            return Collections.singletonList(credential());
-        }
-
-        @Override
-        public EntityId insert(UserCredential userCredential) {
-            return EntityId.of(9001L);
-        }
-
-        @Override
-        public int update(UserCredential userCredential) {
-            return 1;
-        }
-
-        @Override
-        public int updateStatus(UserCredential userCredential) {
-            return 1;
-        }
-
-        @Override
-        public int updateVerifyState(UserCredential userCredential) {
-            return 1;
-        }
-
-        private UserCredential credential() {
-            UserCredential credential = new UserCredential();
-            credential.setId(EntityId.of(9001L));
-            credential.setUserId(EntityId.of(1L));
-            credential.setIdentityId(EntityId.of(8001L));
-            credential.setCredentialType(UserCredentialType.PASSWORD);
-            credential.setCredentialValue("secret");
-            credential.setStatus(UserCredentialStatus.ACTIVE);
-            credential.setFailedLimit(3);
-            return credential;
-        }
-    }
-
     private static class TestUserService implements UserService {
 
         @Override
@@ -916,38 +810,103 @@ public class AuthPermissionLifecycleTest {
         }
     }
 
-    private static class TestUserIdentityService implements UserIdentityService {
+    private static class TestPrincipalIdentityService implements PrincipalIdentityService {
 
         @Override
-        public UserIdentity getByLoginName(String loginName) {
-            return updateAccountIdentity(new TestUserService().getById(EntityId.of(1L)), loginName);
+        public PrincipalIdentity getById(EntityId id) {
+            return identity("tester");
         }
 
         @Override
-        public String getAccountLoginName(EntityId userId) {
-            return "tester";
+        public PrincipalIdentity getByIdentity(PrincipalIdentityType identityType, String identityValue) {
+            return identity(identityValue);
         }
 
         @Override
-        public UserIdentity updateAccountIdentity(User user, String loginName) {
-            UserIdentity identity = new UserIdentity();
+        public PrincipalIdentity getByPrincipalKeyAndType(
+                PrincipalKey principalKey, PrincipalIdentityType identityType) {
+            return identity("tester");
+        }
+
+        @Override
+        public List<PrincipalIdentity> listByPrincipalKeyAndStatus(
+                PrincipalKey principalKey, PrincipalIdentityStatus status) {
+            return Collections.singletonList(identity("tester"));
+        }
+
+        @Override
+        public EntityId add(PrincipalIdentity principalIdentity) {
+            principalIdentity.setId(EntityId.of(8001L));
+            return principalIdentity.getId();
+        }
+
+        @Override
+        public void update(PrincipalIdentity principalIdentity) {}
+
+        @Override
+        public void updateStatus(PrincipalIdentity principalIdentity) {}
+
+        private PrincipalIdentity identity(String loginName) {
+            PrincipalIdentity identity = new PrincipalIdentity();
             identity.setId(EntityId.of(8001L));
-            identity.setUserId(user.getId());
-            identity.setIdentityType(UserIdentityType.ACCOUNT);
+            identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+            identity.setType(PrincipalIdentityType.USER_ACCOUNT);
             identity.setIdentityValue(loginName);
+            identity.setStatus(PrincipalIdentityStatus.ENABLED);
             return identity;
         }
     }
 
-    private static class TestUserCredentialService implements UserCredentialService {
+    private static class TestPrincipalCredentialService implements PrincipalCredentialService {
 
         @Override
-        public UserCredential getPasswordCredential(EntityId userId) {
-            return new TestUserCredentialDao().credential();
+        public PrincipalCredential getById(EntityId id) {
+            return credential();
         }
 
         @Override
-        public void upsertPassword(User user, String encryptedPassword) {}
+        public PrincipalCredential getByIdentityIdAndType(EntityId identityId, PrincipalCredentialType credentialType) {
+            return credential();
+        }
+
+        @Override
+        public PrincipalCredential getByPrincipalKeyAndType(
+                PrincipalKey principalKey, PrincipalCredentialType credentialType) {
+            return credential();
+        }
+
+        @Override
+        public List<PrincipalCredential> listByPrincipalKeyAndStatus(
+                PrincipalKey principalKey, PrincipalCredentialStatus status) {
+            return Collections.singletonList(credential());
+        }
+
+        @Override
+        public EntityId add(PrincipalCredential principalCredential) {
+            principalCredential.setId(EntityId.of(9001L));
+            return principalCredential.getId();
+        }
+
+        @Override
+        public void update(PrincipalCredential principalCredential) {}
+
+        @Override
+        public void updateStatus(PrincipalCredential principalCredential) {}
+
+        @Override
+        public void updateVerifyState(PrincipalCredential principalCredential) {}
+
+        private PrincipalCredential credential() {
+            PrincipalCredential credential = new PrincipalCredential();
+            credential.setId(EntityId.of(9001L));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+            credential.setIdentityId(EntityId.of(8001L));
+            credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
+            credential.setCredentialValue("secret");
+            credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+            credential.setFailedLimit(3);
+            return credential;
+        }
     }
 
     private static class TestMenuService implements MenuService {

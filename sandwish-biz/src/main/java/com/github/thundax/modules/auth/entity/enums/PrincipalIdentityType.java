@@ -33,11 +33,11 @@ public enum PrincipalIdentityType {
         return identityName;
     }
 
-    public boolean isUserIdentity() {
+    public boolean isUserPrincipal() {
         return PrincipalType.USER == principalType;
     }
 
-    public boolean isMemberIdentity() {
+    public boolean isMemberPrincipal() {
         return PrincipalType.MEMBER == principalType;
     }
 

@@ -39,9 +39,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO",
         "com.github.thundax.modules.auth.persistence.dataobject.MemberAccessTokenDO",
         "com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO",
-        "com.github.thundax.modules.member.persistence.dataobject.MemberCredentialDO",
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
-        "com.github.thundax.modules.member.persistence.dataobject.MemberIdentityDO",
         "com.github.thundax.modules.auth.persistence.dataobject.MemberRefreshTokenDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
@@ -51,9 +49,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.sys.persistence.dataobject.LogDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuDO",
         "com.github.thundax.modules.sys.persistence.dataobject.RoleDO",
-        "com.github.thundax.modules.sys.persistence.dataobject.UserCredentialDO",
-        "com.github.thundax.modules.sys.persistence.dataobject.UserDO",
-        "com.github.thundax.modules.sys.persistence.dataobject.UserIdentityDO"
+        "com.github.thundax.modules.sys.persistence.dataobject.UserDO"
     };
     private static final String[] LEGACY_TABLE_NAME_DATA_OBJECTS = {};
 

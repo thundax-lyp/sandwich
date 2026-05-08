@@ -9,7 +9,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.Date;
@@ -53,7 +53,7 @@ public class AuthSessionRuntimeDaoImplTest {
         session.setToken("token-1");
         session.setUserId(EntityId.of(1001L));
         session.setIdentityId(EntityId.of(2001L));
-        session.setIdentityType(UserIdentityType.ACCOUNT);
+        session.setIdentityType(PrincipalIdentityType.USER_ACCOUNT);
         session.setLoginType("PASSWORD");
         session.setStatus(AuthSessionStatus.ACTIVE);
         session.setIssuedAt(new Date(1000L));

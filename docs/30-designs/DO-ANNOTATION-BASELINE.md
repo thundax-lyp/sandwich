@@ -10,19 +10,18 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 
 当前扫描结果：
 
-- DO 类总数：22
-- 数据库表映射 DO：19
+- DO 类总数：20
+- 数据库表映射 DO：17
 - Redis-only DO：3
 - DataObject 类：0
 
 数据库表映射 DO 当前为：
 
-- `com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO`
-- `com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO`
 - `com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO`
 - `com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO`
 - `com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO`
 - `com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO`
+- `com.github.thundax.modules.auth.persistence.dataobject.PrincipalLoginEventDO`
 - `com.github.thundax.modules.member.persistence.dataobject.MemberDO`
 - `com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO`
 - `com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO`

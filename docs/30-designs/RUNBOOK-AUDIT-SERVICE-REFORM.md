@@ -206,7 +206,7 @@ mvn -pl sandwish-admin-api -am test
 目标对象来自当前实现 `Auditable` 的 domain 实体。
 
 - `sys`：`User`、`Role`、`Menu`、`Department`、`Dict`。
-- `auth`：`AuthSession`、`OAuthClient`、`OAuthAuthorization`、`PrincipalAccessToken`、`PrincipalRefreshToken`。
+- `auth`：`OAuthClient`、`OAuthAuthorization`、`PrincipalAccessToken`、`PrincipalRefreshToken`、`PrincipalLoginEvent`。
 - `assist`：`AsyncTask`。
 - `member`：`Member`。
 

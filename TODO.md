@@ -11,17 +11,4 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-runbook-cleanup`：清理 PrincipalAuthSession RUNBOOK 现场
-  - 范围文件：
-    - `docs/30-designs/RUNBOOK-PRINCIPAL-AUTH-SESSION-REFORM.md`
-    - `docs/10-requirements/AUTH-REQUIREMENTS.md`
-    - `docs/10-requirements/SYSTEM-REQUIREMENTS.md`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-    - `docs/30-designs/AUDIT-SERVICE-REFORM.md`
-    - `docs/30-designs/DO-ANNOTATION-BASELINE.md`
-    - `TODO.md`
-  - 处理动作：删除或收窄一次性 RUNBOOK，清理需求和设计文档里的旧 `AuthSession` / `MemberAuthSession` / `PermissionSession` 口径。
-  - 验收点：旧会话链路残留扫描只命中 `PreAuthSession` / `PrincipalAuthSession` 等新口径。
-  - 重要度：10/10
-
 ## 待讨论项

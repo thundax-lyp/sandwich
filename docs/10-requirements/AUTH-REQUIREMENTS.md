@@ -44,7 +44,7 @@
 
 后台认证目标模型固定为：
 
-`User -> PrincipalIdentity -> PrincipalCredential -> AuthSession`
+`PrincipalKey -> PrincipalIdentity -> PrincipalCredential -> PrincipalAuthSession`
 
 `User` 归属 `sys` 用户主体，承载后台用户资料、组织关系、权限等级、启停状态和审计字段。
 
@@ -52,17 +52,17 @@
 
 `PrincipalCredential` 归属 `auth` 认证模型，承载后台用户和前台会员的认证凭据。一个 `PrincipalIdentity` 可以绑定多个 `PrincipalCredential`。
 
-`AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
+`PrincipalAuthSession` 归属 `auth` 认证模型，承载后台、前台会员和 OAuth2 的登录后会话运行态。
 
-`PrincipalAccessToken` 承载后台、前台会员和 OAuth2 access token 运行态。`PrincipalRefreshToken` 承载后台、前台会员和 OAuth2 refresh token 运行态。`AuthSession` 固定不替代 token 的传输职责。
+`PrincipalAccessToken` 承载后台、前台会员和 OAuth2 access token 运行态。`PrincipalRefreshToken` 承载后台、前台会员和 OAuth2 refresh token 运行态。`PrincipalAuthSession` 固定不替代 token 的传输职责。
 
-`PermissionSession` 继续承载权限集合缓存。`AuthSession` 固定不承载权限集合。
+后台权限集合固定写入 `PrincipalAuthSession.values["PERMISSIONS"]`，不再使用独立权限会话。
 
 `OAuthClient` 归属 `auth` 认证模型，承载 OAuth2 客户端配置、密钥哈希、授权类型、scope、redirect uri 和 token TTL 策略。
 
 `OAuthAuthorization` 归属 `auth` 认证模型，承载 OAuth2 授权请求、授权码、PKCE 参数、授权范围、决策状态和一次性消费状态。
 
-前台会员认证运行态也归属 `auth` 认证模型。`MemberAuthSession` 保留 `Member` 前缀，用于表达前台会员会话事实；前台会员访问 token 和 refresh token 统一由 `PrincipalAccessToken` / `PrincipalRefreshToken` 表达。
+前台会员认证运行态也归属 `auth` 认证模型，统一由 `PrincipalAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken` 表达。
 
 后台和前台认证的共性结构固定为：
 
@@ -81,11 +81,11 @@
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、`Principal*` 统一认证结构、`PreAuthSession` 运行态、前台会员认证运行态模型、认证枚举、DAO 契约和可复用认证业务 Service。
+  - 定义 OAuth2 模型、token 模型、`Principal*` 统一认证结构、`PreAuthSession` 运行态、认证枚举、DAO 契约和可复用认证业务 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、用户保存流程和用户资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
-  - 实现后台认证运行态、前台会员认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
+  - 实现认证运行态和 OAuth2 模型 DAO，维护 DO、Mapper 和持久化转换。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现后台用户主体、登录标识和认证凭据 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
@@ -198,63 +198,42 @@
 - `identityId + credentialType` 必须唯一定位一个认证凭据。
 - `PrincipalCredential` 不承载通用审计字段，只保存凭据认证策略所需状态。
 
-### 5.4 AuthSession
+### 5.4 PrincipalAuthSession
 
-`AuthSession` 是后台认证会话事实，分为 Redis 运行态和数据库持久化事实。
+`PrincipalAuthSession` 是统一主体认证会话运行态，保存于 Redis / JetCache，不建立数据库表。
 
 核心字段：
 
-- `id`：认证会话 ID。
-- `sessionId`：认证会话标识。
-- `token`：访问 token。
-- `userId`：后台用户 ID。
-- `identityId`：登录标识 ID。
-- `identityType`：登录标识类型。
-- `loginType`：登录方式。
-- `status`：会话状态。
+- `id`：认证会话 ID，内部存储主键。
+- `principalKey`：统一主体坐标。
+- `clientId`：客户端标识。
+- `values`：会话相关附加值。
 - `issuedAt`：签发时间。
 - `lastAccessTime`：最近访问时间。
 - `expireAt`：过期时间。
-- `logoutAt`：登出时间。
-- `invalidateReason`：失效原因。
-
-固定登录方式：
-
-- `PASSWORD`：账号密码登录。
-
-固定状态：
-
-- `ACTIVE`：活跃。
-- `LOGGED_OUT`：已登出。
-- `INVALIDATED`：已失效。
-- `EXPIRED`：已过期。
 
 固定约束：
 
-- 每次后台登录成功必须创建新的 `AuthSession` 数据库事实记录。
-- 每次后台登录成功必须写入对应 `AuthSession` Redis 运行态快照。
-- Redis 运行态固定承载活跃会话快照、最近访问时间和 TTL。
-- 数据库持久化事实固定承载登录事实、最终最近访问时间、登出、失效和过期状态。
-- 请求 token 有效且刷新访问态时，必须 touch 对应 Redis 运行态 `AuthSession.lastAccessTime`。
-- 正常请求不得逐次更新数据库 `auth_session.last_access_time`。
-- 主动登出固定将 `AuthSession.status` 更新为 `LOGGED_OUT`。
-- 安全策略失效固定将 `AuthSession.status` 更新为 `INVALIDATED`。
-- 自然过期固定将 `AuthSession.status` 更新为 `EXPIRED`。
-- `AuthSession` 不保存权限集合。
+- 登录成功必须创建新的 `PrincipalAuthSession`。
+- 请求 token 有效且刷新访问态时，必须由 Service touch `PrincipalAuthSession.lastAccessTime`。
+- token 删除、登出或安全失效时必须删除对应 `PrincipalAuthSession`。
+- 会话过期由 `expireAt` 和缓存 TTL 共同约束。
+- `values["PERMISSIONS"]` 固定承载后台权限集合。
+- 认证历史事实固定写入 `PrincipalLoginEvent`，不由会话运行态长期保存。
 
 ### 5.5 Front Member Auth Runtime
 
 前台会员认证运行态对象归属 auth 域：
 
-- `MemberAuthSession`：前台会员认证会话事实。
+- `PrincipalAuthSession`：前台会员认证会话运行态。
 - `PrincipalAccessToken`：前台会员 API 请求访问 token。
 - `PrincipalRefreshToken`：前台会员刷新 token。
 
 固定约束：
 
-- 前台 API 登录成功后必须创建 `MemberAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken`。
+- 前台 API 登录成功后必须创建 `PrincipalAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken`。
 - 前台会员 token 固定使用 `PrincipalKey(MEMBER, memberId)` 定位主体。
-- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 固定只保存 token hash，不保存 token 明文。
+- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 通过 token code 对外传递，通过 id 在 Redis 内部定位。
 
 ### 5.6 PreAuthSession
 
@@ -265,7 +244,7 @@
 - `PreAuthSession` 固定用于承载 `loginToken`、refresh token、验证码、短信验证码、邮箱验证码、密码传输密钥和登录前短期校验数据。
 - `PreAuthSession` 是临时存储容器，不按 admin/front 拆分模型。
 - `PreAuthSession` 通过 `PrincipalType` 区分 `USER` 和 `MEMBER` 登录前状态。
-- `PreAuthSession` 不是认证会话，不替代 `AuthSession` 或 `MemberAuthSession`。
+- `PreAuthSession` 不是认证会话，不替代 `PrincipalAuthSession`。
 - `PreAuthSession` 过期不等于访问 token 过期。
 - `PreAuthSession` 使用 Redis / JetCache 运行态存储，不建立数据库表，不依赖 HTTP session。
 - 创建 `PreAuthSession` 前必须校验登录前会话容量和登录后在线容量。
@@ -282,19 +261,18 @@
 
 - 登录成功后必须创建 `PrincipalAccessToken` 和 `PrincipalRefreshToken`。
 - `PrincipalAccessToken` 必须能定位后台 `User`。
-- token 删除时必须释放权限会话并更新认证会话状态。
+- token 删除时必须删除对应 `PrincipalAuthSession`。
 
-### 5.8 PermissionSession
+### 5.8 权限集合
 
-`PermissionSession` 是后台权限集合缓存。
+后台权限集合固定作为 `PrincipalAuthSession.values["PERMISSIONS"]` 的会话值保存。
 
 固定约束：
 
-- 登录成功后必须创建 `PermissionSession`。
-- 有效请求必须 touch `PermissionSession`。
-- 登出或 token 删除时必须释放 `PermissionSession`。
-- `PermissionSession` 不替代 `AuthSession` 的会话事实职责。
-- `PermissionSession` 运行态模型和 DAO 归属 `biz.modules.auth`，后台权限会话适配 Service 归属 `sandwish-admin-api` 的 `auth.service`。
+- 登录成功后必须写入权限集合。
+- 权限集合随 `PrincipalAuthSession` 存活，不独立表达会话存活。
+- 登出或 token 删除时通过删除 `PrincipalAuthSession` 清理权限集合。
+- 权限来源和匹配规则由后台权限适配 Service 负责。
 
 ### 5.9 OAuthClient
 
@@ -477,30 +455,27 @@
 ### 7.5 访问 token
 
 - 密码认证成功后必须创建 `PrincipalAccessToken` 和 `PrincipalRefreshToken`。
-- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 必须只保存 token hash，不保存 token 明文。
+- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 必须通过 token code 对外传递，通过 id 在 Redis 内部定位。
 - token 校验失败时必须拒绝访问。
 - 有效 token 请求必须刷新访问态。
-- 删除 token 时必须释放权限会话。
+- 删除 token 时必须删除对应 `PrincipalAuthSession`。
 
-### 7.6 权限会话
+### 7.6 权限集合
 
-- 登录成功后必须创建 `PermissionSession`。
-- `PermissionSession` 必须绑定 token 和 `userId`。
-- 有效请求必须 touch 权限会话。
-- 登出时必须释放权限会话。
-- 权限会话的权限来源和匹配规则不在本文档重定义。
+- 登录成功后必须把后台权限集合写入 `PrincipalAuthSession.values["PERMISSIONS"]`。
+- 权限集合必须跟随 `PrincipalAuthSession` 存活。
+- 有效请求必须 touch `PrincipalAuthSession`。
+- 登出时必须删除 `PrincipalAuthSession`。
+- 权限来源和匹配规则不在本文档重定义。
 
-### 7.7 认证会话
+### 7.7 认证会话运行态
 
-- 登录成功后必须创建 `AuthSession`。
-- `AuthSession` 必须绑定 token、`userId`、`identityId`、`identityType` 和 `loginType`。
-- 有效请求刷新访问态时必须 touch Redis 运行态 `AuthSession`。
-- 登出时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `LOGGED_OUT`。
-- token 安全失效时必须用 Redis 运行态最后访问时间收口数据库 `AuthSession`，并标记为 `INVALIDATED`。
-- 按 token 失效会话时必须释放对应 `PermissionSession`。
-- 按用户失效会话时必须失效该用户全部活跃 `AuthSession`。
-- 会话自然过期时必须将数据库 `AuthSession` 标记为 `EXPIRED`。
-- Redis 运行态过期不替代数据库最终状态收口。
+- 登录成功后必须创建 `PrincipalAuthSession`。
+- `PrincipalAuthSession` 必须绑定 `PrincipalKey`、`clientId`、签发时间、最近访问时间和过期时间。
+- 有效请求刷新访问态时必须 touch `PrincipalAuthSession`。
+- 登出、token 安全失效和按用户失效会话时必须删除对应 `PrincipalAuthSession`。
+- 登录、登出、刷新和授权事件必须写入 `PrincipalLoginEvent`。
+- Redis 运行态过期不替代登录事件审计。
 
 ### 7.8 OAuth2 client
 
@@ -541,7 +516,7 @@
 - 企业微信登录必须通过 provider 校验外部身份。
 - GitHub 登录必须通过 provider 校验外部身份。
 - 外部身份映射不到后台用户时必须拒绝登录。
-- 多登录方式登录成功后必须复用统一 `PrincipalAccessToken`、`PrincipalRefreshToken`、`PermissionSession` 和 `AuthSession` 创建流程。
+- 多登录方式登录成功后必须复用统一 `PrincipalAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken` 创建流程。
 
 ### 7.13 用户保存联动
 
@@ -578,9 +553,9 @@
 12. 登录成功后释放 `PreAuthSession`。
 13. 登录成功后创建 `PrincipalAccessToken`。
 14. 登录成功后创建 `PrincipalRefreshToken`。
-15. 登录成功后创建 `PermissionSession`。
-16. 登录成功后创建数据库持久化事实 `AuthSession`。
-17. 登录成功后写入 Redis 运行态 `AuthSession`。
+15. 登录成功后创建 `PrincipalAuthSession`。
+16. 登录成功后把权限集合写入 `PrincipalAuthSession.values["PERMISSIONS"]`。
+17. 登录成功后写入 `PrincipalLoginEvent`。
 18. `AuthController` 返回 token 和 refresh token 响应。
 
 ### 8.2 后台请求认证流程
@@ -588,8 +563,8 @@
 1. 后台 token filter 读取请求 token。
 2. token filter 按 token hash 读取 `PrincipalAccessToken`。
 3. token filter 校验 token 状态和过期时间。
-4. token filter touch `PermissionSession`。
-5. token filter touch Redis 运行态 `AuthSession`。
+4. token filter 读取 `PrincipalAuthSession.values["PERMISSIONS"]`。
+5. token filter touch `PrincipalAuthSession`。
 6. token filter 恢复当前用户上下文。
 
 ### 8.3 后台登出流程
@@ -597,10 +572,8 @@
 1. `AuthController.logout` 接收登出请求。
 2. Controller 按 token hash 定位 `PrincipalAccessToken`。
 3. Service 撤销 `PrincipalAccessToken`。
-4. Service 释放 `PermissionSession`。
-5. Service 读取 Redis 运行态 `AuthSession` 的最后访问时间。
-6. Service 删除 Redis 运行态 `AuthSession`。
-7. Service 将数据库 `AuthSession` 标记为 `LOGGED_OUT`。
+4. Service 删除 `PrincipalAuthSession`。
+5. Service 写入 `PrincipalLoginEvent`。
 
 ### 8.4 后台用户创建流程
 

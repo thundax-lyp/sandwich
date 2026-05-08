@@ -30,8 +30,9 @@ public class UserDaoImpl implements UserDao {
             "department_id IN (SELECT o.id FROM sys_department query_department "
                     + "JOIN sys_department o ON o.lft BETWEEN query_department.lft AND query_department.rgt "
                     + "WHERE query_department.id = {0})";
-    private static final String ACCOUNT_LOGIN_NAME_FILTER_SQL = "id IN (SELECT user_id FROM sys_user_identity "
-            + "WHERE identity_type = 'ACCOUNT' AND identity_value LIKE CONCAT('%',{0},'%'))";
+    private static final String ACCOUNT_LOGIN_NAME_FILTER_SQL = "id IN (SELECT principal_id "
+            + "FROM auth_principal_identity WHERE principal_type = 'USER' AND identity_type = 'USER_ACCOUNT' "
+            + "AND identity_value LIKE CONCAT('%',{0},'%'))";
     private static final String DEL_FLAG_COLUMN = "del_flag";
     private static final String NORMAL_DEL_FLAG = "0";
 

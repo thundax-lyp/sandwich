@@ -8,7 +8,12 @@ import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
@@ -21,7 +26,6 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.CurrentUserService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,16 +50,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class CurrentUserController {
 
     private final CurrentUserService currentUserService;
-    private final UserIdentityService userIdentityService;
+    private final PrincipalIdentityService principalIdentityService;
     private final AdminAuthService authService;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
-            UserIdentityService userIdentityService,
+            PrincipalIdentityService principalIdentityService,
             AdminAuthService authService) {
 
         this.currentUserService = currentUserService;
-        this.userIdentityService = userIdentityService;
+        this.principalIdentityService = principalIdentityService;
         this.authService = authService;
     }
 
@@ -75,8 +79,7 @@ public class CurrentUserController {
             throw new InvalidTokenException();
         }
 
-        return PersonalInterfaceAssembler.toInfoResponse(
-                currentUser, userIdentityService.getAccountLoginName(currentUser.getId()));
+        return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
     }
 
     @ApiOperation(value = "更新当前用户信息", notes = "更新当前登录后台用户的姓名、邮箱和手机号")
@@ -96,8 +99,7 @@ public class CurrentUserController {
         currentUser =
                 currentUserService.updateInfo(currentUser, request.getName(), request.getEmail(), request.getMobile());
 
-        return PersonalInterfaceAssembler.toInfoResponse(
-                currentUser, userIdentityService.getAccountLoginName(currentUser.getId()));
+        return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
     }
 
     @ApiOperation(value = "更新当前用户密码", notes = "校验当前登录后台用户旧密码后更新密码凭据")
@@ -209,5 +211,14 @@ public class CurrentUserController {
 
         return PersonalInterfaceAssembler.toPermsResponse(
                 PermissionAuthorities.toPermissions(authentication.getAuthorities()));
+    }
+
+    private String getAccountLoginName(User user) {
+        if (user == null || user.getId() == null) {
+            return null;
+        }
+        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
     }
 }

@@ -3,8 +3,9 @@ package com.github.thundax.modules.auth.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO;
-import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +21,7 @@ public final class MemberAuthSessionPersistenceAssembler {
         dataObject.setSessionId(entity.getSessionId());
         dataObject.setMemberId(EntityIdCodec.toValue(entity.getMemberId()));
         dataObject.setIdentityId(EntityIdCodec.toValue(entity.getIdentityId()));
-        dataObject.setIdentityType(
-                entity.getIdentityType() == null
-                        ? null
-                        : entity.getIdentityType().value());
+        dataObject.setIdentityType(identityTypeValue(entity.getIdentityType()));
         dataObject.setLoginType(entity.getLoginType());
         dataObject.setStatus(
                 entity.getStatus() == null ? null : entity.getStatus().value());
@@ -48,8 +46,7 @@ public final class MemberAuthSessionPersistenceAssembler {
         entity.setSessionId(dataObject.getSessionId());
         entity.setMemberId(EntityIdCodec.toDomain(dataObject.getMemberId()));
         entity.setIdentityId(EntityIdCodec.toDomain(dataObject.getIdentityId()));
-        entity.setIdentityType(
-                dataObject.getIdentityType() == null ? null : MemberIdentityType.from(dataObject.getIdentityType()));
+        entity.setIdentityType(identityTypeFrom(dataObject.getIdentityType()));
         entity.setLoginType(dataObject.getLoginType());
         entity.setStatus(dataObject.getStatus() == null ? null : MemberAuthSessionStatus.from(dataObject.getStatus()));
         entity.setIssuedAt(dataObject.getIssuedAt());
@@ -73,5 +70,19 @@ public final class MemberAuthSessionPersistenceAssembler {
             entities.add(toEntity(dataObject));
         }
         return entities;
+    }
+
+    private static String identityTypeValue(PrincipalIdentityType identityType) {
+        return identityType == null ? null : identityType.value();
+    }
+
+    private static PrincipalIdentityType identityTypeFrom(String identityType) {
+        if (identityType == null) {
+            return null;
+        }
+        if (identityType.startsWith("MEMBER_")) {
+            return PrincipalIdentityType.from(identityType);
+        }
+        return PrincipalIdentityType.from(PrincipalType.MEMBER, identityType);
     }
 }

@@ -30,6 +30,8 @@ import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.entity.enums.OAuthRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
@@ -39,6 +41,7 @@ import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -47,12 +50,7 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
-import com.github.thundax.modules.sys.dao.UserIdentityDao;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserIdentity;
-import com.github.thundax.modules.sys.entity.enums.UserCredentialType;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,11 +82,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private final AccessTokenDao accessTokenDao;
     private final AuthSessionDao authSessionDao;
     private final AuthSessionRuntimeDao authSessionRuntimeDao;
-    private final UserIdentityDao userIdentityDao;
     private final PermissionService permissionService;
     private final PrincipalAuthService principalAuthService;
+    private final PrincipalIdentityService principalIdentityService;
     private final UserService userService;
-    private final UserIdentityService userIdentityService;
 
     @Autowired(required = false)
     private WecomLoginProvider wecomLoginProvider;
@@ -115,22 +112,20 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             AccessTokenDao accessTokenDao,
             AuthSessionDao authSessionDao,
             AuthSessionRuntimeDao authSessionRuntimeDao,
-            UserIdentityDao userIdentityDao,
             PermissionService permissionService,
             PrincipalAuthService principalAuthService,
-            UserService userService,
-            UserIdentityService userIdentityService) {
+            PrincipalIdentityService principalIdentityService,
+            UserService userService) {
         this.properties = properties;
         this.loginProperties = loginProperties;
         this.loginFormDao = loginFormDao;
         this.accessTokenDao = accessTokenDao;
         this.authSessionDao = authSessionDao;
         this.authSessionRuntimeDao = authSessionRuntimeDao;
-        this.userIdentityDao = userIdentityDao;
         this.permissionService = permissionService;
         this.principalAuthService = principalAuthService;
+        this.principalIdentityService = principalIdentityService;
         this.userService = userService;
-        this.userIdentityService = userIdentityService;
     }
 
     @Override
@@ -353,7 +348,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(token, session, user, userIdentityService.getAccountLoginName(user.getId()));
+        return AuthTokenQueryResult.active(token, session, user, getAccountLoginName(user.getId()));
     }
 
     private AuthTokenQueryResult queryOAuthAccessToken(String token) {
@@ -371,8 +366,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
-        return AuthTokenQueryResult.active(
-                token, accessToken, user, userIdentityService.getAccountLoginName(user.getId()));
+        return AuthTokenQueryResult.active(token, accessToken, user, getAccountLoginName(user.getId()));
     }
 
     @Override
@@ -584,7 +578,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (!validateSmsValidateCode(loginToken, mobile, validateCode)) {
             throw new InvalidCaptchaException();
         }
-        return authenticateIdentity(UserIdentityType.MOBILE, mobile);
+        return authenticateIdentity(PrincipalIdentityType.USER_MOBILE, mobile);
     }
 
     @Override
@@ -592,7 +586,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (wecomLoginProvider == null) {
             throw new ApiException("企业微信登录未配置");
         }
-        return authenticateIdentity(UserIdentityType.WECOM, wecomLoginProvider.resolveIdentity(code));
+        return authenticateIdentity(PrincipalIdentityType.USER_WECOM, wecomLoginProvider.resolveIdentity(code));
     }
 
     @Override
@@ -600,7 +594,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (githubLoginProvider == null) {
             throw new ApiException("GitHub登录未配置");
         }
-        return authenticateIdentity(UserIdentityType.GITHUB, githubLoginProvider.resolveIdentity(code));
+        return authenticateIdentity(PrincipalIdentityType.USER_GITHUB, githubLoginProvider.resolveIdentity(code));
     }
 
     @Override
@@ -608,7 +602,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
-        String loginName = userIdentityService.getAccountLoginName(user.getId());
+        String loginName = getAccountLoginName(user.getId());
         if (StringUtils.isBlank(loginName)) {
             throw new InvalidUsernamePasswordException();
         }
@@ -634,16 +628,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return sb.toString();
     }
 
-    private UserIdentity getAccountIdentity(String loginName) {
-        return userIdentityDao.getByIdentity(UserIdentityType.ACCOUNT, loginName);
-    }
-
-    private User authenticateIdentity(UserIdentityType identityType, String identityValue) throws ApiException {
-        UserIdentity identity = userIdentityDao.getByIdentity(identityType, identityValue);
-        if (identity == null || !identity.isEnabled()) {
+    private User authenticateIdentity(PrincipalIdentityType identityType, String identityValue) throws ApiException {
+        PrincipalIdentity identity;
+        try {
+            identity = principalAuthService.authenticateIdentity(identityType, identityValue);
+        } catch (InvalidPasswordException e) {
             throw new InvalidUsernamePasswordException();
         }
-        User user = userService.getById(identity.getUserId());
+        User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -657,9 +649,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (StringUtils.isBlank(loginName)) {
             return;
         }
-        UserIdentity identity = getAccountIdentity(loginName);
+        PrincipalIdentity identity =
+                principalIdentityService.getByIdentity(PrincipalIdentityType.USER_ACCOUNT, loginName);
         if (identity == null
-                || !StringUtils.equals(accessToken.getUserId(), EntityIdCodec.toStringValue(identity.getUserId()))) {
+                || identity.getPrincipalKey() == null
+                || !StringUtils.equals(
+                        accessToken.getUserId(),
+                        EntityIdCodec.toStringValue(identity.getPrincipalKey().getPrincipalId()))) {
             return;
         }
 
@@ -667,10 +663,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         AuthSession authSession = new AuthSession();
         authSession.setSessionId(UuidHelper.compact());
         authSession.setToken(accessToken.getToken());
-        authSession.setUserId(identity.getUserId());
+        authSession.setUserId(identity.getPrincipalKey().getPrincipalId());
         authSession.setIdentityId(identity.getId());
-        authSession.setIdentityType(identity.getIdentityType());
-        authSession.setLoginType(UserCredentialType.PASSWORD.value());
+        authSession.setIdentityType(identity.getType());
+        authSession.setLoginType(PrincipalCredentialType.USER_PASSWORD.credentialName());
         authSession.setStatus(AuthSessionStatus.ACTIVE);
         authSession.setIssuedAt(now);
         authSession.setLastAccessTime(now);
@@ -870,6 +866,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return StringUtils.EMPTY;
         }
         return Sha256Helper.hashBase64Url(token);
+    }
+
+    private String getAccountLoginName(EntityId userId) {
+        if (userId == null) {
+            return null;
+        }
+        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
     }
 
     private PrincipalPasswordPolicyDTO passwordPolicy() {

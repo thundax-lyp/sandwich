@@ -5,19 +5,28 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import com.github.thundax.modules.sys.service.UserCredentialService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,16 +35,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private static final String LEGACY_SUPER_FLAG = "1";
+    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
     private final UserDao dao;
-    private final UserIdentityService userIdentityService;
-    private final UserCredentialService userCredentialService;
+    private final PrincipalIdentityService principalIdentityService;
+    private final PrincipalCredentialService principalCredentialService;
 
     public UserServiceImpl(
-            UserDao dao, UserIdentityService userIdentityService, UserCredentialService userCredentialService) {
+            UserDao dao,
+            PrincipalIdentityService principalIdentityService,
+            PrincipalCredentialService principalCredentialService) {
         this.dao = dao;
-        this.userIdentityService = userIdentityService;
-        this.userCredentialService = userCredentialService;
+        this.principalIdentityService = principalIdentityService;
+        this.principalCredentialService = principalCredentialService;
     }
 
     public User getById(EntityId id) {
@@ -98,10 +110,62 @@ public class UserServiceImpl implements UserService {
                 dao.insertUserRole(EntityIdCodec.toValue(user.getId()), roleIdList);
             }
         }
-        userIdentityService.updateAccountIdentity(user, loginName);
+        PrincipalIdentity accountIdentity = updateAccountIdentity(user, loginName);
         if (added) {
-            userCredentialService.upsertPassword(user, encryptedPassword);
+            upsertPassword(user, accountIdentity, encryptedPassword);
         }
+    }
+
+    private PrincipalIdentity updateAccountIdentity(User user, String loginName) {
+        if (user == null || user.getId() == null || StringUtils.isBlank(loginName)) {
+            return null;
+        }
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.USER, user.getId());
+        PrincipalIdentity identity =
+                principalIdentityService.getByPrincipalKeyAndType(principalKey, PrincipalIdentityType.USER_ACCOUNT);
+        if (identity == null) {
+            identity = new PrincipalIdentity();
+            identity.setPrincipalKey(principalKey);
+            identity.setType(PrincipalIdentityType.USER_ACCOUNT);
+            identity.setIdentityValue(loginName);
+            identity.setStatus(PrincipalIdentityStatus.ENABLED);
+            principalIdentityService.add(identity);
+            return identity;
+        }
+
+        identity.setIdentityValue(loginName);
+        identity.setStatus(PrincipalIdentityStatus.ENABLED);
+        principalIdentityService.update(identity);
+        return identity;
+    }
+
+    private void upsertPassword(User user, PrincipalIdentity accountIdentity, String encryptedPassword) {
+        if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
+            return;
+        }
+        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
+                accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+        if (credential == null) {
+            credential = new PrincipalCredential();
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
+            credential.setIdentityId(accountIdentity.getId());
+            credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
+            credential.setCredentialValue(encryptedPassword);
+            credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+            credential.setNeedChangePassword(false);
+            credential.setFailedCount(0);
+            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
+            principalCredentialService.add(credential);
+            return;
+        }
+
+        credential.setCredentialValue(encryptedPassword);
+        credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+        credential.setNeedChangePassword(false);
+        credential.setFailedCount(0);
+        credential.setLockedUntil(null);
+        credential.setLastVerifiedAt(null);
+        principalCredentialService.update(credential);
     }
 
     @Override

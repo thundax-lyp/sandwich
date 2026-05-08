@@ -3,17 +3,23 @@ package com.github.thundax.modules.sys.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserCredential;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
-import com.github.thundax.modules.sys.service.UserCredentialService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
@@ -28,23 +34,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CurrentUserServiceImpl implements CurrentUserService {
 
+    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+
     private final UserService userService;
     private final RoleService roleService;
     private final MenuService menuService;
-    private final UserCredentialService userCredentialService;
-    private final UserIdentityService userIdentityService;
+    private final PrincipalIdentityService principalIdentityService;
+    private final PrincipalCredentialService principalCredentialService;
 
     public CurrentUserServiceImpl(
             UserService userService,
             RoleService roleService,
             MenuService menuService,
-            UserCredentialService userCredentialService,
-            UserIdentityService userIdentityService) {
+            PrincipalIdentityService principalIdentityService,
+            PrincipalCredentialService principalCredentialService) {
         this.userService = userService;
         this.roleService = roleService;
         this.menuService = menuService;
-        this.userCredentialService = userCredentialService;
-        this.userIdentityService = userIdentityService;
+        this.principalIdentityService = principalIdentityService;
+        this.principalCredentialService = principalCredentialService;
     }
 
     @Override
@@ -53,7 +61,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         currentUser.setName(name);
         currentUser.setEmail(email);
         currentUser.setMobile(mobile);
-        userService.update(currentUser, userIdentityService.getAccountLoginName(currentUser.getId()), null);
+        userService.update(currentUser, getAccountLoginName(currentUser.getId()), null);
         return currentUser;
     }
 
@@ -66,12 +74,16 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             throw new ApiException(SysApiUtils.PASSWORD_VALIDATE_MESSAGE);
         }
 
-        UserCredential credential = userCredentialService.getPasswordCredential(currentUser.getId());
+        PrincipalIdentity accountIdentity = getAccountIdentity(currentUser.getId());
+        PrincipalCredential credential = accountIdentity == null
+                ? null
+                : principalCredentialService.getByIdentityIdAndType(
+                        accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
         if (credential == null || !PasswordHelper.validate(oldPassword, credential.getCredentialValue())) {
             throw new InvalidPasswordException();
         }
 
-        userCredentialService.upsertPassword(currentUser, PasswordHelper.encrypt(password));
+        upsertPassword(currentUser, accountIdentity, PasswordHelper.encrypt(password));
     }
 
     @Override
@@ -120,5 +132,47 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             menuList.addAll(childList);
         }
         return menuList;
+    }
+
+    private PrincipalIdentity getAccountIdentity(EntityId userId) {
+        if (userId == null) {
+            return null;
+        }
+        return principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+    }
+
+    private String getAccountLoginName(EntityId userId) {
+        PrincipalIdentity identity = getAccountIdentity(userId);
+        return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private void upsertPassword(User user, PrincipalIdentity accountIdentity, String encryptedPassword) {
+        if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
+            return;
+        }
+        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
+                accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+        if (credential == null) {
+            credential = new PrincipalCredential();
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
+            credential.setIdentityId(accountIdentity.getId());
+            credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
+            credential.setCredentialValue(encryptedPassword);
+            credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+            credential.setNeedChangePassword(false);
+            credential.setFailedCount(0);
+            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
+            principalCredentialService.add(credential);
+            return;
+        }
+
+        credential.setCredentialValue(encryptedPassword);
+        credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+        credential.setNeedChangePassword(false);
+        credential.setFailedCount(0);
+        credential.setLockedUntil(null);
+        credential.setLastVerifiedAt(null);
+        principalCredentialService.update(credential);
     }
 }

@@ -9,7 +9,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
 import com.github.thundax.modules.auth.entity.enums.MemberAuthSessionStatus;
-import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
@@ -55,8 +56,7 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
         authSession.setSessionId(cacheDTO.sessionId);
         authSession.setMemberId(EntityIdCodec.toDomain(cacheDTO.memberId));
         authSession.setIdentityId(EntityIdCodec.toDomain(cacheDTO.identityId));
-        authSession.setIdentityType(
-                cacheDTO.identityType == null ? null : MemberIdentityType.from(cacheDTO.identityType));
+        authSession.setIdentityType(identityTypeFrom(cacheDTO.identityType));
         authSession.setLoginType(cacheDTO.loginType);
         authSession.setStatus(cacheDTO.status == null ? null : MemberAuthSessionStatus.from(cacheDTO.status));
         authSession.setIssuedAt(cacheDTO.issuedAt);
@@ -85,6 +85,16 @@ public class MemberAuthSessionRuntimeDaoImpl implements MemberAuthSessionRuntime
         cacheDTO.logoutAt = authSession.getLogoutAt();
         cacheDTO.invalidateReason = authSession.getInvalidateReason();
         return cacheDTO;
+    }
+
+    private static PrincipalIdentityType identityTypeFrom(String identityType) {
+        if (identityType == null) {
+            return null;
+        }
+        if (identityType.startsWith("MEMBER_")) {
+            return PrincipalIdentityType.from(identityType);
+        }
+        return PrincipalIdentityType.from(PrincipalType.MEMBER, identityType);
     }
 
     private static class MemberAuthSessionCacheDTO implements CacheDTO {

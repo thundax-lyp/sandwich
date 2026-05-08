@@ -9,7 +9,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.dao.AuthSessionRuntimeDao;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
@@ -67,8 +68,7 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         authSession.setToken(cacheDTO.token);
         authSession.setUserId(EntityIdCodec.toDomain(cacheDTO.userId));
         authSession.setIdentityId(EntityIdCodec.toDomain(cacheDTO.identityId));
-        authSession.setIdentityType(
-                cacheDTO.identityType == null ? null : UserIdentityType.from(cacheDTO.identityType));
+        authSession.setIdentityType(identityTypeFrom(cacheDTO.identityType));
         authSession.setLoginType(cacheDTO.loginType);
         authSession.setStatus(cacheDTO.status == null ? null : AuthSessionStatus.from(cacheDTO.status));
         authSession.setIssuedAt(cacheDTO.issuedAt);
@@ -106,6 +106,16 @@ public class AuthSessionRuntimeDaoImpl implements AuthSessionRuntimeDao {
         cacheDTO.updateDate = authSession.getUpdateDate();
         cacheDTO.updateUserId = authSession.getUpdateUserId();
         return cacheDTO;
+    }
+
+    private static PrincipalIdentityType identityTypeFrom(String identityType) {
+        if (identityType == null) {
+            return null;
+        }
+        if (identityType.startsWith("USER_")) {
+            return PrincipalIdentityType.from(identityType);
+        }
+        return PrincipalIdentityType.from(PrincipalType.USER, identityType);
     }
 
     private static class AuthSessionCacheDTO implements CacheDTO {

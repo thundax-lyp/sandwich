@@ -9,6 +9,11 @@ import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.LogPageRequest;
 import com.github.thundax.modules.sys.controller.response.LogResponse;
@@ -17,7 +22,6 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import io.swagger.annotations.Api;
@@ -37,18 +41,18 @@ public class LogController {
 
     private final LogService logService;
     private final UserService userService;
-    private final UserIdentityService userIdentityService;
+    private final PrincipalIdentityService principalIdentityService;
     private final DepartmentService departmentService;
 
     @Autowired
     public LogController(
             LogService logService,
             UserService userService,
-            UserIdentityService userIdentityService,
+            PrincipalIdentityService principalIdentityService,
             DepartmentService departmentService) {
         this.logService = logService;
         this.userService = userService;
-        this.userIdentityService = userIdentityService;
+        this.principalIdentityService = principalIdentityService;
         this.departmentService = departmentService;
     }
 
@@ -73,11 +77,16 @@ public class LogController {
         Department department =
                 user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         return LogInterfaceAssembler.toResponse(
-                log,
-                user,
-                user == null ? null : userIdentityService.getAccountLoginName(user.getId()),
-                department,
-                departmentService::getById);
+                log, user, getAccountLoginName(user), department, departmentService::getById);
+    }
+
+    private String getAccountLoginName(User user) {
+        if (user == null || user.getId() == null) {
+            return null;
+        }
+        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
     }
 
     private PageDTO<Log> readLogPage(LogPageRequest request) {

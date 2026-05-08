@@ -6,14 +6,20 @@ import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.MemberLoginFormDao;
 import com.github.thundax.modules.auth.entity.MemberLoginForm;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberIdentity;
-import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
-import com.github.thundax.modules.member.service.MemberCredentialService;
-import com.github.thundax.modules.member.service.MemberIdentityService;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
@@ -28,23 +34,24 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     private static final int EMAIL_VALIDATE_CODE_LENGTH = 6;
     private static final char[] VALIDATE_CODE = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     private static final String PRIVATE_KEY_SEPARATOR = ":";
+    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
     private final AuthProperties authProperties;
     private final MemberService memberService;
-    private final MemberIdentityService memberIdentityService;
-    private final MemberCredentialService memberCredentialService;
+    private final PrincipalIdentityService principalIdentityService;
+    private final PrincipalCredentialService principalCredentialService;
     private final MemberLoginFormDao memberLoginFormDao;
 
     public MemberRegistrationServiceImpl(
             AuthProperties authProperties,
             MemberService memberService,
-            MemberIdentityService memberIdentityService,
-            MemberCredentialService memberCredentialService,
+            PrincipalIdentityService principalIdentityService,
+            PrincipalCredentialService principalCredentialService,
             MemberLoginFormDao memberLoginFormDao) {
         this.authProperties = authProperties;
         this.memberService = memberService;
-        this.memberIdentityService = memberIdentityService;
-        this.memberCredentialService = memberCredentialService;
+        this.principalIdentityService = principalIdentityService;
+        this.principalCredentialService = principalCredentialService;
         this.memberLoginFormDao = memberLoginFormDao;
     }
 
@@ -57,14 +64,14 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(account, "account");
         requireText(encryptedPassword, "password");
         validateCaptcha(loginToken, captcha);
-        ensureIdentityAvailable(MemberIdentityType.ACCOUNT, account);
+        ensureIdentityAvailable(PrincipalIdentityType.MEMBER_ACCOUNT, account);
 
         String password = decryptPassword(loginToken, encryptedPassword);
         requireText(password, "password");
 
         Member member = createMember(name);
-        MemberIdentity identity = memberIdentityService.updateIdentity(member, MemberIdentityType.ACCOUNT, account);
-        memberCredentialService.upsertPassword(member, identity, PasswordHelper.encrypt(password));
+        PrincipalIdentity identity = updateIdentity(member, PrincipalIdentityType.MEMBER_ACCOUNT, account);
+        upsertPassword(member, identity, PasswordHelper.encrypt(password));
         memberLoginFormDao.deleteByToken(loginToken);
         return member.getId();
     }
@@ -73,7 +80,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     public void sendRegisterSmsCode(String loginToken, String mobile, String captcha) throws ApiException {
         requireText(mobile, "mobile");
         validateCaptcha(loginToken, captcha);
-        ensureIdentityAvailable(MemberIdentityType.MOBILE, mobile);
+        ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
         memberLoginFormDao.updateSmsValidateCode(
                 loginToken, mobile, createCode(VALIDATE_CODE, SMS_VALIDATE_CODE_LENGTH));
         memberLoginFormDao.updateCaptcha(loginToken, null);
@@ -86,10 +93,10 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(name, "name");
         requireText(mobile, "mobile");
         validateMobileCode(loginToken, mobile, validateCode);
-        ensureIdentityAvailable(MemberIdentityType.MOBILE, mobile);
+        ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
 
         Member member = createMember(name);
-        memberIdentityService.updateIdentity(member, MemberIdentityType.MOBILE, mobile);
+        updateIdentity(member, PrincipalIdentityType.MEMBER_MOBILE, mobile);
         memberLoginFormDao.deleteByToken(loginToken);
         return member.getId();
     }
@@ -98,7 +105,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     public void sendRegisterEmailCode(String loginToken, String email, String captcha) throws ApiException {
         requireText(email, "email");
         validateCaptcha(loginToken, captcha);
-        ensureIdentityAvailable(MemberIdentityType.EMAIL, email);
+        ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
         memberLoginFormDao.updateEmailValidateCode(
                 loginToken, email, createCode(VALIDATE_CODE, EMAIL_VALIDATE_CODE_LENGTH));
         memberLoginFormDao.updateCaptcha(loginToken, null);
@@ -111,10 +118,10 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(name, "name");
         requireText(email, "email");
         validateEmailCode(loginToken, email, validateCode);
-        ensureIdentityAvailable(MemberIdentityType.EMAIL, email);
+        ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
 
         Member member = createMember(name);
-        memberIdentityService.updateIdentity(member, MemberIdentityType.EMAIL, email);
+        updateIdentity(member, PrincipalIdentityType.MEMBER_EMAIL, email);
         memberLoginFormDao.deleteByToken(loginToken);
         return member.getId();
     }
@@ -171,10 +178,58 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         return form;
     }
 
-    private void ensureIdentityAvailable(MemberIdentityType identityType, String identityValue) throws ApiException {
-        if (memberIdentityService.getByIdentity(identityType, identityValue) != null) {
+    private void ensureIdentityAvailable(PrincipalIdentityType identityType, String identityValue) throws ApiException {
+        if (principalIdentityService.getByIdentity(identityType, identityValue) != null) {
             throw new ApiException("会员标识已存在");
         }
+    }
+
+    private PrincipalIdentity updateIdentity(Member member, PrincipalIdentityType identityType, String identityValue) {
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, member.getId());
+        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(principalKey, identityType);
+        if (identity == null) {
+            identity = new PrincipalIdentity();
+            identity.setPrincipalKey(principalKey);
+            identity.setType(identityType);
+            identity.setIdentityValue(identityValue);
+            identity.setStatus(PrincipalIdentityStatus.ENABLED);
+            principalIdentityService.add(identity);
+            return identity;
+        }
+
+        identity.setIdentityValue(identityValue);
+        identity.setStatus(PrincipalIdentityStatus.ENABLED);
+        principalIdentityService.update(identity);
+        return identity;
+    }
+
+    private void upsertPassword(Member member, PrincipalIdentity identity, String encryptedPassword) {
+        if (member == null || identity == null || StringUtils.isBlank(encryptedPassword)) {
+            return;
+        }
+        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
+                identity.getId(), PrincipalCredentialType.MEMBER_PASSWORD);
+        if (credential == null) {
+            credential = new PrincipalCredential();
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.MEMBER, member.getId()));
+            credential.setIdentityId(identity.getId());
+            credential.setCredentialType(PrincipalCredentialType.MEMBER_PASSWORD);
+            credential.setCredentialValue(encryptedPassword);
+            credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+            credential.setNeedChangePassword(false);
+            credential.setFailedCount(0);
+            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
+            principalCredentialService.add(credential);
+            return;
+        }
+
+        credential.setCredentialValue(encryptedPassword);
+        credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+        credential.setNeedChangePassword(false);
+        credential.setFailedCount(0);
+        credential.setLockedUntil(null);
+        credential.setLastVerifiedAt(null);
+        principalCredentialService.update(credential);
     }
 
     private String decryptPassword(String loginToken, String encryptedPassword) throws ApiException {

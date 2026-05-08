@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class AuthSession implements Auditable {
     private String token;
     private EntityId userId;
     private EntityId identityId;
-    private UserIdentityType identityType;
+    private PrincipalIdentityType identityType;
     private String loginType;
     private AuthSessionStatus status = AuthSessionStatus.ACTIVE;
     private Date issuedAt;

@@ -3,8 +3,9 @@ package com.github.thundax.modules.auth.persistence.assembler;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.enums.AuthSessionStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO;
-import com.github.thundax.modules.sys.entity.enums.UserIdentityType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,12 +74,18 @@ public final class AuthSessionPersistenceAssembler {
         return entities;
     }
 
-    private static String identityTypeValue(UserIdentityType identityType) {
+    private static String identityTypeValue(PrincipalIdentityType identityType) {
         return identityType == null ? null : identityType.value();
     }
 
-    private static UserIdentityType identityTypeFrom(String identityType) {
-        return identityType == null ? null : UserIdentityType.from(identityType);
+    private static PrincipalIdentityType identityTypeFrom(String identityType) {
+        if (identityType == null) {
+            return null;
+        }
+        if (identityType.startsWith("USER_")) {
+            return PrincipalIdentityType.from(identityType);
+        }
+        return PrincipalIdentityType.from(PrincipalType.USER, identityType);
     }
 
     private static String statusValue(AuthSessionStatus status) {

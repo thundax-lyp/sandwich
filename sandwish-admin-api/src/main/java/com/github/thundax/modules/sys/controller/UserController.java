@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageDTO;
 import com.github.thundax.common.page.PageRules;
@@ -15,7 +16,16 @@ import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
+import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -34,12 +44,9 @@ import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.UserIdentity;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
-import com.github.thundax.modules.sys.service.UserCredentialService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
@@ -77,12 +84,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
+    private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
     private final UserService userService;
     private final DepartmentService departmentService;
     private final RoleService roleService;
-    private final UserCredentialService userCredentialService;
-    private final UserIdentityService userIdentityService;
+    private final PrincipalIdentityService principalIdentityService;
+    private final PrincipalCredentialService principalCredentialService;
     private final AdminAuthService authService;
 
     @Autowired
@@ -90,15 +98,15 @@ public class UserController {
             UserService userService,
             DepartmentService departmentService,
             RoleService roleService,
-            UserCredentialService userCredentialService,
-            UserIdentityService userIdentityService,
+            PrincipalIdentityService principalIdentityService,
+            PrincipalCredentialService principalCredentialService,
             AdminAuthService authService) {
 
         this.userService = userService;
         this.departmentService = departmentService;
         this.roleService = roleService;
-        this.userCredentialService = userCredentialService;
-        this.userIdentityService = userIdentityService;
+        this.principalIdentityService = principalIdentityService;
+        this.principalCredentialService = principalCredentialService;
         this.authService = authService;
     }
 
@@ -250,7 +258,7 @@ public class UserController {
         userService.update(entity, request.getLoginName(), roleIdList);
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            userCredentialService.upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()));
+            upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()));
         }
 
         return toResponse(entity);
@@ -518,23 +526,64 @@ public class UserController {
         if (StringUtils.isBlank(loginName)) {
             return true;
         }
-        UserIdentity identity = userIdentityService.getByLoginName(loginName);
+        PrincipalIdentity identity =
+                principalIdentityService.getByIdentity(PrincipalIdentityType.USER_ACCOUNT, loginName);
         if (identity == null) {
             return true;
         }
 
-        return Objects.equals(EntityIdCodec.toValue(identity.getUserId()), id);
+        return identity.getPrincipalKey() != null
+                && Objects.equals(
+                        EntityIdCodec.toValue(identity.getPrincipalKey().getPrincipalId()), id);
     }
 
     private UserResponse toResponse(User user) {
         Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         List<Role> roleList = userService.listUserRoles(user);
         return UserInterfaceAssembler.toResponse(
-                user,
-                userIdentityService.getAccountLoginName(user.getId()),
-                department,
-                roleList,
-                departmentService::getById);
+                user, getAccountLoginName(user.getId()), department, roleList, departmentService::getById);
+    }
+
+    private String getAccountLoginName(EntityId userId) {
+        PrincipalIdentity identity = getAccountIdentity(userId);
+        return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private PrincipalIdentity getAccountIdentity(EntityId userId) {
+        if (userId == null) {
+            return null;
+        }
+        return principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+    }
+
+    private void upsertPassword(User user, String encryptedPassword) {
+        PrincipalIdentity accountIdentity = getAccountIdentity(user.getId());
+        if (accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
+            return;
+        }
+        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
+                accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+        if (credential == null) {
+            credential = new PrincipalCredential();
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
+            credential.setIdentityId(accountIdentity.getId());
+            credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
+            credential.setCredentialValue(encryptedPassword);
+            credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+            credential.setNeedChangePassword(false);
+            credential.setFailedCount(0);
+            credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
+            principalCredentialService.add(credential);
+            return;
+        }
+        credential.setCredentialValue(encryptedPassword);
+        credential.setStatus(PrincipalCredentialStatus.ACTIVE);
+        credential.setNeedChangePassword(false);
+        credential.setFailedCount(0);
+        credential.setLockedUntil(null);
+        credential.setLastVerifiedAt(null);
+        principalCredentialService.update(credential);
     }
 
     public static String getAvatarUrl(String userId, String token) {

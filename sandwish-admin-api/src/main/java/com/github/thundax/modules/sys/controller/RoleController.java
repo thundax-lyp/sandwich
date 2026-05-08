@@ -9,6 +9,11 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.RoleAssignUserRequest;
@@ -30,7 +35,6 @@ import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
-import com.github.thundax.modules.sys.service.UserIdentityService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -61,7 +65,7 @@ public class RoleController {
     private final MenuService menuService;
     private final DepartmentService departmentService;
     private final UserService userService;
-    private final UserIdentityService userIdentityService;
+    private final PrincipalIdentityService principalIdentityService;
 
     @Autowired
     public RoleController(
@@ -69,13 +73,13 @@ public class RoleController {
             MenuService menuService,
             DepartmentService departmentService,
             UserService userService,
-            UserIdentityService userIdentityService) {
+            PrincipalIdentityService principalIdentityService) {
 
         this.roleService = roleService;
         this.menuService = menuService;
         this.departmentService = departmentService;
         this.userService = userService;
-        this.userIdentityService = userIdentityService;
+        this.principalIdentityService = principalIdentityService;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:role:view")
@@ -294,7 +298,7 @@ public class RoleController {
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         DEPARTMENT_ID_PREFIX,
                         user,
-                        userIdentityService.getAccountLoginName(user.getId()),
+                        getAccountLoginName(user),
                         departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                         departmentService::getById))
                 .collect(Collectors.toList()));
@@ -360,9 +364,18 @@ public class RoleController {
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
                 user,
-                userIdentityService.getAccountLoginName(user.getId()),
+                getAccountLoginName(user),
                 departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
                 departmentService::getById);
+    }
+
+    private String getAccountLoginName(User user) {
+        if (user == null || user.getId() == null) {
+            return null;
+        }
+        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
+                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        return identity == null ? null : identity.getIdentityValue();
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {

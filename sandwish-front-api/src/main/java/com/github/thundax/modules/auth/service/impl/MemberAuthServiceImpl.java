@@ -27,9 +27,6 @@ import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.MemberIdentity;
-import com.github.thundax.modules.member.entity.enums.MemberIdentityType;
-import com.github.thundax.modules.member.service.MemberIdentityService;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +45,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     private final AuthProperties authProperties;
     private final MemberLoginFormDao memberLoginFormDao;
-    private final MemberIdentityService memberIdentityService;
     private final MemberService memberService;
     private final PrincipalAuthService principalAuthService;
     private final MemberAuthSessionDao memberAuthSessionDao;
@@ -59,7 +55,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     public MemberAuthServiceImpl(
             AuthProperties authProperties,
             MemberLoginFormDao memberLoginFormDao,
-            MemberIdentityService memberIdentityService,
             MemberService memberService,
             PrincipalAuthService principalAuthService,
             MemberAuthSessionDao memberAuthSessionDao,
@@ -68,7 +63,6 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             MemberRefreshTokenDao memberRefreshTokenDao) {
         this.authProperties = authProperties;
         this.memberLoginFormDao = memberLoginFormDao;
-        this.memberIdentityService = memberIdentityService;
         this.memberService = memberService;
         this.principalAuthService = principalAuthService;
         this.memberAuthSessionDao = memberAuthSessionDao;
@@ -134,18 +128,17 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new ApiException("用户名或密码错误");
         }
         Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
-        MemberIdentity identity = requireIdentity(MemberIdentityType.ACCOUNT, account);
         memberLoginFormDao.deleteByToken(loginToken);
-        return createTokenResult(member, identity, "ACCOUNT");
+        return createTokenResult(member, principalIdentity, "ACCOUNT");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginSms(String loginToken, String mobile, String validateCode) throws ApiException {
         validateSmsCode(loginToken, mobile, validateCode);
-        MemberIdentity identity = requireIdentity(MemberIdentityType.MOBILE, mobile);
+        PrincipalIdentity identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
         memberLoginFormDao.deleteByToken(loginToken);
-        return createTokenResult(requireActiveMember(identity.getMemberId()), identity, "SMS");
+        return createTokenResult(requireActiveMember(identity.getPrincipalKey().getPrincipalId()), identity, "SMS");
     }
 
     @Override
@@ -187,12 +180,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return token != null && token.canAccess(new Date()) ? token : null;
     }
 
-    private MemberTokenResult createTokenResult(Member member, MemberIdentity identity, String loginType) {
+    private MemberTokenResult createTokenResult(Member member, PrincipalIdentity identity, String loginType) {
         MemberAuthSession session = new MemberAuthSession();
         session.setSessionId(UuidHelper.compact());
         session.setMemberId(member.getId());
         session.setIdentityId(identity.getId());
-        session.setIdentityType(identity.getIdentityType());
+        session.setIdentityType(identity.getType());
         session.setLoginType(loginType);
         return createTokenResult(member, session, loginType);
     }
@@ -251,9 +244,11 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return member;
     }
 
-    private MemberIdentity requireIdentity(MemberIdentityType type, String value) throws ApiException {
-        MemberIdentity identity = memberIdentityService.getByIdentity(type, value);
-        if (identity == null || !identity.isEnabled()) {
+    private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) throws ApiException {
+        PrincipalIdentity identity;
+        try {
+            identity = principalAuthService.authenticateIdentity(type, value);
+        } catch (InvalidPasswordException e) {
             throw new ApiException("用户名或密码错误");
         }
         return identity;

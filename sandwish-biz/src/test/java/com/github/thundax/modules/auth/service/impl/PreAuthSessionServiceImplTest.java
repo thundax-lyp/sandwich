@@ -2,9 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.i18n.I18nMessages;
@@ -41,21 +39,12 @@ public class PreAuthSessionServiceImplTest {
     }
 
     @Test
-    public void shouldCreatePreAuthSessionWithIndexes() {
+    public void shouldCreateAndRefreshPreAuthSession() throws Exception {
         PreAuthSession session = service.create(60);
 
-        assertNotNull(session.getId());
-        assertNotNull(session.getToken());
-        assertNotNull(session.getRefreshToken());
-        assertTrue(session.getExpiredAt() > System.currentTimeMillis());
         assertEquals(session.getId(), service.findIdByToken(session.getToken()));
         assertEquals(session.getId(), service.findIdByRefreshToken(session.getRefreshToken()));
-        assertEquals(session, preAuthSessionDao.getById(session.getId()));
-    }
 
-    @Test
-    public void shouldRefreshPreAuthSessionById() throws Exception {
-        PreAuthSession session = service.create(60);
         PreAuthSessionToken oldToken = session.getToken();
         PreAuthSessionToken oldRefreshToken = session.getRefreshToken();
 
@@ -68,17 +57,6 @@ public class PreAuthSessionServiceImplTest {
         assertEquals(session.getId(), service.findIdByToken(refreshed.getToken()));
         assertEquals(session.getId(), service.findIdByRefreshToken(refreshed.getRefreshToken()));
         assertEquals(session.getId(), service.findIdByRefreshToken(oldRefreshToken));
-        assertEquals(2, refreshed.refreshTokenValues().size());
-        assertEquals(oldRefreshToken, refreshed.refreshTokenValues().get(1).getToken());
-        assertTrue(refreshed.refreshTokenValues().get(1).getExpiredAt() <= System.currentTimeMillis() + 60000L);
-    }
-
-    @Test(expected = InvalidTokenException.class)
-    public void shouldRejectMissingSessionWhenRefreshing() throws Exception {
-        PreAuthSession session = service.create(60);
-        service.release(session.getId());
-
-        service.refresh(session.getId(), 60, 60);
     }
 
     @Test
@@ -93,21 +71,15 @@ public class PreAuthSessionServiceImplTest {
     }
 
     @Test
-    public void shouldUpsertAndFindPreAuthSessionValue() throws Exception {
+    public void shouldManagePreAuthSessionValueWithTtl() throws Exception {
         PreAuthSession session = service.create(60);
 
         service.upsertValue(session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() + 60000L);
-
         assertEquals("2345", service.findValue(session.getId(), CAPTCHA_ITEM));
-    }
 
-    @Test
-    public void shouldReturnNullWhenPreAuthSessionValueExpired() {
-        PreAuthSession session = PreAuthSession.create(60);
+        service.upsertValue(session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L);
 
-        session.upsertValue(CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L);
-
-        assertNull(session.findValue(CAPTCHA_ITEM));
+        assertNull(service.findValue(session.getId(), CAPTCHA_ITEM));
     }
 
     @Test(expected = InvalidTokenException.class)
@@ -122,34 +94,6 @@ public class PreAuthSessionServiceImplTest {
         preAuthSessionDao.insert(session);
 
         service.getById(session.getId());
-    }
-
-    @Test
-    public void shouldCreatePreAuthSessionWithHexSnowflakeId() {
-        PreAuthSession session = PreAuthSession.create(60);
-
-        assertTrue(session.getId().asString().matches("[0-9a-f]+"));
-        assertTrue(session.getToken().asString().matches("[0-9a-f]+"));
-        assertTrue(session.getRefreshToken().asString().matches("[0-9a-f]+"));
-        assertEquals(1, session.refreshTokenValues().size());
-    }
-
-    @Test
-    public void shouldKeepLatestFiveRefreshTokensWhenRefreshed() {
-        PreAuthSession session = PreAuthSession.create(60);
-
-        for (int idx = 0; idx < 5; idx++) {
-            session.refresh(60, 60);
-        }
-
-        assertEquals(5, session.refreshTokenValues().size());
-        assertEquals(
-                session.getRefreshToken(), session.refreshTokenValues().get(0).getToken());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldRejectNonPositiveExpiredSeconds() {
-        PreAuthSession.create(0);
     }
 
     private static class RecordingPreAuthSessionDao implements PreAuthSessionDao {

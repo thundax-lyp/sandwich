@@ -2,14 +2,14 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.modules.auth.entity.MemberAccessToken;
-import com.github.thundax.modules.auth.entity.MemberLoginForm;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 
 public interface MemberAuthService {
 
-    MemberLoginForm createLoginForm() throws ApiException;
+    PreAuthSessionDTO createLoginForm() throws ApiException;
 
-    MemberLoginForm refreshLoginForm(String refreshToken) throws ApiException;
+    PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException;
 
     String createCaptcha(String loginToken) throws ApiException;
 

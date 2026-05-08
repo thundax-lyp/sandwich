@@ -16,8 +16,8 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Collections;
@@ -119,13 +119,13 @@ public class AuthControllerContractTest {
                 .build();
     }
 
-    private LoginForm loginForm() {
-        LoginForm form = new LoginForm();
-        form.setLoginToken("login-token-1");
-        form.setRefreshTokenList(Collections.singletonList("refresh-token-1"));
-        form.setExpiredSeconds(300);
-        form.setPublicKey("public-key-1");
-        return form;
+    private PreAuthSessionDTO loginForm() {
+        PreAuthSessionDTO session = new PreAuthSessionDTO();
+        session.setLoginToken("login-token-1");
+        session.setRefreshTokenList(Collections.singletonList("refresh-token-1"));
+        session.setExpiredSeconds(300);
+        session.setPublicKey("public-key-1");
+        return session;
     }
 
     private User user() {

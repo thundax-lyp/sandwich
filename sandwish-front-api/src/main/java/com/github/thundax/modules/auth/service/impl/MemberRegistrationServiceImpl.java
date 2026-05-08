@@ -2,10 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
-import com.github.thundax.modules.auth.dao.MemberLoginFormDao;
-import com.github.thundax.modules.auth.entity.MemberLoginForm;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
@@ -15,13 +12,13 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
-import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,29 +27,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberRegistrationServiceImpl implements MemberRegistrationService {
 
-    private static final int SMS_VALIDATE_CODE_LENGTH = 6;
-    private static final int EMAIL_VALIDATE_CODE_LENGTH = 6;
-    private static final char[] VALIDATE_CODE = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    private static final String PRIVATE_KEY_SEPARATOR = ":";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
 
-    private final AuthProperties authProperties;
     private final MemberService memberService;
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
-    private final MemberLoginFormDao memberLoginFormDao;
+    private final PreAuthSessionService preAuthSessionService;
 
     public MemberRegistrationServiceImpl(
             AuthProperties authProperties,
             MemberService memberService,
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
-            MemberLoginFormDao memberLoginFormDao) {
-        this.authProperties = authProperties;
+            PreAuthSessionService preAuthSessionService) {
         this.memberService = memberService;
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
-        this.memberLoginFormDao = memberLoginFormDao;
+        this.preAuthSessionService = preAuthSessionService;
     }
 
     @Override
@@ -63,27 +54,29 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(name, "name");
         requireText(account, "account");
         requireText(encryptedPassword, "password");
-        validateCaptcha(loginToken, captcha);
+        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+            throw new ApiException("图形验证码错误");
+        }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_ACCOUNT, account);
 
-        String password = decryptPassword(loginToken, encryptedPassword);
+        String password = preAuthSessionService.decryptRsaValue(PrincipalType.MEMBER, loginToken, encryptedPassword);
         requireText(password, "password");
 
         Member member = createMember(name);
         PrincipalIdentity identity = updateIdentity(member, PrincipalIdentityType.MEMBER_ACCOUNT, account);
         upsertPassword(member, identity, PasswordHelper.encrypt(password));
-        memberLoginFormDao.deleteByToken(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
         return member.getId();
     }
 
     @Override
     public void sendRegisterSmsCode(String loginToken, String mobile, String captcha) throws ApiException {
         requireText(mobile, "mobile");
-        validateCaptcha(loginToken, captcha);
+        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+            throw new ApiException("图形验证码错误");
+        }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        memberLoginFormDao.updateSmsValidateCode(
-                loginToken, mobile, createCode(VALIDATE_CODE, SMS_VALIDATE_CODE_LENGTH));
-        memberLoginFormDao.updateCaptcha(loginToken, null);
+        preAuthSessionService.createSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile);
     }
 
     @Override
@@ -92,23 +85,25 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             throws ApiException {
         requireText(name, "name");
         requireText(mobile, "mobile");
-        validateMobileCode(loginToken, mobile, validateCode);
+        if (!preAuthSessionService.validateSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile, validateCode)) {
+            throw new ApiException("短信验证码错误");
+        }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        memberLoginFormDao.deleteByToken(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
         return member.getId();
     }
 
     @Override
     public void sendRegisterEmailCode(String loginToken, String email, String captcha) throws ApiException {
         requireText(email, "email");
-        validateCaptcha(loginToken, captcha);
+        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+            throw new ApiException("图形验证码错误");
+        }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
-        memberLoginFormDao.updateEmailValidateCode(
-                loginToken, email, createCode(VALIDATE_CODE, EMAIL_VALIDATE_CODE_LENGTH));
-        memberLoginFormDao.updateCaptcha(loginToken, null);
+        preAuthSessionService.createEmailValidateCode(PrincipalType.MEMBER, loginToken, email);
     }
 
     @Override
@@ -117,12 +112,14 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             throws ApiException {
         requireText(name, "name");
         requireText(email, "email");
-        validateEmailCode(loginToken, email, validateCode);
+        if (!preAuthSessionService.validateEmailValidateCode(PrincipalType.MEMBER, loginToken, email, validateCode)) {
+            throw new ApiException("邮箱验证码错误");
+        }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_EMAIL, email);
-        memberLoginFormDao.deleteByToken(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
         return member.getId();
     }
 
@@ -132,50 +129,6 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         member.setStatus(MemberStatus.ACTIVE);
         member.setId(memberService.add(member));
         return member;
-    }
-
-    private void validateCaptcha(String loginToken, String captcha) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
-            return;
-        }
-        if (form.isNullCaptcha() || !StringUtils.equals(form.getCaptcha(), captcha)) {
-            throw new ApiException("图形验证码错误");
-        }
-    }
-
-    private void validateMobileCode(String loginToken, String mobile, String validateCode) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
-            return;
-        }
-        if (!StringUtils.equals(form.getMobile(), mobile)
-                || !StringUtils.equals(form.getMobileValidateCode(), validateCode)) {
-            throw new ApiException("短信验证码错误");
-        }
-    }
-
-    private void validateEmailCode(String loginToken, String email, String validateCode) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
-            return;
-        }
-        if (!StringUtils.equals(form.getEmail(), email)
-                || !StringUtils.equals(form.getEmailValidateCode(), validateCode)) {
-            throw new ApiException("邮箱验证码错误");
-        }
-    }
-
-    private MemberLoginForm getLoginForm(String loginToken) throws ApiException {
-        requireText(loginToken, "loginToken");
-        MemberLoginForm form = memberLoginFormDao.getByToken(loginToken);
-        if (form == null || !form.validateCheckCode()) {
-            throw new ApiException("登录表单已失效");
-        }
-        return form;
     }
 
     private void ensureIdentityAvailable(PrincipalIdentityType identityType, String identityValue) throws ApiException {
@@ -232,32 +185,9 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         principalCredentialService.update(credential);
     }
 
-    private String decryptPassword(String loginToken, String encryptedPassword) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isBlank(form.getPrivateKey())) {
-            throw new ApiException("登录表单密钥已失效");
-        }
-        String[] privateKeyParts = StringUtils.split(form.getPrivateKey(), PRIVATE_KEY_SEPARATOR);
-        if (privateKeyParts == null || privateKeyParts.length != 2) {
-            throw new ApiException("登录表单密钥已失效");
-        }
-        RSAUtils.ReadableKeyPair keyPair =
-                new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
-        return RSAUtils.decryptBase64(encryptedPassword, keyPair);
-    }
-
     private void requireText(String value, String field) throws ApiException {
         if (StringUtils.isBlank(value)) {
             throw new ApiException(field + "不能为空");
         }
-    }
-
-    private String createCode(char[] candidate, int length) {
-        Random random = new Random();
-        StringBuilder builder = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            builder.append(candidate[random.nextInt(candidate.length)]);
-        }
-        return builder.toString();
     }
 }

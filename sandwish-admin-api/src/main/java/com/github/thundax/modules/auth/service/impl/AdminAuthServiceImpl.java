@@ -17,7 +17,6 @@ import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
@@ -34,13 +33,12 @@ import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
-import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
-import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -119,50 +117,74 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException {
-        return preAuthSessionService.createLoginForm();
+    public PreAuthSessionDTO createLoginForm() throws ApiException {
+        return preAuthSessionService.createPreAuthSession(PrincipalType.USER);
     }
 
     @Override
-    public LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException {
-        return preAuthSessionService.refreshLoginForm(refreshToken);
+    public PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException {
+        return preAuthSessionService.refreshPreAuthSession(PrincipalType.USER, refreshToken);
     }
 
     @Override
     public void deleteLoginForm(String loginToken) {
-        preAuthSessionService.deleteLoginForm(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.USER, loginToken);
     }
 
     @Override
     public String createCaptcha(String loginToken) throws InvalidTokenException {
-        return preAuthSessionService.createCaptcha(loginToken);
+        try {
+            return preAuthSessionService.createCaptcha(PrincipalType.USER, loginToken);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
-        return preAuthSessionService.getCaptcha(loginToken);
+        try {
+            return preAuthSessionService.getCaptcha(PrincipalType.USER, loginToken);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public boolean validateCaptcha(String loginToken, String captcha)
             throws InvalidTokenException, InvalidCaptchaException {
-        return preAuthSessionService.validateCaptcha(loginToken, captcha);
+        try {
+            return preAuthSessionService.validateCaptcha(PrincipalType.USER, loginToken, captcha);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException {
-        return preAuthSessionService.createSmsValidateCode(loginToken, mobile);
+        try {
+            return preAuthSessionService.createSmsValidateCode(PrincipalType.USER, loginToken, mobile);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException {
-        return preAuthSessionService.getSmsValidateCode(loginToken);
+        try {
+            return preAuthSessionService.getSmsValidateCode(PrincipalType.USER, loginToken);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
             throws InvalidTokenException, InvalidCaptchaException {
-        return preAuthSessionService.validateSmsValidateCode(loginToken, mobile, validateCode);
+        try {
+            return preAuthSessionService.validateSmsValidateCode(PrincipalType.USER, loginToken, mobile, validateCode);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
@@ -506,7 +528,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public String getPrivateKey(String loginToken) throws InvalidTokenException {
-        return preAuthSessionService.getPrivateKey(loginToken);
+        try {
+            return preAuthSessionService.getPrivateKey(PrincipalType.USER, loginToken);
+        } catch (ApiException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private User authenticateIdentity(PrincipalIdentityType identityType, String identityValue) throws ApiException {

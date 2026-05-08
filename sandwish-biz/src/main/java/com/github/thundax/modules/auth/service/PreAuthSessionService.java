@@ -1,31 +1,46 @@
 package com.github.thundax.modules.auth.service;
 
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.modules.auth.entity.LoginForm;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
 import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 
 public interface PreAuthSessionService {
 
-    LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException;
+    PreAuthSessionDTO createPreAuthSession(PrincipalType principalType)
+            throws TooManyLoginRequestException, TooManyOnlineUserException, ApiException;
 
-    LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException;
+    PreAuthSessionDTO refreshPreAuthSession(PrincipalType principalType, String refreshToken)
+            throws InvalidTokenException, ApiException;
 
-    void deleteLoginForm(String loginToken);
+    void releasePreAuthSession(PrincipalType principalType, String loginToken);
 
-    String createCaptcha(String loginToken) throws InvalidTokenException;
+    String createCaptcha(PrincipalType principalType, String loginToken) throws InvalidTokenException, ApiException;
 
-    String getCaptcha(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
+    String getCaptcha(PrincipalType principalType, String loginToken)
+            throws InvalidTokenException, InvalidCaptchaException, ApiException;
 
-    boolean validateCaptcha(String loginToken, String captcha) throws InvalidTokenException, InvalidCaptchaException;
+    boolean validateCaptcha(PrincipalType principalType, String loginToken, String captcha)
+            throws InvalidTokenException, InvalidCaptchaException, ApiException;
 
-    String createSmsValidateCode(String loginToken, String mobile) throws InvalidTokenException;
+    String createSmsValidateCode(PrincipalType principalType, String loginToken, String mobile)
+            throws InvalidTokenException, ApiException;
 
-    String getSmsValidateCode(String loginToken) throws InvalidTokenException, InvalidCaptchaException;
+    String getSmsValidateCode(PrincipalType principalType, String loginToken)
+            throws InvalidTokenException, InvalidCaptchaException, ApiException;
 
-    boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode)
-            throws InvalidTokenException, InvalidCaptchaException;
+    boolean validateSmsValidateCode(PrincipalType principalType, String loginToken, String mobile, String validateCode)
+            throws InvalidTokenException, InvalidCaptchaException, ApiException;
 
-    String getPrivateKey(String loginToken) throws InvalidTokenException;
+    String createEmailValidateCode(PrincipalType principalType, String loginToken, String email) throws ApiException;
+
+    boolean validateEmailValidateCode(PrincipalType principalType, String loginToken, String email, String validateCode)
+            throws ApiException;
+
+    String getPrivateKey(PrincipalType principalType, String loginToken) throws InvalidTokenException, ApiException;
+
+    String decryptRsaValue(PrincipalType principalType, String loginToken, String encryptedValue) throws ApiException;
 }

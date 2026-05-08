@@ -21,7 +21,6 @@ import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.OAuthRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
@@ -45,6 +44,7 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
@@ -57,6 +57,7 @@ import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisio
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryLoginFormDaoImpl;
+import com.github.thundax.modules.auth.testsupport.InMemoryMemberLoginFormDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -106,8 +107,8 @@ public class AuthPermissionLifecycleTest {
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
-        PreAuthSessionService preAuthSessionService =
-                new PreAuthSessionServiceImpl(authProperties, loginFormDao, accessTokenDao);
+        PreAuthSessionService preAuthSessionService = new PreAuthSessionServiceImpl(
+                authProperties, loginFormDao, accessTokenDao, new InMemoryMemberLoginFormDaoImpl());
 
         TestUserService userService = new TestUserService();
         TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
@@ -338,13 +339,13 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
-        LoginForm form = authService.createLoginForm();
-        String smsCode = authService.createSmsValidateCode(form.getLoginToken(), "13800000000");
+        PreAuthSessionDTO session = authService.createLoginForm();
+        String smsCode = authService.createSmsValidateCode(session.getLoginToken(), "13800000000");
 
         Assert.assertEquals(
                 Long.valueOf(1L),
                 EntityIdCodec.toValue(authService
-                        .authenticateSms(form.getLoginToken(), "13800000000", smsCode)
+                        .authenticateSms(session.getLoginToken(), "13800000000", smsCode)
                         .getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");

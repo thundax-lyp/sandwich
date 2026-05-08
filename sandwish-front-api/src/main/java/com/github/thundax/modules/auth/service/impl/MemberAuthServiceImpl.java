@@ -3,48 +3,40 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.MemberAccessTokenDao;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionDao;
 import com.github.thundax.modules.auth.dao.MemberAuthSessionRuntimeDao;
-import com.github.thundax.modules.auth.dao.MemberLoginFormDao;
 import com.github.thundax.modules.auth.dao.MemberRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.MemberAccessToken;
 import com.github.thundax.modules.auth.entity.MemberAuthSession;
-import com.github.thundax.modules.auth.entity.MemberLoginForm;
 import com.github.thundax.modules.auth.entity.MemberRefreshToken;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.MemberAccessTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.MemberRefreshTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.MemberAuthService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
-import com.github.thundax.modules.auth.utils.AuthUtils;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Random;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 public class MemberAuthServiceImpl implements MemberAuthService {
-    private static final int CAPTCHA_LENGTH = 4;
-    private static final char[] VALIDATE_CAPTCHA_CODE = {'2', '3', '4', '5', '6', '7', '8', '9'};
-    private static final String PRIVATE_KEY_SEPARATOR = ":";
 
     private final AuthProperties authProperties;
-    private final MemberLoginFormDao memberLoginFormDao;
+    private final PreAuthSessionService preAuthSessionService;
     private final MemberService memberService;
     private final PrincipalAuthService principalAuthService;
     private final MemberAuthSessionDao memberAuthSessionDao;
@@ -54,7 +46,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     public MemberAuthServiceImpl(
             AuthProperties authProperties,
-            MemberLoginFormDao memberLoginFormDao,
+            PreAuthSessionService preAuthSessionService,
             MemberService memberService,
             PrincipalAuthService principalAuthService,
             MemberAuthSessionDao memberAuthSessionDao,
@@ -62,7 +54,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             MemberAccessTokenDao memberAccessTokenDao,
             MemberRefreshTokenDao memberRefreshTokenDao) {
         this.authProperties = authProperties;
-        this.memberLoginFormDao = memberLoginFormDao;
+        this.preAuthSessionService = preAuthSessionService;
         this.memberService = memberService;
         this.principalAuthService = principalAuthService;
         this.memberAuthSessionDao = memberAuthSessionDao;
@@ -72,50 +64,28 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public MemberLoginForm createLoginForm() {
-        MemberLoginForm form = new MemberLoginForm();
-        form.setLoginToken(UuidHelper.compact());
-        form.setRefreshTokenList(new ArrayList<>(Collections.singletonList(UuidHelper.compact())));
-        form.setExpiredSeconds(authProperties.getLoginExpiredSeconds());
-        form.setCheckCode(AuthUtils.currentCheckCode());
-        form.setCaptcha(createCode(VALIDATE_CAPTCHA_CODE, CAPTCHA_LENGTH));
-        RSAUtils.ReadableKeyPair keyPair = RSAUtils.generateKeyPair();
-        form.setPublicKey(keyPair.getPublicKey());
-        form.setPrivateKey(privateKeyValue(keyPair));
-        memberLoginFormDao.insert(form);
-        return form;
+    public PreAuthSessionDTO createLoginForm() throws ApiException {
+        return preAuthSessionService.createPreAuthSession(PrincipalType.MEMBER);
     }
 
     @Override
-    public MemberLoginForm refreshLoginForm(String refreshToken) throws ApiException {
-        MemberLoginForm form = memberLoginFormDao.getByRefreshToken(refreshToken);
-        if (form == null || !form.validateCheckCode()) {
-            throw new ApiException("登录表单已失效");
-        }
-        form.getRefreshTokenList().add(0, UuidHelper.compact());
-        form.setLoginToken(UuidHelper.compact());
-        form.setExpiredSeconds(authProperties.getLoginExpiredSeconds());
-        form.setCheckCode(AuthUtils.currentCheckCode());
-        memberLoginFormDao.insert(form);
-        return form;
+    public PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException {
+        return preAuthSessionService.refreshPreAuthSession(PrincipalType.MEMBER, refreshToken);
     }
 
     @Override
     public String createCaptcha(String loginToken) throws ApiException {
-        if (!memberLoginFormDao.tokenExists(loginToken)) {
-            throw new ApiException("登录表单已失效");
-        }
-        String captcha = createCode(VALIDATE_CAPTCHA_CODE, CAPTCHA_LENGTH);
-        memberLoginFormDao.updateCaptcha(loginToken, captcha);
-        return captcha;
+        return preAuthSessionService.createCaptcha(PrincipalType.MEMBER, loginToken);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginAccount(String loginToken, String account, String encryptedPassword, String captcha)
             throws ApiException {
-        validateCaptcha(loginToken, captcha);
-        String password = decryptPassword(loginToken, encryptedPassword);
+        if (!preAuthSessionService.validateCaptcha(PrincipalType.MEMBER, loginToken, captcha)) {
+            throw new ApiException("图形验证码错误");
+        }
+        String password = preAuthSessionService.decryptRsaValue(PrincipalType.MEMBER, loginToken, encryptedPassword);
         PrincipalIdentity principalIdentity;
         try {
             principalIdentity = principalAuthService.authenticatePassword(
@@ -128,16 +98,18 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new ApiException("用户名或密码错误");
         }
         Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
-        memberLoginFormDao.deleteByToken(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
         return createTokenResult(member, principalIdentity, "ACCOUNT");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginSms(String loginToken, String mobile, String validateCode) throws ApiException {
-        validateSmsCode(loginToken, mobile, validateCode);
+        if (!preAuthSessionService.validateSmsValidateCode(PrincipalType.MEMBER, loginToken, mobile, validateCode)) {
+            throw new ApiException("短信验证码错误");
+        }
         PrincipalIdentity identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        memberLoginFormDao.deleteByToken(loginToken);
+        preAuthSessionService.releasePreAuthSession(PrincipalType.MEMBER, loginToken);
         return createTokenResult(requireActiveMember(identity.getPrincipalKey().getPrincipalId()), identity, "SMS");
     }
 
@@ -254,60 +226,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return identity;
     }
 
-    private void validateCaptcha(String loginToken, String captcha) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
-            return;
-        }
-        if (form.isNullCaptcha() || !StringUtils.equals(form.getCaptcha(), captcha)) {
-            throw new ApiException("图形验证码错误");
-        }
-    }
-
-    private void validateSmsCode(String loginToken, String mobile, String validateCode) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
-            return;
-        }
-        if (!StringUtils.equals(form.getMobile(), mobile)
-                || !StringUtils.equals(form.getMobileValidateCode(), validateCode)) {
-            throw new ApiException("短信验证码错误");
-        }
-    }
-
-    private MemberLoginForm getLoginForm(String loginToken) throws ApiException {
-        MemberLoginForm form = memberLoginFormDao.getByToken(loginToken);
-        if (form == null || !form.validateCheckCode()) {
-            throw new ApiException("登录表单已失效");
-        }
-        return form;
-    }
-
-    private String decryptPassword(String loginToken, String encryptedPassword) throws ApiException {
-        MemberLoginForm form = getLoginForm(loginToken);
-        String[] parts = StringUtils.split(form.getPrivateKey(), PRIVATE_KEY_SEPARATOR);
-        if (parts == null || parts.length != 2) {
-            throw new ApiException("登录表单密钥已失效");
-        }
-        return RSAUtils.decryptBase64(encryptedPassword, new RSAUtils.ReadableKeyPair(null, parts[0], null, parts[1]));
-    }
-
-    private String privateKeyValue(RSAUtils.ReadableKeyPair keyPair) {
-        return keyPair.getModulus() + PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent();
-    }
-
     private String tokenHash(String token) {
         return Sha256Helper.hashBase64Url(token);
-    }
-
-    private String createCode(char[] candidate, int length) {
-        Random random = new Random();
-        StringBuilder builder = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            builder.append(candidate[random.nextInt(candidate.length)]);
-        }
-        return builder.toString();
     }
 }

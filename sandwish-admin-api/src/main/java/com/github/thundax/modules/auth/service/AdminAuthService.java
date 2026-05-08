@@ -5,10 +5,8 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
-import com.github.thundax.modules.auth.exception.TooManyLoginRequestException;
-import com.github.thundax.modules.auth.exception.TooManyOnlineUserException;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -19,7 +17,7 @@ import org.springframework.lang.NonNull;
 
 public interface AdminAuthService {
 
-    LoginForm createLoginForm() throws TooManyLoginRequestException, TooManyOnlineUserException;
+    PreAuthSessionDTO createLoginForm() throws ApiException;
 
     /**
      * 刷新登录令牌 刷新后，refreshToken并未立即消失，而是指向新的Token位置，直到60秒后，此时可能有多个refreshToken指向同一个token。
@@ -29,7 +27,7 @@ public interface AdminAuthService {
      * @return 登录令牌
      * @throws InvalidTokenException 无效的refreshToken
      */
-    LoginForm refreshLoginForm(String refreshToken) throws InvalidTokenException;
+    PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException;
 
     void deleteLoginForm(String loginToken) throws InvalidTokenException;
 

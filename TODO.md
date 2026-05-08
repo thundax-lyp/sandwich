@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `member-pre-auth-session-biz-baseline`：下沉会员登录表单业务 Service
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PreAuthSessionService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImplTest.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberRegistrationServiceImpl.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/utils/RsaSessionUtils.java`
-  - 处理动作：将会员登录表单、验证码、短信/邮箱验证码和 RSA 密钥逻辑搬入 biz
-  - 验收点：front-api 生产代码不直接依赖 `MemberLoginFormDao`，`RsaSessionUtils` 删除或无生产引用
-  - 重要度：8/10
-
 - [ ] `login-form-entry-cleanup`：清理入口模块登录表单残留依赖
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AdminAuthService.java`

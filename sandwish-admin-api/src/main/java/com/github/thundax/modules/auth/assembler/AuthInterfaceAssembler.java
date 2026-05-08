@@ -10,8 +10,8 @@ import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionRe
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.entity.OAuthAccessToken;
+import com.github.thundax.modules.auth.service.dto.PreAuthSessionDTO;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -28,15 +28,15 @@ public final class AuthInterfaceAssembler {
     private AuthInterfaceAssembler() {}
 
     @NonNull
-    public static AuthLoginFormResponse toLoginFormResponse(LoginForm entity) {
-        if (entity == null) {
+    public static AuthLoginFormResponse toLoginFormResponse(PreAuthSessionDTO session) {
+        if (session == null) {
             return new AuthLoginFormResponse();
         }
         AuthLoginFormResponse response = new AuthLoginFormResponse();
-        response.setLoginToken(entity.getLoginToken());
-        response.setRefreshToken(entity.getRefreshTokenList().get(0));
-        response.setExpireSeconds(entity.getExpiredSeconds());
-        response.setPublicKey(entity.getPublicKey());
+        response.setLoginToken(session.getLoginToken());
+        response.setRefreshToken(session.getRefreshTokenList().get(0));
+        response.setExpireSeconds(session.getExpiredSeconds());
+        response.setPublicKey(session.getPublicKey());
         return response;
     }
 

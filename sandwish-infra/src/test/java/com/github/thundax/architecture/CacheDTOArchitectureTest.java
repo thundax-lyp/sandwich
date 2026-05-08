@@ -6,11 +6,9 @@ import static org.junit.Assert.assertTrue;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.assist.persistence.dao.AsyncTaskDaoImpl;
 import com.github.thundax.modules.auth.entity.AccessToken;
-import com.github.thundax.modules.auth.entity.LoginForm;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.persistence.dao.AccessTokenDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.AuthSessionRuntimeDaoImpl;
-import com.github.thundax.modules.auth.persistence.dao.LoginFormDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PermissionDaoImpl;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
@@ -34,7 +32,6 @@ public class CacheDTOArchitectureTest {
         DictCacheSupport.class,
         StorageCacheSupport.class,
         AccessTokenDaoImpl.class,
-        LoginFormDaoImpl.class,
         AuthSessionRuntimeDaoImpl.class,
         PermissionDaoImpl.class,
         AsyncTaskDaoImpl.class
@@ -43,7 +40,6 @@ public class CacheDTOArchitectureTest {
     @Test
     public void shouldKeepDomainObjectsOutOfJdkSerializationContract() {
         assertFalse(Serializable.class.isAssignableFrom(AccessToken.class));
-        assertFalse(Serializable.class.isAssignableFrom(LoginForm.class));
         assertFalse(Serializable.class.isAssignableFrom(PermissionSession.class));
     }
 

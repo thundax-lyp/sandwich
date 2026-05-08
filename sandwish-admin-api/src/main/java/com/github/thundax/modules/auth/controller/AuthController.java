@@ -28,6 +28,9 @@ import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionRe
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
+import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
@@ -110,6 +113,12 @@ public class AuthController {
         if (!validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
             createCaptcha(request.getLoginToken());
             writeLog(currentRequest, "验证码失败", request);
+            authService.recordLoginFailed(
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.USER_ACCOUNT,
+                    ip(currentRequest),
+                    userAgent(currentRequest),
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
             throw new InvalidCaptchaException();
         }
         createCaptcha(request.getLoginToken());
@@ -119,7 +128,8 @@ public class AuthController {
 
         User user;
         try {
-            user = authService.authenticatePassword(request.getUsername(), password);
+            user = authService.authenticatePassword(
+                    request.getUsername(), password, ip(currentRequest), userAgent(currentRequest));
         } catch (ApiException e) {
             if (e.getMessage() != null && e.getMessage().contains("锁定")) {
                 writeLog(currentRequest, "用户锁定", request);
@@ -137,31 +147,52 @@ public class AuthController {
 
         authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
 
-        return loginSuccess(user, request.getUsername(), "用户/密码登录成功");
+        return loginSuccess(
+                user,
+                request.getUsername(),
+                "用户/密码登录成功",
+                PrincipalAuthenticationMethod.PASSWORD,
+                PrincipalIdentityType.USER_ACCOUNT);
     }
 
     @ApiOperation(value = "短信登录")
     @PostMapping(value = "login/sms")
     public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
+        HttpServletRequest currentRequest = currentRequest();
         if (!validateSmsValidateCode(request.getLoginToken(), request.getMobile(), request.getValidateCode())) {
+            authService.recordLoginFailed(
+                    PrincipalAuthenticationMethod.SMS_CODE,
+                    PrincipalIdentityType.USER_MOBILE,
+                    ip(currentRequest),
+                    userAgent(currentRequest),
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
             throw new InvalidCaptchaException();
         }
-        User user = authService.authenticateSms(request.getMobile());
-        return loginSuccess(user, request.getMobile(), "短信登录成功");
+        User user = authService.authenticateSms(request.getMobile(), ip(currentRequest), userAgent(currentRequest));
+        return loginSuccess(
+                user,
+                request.getMobile(),
+                "短信登录成功",
+                PrincipalAuthenticationMethod.SMS_CODE,
+                PrincipalIdentityType.USER_MOBILE);
     }
 
     @ApiOperation(value = "企业微信登录")
     @PostMapping(value = "login/wecom")
     public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
-        User user = authService.authenticateWecom(request.getCode());
-        return loginSuccess(user, "wecom", "企业微信登录成功");
+        HttpServletRequest currentRequest = currentRequest();
+        User user = authService.authenticateWecom(request.getCode(), ip(currentRequest), userAgent(currentRequest));
+        return loginSuccess(
+                user, "wecom", "企业微信登录成功", PrincipalAuthenticationMethod.WECOM, PrincipalIdentityType.USER_WECOM);
     }
 
     @ApiOperation(value = "GitHub 登录")
     @PostMapping(value = "login/github")
     public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
-        User user = authService.authenticateGithub(request.getCode());
-        return loginSuccess(user, "github", "GitHub登录成功");
+        HttpServletRequest currentRequest = currentRequest();
+        User user = authService.authenticateGithub(request.getCode(), ip(currentRequest), userAgent(currentRequest));
+        return loginSuccess(
+                user, "github", "GitHub登录成功", PrincipalAuthenticationMethod.GITHUB, PrincipalIdentityType.USER_GITHUB);
     }
 
     @ApiOperation(value = "登出")
@@ -177,7 +208,8 @@ public class AuthController {
             throw new InvalidTokenException();
         }
 
-        authService.deleteAccessToken(accessToken);
+        HttpServletRequest currentRequest = currentRequest();
+        authService.deleteAccessToken(accessToken, ip(currentRequest), userAgent(currentRequest));
 
         return true;
     }
@@ -203,8 +235,8 @@ public class AuthController {
     @ApiOperation(value = "刷新 token")
     @PostMapping(value = "token/refresh")
     public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
-        return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.refreshAccessToken(request.getClientId(), request.getRefreshToken()));
+        return AuthInterfaceAssembler.toAccessTokenResponse(authService.refreshAccessToken(
+                request.getClientId(), request.getRefreshToken(), ip(currentRequest()), userAgent(currentRequest())));
     }
 
     @ApiOperation(value = "OAuth2 授权视图")
@@ -227,7 +259,9 @@ public class AuthController {
                 request.getCodeChallenge(),
                 request.getCodeChallengeMethod(),
                 request.getUserId(),
-                request.isApproved()));
+                request.isApproved(),
+                ip(currentRequest()),
+                userAgent(currentRequest())));
     }
 
     @ApiOperation(value = "OAuth2 授权码换 token")
@@ -240,7 +274,9 @@ public class AuthController {
                 request.getRedirectUri(),
                 request.getAuthorizationCode(),
                 request.getCodeVerifier(),
-                request.getRefreshToken()));
+                request.getRefreshToken(),
+                ip(currentRequest()),
+                userAgent(currentRequest())));
     }
 
     @ApiOperation(value = "OAuth2 撤销令牌")
@@ -373,12 +409,33 @@ public class AuthController {
         SysLogUtils.saveLog(log);
     }
 
-    private AuthAccessTokenResponse loginSuccess(User user, String loginName, String logTitle) {
+    private AuthAccessTokenResponse loginSuccess(
+            User user,
+            String loginName,
+            String logTitle,
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType) {
         authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
-        HttpServletRequest currentRequest =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletRequest currentRequest = currentRequest();
         writeLog(currentRequest, logTitle, user, loginName);
-        return AuthInterfaceAssembler.toAccessTokenResponse(
-                authService.createAccessToken(EntityIdCodec.toStringValue(user.getId()), loginName));
+        return AuthInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(
+                EntityIdCodec.toStringValue(user.getId()),
+                loginName,
+                ip(currentRequest),
+                userAgent(currentRequest),
+                authenticationMethod,
+                identityType));
+    }
+
+    private HttpServletRequest currentRequest() {
+        return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
+
+    private String ip(HttpServletRequest request) {
+        return IPUtils.getIpAddr(request);
+    }
+
+    private String userAgent(HttpServletRequest request) {
+        return request.getHeader("user-agent");
     }
 }

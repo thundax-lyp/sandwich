@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `principal-login-event-write`：认证链路写入主体登录事件
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/LoginController.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java`
-  - 处理动作：登录成功、登录失败、logout、refresh、OAuth authorized 写入 `PrincipalLoginEvent`。
-  - 验收点：Controller 直接传入 `ip` 和 `userAgent`，Service 不依赖 Servlet API，既有异常语义不变。
-  - 重要度：9/10
-
 - [ ] `permission-session-merge`：将 PermissionSession 合并进 PrincipalAuthSession.values
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PermissionSession.java`

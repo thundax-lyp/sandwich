@@ -8,13 +8,17 @@ import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
+import com.github.thundax.modules.auth.dao.PrincipalLoginEventDao;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
 import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalLoginEventType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
@@ -29,6 +33,7 @@ import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +50,9 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private final PrincipalAuthSessionDao principalAuthSessionDao;
     private final PrincipalAccessTokenDao principalAccessTokenDao;
     private final PrincipalRefreshTokenDao principalRefreshTokenDao;
+
+    @Autowired(required = false)
+    private PrincipalLoginEventDao principalLoginEventDao;
 
     public MemberAuthServiceImpl(
             AuthProperties authProperties,
@@ -64,6 +72,13 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginAccount(String account, String plainPassword) throws ApiException {
+        return loginAccount(account, plainPassword, null, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent)
+            throws ApiException {
         PrincipalIdentity principalIdentity;
         try {
             principalIdentity = principalAuthService.authenticatePassword(
@@ -73,22 +88,74 @@ public class MemberAuthServiceImpl implements MemberAuthService {
                     plainPassword,
                     PrincipalPasswordPolicyDTO.disabled());
         } catch (InvalidPasswordException e) {
+            writeLoginEvent(
+                    null,
+                    PrincipalLoginEventType.LOGIN_FAILED,
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.MEMBER_ACCOUNT,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_INVALID_CREDENTIAL);
             throw new ApiException("用户名或密码错误");
         }
         Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
-        return createTokenResult(member);
+        MemberTokenResult result = createTokenResult(member);
+        writeLoginEvent(
+                principalIdentity.getPrincipalKey(),
+                PrincipalLoginEventType.LOGIN_SUCCESS,
+                PrincipalAuthenticationMethod.PASSWORD,
+                PrincipalIdentityType.MEMBER_ACCOUNT,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
+        return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult loginSms(String mobile) throws ApiException {
-        PrincipalIdentity identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        return createTokenResult(requireActiveMember(identity.getPrincipalKey().getPrincipalId()));
+        return loginSms(mobile, null, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberTokenResult loginSms(String mobile, String ip, String userAgent) throws ApiException {
+        PrincipalIdentity identity;
+        try {
+            identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
+        } catch (ApiException e) {
+            writeLoginEvent(
+                    null,
+                    PrincipalLoginEventType.LOGIN_FAILED,
+                    PrincipalAuthenticationMethod.SMS_CODE,
+                    PrincipalIdentityType.MEMBER_MOBILE,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);
+            throw e;
+        }
+        MemberTokenResult result =
+                createTokenResult(requireActiveMember(identity.getPrincipalKey().getPrincipalId()));
+        writeLoginEvent(
+                identity.getPrincipalKey(),
+                PrincipalLoginEventType.LOGIN_SUCCESS,
+                PrincipalAuthenticationMethod.SMS_CODE,
+                PrincipalIdentityType.MEMBER_MOBILE,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
+        return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public MemberTokenResult refreshAccessToken(String refreshToken) throws ApiException {
+        return refreshAccessToken(refreshToken, null, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) throws ApiException {
         PrincipalRefreshToken oldRefreshToken = principalRefreshTokenDao.getByToken(refreshToken);
         Date now = new Date();
         if (oldRefreshToken == null || !oldRefreshToken.canRefresh(now)) {
@@ -101,12 +168,27 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         if (session == null || session.isExpired(now)) {
             throw new ApiException("refreshToken已失效");
         }
-        return createTokenResult(member, session);
+        MemberTokenResult result = createTokenResult(member, session);
+        writeLoginEvent(
+                oldRefreshToken.getPrincipalKey(),
+                PrincipalLoginEventType.TOKEN_REFRESH,
+                PrincipalAuthenticationMethod.REFRESH_TOKEN,
+                null,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
+        return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void logout(String accessToken) throws ApiException {
+        logout(accessToken, null, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void logout(String accessToken, String ip, String userAgent) throws ApiException {
         PrincipalAccessToken token = principalAccessTokenDao.getByToken(accessToken);
         if (token == null) {
             throw new ApiException("accessToken已失效");
@@ -115,6 +197,14 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         token.revoke();
         principalAccessTokenDao.updateStatus(token);
         principalAuthSessionDao.deleteById(token.getSessionId());
+        writeLoginEvent(
+                token.getPrincipalKey(),
+                PrincipalLoginEventType.LOGOUT,
+                PrincipalAuthenticationMethod.PASSWORD,
+                null,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_USER_LOGOUT);
     }
 
     @Override
@@ -130,6 +220,17 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         }
         principalAuthSessionDao.touch(session.getId(), now, session.remainingSeconds(now));
         return token;
+    }
+
+    @Override
+    public void recordLoginFailed(
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType,
+            String ip,
+            String userAgent,
+            String reason) {
+        writeLoginEvent(
+                null, PrincipalLoginEventType.LOGIN_FAILED, authenticationMethod, identityType, ip, userAgent, reason);
     }
 
     private MemberTokenResult createTokenResult(Member member) {
@@ -201,5 +302,29 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throw new ApiException("用户名或密码错误");
         }
         return identity;
+    }
+
+    private void writeLoginEvent(
+            PrincipalKey principalKey,
+            PrincipalLoginEventType eventType,
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType,
+            String ip,
+            String userAgent,
+            String reason) {
+        if (principalLoginEventDao == null) {
+            return;
+        }
+        PrincipalLoginEvent event = new PrincipalLoginEvent();
+        event.setPrincipalKey(principalKey);
+        event.setClientId(MEMBER_CLIENT_ID);
+        event.setEventType(eventType);
+        event.setAuthenticationMethod(authenticationMethod);
+        event.setIdentityType(identityType);
+        event.setOccurredAt(new Date());
+        event.setIp(ip);
+        event.setUserAgent(userAgent);
+        event.setReason(reason);
+        principalLoginEventDao.insert(event);
     }
 }

@@ -14,16 +14,20 @@ import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
+import com.github.thundax.modules.auth.dao.PrincipalLoginEventDao;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
 import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
+import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalLoginEventType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
@@ -88,6 +92,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Autowired(required = false)
     private PrincipalRefreshTokenDao principalRefreshTokenDao;
 
+    @Autowired(required = false)
+    private PrincipalLoginEventDao principalLoginEventDao;
+
     public AdminAuthServiceImpl(
             AuthProperties properties,
             LoginProperties loginProperties,
@@ -114,6 +121,30 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     @Override
     @NonNull
     public AuthAccessTokenResult createAccessToken(String userId, String loginName) {
+        return createAccessToken(userId, loginName, null, null);
+    }
+
+    @Override
+    @NonNull
+    public AuthAccessTokenResult createAccessToken(String userId, String loginName, String ip, String userAgent) {
+        return createAccessToken(
+                userId,
+                loginName,
+                ip,
+                userAgent,
+                PrincipalAuthenticationMethod.PASSWORD,
+                PrincipalIdentityType.USER_ACCOUNT);
+    }
+
+    @Override
+    @NonNull
+    public AuthAccessTokenResult createAccessToken(
+            String userId,
+            String loginName,
+            String ip,
+            String userAgent,
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType) {
         Date now = new Date();
         String token = UuidHelper.compact();
         PrincipalAccessToken accessToken = buildPrincipalAccessToken(
@@ -129,6 +160,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
         permissionService.createSession(token, userId);
         String refreshToken = createPrincipalRefreshToken(accessToken, ADMIN_CLIENT_ID, now);
+        if (StringUtils.isNotBlank(loginName)) {
+            writeLoginEvent(
+                    accessToken.getPrincipalKey(),
+                    ADMIN_CLIENT_ID,
+                    PrincipalLoginEventType.LOGIN_SUCCESS,
+                    authenticationMethod,
+                    identityType,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_NONE);
+        }
         return new AuthAccessTokenResult(token, refreshToken, accessToken);
     }
 
@@ -184,6 +226,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public void deleteAccessToken(AuthAccessTokenResult accessToken) {
+        deleteAccessToken(accessToken, null, null);
+    }
+
+    @Override
+    public void deleteAccessToken(AuthAccessTokenResult accessToken, String ip, String userAgent) {
         if (accessToken == null) {
             return;
         }
@@ -194,6 +241,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         permissionService.release(accessToken.getToken());
         deletePrincipalAuthSession(principalAccessToken);
+        if (principalAccessToken != null) {
+            writeLoginEvent(
+                    principalAccessToken.getPrincipalKey(),
+                    principalAccessToken.getClientId(),
+                    PrincipalLoginEventType.LOGOUT,
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    null,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_USER_LOGOUT);
+        }
     }
 
     @Override
@@ -244,6 +302,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
+        return refreshAccessToken(clientId, refreshToken, null, null);
+    }
+
+    @Override
+    public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken, String ip, String userAgent)
+            throws ApiException {
         if (principalRefreshTokenDao == null) {
             throw new ApiException("refresh token 未配置");
         }
@@ -259,7 +323,16 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         principalRefreshTokenDao.updateStatus(current);
 
         AuthAccessTokenResult accessToken = createAccessToken(
-                EntityIdCodec.toStringValue(current.getPrincipalKey().getPrincipalId()));
+                EntityIdCodec.toStringValue(current.getPrincipalKey().getPrincipalId()), null, ip, userAgent);
+        writeLoginEvent(
+                current.getPrincipalKey(),
+                requestedClientId,
+                PrincipalLoginEventType.TOKEN_REFRESH,
+                PrincipalAuthenticationMethod.REFRESH_TOKEN,
+                null,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
         return new AuthTokenRefreshResult(accessToken, accessToken.getRefreshToken());
     }
 
@@ -287,11 +360,37 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String userId,
             boolean approved)
             throws ApiException {
+        return decideOAuth2(
+                clientId, redirectUri, scopes, state, codeChallenge, codeChallengeMethod, userId, approved, null, null);
+    }
+
+    @Override
+    public OAuth2AuthorizationDecisionResult decideOAuth2(
+            String clientId,
+            String redirectUri,
+            List<String> scopes,
+            String state,
+            String codeChallenge,
+            String codeChallengeMethod,
+            String userId,
+            boolean approved,
+            String ip,
+            String userAgent)
+            throws ApiException {
         validateOAuthClient(clientId, redirectUri, scopes);
         OAuth2AuthorizationDecisionResult result = new OAuth2AuthorizationDecisionResult();
         result.setApproved(approved);
         result.setState(state);
         if (!approved) {
+            writeLoginEvent(
+                    PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))),
+                    clientId,
+                    PrincipalLoginEventType.OAUTH_AUTHORIZED,
+                    PrincipalAuthenticationMethod.OAUTH_CODE,
+                    null,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_OAUTH_DENIED);
             return result;
         }
         if (oauthAuthorizationDao == null) {
@@ -312,6 +411,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         authorization.setExpireAt(new Date(now.getTime() + 300000L));
         authorization.setId(oauthAuthorizationDao.insert(authorization));
         result.setAuthorizationCode(authorization.getAuthorizationCode());
+        writeLoginEvent(
+                authorization.getPrincipalKey(),
+                clientId,
+                PrincipalLoginEventType.OAUTH_AUTHORIZED,
+                PrincipalAuthenticationMethod.OAUTH_CODE,
+                null,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
         return result;
     }
 
@@ -325,21 +433,51 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String codeVerifier,
             String refreshToken)
             throws ApiException {
+        return exchangeOAuth2Token(
+                clientId,
+                clientSecret,
+                grantType,
+                redirectUri,
+                authorizationCode,
+                codeVerifier,
+                refreshToken,
+                null,
+                null);
+    }
+
+    @Override
+    public AuthTokenRefreshResult exchangeOAuth2Token(
+            String clientId,
+            String clientSecret,
+            String grantType,
+            String redirectUri,
+            String authorizationCode,
+            String codeVerifier,
+            String refreshToken,
+            String ip,
+            String userAgent)
+            throws ApiException {
         OAuthClient client = validateOAuthClientSecret(clientId, clientSecret);
         if (!client.supportsGrantType(grantType)) {
             throw new ApiException("OAuth2 grant type unsupported");
         }
         if ("authorization_code".equals(grantType)) {
-            return exchangeAuthorizationCode(client, redirectUri, authorizationCode, codeVerifier);
+            return exchangeAuthorizationCode(client, redirectUri, authorizationCode, codeVerifier, ip, userAgent);
         }
         if ("refresh_token".equals(grantType)) {
-            return refreshOAuth2Token(client, refreshToken);
+            return refreshOAuth2Token(client, refreshToken, ip, userAgent);
         }
         throw new ApiException("OAuth2 grant type unsupported");
     }
 
     private AuthTokenRefreshResult exchangeAuthorizationCode(
-            OAuthClient client, String redirectUri, String authorizationCode, String codeVerifier) throws ApiException {
+            OAuthClient client,
+            String redirectUri,
+            String authorizationCode,
+            String codeVerifier,
+            String ip,
+            String userAgent)
+            throws ApiException {
         if (oauthAuthorizationDao == null) {
             throw new ApiException("OAuth2 authorization 未配置");
         }
@@ -363,7 +501,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthTokenRefreshResult(oauthAccessToken, refreshToken, oauthAccessToken.getToken());
     }
 
-    private AuthTokenRefreshResult refreshOAuth2Token(OAuthClient client, String refreshToken) throws ApiException {
+    private AuthTokenRefreshResult refreshOAuth2Token(
+            OAuthClient client, String refreshToken, String ip, String userAgent) throws ApiException {
         if (principalRefreshTokenDao == null) {
             throw new ApiException("refresh token 未配置");
         }
@@ -384,6 +523,15 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, current, session, now);
         String nextRefreshToken =
                 createPrincipalRefreshToken(oauthAccessToken.getPrincipalAccessToken(), client.getClientId(), now);
+        writeLoginEvent(
+                current.getPrincipalKey(),
+                client.getClientId(),
+                PrincipalLoginEventType.TOKEN_REFRESH,
+                PrincipalAuthenticationMethod.REFRESH_TOKEN,
+                null,
+                ip,
+                userAgent,
+                PrincipalLoginEvent.REASON_NONE);
         return new AuthTokenRefreshResult(oauthAccessToken, nextRefreshToken, oauthAccessToken.getToken());
     }
 
@@ -445,6 +593,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public User authenticatePassword(String loginName, String plainPassword) throws ApiException {
+        return authenticatePassword(loginName, plainPassword, null, null);
+    }
+
+    @Override
+    public User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent)
+            throws ApiException {
         PrincipalIdentity identity;
         try {
             identity = principalAuthService.authenticatePassword(
@@ -454,14 +608,35 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     plainPassword,
                     passwordPolicy());
         } catch (InvalidPasswordException e) {
+            recordLoginFailed(
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.USER_ACCOUNT,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_INVALID_CREDENTIAL);
             throw new InvalidUsernamePasswordException();
         }
 
         User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
+            recordLoginFailed(
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.USER_ACCOUNT,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
             throw new InvalidUsernamePasswordException();
         }
         if (!user.isEnable()) {
+            writeLoginEvent(
+                    identity.getPrincipalKey(),
+                    ADMIN_CLIENT_ID,
+                    PrincipalLoginEventType.LOGIN_FAILED,
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.USER_ACCOUNT,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_ACCOUNT_DISABLED);
             throw new BannedAccountException();
         }
         return user;
@@ -469,23 +644,49 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public User authenticateSms(String mobile) throws ApiException {
-        return authenticateIdentity(PrincipalIdentityType.USER_MOBILE, mobile);
+        return authenticateSms(mobile, null, null);
+    }
+
+    @Override
+    public User authenticateSms(String mobile, String ip, String userAgent) throws ApiException {
+        return authenticateIdentity(
+                PrincipalIdentityType.USER_MOBILE, mobile, PrincipalAuthenticationMethod.SMS_CODE, ip, userAgent);
     }
 
     @Override
     public User authenticateWecom(String code) throws ApiException {
+        return authenticateWecom(code, null, null);
+    }
+
+    @Override
+    public User authenticateWecom(String code, String ip, String userAgent) throws ApiException {
         if (wecomLoginProvider == null) {
             throw new ApiException("企业微信登录未配置");
         }
-        return authenticateIdentity(PrincipalIdentityType.USER_WECOM, wecomLoginProvider.resolveIdentity(code));
+        return authenticateIdentity(
+                PrincipalIdentityType.USER_WECOM,
+                wecomLoginProvider.resolveIdentity(code),
+                PrincipalAuthenticationMethod.WECOM,
+                ip,
+                userAgent);
     }
 
     @Override
     public User authenticateGithub(String code) throws ApiException {
+        return authenticateGithub(code, null, null);
+    }
+
+    @Override
+    public User authenticateGithub(String code, String ip, String userAgent) throws ApiException {
         if (githubLoginProvider == null) {
             throw new ApiException("GitHub登录未配置");
         }
-        return authenticateIdentity(PrincipalIdentityType.USER_GITHUB, githubLoginProvider.resolveIdentity(code));
+        return authenticateIdentity(
+                PrincipalIdentityType.USER_GITHUB,
+                githubLoginProvider.resolveIdentity(code),
+                PrincipalAuthenticationMethod.GITHUB,
+                ip,
+                userAgent);
     }
 
     @Override
@@ -500,18 +701,55 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         authenticatePassword(loginName, plainPassword);
     }
 
-    private User authenticateIdentity(PrincipalIdentityType identityType, String identityValue) throws ApiException {
+    @Override
+    public void recordLoginFailed(
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType,
+            String ip,
+            String userAgent,
+            String reason) {
+        writeLoginEvent(
+                null,
+                ADMIN_CLIENT_ID,
+                PrincipalLoginEventType.LOGIN_FAILED,
+                authenticationMethod,
+                identityType,
+                ip,
+                userAgent,
+                reason);
+    }
+
+    private User authenticateIdentity(
+            PrincipalIdentityType identityType,
+            String identityValue,
+            PrincipalAuthenticationMethod authenticationMethod,
+            String ip,
+            String userAgent)
+            throws ApiException {
         PrincipalIdentity identity;
         try {
             identity = principalAuthService.authenticateIdentity(identityType, identityValue);
         } catch (InvalidPasswordException e) {
+            recordLoginFailed(
+                    authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);
             throw new InvalidUsernamePasswordException();
         }
         User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
+            recordLoginFailed(
+                    authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
             throw new InvalidUsernamePasswordException();
         }
         if (!user.isEnable()) {
+            writeLoginEvent(
+                    identity.getPrincipalKey(),
+                    ADMIN_CLIENT_ID,
+                    PrincipalLoginEventType.LOGIN_FAILED,
+                    authenticationMethod,
+                    identityType,
+                    ip,
+                    userAgent,
+                    PrincipalLoginEvent.REASON_ACCOUNT_DISABLED);
             throw new BannedAccountException();
         }
         return user;
@@ -576,6 +814,31 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             principalAuthSessionDao.deleteById(principalAccessToken.getSessionId());
         }
         permissionService.release(token);
+    }
+
+    private void writeLoginEvent(
+            PrincipalKey principalKey,
+            String clientId,
+            PrincipalLoginEventType eventType,
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType,
+            String ip,
+            String userAgent,
+            String reason) {
+        if (principalLoginEventDao == null) {
+            return;
+        }
+        PrincipalLoginEvent event = new PrincipalLoginEvent();
+        event.setPrincipalKey(principalKey);
+        event.setClientId(clientId);
+        event.setEventType(eventType);
+        event.setAuthenticationMethod(authenticationMethod);
+        event.setIdentityType(identityType);
+        event.setOccurredAt(new Date());
+        event.setIp(ip);
+        event.setUserAgent(userAgent);
+        event.setReason(reason);
+        principalLoginEventDao.insert(event);
     }
 
     private int runtimeExpiredSeconds() {

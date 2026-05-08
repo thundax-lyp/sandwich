@@ -16,6 +16,8 @@ import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
@@ -73,8 +75,16 @@ public class AuthControllerContractTest {
                 .thenReturn(sessionId);
         when(preAuthSessionService.findValue(sessionId, "CAPTCHA")).thenReturn("1234");
         when(preAuthSessionService.findValue(sessionId, "privateKey")).thenReturn(keyPair.getPrivateKey());
-        when(authService.authenticatePassword("admin", "plain-password")).thenReturn(user());
-        when(authService.createAccessToken("1", "admin")).thenReturn(accessToken("access-token-1"));
+        when(authService.authenticatePassword(eq("admin"), eq("plain-password"), any(), eq("JUnit")))
+                .thenReturn(user());
+        when(authService.createAccessToken(
+                        eq("1"),
+                        eq("admin"),
+                        any(),
+                        eq("JUnit"),
+                        eq(PrincipalAuthenticationMethod.PASSWORD),
+                        eq(PrincipalIdentityType.USER_ACCOUNT)))
+                .thenReturn(accessToken("access-token-1"));
 
         mockMvc(authService, preAuthSessionService)
                 .perform(post("/api/auth/login")

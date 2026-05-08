@@ -13,6 +13,9 @@ import com.github.thundax.modules.auth.controller.response.MemberLoginFormRespon
 import com.github.thundax.modules.auth.controller.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.auth.controller.response.MemberTokenResponse;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
+import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.security.MemberSecurityContext;
@@ -20,8 +23,10 @@ import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
+import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,34 +78,49 @@ public class LoginController {
 
     @ApiOperation(value = "账号密码登录")
     @PostMapping("login")
-    public MemberTokenResponse loginAccount(@Valid @RequestBody MemberAccountLoginRequest request) throws ApiException {
+    public MemberTokenResponse loginAccount(
+            @Valid @RequestBody MemberAccountLoginRequest request, HttpServletRequest httpRequest) throws ApiException {
         PreAuthSessionToken token = PreAuthSessionToken.of(request.getLoginToken());
         if (!validateCaptcha(token, request.getCaptcha())) {
+            memberAuthService.recordLoginFailed(
+                    PrincipalAuthenticationMethod.PASSWORD,
+                    PrincipalIdentityType.MEMBER_ACCOUNT,
+                    ip(httpRequest),
+                    userAgent(httpRequest),
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
             throw new ApiException("图形验证码错误");
         }
         String password = decryptRsaValue(token, request.getPassword());
         preAuthSessionService.release(requireSessionIdByToken(request.getLoginToken()));
-        return MemberLoginInterfaceAssembler.toTokenResponse(
-                memberAuthService.loginAccount(request.getAccount(), password));
+        return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.loginAccount(
+                request.getAccount(), password, ip(httpRequest), userAgent(httpRequest)));
     }
 
     @ApiOperation(value = "短信登录")
     @PostMapping("login/sms")
-    public MemberTokenResponse loginSms(@Valid @RequestBody MemberSmsLoginRequest request) throws ApiException {
+    public MemberTokenResponse loginSms(
+            @Valid @RequestBody MemberSmsLoginRequest request, HttpServletRequest httpRequest) throws ApiException {
         PreAuthSessionToken token = PreAuthSessionToken.of(request.getLoginToken());
         if (!validateSmsValidateCode(token, request.getMobile(), request.getValidateCode())) {
+            memberAuthService.recordLoginFailed(
+                    PrincipalAuthenticationMethod.SMS_CODE,
+                    PrincipalIdentityType.MEMBER_MOBILE,
+                    ip(httpRequest),
+                    userAgent(httpRequest),
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
             throw new ApiException("短信验证码错误");
         }
         preAuthSessionService.release(requireSessionIdByToken(request.getLoginToken()));
-        return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.loginSms(request.getMobile()));
+        return MemberLoginInterfaceAssembler.toTokenResponse(
+                memberAuthService.loginSms(request.getMobile(), ip(httpRequest), userAgent(httpRequest)));
     }
 
     @ApiOperation(value = "刷新 access token")
     @PostMapping("token/refresh")
-    public MemberTokenResponse refreshAccessToken(@Valid @RequestBody MemberRefreshTokenRequest request)
-            throws ApiException {
-        return MemberLoginInterfaceAssembler.toTokenResponse(
-                memberAuthService.refreshAccessToken(request.getRefreshToken()));
+    public MemberTokenResponse refreshAccessToken(
+            @Valid @RequestBody MemberRefreshTokenRequest request, HttpServletRequest httpRequest) throws ApiException {
+        return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.refreshAccessToken(
+                request.getRefreshToken(), ip(httpRequest), userAgent(httpRequest)));
     }
 
     @ApiOperation(value = "登录状态")
@@ -119,8 +139,9 @@ public class LoginController {
 
     @ApiOperation(value = "登出")
     @PostMapping("logout")
-    public MemberLoginStatusResponse logout(@Valid @RequestBody MemberLogoutRequest request) throws ApiException {
-        memberAuthService.logout(request.getAccessToken());
+    public MemberLoginStatusResponse logout(
+            @Valid @RequestBody MemberLogoutRequest request, HttpServletRequest httpRequest) throws ApiException {
+        memberAuthService.logout(request.getAccessToken(), ip(httpRequest), userAgent(httpRequest));
         return MemberLoginInterfaceAssembler.toLogoutResponse();
     }
 
@@ -187,6 +208,14 @@ public class LoginController {
 
     private String memberPrivateKeyValue(RSAUtils.ReadableKeyPair keyPair) {
         return keyPair.getModulus() + MEMBER_PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent();
+    }
+
+    private String ip(HttpServletRequest request) {
+        return IPUtils.getIpAddr(request);
+    }
+
+    private String userAgent(HttpServletRequest request) {
+        return request.getHeader("user-agent");
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {

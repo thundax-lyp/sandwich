@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `member-auth-session`：前台会员认证接入 PrincipalAuthSession
-  - 范围文件：
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/security/MemberAccessTokenAuthenticationFilter.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/LoginController.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberAuthService.java`
-  - 处理动作：会员登录、refresh、logout 改为创建和读取 `PrincipalAuthSession`。
-  - 验收点：member 链路不再创建 `MemberAuthSession`，refresh 沿用旧 `PrincipalAuthSessionId`。
-  - 重要度：10/10
-
 - [ ] `oauth-authorization-principal-key`：OAuthAuthorization 主体字段升级为 PrincipalKey
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthAuthorization.java`

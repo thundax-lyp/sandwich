@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,7 +42,7 @@ public class PrincipalRefreshToken {
     }
 
     public boolean isActive() {
-        return status != null && status.isActive();
+        return status == PrincipalTokenStatus.ACTIVE;
     }
 
     public boolean isExpired(Date now) {

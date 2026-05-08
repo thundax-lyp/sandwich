@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -40,7 +40,7 @@ public class PrincipalAccessToken {
     }
 
     public boolean isActive() {
-        return status != null && status.isActive();
+        return status == PrincipalTokenStatus.ACTIVE;
     }
 
     public boolean isExpired(Date now) {

@@ -2,8 +2,8 @@ package com.github.thundax.modules.auth.dao;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import java.util.List;
 
 public interface PrincipalAccessTokenDao {

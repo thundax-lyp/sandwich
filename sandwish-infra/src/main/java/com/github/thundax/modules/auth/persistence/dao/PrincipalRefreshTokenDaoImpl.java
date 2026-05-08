@@ -10,9 +10,9 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
@@ -205,7 +205,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
                 PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
         refreshToken.setIssuedAt(cacheDTO.issuedAt);
         refreshToken.setExpireAt(cacheDTO.expireAt);
-        refreshToken.setStatus(PrincipalTokenStatus.of(cacheDTO.status));
+        refreshToken.setStatus(PrincipalTokenStatus.from(cacheDTO.status));
         return refreshToken;
     }
 

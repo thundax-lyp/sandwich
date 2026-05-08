@@ -10,9 +10,9 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalTokenStatus;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
@@ -224,7 +224,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
         accessToken.setScopes(new LinkedHashSet<>(cacheDTO.scopes));
         accessToken.setIssuedAt(cacheDTO.issuedAt);
         accessToken.setExpireAt(cacheDTO.expireAt);
-        accessToken.setStatus(PrincipalTokenStatus.of(cacheDTO.status));
+        accessToken.setStatus(PrincipalTokenStatus.from(cacheDTO.status));
         return accessToken;
     }
 

@@ -54,7 +54,7 @@
 
 `AuthSession` 归属 `auth` 认证模型，承载后台登录后的会话事实。
 
-`AccessToken` 继续承载后台权限会话入口 token。`PrincipalAccessToken` 承载后台、前台会员和 OAuth2 access token 运行态。`PrincipalRefreshToken` 承载后台、前台会员和 OAuth2 refresh token 运行态。`AuthSession` 固定不替代 token 的传输职责。
+`PrincipalAccessToken` 承载后台、前台会员和 OAuth2 access token 运行态。`PrincipalRefreshToken` 承载后台、前台会员和 OAuth2 refresh token 运行态。`AuthSession` 固定不替代 token 的传输职责。
 
 `PermissionSession` 继续承载权限集合缓存。`AuthSession` 固定不承载权限集合。
 
@@ -274,14 +274,14 @@
 - 登录成功后必须释放对应 `PreAuthSession`。
 - 密码类接口需要加密传输时，固定复用 `PreAuthSession` 中的传输密钥，不提供独立 keypair API。
 
-### 5.7 AccessToken
+### 5.7 后台 token
 
-`AccessToken` 是后台请求访问 token。
+后台请求访问 token 由 `PrincipalAccessToken` 统一表达。
 
 固定约束：
 
-- 登录成功后必须创建 `AccessToken`。
-- `AccessToken` 必须能定位后台 `User`。
+- 登录成功后必须创建 `PrincipalAccessToken` 和 `PrincipalRefreshToken`。
+- `PrincipalAccessToken` 必须能定位后台 `User`。
 - token 删除时必须释放权限会话并更新认证会话状态。
 
 ### 5.8 PermissionSession
@@ -476,8 +476,8 @@
 
 ### 7.5 访问 token
 
-- 密码认证成功后必须创建 `AccessToken`。
-- `AccessToken` 必须记录 token、`userId` 和校验码。
+- 密码认证成功后必须创建 `PrincipalAccessToken` 和 `PrincipalRefreshToken`。
+- `PrincipalAccessToken` 和 `PrincipalRefreshToken` 必须只保存 token hash，不保存 token 明文。
 - token 校验失败时必须拒绝访问。
 - 有效 token 请求必须刷新访问态。
 - 删除 token 时必须释放权限会话。
@@ -519,6 +519,8 @@
 
 ### 7.10 refresh token
 
+- 后台登录和 OAuth2 token 响应需要生成 refresh token。
+- 后台登录 refresh token 使用默认 `clientId=admin-api`。
 - OAuth2 token 响应需要按客户端策略生成 refresh token。
 - refresh token 必须能定位 client、user 和 access token。
 - refresh token 只保存哈希，不保存明文。
@@ -539,7 +541,7 @@
 - 企业微信登录必须通过 provider 校验外部身份。
 - GitHub 登录必须通过 provider 校验外部身份。
 - 外部身份映射不到后台用户时必须拒绝登录。
-- 多登录方式登录成功后必须复用统一 `AccessToken`、`PermissionSession` 和 `AuthSession` 创建流程。
+- 多登录方式登录成功后必须复用统一 `PrincipalAccessToken`、`PrincipalRefreshToken`、`PermissionSession` 和 `AuthSession` 创建流程。
 
 ### 7.13 用户保存联动
 
@@ -574,27 +576,27 @@
 10. 密码错误时写回凭据失败次数。
 11. 密码正确时清零凭据失败状态。
 12. 登录成功后释放 `PreAuthSession`。
-13. 登录成功后创建 `AccessToken`。
-14. 登录成功后创建 `PermissionSession`。
-15. 登录成功后创建数据库审计态 `AuthSession`。
-16. 登录成功后写入 Redis 运行态 `AuthSession`。
-17. `AuthController` 返回 token 响应。
+13. 登录成功后创建 `PrincipalAccessToken`。
+14. 登录成功后创建 `PrincipalRefreshToken`。
+15. 登录成功后创建 `PermissionSession`。
+16. 登录成功后创建数据库审计态 `AuthSession`。
+17. 登录成功后写入 Redis 运行态 `AuthSession`。
+18. `AuthController` 返回 token 和 refresh token 响应。
 
 ### 8.2 后台请求认证流程
 
 1. 后台 token filter 读取请求 token。
-2. token filter 读取 `AccessToken`。
-3. token filter 校验 token check code。
-4. token filter touch `AccessToken`。
-5. token filter touch `PermissionSession`。
-6. token filter touch Redis 运行态 `AuthSession`。
-7. token filter 恢复当前用户上下文。
+2. token filter 按 token hash 读取 `PrincipalAccessToken`。
+3. token filter 校验 token 状态和过期时间。
+4. token filter touch `PermissionSession`。
+5. token filter touch Redis 运行态 `AuthSession`。
+6. token filter 恢复当前用户上下文。
 
 ### 8.3 后台登出流程
 
 1. `AuthController.logout` 接收登出请求。
-2. Controller 按 token 定位 `AccessToken`。
-3. Service 删除 `AccessToken`。
+2. Controller 按 token hash 定位 `PrincipalAccessToken`。
+3. Service 撤销 `PrincipalAccessToken`。
 4. Service 释放 `PermissionSession`。
 5. Service 读取 Redis 运行态 `AuthSession` 的最后访问时间。
 6. Service 删除 Redis 运行态 `AuthSession`。

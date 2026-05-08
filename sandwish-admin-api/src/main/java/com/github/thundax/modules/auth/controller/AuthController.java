@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
@@ -27,11 +26,10 @@ import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationVi
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
-import com.github.thundax.modules.auth.utils.AuthUtils;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
@@ -122,10 +120,7 @@ public class AuthController {
 
         authService.releasePreAuthSession(request.getLoginToken());
 
-        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toStringValue(user.getId()));
-        if (accessToken != null) {
-            authService.deleteAccessToken(accessToken);
-        }
+        authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
 
         return loginSuccess(user, request.getUsername(), "用户/密码登录成功");
     }
@@ -160,13 +155,9 @@ public class AuthController {
             throw new InvalidTokenException();
         }
 
-        AccessToken accessToken = authService.getAccessToken(request.getToken());
+        AuthAccessTokenResult accessToken = authService.getAccessToken(request.getToken());
         if (accessToken == null) {
             throw new InvalidTokenException();
-        }
-
-        if (AuthUtils.validateCheckCode(accessToken.getCheckCode())) {
-            throw new PermissionDeniedException();
         }
 
         authService.deleteAccessToken(accessToken);
@@ -269,10 +260,7 @@ public class AuthController {
     }
 
     private AuthAccessTokenResponse loginSuccess(User user, String loginName, String logTitle) {
-        AccessToken accessToken = authService.getByUserId(EntityIdCodec.toStringValue(user.getId()));
-        if (accessToken != null) {
-            authService.deleteAccessToken(accessToken);
-        }
+        authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
         HttpServletRequest currentRequest =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         writeLog(currentRequest, logTitle, user, loginName);

@@ -4,10 +4,10 @@ import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PermissionSession;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
@@ -84,7 +84,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        AccessToken accessToken = authService.getAccessToken(token);
+        AuthAccessTokenResult accessToken = authService.getAccessToken(token);
         if (accessToken == null) {
             writeError(response);
             return;

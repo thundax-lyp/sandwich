@@ -40,8 +40,6 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 Redis-only DO 当前为：
 
 - `com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO`
-- `com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO`
-- `com.github.thundax.modules.auth.persistence.dataobject.LoginFormDO`
 
 Redis-only DO 不纳入数据库表 DO 注解门禁，因为它们没有数据库表名，不补 `@TableName`。Redis-only DO 的命名规则归属运行态持久化设计，不混入数据库表注解门禁。
 

@@ -17,6 +17,8 @@ public interface PrincipalAccessTokenDao {
     List<PrincipalAccessToken> listByPrincipalKeyAndClientIdAndStatus(
             PrincipalKey principalKey, String clientId, PrincipalTokenStatus status);
 
+    int countByClientIdAndStatus(String clientId, PrincipalTokenStatus status);
+
     EntityId insert(PrincipalAccessToken accessToken);
 
     int updateStatus(PrincipalAccessToken accessToken);

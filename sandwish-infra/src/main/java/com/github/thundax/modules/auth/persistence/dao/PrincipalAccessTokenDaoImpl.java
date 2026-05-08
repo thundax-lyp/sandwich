@@ -36,6 +36,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
     private static final String TOKEN_HASH_PREFIX = CACHE_SECTION + "HASH_";
     private static final String TOKEN_ID_PREFIX = CACHE_SECTION + "TOKEN_ID_";
     private static final String PRINCIPAL_INDEX_PREFIX = CACHE_SECTION + "PRINCIPAL_";
+    private static final String CLIENT_INDEX_PREFIX = CACHE_SECTION + "CLIENT_";
     private static final int SAFETY_SECONDS = 5;
 
     private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
@@ -94,6 +95,16 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
     }
 
     @Override
+    public int countByClientIdAndStatus(String clientId, PrincipalTokenStatus status) {
+        if (status == null) {
+            return 0;
+        }
+        String indexKey = clientIndexKey(clientId, status);
+        removeExpired(indexKey);
+        return redis().zcard(indexKey).intValue();
+    }
+
+    @Override
     public EntityId insert(PrincipalAccessToken accessToken) {
         Assert.notNull(accessToken, "accessToken can not be null");
         Assert.notNull(accessToken.getTokenId(), "tokenId can not be null");
@@ -135,10 +146,12 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
                 seconds,
                 TimeUnit.SECONDS);
         redis().zadd(principalIndexKey(accessToken), accessToken.getExpireAt().getTime(), accessToken.getTokenHash());
+        redis().zadd(clientIndexKey(accessToken), accessToken.getExpireAt().getTime(), accessToken.getTokenHash());
     }
 
     private void removeIndex(PrincipalAccessToken accessToken) {
         redis().zrem(principalIndexKey(accessToken), accessToken.getTokenHash());
+        redis().zrem(clientIndexKey(accessToken), accessToken.getTokenHash());
     }
 
     private long remainingSeconds(PrincipalAccessToken accessToken) {
@@ -156,6 +169,14 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
 
     private String principalIndexKey(PrincipalAccessToken accessToken) {
         return principalIndexKey(accessToken.getPrincipalKey(), accessToken.getClientId(), accessToken.getStatus());
+    }
+
+    private String clientIndexKey(PrincipalAccessToken accessToken) {
+        return clientIndexKey(accessToken.getClientId(), accessToken.getStatus());
+    }
+
+    private String clientIndexKey(String clientId, PrincipalTokenStatus status) {
+        return CLIENT_INDEX_PREFIX + StringUtils.defaultIfBlank(clientId, "DEFAULT") + "_" + status.value();
     }
 
     private String principalIndexKey(PrincipalKey principalKey, String clientId, PrincipalTokenStatus status) {

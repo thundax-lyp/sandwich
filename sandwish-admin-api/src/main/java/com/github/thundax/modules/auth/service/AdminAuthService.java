@@ -4,9 +4,9 @@ import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -64,20 +64,20 @@ public interface AdminAuthService {
             throws InvalidTokenException, InvalidCaptchaException;
 
     @NonNull
-    AccessToken createAccessToken(String userId);
+    AuthAccessTokenResult createAccessToken(String userId);
 
     @NonNull
-    AccessToken createAccessToken(String userId, String loginName);
+    AuthAccessTokenResult createAccessToken(String userId, String loginName);
 
-    AccessToken getAccessToken(String token);
+    AuthAccessTokenResult getAccessToken(String token);
 
-    AccessToken getByUserId(String userId);
+    int deleteAccessTokensByUserId(String userId);
 
-    boolean validateToken(AccessToken accessToken);
+    boolean validateToken(AuthAccessTokenResult accessToken);
 
-    void activeAccessToken(AccessToken accessToken);
+    void activeAccessToken(AuthAccessTokenResult accessToken);
 
-    void deleteAccessToken(AccessToken accessToken);
+    void deleteAccessToken(AuthAccessTokenResult accessToken);
 
     AuthTokenQueryResult queryToken(String token);
 

@@ -203,7 +203,7 @@
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `session_id` 由 Service 生成，作为认证会话业务标识。
-- `token` 来源是 `AccessToken.token`。
+- `token` 来源是接口传输的明文 token；token 运行态由 `PrincipalAccessToken.tokenHash` 表达。
 - `user_id` 来源是 `sys_user.id`。
 - `identity_id` 来源是 `auth_principal_identity.id`。
 - `identity_type` 固定写入登录时使用的标识类型。

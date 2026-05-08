@@ -19,7 +19,6 @@ import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.OAuthClient;
@@ -50,11 +49,11 @@ import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PreAuthSessionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
-import com.github.thundax.modules.auth.testsupport.InMemoryAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPermissionDaoImpl;
 import com.github.thundax.modules.auth.testsupport.InMemoryPreAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -87,7 +86,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AuthPermissionLifecycleTest {
 
-    private InMemoryAccessTokenDaoImpl accessTokenDao;
+    private TestPrincipalAccessTokenDao accessTokenDao;
+    private TestPrincipalRefreshTokenDao refreshTokenDao;
     private InMemoryPermissionDaoImpl permissionDao;
     private TestAuthSessionDao authSessionDao;
     private TestAuthSessionRuntimeDao authSessionRuntimeDao;
@@ -95,8 +95,9 @@ public class AuthPermissionLifecycleTest {
     private PermissionService permissionService;
 
     @Before
-    public void setUp() {
-        accessTokenDao = new InMemoryAccessTokenDaoImpl();
+    public void setUp() throws Exception {
+        accessTokenDao = new TestPrincipalAccessTokenDao();
+        refreshTokenDao = new TestPrincipalRefreshTokenDao();
         permissionDao = new InMemoryPermissionDaoImpl();
         authSessionDao = new TestAuthSessionDao();
         authSessionRuntimeDao = new TestAuthSessionRuntimeDao();
@@ -123,13 +124,14 @@ public class AuthPermissionLifecycleTest {
                 authProperties,
                 new LoginProperties(),
                 preAuthSessionService,
-                accessTokenDao,
                 authSessionDao,
                 authSessionRuntimeDao,
                 permissionService,
                 new TestPrincipalAuthService(),
                 principalIdentityService,
                 userService);
+        inject(authService, "principalAccessTokenDao", accessTokenDao);
+        inject(authService, "principalRefreshTokenDao", refreshTokenDao);
     }
 
     @After
@@ -140,7 +142,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldCreateTouchAndReleasePermissionSessionWithAccessToken() {
-        AccessToken accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
 
         Assert.assertNotNull(permissionService.getSession(accessToken.getToken()));
         Assert.assertNotNull(authSessionDao.getByToken(accessToken.getToken()));
@@ -175,11 +177,13 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldInvalidateSessionByUserId() {
-        AccessToken accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
 
         authService.invalidateSessionsByUserId(EntityIdCodec.toDomain(1L), "PASSWORD_RESET");
 
-        Assert.assertNull(accessTokenDao.getByUserId("1"));
+        Assert.assertEquals(
+                PrincipalTokenStatus.REVOKED,
+                accessToken.getPrincipalAccessToken().getStatus());
         Assert.assertNull(permissionService.getSession(accessToken.getToken()));
         Assert.assertNull(authSessionRuntimeDao.getByToken(accessToken.getToken()));
         Assert.assertEquals(
@@ -192,7 +196,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldQueryTokenActiveStateAndUserinfo() {
-        AccessToken accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
 
         AuthTokenQueryResult result = authService.queryToken(accessToken.getToken());
 
@@ -360,7 +364,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
-        AccessToken accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -378,14 +382,16 @@ public class AuthPermissionLifecycleTest {
                 "1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertTrue(permissionDao.getTouchCount() > 0);
-        Assert.assertTrue(accessTokenDao.getActiveCount() > 0);
+        Assert.assertEquals(
+                PrincipalTokenStatus.ACTIVE,
+                accessToken.getPrincipalAccessToken().getStatus());
         Assert.assertEquals(0, authSessionDao.getTouchCount());
         Assert.assertTrue(authSessionRuntimeDao.getTouchCount() > 0);
     }
 
     @Test
     public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
-        AccessToken accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -544,6 +550,11 @@ public class AuthPermissionLifecycleTest {
         public List<PrincipalAccessToken> listByPrincipalKeyAndClientIdAndStatus(
                 PrincipalKey principalKey, String clientId, PrincipalTokenStatus status) {
             return current == null ? Collections.emptyList() : Collections.singletonList(current);
+        }
+
+        @Override
+        public int countByClientIdAndStatus(String clientId, PrincipalTokenStatus status) {
+            return current == null ? 0 : 1;
         }
 
         @Override

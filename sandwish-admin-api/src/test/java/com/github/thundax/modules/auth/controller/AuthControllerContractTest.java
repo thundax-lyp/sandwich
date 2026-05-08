@@ -14,10 +14,13 @@ import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.ApiResponse;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.AuthSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.sys.entity.User;
 import org.junit.After;
@@ -64,7 +67,7 @@ public class AuthControllerContractTest {
         when(authService.validateCaptcha("login-token-1", "1234")).thenReturn(true);
         when(authService.getPrivateKey("login-token-1")).thenReturn(keyPair.getPrivateKey());
         when(authService.authenticatePassword("admin", "plain-password")).thenReturn(user());
-        when(authService.createAccessToken("1", "admin")).thenReturn(accessToken("access-token-1", "mismatch"));
+        when(authService.createAccessToken("1", "admin")).thenReturn(accessToken("access-token-1"));
 
         mockMvc(authService)
                 .perform(post("/api/auth/login")
@@ -81,7 +84,7 @@ public class AuthControllerContractTest {
     @Test
     public void shouldWrapLogoutJsonResponseWithApiResponseAdvice() throws Exception {
         AdminAuthService authService = mock(AdminAuthService.class);
-        when(authService.getAccessToken("access-token-1")).thenReturn(accessToken("access-token-1", "mismatch"));
+        when(authService.getAccessToken("access-token-1")).thenReturn(accessToken("access-token-1"));
 
         mockMvc(authService)
                 .perform(post("/api/auth/logout")
@@ -133,12 +136,10 @@ public class AuthControllerContractTest {
         return user;
     }
 
-    private AccessToken accessToken(String token, String checkCode) {
-        AccessToken accessToken = new AccessToken();
-        accessToken.setToken(token);
-        accessToken.setUserId("1");
-        accessToken.setCheckCode(checkCode);
-        return accessToken;
+    private AuthAccessTokenResult accessToken(String token) {
+        PrincipalAccessToken accessToken = new PrincipalAccessToken();
+        accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+        return new AuthAccessTokenResult(token, "refresh-token-1", accessToken);
     }
 
     private void mockSysLogTemplate() {

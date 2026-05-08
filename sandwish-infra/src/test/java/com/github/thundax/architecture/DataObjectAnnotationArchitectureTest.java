@@ -23,7 +23,6 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
 
     private static final String[] NON_AUTO_ID_DATA_OBJECTS = {
         "com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
@@ -53,9 +52,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         JavaClasses classes = importPackages(BASE_PACKAGE);
 
         ModelAnnotationArchitectureRuleSupport.dataObjectClassAnnotationsRequired(
-                        BASE_PACKAGE,
-                        "com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO",
-                        "com.github.thundax.modules.auth.persistence.dataobject.AccessTokenDO")
+                        BASE_PACKAGE, "com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO")
                 .check(classes);
     }
 

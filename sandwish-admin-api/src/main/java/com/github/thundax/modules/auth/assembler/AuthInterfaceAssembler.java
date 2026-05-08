@@ -9,9 +9,9 @@ import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationVi
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.controller.response.TokenVerifyResponse;
-import com.github.thundax.modules.auth.entity.AccessToken;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
+import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
@@ -43,10 +43,11 @@ public final class AuthInterfaceAssembler {
     }
 
     @NonNull
-    public static AuthAccessTokenResponse toAccessTokenResponse(AccessToken entity) {
+    public static AuthAccessTokenResponse toAccessTokenResponse(AuthAccessTokenResult entity) {
         AuthAccessTokenResponse response = new AuthAccessTokenResponse();
         if (entity != null) {
             response.setToken(entity.getToken());
+            response.setRefreshToken(entity.getRefreshToken());
         }
         return response;
     }

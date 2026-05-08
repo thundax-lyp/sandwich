@@ -7,9 +7,9 @@ import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 
 public interface MemberAuthService {
 
-    PreAuthSessionDTO createLoginForm() throws ApiException;
+    PreAuthSessionDTO createPreAuthSession() throws ApiException;
 
-    PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException;
+    PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException;
 
     String createCaptcha(String loginToken) throws ApiException;
 

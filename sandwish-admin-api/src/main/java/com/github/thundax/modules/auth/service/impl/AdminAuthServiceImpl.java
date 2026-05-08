@@ -117,17 +117,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public PreAuthSessionDTO createLoginForm() throws ApiException {
+    public PreAuthSessionDTO createPreAuthSession() throws ApiException {
         return preAuthSessionService.createPreAuthSession(PrincipalType.USER);
     }
 
     @Override
-    public PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException {
+    public PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException {
         return preAuthSessionService.refreshPreAuthSession(PrincipalType.USER, refreshToken);
     }
 
     @Override
-    public void deleteLoginForm(String loginToken) {
+    public void releasePreAuthSession(String loginToken) {
         preAuthSessionService.releasePreAuthSession(PrincipalType.USER, loginToken);
     }
 

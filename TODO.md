@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `login-form-entry-cleanup`：清理入口模块登录表单残留依赖
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AdminAuthService.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberAuthService.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/testsupport/InMemoryLoginFormDaoImpl.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/AuthControllerContractTest.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/CaptchaControllerContractTest.java`
-  - 处理动作：清理入口 Service、Controller 测试和测试支撑中的旧登录表单依赖口径
-  - 验收点：入口生产代码只依赖登录表单 biz Service，不直接编排登录表单 DAO
-  - 重要度：7/10
-
 - [ ] `login-form-document-sync`：同步登录表单目标文档
   - 范围文件：
     - `docs/10-requirements/AUTH-REQUIREMENTS.md`

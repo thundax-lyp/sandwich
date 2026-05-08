@@ -339,7 +339,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
-        PreAuthSessionDTO session = authService.createLoginForm();
+        PreAuthSessionDTO session = authService.createPreAuthSession();
         String smsCode = authService.createSmsValidateCode(session.getLoginToken(), "13800000000");
 
         Assert.assertEquals(

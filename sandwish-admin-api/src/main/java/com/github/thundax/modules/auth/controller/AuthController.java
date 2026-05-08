@@ -66,23 +66,23 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @ApiOperation(value = "请求登录令牌")
+    @ApiOperation(value = "请求预认证会话")
     @PostMapping(value = "form")
-    @SysLogger("请求登录令牌")
-    public AuthLoginFormResponse loginForm() throws ApiException {
-        return AuthInterfaceAssembler.toLoginFormResponse(authService.createLoginForm());
+    @SysLogger("请求预认证会话")
+    public AuthLoginFormResponse preAuthSession() throws ApiException {
+        return AuthInterfaceAssembler.toLoginFormResponse(authService.createPreAuthSession());
     }
 
-    @ApiOperation(value = "刷新登录令牌")
+    @ApiOperation(value = "刷新预认证会话")
     @PostMapping(value = "form/refresh")
-    @SysLogger("刷新登录令牌")
-    public AuthLoginFormResponse refreshLoginForm(@Valid @RequestBody AuthLoginFormRefreshRequest request)
+    @SysLogger("刷新预认证会话")
+    public AuthLoginFormResponse refreshPreAuthSession(@Valid @RequestBody AuthLoginFormRefreshRequest request)
             throws ApiException {
         if (StringUtils.isBlank(request.getRefreshToken())) {
             throw new InvalidParameterException("refreshToken");
         }
 
-        return AuthInterfaceAssembler.toLoginFormResponse(authService.refreshLoginForm(request.getRefreshToken()));
+        return AuthInterfaceAssembler.toLoginFormResponse(authService.refreshPreAuthSession(request.getRefreshToken()));
     }
 
     @ApiOperation(value = "用户/密码登录")
@@ -120,7 +120,7 @@ public class AuthController {
             throw e;
         }
 
-        authService.deleteLoginForm(request.getLoginToken());
+        authService.releasePreAuthSession(request.getLoginToken());
 
         AccessToken accessToken = authService.getByUserId(EntityIdCodec.toStringValue(user.getId()));
         if (accessToken != null) {

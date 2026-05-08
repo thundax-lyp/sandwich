@@ -64,12 +64,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public PreAuthSessionDTO createLoginForm() throws ApiException {
+    public PreAuthSessionDTO createPreAuthSession() throws ApiException {
         return preAuthSessionService.createPreAuthSession(PrincipalType.MEMBER);
     }
 
     @Override
-    public PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException {
+    public PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException {
         return preAuthSessionService.refreshPreAuthSession(PrincipalType.MEMBER, refreshToken);
     }
 

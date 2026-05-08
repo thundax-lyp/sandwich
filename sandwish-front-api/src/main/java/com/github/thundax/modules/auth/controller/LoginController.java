@@ -34,18 +34,18 @@ public class LoginController {
         this.memberAuthService = memberAuthService;
     }
 
-    @ApiOperation(value = "请求登录表单")
+    @ApiOperation(value = "请求预认证会话")
     @PostMapping("form")
-    public MemberLoginFormResponse loginForm() throws ApiException {
-        return MemberLoginInterfaceAssembler.toLoginFormResponse(memberAuthService.createLoginForm());
+    public MemberLoginFormResponse preAuthSession() throws ApiException {
+        return MemberLoginInterfaceAssembler.toLoginFormResponse(memberAuthService.createPreAuthSession());
     }
 
-    @ApiOperation(value = "刷新登录表单")
+    @ApiOperation(value = "刷新预认证会话")
     @PostMapping("form/refresh")
-    public MemberLoginFormResponse refreshLoginForm(@Valid @RequestBody MemberRefreshTokenRequest request)
+    public MemberLoginFormResponse refreshPreAuthSession(@Valid @RequestBody MemberRefreshTokenRequest request)
             throws ApiException {
         return MemberLoginInterfaceAssembler.toLoginFormResponse(
-                memberAuthService.refreshLoginForm(request.getRefreshToken()));
+                memberAuthService.refreshPreAuthSession(request.getRefreshToken()));
     }
 
     @ApiOperation(value = "账号密码登录")

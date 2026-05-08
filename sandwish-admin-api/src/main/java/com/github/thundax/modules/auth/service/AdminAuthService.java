@@ -17,7 +17,7 @@ import org.springframework.lang.NonNull;
 
 public interface AdminAuthService {
 
-    PreAuthSessionDTO createLoginForm() throws ApiException;
+    PreAuthSessionDTO createPreAuthSession() throws ApiException;
 
     /**
      * 刷新登录令牌 刷新后，refreshToken并未立即消失，而是指向新的Token位置，直到60秒后，此时可能有多个refreshToken指向同一个token。
@@ -27,9 +27,9 @@ public interface AdminAuthService {
      * @return 登录令牌
      * @throws InvalidTokenException 无效的refreshToken
      */
-    PreAuthSessionDTO refreshLoginForm(String refreshToken) throws ApiException;
+    PreAuthSessionDTO refreshPreAuthSession(String refreshToken) throws ApiException;
 
-    void deleteLoginForm(String loginToken) throws InvalidTokenException;
+    void releasePreAuthSession(String loginToken) throws InvalidTokenException;
 
     String createCaptcha(String loginToken) throws InvalidTokenException;
 

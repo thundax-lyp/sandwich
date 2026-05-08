@@ -39,9 +39,9 @@ public class AuthControllerContractTest {
     }
 
     @Test
-    public void shouldWrapLoginFormJsonResponseWithApiResponseAdvice() throws Exception {
+    public void shouldWrapPreAuthSessionJsonResponseWithApiResponseAdvice() throws Exception {
         AdminAuthService authService = mock(AdminAuthService.class);
-        when(authService.createLoginForm()).thenReturn(loginForm());
+        when(authService.createPreAuthSession()).thenReturn(preAuthSession());
 
         mockMvc(authService)
                 .perform(post("/api/auth/form").contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +119,7 @@ public class AuthControllerContractTest {
                 .build();
     }
 
-    private PreAuthSessionDTO loginForm() {
+    private PreAuthSessionDTO preAuthSession() {
         PreAuthSessionDTO session = new PreAuthSessionDTO();
         session.setLoginToken("login-token-1");
         session.setRefreshTokenList(Collections.singletonList("refresh-token-1"));

@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,9 +15,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PreAuthSession implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class PreAuthSession {
     private static final int MAX_REFRESH_TOKEN_SIZE = 5;
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator();
 
@@ -51,10 +48,19 @@ public class PreAuthSession implements Serializable {
 
     public static PreAuthSession restore(
             PreAuthSessionId id, PreAuthSessionToken token, List<RefreshTokenValue> refreshTokens, long expiredAt) {
+        return restore(id, token, refreshTokens, expiredAt, new LinkedHashMap<>());
+    }
+
+    public static PreAuthSession restore(
+            PreAuthSessionId id,
+            PreAuthSessionToken token,
+            List<RefreshTokenValue> refreshTokens,
+            long expiredAt,
+            Map<String, PreAuthSessionValue> items) {
         if (id == null || token == null || refreshTokens == null || refreshTokens.isEmpty()) {
             throw new IllegalArgumentException("pre-auth session state can not be null");
         }
-        return new PreAuthSession(id, token, expiredAt, new ArrayList<>(refreshTokens), new LinkedHashMap<>());
+        return new PreAuthSession(id, token, expiredAt, new ArrayList<>(refreshTokens), new LinkedHashMap<>(items));
     }
 
     public void refresh(int expiredSeconds, int refreshTokenGraceSeconds) {
@@ -107,6 +113,10 @@ public class PreAuthSession implements Serializable {
         return Collections.unmodifiableList(refreshTokens);
     }
 
+    public Map<String, PreAuthSessionValue> itemValues() {
+        return Collections.unmodifiableMap(items);
+    }
+
     private static String nextHexSnowflakeId() {
         return Long.toHexString(ID_GENERATOR.nextId().value());
     }
@@ -121,9 +131,7 @@ public class PreAuthSession implements Serializable {
 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class RefreshTokenValue implements Serializable {
-        private static final long serialVersionUID = 1L;
-
+    public static class RefreshTokenValue {
         private final PreAuthSessionToken token;
         private final long expiredAt;
 
@@ -134,10 +142,12 @@ public class PreAuthSession implements Serializable {
 
     @Getter
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class PreAuthSessionValue implements Serializable {
-        private static final long serialVersionUID = 1L;
-
+    public static class PreAuthSessionValue {
         private final String value;
         private final long expiredAt;
+
+        public static PreAuthSessionValue of(String value, long expiredAt) {
+            return new PreAuthSessionValue(value, expiredAt);
+        }
     }
 }

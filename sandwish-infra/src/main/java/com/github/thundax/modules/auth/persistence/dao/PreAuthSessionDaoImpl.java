@@ -4,14 +4,20 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
+import com.github.thundax.modules.auth.entity.PreAuthSession.PreAuthSessionValue;
 import com.github.thundax.modules.auth.entity.PreAuthSession.RefreshTokenValue;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +54,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
 
     @Override
     public PreAuthSession getById(PreAuthSessionId id) {
-        return id == null ? null : (PreAuthSession) cache.get(SESSION_PREFIX + id.asString());
+        return id == null ? null : toEntity((PreAuthSessionCacheDTO) cache.get(SESSION_PREFIX + id.asString()));
     }
 
     @Override
@@ -97,7 +103,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
     private void putSession(PreAuthSession session) {
         long seconds = remainingSeconds(session);
         String sessionKey = SESSION_PREFIX + session.getId().asString();
-        cache.put(sessionKey, session, seconds + SAFETY_SECONDS, TimeUnit.SECONDS);
+        cache.put(sessionKey, toCacheDTO(session), seconds + SAFETY_SECONDS, TimeUnit.SECONDS);
         redis().zadd(ACTIVE_SESSION_KEY, session.getExpiredAt(), session.getId().asString());
         cache.put(TOKEN_PREFIX + session.getToken().asString(), session.getId().asString(), seconds, TimeUnit.SECONDS);
         for (RefreshTokenValue refreshToken : session.refreshTokenValues()) {
@@ -137,6 +143,48 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
         redis().zremrangebyscore(ACTIVE_SESSION_KEY, 0, System.currentTimeMillis());
     }
 
+    private static PreAuthSession toEntity(PreAuthSessionCacheDTO cacheDTO) {
+        if (cacheDTO == null) {
+            return null;
+        }
+        List<RefreshTokenValue> refreshTokens = new ArrayList<>();
+        for (RefreshTokenCacheDTO refreshToken : cacheDTO.refreshTokens) {
+            refreshTokens.add(RefreshTokenValue.of(PreAuthSessionToken.of(refreshToken.token), refreshToken.expiredAt));
+        }
+        Map<String, PreAuthSessionValue> items = new LinkedHashMap<>();
+        for (Map.Entry<String, PreAuthSessionValueCacheDTO> entry : cacheDTO.items.entrySet()) {
+            items.put(entry.getKey(), PreAuthSessionValue.of(entry.getValue().value, entry.getValue().expiredAt));
+        }
+        return PreAuthSession.restore(
+                PreAuthSessionId.of(cacheDTO.id),
+                PreAuthSessionToken.of(cacheDTO.token),
+                refreshTokens,
+                cacheDTO.expiredAt,
+                items);
+    }
+
+    private static PreAuthSessionCacheDTO toCacheDTO(PreAuthSession session) {
+        PreAuthSessionCacheDTO cacheDTO = new PreAuthSessionCacheDTO();
+        cacheDTO.id = session.getId().asString();
+        cacheDTO.token = session.getToken().asString();
+        cacheDTO.expiredAt = session.getExpiredAt();
+        cacheDTO.refreshTokens = new ArrayList<>();
+        for (RefreshTokenValue refreshToken : session.refreshTokenValues()) {
+            RefreshTokenCacheDTO refreshTokenDTO = new RefreshTokenCacheDTO();
+            refreshTokenDTO.token = refreshToken.getToken().asString();
+            refreshTokenDTO.expiredAt = refreshToken.getExpiredAt();
+            cacheDTO.refreshTokens.add(refreshTokenDTO);
+        }
+        cacheDTO.items = new LinkedHashMap<>();
+        for (Map.Entry<String, PreAuthSessionValue> entry : session.itemValues().entrySet()) {
+            PreAuthSessionValueCacheDTO valueDTO = new PreAuthSessionValueCacheDTO();
+            valueDTO.value = entry.getValue().getValue();
+            valueDTO.expiredAt = entry.getValue().getExpiredAt();
+            cacheDTO.items.put(entry.getKey(), valueDTO);
+        }
+        return cacheDTO;
+    }
+
     private RedisCommands<String, String> redis() {
         if (redisConnection == null) {
             synchronized (this) {
@@ -154,5 +202,23 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
             redisConnection.close();
         }
         redisClient.shutdown();
+    }
+
+    private static class PreAuthSessionCacheDTO implements CacheDTO {
+        private String id;
+        private String token;
+        private long expiredAt;
+        private List<RefreshTokenCacheDTO> refreshTokens = new ArrayList<>();
+        private Map<String, PreAuthSessionValueCacheDTO> items = new LinkedHashMap<>();
+    }
+
+    private static class RefreshTokenCacheDTO implements CacheDTO {
+        private String token;
+        private long expiredAt;
+    }
+
+    private static class PreAuthSessionValueCacheDTO implements CacheDTO {
+        private String value;
+        private long expiredAt;
     }
 }

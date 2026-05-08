@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.assist.persistence.dao.AsyncTaskDaoImpl;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
-import com.github.thundax.modules.auth.persistence.dao.AuthSessionRuntimeDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PreAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PrincipalAccessTokenDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PrincipalAuthSessionDaoImpl;
@@ -35,7 +34,6 @@ public class CacheDTOArchitectureTest {
         PrincipalAccessTokenDaoImpl.class,
         PrincipalAuthSessionDaoImpl.class,
         PrincipalRefreshTokenDaoImpl.class,
-        AuthSessionRuntimeDaoImpl.class,
         PreAuthSessionDaoImpl.class,
         AsyncTaskDaoImpl.class
     };

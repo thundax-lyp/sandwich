@@ -307,22 +307,6 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002074, 'member_auth_session_status', '活跃', 'ACTIVE', 0, '会员认证会话活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002075, 'member_auth_session_status', '已登出', 'LOGGED_OUT', 1, '会员认证会话登出状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002076, 'member_auth_session_status', '已失效', 'INVALIDATED', 2, '会员认证会话失效状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002077, 'member_auth_session_status', '已过期', 'EXPIRED', 3, '会员认证会话过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
         1000000000000002078, 'principal_token_status', '活跃', 'ACTIVE', 0, '统一主体 token 活跃状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
@@ -408,22 +392,6 @@ INSERT INTO `sys_dict` (
     ),
     (
         1000000000000002104, 'principal_credential_status', '禁用', 'DISABLED', 3, '统一认证主体凭据禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002028, 'auth_session_status', '活跃', 'ACTIVE', 0, '认证会话活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002029, 'auth_session_status', '已登出', 'LOGGED_OUT', 1, '认证会话登出状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002030, 'auth_session_status', '已失效', 'INVALIDATED', 2, '认证会话失效状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002031, 'auth_session_status', '已过期', 'EXPIRED', 3, '认证会话过期状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (

@@ -22,18 +22,17 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             "com.github.thundax.common.persistence.typehandler.DefaultEncryptTypeHandler";
 
     private static final String[] NON_AUTO_ID_DATA_OBJECTS = {
+        "com.github.thundax.modules.auth.persistence.dataobject.PrincipalLoginEventDO",
         "com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO",
         "com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO",
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
     };
     private static final String[] SNOWFLAKE_ID_DATA_OBJECTS = {
-        "com.github.thundax.modules.auth.persistence.dataobject.AuthSessionDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO",
-        "com.github.thundax.modules.auth.persistence.dataobject.MemberAuthSessionDO",
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",

@@ -50,45 +50,6 @@ CREATE TABLE IF NOT EXISTS `auth_principal_login_event` (
     KEY `idx_auth_principal_login_event_type_time` (`event_type`, `occurred_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一认证登录事件表';
 
-CREATE TABLE IF NOT EXISTS `auth_session` (
-    `id` bigint NOT NULL,
-    `token` varchar(255) NOT NULL,
-    `principal_type` varchar(16) NOT NULL,
-    `principal_id` bigint NOT NULL,
-    `identity_id` bigint NOT NULL,
-    `identity_type` varchar(16) NOT NULL,
-    `login_type` varchar(16) NOT NULL,
-    `status` varchar(16) NOT NULL,
-    `issued_at` datetime(3) NOT NULL,
-    `last_access_time` datetime(3) NOT NULL,
-    `expire_at` datetime(3) NOT NULL,
-    `logout_at` datetime(3) DEFAULT NULL,
-    `invalidate_reason` varchar(128) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_auth_session_token` (`token`),
-    KEY `idx_auth_session_principal_status` (`principal_type`, `principal_id`, `status`),
-    KEY `idx_auth_session_identity` (`identity_id`, `identity_type`),
-    KEY `idx_auth_session_expire` (`status`, `expire_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台认证会话审计表';
-
-CREATE TABLE IF NOT EXISTS `member_auth_session` (
-    `id` bigint NOT NULL,
-    `principal_type` varchar(16) NOT NULL,
-    `principal_id` bigint NOT NULL,
-    `identity_id` bigint DEFAULT NULL,
-    `identity_type` varchar(16) DEFAULT NULL,
-    `login_type` varchar(32) DEFAULT NULL,
-    `status` varchar(16) NOT NULL,
-    `issued_at` datetime(3) NOT NULL,
-    `last_access_time` datetime(3) DEFAULT NULL,
-    `expire_at` datetime(3) DEFAULT NULL,
-    `logout_at` datetime(3) DEFAULT NULL,
-    `invalidate_reason` varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `idx_member_auth_session_principal` (`principal_type`, `principal_id`, `status`),
-    KEY `idx_member_auth_session_status` (`status`, `last_access_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='前台会员认证会话审计表';
-
 CREATE TABLE IF NOT EXISTS `auth_oauth_client` (
     `id` bigint NOT NULL,
     `client_id` varchar(64) NOT NULL,

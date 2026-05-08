@@ -11,33 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `legacy-auth-session-delete`：删除旧 AuthSession 和 MemberAuthSession 链路
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/AuthSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/MemberAuthSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/AuthSessionStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/MemberAuthSessionStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/AuthSessionDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/AuthSessionRuntimeDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/MemberAuthSessionDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/dao/MemberAuthSessionRuntimeDao.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/AuthSessionPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/MemberAuthSessionPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/AuthSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/MemberAuthSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/AuthSessionMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/mapper/MemberAuthSessionMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/MemberAuthSessionDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/MemberAuthSessionRuntimeDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/dao/AuthSessionRuntimeDaoImplTest.java`
-    - `db/schema/auth.sql`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-  - 处理动作：删除旧 admin/member 认证会话实体、DAO、DO、Mapper、实现、测试和表结构。
-  - 验收点：代码、schema、数据库设计文档中不再存在旧认证会话链路。
-  - 重要度：10/10
-
 - [ ] `auth-runbook-verification`：执行认证会话改造总验证
   - 范围文件：
     - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java`

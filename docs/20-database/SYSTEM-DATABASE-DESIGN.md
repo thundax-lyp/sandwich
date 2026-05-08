@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 后台系统管理域的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `SYSTEM-REQUIREMENTS.md` 的后台系统模型为基础，固定 `sys` 拥有的用户、角色、菜单、部门、字典和日志的目标持久化设计。登录标识、认证凭据、认证会话、访问 token、OAuth2 client、authorization、access token 和 refresh token 的数据库设计见 `AUTH-DATABASE-DESIGN.md`。
+本文档以 `SYSTEM-REQUIREMENTS.md` 的后台系统模型为基础，固定 `sys` 拥有的用户、角色、菜单、部门、字典和日志的目标持久化设计。登录标识、认证凭据、登录事件、OAuth2 client 和 authorization 的数据库设计见 `AUTH-DATABASE-DESIGN.md`。
 
 建表 SQL 见 [`../../db/schema/system.sql`](../../db/schema/system.sql)，初始化脚本见 [`../../db/data/system.sql`](../../db/data/system.sql)。
 
@@ -27,7 +27,6 @@
 
 当前不覆盖范围：
 
-- `auth_session`
 - `auth_oauth_client`
 - `auth_oauth_authorization`
 - `auth_principal_identity`

@@ -2,9 +2,9 @@
 
 ## 1. Purpose
 
-本文档定义 Sandwich 后台认证、前台会员认证运行态、用户登录标识、用户认证凭据、OAuth2 授权和 OAuth token 模型的数据库表、字段映射、关系约束和持久化规则。
+本文档定义 Sandwich 后台认证、前台会员认证、用户登录标识、用户认证凭据、登录事件和 OAuth2 授权模型的数据库表、字段映射、关系约束和持久化规则。
 
-本文档以 `AUTH-REQUIREMENTS.md` 的后台认证和前台会员认证模型为基础，固定 `auth` 拥有的 `PrincipalIdentity`、`PrincipalCredential`、认证会话、token 和 OAuth2 模型的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
+本文档以 `AUTH-REQUIREMENTS.md` 的后台认证和前台会员认证模型为基础，固定 `auth` 拥有的 `PrincipalIdentity`、`PrincipalCredential`、`PrincipalLoginEvent` 和 OAuth2 模型的目标持久化设计。建表 SQL 见 [`../../db/schema/auth.sql`](../../db/schema/auth.sql)，初始化脚本见 [`../../db/data/auth.sql`](../../db/data/auth.sql)。
 
 后台系统管理域的完整 sys 表设计见 [`SYSTEM-DATABASE-DESIGN.md`](./SYSTEM-DATABASE-DESIGN.md)。登录标识和认证凭据固定由本文档的 Principal 表承载。
 
@@ -14,33 +14,27 @@
 
 - `auth_principal_identity`
 - `auth_principal_credential`
-- `auth_session`
+- `auth_principal_login_event`
 - `auth_oauth_client`
 - `auth_oauth_authorization`
-- `member_auth_session`
 - `PrincipalIdentityDO`
 - `PrincipalCredentialDO`
-- `AuthSessionDO`
-- `MemberAuthSessionDO`
+- `PrincipalLoginEventDO`
 - `OAuthClientDO`
 - `OAuthAuthorizationDO`
 - `PrincipalIdentityMapper`
 - `PrincipalCredentialMapper`
-- `AuthSessionMapper`
-- `MemberAuthSessionMapper`
+- `PrincipalLoginEventMapper`
 - `OAuthClientMapper`
 - `OAuthAuthorizationMapper`
 - `PrincipalIdentityDaoImpl`
 - `PrincipalCredentialDaoImpl`
-- `AuthSessionDaoImpl`
-- `MemberAuthSessionDaoImpl`
-- `MemberAuthSessionRuntimeDaoImpl`
+- `PrincipalLoginEventDaoImpl`
 - `OAuthClientDaoImpl`
 - `OAuthAuthorizationDaoImpl`
 - `PrincipalIdentityPersistenceAssembler`
 - `PrincipalCredentialPersistenceAssembler`
-- `AuthSessionPersistenceAssembler`
-- `MemberAuthSessionPersistenceAssembler`
+- `PrincipalLoginEventPersistenceAssembler`
 - `OAuthClientPersistenceAssembler`
 - `OAuthAuthorizationPersistenceAssembler`
 
@@ -48,8 +42,8 @@
 
 - `PreAuthSession` 只使用 Redis / JetCache 运行态，不建立数据库表。
 - `PrincipalAccessToken` 和 `PrincipalRefreshToken` 只使用 Redis / JetCache 运行态，不建立数据库表。
+- `PrincipalAuthSession` 只使用 Redis / JetCache 运行态，不建立数据库表。
 - MFA 凭据表。
-- 认证审计日志表。
 - 生产数据变更脚本。
 
 ## 3. Database Rules
@@ -76,10 +70,9 @@
 
 - 统一认证主体登录标识表固定为 `auth_principal_identity`。
 - 统一认证主体凭据表固定为 `auth_principal_credential`。
-- 认证会话表固定为 `auth_session`。
+- 统一认证登录事件表固定为 `auth_principal_login_event`。
 - OAuth 客户端表固定为 `auth_oauth_client`。
 - OAuth 授权表固定为 `auth_oauth_authorization`。
-- 前台会员认证会话表固定为 `member_auth_session`。
 - 主键字段固定为 `id`。
 - 统一认证主体类型字段固定为 `principal_type`。
 - 统一认证主体 ID 字段固定为 `principal_id`。
@@ -88,8 +81,6 @@
 - 登录标识值字段固定为 `identity_value`。
 - 凭据类型字段固定为 `credential_type`。
 - 凭据值字段固定为 `credential_value`。
-- 会话标识字段固定为 `session_id`。
-- 访问 token 字段固定为 `token`。
 - 状态字段固定为 `status`。
 - 配置类表使用 `create_date`、`create_by`、`update_date`、`update_by`；会话事实和授权码事实不使用通用审计字段。
 
@@ -100,8 +91,6 @@
 | `auth_principal_identity` | `PrincipalIdentityDO` | `PrincipalIdentityMapper` | `PrincipalIdentity` |
 | `auth_principal_credential` | `PrincipalCredentialDO` | `PrincipalCredentialMapper` | `PrincipalCredential` |
 | `auth_principal_login_event` | `PrincipalLoginEventDO` | `PrincipalLoginEventMapper` | `PrincipalLoginEvent` |
-| `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
-| `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
 | `auth_oauth_client` | `OAuthClientDO` | `OAuthClientMapper` | `OAuthClient` |
 | `auth_oauth_authorization` | `OAuthAuthorizationDO` | `OAuthAuthorizationMapper` | `OAuthAuthorization` |
 
@@ -210,51 +199,7 @@
 - 普通索引：`idx_auth_principal_login_event_client_time(client_id, occurred_at)`
 - 普通索引：`idx_auth_principal_login_event_type_time(event_type, occurred_at)`
 
-### 6.4 auth_session
-
-`auth_session` 保存后台认证会话事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
-
-| Column | DO Field | Entity Field | Required | Description |
-| --- | --- | --- | --- | --- |
-| `id` | `id` | `id` | 是 | 认证会话主键 |
-| `session_id` | `sessionId` | `sessionId` | 是 | 认证会话标识 |
-| `token` | `token` | `token` | 是 | 访问 token |
-| `user_id` | `userId` | `userId` | 是 | 后台用户 ID |
-| `identity_id` | `identityId` | `identityId` | 是 | 登录标识 ID |
-| `identity_type` | `identityType` | `identityType` | 是 | 登录标识类型 |
-| `login_type` | `loginType` | `loginType` | 是 | 登录方式 |
-| `status` | `status` | `status` | 是 | 会话状态 |
-| `issued_at` | `issuedAt` | `issuedAt` | 是 | 签发时间 |
-| `last_access_time` | `lastAccessTime` | `lastAccessTime` | 是 | 最近访问时间 |
-| `expire_at` | `expireAt` | `expireAt` | 是 | 过期时间 |
-| `logout_at` | `logoutAt` | `logoutAt` | 否 | 登出时间 |
-| `invalidate_reason` | `invalidateReason` | `invalidateReason` | 否 | 失效原因 |
-字段规则：
-
-- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
-- `session_id` 由 Service 生成，作为认证会话业务标识。
-- `token` 来源是接口传输的明文 token；token 运行态由 `PrincipalAccessToken.tokenHash` 表达。
-- `user_id` 来源是 `sys_user.id`。
-- `identity_id` 来源是 `auth_principal_identity.id`。
-- `identity_type` 固定写入登录时使用的标识类型。
-- `login_type` 固定写入 `PASSWORD`。
-- `status` 固定写入 `ACTIVE`、`LOGGED_OUT`、`INVALIDATED` 或 `EXPIRED`。
-- `issued_at` 和 `last_access_time` 创建时固定相同。
-- `last_access_time` 不随每次有效请求直接更新，登出、失效或过期收口时从 Redis 运行态回写最终最近访问时间。
-- `expire_at` 来源是 token 或认证会话有效期策略。
-- `logout_at` 只在主动登出时写入。
-- `invalidate_reason` 只在安全策略失效时写入。
-
-索引：
-
-- 主键：`pk_auth_session(id)`
-- 唯一索引：`uk_auth_session_session_id(session_id)`
-- 唯一索引：`uk_auth_session_token(token)`
-- 普通索引：`idx_auth_session_user_status(user_id, status)`
-- 普通索引：`idx_auth_session_identity(identity_id, identity_type)`
-- 普通索引：`idx_auth_session_expire(status, expire_at)`
-
-### 6.5 auth_oauth_client
+### 6.4 auth_oauth_client
 
 `auth_oauth_client` 保存 OAuth2 客户端配置。
 
@@ -289,7 +234,7 @@
 - 主键：`pk_auth_oauth_client(id)`
 - 唯一索引：`uk_auth_oauth_client_client_id(client_id)`
 
-### 6.6 auth_oauth_authorization
+### 6.5 auth_oauth_authorization
 
 `auth_oauth_authorization` 保存 OAuth2 授权请求和授权码事实。
 
@@ -327,35 +272,32 @@
 - `auth_principal_identity.principal_type + principal_id` 表达统一认证主体业务坐标。
 - `auth_principal_credential.principal_type + principal_id` 表达统一认证主体业务坐标。
 - `auth_principal_credential.identity_id` 引用 `auth_principal_identity.id`。
-- `auth_session.user_id` 引用 `sys_user.id`。
-- `auth_session.identity_id` 引用 `auth_principal_identity.id`。
-- `auth_session.token` 引用访问 token 存储中的 token 值。
 - `auth_oauth_authorization.client_id` 引用 `auth_oauth_client.client_id`。
 - `auth_oauth_authorization.principal_type + principal_id` 表达统一认证主体业务坐标。
 - 当前项目不强制数据库外键。
 - 用户创建时，Service 必须先保存 `sys_user`，再保存 `auth_principal_identity` 和 `auth_principal_credential`。
 - 修改登录名时，Service 必须更新 `USER_ACCOUNT` 类型 `auth_principal_identity`。
 - 重置密码时，Service 必须更新 `USER_PASSWORD` 类型 `auth_principal_credential`。
-- 删除 token 或登出时，Service 必须更新对应 `auth_session` 状态。
+- 登录成功、登录失败、登出、刷新 token 和 OAuth 授权时，Service 必须写入 `auth_principal_login_event`。
 
 ## 8. Persistence Rules
 
 - `PrincipalIdentityMapper` 固定继承 `BaseMapper<PrincipalIdentityDO>`。
 - `PrincipalCredentialMapper` 固定继承 `BaseMapper<PrincipalCredentialDO>`。
-- `AuthSessionMapper` 固定继承 `BaseMapper<AuthSessionDO>`。
+- `PrincipalLoginEventMapper` 固定继承 `BaseMapper<PrincipalLoginEventDO>`。
 - `OAuthClientMapper` 固定继承 `BaseMapper<OAuthClientDO>`。
 - `OAuthAuthorizationMapper` 固定继承 `BaseMapper<OAuthAuthorizationDO>`。
 - Mapper interface 不新增注解 SQL、Mapper XML 或 SQL Provider。
 - `PrincipalIdentityDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `PrincipalCredentialDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
-- `AuthSessionDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
+- `PrincipalLoginEventDaoImpl` 固定通过 MyBatis-Plus 插入登录事件事实。
 - `OAuthClientDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `OAuthAuthorizationDaoImpl` 固定通过 MyBatis-Plus wrapper 构造查询和更新。
 - `PrincipalAccessTokenDaoImpl` 固定通过 Redis / JetCache 保存 access token 运行态和 token hash 索引。
 - `PrincipalRefreshTokenDaoImpl` 固定通过 Redis / JetCache 保存 refresh token 运行态和 token hash 索引。
 - `PrincipalIdentityPersistenceAssembler` 只负责 `PrincipalIdentity <-> PrincipalIdentityDO` 转换。
 - `PrincipalCredentialPersistenceAssembler` 只负责 `PrincipalCredential <-> PrincipalCredentialDO` 转换。
-- `AuthSessionPersistenceAssembler` 只负责 `AuthSession <-> AuthSessionDO` 转换。
+- `PrincipalLoginEventPersistenceAssembler` 只负责 `PrincipalLoginEvent <-> PrincipalLoginEventDO` 转换。
 - `OAuthClientPersistenceAssembler` 只负责 `OAuthClient <-> OAuthClientDO` 转换。
 - `OAuthAuthorizationPersistenceAssembler` 只负责 `OAuthAuthorization <-> OAuthAuthorizationDO` 转换。
 - `PersistenceAssembler` 不调用 Service、DAO 或 Mapper。
@@ -380,18 +322,6 @@
 - 按 `principalKey + credentialType` 查询。
 - 按 `principalKey + status` 查询。
 - 写回失败次数、锁定状态和最近验证时间。
-
-`AuthSessionDao` 固定支持以下查询：
-
-- 按 `id` 查询。
-- 按 `sessionId` 查询。
-- 按 `token` 查询。
-- 按 `userId + status` 查询。
-- 写回最近访问时间。
-- 写回登出状态。
-- 写回失效状态。
-- 写回过期状态。
-- 按 `userId + status` 批量失效。
 
 `OAuthClientDao` 固定支持以下查询：
 
@@ -421,7 +351,6 @@
 
 分页规则：
 
-- 后台会话列表分页查询按 `issued_at` 降序。
 - 后台身份和凭据管理分页查询按 `create_date` 降序。
 - 分页参数有效性由 Service 校验。
 - DAO implementation 只按已校验参数执行持久化分页。

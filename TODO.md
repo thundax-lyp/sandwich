@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-principal-sql-cleanup`：清理仓库 SQL 中的旧身份凭据表定义和初始化
-  - 范围文件：
-    - `db/schema/system.sql`
-    - `db/schema/member.sql`
-    - `db/data/system.sql`
-    - `db/data/member.sql`
-  - 处理动作：删除仓库 SQL 脚本中的 `sys_user_identity` / `sys_user_credential` / `member_identity` / `member_credential` 定义和初始化内容
-  - 验收点：仓库 SQL 脚本不再创建或初始化旧 Identity / Credential 表
-  - 重要度：8/10
-
 - [ ] `auth-principal-document-sync`：同步 Auth Principal 文档口径
   - 范围文件：
     - `docs/10-requirements/AUTH-REQUIREMENTS.md`

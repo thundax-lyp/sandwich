@@ -41,36 +41,6 @@ INSERT INTO `sys_user` (
     `update_by` = VALUES(`update_by`),
     `del_flag` = VALUES(`del_flag`);
 
-INSERT INTO `sys_user_identity` (
-    `id`, `user_id`, `identity_type`, `identity_value`, `status`
-) VALUES (
-    1000000000000000201, 1000000000000000101, 'ACCOUNT', 'developer', 'ENABLED'
-) ON DUPLICATE KEY UPDATE
-    `user_id` = VALUES(`user_id`),
-    `identity_value` = VALUES(`identity_value`),
-    `status` = VALUES(`status`);
-
-INSERT INTO `sys_user_credential` (
-    `id`, `user_id`, `identity_id`, `credential_type`, `credential_value`, `status`,
-    `need_change_password`, `failed_count`, `failed_limit`,
-    `locked_until`, `expires_at`, `last_verified_at`
-) VALUES (
-    1000000000000000301, 1000000000000000101, 1000000000000000201, 'PASSWORD',
-    'ENC(fdf7,030f84263f1a4eef98be3a7689f52385a2d1bf1fe83af14ecdcc66948b39af75)', 'ACTIVE',
-    1, 0, 5,
-    NULL, NULL, NULL
-) ON DUPLICATE KEY UPDATE
-    `user_id` = VALUES(`user_id`),
-    `identity_id` = VALUES(`identity_id`),
-    `credential_value` = VALUES(`credential_value`),
-    `status` = VALUES(`status`),
-    `need_change_password` = VALUES(`need_change_password`),
-    `failed_count` = VALUES(`failed_count`),
-    `failed_limit` = VALUES(`failed_limit`),
-    `locked_until` = VALUES(`locked_until`),
-    `expires_at` = VALUES(`expires_at`),
-    `last_verified_at` = VALUES(`last_verified_at`);
-
 INSERT INTO `sys_role` (
     `id`, `name`, `admin_flag`, `enable_flag`, `priority`, `remarks`,
     `create_date`, `create_by`, `update_date`, `update_by`, `del_flag`
@@ -277,54 +247,6 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
-        1000000000000002006, 'user_identity_type', '账号', 'ACCOUNT', 0, '账号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002007, 'user_identity_type', '手机号', 'MOBILE', 1, '手机号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002008, 'user_identity_type', '邮箱', 'EMAIL', 2, '邮箱登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002009, 'user_identity_type', '企业微信', 'WECOM', 3, '企业微信登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002010, 'user_identity_type', 'GitHub', 'GITHUB', 4, 'GitHub 登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002011, 'user_identity_status', '启用', 'ENABLED', 0, '登录标识启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002012, 'user_identity_status', '禁用', 'DISABLED', 1, '登录标识禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002013, 'user_credential_type', '密码', 'PASSWORD', 0, '密码认证凭据',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002014, 'user_credential_status', '可用', 'ACTIVE', 0, '认证凭据可用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002015, 'user_credential_status', '锁定', 'LOCKED', 1, '认证凭据锁定状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002016, 'user_credential_status', '过期', 'EXPIRED', 2, '认证凭据过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002017, 'user_credential_status', '禁用', 'DISABLED', 3, '认证凭据禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
         1000000000000002018, 'role_status', '启用', 'ENABLED', 0, '角色启用状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
@@ -382,46 +304,6 @@ INSERT INTO `sys_dict` (
     ),
     (
         1000000000000002063, 'member_gender', '保密', 'PRIVATE', 2, '会员性别保密',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002064, 'member_identity_type', '账号', 'ACCOUNT', 0, '会员账号标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002065, 'member_identity_type', '手机号', 'MOBILE', 1, '会员手机号标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002066, 'member_identity_type', '邮箱', 'EMAIL', 2, '会员邮箱标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002067, 'member_identity_status', '启用', 'ENABLED', 0, '会员标识启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002068, 'member_identity_status', '禁用', 'DISABLED', 1, '会员标识禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002069, 'member_credential_type', '密码', 'PASSWORD', 0, '会员密码凭据',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002070, 'member_credential_status', '活跃', 'ACTIVE', 0, '会员凭据活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002071, 'member_credential_status', '锁定', 'LOCKED', 1, '会员凭据锁定状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002072, 'member_credential_status', '过期', 'EXPIRED', 2, '会员凭据过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
-    ),
-    (
-        1000000000000002073, 'member_credential_status', '禁用', 'DISABLED', 3, '会员凭据禁用状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (

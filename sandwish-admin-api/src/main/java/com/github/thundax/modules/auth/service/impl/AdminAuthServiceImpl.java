@@ -296,7 +296,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         OAuthAuthorization authorization = new OAuthAuthorization();
         authorization.setAuthorizationCode(UuidHelper.compact());
         authorization.setClientId(clientId);
-        authorization.setUserId(EntityIdCodec.toDomain(Long.valueOf(userId)));
+        authorization.setPrincipalKey(
+                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))));
         authorization.setRedirectUri(redirectUri);
         authorization.setScopes(toScopeSet(scopes));
         authorization.setState(state);
@@ -577,7 +578,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         PrincipalAccessToken entity = buildPrincipalAccessToken(
                 token,
                 client.getClientId(),
-                PrincipalKey.of(PrincipalType.USER, authorization.getUserId()),
+                authorization.getPrincipalKey(),
                 authorization.getScopes(),
                 issuedAt,
                 accessTokenTtlSeconds(client));

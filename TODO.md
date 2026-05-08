@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `oauth-authorization-principal-key`：OAuthAuthorization 主体字段升级为 PrincipalKey
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthAuthorization.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthAuthorizationDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthAuthorizationPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/OAuthAuthorizationDaoImpl.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/assembler/OAuthAuthorizationPersistenceAssemblerTest.java`
-    - `db/schema/auth.sql`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-  - 处理动作：将 `OAuthAuthorization.userId` 改为 `PrincipalKey`，数据库字段改为 `principal_type` 和 `principal_id`。
-  - 验收点：OAuth authorization code 持久化不再出现 `user_id`，assembler 测试覆盖 `PrincipalKey` 映射。
-  - 重要度：9/10
-
 - [ ] `oauth-auth-session`：OAuth2 令牌交换接入 PrincipalAuthSession
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`

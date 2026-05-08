@@ -23,7 +23,9 @@ public class OAuthAuthorizationDO {
 
     private String clientId;
 
-    private Long userId;
+    private String principalType;
+
+    private Long principalId;
 
     private String redirectUri;
 

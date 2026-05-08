@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,7 +24,7 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         entity.setId(EntityId.of(4002L));
         entity.setAuthorizationCode("code-1");
         entity.setClientId("admin-web");
-        entity.setUserId(EntityId.of(1001L));
+        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)));
         entity.setRedirectUri("http://127.0.0.1/callback");
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
         entity.setState("state-1");
@@ -37,7 +39,8 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         assertEquals(Long.valueOf(4002L), dataObject.getId());
         assertEquals("code-1", dataObject.getAuthorizationCode());
         assertEquals("admin-web", dataObject.getClientId());
-        assertEquals(Long.valueOf(1001L), dataObject.getUserId());
+        assertEquals("USER", dataObject.getPrincipalType());
+        assertEquals(Long.valueOf(1001L), dataObject.getPrincipalId());
         assertEquals("[\"openid\",\"profile\"]", dataObject.getScopes());
         assertEquals("state-1", dataObject.getState());
         assertEquals("challenge-1", dataObject.getCodeChallenge());
@@ -53,7 +56,8 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         dataObject.setId(4002L);
         dataObject.setAuthorizationCode("code-1");
         dataObject.setClientId("admin-web");
-        dataObject.setUserId(1001L);
+        dataObject.setPrincipalType("USER");
+        dataObject.setPrincipalId(1001L);
         dataObject.setRedirectUri("http://127.0.0.1/callback");
         dataObject.setScopes("[\"openid\",\"profile\"]");
         dataObject.setExpireAt(new Date(2000L));
@@ -64,6 +68,7 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         assertEquals(Long.valueOf(4002L), entity.getId().value());
         assertEquals("code-1", entity.getAuthorizationCode());
         assertEquals("admin-web", entity.getClientId());
+        assertEquals(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)), entity.getPrincipalKey());
         assertTrue(entity.getScopes().contains("openid"));
         assertTrue(entity.canConsume(new Date(1000L)));
         assertFalse(entity.canConsume(new Date(3000L)));

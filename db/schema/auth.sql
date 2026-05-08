@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_authorization` (
     `id` bigint NOT NULL,
     `authorization_code` varchar(128) NOT NULL,
     `client_id` varchar(64) NOT NULL,
-    `user_id` bigint NOT NULL,
+    `principal_type` varchar(32) NOT NULL,
+    `principal_id` bigint NOT NULL,
     `redirect_uri` varchar(512) NOT NULL,
     `scopes` text NOT NULL,
     `state` varchar(255) DEFAULT NULL,
@@ -108,5 +109,5 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_authorization` (
     `used` tinyint(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_auth_oauth_authorization_code` (`authorization_code`),
-    KEY `idx_auth_oauth_authorization_client_user` (`client_id`, `user_id`, `expire_at`)
+    KEY `idx_auth_oauth_authorization_client_principal` (`client_id`, `principal_type`, `principal_id`, `expire_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2授权码表';

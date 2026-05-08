@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class OAuthAuthorization {
     private EntityId id;
     private String authorizationCode;
     private String clientId;
-    private EntityId userId;
+    private PrincipalKey principalKey;
     private String redirectUri;
     private Set<String> scopes = new LinkedHashSet<>();
     private String state;

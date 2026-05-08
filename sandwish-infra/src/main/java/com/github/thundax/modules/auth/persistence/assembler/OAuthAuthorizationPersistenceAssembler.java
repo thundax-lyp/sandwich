@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -26,7 +28,8 @@ public final class OAuthAuthorizationPersistenceAssembler {
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setAuthorizationCode(entity.getAuthorizationCode());
         dataObject.setClientId(entity.getClientId());
-        dataObject.setUserId(EntityIdCodec.toValue(entity.getUserId()));
+        dataObject.setPrincipalType(entity.getPrincipalKey().getPrincipalType().value());
+        dataObject.setPrincipalId(EntityIdCodec.toValue(entity.getPrincipalKey().getPrincipalId()));
         dataObject.setRedirectUri(entity.getRedirectUri());
         dataObject.setScopes(writeStringSet(entity.getScopes()));
         dataObject.setState(entity.getState());
@@ -46,7 +49,9 @@ public final class OAuthAuthorizationPersistenceAssembler {
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setAuthorizationCode(dataObject.getAuthorizationCode());
         entity.setClientId(dataObject.getClientId());
-        entity.setUserId(EntityIdCodec.toDomain(dataObject.getUserId()));
+        entity.setPrincipalKey(PrincipalKey.of(
+                PrincipalType.from(dataObject.getPrincipalType()),
+                EntityIdCodec.toDomain(dataObject.getPrincipalId())));
         entity.setRedirectUri(dataObject.getRedirectUri());
         entity.setScopes(readStringSet(dataObject.getScopes()));
         entity.setState(dataObject.getState());

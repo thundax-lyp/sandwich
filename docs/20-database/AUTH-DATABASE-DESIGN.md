@@ -263,7 +263,8 @@
 | `id` | `id` | `id` | 是 | 授权主键 |
 | `authorization_code` | `authorizationCode` | `authorizationCode` | 是 | 授权码 |
 | `client_id` | `clientId` | `clientId` | 是 | 客户端标识 |
-| `user_id` | `userId` | `userId` | 是 | 用户标识 |
+| `principal_type` | `principalType` | `principalKey.principalType` | 是 | 主体类型 |
+| `principal_id` | `principalId` | `principalKey.principalId` | 是 | 主体 ID |
 | `redirect_uri` | `redirectUri` | `redirectUri` | 是 | 回调地址 |
 | `scopes` | `scopes` | `scopes` | 是 | 授权范围集合 |
 | `state` | `state` | `state` | 否 | OAuth2 state |
@@ -278,13 +279,13 @@
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `authorization_code` 由 Service 生成，作为 OAuth 授权码业务标识。
 - `client_id` 来源是 `auth_oauth_client.client_id`。
-- `user_id` 来源是 `sys_user.id`。
+- `principal_type + principal_id` 表达统一认证主体业务坐标。
 
 索引：
 
 - 主键：`pk_auth_oauth_authorization(id)`
 - 唯一索引：`uk_auth_oauth_authorization_code(authorization_code)`
-- 普通索引：`idx_auth_oauth_authorization_client_user(client_id, user_id, expire_at)`
+- 普通索引：`idx_auth_oauth_authorization_client_principal(client_id, principal_type, principal_id, expire_at)`
 
 ## 7. Relationship Rules
 
@@ -295,7 +296,7 @@
 - `auth_session.identity_id` 引用 `auth_principal_identity.id`。
 - `auth_session.token` 引用访问 token 存储中的 token 值。
 - `auth_oauth_authorization.client_id` 引用 `auth_oauth_client.client_id`。
-- `auth_oauth_authorization.user_id` 引用 `sys_user.id`。
+- `auth_oauth_authorization.principal_type + principal_id` 表达统一认证主体业务坐标。
 - 当前项目不强制数据库外键。
 - 用户创建时，Service 必须先保存 `sys_user`，再保存 `auth_principal_identity` 和 `auth_principal_credential`。
 - 修改登录名时，Service 必须更新 `USER_ACCOUNT` 类型 `auth_principal_identity`。

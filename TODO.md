@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-principal-admin-compat-shell-removal`：拆除后台旧身份凭据兼容壳
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserIdentityService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserCredentialService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserIdentityServiceImplTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceImplTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserCredentialServiceTest.java`
-  - 处理动作：删除后台旧 Identity / Credential Service 兼容层及对应测试
-  - 验收点：生产代码和测试代码中不存在 `UserIdentityService` / `UserCredentialService` 引用
-  - 重要度：8/10
-
 - [ ] `auth-principal-member-compat-shell-removal`：拆除会员旧身份凭据兼容壳
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberIdentityService.java`
@@ -34,30 +21,6 @@
     - `sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberCredentialServiceImplTest.java`
   - 处理动作：删除会员旧 Identity / Credential Service 兼容层及对应测试
   - 验收点：生产代码和测试代码中不存在 `MemberIdentityService` / `MemberCredentialService` 引用
-  - 重要度：8/10
-
-- [ ] `auth-principal-admin-model-removal`：删除后台旧身份凭据模型和持久化实现
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserIdentityDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserCredentialDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/UserIdentity.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/UserCredential.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserIdentityType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserIdentityStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserCredentialType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserCredentialStatus.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserIdentityPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserCredentialPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/UserIdentityDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/UserCredentialDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/UserIdentityDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/UserCredentialDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/UserIdentityMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/UserCredentialMapper.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/UserIdentityPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/UserCredentialPersistenceAssemblerTest.java`
-  - 处理动作：删除后台旧 Identity / Credential Entity、Enum、DAO、DO、Mapper、assembler 和测试
-  - 验收点：后台旧身份凭据模型在 biz 和 infra 中不存在
   - 重要度：8/10
 
 - [ ] `auth-principal-member-model-removal`：删除会员旧身份凭据模型和持久化实现

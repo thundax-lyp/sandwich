@@ -41,12 +41,14 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
+import com.github.thundax.modules.auth.service.impl.PreAuthSessionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
@@ -104,6 +106,8 @@ public class AuthPermissionLifecycleTest {
 
         AuthProperties authProperties = new AuthProperties();
         authProperties.setLoginExpiredSeconds(60);
+        PreAuthSessionService preAuthSessionService =
+                new PreAuthSessionServiceImpl(authProperties, loginFormDao, accessTokenDao);
 
         TestUserService userService = new TestUserService();
         TestPrincipalIdentityService principalIdentityService = new TestPrincipalIdentityService();
@@ -121,7 +125,7 @@ public class AuthPermissionLifecycleTest {
         authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),
-                loginFormDao,
+                preAuthSessionService,
                 accessTokenDao,
                 authSessionDao,
                 authSessionRuntimeDao,

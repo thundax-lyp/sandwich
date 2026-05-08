@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `pre-auth-session-biz-baseline`：下沉后台登录表单业务 Service
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PreAuthSessionService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImpl.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImplTest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java`
-  - 处理动作：将后台登录表单创建、刷新、验证码、短信验证码和私钥读取逻辑搬入 biz
-  - 验收点：`AdminAuthServiceImpl` 不直接依赖 `LoginFormDao`，相关模块测试通过
-  - 重要度：8/10
-
 - [ ] `member-pre-auth-session-biz-baseline`：下沉会员登录表单业务 Service
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PreAuthSessionService.java`

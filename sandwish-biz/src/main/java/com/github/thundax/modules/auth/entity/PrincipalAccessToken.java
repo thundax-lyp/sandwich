@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -20,7 +21,7 @@ public class PrincipalAccessToken {
     private PrincipalAccessTokenId id;
     private PrincipalAccessTokenCode tokenCode;
     private String clientId;
-    private String sessionId;
+    private PrincipalAuthSessionId sessionId;
     private PrincipalKey principalKey;
     private Set<String> scopes = new LinkedHashSet<>();
     private Date issuedAt;

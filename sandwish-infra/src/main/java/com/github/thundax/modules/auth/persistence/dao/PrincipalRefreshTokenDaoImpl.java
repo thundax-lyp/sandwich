@@ -9,6 +9,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
+import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
 import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
@@ -213,7 +214,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         refreshToken.setTokenCode(PrincipalRefreshTokenCode.ofNullable(cacheDTO.tokenCode));
         refreshToken.setAccessTokenId(PrincipalAccessTokenIdCodec.toDomain(cacheDTO.accessTokenId));
         refreshToken.setClientId(cacheDTO.clientId);
-        refreshToken.setSessionId(cacheDTO.sessionId);
+        refreshToken.setSessionId(PrincipalAuthSessionIdCodec.toDomain(cacheDTO.sessionId));
         refreshToken.setPrincipalKey(PrincipalKey.of(
                 PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
         refreshToken.setIssuedAt(cacheDTO.issuedAt);
@@ -228,7 +229,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         cacheDTO.tokenCode = refreshToken.getTokenCode().value();
         cacheDTO.accessTokenId = PrincipalAccessTokenIdCodec.toValue(refreshToken.getAccessTokenId());
         cacheDTO.clientId = refreshToken.getClientId();
-        cacheDTO.sessionId = refreshToken.getSessionId();
+        cacheDTO.sessionId = PrincipalAuthSessionIdCodec.toValue(refreshToken.getSessionId());
         cacheDTO.principalType =
                 refreshToken.getPrincipalKey().getPrincipalType().value();
         cacheDTO.principalId =

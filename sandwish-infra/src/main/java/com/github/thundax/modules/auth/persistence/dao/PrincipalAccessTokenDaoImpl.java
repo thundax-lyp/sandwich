@@ -9,6 +9,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
+import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
@@ -231,7 +232,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
         accessToken.setId(PrincipalAccessTokenIdCodec.toDomain(cacheDTO.id));
         accessToken.setTokenCode(PrincipalAccessTokenCode.ofNullable(cacheDTO.tokenCode));
         accessToken.setClientId(cacheDTO.clientId);
-        accessToken.setSessionId(cacheDTO.sessionId);
+        accessToken.setSessionId(PrincipalAuthSessionIdCodec.toDomain(cacheDTO.sessionId));
         accessToken.setPrincipalKey(PrincipalKey.of(
                 PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
         accessToken.setScopes(new LinkedHashSet<>(cacheDTO.scopes));
@@ -248,7 +249,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
                 ? null
                 : accessToken.getTokenCode().value();
         cacheDTO.clientId = accessToken.getClientId();
-        cacheDTO.sessionId = accessToken.getSessionId();
+        cacheDTO.sessionId = PrincipalAuthSessionIdCodec.toValue(accessToken.getSessionId());
         cacheDTO.principalType =
                 accessToken.getPrincipalKey().getPrincipalType().value();
         cacheDTO.principalId =

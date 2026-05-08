@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenId;
@@ -20,7 +21,7 @@ public class PrincipalRefreshToken {
     private PrincipalRefreshTokenCode tokenCode;
     private PrincipalAccessTokenId accessTokenId;
     private String clientId;
-    private String sessionId;
+    private PrincipalAuthSessionId sessionId;
     private PrincipalKey principalKey;
     private Date issuedAt;
     private Date expireAt;

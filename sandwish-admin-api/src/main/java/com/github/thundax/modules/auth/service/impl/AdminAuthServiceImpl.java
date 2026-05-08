@@ -27,6 +27,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
 import com.github.thundax.modules.auth.exception.BannedAccountException;
@@ -127,7 +128,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 properties.getLoginExpiredSeconds());
         AuthSession authSession = createAuthSession(token, userId, loginName, now);
         if (authSession != null) {
-            accessToken.setSessionId(EntityIdCodec.toStringValue(authSession.getId()));
+            accessToken.setSessionId(PrincipalAuthSessionId.of(EntityIdCodec.toStringValue(authSession.getId())));
         }
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
         permissionService.createSession(token, userId);

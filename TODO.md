@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-token-session-id`：将 token 的 sessionId 升级为 PrincipalAuthSessionId
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalAccessToken.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/PrincipalRefreshToken.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PrincipalAccessTokenDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dao/PrincipalRefreshTokenDaoImpl.java`
-  - 处理动作：把 `PrincipalAccessToken.sessionId` 和 `PrincipalRefreshToken.sessionId` 从 `String` 改为 `PrincipalAuthSessionId`。
-  - 验收点：业务层不再出现 token session id 裸字符串，Redis DTO 仅在 DAO 内部保存字符串。
-  - 重要度：10/10
-
 - [ ] `admin-auth-session`：后台认证接入 PrincipalAuthSession
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`

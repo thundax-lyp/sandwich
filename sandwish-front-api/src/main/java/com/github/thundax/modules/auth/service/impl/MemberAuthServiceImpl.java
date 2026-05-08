@@ -18,6 +18,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
@@ -153,7 +154,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
         accessToken.setTokenCode(PrincipalAccessTokenCode.of(UuidHelper.compact()));
         accessToken.setClientId(MEMBER_CLIENT_ID);
-        accessToken.setSessionId(authSessionId);
+        accessToken.setSessionId(PrincipalAuthSessionId.of(authSessionId));
         accessToken.setPrincipalKey(principalKey);
         accessToken.setIssuedAt(now);
         accessToken.setExpireAt(expireAt);
@@ -165,7 +166,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         refreshToken.setTokenCode(PrincipalRefreshTokenCode.of(UuidHelper.compact()));
         refreshToken.setAccessTokenId(accessToken.getId());
         refreshToken.setClientId(MEMBER_CLIENT_ID);
-        refreshToken.setSessionId(authSessionId);
+        refreshToken.setSessionId(PrincipalAuthSessionId.of(authSessionId));
         refreshToken.setPrincipalKey(principalKey);
         refreshToken.setIssuedAt(now);
         refreshToken.setExpireAt(new Date(now.getTime() + authProperties.getLoginExpiredSeconds() * 2L * 1000L));
@@ -198,7 +199,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return identity;
     }
 
-    private EntityId authSessionId(String sessionId) {
-        return EntityIdCodec.toDomain(Long.valueOf(sessionId));
+    private EntityId authSessionId(PrincipalAuthSessionId sessionId) {
+        return EntityIdCodec.toDomain(Long.valueOf(sessionId.value()));
     }
 }

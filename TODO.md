@@ -11,23 +11,17 @@
 
 ## 待审阅任务项
 
-- [ ] `auth-runbook-verification`：执行认证会话改造总验证
-  - 范围文件：
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/security/AuthPermissionLifecycleTest.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/auth/controller/AuthControllerContractTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/dao/PrincipalAuthSessionDaoImplTest.java`
-    - `TODO.md`
-  - 处理动作：执行 RUNBOOK 固定验证命令和残留扫描，收窄或删除已完成 TODO。
-  - 验收点：compile/test/diff check 通过，残留扫描只剩有意保留项，`TODO.md` 不保留完成项。
-  - 重要度：10/10
-
 - [ ] `auth-runbook-cleanup`：清理 PrincipalAuthSession RUNBOOK 现场
   - 范围文件：
     - `docs/30-designs/RUNBOOK-PRINCIPAL-AUTH-SESSION-REFORM.md`
+    - `docs/10-requirements/AUTH-REQUIREMENTS.md`
+    - `docs/10-requirements/SYSTEM-REQUIREMENTS.md`
     - `docs/20-database/AUTH-DATABASE-DESIGN.md`
+    - `docs/30-designs/AUDIT-SERVICE-REFORM.md`
+    - `docs/30-designs/DO-ANNOTATION-BASELINE.md`
     - `TODO.md`
-  - 处理动作：将稳定口径收敛到数据库设计文档，删除或收窄一次性 RUNBOOK，并清理对应 TODO。
-  - 验收点：RUNBOOK 不作为长期遗留文档存在，稳定结构进入正式文档，工作区没有无关残留。
+  - 处理动作：删除或收窄一次性 RUNBOOK，清理需求和设计文档里的旧 `AuthSession` / `MemberAuthSession` / `PermissionSession` 口径。
+  - 验收点：旧会话链路残留扫描只命中 `PreAuthSession` / `PrincipalAuthSession` 等新口径。
   - 重要度：10/10
 
 ## 待讨论项

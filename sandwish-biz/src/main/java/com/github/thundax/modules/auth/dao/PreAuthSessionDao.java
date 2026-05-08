@@ -10,19 +10,9 @@ public interface PreAuthSessionDao {
 
     PreAuthSession getById(PreAuthSessionId id);
 
-    PreAuthSessionId getIdByToken(PreAuthSessionToken token);
+    PreAuthSessionId getByToken(PreAuthSessionToken token);
 
-    PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken);
-
-    default PreAuthSession getByToken(PreAuthSessionToken token) {
-        PreAuthSessionId id = getIdByToken(token);
-        return id == null ? null : getById(id);
-    }
-
-    default PreAuthSession getByRefreshToken(PreAuthSessionToken refreshToken) {
-        PreAuthSessionId id = getIdByRefreshToken(refreshToken);
-        return id == null ? null : getById(id);
-    }
+    PreAuthSessionId getByRefreshToken(PreAuthSessionToken refreshToken);
 
     void insert(PreAuthSession session);
 
@@ -31,7 +21,7 @@ public interface PreAuthSessionDao {
     void deleteById(PreAuthSessionId id);
 
     default void deleteByToken(PreAuthSessionToken token) {
-        PreAuthSessionId id = getIdByToken(token);
+        PreAuthSessionId id = getByToken(token);
         if (id != null) {
             deleteById(id);
         }

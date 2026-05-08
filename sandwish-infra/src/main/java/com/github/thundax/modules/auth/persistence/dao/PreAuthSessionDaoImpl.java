@@ -58,7 +58,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
     }
 
     @Override
-    public PreAuthSessionId getIdByToken(PreAuthSessionToken token) {
+    public PreAuthSessionId getByToken(PreAuthSessionToken token) {
         if (token == null) {
             return null;
         }
@@ -66,7 +66,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
     }
 
     @Override
-    public PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken) {
+    public PreAuthSessionId getByRefreshToken(PreAuthSessionToken refreshToken) {
         if (refreshToken == null) {
             return null;
         }

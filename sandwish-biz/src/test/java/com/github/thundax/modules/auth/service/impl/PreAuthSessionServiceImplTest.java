@@ -112,12 +112,12 @@ public class PreAuthSessionServiceImplTest {
         }
 
         @Override
-        public PreAuthSessionId getIdByToken(PreAuthSessionToken token) {
+        public PreAuthSessionId getByToken(PreAuthSessionToken token) {
             return token == null ? null : PreAuthSessionId.ofNullable(tokenIndex.get(token.asString()));
         }
 
         @Override
-        public PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken) {
+        public PreAuthSessionId getByRefreshToken(PreAuthSessionToken refreshToken) {
             return refreshToken == null
                     ? null
                     : PreAuthSessionId.ofNullable(refreshTokenIndex.get(refreshToken.asString()));

@@ -31,12 +31,12 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
 
     @Override
     public PreAuthSessionId findIdByToken(PreAuthSessionToken token) {
-        return preAuthSessionDao.getIdByToken(token);
+        return preAuthSessionDao.getByToken(token);
     }
 
     @Override
     public PreAuthSessionId findIdByRefreshToken(PreAuthSessionToken refreshToken) {
-        return preAuthSessionDao.getIdByRefreshToken(refreshToken);
+        return preAuthSessionDao.getByRefreshToken(refreshToken);
     }
 
     @Override

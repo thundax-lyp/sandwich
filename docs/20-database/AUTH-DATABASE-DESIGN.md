@@ -14,6 +14,8 @@
 
 - `sys_user_identity`
 - `sys_user_credential`
+- `auth_principal_identity`
+- `auth_principal_credential`
 - `auth_session`
 - `auth_oauth_client`
 - `auth_oauth_authorization`
@@ -24,6 +26,8 @@
 - `member_refresh_token`
 - `UserIdentityDO`
 - `UserCredentialDO`
+- `PrincipalIdentityDO`
+- `PrincipalCredentialDO`
 - `AuthSessionDO`
 - `MemberAuthSessionDO`
 - `MemberAccessTokenDO`
@@ -34,6 +38,8 @@
 - `OAuthRefreshTokenDO`
 - `UserIdentityMapper`
 - `UserCredentialMapper`
+- `PrincipalIdentityMapper`
+- `PrincipalCredentialMapper`
 - `AuthSessionMapper`
 - `MemberAuthSessionMapper`
 - `MemberAccessTokenMapper`
@@ -44,6 +50,8 @@
 - `OAuthRefreshTokenMapper`
 - `UserIdentityDaoImpl`
 - `UserCredentialDaoImpl`
+- `PrincipalIdentityDaoImpl`
+- `PrincipalCredentialDaoImpl`
 - `AuthSessionDaoImpl`
 - `MemberAuthSessionDaoImpl`
 - `MemberAuthSessionRuntimeDaoImpl`
@@ -55,6 +63,8 @@
 - `OAuthRefreshTokenDaoImpl`
 - `UserIdentityPersistenceAssembler`
 - `UserCredentialPersistenceAssembler`
+- `PrincipalIdentityPersistenceAssembler`
+- `PrincipalCredentialPersistenceAssembler`
 - `AuthSessionPersistenceAssembler`
 - `MemberAuthSessionPersistenceAssembler`
 - `MemberAccessTokenPersistenceAssembler`
@@ -80,6 +90,9 @@
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `user_id` 固定引用 `sys_user.id`。
 - `identity_id` 固定引用 `sys_user_identity.id`。
+- `principal_type + principal_id` 固定表达统一认证主体业务坐标。
+- `auth_principal_identity.identity_id` 不作为外部字段存在，统一登录标识主键仍使用 `id`。
+- `auth_principal_credential.identity_id` 固定引用 `auth_principal_identity.id`。
 - 枚举字段使用 `varchar` 存储。
 - 集合字段优先使用 JSON 字符串表达，由持久化装配器负责转换。
 - 敏感字段不得明文落库。
@@ -93,6 +106,8 @@
 
 - 登录标识表固定为 `sys_user_identity`。
 - 认证凭据表固定为 `sys_user_credential`。
+- 统一认证主体登录标识表固定为 `auth_principal_identity`。
+- 统一认证主体凭据表固定为 `auth_principal_credential`。
 - 认证会话表固定为 `auth_session`。
 - OAuth 客户端表固定为 `auth_oauth_client`。
 - OAuth 授权表固定为 `auth_oauth_authorization`。
@@ -103,6 +118,8 @@
 - 前台会员 refresh token 表固定为 `member_refresh_token`。
 - 主键字段固定为 `id`。
 - 后台用户主键字段固定为 `user_id`。
+- 统一认证主体类型字段固定为 `principal_type`。
+- 统一认证主体 ID 字段固定为 `principal_id`。
 - 登录标识主键字段固定为 `identity_id`。
 - 登录标识类型字段固定为 `identity_type`。
 - 登录标识值字段固定为 `identity_value`。
@@ -119,6 +136,8 @@
 | --- | --- | --- | --- |
 | `sys_user_identity` | `UserIdentityDO` | `UserIdentityMapper` | `UserIdentity` |
 | `sys_user_credential` | `UserCredentialDO` | `UserCredentialMapper` | `UserCredential` |
+| `auth_principal_identity` | `PrincipalIdentityDO` | `PrincipalIdentityMapper` | `PrincipalIdentity` |
+| `auth_principal_credential` | `PrincipalCredentialDO` | `PrincipalCredentialMapper` | `PrincipalCredential` |
 | `auth_session` | `AuthSessionDO` | `AuthSessionMapper` | `AuthSession` |
 | `member_auth_session` | `MemberAuthSessionDO` | `MemberAuthSessionMapper` | `MemberAuthSession` |
 | `member_access_token` | `MemberAccessTokenDO` | `MemberAccessTokenMapper` | `MemberAccessToken` |
@@ -205,7 +224,76 @@
 - 普通索引：`idx_sys_user_credential_identity_status(identity_id, status)`
 - 普通索引：`idx_sys_user_credential_locked(locked_until)`
 
-### 6.3 auth_session
+### 6.3 auth_principal_identity
+
+`auth_principal_identity` 保存统一认证主体登录标识。该表是 `sys_user_identity` 与 `member_identity` 的目标统一结构，旧表在迁移完成前兼容保留。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | 登录标识主键 |
+| `principal_type` | `principalType` | `principalKey.principalType` | 是 | 主体类型 |
+| `principal_id` | `principalId` | `principalKey.principalId` | 是 | 主体 ID |
+| `identity_type` | `identityType` | `type` | 是 | 登录标识类型 |
+| `identity_value` | `identityValue` | `identityValue` | 是 | 登录标识值 |
+| `status` | `status` | `status` | 是 | 登录标识状态 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- 后台用户固定写入 `principal_type=USER`、`principal_id=sys_user.id`。
+- 前台会员固定写入 `principal_type=MEMBER`、`principal_id=member_member.id`。
+- `identity_type` 固定写入 `USER_ACCOUNT`、`USER_MOBILE`、`USER_EMAIL`、`USER_WECOM`、`USER_GITHUB`、`MEMBER_ACCOUNT`、`MEMBER_MOBILE` 或 `MEMBER_EMAIL`。
+- `status` 固定写入 `ENABLED` 或 `DISABLED`。
+- `identity_value` 必须保存规范化后的登录标识值。
+- 本表不保存通用审计字段。
+
+索引：
+
+- 主键：`pk_auth_principal_identity(id)`
+- 联合唯一索引：`uk_auth_principal_identity_type_value(identity_type, identity_value)`
+- 普通索引：`idx_auth_principal_identity_principal(principal_type, principal_id, status)`
+- 普通索引：`idx_auth_principal_identity_principal_type(principal_type, principal_id, identity_type)`
+
+### 6.4 auth_principal_credential
+
+`auth_principal_credential` 保存统一认证主体认证凭据。该表是 `sys_user_credential` 与 `member_credential` 的目标统一结构，旧表在迁移完成前兼容保留。
+
+| Column | DO Field | Entity Field | Required | Description |
+| --- | --- | --- | --- | --- |
+| `id` | `id` | `id` | 是 | 认证凭据主键 |
+| `principal_type` | `principalType` | `principalKey.principalType` | 是 | 主体类型 |
+| `principal_id` | `principalId` | `principalKey.principalId` | 是 | 主体 ID |
+| `identity_id` | `identityId` | `identityId` | 是 | 登录标识 ID |
+| `credential_type` | `credentialType` | `credentialType` | 是 | 凭据类型 |
+| `credential_value` | `credentialValue` | `credentialValue` | 是 | 凭据值 |
+| `status` | `status` | `status` | 是 | 凭据状态 |
+| `need_change_password` | `needChangePassword` | `needChangePassword` | 是 | 是否需要强制改密 |
+| `failed_count` | `failedCount` | `failedCount` | 是 | 连续失败次数 |
+| `failed_limit` | `failedLimit` | `failedLimit` | 是 | 最大允许连续失败次数 |
+| `locked_until` | `lockedUntil` | `lockedUntil` | 否 | 锁定截止时间 |
+| `expires_at` | `expiresAt` | `expiresAt` | 否 | 过期时间 |
+| `last_verified_at` | `lastVerifiedAt` | `lastVerifiedAt` | 否 | 最近验证时间 |
+
+字段规则：
+
+- `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `principal_type + principal_id` 必须与关联 `auth_principal_identity` 的主体坐标一致。
+- `identity_id` 来源是 `auth_principal_identity.id`。
+- `credential_type` 固定写入 `USER_PASSWORD` 或 `MEMBER_PASSWORD`。
+- `credential_value` 固定保存密码哈希，不保存密码明文。
+- `status` 固定写入 `ACTIVE`、`LOCKED`、`EXPIRED` 或 `DISABLED`。
+- `need_change_password` 固定使用 `tinyint(1)` 或项目既有等价写法。
+- 本表不保存通用审计字段。
+
+索引：
+
+- 主键：`pk_auth_principal_credential(id)`
+- 联合唯一索引：`uk_auth_principal_credential_identity_type(identity_id, credential_type)`
+- 普通索引：`idx_auth_principal_credential_principal(principal_type, principal_id, status)`
+- 普通索引：`idx_auth_principal_credential_identity_status(identity_id, status)`
+- 普通索引：`idx_auth_principal_credential_locked(locked_until)`
+
+### 6.5 auth_session
 
 `auth_session` 保存后台认证会话审计事实。活跃会话运行态固定保存在 Redis，不通过本表承接逐请求 touch。
 
@@ -254,7 +342,7 @@
 - 普通索引：`idx_auth_session_identity(identity_id, identity_type)`
 - 普通索引：`idx_auth_session_expire(status, expire_at)`
 
-### 6.4 auth_oauth_client
+### 6.6 auth_oauth_client
 
 `auth_oauth_client` 保存 OAuth2 客户端配置。
 
@@ -289,7 +377,7 @@
 - 主键：`pk_auth_oauth_client(id)`
 - 唯一索引：`uk_auth_oauth_client_client_id(client_id)`
 
-### 6.5 auth_oauth_authorization
+### 6.7 auth_oauth_authorization
 
 `auth_oauth_authorization` 保存 OAuth2 授权请求和授权码事实。
 
@@ -325,7 +413,7 @@
 - 唯一索引：`uk_auth_oauth_authorization_code(authorization_code)`
 - 普通索引：`idx_auth_oauth_authorization_client_user(client_id, user_id, expire_at)`
 
-### 6.6 auth_oauth_access_token
+### 6.8 auth_oauth_access_token
 
 `auth_oauth_access_token` 保存 OAuth2 access token 事实。
 
@@ -360,7 +448,7 @@
 - 唯一索引：`uk_auth_oauth_access_token_hash(token_hash)`
 - 普通索引：`idx_auth_oauth_access_token_client_user(client_id, user_id, status)`
 
-### 6.7 auth_oauth_refresh_token
+### 6.9 auth_oauth_refresh_token
 
 `auth_oauth_refresh_token` 保存 refresh token 事实。
 

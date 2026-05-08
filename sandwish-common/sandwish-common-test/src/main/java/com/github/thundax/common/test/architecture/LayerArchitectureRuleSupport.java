@@ -180,19 +180,15 @@ public final class LayerArchitectureRuleSupport {
         collectServiceSourceViolations(sourceRoot, false, violations);
 
         assertTrue(
-                "*AuthService, *RegistrationService, PermissionService and their implementations are "
-                        + "entry-specific orchestrators "
-                        + "and must stay in sandwish-admin-api or sandwish-front-api. Violations: "
+                "*RegistrationService, PermissionService and their implementations are "
+                        + "entry-specific orchestrators and must stay in sandwish-admin-api "
+                        + "or sandwish-front-api. Violations: "
                         + violations,
                 violations.isEmpty());
     }
 
     public static void assertApiModuleSourceDeclaresOnlyAuthServices(String apiModule) {
         assertApiModuleSourceDeclaresOnlyEntryServices(apiModule);
-    }
-
-    public static void assertBusinessModuleSourceDoesNotDeclareAuthServices() {
-        assertBusinessModuleSourceDoesNotDeclareEntryServices();
     }
 
     public static void assertLayerPublicApiMethodsAreNotTestOnly() {
@@ -350,19 +346,27 @@ public final class LayerArchitectureRuleSupport {
         String fileName = path.getFileName().toString();
         String className = fileName.substring(0, fileName.length() - ".java".length());
         boolean serviceType = className.endsWith("Service") || className.endsWith("ServiceImpl");
-        boolean entryServiceType = isEntryServiceType(className);
+        boolean entryServiceType = isApiEntryServiceType(className);
+        boolean bizForbiddenEntryServiceType = isBusinessForbiddenEntryServiceType(className);
         if (allowOnlyEntryServices && serviceType && !entryServiceType) {
             violations.add(ArchitectureSourceSupport.repositoryPath(ArchitectureSourceSupport.repositoryRoot(), path));
         }
-        if (!allowOnlyEntryServices && entryServiceType) {
+        if (!allowOnlyEntryServices && bizForbiddenEntryServiceType) {
             violations.add(ArchitectureSourceSupport.repositoryPath(ArchitectureSourceSupport.repositoryRoot(), path));
         }
     }
 
-    private static boolean isEntryServiceType(String className) {
+    private static boolean isApiEntryServiceType(String className) {
         return className.endsWith("AuthService")
                 || className.endsWith("AuthServiceImpl")
                 || className.endsWith("RegistrationService")
+                || className.endsWith("RegistrationServiceImpl")
+                || className.endsWith("PermissionService")
+                || className.endsWith("PermissionServiceImpl");
+    }
+
+    private static boolean isBusinessForbiddenEntryServiceType(String className) {
+        return className.endsWith("RegistrationService")
                 || className.endsWith("RegistrationServiceImpl")
                 || className.endsWith("PermissionService")
                 || className.endsWith("PermissionServiceImpl");

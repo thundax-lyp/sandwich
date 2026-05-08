@@ -8,6 +8,8 @@
 
 后台用户主体、登录标识和认证凭据的系统管理需求见 [`SYSTEM-REQUIREMENTS.md`](./SYSTEM-REQUIREMENTS.md)。本文档只定义这些资料在认证流程中的使用规则。
 
+统一认证业务结构固定以 `Principal*` 模型描述后台用户认证和前台会员认证的共性。`Principal*` 不替代 `User`、`Member` 或入口安全上下文，只用于在 `auth` 域内统一表达认证主体、登录标识、认证凭据和 token 运行态。
+
 ## 2. Scope
 
 当前覆盖范围：
@@ -66,10 +68,24 @@
 
 前台会员认证运行态也归属 `auth` 认证模型。`MemberLoginForm`、`MemberAuthSession`、`MemberAccessToken` 和 `MemberRefreshToken` 保留 `Member` 前缀，用于区分后台用户认证模型和前台会员认证模型。
 
+后台和前台认证的共性结构固定为：
+
+`PrincipalKey -> PrincipalIdentity -> PrincipalCredential -> PrincipalAccessToken / PrincipalRefreshToken`
+
+`PrincipalKey` 由 `principalType` 和 `principalId` 组成。`principalType=USER` 表示后台用户主体，`principalType=MEMBER` 表示前台会员主体。`principalId` 必须指向对应主体主键。`PrincipalIdentity` 统一表达账号、手机号、邮箱等登录标识。`PrincipalCredential` 统一表达密码等认证凭据。`PrincipalAccessToken` 和 `PrincipalRefreshToken` 统一表达面向主体的访问 token 与刷新 token 运行态。
+
+固定约束：
+
+- `Principal*` 是 auth 域内部统一结构描述，不作为公开 HTTP Request / Response。
+- `PrincipalKey.principalType + principalId` 必须唯一定位业务主体；后台固定为 `USER + User.id`，前台固定为 `MEMBER + Member.id`。
+- 后台上下文仍由 `UserAccessHolder` 建立和读取，前台上下文仍由 `MemberSecurityContext` 建立和读取。
+- API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话和响应装配适配；可复用的认证业务流程优先收敛到 `sandwish-biz` 的 `AuthService`。
+- `AuthService` 进入 `sandwish-biz` 后不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
+
 ## 4. Module Mapping
 
 - `sandwish-biz/src/main/java/com/github/thundax/modules/auth`
-  - 定义 `AuthSession`、OAuth2 模型、token 模型、后台登录表单运行态、前台会员认证运行态模型、认证枚举、DAO 契约和通用认证支撑 Service。
+  - 定义 `AuthSession`、OAuth2 模型、token 模型、`Principal*` 统一认证结构、后台登录表单运行态、前台会员认证运行态模型、认证枚举、DAO 契约和可复用认证业务 Service。
 - `sandwish-biz/src/main/java/com/github/thundax/modules/sys`
   - 定义后台 `User` 主体、`UserIdentity`、`UserCredential`、用户保存流程和用户认证资料维护。
 - `sandwish-infra/src/main/java/com/github/thundax/modules/auth`
@@ -77,9 +93,9 @@
 - `sandwish-infra/src/main/java/com/github/thundax/modules/sys`
   - 实现后台用户主体、登录标识和认证凭据 DAO，维护用户资料持久化。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth`
-  - 提供后台登录、刷新、验证码、登出、session command、OAuth2、token 认证入口适配和后台权限会话适配 Service。
+  - 提供后台登录、刷新、验证码、登出、session command、OAuth2、token 认证入口适配、后台权限会话适配 Service 和入口专用第三方登录 provider。
 - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth`
-  - 提供前台会员登录、注册、验证码、刷新、登出和 token 认证入口适配。
+  - 提供前台会员登录、注册、验证码、刷新、登出、Spring Security 过滤器、会员上下文和 token 认证入口适配。
 
 ## 5. Core Business Objects
 

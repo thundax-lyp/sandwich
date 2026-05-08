@@ -469,6 +469,78 @@ INSERT INTO `sys_dict` (
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),
     (
+        1000000000000002087, 'principal_type', '后台用户', 'USER', 0, '后台用户认证主体',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002088, 'principal_type', '前台会员', 'MEMBER', 1, '前台会员认证主体',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002089, 'principal_identity_type', '后台账号', 'USER_ACCOUNT', 0, '后台账号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002090, 'principal_identity_type', '后台手机号', 'USER_MOBILE', 1, '后台手机号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002091, 'principal_identity_type', '后台邮箱', 'USER_EMAIL', 2, '后台邮箱登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002092, 'principal_identity_type', '企业微信', 'USER_WECOM', 3, '后台企业微信登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002093, 'principal_identity_type', 'GitHub', 'USER_GITHUB', 4, '后台 GitHub 登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002094, 'principal_identity_type', '会员账号', 'MEMBER_ACCOUNT', 5, '会员账号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002095, 'principal_identity_type', '会员手机号', 'MEMBER_MOBILE', 6, '会员手机号登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002096, 'principal_identity_type', '会员邮箱', 'MEMBER_EMAIL', 7, '会员邮箱登录标识',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002097, 'principal_identity_status', '启用', 'ENABLED', 0, '统一认证主体标识启用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002098, 'principal_identity_status', '禁用', 'DISABLED', 1, '统一认证主体标识禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002099, 'principal_credential_type', '后台密码', 'USER_PASSWORD', 0, '后台用户密码凭据',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002100, 'principal_credential_type', '会员密码', 'MEMBER_PASSWORD', 1, '前台会员密码凭据',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002101, 'principal_credential_status', '活跃', 'ACTIVE', 0, '统一认证主体凭据活跃状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002102, 'principal_credential_status', '锁定', 'LOCKED', 1, '统一认证主体凭据锁定状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002103, 'principal_credential_status', '过期', 'EXPIRED', 2, '统一认证主体凭据过期状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
+        1000000000000002104, 'principal_credential_status', '禁用', 'DISABLED', 3, '统一认证主体凭据禁用状态',
+        '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
+    ),
+    (
         1000000000000002028, 'auth_session_status', '活跃', 'ACTIVE', 0, '认证会话活跃状态',
         '2026-05-05 00:00:00.000', 'system', NULL, NULL, '0'
     ),

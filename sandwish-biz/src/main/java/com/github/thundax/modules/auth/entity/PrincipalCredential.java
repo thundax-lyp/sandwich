@@ -35,4 +35,50 @@ public class PrincipalCredential {
     public boolean isActive() {
         return PrincipalCredentialStatus.ACTIVE == status;
     }
+
+    public boolean isLocked(Date now) {
+        if (PrincipalCredentialStatus.LOCKED == status) {
+            return lockedUntil == null || now == null || lockedUntil.after(now);
+        }
+        return lockedUntil != null && now != null && lockedUntil.after(now);
+    }
+
+    public boolean isExpired(Date now) {
+        if (PrincipalCredentialStatus.EXPIRED == status) {
+            return true;
+        }
+        return expiresAt != null && now != null && !expiresAt.after(now);
+    }
+
+    public void markVerified(Date verifiedAt) {
+        this.status = PrincipalCredentialStatus.ACTIVE;
+        this.failedCount = 0;
+        this.lockedUntil = null;
+        this.lastVerifiedAt = verifiedAt;
+    }
+
+    public void markFailed(Date lockedUntil) {
+        this.failedCount += 1;
+        if (failedLimit > 0 && failedCount >= failedLimit) {
+            lock(lockedUntil);
+        }
+    }
+
+    public void lock(Date lockedUntil) {
+        this.status = PrincipalCredentialStatus.LOCKED;
+        this.lockedUntil = lockedUntil;
+    }
+
+    public void unlock() {
+        this.status = PrincipalCredentialStatus.ACTIVE;
+        this.lockedUntil = null;
+    }
+
+    public void expire() {
+        this.status = PrincipalCredentialStatus.EXPIRED;
+    }
+
+    public void disable() {
+        this.status = PrincipalCredentialStatus.DISABLED;
+    }
 }

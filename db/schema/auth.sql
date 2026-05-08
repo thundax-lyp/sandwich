@@ -1,3 +1,37 @@
+CREATE TABLE IF NOT EXISTS `auth_principal_identity` (
+    `id` bigint NOT NULL,
+    `principal_type` varchar(32) NOT NULL,
+    `principal_id` bigint NOT NULL,
+    `identity_type` varchar(32) NOT NULL,
+    `identity_value` varchar(255) NOT NULL,
+    `status` varchar(16) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_auth_principal_identity_type_value` (`identity_type`, `identity_value`),
+    KEY `idx_auth_principal_identity_principal` (`principal_type`, `principal_id`, `status`),
+    KEY `idx_auth_principal_identity_principal_type` (`principal_type`, `principal_id`, `identity_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一认证主体登录标识表';
+
+CREATE TABLE IF NOT EXISTS `auth_principal_credential` (
+    `id` bigint NOT NULL,
+    `principal_type` varchar(32) NOT NULL,
+    `principal_id` bigint NOT NULL,
+    `identity_id` bigint NOT NULL,
+    `credential_type` varchar(32) NOT NULL,
+    `credential_value` varchar(255) NOT NULL,
+    `status` varchar(16) NOT NULL,
+    `need_change_password` tinyint(1) NOT NULL DEFAULT 0,
+    `failed_count` int NOT NULL DEFAULT 0,
+    `failed_limit` int NOT NULL DEFAULT 0,
+    `locked_until` datetime(3) DEFAULT NULL,
+    `expires_at` datetime(3) DEFAULT NULL,
+    `last_verified_at` datetime(3) DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_auth_principal_credential_identity_type` (`identity_id`, `credential_type`),
+    KEY `idx_auth_principal_credential_principal` (`principal_type`, `principal_id`, `status`),
+    KEY `idx_auth_principal_credential_identity_status` (`identity_id`, `status`),
+    KEY `idx_auth_principal_credential_locked` (`locked_until`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一认证主体凭据表';
+
 CREATE TABLE IF NOT EXISTS `auth_session` (
     `id` bigint NOT NULL,
     `session_id` varchar(64) NOT NULL,

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.entity;
 
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import lombok.AllArgsConstructor;
@@ -18,20 +19,37 @@ public class PrincipalIdentity {
     private PrincipalKey principalKey;
     private PrincipalIdentityType type;
     private String identityValue;
+    private PrincipalIdentityStatus status = PrincipalIdentityStatus.ENABLED;
+
+    public boolean isEnabled() {
+        return PrincipalIdentityStatus.ENABLED == status;
+    }
+
+    public boolean isDisabled() {
+        return PrincipalIdentityStatus.DISABLED == status;
+    }
 
     public boolean matches(String value) {
         return StringUtils.equals(identityValue, value);
     }
 
     public boolean isAccount() {
-        return PrincipalIdentityType.USER_ACCOUNT == type || PrincipalIdentityType.MEMBER_ACCOUNT == type;
+        return type != null && type.isAccount();
     }
 
     public boolean isMobile() {
-        return PrincipalIdentityType.MEMBER_MOBILE == type;
+        return type != null && type.isMobile();
     }
 
     public boolean isEmail() {
-        return PrincipalIdentityType.MEMBER_EMAIL == type;
+        return type != null && type.isEmail();
+    }
+
+    public void enable() {
+        this.status = PrincipalIdentityStatus.ENABLED;
+    }
+
+    public void disable() {
+        this.status = PrincipalIdentityStatus.DISABLED;
     }
 }

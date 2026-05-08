@@ -45,4 +45,13 @@ public enum PrincipalCredentialType {
                 .findFirst()
                 .orElseThrow(() -> new BizException("Unknown principal credential type: " + value));
     }
+
+    public static PrincipalCredentialType from(PrincipalType principalType, String credentialName) {
+        return Arrays.stream(values())
+                .filter(item ->
+                        item.principalType == principalType && item.credentialName.equalsIgnoreCase(credentialName))
+                .findFirst()
+                .orElseThrow(() ->
+                        new BizException("Unknown principal credential type: " + principalType + ":" + credentialName));
+    }
 }

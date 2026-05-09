@@ -16,8 +16,6 @@ public final class AsyncTaskInterfaceAssembler {
         AsyncTaskResponse response = new AsyncTaskResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         response.setStatus(entity.getStatus().value());
         response.setMessage(entity.getMessage());

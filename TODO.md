@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 assist-domain`：拆除辅助任务业务表审计字段
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/AsyncTask.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dataobject/AsyncTaskDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/assembler/AsyncTaskPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dao/AsyncTaskDaoImpl.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/AsyncTaskResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/AsyncTaskInterfaceAssembler.java`
-  - 处理动作：删除辅助任务 Entity/DO/assembler/DAO/API 响应中的通用审计字段。
-  - 验收点：辅助任务领域和普通 API 响应不再依赖通用审计字段；执行 `mvn -pl sandwish-biz -am compile`、`mvn -pl sandwish-infra -am compile` 和 `mvn -pl sandwish-admin-api -am compile`。
-  - 重要度：8/10
-
 - [ ] `Audit 3.2 member-domain`：拆除会员业务表审计字段
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java`

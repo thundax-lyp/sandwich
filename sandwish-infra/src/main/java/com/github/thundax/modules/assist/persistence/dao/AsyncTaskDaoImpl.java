@@ -11,8 +11,6 @@ import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
 
@@ -36,20 +34,12 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         if (asyncTask.getId() == null) {
             asyncTask.setId(idGenerator.nextId());
         }
-        Date now = new Date();
-        String currentUserId = UserAccessHolder.currentUserId();
-        asyncTask.setCreateDate(now);
-        asyncTask.setCreateUserId(currentUserId);
-        asyncTask.setUpdateDate(now);
-        asyncTask.setUpdateUserId(currentUserId);
         put(asyncTask);
         return asyncTask.getId();
     }
 
     @Override
     public void update(AsyncTask asyncTask) {
-        asyncTask.setUpdateDate(new Date());
-        asyncTask.setUpdateUserId(UserAccessHolder.currentUserId());
         put(asyncTask);
     }
 
@@ -84,10 +74,6 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         asyncTask.setExpiredSeconds(cacheDTO.expiredSeconds);
         asyncTask.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         asyncTask.setRemarks(cacheDTO.remarks);
-        asyncTask.setCreateDate(cacheDTO.createDate);
-        asyncTask.setCreateUserId(cacheDTO.createUserId);
-        asyncTask.setUpdateDate(cacheDTO.updateDate);
-        asyncTask.setUpdateUserId(cacheDTO.updateUserId);
         return asyncTask;
     }
 
@@ -103,10 +89,6 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         cacheDTO.expiredSeconds = asyncTask.getExpiredSeconds();
         cacheDTO.priority = asyncTask.getPriority();
         cacheDTO.remarks = asyncTask.getRemarks();
-        cacheDTO.createDate = asyncTask.getCreateDate();
-        cacheDTO.createUserId = asyncTask.getCreateUserId();
-        cacheDTO.updateDate = asyncTask.getUpdateDate();
-        cacheDTO.updateUserId = asyncTask.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -120,9 +102,5 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         private Integer expiredSeconds;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

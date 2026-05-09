@@ -75,7 +75,6 @@ public class AsyncTaskControllerContractTest {
         AsyncTaskController controller = new AsyncTaskController(asyncTaskService);
         AsyncTask task = task(1001L);
         task.setPrivate(true);
-        task.setCreateUserId("2001");
         when(asyncTaskService.get(org.mockito.ArgumentMatchers.argThat(queryWithId(1001L))))
                 .thenReturn(task);
         UserAccessHolder.currentUserId("2002", "token-1");

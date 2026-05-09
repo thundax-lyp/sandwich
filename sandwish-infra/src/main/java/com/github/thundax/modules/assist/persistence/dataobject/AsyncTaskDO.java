@@ -1,6 +1,5 @@
 package com.github.thundax.modules.assist.persistence.dataobject;
 
-import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +18,4 @@ public class AsyncTaskDO {
     private Integer expiredSeconds;
     private Integer priority;
     private String remarks;
-    private Date createDate;
-    private String createBy;
-    private Date updateDate;
-    private String updateBy;
 }

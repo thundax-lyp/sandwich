@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -60,10 +61,7 @@ public class MenuServiceImpl implements MenuService {
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         return PageResult.of(
-                (int) dataPage.getCurrent(),
-                (int) dataPage.getSize(),
-                dataPage.getTotal(),
-                dataPage.getRecords());
+                (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
 
     @Override

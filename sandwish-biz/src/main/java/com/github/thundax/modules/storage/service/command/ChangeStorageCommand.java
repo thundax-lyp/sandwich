@@ -5,7 +5,6 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +32,4 @@ public class ChangeStorageCommand {
     private StoredObjectReferenceStatus referenceStatus;
     private int priority;
     private String remarks;
-    private Date createDate;
-    private Date updateDate;
 }

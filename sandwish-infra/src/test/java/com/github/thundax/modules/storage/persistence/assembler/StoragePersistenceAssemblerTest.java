@@ -143,8 +143,6 @@ public class StoragePersistenceAssemblerTest {
 
     @Test
     public void shouldMapMultipartSessionFields() {
-        Date createDate = new Date(1000L);
-        Date updateDate = new Date(2000L);
         Date completedDate = new Date(3000L);
         Date abortedDate = new Date(4000L);
         MultipartUploadSession entity = new MultipartUploadSession();
@@ -163,8 +161,6 @@ public class StoragePersistenceAssemblerTest {
         entity.setPartSize(256L);
         entity.setUploadedPartCount(2);
         entity.setUploadStatus(MultipartUploadStatus.UPLOADING);
-        entity.setCreateDate(createDate);
-        entity.setUpdateDate(updateDate);
         entity.setCompletedDate(completedDate);
         entity.setAbortedDate(abortedDate);
 
@@ -203,14 +199,12 @@ public class StoragePersistenceAssemblerTest {
 
     @Test
     public void shouldMapMultipartPartFields() {
-        Date createDate = new Date(1000L);
         MultipartUploadPart entity = new MultipartUploadPart();
         entity.setId(EntityId.of(5003L));
         entity.setUploadId("upload-1");
         entity.setPartNumber(1);
         entity.setEtag("etag-1");
         entity.setSize(128L);
-        entity.setCreateDate(createDate);
 
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(entity);
         MultipartUploadPart restored = StoragePersistenceAssembler.toMultipartPartEntity(dataObject);
@@ -220,12 +214,10 @@ public class StoragePersistenceAssemblerTest {
         assertEquals(Integer.valueOf(1), dataObject.getPartNumber());
         assertEquals("etag-1", dataObject.getEtag());
         assertEquals(Long.valueOf(128L), dataObject.getSize());
-        assertEquals(createDate, dataObject.getCreateDate());
         assertEquals(Long.valueOf(5003L), restored.getId().value());
         assertEquals("upload-1", restored.getUploadId());
         assertEquals(Integer.valueOf(1), restored.getPartNumber());
         assertEquals("etag-1", restored.getEtag());
         assertEquals(Long.valueOf(128L), restored.getSize());
-        assertEquals(createDate, restored.getCreateDate());
     }
 }

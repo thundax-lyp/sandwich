@@ -263,7 +263,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like(StoredObjectDO::getRemarks, remarks);
         }
-        wrapper.orderByDesc(StoredObjectDO::getCreateDate);
+        wrapper.orderByDesc(StoredObjectDO::getId);
         wrapper.orderByAsc(StoredObjectDO::getPriority);
         return wrapper;
     }

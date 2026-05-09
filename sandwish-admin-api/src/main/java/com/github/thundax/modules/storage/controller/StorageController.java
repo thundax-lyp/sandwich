@@ -258,8 +258,6 @@ public class StorageController {
         command.setReferenceStatus(storage.getReferenceStatus());
         command.setPriority(storage.getPriority());
         command.setRemarks(storage.getRemarks());
-        command.setCreateDate(storage.getCreateDate());
-        command.setUpdateDate(storage.getUpdateDate());
         return command;
     }
 }

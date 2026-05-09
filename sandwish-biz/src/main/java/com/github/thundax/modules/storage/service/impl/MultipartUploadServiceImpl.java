@@ -48,8 +48,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         }
         session.setUploadStatus(MultipartUploadStatus.INITIATED);
         session.setUploadedPartCount(0);
-        session.setCreateDate(now);
-        session.setUpdateDate(now);
         session.setId(multipartUploadDao.insertMultipartSession(session));
         return session;
     }
@@ -68,13 +66,10 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         if (multipartUploadDao.getMultipartPart(part.getUploadId(), part.getPartNumber()) != null) {
             throw new BizException("Multipart upload part already exists: " + part.getPartNumber());
         }
-
-        part.setCreateDate(new Date());
         part.setId(multipartUploadDao.insertMultipartPart(part));
 
         session.setUploadStatus(MultipartUploadStatus.UPLOADING);
         session.setUploadedPartCount(multipartUploadDao.countMultipartParts(session.getUploadId()));
-        session.setUpdateDate(new Date());
         multipartUploadDao.updateMultipartSession(session);
         return part;
     }
@@ -94,7 +89,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         session.setUploadStatus(MultipartUploadStatus.COMPLETED);
         session.setUploadedPartCount(parts.size());
         session.setCompletedDate(now);
-        session.setUpdateDate(now);
         multipartUploadDao.updateMultipartSession(session);
         return storage;
     }
@@ -106,7 +100,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         Date now = new Date();
         session.setUploadStatus(MultipartUploadStatus.ABORTED);
         session.setAbortedDate(now);
-        session.setUpdateDate(now);
         return multipartUploadDao.updateMultipartSession(session);
     }
 
@@ -173,7 +166,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         storage.setAccessEndpoint(command == null ? null : command.getAccessEndpoint());
         storage.setObjectStatus(StoredObjectStatus.ACTIVE);
         storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
-        storage.setCreateDate(new Date());
         return storage;
     }
 

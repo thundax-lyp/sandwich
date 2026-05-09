@@ -47,10 +47,6 @@ public class MultipartUploadSessionDO {
 
     private String uploadStatus;
 
-    private Date createDate;
-
-    private Date updateDate;
-
     private Date completedDate;
 
     private Date abortedDate;

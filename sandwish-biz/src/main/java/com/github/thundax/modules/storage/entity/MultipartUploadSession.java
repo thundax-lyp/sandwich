@@ -28,8 +28,6 @@ public class MultipartUploadSession {
     private Long partSize;
     private Integer uploadedPartCount = 0;
     private MultipartUploadStatus uploadStatus = MultipartUploadStatus.INITIATED;
-    private Date createDate;
-    private Date updateDate;
     private Date completedDate;
     private Date abortedDate;
 

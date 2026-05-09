@@ -81,8 +81,6 @@ public class StorageServiceImplTest {
         storage.setId(service.create(toCreateStorageCommand(storage)));
 
         assertNotNull(storage.getId());
-        assertEquals(null, dao.inserted.getCreateDate());
-        assertEquals(null, dao.inserted.getUpdateDate());
         assertEquals(storage.getId(), dao.inserted.getId());
     }
 
@@ -195,8 +193,6 @@ public class StorageServiceImplTest {
         command.setReferenceStatus(storage.getReferenceStatus());
         command.setPriority(storage.getPriority());
         command.setRemarks(storage.getRemarks());
-        command.setCreateDate(storage.getCreateDate());
-        command.setUpdateDate(storage.getUpdateDate());
         return command;
     }
 

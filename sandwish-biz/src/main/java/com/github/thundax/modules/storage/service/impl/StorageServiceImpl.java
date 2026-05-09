@@ -207,8 +207,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setReferenceStatus(command.getReferenceStatus());
         storage.setPriority(command.getPriority());
         storage.setRemarks(command.getRemarks());
-        storage.setCreateDate(command.getCreateDate());
-        storage.setUpdateDate(command.getUpdateDate());
         return storage;
     }
 
@@ -231,8 +229,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setReferenceStatus(command.getReferenceStatus());
         storage.setPriority(command.getPriority());
         storage.setRemarks(command.getRemarks());
-        storage.setCreateDate(command.getCreateDate());
-        storage.setUpdateDate(command.getUpdateDate());
         return storage;
     }
 }

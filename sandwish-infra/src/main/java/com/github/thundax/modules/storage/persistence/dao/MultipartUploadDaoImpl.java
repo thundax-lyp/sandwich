@@ -64,7 +64,6 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
                         .set(MultipartUploadSessionDO::getPartSize, dataObject.getPartSize())
                         .set(MultipartUploadSessionDO::getUploadedPartCount, dataObject.getUploadedPartCount())
                         .set(MultipartUploadSessionDO::getUploadStatus, dataObject.getUploadStatus())
-                        .set(MultipartUploadSessionDO::getUpdateDate, dataObject.getUpdateDate())
                         .set(MultipartUploadSessionDO::getCompletedDate, dataObject.getCompletedDate())
                         .set(MultipartUploadSessionDO::getAbortedDate, dataObject.getAbortedDate()));
     }

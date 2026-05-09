@@ -38,7 +38,6 @@ public class ObjectStorageStoredObjectStoreTest {
         StoredObject storage = new StoredObject();
         storage.setId(EntityId.of(5001L));
         storage.setExtendName("txt");
-        storage.setCreateDate(new Date());
         return storage;
     }
 

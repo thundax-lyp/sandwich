@@ -57,7 +57,7 @@ public class StoredObjectDaoImplTest {
         assertSqlContains(storageWrapper, "reference_status");
         assertSqlContains(storageWrapper, "name");
         assertSqlContains(storageWrapper, "remarks");
-        assertSqlContains(storageWrapper, "order by create_date desc");
+        assertSqlContains(storageWrapper, "id desc");
         assertSqlContains(storageWrapper, "priority asc");
         assertParamsContain(
                 storageWrapper,

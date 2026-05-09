@@ -11,23 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 storage-domain`：拆除存储领域业务表审计字段
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StoredObject.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/MultipartUploadSession.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/MultipartUploadPart.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/command/CreateStorageCommand.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/command/ChangeStorageCommand.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/StoredObjectDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/MultipartUploadSessionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dataobject/MultipartUploadPartDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/cache/StorageCacheSupport.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/storage/persistence/assembler/StoragePersistenceAssemblerTest.java`
-  - 处理动作：删除存储对象、分片上传和存储命令中的通用审计字段及持久化转换、缓存、测试断言。
-  - 验收点：存储领域不再声明业务表通用审计字段；执行 `mvn -pl sandwish-biz -am compile` 和 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：9/10
-
 - [ ] `Audit 3.2 storage-api-response`：移除存储普通 API 响应中的审计字段
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/response/StorageResponse.java`

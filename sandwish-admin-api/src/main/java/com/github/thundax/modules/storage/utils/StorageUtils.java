@@ -4,7 +4,6 @@ import com.github.thundax.modules.storage.entity.StoredObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +38,6 @@ public final class StorageUtils {
         String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
         if (StringUtils.isBlank(extendName)) {
             extendName = ALLOW_CONTENT_TYPES.get(StringUtils.lowerCase(file.getContentType()));
-        }
-
-        if (storage.getId() == null) {
-            storage.setCreateDate(new Date());
         }
 
         storage.setExtendName(extendName);

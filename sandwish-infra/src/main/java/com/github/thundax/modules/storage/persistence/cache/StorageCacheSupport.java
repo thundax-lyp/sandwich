@@ -11,7 +11,6 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -70,8 +69,6 @@ public class StorageCacheSupport {
                 cacheDTO.referenceStatus == null ? null : StoredObjectReferenceStatus.from(cacheDTO.referenceStatus));
         storage.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         storage.setRemarks(cacheDTO.remarks);
-        storage.setCreateDate(cacheDTO.createDate);
-        storage.setUpdateDate(cacheDTO.updateDate);
         return storage;
     }
 
@@ -101,8 +98,6 @@ public class StorageCacheSupport {
                 : storage.getReferenceStatus().value();
         cacheDTO.priority = storage.getPriority();
         cacheDTO.remarks = storage.getRemarks();
-        cacheDTO.createDate = storage.getCreateDate();
-        cacheDTO.updateDate = storage.getUpdateDate();
         return cacheDTO;
     }
 
@@ -124,7 +119,5 @@ public class StorageCacheSupport {
         private String referenceStatus;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private Date updateDate;
     }
 }

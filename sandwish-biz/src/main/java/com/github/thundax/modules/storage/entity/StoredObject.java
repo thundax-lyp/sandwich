@@ -42,8 +42,6 @@ public class StoredObject implements Sortable {
     private StoredObjectReferenceStatus referenceStatus = StoredObjectReferenceStatus.UNREFERENCED;
     private int priority;
     private String remarks;
-    private Date createDate;
-    private Date updateDate;
 
     public String getOriginalFilename() {
         return StringUtils.isBlank(originalFilename) ? getOriginalFileName() : originalFilename;
@@ -126,6 +124,6 @@ public class StoredObject implements Sortable {
     }
 
     public String getPathName() {
-        return new SimpleDateFormat(PATH_FORMAT).format(this.getCreateDate()) + MetaFile.SEPARATOR + this.getFileName();
+        return new SimpleDateFormat(PATH_FORMAT).format(new Date()) + MetaFile.SEPARATOR + this.getFileName();
     }
 }

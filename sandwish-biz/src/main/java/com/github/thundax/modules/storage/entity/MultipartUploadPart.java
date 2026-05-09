@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.id.EntityId;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +13,4 @@ public class MultipartUploadPart {
     private Integer partNumber;
     private String etag;
     private Long size;
-    private Date createDate;
 }

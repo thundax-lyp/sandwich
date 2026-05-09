@@ -41,8 +41,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setReferenceStatus(referenceStatusValue(entity.getReferenceStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setUpdateDate(entity.getUpdateDate());
         return dataObject;
     }
 
@@ -66,8 +64,6 @@ public final class StoragePersistenceAssembler {
         entity.setReferenceStatus(referenceStatusFrom(dataObject.getReferenceStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setUpdateDate(dataObject.getUpdateDate());
         return entity;
     }
 
@@ -186,8 +182,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setPartSize(entity.getPartSize());
         dataObject.setUploadedPartCount(uploadedPartCountOrDefault(entity.getUploadedPartCount()));
         dataObject.setUploadStatus(uploadStatusValue(entity.getUploadStatus()));
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setUpdateDate(entity.getUpdateDate());
         dataObject.setCompletedDate(entity.getCompletedDate());
         dataObject.setAbortedDate(entity.getAbortedDate());
         return dataObject;
@@ -213,8 +207,6 @@ public final class StoragePersistenceAssembler {
         entity.setPartSize(dataObject.getPartSize());
         entity.setUploadedPartCount(uploadedPartCountOrDefault(dataObject.getUploadedPartCount()));
         entity.setUploadStatus(uploadStatusFrom(dataObject.getUploadStatus()));
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setUpdateDate(dataObject.getUpdateDate());
         entity.setCompletedDate(dataObject.getCompletedDate());
         entity.setAbortedDate(dataObject.getAbortedDate());
         return entity;
@@ -230,7 +222,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setPartNumber(entity.getPartNumber());
         dataObject.setEtag(entity.getEtag());
         dataObject.setSize(entity.getSize());
-        dataObject.setCreateDate(entity.getCreateDate());
         return dataObject;
     }
 
@@ -244,7 +235,6 @@ public final class StoragePersistenceAssembler {
         entity.setPartNumber(dataObject.getPartNumber());
         entity.setEtag(dataObject.getEtag());
         entity.setSize(dataObject.getSize());
-        entity.setCreateDate(dataObject.getCreateDate());
         return entity;
     }
 

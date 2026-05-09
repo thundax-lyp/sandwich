@@ -40,8 +40,6 @@ public class MultipartUploadServiceImplTest {
         assertNotNull(saved.getUploadId());
         assertEquals(Integer.valueOf(0), saved.getUploadedPartCount());
         assertSame(MultipartUploadStatus.INITIATED, saved.getUploadStatus());
-        assertNotNull(saved.getCreateDate());
-        assertNotNull(saved.getUpdateDate());
         assertSame(saved, dao.insertedMultipartSession);
     }
 
@@ -56,7 +54,6 @@ public class MultipartUploadServiceImplTest {
         MultipartUploadPart saved = service.uploadPart(toUploadMultipartPartCommand(part));
 
         assertNotNull(saved.getId());
-        assertNotNull(saved.getCreateDate());
         assertSame(saved, dao.insertedMultipartPart);
         assertSame(MultipartUploadStatus.UPLOADING, dao.updatedMultipartSession.getUploadStatus());
         assertEquals(Integer.valueOf(1), dao.updatedMultipartSession.getUploadedPartCount());

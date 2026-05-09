@@ -62,8 +62,6 @@ public class MemberServiceImplTest {
         service.create(new MemberCommand(null, member));
 
         assertNotNull(member.getId());
-        assertEquals(null, member.getCreateDate());
-        assertEquals(null, member.getUpdateDate());
         assertSame(member, dao.inserted);
     }
 

@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 member-domain`：拆除会员业务表审计字段
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/Member.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dataobject/MemberDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/assembler/MemberPersistenceAssembler.java`
-  - 处理动作：删除会员 Entity/DO/assembler 中的通用审计字段。
-  - 验收点：会员领域不再声明业务表通用审计字段；执行 `mvn -pl sandwish-biz -am compile` 和 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：8/10
-
 - [ ] `Audit 3.3 biz-core`：新增 Audit 领域模型和 Service 契约
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/valueobject/AuditObjectRef.java`

@@ -39,6 +39,7 @@
 - API 响应对象：`Response`
 - 接口传输对象：`DTO`
 - Service 查询对象：`XxxQuery`
+- Service 单对象标识：`XxxId`
 - Service 写入口对象：`XxxCommand`
 - Service 分页输入对象：`PageQuery`
 - Service 分页返回对象：`PageResult`
@@ -66,12 +67,13 @@
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装；入口模型放在同业务模块的 `controller/request` 与 `controller/response` 包，不下沉到 Service
-- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定为 `*Query`、`*Query + PageQuery` 或 `*Command` 三种形态；方法参数最多 2 个；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper` 或其他持久化实现类型。
+- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定为 `*Id`、`*Query`、`*Query + PageQuery` 或 `*Command` 四种形态；方法参数最多 2 个；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper`、通用 `EntityId` 参数或其他持久化实现类型。
 - `LAYER_SERVICE_PAGE_RESULT`：Service 分页返回结果固定使用 `PageResult<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型；`PageResult` 不作为 Service 方法入参。
 - `LAYER_SERVICE_WRITE_COMMAND`：Service 写入口固定接收一个 `*Command`，不接收业务 `Entity`、散落业务字段或 API `Request`。
 - `LAYER_SERVICE_NO_EMPTY_BASE`：不得新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`；Service 共性能力必须有明确方法契约或具体业务价值。
 - `LAYER_DAO_BOUNDARY_TYPES`：DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型；返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`；不得接收或返回 `*DTO`、API `Request` / `Response`、`DO/DataObject`、common `PageQuery` 或 common `PageResult`。
 - `LAYER_SERVICE_QUERY_MODEL`：Service 读取条件使用 `XxxQuery` 表达时，`XxxQuery` 固定作为 Service 输入模型，只承载读取过滤条件，不承载 HTTP、Session、权限适配、分页状态、持久化实现类型或 request 字符串解析逻辑。
+- `LAYER_SERVICE_ID_MODEL`：Service 单对象定位优先使用对应领域 `XxxId`；`XxxId` 固定归属业务对象的 `entity/valueobject` 包，允许未来承载对象身份校验、外部编码或业务化标识语义，不用通用 `EntityId` 直接作为 Service 参数。
 - `LAYER_SERVICE_QUERY_NO_SETTER_LOGIC`：`XxxQuery` 源码不得声明手写 `setXxx` 方法；JDK8 下使用 class 承载字段定义，request 到 query 的枚举解析、日期归一化和字段装配固定放在对应 `InterfaceAssembler`。
 - `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
 - `LAYER_INTERFACE_ASSEMBLER_NO_DO`：`InterfaceAssembler` 不转换 `DO` / `DataObject`
@@ -104,6 +106,7 @@
 - `NAME_DECLARATION_ORDER`：类成员固定按 Checkstyle `DeclarationOrder` 排列；类级静态常量和静态字段放在实例字段前，同类成员按可见性顺序排列。
 - `NAME_DTO`：Service 边界传输对象必须以 `DTO` 结尾。
 - `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 API `Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
+- `NAME_SERVICE_ID`：Service 单对象标识命名固定为 `{业务对象名}Id`，例如 `UserId`、`RoleId`、`StoredObjectId`；不得用裸 `EntityId` 替代业务对象标识。
 - `NAME_SERVICE_COMMAND`：Service 写入口对象命名固定为 `{业务动作}{业务对象}Command` 或 `{业务动作}Command`，例如 `CreateDictCommand`、`RenameRoleCommand`、`BindRoleMenusCommand`；不得使用 API `Request`、`Param`、`DTO` 或业务 `Entity` 替代。
 - `NAME_SERVICE_METHOD_BUSINESS_ACTION`：Service 写方法固定使用业务动作名，不使用 `update*`、`save*`、`insert*`、`batch*` 等泛化或过时命名；条件清理动作允许使用 `deleteByXxx(*Query)` 窄口径。
 

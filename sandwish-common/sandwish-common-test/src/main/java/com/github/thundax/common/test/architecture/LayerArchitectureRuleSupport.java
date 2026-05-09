@@ -111,7 +111,7 @@ public final class LayerArchitectureRuleSupport {
 
         assertTrue(
                 "Service method boundary types must stay inside service-safe models such as *Query, PageQuery, "
-                        + "PageResult, *Command, *DTO, Entity, or Java-Type. Known dirty types still need cleanup: "
+                        + "PageResult, *Command, *Id, *DTO, Entity, or Java-Type. Known dirty types still need cleanup: "
                         + legacyDirtyTypes
                         + ". New violations: "
                         + violations,
@@ -259,11 +259,17 @@ public final class LayerArchitectureRuleSupport {
     }
 
     private static boolean isAllowedServiceReturnType(JavaClass type) {
-        return isVoid(type) || isJavaType(type) || isModuleEntity(type) || isDto(type) || isPageResult(type);
+        return isVoid(type)
+                || isJavaType(type)
+                || isEntityId(type)
+                || isModuleEntity(type)
+                || isDto(type)
+                || isPageResult(type);
     }
 
     private static boolean isAllowedServiceParameterType(JavaClass type) {
         return isJavaType(type)
+                || isServiceId(type)
                 || isModuleEntity(type)
                 || isDto(type)
                 || isServiceQuery(type)
@@ -272,11 +278,13 @@ public final class LayerArchitectureRuleSupport {
     }
 
     private static boolean isAllowedDaoResultType(JavaMethod method, JavaClass type) {
-        return isAllowedDaoParameterType(type) || isMyBatisPlusPage(type) && "page".equals(method.getName());
+        return isAllowedDaoParameterType(type)
+                || isEntityId(type)
+                || isMyBatisPlusPage(type) && "page".equals(method.getName());
     }
 
     private static boolean isAllowedDaoParameterType(JavaClass type) {
-        return isJavaType(type) || isModuleEntity(type);
+        return isJavaType(type) || isEntityId(type) || isModuleEntity(type);
     }
 
     private static boolean isServiceInterface(JavaClass javaClass) {
@@ -303,9 +311,14 @@ public final class LayerArchitectureRuleSupport {
             return isJavaType(type.getBaseComponentType())
                     || isModuleEntity(type.getBaseComponentType())
                     || isDto(type.getBaseComponentType())
+                    || isServiceId(type.getBaseComponentType())
                     || isServiceQuery(type.getBaseComponentType());
         }
-        return type.getName().startsWith("java.") || type.getName().startsWith("com.github.thundax.common.id.");
+        return type.getName().startsWith("java.");
+    }
+
+    private static boolean isEntityId(JavaClass type) {
+        return "com.github.thundax.common.id.EntityId".equals(type.getName());
     }
 
     private static boolean isModuleEntity(JavaClass type) {
@@ -315,6 +328,10 @@ public final class LayerArchitectureRuleSupport {
 
     private static boolean isDto(JavaClass type) {
         return type.getSimpleName().endsWith("DTO");
+    }
+
+    private static boolean isServiceId(JavaClass type) {
+        return type.getSimpleName().endsWith("Id") && type.getPackageName().contains(".entity.valueobject");
     }
 
     private static boolean isServiceQuery(JavaClass type) {

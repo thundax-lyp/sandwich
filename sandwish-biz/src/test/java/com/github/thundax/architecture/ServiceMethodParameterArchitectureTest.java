@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ServiceMethodParameterArchitectureTest extends AbstractArchitectureTest {
 
     @Test
-    public void shouldUseQueryPageQueryOrCommandForServiceParameters() {
+    public void shouldUseIdQueryPageQueryOrCommandForServiceParameters() {
         JavaClasses classes = importPackages("com.github.thundax.modules");
         List<String> violations = new ArrayList<String>();
 
@@ -30,7 +30,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
 
         assertTrue(
                 "Service methods must use one of the target parameter shapes: (*Query), (*Query, PageQuery), "
-                        + "or (*Command). Violations: "
+                        + "(*Id), or (*Command). Violations: "
                         + violations,
                 violations.isEmpty());
     }
@@ -43,6 +43,12 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
                     && isPageQuery(parameters.get(1))
                     && isPageResult(method.getRawReturnType());
         }
+        if (isIdMethod(method.getName())) {
+            return parameters.size() == 1 && (isServiceQuery(parameters.get(0)) || isServiceId(parameters.get(0)));
+        }
+        if ("remove".equals(method.getName())) {
+            return parameters.size() == 1 && (isServiceCommand(parameters.get(0)) || isServiceId(parameters.get(0)));
+        }
         if (isQueryMethod(method.getName())) {
             return parameters.size() == 1 && isServiceQuery(parameters.get(0));
         }
@@ -53,8 +59,11 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
         return methodName.startsWith("get")
                 || methodName.startsWith("list")
                 || methodName.startsWith("count")
-                || methodName.startsWith("exists")
                 || methodName.startsWith("deleteBy");
+    }
+
+    private boolean isIdMethod(String methodName) {
+        return methodName.startsWith("get") || methodName.startsWith("exists") || "deleteById".equals(methodName);
     }
 
     private boolean isServiceInterface(JavaClass javaClass) {
@@ -66,6 +75,11 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
     private boolean isServiceQuery(JavaClass javaClass) {
         return javaClass.getSimpleName().endsWith("Query")
                 && javaClass.getPackageName().contains(".service.query");
+    }
+
+    private boolean isServiceId(JavaClass javaClass) {
+        return javaClass.getSimpleName().endsWith("Id")
+                && javaClass.getPackageName().contains(".entity.valueobject");
     }
 
     private boolean isServiceCommand(JavaClass javaClass) {

@@ -213,7 +213,7 @@ public class RoleDaoImpl implements RoleDao {
         if (StringUtils.isNotBlank(status)) {
             wrapper.eq(RoleDO::getStatus, status);
         }
-        wrapper.orderByAsc(RoleDO::getPriority, RoleDO::getCreateDate);
+        wrapper.orderByAsc(RoleDO::getPriority, RoleDO::getId);
         return wrapper;
     }
 

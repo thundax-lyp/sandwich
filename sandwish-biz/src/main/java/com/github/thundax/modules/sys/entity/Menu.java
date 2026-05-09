@@ -1,11 +1,9 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu implements Auditable, Sortable, Comparable<Menu> {
+public class Menu implements Sortable, Comparable<Menu> {
     private EntityId id;
 
     private EntityId parentId;
@@ -29,10 +27,6 @@ public class Menu implements Auditable, Sortable, Comparable<Menu> {
     private String target;
     private int priority;
     private String remarks;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isDisplay() {
         return MenuVisibility.VISIBLE == getVisibility();

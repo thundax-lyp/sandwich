@@ -11,34 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 sys-domain`：拆除系统管理领域业务表审计字段
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/common/domain/Auditable.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/User.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Role.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Menu.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Department.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/Dict.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/UserDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/RoleDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/MenuDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/DepartmentDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dataobject/DictDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/UserPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/RolePersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/MenuPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/DepartmentPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/assembler/DictPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/cache/UserCacheSupport.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/cache/RoleCacheSupport.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/cache/MenuCacheSupport.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/cache/DepartmentCacheSupport.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/cache/DictCacheSupport.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/architecture/DataObjectAnnotationArchitectureTest.java`
-  - 处理动作：删除 `Auditable` 和系统管理 Entity/DO/assembler/cache/test 中的通用审计字段。
-  - 验收点：系统管理业务模型和持久化模型不再依赖通用审计字段；执行 `mvn -pl sandwish-biz -am compile` 和 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.2 sys-api-response`：移除系统管理普通 API 响应中的审计字段
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/UserResponse.java`

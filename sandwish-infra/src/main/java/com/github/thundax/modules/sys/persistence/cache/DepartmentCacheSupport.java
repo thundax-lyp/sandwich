@@ -7,7 +7,6 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Department;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -91,10 +90,6 @@ public class DepartmentCacheSupport {
         department.setShortName(cacheDTO.shortName);
         department.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         department.setRemarks(cacheDTO.remarks);
-        department.setCreateDate(cacheDTO.createDate);
-        department.setCreateUserId(cacheDTO.createUserId);
-        department.setUpdateDate(cacheDTO.updateDate);
-        department.setUpdateUserId(cacheDTO.updateUserId);
         return department;
     }
 
@@ -106,10 +101,6 @@ public class DepartmentCacheSupport {
         cacheDTO.shortName = department.getShortName();
         cacheDTO.priority = department.getPriority();
         cacheDTO.remarks = department.getRemarks();
-        cacheDTO.createDate = department.getCreateDate();
-        cacheDTO.createUserId = department.getCreateUserId();
-        cacheDTO.updateDate = department.getUpdateDate();
-        cacheDTO.updateUserId = department.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -120,9 +111,5 @@ public class DepartmentCacheSupport {
         private String shortName;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

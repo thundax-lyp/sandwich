@@ -1,13 +1,11 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -19,7 +17,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role implements Auditable, Sortable {
+public class Role implements Sortable {
     public static final String BEAN_NAME = "Role";
 
     private EntityId id;
@@ -28,10 +26,6 @@ public class Role implements Auditable, Sortable {
     private RoleStatus status;
     private int priority;
     private String remarks;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     private List<Long> menuIdList;
 

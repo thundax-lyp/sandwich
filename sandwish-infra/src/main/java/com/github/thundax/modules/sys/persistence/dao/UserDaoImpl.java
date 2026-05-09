@@ -217,7 +217,7 @@ public class UserDaoImpl implements UserDao {
         if (privilege != null) {
             wrapper.eq("privilege", privilege.value());
         }
-        wrapper.orderByAsc("priority", "create_date");
+        wrapper.orderByAsc("priority", "id");
         return wrapper;
     }
 

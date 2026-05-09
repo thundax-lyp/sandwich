@@ -148,7 +148,7 @@ public class DictDaoImpl implements DictDao {
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like("remarks", remarks);
         }
-        wrapper.orderByAsc("type", "priority", "create_date");
+        wrapper.orderByAsc("type", "priority", "id");
         return wrapper;
     }
 

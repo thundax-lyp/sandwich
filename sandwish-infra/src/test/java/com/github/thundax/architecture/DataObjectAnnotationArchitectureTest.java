@@ -91,7 +91,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
     }
 
     @Test
-    public void shouldUseDatabaseAuditFieldNamesForDataObjects() {
+    public void shouldNotUseBusinessAuditFieldsForDataObjects() {
         JavaClasses classes = importPackages(BASE_PACKAGE);
 
         for (JavaClass javaClass : classes) {
@@ -104,6 +104,18 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             assertFalse(
                     javaClass.getFullName() + " must not declare updateUserId field",
                     javaClass.tryGetField("updateUserId").isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare createDate field",
+                    javaClass.tryGetField("createDate").isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare createBy field",
+                    javaClass.tryGetField("createBy").isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare updateDate field",
+                    javaClass.tryGetField("updateDate").isPresent());
+            assertFalse(
+                    javaClass.getFullName() + " must not declare updateBy field",
+                    javaClass.tryGetField("updateBy").isPresent());
         }
     }
 

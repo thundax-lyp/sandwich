@@ -9,7 +9,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -98,10 +97,6 @@ public class MenuCacheSupport {
         menu.setTarget(cacheDTO.target);
         menu.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         menu.setRemarks(cacheDTO.remarks);
-        menu.setCreateDate(cacheDTO.createDate);
-        menu.setCreateUserId(cacheDTO.createUserId);
-        menu.setUpdateDate(cacheDTO.updateDate);
-        menu.setUpdateUserId(cacheDTO.updateUserId);
         return menu;
     }
 
@@ -119,10 +114,6 @@ public class MenuCacheSupport {
         cacheDTO.target = menu.getTarget();
         cacheDTO.priority = menu.getPriority();
         cacheDTO.remarks = menu.getRemarks();
-        cacheDTO.createDate = menu.getCreateDate();
-        cacheDTO.createUserId = menu.getCreateUserId();
-        cacheDTO.updateDate = menu.getUpdateDate();
-        cacheDTO.updateUserId = menu.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -138,9 +129,5 @@ public class MenuCacheSupport {
         private String target;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

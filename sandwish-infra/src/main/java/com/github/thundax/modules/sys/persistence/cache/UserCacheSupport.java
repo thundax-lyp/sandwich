@@ -10,7 +10,6 @@ import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -122,10 +121,6 @@ public class UserCacheSupport {
         user.setStatus(cacheDTO.status == null ? null : UserStatus.from(cacheDTO.status));
         user.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         user.setRemarks(cacheDTO.remarks);
-        user.setCreateDate(cacheDTO.createDate);
-        user.setCreateUserId(cacheDTO.createUserId);
-        user.setUpdateDate(cacheDTO.updateDate);
-        user.setUpdateUserId(cacheDTO.updateUserId);
         return user;
     }
 
@@ -143,10 +138,6 @@ public class UserCacheSupport {
         cacheDTO.status = user.getStatus() == null ? null : user.getStatus().value();
         cacheDTO.priority = user.getPriority();
         cacheDTO.remarks = user.getRemarks();
-        cacheDTO.createDate = user.getCreateDate();
-        cacheDTO.createUserId = user.getCreateUserId();
-        cacheDTO.updateDate = user.getUpdateDate();
-        cacheDTO.updateUserId = user.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -162,9 +153,5 @@ public class UserCacheSupport {
         private String status;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

@@ -9,7 +9,6 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -138,10 +137,6 @@ public class RoleCacheSupport {
         role.setStatus(cacheDTO.status == null ? null : RoleStatus.from(cacheDTO.status));
         role.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         role.setRemarks(cacheDTO.remarks);
-        role.setCreateDate(cacheDTO.createDate);
-        role.setCreateUserId(cacheDTO.createUserId);
-        role.setUpdateDate(cacheDTO.updateDate);
-        role.setUpdateUserId(cacheDTO.updateUserId);
         return role;
     }
 
@@ -154,10 +149,6 @@ public class RoleCacheSupport {
         cacheDTO.status = role.getStatus() == null ? null : role.getStatus().value();
         cacheDTO.priority = role.getPriority();
         cacheDTO.remarks = role.getRemarks();
-        cacheDTO.createDate = role.getCreateDate();
-        cacheDTO.createUserId = role.getCreateUserId();
-        cacheDTO.updateDate = role.getUpdateDate();
-        cacheDTO.updateUserId = role.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -168,9 +159,5 @@ public class RoleCacheSupport {
         private String status;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

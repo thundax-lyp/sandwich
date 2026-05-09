@@ -7,7 +7,6 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Dict;
-import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
@@ -50,10 +49,6 @@ public class DictCacheSupport {
         dict.setValue(cacheDTO.value);
         dict.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         dict.setRemarks(cacheDTO.remarks);
-        dict.setCreateDate(cacheDTO.createDate);
-        dict.setCreateUserId(cacheDTO.createUserId);
-        dict.setUpdateDate(cacheDTO.updateDate);
-        dict.setUpdateUserId(cacheDTO.updateUserId);
         return Optional.of(dict);
     }
 
@@ -65,10 +60,6 @@ public class DictCacheSupport {
         cacheDTO.value = dict.getValue();
         cacheDTO.priority = dict.getPriority();
         cacheDTO.remarks = dict.getRemarks();
-        cacheDTO.createDate = dict.getCreateDate();
-        cacheDTO.createUserId = dict.getCreateUserId();
-        cacheDTO.updateDate = dict.getUpdateDate();
-        cacheDTO.updateUserId = dict.getUpdateUserId();
         return cacheDTO;
     }
 
@@ -79,9 +70,5 @@ public class DictCacheSupport {
         private String value;
         private Integer priority;
         private String remarks;
-        private Date createDate;
-        private String createUserId;
-        private Date updateDate;
-        private String updateUserId;
     }
 }

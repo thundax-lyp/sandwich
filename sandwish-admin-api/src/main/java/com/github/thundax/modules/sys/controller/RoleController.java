@@ -16,20 +16,24 @@ import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
-import com.github.thundax.modules.sys.controller.request.*;
+import com.github.thundax.modules.sys.controller.request.RoleAssignUserRequest;
+import com.github.thundax.modules.sys.controller.request.RoleIdRequest;
+import com.github.thundax.modules.sys.controller.request.RoleMenuRequest;
+import com.github.thundax.modules.sys.controller.request.RolePriorityRequest;
+import com.github.thundax.modules.sys.controller.request.RoleQueryRequest;
+import com.github.thundax.modules.sys.controller.request.RoleSaveRequest;
+import com.github.thundax.modules.sys.controller.request.RoleStatusRequest;
+import com.github.thundax.modules.sys.controller.request.RoleUserRequest;
 import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
-import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
-import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
-import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -49,15 +53,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(tags = "系统/权限")
 @SysLogger(module = {"系统", "权限"})
@@ -366,18 +369,16 @@ public class RoleController {
 
     private RoleUserResponse toUserResponse(User user) {
         return RoleInterfaceAssembler.toUserResponse(
-                user,
-                getAccountLoginName(user),
-                departmentService.get(user.getDepartmentId()),
-                departmentService::get);
+                user, getAccountLoginName(user), departmentService.get(user.getDepartmentId()), departmentService::get);
     }
 
     private String getAccountLoginName(User user) {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
+        PrincipalIdentity identity = principalIdentityService.get(identityQuery(
+                PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId())),
+                PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
     }
 

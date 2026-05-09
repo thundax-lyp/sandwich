@@ -7,11 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.thundax.common.web.request.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Getter
 @Setter

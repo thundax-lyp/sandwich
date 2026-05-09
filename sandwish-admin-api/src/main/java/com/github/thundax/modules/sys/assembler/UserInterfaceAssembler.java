@@ -153,7 +153,8 @@ public final class UserInterfaceAssembler {
         }
         entity.setRemarks(request.getRemarks());
         if (request.getDepartment() != null) {
-            entity.setDepartmentId(request.getDepartment().getId());
+            entity.setDepartmentId(
+                    DepartmentIdCodec.toDomain(request.getDepartment().getId()));
         }
         entity.setRank(AccessRankCodec.toDomain(request.getRanks()));
         entity.setName(request.getName());

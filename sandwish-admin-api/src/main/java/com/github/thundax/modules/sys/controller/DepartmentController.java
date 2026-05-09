@@ -2,7 +2,11 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.collection.TreeNodeListHelper;
-import com.github.thundax.common.exception.*;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.MoveTreeNodeException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.annotation.WrappedApiController;
@@ -25,17 +29,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Api(tags = "系统/部门")
 @SysLogger(module = {"系统", "部门"})
@@ -196,8 +199,8 @@ public class DepartmentController {
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
         List<Department> beanList = departmentService.list(new DepartmentQuery());
 
-        Set<DepartmentId> excludeIds =
-                new HashSet<>(RequestListHelper.map(excludeList, request -> DepartmentIdCodec.toDomain(request.getId())));
+        Set<DepartmentId> excludeIds = new HashSet<>(
+                RequestListHelper.map(excludeList, request -> DepartmentIdCodec.toDomain(request.getId())));
         beanList.removeIf(bean -> excludeIds.contains(bean.getId()));
 
         TreeNodeListHelper.remove(
@@ -280,5 +283,4 @@ public class DepartmentController {
         query.setAncestorId(ancestor.getId());
         return query;
     }
-
 }

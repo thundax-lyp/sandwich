@@ -2,7 +2,11 @@ package com.github.thundax.modules.sys.assembler;
 
 import com.github.thundax.modules.sys.controller.request.RoleQueryRequest;
 import com.github.thundax.modules.sys.controller.request.RoleSaveRequest;
-import com.github.thundax.modules.sys.controller.response.*;
+import com.github.thundax.modules.sys.controller.response.RoleDepartmentResponse;
+import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
+import com.github.thundax.modules.sys.controller.response.RoleResponse;
+import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
+import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -84,7 +88,8 @@ public final class RoleInterfaceAssembler {
     public static RoleUserTreeNodeResponse toDepartmentTreeNode(String id, Department entity) {
         return RoleUserTreeNodeResponse.builder()
                 .id(id)
-                .parentId(entity.getParentId() == null ? null : idPrefix(DepartmentIdCodec.toValue(entity.getParentId())))
+                .parentId(
+                        entity.getParentId() == null ? null : idPrefix(DepartmentIdCodec.toValue(entity.getParentId())))
                 .name(entity.getName())
                 .build();
     }

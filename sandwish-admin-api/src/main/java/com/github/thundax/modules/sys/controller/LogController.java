@@ -29,12 +29,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
 
 @Api(tags = "系统/日志")
 @RequestMapping(value = "/api/sys/log")
@@ -77,15 +76,17 @@ public class LogController {
     private LogResponse toResponse(Log log) {
         User user = userService.get(UserIdCodec.toDomain(Long.valueOf(log.getUserId())));
         Department department = user == null ? null : departmentService.get(user.getDepartmentId());
-        return LogInterfaceAssembler.toResponse(log, user, getAccountLoginName(user), department, departmentService::get);
+        return LogInterfaceAssembler.toResponse(
+                log, user, getAccountLoginName(user), department, departmentService::get);
     }
 
     private String getAccountLoginName(User user) {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
+        PrincipalIdentity identity = principalIdentityService.get(identityQuery(
+                PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId())),
+                PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
     }
 

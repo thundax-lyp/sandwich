@@ -1,9 +1,13 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.*;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.exception.PermissionDeniedException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -32,7 +36,14 @@ import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
-import com.github.thundax.modules.sys.controller.request.*;
+import com.github.thundax.modules.sys.controller.request.UserAvatarRequest;
+import com.github.thundax.modules.sys.controller.request.UserCheckRequest;
+import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
+import com.github.thundax.modules.sys.controller.request.UserIdRequest;
+import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
+import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
+import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
+import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
 import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
@@ -42,7 +53,6 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
-import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -59,24 +69,28 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = "系统/用户")
 @SysLogger(module = {"系统", "用户"})
@@ -535,8 +549,7 @@ public class UserController {
         }
 
         return identity.getPrincipalKey() != null
-                && Objects.equals(
-                        EntityIdCodec.toValue(identity.getPrincipalKey().getPrincipalId()), id);
+                && Objects.equals(identity.getPrincipalKey().getPrincipalId(), id);
     }
 
     private UserResponse toResponse(User user) {
@@ -552,17 +565,17 @@ public class UserController {
         return query;
     }
 
-    private String getAccountLoginName(EntityId userId) {
+    private String getAccountLoginName(UserId userId) {
         PrincipalIdentity identity = getAccountIdentity(userId);
         return identity == null ? null : identity.getIdentityValue();
     }
 
-    private PrincipalIdentity getAccountIdentity(EntityId userId) {
+    private PrincipalIdentity getAccountIdentity(UserId userId) {
         if (userId == null) {
             return null;
         }
-        return principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
+        return principalIdentityService.get(identityQuery(
+                PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)), PrincipalIdentityType.USER_ACCOUNT));
     }
 
     private void upsertPassword(User user, String encryptedPassword) {
@@ -574,7 +587,7 @@ public class UserController {
                 credentialQuery(accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
-            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId())));
             credential.setIdentityId(accountIdentity.getId());
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
             credential.setCredentialValue(encryptedPassword);

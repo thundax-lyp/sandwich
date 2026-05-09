@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.service.result;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +15,6 @@ public class AuthAccessTokenResult {
         if (principalAccessToken == null || principalAccessToken.getPrincipalKey() == null) {
             return null;
         }
-        return EntityIdCodec.toStringValue(
-                principalAccessToken.getPrincipalKey().getPrincipalId());
+        return String.valueOf(principalAccessToken.getPrincipalKey().getPrincipalId());
     }
 }

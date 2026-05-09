@@ -33,17 +33,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,6 +40,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Api(tags = "存储")
 @RequestMapping(value = "/api/storage/object")
@@ -110,7 +114,7 @@ public class StorageController {
 
             StoredObject storage = new StoredObject();
             storage.setOwnerType(StorageOwnerType.USER);
-            storage.setOwnerId(UserAccessHolder.currentUserId());
+            storage.setOwnerId(String.valueOf(UserAccessHolder.currentUserId()));
             StorageUtils.applyFileMetadata(file, storage);
             try {
                 applyStoredObject(storage, storedObjectStore.save(storage, file.getInputStream()));
@@ -134,7 +138,7 @@ public class StorageController {
         }
         StorageQuery accessQuery = storageQuery(id);
         accessQuery.setOwnerType(StorageOwnerType.USER);
-        accessQuery.setOwnerId(UserAccessHolder.currentUserId());
+        accessQuery.setOwnerId(String.valueOf(UserAccessHolder.currentUserId()));
         if (!storageService.existsReadableContent(accessQuery)) {
             response.sendError(HttpStatus.SC_FORBIDDEN);
             return;

@@ -38,6 +38,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -45,12 +50,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(tags = "系统/当前用户")
 @SysLogger(module = {"系统", "当前用户"})
@@ -236,8 +235,9 @@ public class CurrentUserController {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
+        PrincipalIdentity identity = principalIdentityService.get(identityQuery(
+                PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId())),
+                PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
     }
 

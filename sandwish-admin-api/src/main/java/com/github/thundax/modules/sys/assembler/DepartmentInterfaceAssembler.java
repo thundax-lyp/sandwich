@@ -19,7 +19,8 @@ public final class DepartmentInterfaceAssembler {
     private DepartmentInterfaceAssembler() {}
 
     @NonNull
-    public static DepartmentResponse toResponse(Department entity, Function<DepartmentId, Department> departmentLoader) {
+    public static DepartmentResponse toResponse(
+            Department entity, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return DepartmentResponse.builder().build();
         }

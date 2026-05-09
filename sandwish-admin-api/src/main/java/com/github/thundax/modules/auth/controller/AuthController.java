@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.controller;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
@@ -50,6 +49,7 @@ import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
@@ -152,7 +152,7 @@ public class AuthController {
 
         releasePreAuthSession(request.getLoginToken());
 
-        authService.deleteAccessTokensByUserId(userIdCommand(EntityIdCodec.toStringValue(user.getId())));
+        authService.deleteAccessTokensByUserId(userIdCommand(UserIdCodec.toStringValue(user.getId())));
 
         return loginSuccess(
                 user,
@@ -394,7 +394,7 @@ public class AuthController {
 
     private void writeLog(HttpServletRequest currentRequest, String title, User user, String loginName) {
         Log log = new Log();
-        log.setUserId(EntityIdCodec.toStringValue(user.getId()));
+        log.setUserId(UserIdCodec.toStringValue(user.getId()));
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
         log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
@@ -412,11 +412,11 @@ public class AuthController {
             String logTitle,
             PrincipalAuthenticationMethod authenticationMethod,
             PrincipalIdentityType identityType) {
-        authService.deleteAccessTokensByUserId(userIdCommand(EntityIdCodec.toStringValue(user.getId())));
+        authService.deleteAccessTokensByUserId(userIdCommand(UserIdCodec.toStringValue(user.getId())));
         HttpServletRequest currentRequest = currentRequest();
         writeLog(currentRequest, logTitle, user, loginName);
         AdminAuthCommand command =
-                accessTokenCommand(EntityIdCodec.toStringValue(user.getId()), loginName, currentRequest);
+                accessTokenCommand(UserIdCodec.toStringValue(user.getId()), loginName, currentRequest);
         command.setAuthenticationMethod(authenticationMethod);
         command.setIdentityType(identityType);
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(command));

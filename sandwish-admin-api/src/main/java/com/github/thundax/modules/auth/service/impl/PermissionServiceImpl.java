@@ -5,8 +5,6 @@ import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.S
 import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.SUPER;
 import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.USER;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
@@ -17,10 +15,10 @@ import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
-import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -84,7 +82,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     private Set<String> loadPermissions(String userId) {
-        User user = userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(userId))));
+        User user = userService.get(UserIdCodec.toDomain(Long.valueOf(userId)));
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
@@ -125,12 +123,6 @@ public class PermissionServiceImpl implements PermissionService {
             return null;
         }
         return session;
-    }
-
-    private UserQuery userQuery(EntityId userId) {
-        UserQuery query = new UserQuery();
-        query.setId(userId);
-        return query;
     }
 
     private CurrentUserQuery currentUserQuery(User user) {

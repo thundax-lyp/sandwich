@@ -2,14 +2,22 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.collection.TreeNodeListHelper;
-import com.github.thundax.common.exception.*;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.InsertBeanExistException;
+import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.MoveTreeNodeException;
+import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.MenuInterfaceAssembler;
-import com.github.thundax.modules.sys.controller.request.*;
+import com.github.thundax.modules.sys.controller.request.MenuDisplayRequest;
+import com.github.thundax.modules.sys.controller.request.MenuIdRequest;
+import com.github.thundax.modules.sys.controller.request.MenuMoveRequest;
+import com.github.thundax.modules.sys.controller.request.MenuQueryRequest;
+import com.github.thundax.modules.sys.controller.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.controller.response.MenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
@@ -24,17 +32,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Api(tags = "系统/菜单")
 @SysLogger(module = {"系统", "菜单"})
@@ -309,5 +316,4 @@ public class MenuController {
         query.setAncestorId(ancestor.getId());
         return query;
     }
-
 }

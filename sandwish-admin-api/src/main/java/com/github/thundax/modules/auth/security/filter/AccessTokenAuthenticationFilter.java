@@ -2,8 +2,6 @@ package com.github.thundax.modules.auth.security.filter;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
@@ -12,8 +10,8 @@ import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -94,10 +92,13 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        UserAccessHolder.currentUserId(accessToken.getUserId(), token);
+        if (StringUtils.isBlank(accessToken.getUserId())) {
+            writeError(response);
+            return;
+        }
+        UserAccessHolder.currentUserId(Long.valueOf(accessToken.getUserId()), token);
         try {
-            User currentUser =
-                    userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId()))));
+            User currentUser = userService.get(UserIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
             if (currentUser.getId() == null || !currentUser.isEnable()) {
                 writeError(response);
                 return;
@@ -138,12 +139,6 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setAccessToken(accessToken);
         return command;
-    }
-
-    private UserQuery userQuery(EntityId userId) {
-        UserQuery query = new UserQuery();
-        query.setId(userId);
-        return query;
     }
 
     private Collection<SimpleGrantedAuthority> toAuthorities(Collection<String> permissions) {

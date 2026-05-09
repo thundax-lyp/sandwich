@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
@@ -16,6 +15,8 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import io.swagger.annotations.Api;
@@ -75,7 +76,7 @@ public class CurrentUserControllerContractTest {
         when(currentUserService.listVisibleMenus(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(menus);
         mockApplicationContext(userService);
-        UserAccessHolder.currentUserId("1", "token-1");
+        UserAccessHolder.currentUserId(1L, "token-1");
 
         CurrentUserController controller = new CurrentUserController(
                 currentUserService, mock(PrincipalIdentityService.class), mock(PreAuthSessionService.class));
@@ -108,15 +109,15 @@ public class CurrentUserControllerContractTest {
 
     private User superUser() {
         User user = new User();
-        user.setId(EntityId.of(1L));
+        user.setId(UserIdCodec.toDomain(1L));
         user.setPrivilege(UserPrivilege.SUPER);
         return user;
     }
 
     private Menu menu(Long id, Long parentId, String name) {
         Menu menu = new Menu();
-        menu.setId(EntityId.of(id));
-        menu.setParentId(EntityId.ofNullable(parentId));
+        menu.setId(MenuIdCodec.toDomain(id));
+        menu.setParentId(MenuIdCodec.toDomain(parentId));
         menu.setName(name);
         return menu;
     }

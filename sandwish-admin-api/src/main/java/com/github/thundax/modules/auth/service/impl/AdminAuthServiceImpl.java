@@ -4,7 +4,6 @@ import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -52,8 +51,9 @@ import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -295,7 +295,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         PrincipalAccessToken accessToken = buildPrincipalAccessToken(
                 token,
                 ADMIN_CLIENT_ID,
-                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))),
+                PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
                 new LinkedHashSet<>(),
                 now,
                 properties.getLoginExpiredSeconds());
@@ -341,7 +341,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         int count = 0;
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
-                        PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))),
+                        PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
                         ADMIN_CLIENT_ID,
                         PrincipalTokenStatus.ACTIVE);
         for (PrincipalAccessToken token : tokens) {
@@ -405,7 +405,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (session == null) {
             return AuthTokenQueryResult.inactive(token);
         }
-        User user = getUser(session.getPrincipalKey().getPrincipalId());
+        User user = getUser(UserIdCodec.toDomain(session.getPrincipalKey().getPrincipalId()));
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
@@ -430,7 +430,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (session == null) {
             return AuthTokenQueryResult.inactive(token);
         }
-        User user = getUser(accessToken.getPrincipalKey().getPrincipalId());
+        User user = getUser(UserIdCodec.toDomain(accessToken.getPrincipalKey().getPrincipalId()));
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
@@ -457,8 +457,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         current.markUsed();
         principalRefreshTokenDao.updateStatus(current);
 
-        AuthAccessTokenResult accessToken = createAccessToken(
-                EntityIdCodec.toStringValue(current.getPrincipalKey().getPrincipalId()), null, ip, userAgent);
+        AuthAccessTokenResult accessToken =
+                createAccessToken(String.valueOf(current.getPrincipalKey().getPrincipalId()), null, ip, userAgent);
         writeLoginEvent(
                 current.getPrincipalKey(),
                 requestedClientId,
@@ -515,7 +515,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         result.setState(state);
         if (!approved) {
             writeLoginEvent(
-                    PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))),
+                    PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
                     clientId,
                     PrincipalLoginEventType.OAUTH_AUTHORIZED,
                     PrincipalAuthenticationMethod.OAUTH_CODE,
@@ -532,8 +532,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         OAuthAuthorization authorization = new OAuthAuthorization();
         authorization.setAuthorizationCode(UuidHelper.compact());
         authorization.setClientId(clientId);
-        authorization.setPrincipalKey(
-                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(Long.valueOf(userId))));
+        authorization.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)));
         authorization.setRedirectUri(redirectUri);
         authorization.setScopes(toScopeSet(scopes));
         authorization.setState(state);
@@ -706,7 +705,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     private int invalidateSessionsByUserId(EntityId userId, String reason) {
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
-                        PrincipalKey.of(PrincipalType.USER, userId), ADMIN_CLIENT_ID, PrincipalTokenStatus.ACTIVE);
+                        PrincipalKey.of(PrincipalType.USER, userId.value()),
+                        ADMIN_CLIENT_ID,
+                        PrincipalTokenStatus.ACTIVE);
         int count = 0;
         for (PrincipalAccessToken token : tokens) {
             if (token != null && token.isActive()) {
@@ -743,7 +744,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new InvalidUsernamePasswordException();
         }
 
-        User user = getUser(identity.getPrincipalKey().getPrincipalId());
+        User user = getUser(UserIdCodec.toDomain(identity.getPrincipalKey().getPrincipalId()));
         if (user == null) {
             recordLoginFailed(
                     PrincipalAuthenticationMethod.PASSWORD,
@@ -853,7 +854,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);
             throw new InvalidUsernamePasswordException();
         }
-        User user = getUser(identity.getPrincipalKey().getPrincipalId());
+        User user = getUser(UserIdCodec.toDomain(identity.getPrincipalKey().getPrincipalId()));
         if (user == null) {
             recordLoginFailed(
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
@@ -885,10 +886,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return session;
     }
 
-    private User getUser(EntityId userId) {
-        UserQuery query = new UserQuery();
-        query.setId(userId);
-        return userService.get(query);
+    private User getUser(UserId userId) {
+        return userService.get(userId);
     }
 
     private PrincipalAuthSession getActivePrincipalAuthSession(PrincipalRefreshToken refreshToken, Date now) {
@@ -1097,12 +1096,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return StringUtils.equals(authorization.getCodeChallenge(), codeVerifier);
     }
 
-    private String getAccountLoginName(EntityId userId) {
+    private String getAccountLoginName(UserId userId) {
         if (userId == null) {
             return null;
         }
         PrincipalIdentity identity = principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
+                identityQuery(PrincipalKey.of(PrincipalType.USER, userId.value()), PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
     }
 

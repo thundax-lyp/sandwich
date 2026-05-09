@@ -13,10 +13,9 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.utils.AvatarUtils;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-
-import java.util.Set;
 
 public final class PersonalInterfaceAssembler {
     private PersonalInterfaceAssembler() {}

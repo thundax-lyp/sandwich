@@ -7,6 +7,13 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
 import com.github.thundax.modules.utils.IPUtils;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,14 +23,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 public class SysLogMethodInterceptor implements MethodInterceptor {
 
@@ -104,7 +103,8 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
         titleParts.add(value);
 
         Log log = new Log();
-        log.setUserId(UserAccessHolder.currentUserId());
+        log.setUserId(
+                UserAccessHolder.currentUserId() == null ? null : String.valueOf(UserAccessHolder.currentUserId()));
         log.setTitle(StringUtils.join(titleParts, TITLE_SEPARATOR));
 
         log.setLogDate(new Date());

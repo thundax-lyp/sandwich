@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.controller.request.AuditLogDetailRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectFieldRequest;
 import com.github.thundax.modules.audit.controller.response.AuditLogDetailResponse;
@@ -15,9 +14,10 @@ import com.github.thundax.modules.audit.controller.response.AuditOptionsResponse
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
 import com.github.thundax.modules.audit.runtime.AuditSnapshots;
 import com.github.thundax.modules.audit.service.AuditService;
-import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import java.util.List;
 import org.junit.Test;
 
@@ -75,7 +75,7 @@ public class AuditControllerContractTest {
 
     private AuditLog auditLog() {
         AuditLog log = new AuditLog();
-        log.setId(EntityId.of(1001L));
+        log.setId(AuditLogIdCodec.toDomain(1001L));
         log.setObjectType("User");
         log.setObjectId("2001");
         log.setVersion(1L);
@@ -89,7 +89,7 @@ public class AuditControllerContractTest {
         return log;
     }
 
-    private org.mockito.ArgumentMatcher<AuditLogQuery> queryWithId(Long id) {
-        return query -> query != null && EntityId.of(id).equals(query.getId());
+    private org.mockito.ArgumentMatcher<AuditLogId> queryWithId(Long id) {
+        return query -> query != null && AuditLogIdCodec.toDomain(id).equals(query);
     }
 }

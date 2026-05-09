@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -23,6 +21,8 @@ import com.github.thundax.modules.sys.controller.request.DictIdRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
@@ -90,9 +90,9 @@ public class DictControllerContractTest {
     public void shouldBatchDeleteExistingDicts() throws Exception {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
-        when(dictService.get(any(DictQuery.class))).thenAnswer(invocation -> {
-            DictQuery query = invocation.getArgument(0);
-            return dict(EntityIdCodec.toValue(query.getId()));
+        when(dictService.get(any(DictId.class))).thenAnswer(invocation -> {
+            DictId query = invocation.getArgument(0);
+            return dict(DictIdCodec.toValue(query));
         });
 
         Boolean deleted = controller.delete(Arrays.asList(idRequest(1L), idRequest(2L)));
@@ -101,9 +101,10 @@ public class DictControllerContractTest {
         verify(dictService, times(2)).remove(commandCaptor.capture());
         assertEquals(Boolean.TRUE, deleted);
         assertEquals(
-                Arrays.asList(EntityIdCodec.toDomain(1L), EntityIdCodec.toDomain(2L)),
+                Arrays.asList(1L, 2L),
                 commandCaptor.getAllValues().stream()
                         .map(DeleteDictCommand::getId)
+                        .map(DictIdCodec::toValue)
                         .collect(Collectors.toList()));
     }
 
@@ -122,7 +123,7 @@ public class DictControllerContractTest {
 
     private Dict dict(Long id) {
         Dict dict = new Dict();
-        dict.setId(EntityId.of(id));
+        dict.setId(DictIdCodec.toDomain(id));
         dict.setType("status");
         dict.setLabel(String.valueOf(id));
         dict.setValue(String.valueOf(id));

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.controller.request.MultipartUploadCompleteRequest;
 import com.github.thundax.modules.storage.controller.request.MultipartUploadInitRequest;
 import com.github.thundax.modules.storage.controller.response.MultipartUploadPartResponse;
@@ -18,6 +17,9 @@ import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.MultipartUploadService;
 import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
@@ -40,7 +42,7 @@ public class MultipartUploadControllerContractTest {
         when(service.init(any(InitMultipartUploadCommand.class))).thenAnswer(invocation -> {
             InitMultipartUploadCommand command = invocation.getArgument(0);
             MultipartUploadSession session = new MultipartUploadSession();
-            session.setId(EntityId.of(9301L));
+            session.setId(MultipartUploadSessionIdCodec.toDomain(9301L));
             session.setUploadId("upload-1");
             session.setOwnerType(command.getOwnerType());
             session.setStorageType(command.getStorageType());
@@ -72,7 +74,7 @@ public class MultipartUploadControllerContractTest {
         when(service.uploadPart(any(UploadMultipartPartCommand.class))).thenAnswer(invocation -> {
             UploadMultipartPartCommand command = invocation.getArgument(0);
             MultipartUploadPart part = new MultipartUploadPart();
-            part.setId(EntityId.of(9401L));
+            part.setId(MultipartUploadPartIdCodec.toDomain(9401L));
             part.setUploadId(command.getUploadId());
             part.setPartNumber(command.getPartNumber());
             part.setSize(command.getSize());
@@ -107,7 +109,7 @@ public class MultipartUploadControllerContractTest {
         StoredObjectStore store = mock(StoredObjectStore.class);
         when(store.type()).thenReturn(StorageType.LOCAL_FILE);
         StoredObject storage = new StoredObject();
-        storage.setId(EntityId.of(9101L));
+        storage.setId(StoredObjectIdCodec.toDomain(9101L));
         storage.setOriginalFilename("demo.png");
         when(service.complete(any(CompleteMultipartUploadCommand.class))).thenReturn(storage);
         MultipartUploadController controller = controller(service, store);

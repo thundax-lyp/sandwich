@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
@@ -26,6 +25,7 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -112,13 +112,13 @@ public class AuthControllerContractTest {
 
     private User user() {
         User user = new User();
-        user.setId(EntityId.of(1L));
+        user.setId(UserIdCodec.toDomain(1L));
         return user;
     }
 
     private AuthAccessTokenResult accessToken(String token) {
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
-        accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+        accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         return new AuthAccessTokenResult(token, "refresh-token-1", accessToken);
     }
 

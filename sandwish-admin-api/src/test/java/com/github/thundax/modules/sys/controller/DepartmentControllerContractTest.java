@@ -13,6 +13,8 @@ import com.github.thundax.modules.sys.controller.request.DepartmentIdRequest;
 import com.github.thundax.modules.sys.controller.request.DepartmentMoveRequest;
 import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
@@ -54,7 +56,7 @@ public class DepartmentControllerContractTest {
         DepartmentController controller = new DepartmentController(departmentService);
         Department from = department(1L, null);
         Department to = department(2L, null);
-        when(departmentService.get(any(DepartmentQuery.class))).thenReturn(from, to);
+        when(departmentService.get(any(DepartmentId.class))).thenReturn(from, to);
 
         Boolean moved = controller.move(moveRequest(1L, 2L, DepartmentMoveRequest.TYPE_INSIDE_LAST));
 
@@ -68,7 +70,7 @@ public class DepartmentControllerContractTest {
         DepartmentController controller = new DepartmentController(departmentService);
         Department from = department(1L, null);
         Department to = department(2L, 1L);
-        when(departmentService.get(any(DepartmentQuery.class))).thenReturn(from, to);
+        when(departmentService.get(any(DepartmentId.class))).thenReturn(from, to);
         when(departmentService.existsChildRelation(any(DepartmentQuery.class))).thenReturn(true);
 
         controller.move(moveRequest(1L, 2L, DepartmentMoveRequest.TYPE_INSIDE));
@@ -92,8 +94,8 @@ public class DepartmentControllerContractTest {
 
     private Department department(Long id, Long parentId) {
         Department department = new Department();
-        department.setId(com.github.thundax.common.id.EntityId.of(id));
-        department.setParentId(com.github.thundax.common.id.EntityId.ofNullable(parentId));
+        department.setId(DepartmentIdCodec.toDomain(id));
+        department.setParentId(DepartmentIdCodec.toDomain(parentId));
         department.setName(String.valueOf(id));
         return department;
     }

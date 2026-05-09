@@ -2,12 +2,8 @@ package com.github.thundax.modules.sys.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.thundax.common.web.request.IdRequest;
 import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,11 +12,4 @@ import lombok.Setter;
 @ApiModel(value = "DictIdRequest", description = "字典标识请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DictIdRequest implements Serializable {
-
-    @ApiModelProperty(name = "id", value = "字典ID")
-    @JsonProperty("id")
-    @NotEmpty(message = "ID不能为空")
-    @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
-}
+public class DictIdRequest extends IdRequest {}

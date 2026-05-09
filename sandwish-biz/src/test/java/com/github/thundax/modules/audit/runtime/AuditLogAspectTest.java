@@ -53,6 +53,12 @@ public class AuditLogAspectTest {
         }
 
         @Override
+        public com.github.thundax.modules.audit.entity.AuditLog getLog(
+                com.github.thundax.modules.audit.service.query.AuditLogQuery query) {
+            return null;
+        }
+
+        @Override
         public com.github.thundax.modules.audit.entity.AuditMeta getMeta(
                 com.github.thundax.modules.audit.service.query.AuditMetaQuery query) {
             return null;

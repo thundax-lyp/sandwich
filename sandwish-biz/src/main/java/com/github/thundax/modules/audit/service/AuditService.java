@@ -14,6 +14,8 @@ public interface AuditService {
 
     EntityId record(CreateAuditLogCommand command);
 
+    AuditLog getLog(AuditLogQuery query);
+
     AuditMeta getMeta(AuditMetaQuery query);
 
     List<AuditLog> list(AuditMetaQuery query);

@@ -8,11 +8,18 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.audit.assembler.AuditInterfaceAssembler;
+import com.github.thundax.modules.audit.controller.request.AuditLogDetailRequest;
 import com.github.thundax.modules.audit.controller.request.AuditLogPageRequest;
 import com.github.thundax.modules.audit.controller.request.AuditMetaRequest;
+import com.github.thundax.modules.audit.controller.request.AuditObjectFieldRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectHistoryRequest;
+import com.github.thundax.modules.audit.controller.request.AuditObjectPageRequest;
+import com.github.thundax.modules.audit.controller.response.AuditLogDetailResponse;
 import com.github.thundax.modules.audit.controller.response.AuditLogResponse;
 import com.github.thundax.modules.audit.controller.response.AuditMetaResponse;
+import com.github.thundax.modules.audit.controller.response.AuditObjectFieldResponse;
+import com.github.thundax.modules.audit.controller.response.AuditObjectOverviewResponse;
+import com.github.thundax.modules.audit.controller.response.AuditOptionsResponse;
 import com.github.thundax.modules.audit.service.AuditService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -67,6 +74,55 @@ public class AuditController {
                 .collect(Collectors.toList());
     }
 
+    @ApiOperation(value = "获取审计日志详情", notes = "audit:view")
+    @HasPermission("audit:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "detail", method = RequestMethod.POST)
+    public AuditLogDetailResponse detail(@Valid @RequestBody AuditLogDetailRequest request) {
+        return AuditInterfaceAssembler.toLogDetailResponse(
+                auditService.getLog(AuditInterfaceAssembler.toLogQuery(request)));
+    }
+
+    @ApiOperation(value = "获取对象审计概览", notes = "audit:view")
+    @HasPermission("audit:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "object/overview", method = RequestMethod.POST)
+    public AuditObjectOverviewResponse objectOverview(@Valid @RequestBody AuditMetaRequest request) {
+        return AuditInterfaceAssembler.toOverviewResponse(
+                auditService.getMeta(AuditInterfaceAssembler.toMetaQuery(request)),
+                auditService.page(
+                        AuditInterfaceAssembler.toObjectLogQuery(request),
+                        new PageQuery(PageRules.firstPageIndex(), 5)));
+    }
+
+    @ApiOperation(value = "获取对象审计分页", notes = "audit:view")
+    @HasPermission("audit:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "object/page", method = RequestMethod.POST)
+    public PageResponse<AuditLogResponse> objectPage(@Valid @RequestBody AuditObjectPageRequest request) {
+        return PageResponseHelper.fromEntityPage(
+                auditService.page(AuditInterfaceAssembler.toLogQuery(request), readPage(request)),
+                AuditInterfaceAssembler::toLogResponse);
+    }
+
     @ApiOperation(value = "审计日志分页", notes = "audit:view")
     @HasPermission("audit:view")
     @ApiImplicitParams({
@@ -84,9 +140,43 @@ public class AuditController {
                 AuditInterfaceAssembler::toLogResponse);
     }
 
+    @ApiOperation(value = "获取审计选项", notes = "audit:view")
+    @HasPermission("audit:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "options", method = RequestMethod.POST)
+    public AuditOptionsResponse options() {
+        return AuditInterfaceAssembler.toOptionsResponse();
+    }
+
+    @ApiOperation(value = "获取审计对象字段", notes = "audit:view")
+    @HasPermission("audit:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @RequestMapping(value = "fields", method = RequestMethod.POST)
+    public List<AuditObjectFieldResponse> fields(@Valid @RequestBody AuditObjectFieldRequest request) {
+        return AuditInterfaceAssembler.toFieldResponses(request.getObjectType());
+    }
+
     private PageQuery readPage(AuditLogPageRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
+        return readPage(request.getPageNo(), request.getPageSize());
+    }
+
+    private PageQuery readPage(AuditObjectPageRequest request) {
+        return readPage(request.getPageNo(), request.getPageSize());
+    }
+
+    private PageQuery readPage(Integer pageNo, Integer pageSize) {
         if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
             pageNo = PageRules.firstPageIndex();
         }

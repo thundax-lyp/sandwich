@@ -12,6 +12,8 @@ public interface AuditLogDao {
 
     EntityId insert(AuditLog log);
 
+    AuditLog getById(EntityId id);
+
     AuditLog getByIdempotencyKey(String idempotencyKey);
 
     List<AuditLog> listByObject(String objectType, String objectId);

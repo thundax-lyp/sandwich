@@ -36,6 +36,11 @@ public class AuditLogDaoImpl implements AuditLogDao {
     }
 
     @Override
+    public AuditLog getById(EntityId id) {
+        return AuditLogPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    }
+
+    @Override
     public AuditLog getByIdempotencyKey(String idempotencyKey) {
         if (StringUtils.isBlank(idempotencyKey)) {
             return null;

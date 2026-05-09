@@ -114,6 +114,14 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    public AuditLog getLog(AuditLogQuery query) {
+        if (query == null || query.getId() == null) {
+            return null;
+        }
+        return auditLogDao.getById(query.getId());
+    }
+
+    @Override
     public AuditMeta getMeta(AuditMetaQuery query) {
         if (query == null) {
             return null;

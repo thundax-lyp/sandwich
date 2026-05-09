@@ -89,6 +89,11 @@ public class AuditServiceImplTest {
         }
 
         @Override
+        public AuditLog getById(EntityId id) {
+            return null;
+        }
+
+        @Override
         public List<AuditLog> listByObject(String objectType, String objectId) {
             return new ArrayList<>();
         }

@@ -33,8 +33,8 @@ import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.query.MemberAuthQuery;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
-import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -235,7 +235,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private MemberTokenResult createTokenResult(Member member) {
         Date now = new Date();
         PrincipalAuthSession session = PrincipalAuthSession.create(
-                PrincipalKey.of(PrincipalType.MEMBER, member.getId()),
+                PrincipalKey.of(PrincipalType.MEMBER, MemberIdCodec.toValue(member.getId())),
                 MEMBER_CLIENT_ID,
                 now,
                 authProperties.getLoginExpiredSeconds());
@@ -250,7 +250,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         session.setExpireAt(expireAt);
         principalAuthSessionDao.insert(session, session.remainingSeconds(now));
         PrincipalAuthSessionId authSessionId = session.getId();
-        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, member.getId());
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, MemberIdCodec.toValue(member.getId()));
 
         String accessTokenValue = UuidHelper.compact();
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
@@ -276,25 +276,19 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         principalRefreshTokenDao.insert(refreshToken, refreshTokenValue);
 
         MemberTokenResult result = new MemberTokenResult();
-        result.setMemberId(member.getId());
+        result.setMemberId(EntityId.of(MemberIdCodec.toValue(member.getId())));
         result.setAccessToken(accessTokenValue);
         result.setRefreshToken(refreshTokenValue);
         result.setExpiresIn(session.remainingSeconds(now));
         return result;
     }
 
-    private Member requireActiveMember(EntityId memberId) throws ApiException {
-        Member member = memberService.get(memberQuery(memberId));
+    private Member requireActiveMember(Long memberId) throws ApiException {
+        Member member = memberService.get(MemberIdCodec.toDomain(memberId));
         if (member == null || !member.isActive()) {
             throw new ApiException("会员状态不可用");
         }
         return member;
-    }
-
-    private MemberQuery memberQuery(EntityId memberId) {
-        MemberQuery query = new MemberQuery();
-        query.setId(memberId);
-        return query;
     }
 
     private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) throws ApiException {

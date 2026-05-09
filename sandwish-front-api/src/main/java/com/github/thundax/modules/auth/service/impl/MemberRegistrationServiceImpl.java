@@ -30,6 +30,7 @@ import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
 import com.github.thundax.modules.member.service.command.MemberCommand;
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +93,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         PrincipalIdentity identity = updateIdentity(member, PrincipalIdentityType.MEMBER_ACCOUNT, account);
         upsertPassword(member, identity, PasswordHelper.encrypt(password));
         preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
-        return member.getId();
+        return EntityId.of(MemberIdCodec.toValue(member.getId()));
     }
 
     @Override
@@ -136,7 +137,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_MOBILE, mobile);
         preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
-        return member.getId();
+        return EntityId.of(MemberIdCodec.toValue(member.getId()));
     }
 
     @Override
@@ -180,7 +181,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_EMAIL, email);
         preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
-        return member.getId();
+        return EntityId.of(MemberIdCodec.toValue(member.getId()));
     }
 
     private Member createMember(String name) {
@@ -198,7 +199,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     private PrincipalIdentity updateIdentity(Member member, PrincipalIdentityType identityType, String identityValue) {
-        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, member.getId());
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, MemberIdCodec.toValue(member.getId()));
         PrincipalIdentity identity = principalIdentityService.get(identityQuery(principalKey, identityType));
         if (identity == null) {
             identity = new PrincipalIdentity();
@@ -224,7 +225,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
                 credentialQuery(identity.getId(), PrincipalCredentialType.MEMBER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
-            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.MEMBER, member.getId()));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.MEMBER, MemberIdCodec.toValue(member.getId())));
             credential.setIdentityId(identity.getId());
             credential.setCredentialType(PrincipalCredentialType.MEMBER_PASSWORD);
             credential.setCredentialValue(encryptedPassword);

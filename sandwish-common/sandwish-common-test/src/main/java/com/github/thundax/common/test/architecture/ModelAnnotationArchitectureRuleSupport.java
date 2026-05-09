@@ -156,7 +156,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
     }
 
     private static Set<String> missingAnnotations(Set<String> actualAnnotations, Set<String> expectedAnnotations) {
-        Set<String> missingAnnotations = new LinkedHashSet<String>(expectedAnnotations);
+        Set<String> missingAnnotations = new LinkedHashSet<>(expectedAnnotations);
         missingAnnotations.removeAll(actualAnnotations);
         return missingAnnotations;
     }
@@ -164,7 +164,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
     private static Set<String> sourceAnnotationTypeNames(JavaClass item) {
         Path sourcePath = sourcePath(item);
         if (sourcePath == null) {
-            return new LinkedHashSet<String>();
+            return new LinkedHashSet<>();
         }
         try {
             List<String> lines = Files.readAllLines(sourcePath, StandardCharsets.UTF_8);

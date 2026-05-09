@@ -11,21 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.4 runtime`：新增 Audit 注解运行时
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/annotation/AuditLog.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditLogAspect.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditExpressionEvaluator.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditObjectLoaderRegistry.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditSnapshotAssemblerRegistry.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditDiffService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditOperatorResolver.java`
-  - 处理动作：实现注解、表达式解析、loader/assembler registry、diff 和操作者解析。
-  - 验收点：Audit 运行时可编译；执行 `mvn -pl sandwish-biz -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.5 sys-access`：接入系统管理目标对象审计
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/UserAuditObjectLoader.java`

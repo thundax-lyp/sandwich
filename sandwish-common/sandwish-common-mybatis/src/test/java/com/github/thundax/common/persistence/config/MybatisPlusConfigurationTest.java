@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.mybatis.interceptor.AuditFieldInterceptor;
 import com.github.thundax.common.mybatis.typehandler.EntityIdTypeHandler;
 import com.github.thundax.common.security.config.SandwishSecurityAutoConfiguration;
 import org.junit.Test;
@@ -29,7 +28,6 @@ public class MybatisPlusConfigurationTest {
     public void shouldRegisterMybatisPlusBeans() {
         contextRunner.run(context -> {
             context.getBean(MybatisPlusInterceptor.class);
-            context.getBean(AuditFieldInterceptor.class);
             context.getBean(ConfigurationCustomizer.class);
         });
     }

@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 common-mybatis`：删除通用审计字段自动填充拦截器
-  - 范围文件：
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/interceptor/AuditFieldInterceptor.java`
-    - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/persistence/config/MybatisPlusConfiguration.java`
-    - `sandwish-common/sandwish-common-mybatis/src/test/java/com/github/thundax/common/mybatis/interceptor/AuditFieldInterceptorTest.java`
-    - `sandwish-common/sandwish-common-mybatis/src/test/java/com/github/thundax/common/persistence/config/MybatisPlusConfigurationTest.java`
-  - 处理动作：删除 `AuditFieldInterceptor` 及配置注册，移除对应测试或改为验证无该 bean 依赖。
-  - 验收点：common-mybatis 不再声明或注册 `AuditFieldInterceptor`；执行 `mvn -pl sandwish-common/sandwish-common-mybatis -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.2 docs`：同步业务表审计字段退出规则
   - 范围文件：
     - `docs/00-governance/DATABASE-RULES.md`

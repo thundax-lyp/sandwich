@@ -6,6 +6,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.modules.audit.annotation.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -65,6 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @AuditLog(type = "User", id = "", action = AuditAction.CREATE, summary = "创建后台用户", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public EntityId create(CreateUserCommand command) {
         User user = toUser(command);
@@ -74,6 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeUserInfoCommand command) {
         User user = toUser(command);
@@ -91,6 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(ChangeUserStatusCommand command) {
         User user = new User();
@@ -99,6 +104,12 @@ public class UserServiceImpl implements UserService {
         return dao.updateStatus(user);
     }
 
+    @AuditLog(
+            type = "User",
+            id = "#command.id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除后台用户",
+            recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteUserCommand command) {
         UserQuery query = new UserQuery();

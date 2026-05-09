@@ -5,6 +5,8 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.modules.audit.annotation.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
@@ -73,6 +75,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @AuditLog(type = "Dict", id = "", action = AuditAction.CREATE, summary = "创建字典", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public EntityId create(CreateDictCommand command) {
         Dict dict = toEntity(command);
@@ -81,12 +84,19 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @AuditLog(type = "Dict", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新字典")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeDictInfoCommand command) {
         dao.update(toEntity(command));
     }
 
     @Override
+    @AuditLog(
+            type = "Dict",
+            id = "#command.id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除字典",
+            recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public void remove(DeleteDictCommand command) {
         if (command != null && command.getId() != null) {

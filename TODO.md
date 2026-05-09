@@ -11,27 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.5 sys-access`：接入系统管理目标对象审计
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/UserAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/UserAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/RoleAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/RoleAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/MenuAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/MenuAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/DepartmentAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/DepartmentAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/DictAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/sys/DictAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/RoleServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/MenuServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DepartmentServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java`
-  - 处理动作：为系统管理目标对象补 loader、snapshot assembler，并在单对象写方法上声明 Audit 注解。
-  - 验收点：系统管理审计接入代码可编译；执行 `mvn -pl sandwish-biz -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.5 assist-member-access`：接入 AsyncTask 和 Member 审计
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/assist/AsyncTaskAuditObjectLoader.java`

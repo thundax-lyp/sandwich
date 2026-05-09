@@ -8,6 +8,8 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
+import com.github.thundax.modules.audit.annotation.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -64,6 +66,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @AuditLog(type = "Role", id = "", action = AuditAction.CREATE, summary = "创建角色", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public EntityId create(CreateRoleCommand command) {
         Role role = toRole(command);
@@ -73,6 +76,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @AuditLog(type = "Role", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新角色")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeRoleInfoCommand command) {
         Role role = toRole(command);
@@ -104,6 +108,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @AuditLog(type = "Role", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新角色状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(ChangeRoleStatusCommand command) {
         Role role = new Role();
@@ -116,6 +121,12 @@ public class RoleServiceImpl implements RoleService {
         return result;
     }
 
+    @AuditLog(
+            type = "Role",
+            id = "#command.id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除角色",
+            recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteRoleCommand command) {
         EntityId id = command.getId();

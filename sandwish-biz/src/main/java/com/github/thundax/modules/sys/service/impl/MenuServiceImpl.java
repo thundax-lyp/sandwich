@@ -7,6 +7,8 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.utils.SpringContextHolder;
+import com.github.thundax.modules.audit.annotation.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -65,6 +67,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @AuditLog(type = "Menu", id = "", action = AuditAction.CREATE, summary = "创建菜单", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public EntityId create(CreateMenuCommand command) {
         Menu menu = toMenu(command);
@@ -74,6 +77,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @AuditLog(type = "Menu", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新菜单")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeMenuInfoCommand command) {
         Menu menu = toMenu(command);
@@ -86,6 +90,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @AuditLog(type = "Menu", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新菜单可见性")
     @Transactional(rollbackFor = Exception.class)
     public int changeVisibility(ChangeMenuVisibilityCommand command) {
         Menu menu = new Menu();
@@ -96,6 +101,12 @@ public class MenuServiceImpl implements MenuService {
         return result;
     }
 
+    @AuditLog(
+            type = "Menu",
+            id = "#command.id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除菜单",
+            recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteMenuCommand command) {
         dao.deleteMenuRole(EntityIdCodec.toValue(command.getId()));

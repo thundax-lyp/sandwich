@@ -14,6 +14,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -32,12 +33,12 @@ public class DictDaoImpl implements DictDao {
 
     @Override
     public Dict getById(EntityId id) {
-        Dict dict = cacheSupport.getById(id.value());
-        if (dict != null) {
-            return dict;
+        Optional<Dict> cachedDict = cacheSupport.getById(id.value());
+        if (cachedDict.isPresent()) {
+            return cachedDict.get();
         }
 
-        dict = DictPersistenceAssembler.toEntity(mapper.selectById(id.value()));
+        Dict dict = DictPersistenceAssembler.toEntity(mapper.selectById(id.value()));
         cacheSupport.putById(dict);
         return dict;
     }
@@ -47,11 +48,10 @@ public class DictDaoImpl implements DictDao {
         List<Dict> dictList = new ArrayList<>();
         List<Long> uncachedIdList = new ArrayList<>();
         for (Long id : idList) {
-            Dict dict = cacheSupport.getById(id);
-            if (dict == null) {
+            Optional<Dict> cachedDict = cacheSupport.getById(id);
+            cachedDict.ifPresent(dictList::add);
+            if (!cachedDict.isPresent()) {
                 uncachedIdList.add(id);
-            } else {
-                dictList.add(dict);
             }
         }
 
@@ -85,7 +85,7 @@ public class DictDaoImpl implements DictDao {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        cacheSupport.removeAll();
+        cacheSupport.putById(DictPersistenceAssembler.toEntity(dataObject));
         return EntityIdCodec.toDomain(dataObject.getId());
     }
 
@@ -100,7 +100,9 @@ public class DictDaoImpl implements DictDao {
                         .set(DictDO::getType, dataObject.getType())
                         .set(DictDO::getPriority, dataObject.getPriority())
                         .set(DictDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeAll();
+        if (count > 0) {
+            cacheSupport.removeById(dataObject.getId());
+        }
         return count;
     }
 
@@ -109,7 +111,9 @@ public class DictDaoImpl implements DictDao {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(DictDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeAll();
+        if (count > 0) {
+            cacheSupport.removeById(dataObject.getId());
+        }
         return count;
     }
 
@@ -120,7 +124,9 @@ public class DictDaoImpl implements DictDao {
     @Override
     public int deleteById(EntityId id) {
         int count = mapper.deleteById(id.value());
-        cacheSupport.removeAll();
+        if (count > 0) {
+            cacheSupport.removeById(id.value());
+        }
         return count;
     }
 

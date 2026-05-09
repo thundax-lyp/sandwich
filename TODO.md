@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-auth/principal-auth`：规约化 PrincipalAuthService 和 PreAuthSessionService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalAuthService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalAuthServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PreAuthSessionService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImpl.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/PrincipalAuthServiceImplTest.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImplTest.java
-  - 处理动作：新增认证运行态 Query 和 Command，规约化登录前会话、认证会话、token 创建/刷新/撤销入口
-  - 验收点：PrincipalAuthService 和 PreAuthSessionService 方法参数符合三态规则；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：9/10
-
 - [ ] `service-method-admin/auth`：同步后台 AuthController 和入口认证 Service
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AdminAuthService.java

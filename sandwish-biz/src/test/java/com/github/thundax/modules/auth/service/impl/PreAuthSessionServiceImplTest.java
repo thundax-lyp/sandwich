@@ -11,6 +11,11 @@ import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession.RefreshTokenValue;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -40,46 +45,49 @@ public class PreAuthSessionServiceImplTest {
 
     @Test
     public void shouldCreateAndRefreshPreAuthSession() throws Exception {
-        PreAuthSession session = service.create(60);
+        PreAuthSession session = service.create(new CreatePreAuthSessionCommand(60));
 
-        assertEquals(session.getId(), service.findIdByToken(session.getToken()));
-        assertEquals(session.getId(), service.findIdByRefreshToken(session.getRefreshToken()));
+        assertEquals(session.getId(), service.getIdByToken(queryByToken(session.getToken())));
+        assertEquals(session.getId(), service.getIdByRefreshToken(queryByRefreshToken(session.getRefreshToken())));
 
         PreAuthSessionToken oldToken = session.getToken();
         PreAuthSessionToken oldRefreshToken = session.getRefreshToken();
 
-        PreAuthSession refreshed = service.refresh(session.getId(), 60, 60);
+        PreAuthSession refreshed =
+                service.refresh(new RefreshPreAuthSessionCommand(session.getId(), 60, 60));
 
         assertEquals(session.getId(), refreshed.getId());
         assertNotEquals(oldToken, refreshed.getToken());
         assertNotEquals(oldRefreshToken, refreshed.getRefreshToken());
-        assertNull(service.findIdByToken(oldToken));
-        assertEquals(session.getId(), service.findIdByToken(refreshed.getToken()));
-        assertEquals(session.getId(), service.findIdByRefreshToken(refreshed.getRefreshToken()));
-        assertEquals(session.getId(), service.findIdByRefreshToken(oldRefreshToken));
+        assertNull(service.getIdByToken(queryByToken(oldToken)));
+        assertEquals(session.getId(), service.getIdByToken(queryByToken(refreshed.getToken())));
+        assertEquals(session.getId(), service.getIdByRefreshToken(queryByRefreshToken(refreshed.getRefreshToken())));
+        assertEquals(session.getId(), service.getIdByRefreshToken(queryByRefreshToken(oldRefreshToken)));
     }
 
     @Test
     public void shouldReleasePreAuthSessionById() {
-        PreAuthSession session = service.create(60);
+        PreAuthSession session = service.create(new CreatePreAuthSessionCommand(60));
 
-        service.release(session.getId());
+        service.release(new ReleasePreAuthSessionCommand(session.getId()));
 
         assertNull(preAuthSessionDao.getById(session.getId()));
-        assertNull(service.findIdByToken(session.getToken()));
-        assertNull(service.findIdByRefreshToken(session.getRefreshToken()));
+        assertNull(service.getIdByToken(queryByToken(session.getToken())));
+        assertNull(service.getIdByRefreshToken(queryByRefreshToken(session.getRefreshToken())));
     }
 
     @Test
     public void shouldManagePreAuthSessionValueWithTtl() throws Exception {
-        PreAuthSession session = service.create(60);
+        PreAuthSession session = service.create(new CreatePreAuthSessionCommand(60));
 
-        service.upsertValue(session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() + 60000L);
-        assertEquals("2345", service.findValue(session.getId(), CAPTCHA_ITEM));
+        service.upsertValue(new UpsertPreAuthSessionValueCommand(
+                session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() + 60000L));
+        assertEquals("2345", service.getValue(queryByName(session.getId(), CAPTCHA_ITEM)));
 
-        service.upsertValue(session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L);
+        service.upsertValue(new UpsertPreAuthSessionValueCommand(
+                session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L));
 
-        assertNull(service.findValue(session.getId(), CAPTCHA_ITEM));
+        assertNull(service.getValue(queryByName(session.getId(), CAPTCHA_ITEM)));
     }
 
     @Test(expected = InvalidTokenException.class)
@@ -93,7 +101,19 @@ public class PreAuthSessionServiceImplTest {
                 System.currentTimeMillis() - 1L);
         preAuthSessionDao.insert(session);
 
-        service.getById(session.getId());
+        service.get(new PreAuthSessionQuery(session.getId(), null, null, null));
+    }
+
+    private PreAuthSessionQuery queryByToken(PreAuthSessionToken token) {
+        return new PreAuthSessionQuery(null, token, null, null);
+    }
+
+    private PreAuthSessionQuery queryByRefreshToken(PreAuthSessionToken refreshToken) {
+        return new PreAuthSessionQuery(null, null, refreshToken, null);
+    }
+
+    private PreAuthSessionQuery queryByName(PreAuthSessionId id, String name) {
+        return new PreAuthSessionQuery(id, null, null, name);
     }
 
     private static class RecordingPreAuthSessionDao implements PreAuthSessionDao {

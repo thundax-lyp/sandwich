@@ -18,6 +18,9 @@ import com.github.thundax.modules.auth.service.MemberRegistrationService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.member.entity.Member;
@@ -79,7 +82,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         Member member = createMember(name);
         PrincipalIdentity identity = updateIdentity(member, PrincipalIdentityType.MEMBER_ACCOUNT, account);
         upsertPassword(member, identity, PasswordHelper.encrypt(password));
-        preAuthSessionService.release(requireSessionId(token));
+        preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
         return member.getId();
     }
 
@@ -93,10 +96,12 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
         String validateCode = PreAuthCodeHelper.generateSmsCode();
         PreAuthSessionId sessionId = requireSessionId(token);
-        long expiredAt = preAuthSessionService.getById(sessionId).getExpiredAt();
-        preAuthSessionService.upsertValue(sessionId, SMS_MOBILE_ITEM, mobile, expiredAt);
-        preAuthSessionService.upsertValue(sessionId, SMS_VALIDATE_CODE_ITEM, validateCode, expiredAt);
-        preAuthSessionService.upsertValue(sessionId, CAPTCHA_ITEM, null, 0L);
+        long expiredAt = preAuthSessionService.get(new PreAuthSessionQuery(sessionId, null, null, null)).getExpiredAt();
+        preAuthSessionService.upsertValue(
+                new UpsertPreAuthSessionValueCommand(sessionId, SMS_MOBILE_ITEM, mobile, expiredAt));
+        preAuthSessionService.upsertValue(
+                new UpsertPreAuthSessionValueCommand(sessionId, SMS_VALIDATE_CODE_ITEM, validateCode, expiredAt));
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(sessionId, CAPTCHA_ITEM, null, 0L));
     }
 
     @Override
@@ -113,7 +118,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        preAuthSessionService.release(requireSessionId(token));
+        preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
         return member.getId();
     }
 
@@ -127,10 +132,12 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
         String validateCode = PreAuthCodeHelper.generateEmailCode();
         PreAuthSessionId sessionId = requireSessionId(token);
-        long expiredAt = preAuthSessionService.getById(sessionId).getExpiredAt();
-        preAuthSessionService.upsertValue(sessionId, EMAIL_ITEM, email, expiredAt);
-        preAuthSessionService.upsertValue(sessionId, EMAIL_VALIDATE_CODE_ITEM, validateCode, expiredAt);
-        preAuthSessionService.upsertValue(sessionId, CAPTCHA_ITEM, null, 0L);
+        long expiredAt = preAuthSessionService.get(new PreAuthSessionQuery(sessionId, null, null, null)).getExpiredAt();
+        preAuthSessionService.upsertValue(
+                new UpsertPreAuthSessionValueCommand(sessionId, EMAIL_ITEM, email, expiredAt));
+        preAuthSessionService.upsertValue(
+                new UpsertPreAuthSessionValueCommand(sessionId, EMAIL_VALIDATE_CODE_ITEM, validateCode, expiredAt));
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(sessionId, CAPTCHA_ITEM, null, 0L));
     }
 
     @Override
@@ -147,7 +154,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
         Member member = createMember(name);
         updateIdentity(member, PrincipalIdentityType.MEMBER_EMAIL, email);
-        preAuthSessionService.release(requireSessionId(token));
+        preAuthSessionService.release(new ReleasePreAuthSessionCommand(requireSessionId(token)));
         return member.getId();
     }
 
@@ -224,7 +231,9 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
             return true;
         }
-        return StringUtils.equals(captcha, preAuthSessionService.findValue(requireSessionId(token), CAPTCHA_ITEM));
+        return StringUtils.equals(
+                captcha,
+                preAuthSessionService.getValue(new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
     }
 
     private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
@@ -234,8 +243,13 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             return true;
         }
         PreAuthSessionId sessionId = requireSessionId(token);
-        return StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_MOBILE_ITEM), mobile)
-                && StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_VALIDATE_CODE_ITEM), validateCode);
+        return StringUtils.equals(
+                        preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, SMS_MOBILE_ITEM)),
+                        mobile)
+                && StringUtils.equals(
+                        preAuthSessionService.getValue(
+                                new PreAuthSessionQuery(sessionId, null, null, SMS_VALIDATE_CODE_ITEM)),
+                        validateCode);
     }
 
     private boolean validateEmailValidateCode(PreAuthSessionToken token, String email, String validateCode)
@@ -245,13 +259,18 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             return true;
         }
         PreAuthSessionId sessionId = requireSessionId(token);
-        return StringUtils.equals(preAuthSessionService.findValue(sessionId, EMAIL_ITEM), email)
+        return StringUtils.equals(
+                        preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, EMAIL_ITEM)),
+                        email)
                 && StringUtils.equals(
-                        preAuthSessionService.findValue(sessionId, EMAIL_VALIDATE_CODE_ITEM), validateCode);
+                        preAuthSessionService.getValue(
+                                new PreAuthSessionQuery(sessionId, null, null, EMAIL_VALIDATE_CODE_ITEM)),
+                        validateCode);
     }
 
     private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
-        String privateKey = preAuthSessionService.findValue(requireSessionId(token), PRIVATE_KEY_ITEM);
+        String privateKey = preAuthSessionService.getValue(
+                new PreAuthSessionQuery(requireSessionId(token), null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw new ApiException("登录表单密钥已失效");
         }
@@ -265,7 +284,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(token);
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
         if (sessionId == null) {
             throw new ApiException("登录表单已失效");
         }

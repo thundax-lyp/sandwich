@@ -26,6 +26,8 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenC
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
+import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
+import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.member.entity.Member;
@@ -78,12 +80,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
             throws ApiException {
         PrincipalIdentity principalIdentity;
         try {
-            principalIdentity = principalAuthService.authenticatePassword(
+            principalIdentity = principalAuthService.authenticatePassword(new AuthenticatePasswordCommand(
                     PrincipalIdentityType.MEMBER_ACCOUNT,
                     account,
                     PrincipalCredentialType.MEMBER_PASSWORD,
                     plainPassword,
-                    PrincipalPasswordPolicyDTO.disabled());
+                    PrincipalPasswordPolicyDTO.disabled()));
         } catch (InvalidPasswordException e) {
             writeLoginEvent(
                     null,
@@ -292,7 +294,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) throws ApiException {
         PrincipalIdentity identity;
         try {
-            identity = principalAuthService.authenticateIdentity(type, value);
+            identity = principalAuthService.authenticateIdentity(new AuthenticateIdentityCommand(type, value));
         } catch (InvalidPasswordException e) {
             throw new ApiException("用户名或密码错误");
         }

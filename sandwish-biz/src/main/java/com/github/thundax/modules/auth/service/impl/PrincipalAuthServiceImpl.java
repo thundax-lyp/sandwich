@@ -3,12 +3,12 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
+import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import java.util.Date;
@@ -27,9 +27,9 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
-    public PrincipalIdentity authenticateIdentity(PrincipalIdentityType identityType, String identityValue)
-            throws ApiException {
-        PrincipalIdentity identity = principalIdentityService.getByIdentity(identityType, identityValue);
+    public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) throws ApiException {
+        PrincipalIdentity identity =
+                principalIdentityService.getByIdentity(command.getIdentityType(), command.getIdentityValue());
         if (identity == null || !identity.isEnabled()) {
             throw invalidPrincipalCredential();
         }
@@ -37,20 +37,15 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
-    public PrincipalIdentity authenticatePassword(
-            PrincipalIdentityType identityType,
-            String identityValue,
-            PrincipalCredentialType credentialType,
-            String plainPassword,
-            PrincipalPasswordPolicyDTO passwordPolicy)
-            throws ApiException {
-        PrincipalIdentity identity = authenticateIdentity(identityType, identityValue);
+    public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) throws ApiException {
+        PrincipalIdentity identity = authenticateIdentity(new AuthenticateIdentityCommand(
+                command.getIdentityType(), command.getIdentityValue()));
         PrincipalCredential credential =
-                principalCredentialService.getByIdentityIdAndType(identity.getId(), credentialType);
+                principalCredentialService.getByIdentityIdAndType(identity.getId(), command.getCredentialType());
         if (credential == null) {
             throw invalidPrincipalCredential();
         }
-        validateCredential(credential, plainPassword, effectivePolicy(passwordPolicy));
+        validateCredential(credential, command.getPlainPassword(), effectivePolicy(command.getPasswordPolicy()));
         return identity;
     }
 

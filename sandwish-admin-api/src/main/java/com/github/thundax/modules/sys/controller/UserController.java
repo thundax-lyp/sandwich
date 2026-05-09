@@ -29,6 +29,7 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -614,11 +615,12 @@ public class UserController {
     }
 
     private String getPrivateKey(String token) throws InvalidTokenException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        PreAuthSessionId sessionId =
+                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
             throw new InvalidTokenException();
         }
-        String privateKey = preAuthSessionService.findValue(sessionId, PRIVATE_KEY_ITEM);
+        String privateKey = preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw new InvalidTokenException();
         }

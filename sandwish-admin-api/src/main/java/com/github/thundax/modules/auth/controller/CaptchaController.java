@@ -11,6 +11,8 @@ import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -104,16 +106,17 @@ public class CaptchaController {
 
     private String createCaptcha(String loginToken) throws ApiException {
         String captcha = PreAuthCodeHelper.generateCaptcha();
-        preAuthSessionService.upsertValue(
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 requireSessionIdByToken(loginToken),
                 CAPTCHA_ITEM,
                 captcha,
-                System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L);
+                System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
         return captcha;
     }
 
     private String getCaptcha(String loginToken) throws ApiException {
-        String captcha = preAuthSessionService.findValue(requireSessionIdByToken(loginToken), CAPTCHA_ITEM);
+        String captcha = preAuthSessionService.getValue(
+                new PreAuthSessionQuery(requireSessionIdByToken(loginToken), null, null, CAPTCHA_ITEM));
         if (StringUtils.isEmpty(captcha)) {
             throw new InvalidCaptchaException();
         }
@@ -121,7 +124,8 @@ public class CaptchaController {
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        PreAuthSessionId sessionId =
+                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
             throw new InvalidParameterException("loginToken");
         }

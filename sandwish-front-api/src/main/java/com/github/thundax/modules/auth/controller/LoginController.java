@@ -22,6 +22,11 @@ import com.github.thundax.modules.auth.security.MemberSecurityContext;
 import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
@@ -91,7 +96,8 @@ public class LoginController {
             throw new ApiException("图形验证码错误");
         }
         String password = decryptRsaValue(token, request.getPassword());
-        preAuthSessionService.release(requireSessionIdByToken(request.getLoginToken()));
+        preAuthSessionService.release(
+                new ReleasePreAuthSessionCommand(requireSessionIdByToken(request.getLoginToken())));
         return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.loginAccount(
                 request.getAccount(), password, ip(httpRequest), userAgent(httpRequest)));
     }
@@ -110,7 +116,8 @@ public class LoginController {
                     PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
             throw new ApiException("短信验证码错误");
         }
-        preAuthSessionService.release(requireSessionIdByToken(request.getLoginToken()));
+        preAuthSessionService.release(
+                new ReleasePreAuthSessionCommand(requireSessionIdByToken(request.getLoginToken())));
         return MemberLoginInterfaceAssembler.toTokenResponse(
                 memberAuthService.loginSms(request.getMobile(), ip(httpRequest), userAgent(httpRequest)));
     }
@@ -146,24 +153,25 @@ public class LoginController {
     }
 
     private PreAuthSession createPreAuthSession() throws ApiException {
-        if (preAuthSessionService.count() > authProperties.getMaxLoginCount()) {
+        if (preAuthSessionService.count(new PreAuthSessionQuery()) > authProperties.getMaxLoginCount()) {
             throw new ApiException("登录请求过多");
         }
-        PreAuthSession session = preAuthSessionService.create(authProperties.getLoginExpiredSeconds());
+        PreAuthSession session =
+                preAuthSessionService.create(new CreatePreAuthSessionCommand(authProperties.getLoginExpiredSeconds()));
         writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
         RSAUtils.ReadableKeyPair keyPair = RSAUtils.generateKeyPair();
-        preAuthSessionService.upsertValue(
-                session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt());
-        preAuthSessionService.upsertValue(
-                session.getId(), PRIVATE_KEY_ITEM, memberPrivateKeyValue(keyPair), session.getExpiredAt());
-        return preAuthSessionService.getById(session.getId());
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
+                session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt()));
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
+                session.getId(), PRIVATE_KEY_ITEM, memberPrivateKeyValue(keyPair), session.getExpiredAt()));
+        return preAuthSessionService.get(new PreAuthSessionQuery(session.getId(), null, null, null));
     }
 
     private PreAuthSession refreshPreAuthSession(String refreshToken) throws ApiException {
-        PreAuthSession session = preAuthSessionService.refresh(
+        PreAuthSession session = preAuthSessionService.refresh(new RefreshPreAuthSessionCommand(
                 requireSessionIdByRefreshToken(refreshToken),
                 authProperties.getLoginExpiredSeconds(),
-                REFRESH_TOKEN_GRACE_SECONDS);
+                REFRESH_TOKEN_GRACE_SECONDS));
         writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
         return session;
     }
@@ -173,7 +181,9 @@ public class LoginController {
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
             return true;
         }
-        return StringUtils.equals(captcha, preAuthSessionService.findValue(requireSessionId(token), CAPTCHA_ITEM));
+        return StringUtils.equals(
+                captcha,
+                preAuthSessionService.getValue(new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
     }
 
     private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
@@ -183,12 +193,18 @@ public class LoginController {
             return true;
         }
         PreAuthSessionId sessionId = requireSessionId(token);
-        return StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_MOBILE_ITEM), mobile)
-                && StringUtils.equals(preAuthSessionService.findValue(sessionId, SMS_VALIDATE_CODE_ITEM), validateCode);
+        return StringUtils.equals(
+                        preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, SMS_MOBILE_ITEM)),
+                        mobile)
+                && StringUtils.equals(
+                        preAuthSessionService.getValue(
+                                new PreAuthSessionQuery(sessionId, null, null, SMS_VALIDATE_CODE_ITEM)),
+                        validateCode);
     }
 
     private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
-        String privateKey = preAuthSessionService.findValue(requireSessionId(token), PRIVATE_KEY_ITEM);
+        String privateKey = preAuthSessionService.getValue(
+                new PreAuthSessionQuery(requireSessionId(token), null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw new ApiException("登录表单密钥已失效");
         }
@@ -202,8 +218,8 @@ public class LoginController {
     }
 
     private void writeCaptcha(PreAuthSessionId sessionId, String captcha) throws ApiException {
-        preAuthSessionService.upsertValue(
-                sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L);
+        preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
+                sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
     }
 
     private String memberPrivateKeyValue(RSAUtils.ReadableKeyPair keyPair) {
@@ -223,7 +239,7 @@ public class LoginController {
     }
 
     private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(token);
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
         if (sessionId == null) {
             throw new ApiException("登录表单已失效");
         }
@@ -231,7 +247,8 @@ public class LoginController {
     }
 
     private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) throws ApiException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByRefreshToken(PreAuthSessionToken.of(refreshToken));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByRefreshToken(
+                new PreAuthSessionQuery(null, null, PreAuthSessionToken.of(refreshToken), null));
         if (sessionId == null) {
             throw new ApiException("登录表单已失效");
         }

@@ -3,26 +3,29 @@ package com.github.thundax.modules.auth.service;
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
-import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 
 public interface PreAuthSessionService {
 
-    int count();
+    int count(PreAuthSessionQuery query);
 
-    PreAuthSession create(int expiredSeconds);
+    PreAuthSession create(CreatePreAuthSessionCommand command);
 
-    PreAuthSessionId findIdByToken(PreAuthSessionToken token);
+    PreAuthSessionId getIdByToken(PreAuthSessionQuery query);
 
-    PreAuthSessionId findIdByRefreshToken(PreAuthSessionToken refreshToken);
+    PreAuthSessionId getIdByRefreshToken(PreAuthSessionQuery query);
 
-    PreAuthSession getById(PreAuthSessionId id) throws InvalidTokenException;
+    PreAuthSession get(PreAuthSessionQuery query) throws InvalidTokenException;
 
-    PreAuthSession refresh(PreAuthSessionId id, int expiredSeconds, int refreshTokenGraceSeconds)
-            throws InvalidTokenException;
+    PreAuthSession refresh(RefreshPreAuthSessionCommand command) throws InvalidTokenException;
 
-    void release(PreAuthSessionId id);
+    void release(ReleasePreAuthSessionCommand command);
 
-    void upsertValue(PreAuthSessionId id, String name, String value, long expiredAt) throws InvalidTokenException;
+    void upsertValue(UpsertPreAuthSessionValueCommand command) throws InvalidTokenException;
 
-    String findValue(PreAuthSessionId id, String name) throws InvalidTokenException;
+    String getValue(PreAuthSessionQuery query) throws InvalidTokenException;
 }

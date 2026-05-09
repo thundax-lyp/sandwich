@@ -20,10 +20,11 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMetho
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
-import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
 import org.junit.After;
@@ -48,8 +49,8 @@ public class AuthControllerContractTest {
         AdminAuthService authService = mock(AdminAuthService.class);
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSession session = preAuthSession();
-        when(preAuthSessionService.create(300)).thenReturn(session);
-        when(preAuthSessionService.getById(session.getId())).thenReturn(session);
+        when(preAuthSessionService.create(any(CreatePreAuthSessionCommand.class))).thenReturn(session);
+        when(preAuthSessionService.get(any(PreAuthSessionQuery.class))).thenReturn(session);
 
         mockMvc(authService, preAuthSessionService)
                 .perform(post("/api/auth/pre-auth-session").contentType(MediaType.APPLICATION_JSON))
@@ -71,10 +72,9 @@ public class AuthControllerContractTest {
         AdminAuthService authService = mock(AdminAuthService.class);
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSessionId sessionId = PreAuthSessionId.of("session-1");
-        when(preAuthSessionService.findIdByToken(any(PreAuthSessionToken.class)))
-                .thenReturn(sessionId);
-        when(preAuthSessionService.findValue(sessionId, "CAPTCHA")).thenReturn("1234");
-        when(preAuthSessionService.findValue(sessionId, "privateKey")).thenReturn(keyPair.getPrivateKey());
+        when(preAuthSessionService.getIdByToken(any(PreAuthSessionQuery.class))).thenReturn(sessionId);
+        when(preAuthSessionService.getValue(any(PreAuthSessionQuery.class)))
+                .thenReturn("1234", keyPair.getPrivateKey());
         when(authService.authenticatePassword(eq("admin"), eq("plain-password"), any(), eq("JUnit")))
                 .thenReturn(user());
         when(authService.createAccessToken(

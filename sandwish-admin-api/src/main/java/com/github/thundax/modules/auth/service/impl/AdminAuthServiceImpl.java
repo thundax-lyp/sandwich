@@ -38,6 +38,8 @@ import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
+import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -600,12 +602,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throws ApiException {
         PrincipalIdentity identity;
         try {
-            identity = principalAuthService.authenticatePassword(
+            identity = principalAuthService.authenticatePassword(new AuthenticatePasswordCommand(
                     PrincipalIdentityType.USER_ACCOUNT,
                     loginName,
                     PrincipalCredentialType.USER_PASSWORD,
                     plainPassword,
-                    passwordPolicy());
+                    passwordPolicy()));
         } catch (InvalidPasswordException e) {
             recordLoginFailed(
                     PrincipalAuthenticationMethod.PASSWORD,
@@ -727,7 +729,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throws ApiException {
         PrincipalIdentity identity;
         try {
-            identity = principalAuthService.authenticateIdentity(identityType, identityValue);
+            identity = principalAuthService.authenticateIdentity(
+                    new AuthenticateIdentityCommand(identityType, identityValue));
         } catch (InvalidPasswordException e) {
             recordLoginFailed(
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);

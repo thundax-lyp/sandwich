@@ -19,6 +19,7 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import java.util.List;
@@ -48,12 +49,12 @@ public class PrincipalAuthServiceImplTest {
 
         PrincipalAuthServiceImpl service = new PrincipalAuthServiceImpl(identityService, credentialService);
 
-        PrincipalIdentity result = service.authenticatePassword(
+        PrincipalIdentity result = service.authenticatePassword(new AuthenticatePasswordCommand(
                 PrincipalIdentityType.USER_ACCOUNT,
                 "developer",
                 PrincipalCredentialType.USER_PASSWORD,
                 "Q1w2e3r$",
-                PrincipalPasswordPolicyDTO.disabled());
+                PrincipalPasswordPolicyDTO.disabled()));
 
         assertSame(identity, result);
         assertEquals(Integer.valueOf(1), credentialService.updateVerifyStateCalls);
@@ -72,12 +73,12 @@ public class PrincipalAuthServiceImplTest {
 
         PrincipalAuthServiceImpl service = new PrincipalAuthServiceImpl(identityService, credentialService);
 
-        service.authenticatePassword(
+        service.authenticatePassword(new AuthenticatePasswordCommand(
                 PrincipalIdentityType.USER_ACCOUNT,
                 "developer",
                 PrincipalCredentialType.USER_PASSWORD,
                 "wrong",
-                PrincipalPasswordPolicyDTO.disabled());
+                PrincipalPasswordPolicyDTO.disabled()));
     }
 
     @Test
@@ -92,12 +93,12 @@ public class PrincipalAuthServiceImplTest {
         PrincipalAuthServiceImpl service = new PrincipalAuthServiceImpl(identityService, credentialService);
 
         try {
-            service.authenticatePassword(
+            service.authenticatePassword(new AuthenticatePasswordCommand(
                     PrincipalIdentityType.USER_ACCOUNT,
                     "developer",
                     PrincipalCredentialType.USER_PASSWORD,
                     "wrong",
-                    new PrincipalPasswordPolicyDTO(true, 2, 60));
+                    new PrincipalPasswordPolicyDTO(true, 2, 60)));
         } catch (ApiException e) {
             assertEquals("帐号已被锁定，请等待（60）秒后自动解锁!", e.getMessage());
         }

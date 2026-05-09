@@ -22,7 +22,6 @@ public class UserCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.user";
-    private static final String ID_PREFIX = "id_";
     private static final String ROLES_PREFIX = ".roles_";
     private static final String KEY_INDEX = "keys";
 
@@ -41,19 +40,19 @@ public class UserCacheSupport {
     private Cache<String, Set<String>> keyIndexCache;
 
     public User getById(Long id) {
-        return toDomain((UserCacheDTO) cache.get(objectKey(id)));
+        return toDomain((UserCacheDTO) cache.get(String.valueOf(id)));
     }
 
     public void putById(User user) {
         if (user != null && EntityIdCodec.toValue(user.getId()) != null) {
-            String key = objectKey(EntityIdCodec.toValue(user.getId()));
+            String key = String.valueOf(EntityIdCodec.toValue(user.getId()));
             cache.put(key, toCacheDTO(user), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
     public void removeById(Long id) {
-        String key = objectKey(id);
+        String key = String.valueOf(id);
         cache.remove(key);
         forgetKey(key);
     }
@@ -83,12 +82,8 @@ public class UserCacheSupport {
         forgetKey(key);
     }
 
-    private String objectKey(Long id) {
-        return CACHE_SECTION + ID_PREFIX + id;
-    }
-
     private String userRoleIdsKey(Long userId) {
-        return CACHE_SECTION + ROLES_PREFIX + userId;
+        return ROLES_PREFIX + userId;
     }
 
     private void rememberKey(String key) {

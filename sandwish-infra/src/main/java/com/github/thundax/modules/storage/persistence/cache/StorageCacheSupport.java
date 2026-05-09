@@ -21,7 +21,6 @@ public class StorageCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "assist.storage.";
-    private static final String ID_PREFIX = "id_";
 
     @CreateCache(
             name = CACHE_SECTION,
@@ -31,13 +30,13 @@ public class StorageCacheSupport {
     private Cache<String, Object> cache;
 
     public StoredObject getById(String id) {
-        return toDomain((StoredObjectCacheDTO) cache.get(objectKey(id)));
+        return toDomain((StoredObjectCacheDTO) cache.get(String.valueOf(id)));
     }
 
     public void putById(StoredObject storage) {
         if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toStringValue(storage.getId()))) {
             cache.put(
-                    objectKey(EntityIdCodec.toStringValue(storage.getId())),
+                    EntityIdCodec.toStringValue(storage.getId()),
                     toCacheDTO(storage),
                     OBJECT_EXPIRE_SECONDS,
                     TimeUnit.SECONDS);
@@ -45,11 +44,7 @@ public class StorageCacheSupport {
     }
 
     public void removeById(String id) {
-        cache.remove(objectKey(id));
-    }
-
-    private String objectKey(String id) {
-        return CACHE_SECTION + ID_PREFIX + id;
+        cache.remove(id);
     }
 
     private static StoredObject toDomain(StoredObjectCacheDTO cacheDTO) {

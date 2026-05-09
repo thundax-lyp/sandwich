@@ -20,7 +20,6 @@ public class MenuCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.menu.";
-    private static final String ID_PREFIX = "id_";
     private static final String KEY_INDEX = "keys";
 
     @CreateCache(
@@ -38,19 +37,19 @@ public class MenuCacheSupport {
     private Cache<String, Set<String>> keyIndexCache;
 
     public Menu getById(Long id) {
-        return toDomain((MenuCacheDTO) cache.get(objectKey(id)));
+        return toDomain((MenuCacheDTO) cache.get(String.valueOf(id)));
     }
 
     public void putById(Menu menu) {
         if (menu != null && EntityIdCodec.toValue(menu.getId()) != null) {
-            String key = objectKey(EntityIdCodec.toValue(menu.getId()));
+            String key = String.valueOf(EntityIdCodec.toValue(menu.getId()));
             cache.put(key, toCacheDTO(menu), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
     }
 
     public void removeById(Long id) {
-        String key = objectKey(id);
+        String key = String.valueOf(id);
         cache.remove(key);
         forgetKey(key);
     }
@@ -61,10 +60,6 @@ public class MenuCacheSupport {
             cache.removeAll(keys);
         }
         keyIndexCache.remove(KEY_INDEX);
-    }
-
-    private String objectKey(Long id) {
-        return CACHE_SECTION + ID_PREFIX + id;
     }
 
     private void rememberKey(String key) {

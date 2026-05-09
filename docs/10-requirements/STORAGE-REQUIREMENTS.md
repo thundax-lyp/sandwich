@@ -200,16 +200,13 @@
 
 Storage 公开入口固定使用资源型路径。
 
-- 上传对象：`POST /api/storage/objects`
-- 分片初始化：`POST /api/storage/objects/multipart`
-- 上传分片：`POST /api/storage/objects/multipart/{uploadId}/parts`
-- 完成分片：`POST /api/storage/objects/multipart/{uploadId}/complete`
-- 取消分片：`DELETE /api/storage/objects/multipart/{uploadId}`
-- 读取对象元数据：`GET /api/storage/objects/{objectId}`
-- 读取对象内容：`GET /api/storage/objects/{objectId}/content`
-- 建立引用：`POST /api/storage/objects/{objectId}/references`
-- 清理引用：`DELETE /api/storage/objects/{objectId}/references`
-- 删除对象：`DELETE /api/storage/objects/{objectId}`
+- 上传对象：`POST /api/storage/object/upload`
+- 分片初始化：`POST /api/storage/multipart-upload`
+- 上传分片：`POST /api/storage/multipart-upload/{uploadId}/parts`
+- 完成分片：`POST /api/storage/multipart-upload/{uploadId}/complete`
+- 取消分片：`POST /api/storage/multipart-upload/{uploadId}/abort`
+- 读取对象内容：`GET /api/storage/object/{objectId}/content`
+- 删除对象：`POST /api/storage/object/delete`
 
 ## 8. Functional Requirements
 
@@ -285,7 +282,7 @@ Storage 公开入口固定使用资源型路径。
 
 ### 9.2 内容读取流程
 
-1. Controller 接收 `GET /api/storage/objects/{objectId}/content`。
+1. Controller 接收 `GET /api/storage/object/{objectId}/content`。
 2. Service 读取 `StoredObject` 主数据。
 3. Service 校验对象状态。
 4. Service 调用底层存储端口读取对象内容。

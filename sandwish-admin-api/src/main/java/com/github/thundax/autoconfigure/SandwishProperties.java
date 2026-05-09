@@ -65,7 +65,7 @@ public class SandwishProperties {
 
         public String getContentPath() {
             if (StringUtils.isEmpty(contentPath)) {
-                return "/api/storage/objects/";
+                return "/api/storage/object/";
             }
 
             return contentPath.endsWith("/") ? contentPath : contentPath + "/";

@@ -88,7 +88,7 @@ public class MultipartUploadServiceImplTest {
         command.setBucketName("/tmp/storage/");
         command.setObjectKey("202605/demo.png");
         command.setSize(300L);
-        command.setAccessEndpoint("/api/storage/objects/s1/content");
+        command.setAccessEndpoint("/api/storage/object/s1/content");
 
         StoredObject storage = service(dao).complete(command);
 
@@ -101,7 +101,7 @@ public class MultipartUploadServiceImplTest {
         assertSame(StorageType.LOCAL_FILE, storage.getStorageType());
         assertEquals("202605/demo.png", storage.getObjectKey());
         assertEquals(Long.valueOf(300L), storage.getSize());
-        assertEquals("/api/storage/objects/s1/content", storage.getAccessEndpoint());
+        assertEquals("/api/storage/object/s1/content", storage.getAccessEndpoint());
         assertSame(StoredObjectStatus.ACTIVE, storage.getObjectStatus());
         assertSame(StoredObjectReferenceStatus.UNREFERENCED, storage.getReferenceStatus());
         assertSame(storage, dao.inserted);

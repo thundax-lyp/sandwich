@@ -13,7 +13,7 @@ if ! smoke_require_admin_token; then
     exit 0
 fi
 
-smoke_post "$(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/assist/storage/treeData")" "" "${SANDWICH_SMOKE_ADMIN_TOKEN}"
+smoke_post "$(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/storage/object/tree")" "" "${SANDWICH_SMOKE_ADMIN_TOKEN}"
 smoke_expect_2xx "storage tree"
 smoke_expect_body "storage tree"
 
@@ -27,7 +27,7 @@ if smoke_bool "${SANDWICH_SMOKE_STORAGE_UPLOAD}"; then
         smoke_fail "storage upload file not found: ${storage_file}"
     fi
 
-    smoke_log "POST $(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/assist/storage/upload")"
+    smoke_log "POST $(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/storage/object/upload")"
     upload_body_file="$(mktemp "${TMPDIR:-/tmp}/sandwich-storage-upload.XXXXXX")"
     SMOKE_TMP_FILES+=("${upload_body_file}")
     upload_status="$(curl -sS -m "${SANDWICH_SMOKE_TIMEOUT}" \
@@ -36,7 +36,7 @@ if smoke_bool "${SANDWICH_SMOKE_STORAGE_UPLOAD}"; then
         -H "Accept: application/json" \
         -H "${SANDWICH_SMOKE_TOKEN_HEADER}: ${SANDWICH_SMOKE_ADMIN_TOKEN}" \
         -F "file=@${storage_file};type=text/plain" \
-        "$(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/assist/storage/upload")")"
+        "$(smoke_url "${SANDWICH_ADMIN_BASE_URL}" "/api/storage/object/upload")")"
 
     if [ "${upload_status#2}" = "${upload_status}" ]; then
         cat "${upload_body_file}" >&2

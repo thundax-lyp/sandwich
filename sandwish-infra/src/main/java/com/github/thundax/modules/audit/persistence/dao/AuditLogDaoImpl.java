@@ -2,20 +2,21 @@ package com.github.thundax.modules.audit.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
 import com.github.thundax.modules.audit.persistence.assembler.AuditLogPersistenceAssembler;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO;
 import com.github.thundax.modules.audit.persistence.mapper.AuditLogMapper;
-import java.util.Date;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public class AuditLogDaoImpl implements AuditLogDao {
@@ -28,16 +29,16 @@ public class AuditLogDaoImpl implements AuditLogDao {
     }
 
     @Override
-    public EntityId insert(AuditLog log) {
+    public AuditLogId insert(AuditLog log) {
         AuditLogDO dataObject = AuditLogPersistenceAssembler.toDataObject(log);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return AuditLogIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
-    public AuditLog getById(EntityId id) {
-        return AuditLogPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    public AuditLog getById(AuditLogId id) {
+        return AuditLogPersistenceAssembler.toEntity(mapper.selectById(AuditLogIdCodec.toValue(id)));
     }
 
     @Override

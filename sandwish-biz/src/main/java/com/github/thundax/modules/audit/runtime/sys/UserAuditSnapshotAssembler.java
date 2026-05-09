@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserAuditSnapshotAssembler implements AuditSnapshotAssembler {
 
+    private static final String OBJECT_TYPE = "User";
+
     @Override
     public String objectType() {
-        return User.BEAN_NAME;
+        return OBJECT_TYPE;
     }
 
     @Override

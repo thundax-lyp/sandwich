@@ -1,7 +1,6 @@
 package com.github.thundax.modules.audit.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
@@ -11,6 +10,8 @@ import com.github.thundax.modules.audit.entity.AuditMeta;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.entity.valueobject.AuditChangedField;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditObjectRef;
 import com.github.thundax.modules.audit.runtime.AuditDiffService;
 import com.github.thundax.modules.audit.service.AuditService;
@@ -38,7 +39,7 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId record(CreateAuditLogCommand command) {
+    public AuditLogId record(CreateAuditLogCommand command) {
         if (command == null
                 || StringUtils.isBlank(command.getObjectType())
                 || StringUtils.isBlank(command.getObjectId())) {
@@ -93,11 +94,11 @@ public class AuditServiceImpl implements AuditService {
             meta.setObjectId(command.getObjectId());
             meta.setVersion(1L);
             meta.setCreatedAt(occurredAt);
-            EntityId metaId = auditMetaDao.insert(meta);
+            AuditMetaId metaId = auditMetaDao.insert(meta);
             meta.setId(metaId);
         }
         log.setMetaId(meta.getId());
-        EntityId logId = auditLogDao.insert(log);
+        AuditLogId logId = auditLogDao.insert(log);
 
         meta.setLastLogId(logId);
         meta.setLastAction(log.getAction());
@@ -114,11 +115,11 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    public AuditLog getLog(AuditLogQuery query) {
-        if (query == null || query.getId() == null) {
+    public AuditLog getLog(AuditLogId id) {
+        if (id == null) {
             return null;
         }
-        return auditLogDao.getById(query.getId());
+        return auditLogDao.getById(id);
     }
 
     @Override

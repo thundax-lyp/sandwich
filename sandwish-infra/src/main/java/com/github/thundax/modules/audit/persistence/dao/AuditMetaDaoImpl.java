@@ -1,11 +1,11 @@
 package com.github.thundax.modules.audit.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.audit.dao.AuditMetaDao;
 import com.github.thundax.modules.audit.entity.AuditMeta;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditObjectRef;
 import com.github.thundax.modules.audit.persistence.assembler.AuditMetaPersistenceAssembler;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditMetaDO;
@@ -34,7 +34,7 @@ public class AuditMetaDaoImpl implements AuditMetaDao {
     }
 
     @Override
-    public EntityId insert(AuditMeta meta) {
+    public AuditMetaId insert(AuditMeta meta) {
         AuditMetaDO dataObject = AuditMetaPersistenceAssembler.toDataObject(meta);
         dataObject.setId(idGenerator.nextId().value());
         if (dataObject.getLastLogId() == null) {
@@ -44,7 +44,7 @@ public class AuditMetaDaoImpl implements AuditMetaDao {
             dataObject.setCreatedLogId(0L);
         }
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return AuditMetaIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

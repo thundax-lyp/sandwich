@@ -1,9 +1,10 @@
 package com.github.thundax.modules.audit.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.audit.entity.AuditMeta;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditMetaDO;
 
 public final class AuditMetaPersistenceAssembler {
@@ -15,11 +16,11 @@ public final class AuditMetaPersistenceAssembler {
             return null;
         }
         AuditMetaDO dataObject = new AuditMetaDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(AuditMetaIdCodec.toValue(entity.getId()));
         dataObject.setObjectType(entity.getObjectType());
         dataObject.setObjectId(entity.getObjectId());
         dataObject.setVersion(entity.getVersion());
-        dataObject.setLastLogId(EntityIdCodec.toValue(entity.getLastLogId()));
+        dataObject.setLastLogId(AuditLogIdCodec.toValue(entity.getLastLogId()));
         dataObject.setLastAction(
                 entity.getLastAction() == null ? null : entity.getLastAction().value());
         dataObject.setLastOperatorType(
@@ -29,7 +30,7 @@ public final class AuditMetaPersistenceAssembler {
         dataObject.setLastOperatorId(entity.getLastOperatorId());
         dataObject.setLastOperatorName(entity.getLastOperatorName());
         dataObject.setLastOperatedAt(entity.getLastOperatedAt());
-        dataObject.setCreatedLogId(EntityIdCodec.toValue(entity.getCreatedLogId()));
+        dataObject.setCreatedLogId(AuditLogIdCodec.toValue(entity.getCreatedLogId()));
         dataObject.setCreatedAt(entity.getCreatedAt());
         return dataObject;
     }
@@ -39,17 +40,17 @@ public final class AuditMetaPersistenceAssembler {
             return null;
         }
         AuditMeta entity = new AuditMeta();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(AuditMetaIdCodec.toDomain(dataObject.getId()));
         entity.setObjectType(dataObject.getObjectType());
         entity.setObjectId(dataObject.getObjectId());
         entity.setVersion(dataObject.getVersion());
-        entity.setLastLogId(EntityIdCodec.toDomain(dataObject.getLastLogId()));
+        entity.setLastLogId(AuditLogIdCodec.toDomain(dataObject.getLastLogId()));
         entity.setLastAction(AuditAction.from(dataObject.getLastAction()));
         entity.setLastOperatorType(AuditOperatorType.from(dataObject.getLastOperatorType()));
         entity.setLastOperatorId(dataObject.getLastOperatorId());
         entity.setLastOperatorName(dataObject.getLastOperatorName());
         entity.setLastOperatedAt(dataObject.getLastOperatedAt());
-        entity.setCreatedLogId(EntityIdCodec.toDomain(dataObject.getCreatedLogId()));
+        entity.setCreatedLogId(AuditLogIdCodec.toDomain(dataObject.getCreatedLogId()));
         entity.setCreatedAt(dataObject.getCreatedAt());
         return entity;
     }

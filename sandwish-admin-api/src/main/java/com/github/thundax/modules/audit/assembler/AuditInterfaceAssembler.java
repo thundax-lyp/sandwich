@@ -1,35 +1,25 @@
 package com.github.thundax.modules.audit.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.controller.request.AuditLogDetailRequest;
 import com.github.thundax.modules.audit.controller.request.AuditLogPageRequest;
 import com.github.thundax.modules.audit.controller.request.AuditMetaRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectPageRequest;
-import com.github.thundax.modules.audit.controller.response.AuditFieldResponse;
-import com.github.thundax.modules.audit.controller.response.AuditLogDetailResponse;
-import com.github.thundax.modules.audit.controller.response.AuditLogResponse;
-import com.github.thundax.modules.audit.controller.response.AuditMetaResponse;
-import com.github.thundax.modules.audit.controller.response.AuditObjectFieldResponse;
-import com.github.thundax.modules.audit.controller.response.AuditObjectOverviewResponse;
-import com.github.thundax.modules.audit.controller.response.AuditOptionResponse;
-import com.github.thundax.modules.audit.controller.response.AuditOptionsResponse;
-import com.github.thundax.modules.audit.controller.response.AuditSnapshotFieldResponse;
-import com.github.thundax.modules.audit.controller.response.AuditSnapshotResponse;
+import com.github.thundax.modules.audit.controller.response.*;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.AuditMeta;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.entity.valueobject.AuditChangedField;
 import com.github.thundax.modules.audit.entity.valueobject.AuditField;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import com.github.thundax.modules.audit.service.query.AuditMetaQuery;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class AuditInterfaceAssembler {
@@ -79,10 +69,8 @@ public final class AuditInterfaceAssembler {
         return query;
     }
 
-    public static AuditLogQuery toLogQuery(AuditLogDetailRequest request) {
-        AuditLogQuery query = new AuditLogQuery();
-        query.setId(EntityIdCodec.toDomain(request.getId()));
-        return query;
+    public static AuditLogId toLogId(AuditLogDetailRequest request) {
+        return AuditLogIdCodec.toDomain(request.getId());
     }
 
     public static AuditLogQuery toLogQuery(AuditObjectPageRequest request) {
@@ -104,7 +92,7 @@ public final class AuditInterfaceAssembler {
             return AuditMetaResponse.builder().build();
         }
         return AuditMetaResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(AuditMetaIdCodec.toValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectId(entity.getObjectId())
                 .version(entity.getVersion())
@@ -132,7 +120,7 @@ public final class AuditInterfaceAssembler {
                     .build();
         }
         return AuditLogDetailResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(AuditLogIdCodec.toValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
                 .objectId(entity.getObjectId())
@@ -203,7 +191,7 @@ public final class AuditInterfaceAssembler {
 
     private static AuditLogResponse.AuditLogResponseBuilder logResponseBuilder(AuditLog entity) {
         return AuditLogResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(AuditLogIdCodec.toValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
                 .objectId(entity.getObjectId())

@@ -1,18 +1,18 @@
 package com.github.thundax.modules.audit.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
 import java.util.Date;
 import java.util.List;
 
 public interface AuditLogDao {
 
-    EntityId insert(AuditLog log);
+    AuditLogId insert(AuditLog log);
 
-    AuditLog getById(EntityId id);
+    AuditLog getById(AuditLogId id);
 
     AuditLog getByIdempotencyKey(String idempotencyKey);
 

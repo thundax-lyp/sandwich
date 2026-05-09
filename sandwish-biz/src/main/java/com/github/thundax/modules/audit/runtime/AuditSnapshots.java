@@ -1,7 +1,6 @@
 package com.github.thundax.modules.audit.runtime;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.id.BaseLongId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditField;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ public final class AuditSnapshots {
         if (id == null) {
             return null;
         }
-        return id instanceof EntityId ? EntityIdCodec.toStringValue((EntityId) id) : String.valueOf(id);
+        return id instanceof BaseLongId ? String.valueOf(((BaseLongId) id).value()) : String.valueOf(id);
     }
 
     public static AuditField field(String name, String label, Object value) {

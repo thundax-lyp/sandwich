@@ -1,13 +1,15 @@
 package com.github.thundax.modules.audit.persistence.assembler;
 
 import com.alibaba.fastjson.JSON;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.entity.valueobject.AuditChangedField;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,8 +22,8 @@ public final class AuditLogPersistenceAssembler {
             return null;
         }
         AuditLogDO dataObject = new AuditLogDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setMetaId(EntityIdCodec.toValue(entity.getMetaId()));
+        dataObject.setId(AuditLogIdCodec.toValue(entity.getId()));
+        dataObject.setMetaId(AuditMetaIdCodec.toValue(entity.getMetaId()));
         dataObject.setObjectType(entity.getObjectType());
         dataObject.setObjectId(entity.getObjectId());
         dataObject.setVersion(entity.getVersion());
@@ -53,8 +55,8 @@ public final class AuditLogPersistenceAssembler {
             return null;
         }
         AuditLog entity = new AuditLog();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setMetaId(EntityIdCodec.toDomain(dataObject.getMetaId()));
+        entity.setId(AuditLogIdCodec.toDomain(dataObject.getId()));
+        entity.setMetaId(AuditMetaIdCodec.toDomain(dataObject.getMetaId()));
         entity.setObjectType(dataObject.getObjectType());
         entity.setObjectId(dataObject.getObjectId());
         entity.setVersion(dataObject.getVersion());

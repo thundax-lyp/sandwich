@@ -1,9 +1,10 @@
 package com.github.thundax.modules.audit.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.entity.valueobject.AuditChangedField;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,8 +16,8 @@ import lombok.Setter;
 @Setter
 public class AuditLog {
 
-    private EntityId id;
-    private EntityId metaId;
+    private AuditLogId id;
+    private AuditMetaId metaId;
     private String objectType;
     private String objectId;
     private Long version;

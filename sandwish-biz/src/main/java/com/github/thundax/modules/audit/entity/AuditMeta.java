@@ -1,8 +1,9 @@
 package com.github.thundax.modules.audit.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaId;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,16 +12,16 @@ import lombok.Setter;
 @Setter
 public class AuditMeta {
 
-    private EntityId id;
+    private AuditMetaId id;
     private String objectType;
     private String objectId;
     private Long version;
-    private EntityId lastLogId;
+    private AuditLogId lastLogId;
     private AuditAction lastAction;
     private AuditOperatorType lastOperatorType;
     private String lastOperatorId;
     private String lastOperatorName;
     private Date lastOperatedAt;
-    private EntityId createdLogId;
+    private AuditLogId createdLogId;
     private Date createdAt;
 }

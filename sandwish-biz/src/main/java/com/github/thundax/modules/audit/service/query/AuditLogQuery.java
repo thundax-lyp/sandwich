@@ -1,6 +1,5 @@
 package com.github.thundax.modules.audit.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import java.util.Date;
@@ -15,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuditLogQuery {
 
-    private EntityId id;
     private String objectType;
     private String objectId;
     private AuditAction action;

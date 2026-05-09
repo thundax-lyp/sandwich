@@ -1,9 +1,8 @@
 package com.github.thundax.modules.audit.runtime.member;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.audit.runtime.AuditObjectLoader;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
-import com.github.thundax.modules.member.service.query.MemberQuery;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,8 +21,6 @@ public class MemberAuditObjectLoader implements AuditObjectLoader {
 
     @Override
     public Object load(String objectId) {
-        MemberQuery query = new MemberQuery();
-        query.setId(EntityIdCodec.toDomain(Long.valueOf(objectId)));
-        return memberService.get(query);
+        return memberService.get(MemberIdCodec.toDomain(Long.valueOf(objectId)));
     }
 }

@@ -1,9 +1,8 @@
 package com.github.thundax.modules.audit.runtime.sys;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.audit.runtime.AuditObjectLoader;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
-import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,8 +21,6 @@ public class DepartmentAuditObjectLoader implements AuditObjectLoader {
 
     @Override
     public Object load(String objectId) {
-        DepartmentQuery query = new DepartmentQuery();
-        query.setId(EntityIdCodec.toDomain(Long.valueOf(objectId)));
-        return departmentService.get(query);
+        return departmentService.get(DepartmentIdCodec.toDomain(Long.valueOf(objectId)));
     }
 }

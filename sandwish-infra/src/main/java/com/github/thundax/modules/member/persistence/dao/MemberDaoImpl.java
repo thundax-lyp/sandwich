@@ -3,17 +3,18 @@ package com.github.thundax.modules.member.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import com.github.thundax.modules.member.persistence.mapper.MemberMapper;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class MemberDaoImpl implements MemberDao {
@@ -26,7 +27,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public Member getById(EntityId id) {
+    public Member getById(MemberId id) {
         return MemberPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
@@ -51,11 +52,11 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public EntityId insert(Member entity) {
+    public MemberId insert(Member entity) {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return MemberIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -79,7 +80,7 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(MemberId id) {
         return mapper.deleteById(id.value());
     }
 

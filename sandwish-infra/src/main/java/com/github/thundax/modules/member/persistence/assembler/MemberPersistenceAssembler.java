@@ -1,10 +1,11 @@
 package com.github.thundax.modules.member.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public final class MemberPersistenceAssembler {
             return null;
         }
         MemberDO dataObject = new MemberDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(MemberIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setGender(genderValue(entity.getGender()));
         dataObject.setStatus(statusValue(entity.getStatus()));
@@ -31,7 +32,7 @@ public final class MemberPersistenceAssembler {
             return null;
         }
         Member entity = new Member();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(MemberIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setGender(genderFrom(dataObject.getGender()));
         entity.setStatus(statusFrom(dataObject.getStatus()));

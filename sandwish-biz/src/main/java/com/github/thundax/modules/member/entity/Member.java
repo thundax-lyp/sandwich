@@ -1,9 +1,9 @@
 package com.github.thundax.modules.member.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member implements Sortable {
-    private EntityId id;
+    private MemberId id;
 
     private String name;
     private MemberGender gender;

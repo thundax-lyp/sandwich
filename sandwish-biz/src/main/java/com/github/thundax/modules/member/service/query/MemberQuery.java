@@ -1,7 +1,7 @@
 package com.github.thundax.modules.member.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberQuery {
-    private EntityId id;
-    private List<EntityId> ids;
+    private List<MemberId> ids;
     private MemberStatus status;
     private String name;
     private String remarks;

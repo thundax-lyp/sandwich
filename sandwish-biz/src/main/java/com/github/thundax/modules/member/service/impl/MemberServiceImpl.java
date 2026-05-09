@@ -1,8 +1,6 @@
 package com.github.thundax.modules.member.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
@@ -10,6 +8,8 @@ import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
 import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
@@ -30,17 +30,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member get(MemberQuery query) {
-        if (query == null || query.getId() == null) {
+    public Member get(MemberId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     @Override
     public List<Member> list(MemberQuery query) {
         if (query != null && query.getIds() != null) {
-            return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
+            return dao.listByIds(MemberIdCodec.toValues(query.getIds()));
         }
         return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
@@ -64,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @AuditLog(type = "Member", id = "", action = AuditAction.CREATE, summary = "创建会员", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(MemberCommand command) {
+    public MemberId create(MemberCommand command) {
         Member member = command.getMember();
         member.setId(dao.insert(member));
         return member.getId();
@@ -100,7 +100,7 @@ public class MemberServiceImpl implements MemberService {
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(MemberCommand command) {
-        EntityId id = command.getId();
+        MemberId id = command.getId();
         return id == null ? 0 : dao.deleteById(id);
     }
 

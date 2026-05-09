@@ -32,37 +32,39 @@ public final class AuthInterfaceAssembler {
     @NonNull
     public static AuthLoginFormResponse toLoginFormResponse(PreAuthSession session) {
         if (session == null) {
-            return new AuthLoginFormResponse();
+            return AuthLoginFormResponse.builder().build();
         }
-        AuthLoginFormResponse response = new AuthLoginFormResponse();
-        response.setLoginToken(session.getToken().asString());
-        response.setRefreshToken(session.getRefreshToken().asString());
-        response.setExpiredAt(session.getExpiredAt());
-        response.setPublicKey(session.findValue(PUBLIC_KEY_ITEM));
-        return response;
+        return AuthLoginFormResponse.builder()
+                .loginToken(session.getToken().asString())
+                .refreshToken(session.getRefreshToken().asString())
+                .expiredAt(session.getExpiredAt())
+                .publicKey(session.findValue(PUBLIC_KEY_ITEM))
+                .build();
     }
 
     @NonNull
     public static AuthAccessTokenResponse toAccessTokenResponse(AuthAccessTokenResult entity) {
-        AuthAccessTokenResponse response = new AuthAccessTokenResponse();
-        if (entity != null) {
-            response.setToken(entity.getToken());
-            response.setRefreshToken(entity.getRefreshToken());
+        if (entity == null) {
+            return AuthAccessTokenResponse.builder().build();
         }
-        return response;
+        return AuthAccessTokenResponse.builder()
+                .token(entity.getToken())
+                .refreshToken(entity.getRefreshToken())
+                .build();
     }
 
     @NonNull
     public static AuthAccessTokenResponse toAccessTokenResponse(AuthTokenRefreshResult result) {
-        AuthAccessTokenResponse response = new AuthAccessTokenResponse();
-        if (result != null && result.getAccessToken() != null) {
-            response.setToken(
-                    result.getOauthAccessToken() == null
-                            ? result.getAccessToken().getToken()
-                            : result.getOauthAccessToken());
-            response.setRefreshToken(result.getRefreshToken());
+        if (result == null || result.getAccessToken() == null) {
+            return AuthAccessTokenResponse.builder().build();
         }
-        return response;
+        return AuthAccessTokenResponse.builder()
+                .token(
+                        result.getOauthAccessToken() == null
+                                ? result.getAccessToken().getToken()
+                                : result.getOauthAccessToken())
+                .refreshToken(result.getRefreshToken())
+                .build();
     }
 
     public static String toLogJson(AuthLoginRequest request) {
@@ -85,70 +87,71 @@ public final class AuthInterfaceAssembler {
 
     @NonNull
     public static TokenVerifyResponse toTokenVerifyResponse(AuthTokenQueryResult result) {
-        TokenVerifyResponse response = new TokenVerifyResponse();
-        response.setActive(result != null && result.isActive());
-        return response;
+        return TokenVerifyResponse.builder()
+                .active(result != null && result.isActive())
+                .build();
     }
 
     @NonNull
     public static OAuth2IntrospectionResponse toIntrospectionResponse(AuthTokenQueryResult result) {
-        OAuth2IntrospectionResponse response = new OAuth2IntrospectionResponse();
         if (result == null || !result.isActive()) {
-            response.setActive(false);
-            return response;
+            return OAuth2IntrospectionResponse.builder().active(false).build();
         }
-        response.setActive(true);
-        response.setSubject(userId(result.getUser()));
-        response.setUsername(result.getUsername());
+        OAuth2IntrospectionResponse.OAuth2IntrospectionResponseBuilder builder = OAuth2IntrospectionResponse.builder()
+                .active(true)
+                .subject(userId(result.getUser()))
+                .username(result.getUsername());
         PrincipalAccessToken principalAccessToken = result.getPrincipalAccessToken();
         if (principalAccessToken != null) {
-            response.setClientId(principalAccessToken.getClientId());
-            response.setScope(scope(principalAccessToken.getScopes()));
-            response.setExpiresAt(epochSeconds(principalAccessToken.getExpireAt()));
-            response.setTokenType("Bearer");
+            builder.clientId(principalAccessToken.getClientId())
+                    .scope(scope(principalAccessToken.getScopes()))
+                    .expiresAt(epochSeconds(principalAccessToken.getExpireAt()))
+                    .tokenType("Bearer");
         }
         if (result.getSession() != null) {
-            response.setSessionId(result.getSession().getId().value());
+            builder.sessionId(result.getSession().getId().value());
         }
-        return response;
+        return builder.build();
     }
 
     @NonNull
     public static OAuth2UserinfoResponse toUserinfoResponse(AuthTokenQueryResult result) {
-        OAuth2UserinfoResponse response = new OAuth2UserinfoResponse();
         if (result == null || !result.isActive()) {
-            return response;
+            return OAuth2UserinfoResponse.builder().build();
         }
-        response.setSubject(userId(result.getUser()));
-        response.setUsername(result.getUsername());
-        response.setPreferredUsername(result.getUsername());
-        response.setName(result.getUser() == null ? null : result.getUser().getName());
-        return response;
+        return OAuth2UserinfoResponse.builder()
+                .subject(userId(result.getUser()))
+                .username(result.getUsername())
+                .preferredUsername(result.getUsername())
+                .name(result.getUser() == null ? null : result.getUser().getName())
+                .build();
     }
 
     @NonNull
     public static OAuth2AuthorizationViewResponse toAuthorizationViewResponse(OAuth2AuthorizationViewResult result) {
-        OAuth2AuthorizationViewResponse response = new OAuth2AuthorizationViewResponse();
-        if (result != null) {
-            response.setClientId(result.getClientId());
-            response.setClientName(result.getClientName());
-            response.setRedirectUri(result.getRedirectUri());
-            response.setScopes(result.getScopes());
-            response.setState(result.getState());
+        if (result == null) {
+            return OAuth2AuthorizationViewResponse.builder().build();
         }
-        return response;
+        return OAuth2AuthorizationViewResponse.builder()
+                .clientId(result.getClientId())
+                .clientName(result.getClientName())
+                .redirectUri(result.getRedirectUri())
+                .scopes(result.getScopes())
+                .state(result.getState())
+                .build();
     }
 
     @NonNull
     public static OAuth2AuthorizationDecisionResponse toAuthorizationDecisionResponse(
             OAuth2AuthorizationDecisionResult result) {
-        OAuth2AuthorizationDecisionResponse response = new OAuth2AuthorizationDecisionResponse();
-        if (result != null) {
-            response.setApproved(result.isApproved());
-            response.setAuthorizationCode(result.getAuthorizationCode());
-            response.setState(result.getState());
+        if (result == null) {
+            return OAuth2AuthorizationDecisionResponse.builder().build();
         }
-        return response;
+        return OAuth2AuthorizationDecisionResponse.builder()
+                .approved(result.isApproved())
+                .authorizationCode(result.getAuthorizationCode())
+                .state(result.getState())
+                .build();
     }
 
     private static String userId(User user) {

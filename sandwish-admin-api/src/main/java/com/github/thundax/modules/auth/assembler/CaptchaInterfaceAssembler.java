@@ -8,8 +8,6 @@ public final class CaptchaInterfaceAssembler {
 
     @NonNull
     public static CaptchaRefreshResponse toRefreshResponse(boolean refreshed) {
-        CaptchaRefreshResponse response = new CaptchaRefreshResponse();
-        response.setRefreshed(refreshed);
-        return response;
+        return CaptchaRefreshResponse.builder().refreshed(refreshed).build();
     }
 }

@@ -23,8 +23,6 @@ public final class MenuInterfaceAssembler {
         MenuResponse response = new MenuResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         Long parentId = EntityIdCodec.toValue(entity.getParentId());
         if (parentId != null) {

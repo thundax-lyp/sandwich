@@ -26,8 +26,6 @@ public final class DictInterfaceAssembler {
         DictResponse response = new DictResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         response.setLabel(entity.getLabel());
         response.setType(entity.getType());

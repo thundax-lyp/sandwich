@@ -42,8 +42,6 @@ public final class UserInterfaceAssembler {
         UserResponse response = new UserResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         response.setLoginName(loginName);
         response.setRanks(AccessRankCodec.toValue(entity.getRank()));

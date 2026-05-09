@@ -1,13 +1,11 @@
 package com.github.thundax.modules.sys.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,16 +27,6 @@ public class MenuResponse implements Serializable {
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
     private String remarks;
-
-    @ApiModelProperty(name = "createDate", value = "创建时间")
-    @JsonProperty("createDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createDate;
-
-    @ApiModelProperty(name = "updateDate", value = "修改时间")
-    @JsonProperty("updateDate")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateDate;
 
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")

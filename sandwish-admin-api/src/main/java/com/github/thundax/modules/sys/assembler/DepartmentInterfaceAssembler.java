@@ -27,8 +27,6 @@ public final class DepartmentInterfaceAssembler {
         DepartmentResponse response = new DepartmentResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         if (entity.getParentId() != null) {
             response.setParentId(EntityIdCodec.toValue(entity.getParentId()));

@@ -37,8 +37,6 @@ public final class RoleInterfaceAssembler {
         RoleResponse response = new RoleResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setPriority(entity.getPriority());
         response.setName(entity.getName());
         response.setAdmin(entity.isAdmin());

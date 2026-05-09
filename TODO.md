@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 sys-api-response`：移除系统管理普通 API 响应中的审计字段
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/UserResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/RoleResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/MenuResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DepartmentResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DictResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/UserInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/RoleInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/MenuInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DepartmentInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java`
-  - 处理动作：删除普通业务响应和装配器中的通用审计字段展示逻辑。
-  - 验收点：系统管理普通 API 响应不再暴露通用审计字段；执行 `mvn -pl sandwish-admin-api -am compile`。
-  - 重要度：9/10
-
 - [ ] `Audit 3.2 auth-oauth-client`：拆除 OAuthClient 业务表审计字段
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthClient.java`

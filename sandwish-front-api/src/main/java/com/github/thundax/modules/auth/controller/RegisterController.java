@@ -10,6 +10,7 @@ import com.github.thundax.modules.auth.controller.request.MemberRegisterEmailCod
 import com.github.thundax.modules.auth.controller.request.MemberRegisterSmsCodeRequest;
 import com.github.thundax.modules.auth.controller.response.MemberRegisterResponse;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
+import com.github.thundax.modules.auth.service.command.MemberRegistrationCommand;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
@@ -34,20 +35,15 @@ public class RegisterController {
     @PostMapping(value = "account")
     public MemberRegisterResponse registerAccount(@Valid @RequestBody MemberAccountRegisterRequest request)
             throws ApiException {
-        return MemberRegisterInterfaceAssembler.toRegisterResponse(memberRegistrationService.registerAccount(
-                request.getLoginToken(),
-                request.getName(),
-                request.getAccount(),
-                request.getPassword(),
-                request.getCaptcha()));
+        return MemberRegisterInterfaceAssembler.toRegisterResponse(
+                memberRegistrationService.registerAccount(accountCommand(request)));
     }
 
     @ApiOperation(value = "发送注册短信验证码")
     @PostMapping(value = "mobile/code")
     public MemberRegisterResponse sendSmsCode(@Valid @RequestBody MemberRegisterSmsCodeRequest request)
             throws ApiException {
-        memberRegistrationService.sendRegisterSmsCode(
-                request.getLoginToken(), request.getMobile(), request.getCaptcha());
+        memberRegistrationService.sendRegisterSmsCode(smsCodeCommand(request));
         return MemberRegisterInterfaceAssembler.toCodeResponse();
     }
 
@@ -55,16 +51,15 @@ public class RegisterController {
     @PostMapping(value = "mobile")
     public MemberRegisterResponse registerMobile(@Valid @RequestBody MemberMobileRegisterRequest request)
             throws ApiException {
-        return MemberRegisterInterfaceAssembler.toRegisterResponse(memberRegistrationService.registerMobile(
-                request.getLoginToken(), request.getName(), request.getMobile(), request.getValidateCode()));
+        return MemberRegisterInterfaceAssembler.toRegisterResponse(
+                memberRegistrationService.registerMobile(mobileCommand(request)));
     }
 
     @ApiOperation(value = "发送注册邮箱验证码")
     @PostMapping(value = "email/code")
     public MemberRegisterResponse sendEmailCode(@Valid @RequestBody MemberRegisterEmailCodeRequest request)
             throws ApiException {
-        memberRegistrationService.sendRegisterEmailCode(
-                request.getLoginToken(), request.getEmail(), request.getCaptcha());
+        memberRegistrationService.sendRegisterEmailCode(emailCodeCommand(request));
         return MemberRegisterInterfaceAssembler.toCodeResponse();
     }
 
@@ -72,7 +67,51 @@ public class RegisterController {
     @PostMapping(value = "email")
     public MemberRegisterResponse registerEmail(@Valid @RequestBody MemberEmailRegisterRequest request)
             throws ApiException {
-        return MemberRegisterInterfaceAssembler.toRegisterResponse(memberRegistrationService.registerEmail(
-                request.getLoginToken(), request.getName(), request.getEmail(), request.getValidateCode()));
+        return MemberRegisterInterfaceAssembler.toRegisterResponse(
+                memberRegistrationService.registerEmail(emailCommand(request)));
+    }
+
+    private MemberRegistrationCommand accountCommand(MemberAccountRegisterRequest request) {
+        MemberRegistrationCommand command = new MemberRegistrationCommand();
+        command.setLoginToken(request.getLoginToken());
+        command.setName(request.getName());
+        command.setAccount(request.getAccount());
+        command.setEncryptedPassword(request.getPassword());
+        command.setCaptcha(request.getCaptcha());
+        return command;
+    }
+
+    private MemberRegistrationCommand smsCodeCommand(MemberRegisterSmsCodeRequest request) {
+        MemberRegistrationCommand command = new MemberRegistrationCommand();
+        command.setLoginToken(request.getLoginToken());
+        command.setMobile(request.getMobile());
+        command.setCaptcha(request.getCaptcha());
+        return command;
+    }
+
+    private MemberRegistrationCommand mobileCommand(MemberMobileRegisterRequest request) {
+        MemberRegistrationCommand command = new MemberRegistrationCommand();
+        command.setLoginToken(request.getLoginToken());
+        command.setName(request.getName());
+        command.setMobile(request.getMobile());
+        command.setValidateCode(request.getValidateCode());
+        return command;
+    }
+
+    private MemberRegistrationCommand emailCodeCommand(MemberRegisterEmailCodeRequest request) {
+        MemberRegistrationCommand command = new MemberRegistrationCommand();
+        command.setLoginToken(request.getLoginToken());
+        command.setEmail(request.getEmail());
+        command.setCaptcha(request.getCaptcha());
+        return command;
+    }
+
+    private MemberRegistrationCommand emailCommand(MemberEmailRegisterRequest request) {
+        MemberRegistrationCommand command = new MemberRegistrationCommand();
+        command.setLoginToken(request.getLoginToken());
+        command.setName(request.getName());
+        command.setEmail(request.getEmail());
+        command.setValidateCode(request.getValidateCode());
+        return command;
     }
 }

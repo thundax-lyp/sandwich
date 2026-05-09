@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.security;
 
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.service.MemberAuthService;
+import com.github.thundax.modules.auth.service.query.MemberAuthQuery;
 import java.io.IOException;
 import java.util.Collections;
 import javax.servlet.FilterChain;
@@ -30,7 +31,7 @@ public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter 
             throws ServletException, IOException {
         String accessToken = resolveAccessToken(request);
         if (StringUtils.isNotBlank(accessToken)) {
-            PrincipalAccessToken token = memberAuthService.getValidAccessToken(accessToken);
+            PrincipalAccessToken token = memberAuthService.getValidAccessToken(memberAuthQuery(accessToken));
             if (token != null) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         new MemberSpringPrincipal(String.valueOf(
@@ -49,5 +50,11 @@ public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter 
             return StringUtils.substring(authorization, BEARER_PREFIX.length());
         }
         return request.getParameter("accessToken");
+    }
+
+    private MemberAuthQuery memberAuthQuery(String accessToken) {
+        MemberAuthQuery query = new MemberAuthQuery();
+        query.setAccessToken(accessToken);
+        return query;
     }
 }

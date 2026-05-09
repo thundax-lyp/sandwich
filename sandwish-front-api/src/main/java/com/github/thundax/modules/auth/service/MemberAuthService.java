@@ -2,43 +2,21 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
-import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.service.command.MemberAuthCommand;
+import com.github.thundax.modules.auth.service.query.MemberAuthQuery;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 
 public interface MemberAuthService {
 
-    MemberTokenResult loginAccount(String account, String plainPassword) throws ApiException;
+    MemberTokenResult loginAccount(MemberAuthCommand command) throws ApiException;
 
-    default MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent)
-            throws ApiException {
-        return loginAccount(account, plainPassword);
-    }
+    MemberTokenResult loginSms(MemberAuthCommand command) throws ApiException;
 
-    MemberTokenResult loginSms(String mobile) throws ApiException;
+    MemberTokenResult refreshAccessToken(MemberAuthCommand command) throws ApiException;
 
-    default MemberTokenResult loginSms(String mobile, String ip, String userAgent) throws ApiException {
-        return loginSms(mobile);
-    }
+    void logout(MemberAuthCommand command) throws ApiException;
 
-    MemberTokenResult refreshAccessToken(String refreshToken) throws ApiException;
+    PrincipalAccessToken getValidAccessToken(MemberAuthQuery query);
 
-    default MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) throws ApiException {
-        return refreshAccessToken(refreshToken);
-    }
-
-    void logout(String accessToken) throws ApiException;
-
-    default void logout(String accessToken, String ip, String userAgent) throws ApiException {
-        logout(accessToken);
-    }
-
-    PrincipalAccessToken getValidAccessToken(String accessToken);
-
-    default void recordLoginFailed(
-            PrincipalAuthenticationMethod authenticationMethod,
-            PrincipalIdentityType identityType,
-            String ip,
-            String userAgent,
-            String reason) {}
+    void recordLoginFailed(MemberAuthCommand command);
 }

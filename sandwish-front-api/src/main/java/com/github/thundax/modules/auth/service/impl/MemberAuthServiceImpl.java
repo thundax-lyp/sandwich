@@ -28,7 +28,9 @@ import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.command.MemberAuthCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
+import com.github.thundax.modules.auth.service.query.MemberAuthQuery;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
@@ -71,13 +73,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginAccount(String account, String plainPassword) throws ApiException {
-        return loginAccount(account, plainPassword, null, null);
+    public MemberTokenResult loginAccount(MemberAuthCommand command) throws ApiException {
+        return loginAccount(command.getAccount(), command.getPlainPassword(), command.getIp(), command.getUserAgent());
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent)
+    private MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent)
             throws ApiException {
         PrincipalIdentity principalIdentity;
         try {
@@ -113,13 +114,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginSms(String mobile) throws ApiException {
-        return loginSms(mobile, null, null);
+    public MemberTokenResult loginSms(MemberAuthCommand command) throws ApiException {
+        return loginSms(command.getMobile(), command.getIp(), command.getUserAgent());
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginSms(String mobile, String ip, String userAgent) throws ApiException {
+    private MemberTokenResult loginSms(String mobile, String ip, String userAgent) throws ApiException {
         PrincipalIdentity identity;
         try {
             identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
@@ -149,13 +149,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult refreshAccessToken(String refreshToken) throws ApiException {
-        return refreshAccessToken(refreshToken, null, null);
+    public MemberTokenResult refreshAccessToken(MemberAuthCommand command) throws ApiException {
+        return refreshAccessToken(command.getRefreshToken(), command.getIp(), command.getUserAgent());
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) throws ApiException {
+    private MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) throws ApiException {
         PrincipalRefreshToken oldRefreshToken = principalRefreshTokenDao.getByToken(refreshToken);
         Date now = new Date();
         if (oldRefreshToken == null || !oldRefreshToken.canRefresh(now)) {
@@ -182,13 +181,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void logout(String accessToken) throws ApiException {
-        logout(accessToken, null, null);
+    public void logout(MemberAuthCommand command) throws ApiException {
+        logout(command.getAccessToken(), command.getIp(), command.getUserAgent());
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public void logout(String accessToken, String ip, String userAgent) throws ApiException {
+    private void logout(String accessToken, String ip, String userAgent) throws ApiException {
         PrincipalAccessToken token = principalAccessTokenDao.getByToken(accessToken);
         if (token == null) {
             throw new ApiException("accessToken已失效");
@@ -208,8 +206,8 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public PrincipalAccessToken getValidAccessToken(String accessToken) {
-        PrincipalAccessToken token = principalAccessTokenDao.getByToken(accessToken);
+    public PrincipalAccessToken getValidAccessToken(MemberAuthQuery query) {
+        PrincipalAccessToken token = principalAccessTokenDao.getByToken(query.getAccessToken());
         Date now = new Date();
         if (token == null || !token.canAccess(now)) {
             return null;
@@ -223,14 +221,15 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     @Override
-    public void recordLoginFailed(
-            PrincipalAuthenticationMethod authenticationMethod,
-            PrincipalIdentityType identityType,
-            String ip,
-            String userAgent,
-            String reason) {
+    public void recordLoginFailed(MemberAuthCommand command) {
         writeLoginEvent(
-                null, PrincipalLoginEventType.LOGIN_FAILED, authenticationMethod, identityType, ip, userAgent, reason);
+                null,
+                PrincipalLoginEventType.LOGIN_FAILED,
+                command.getAuthenticationMethod(),
+                command.getIdentityType(),
+                command.getIp(),
+                command.getUserAgent(),
+                command.getReason());
     }
 
     private MemberTokenResult createTokenResult(Member member) {

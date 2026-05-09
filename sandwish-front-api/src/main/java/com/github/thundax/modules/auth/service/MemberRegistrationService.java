@@ -2,17 +2,17 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.auth.service.command.MemberRegistrationCommand;
 
 public interface MemberRegistrationService {
 
-    EntityId registerAccount(String loginToken, String name, String account, String encryptedPassword, String captcha)
-            throws ApiException;
+    EntityId registerAccount(MemberRegistrationCommand command) throws ApiException;
 
-    void sendRegisterSmsCode(String loginToken, String mobile, String captcha) throws ApiException;
+    void sendRegisterSmsCode(MemberRegistrationCommand command) throws ApiException;
 
-    EntityId registerMobile(String loginToken, String name, String mobile, String validateCode) throws ApiException;
+    EntityId registerMobile(MemberRegistrationCommand command) throws ApiException;
 
-    void sendRegisterEmailCode(String loginToken, String email, String captcha) throws ApiException;
+    void sendRegisterEmailCode(MemberRegistrationCommand command) throws ApiException;
 
-    EntityId registerEmail(String loginToken, String name, String email, String validateCode) throws ApiException;
+    EntityId registerEmail(MemberRegistrationCommand command) throws ApiException;
 }

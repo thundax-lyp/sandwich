@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-front/member-auth`：同步前台会员认证入口
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/LoginController.java
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/RegisterController.java
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberAuthService.java
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberRegistrationService.java
-  - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberRegistrationServiceImpl.java
-  - 处理动作：将前台会员认证和注册 Request 显式组装为 Query 或 Command，并适配 biz Service 新契约
-  - 验收点：前台会员认证入口适配新契约；`mvn -pl sandwish-front-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-assist/async-task`：规约化 AsyncTaskService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java

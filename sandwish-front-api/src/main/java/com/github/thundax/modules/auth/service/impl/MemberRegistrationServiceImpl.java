@@ -22,6 +22,7 @@ import com.github.thundax.modules.auth.service.command.PrincipalCredentialComman
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.command.MemberRegistrationCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
@@ -69,9 +70,12 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerAccount(
-            String loginToken, String name, String account, String encryptedPassword, String captcha)
-            throws ApiException {
+    public EntityId registerAccount(MemberRegistrationCommand command) throws ApiException {
+        String loginToken = command.getLoginToken();
+        String name = command.getName();
+        String account = command.getAccount();
+        String encryptedPassword = command.getEncryptedPassword();
+        String captcha = command.getCaptcha();
         requireText(name, "name");
         requireText(account, "account");
         requireText(encryptedPassword, "password");
@@ -92,7 +96,10 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     @Override
-    public void sendRegisterSmsCode(String loginToken, String mobile, String captcha) throws ApiException {
+    public void sendRegisterSmsCode(MemberRegistrationCommand command) throws ApiException {
+        String loginToken = command.getLoginToken();
+        String mobile = command.getMobile();
+        String captcha = command.getCaptcha();
         requireText(mobile, "mobile");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateCaptcha(token, captcha)) {
@@ -111,8 +118,11 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerMobile(String loginToken, String name, String mobile, String validateCode)
-            throws ApiException {
+    public EntityId registerMobile(MemberRegistrationCommand command) throws ApiException {
+        String loginToken = command.getLoginToken();
+        String name = command.getName();
+        String mobile = command.getMobile();
+        String validateCode = command.getValidateCode();
         requireText(name, "name");
         requireText(mobile, "mobile");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
@@ -128,7 +138,10 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     @Override
-    public void sendRegisterEmailCode(String loginToken, String email, String captcha) throws ApiException {
+    public void sendRegisterEmailCode(MemberRegistrationCommand command) throws ApiException {
+        String loginToken = command.getLoginToken();
+        String email = command.getEmail();
+        String captcha = command.getCaptcha();
         requireText(email, "email");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateCaptcha(token, captcha)) {
@@ -147,8 +160,11 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerEmail(String loginToken, String name, String email, String validateCode)
-            throws ApiException {
+    public EntityId registerEmail(MemberRegistrationCommand command) throws ApiException {
+        String loginToken = command.getLoginToken();
+        String name = command.getName();
+        String email = command.getEmail();
+        String validateCode = command.getValidateCode();
         requireText(name, "name");
         requireText(email, "email");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);

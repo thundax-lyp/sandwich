@@ -70,7 +70,8 @@
 | `ANNO_REST_METHOD_ACCESS_MARK_REQUIRED` | 声明 `@ApiOperation` 的 REST API 方法 | 必须由方法级或类级 `@HasPermission` / `@PublicApi` 表达访问口径；公开认证入口使用 `@PublicApi` | ArchUnit / review | `[ANNO_REST_METHOD_ACCESS_MARK_REQUIRED] <class#method> violates access annotation required: <foundAnnotations>` |
 | `ANNO_REQUEST_BODY_VALID_REQUIRED` | REST API 方法中使用 `@RequestBody` 的 `*Request` 参数 | 必须同时声明 `@Valid` | ArchUnit / review | `[ANNO_REQUEST_BODY_VALID_REQUIRED] <class#method> violates request body Valid required: <parameterType>` |
 | `ANNO_REQUEST_MODEL_CLASS_REQUIRED` | `REQUEST_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_REQUEST_MODEL_CLASS_REQUIRED] <class> violates request class annotations required: <foundAnnotations>` |
-| `ANNO_RESPONSE_MODEL_CLASS_REQUIRED` | `RESPONSE_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Setter`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_RESPONSE_MODEL_CLASS_REQUIRED] <class> violates response class annotations required: <foundAnnotations>` |
+| `ANNO_RESPONSE_MODEL_CLASS_REQUIRED` | `RESPONSE_MODEL_SELECTOR` | 类级注解固定且仅允许 `@Getter`、`@Builder`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)`、`@JsonIgnoreProperties(ignoreUnknown = true)` | ArchUnit | `[ANNO_RESPONSE_MODEL_CLASS_REQUIRED] <class> violates response class annotations required: <foundAnnotations>` |
+| `ANNO_CONTROLLER_RESPONSE_ASSEMBLER_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | Controller 固定通过对应 `*InterfaceAssembler` 或 `PageResponseHelper` 获取完整 `*Response` / `PageResponse`；Controller 不直接创建业务 `*Response` | ArchUnit / review | `[ANNO_CONTROLLER_RESPONSE_ASSEMBLER_REQUIRED] <class> violates response assembler required: <responseType>` |
 | `ANNO_API_OPERATION_NOTES_REVIEW` | API 方法 `@ApiOperation.notes` | `notes` 应表达接口业务契约，不承载权限编码；权限口径由 `@HasPermission` 或 `@PublicApi` 表达 | review | `[ANNO_API_OPERATION_NOTES_REVIEW] <class#method> violates notes business contract review: <notes>` |
 | `ANNO_MODEL_FIELD_DESCRIPTION_REVIEW` | API Request / Response 字段 | 对外字段应声明 `@ApiModelProperty` 和稳定 JSON 字段名；当前作为人工审阅规则，不作为硬门禁 | review | `[ANNO_MODEL_FIELD_DESCRIPTION_REVIEW] <field> violates field description review: <foundAnnotations>` |
 
@@ -78,16 +79,17 @@
 
 | Interface Type | Required | Forbidden |
 | --- | --- | --- |
-| Admin REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码 |
-| Front REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi` | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码 |
+| Admin REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid`；业务 `*Response` 由对应 `*InterfaceAssembler` 创建 | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码；直接 `new *Response()` |
+| Front REST Controller | `@RestController` 或 `@WrappedApiController` + `@RequestMapping @Api`；方法级 HTTP Mapping + `@ApiOperation`；`@ApiOperation.notes` 说明业务契约；`@RequestBody *Request` 参数声明 `@Valid`；公开入口声明 `@PublicApi`；业务 `*Response` 由对应 `*InterfaceAssembler` 创建 | 直接依赖 DAO / Mapper / `DO/DataObject` / `PersistenceAssembler`；在 `@ApiOperation.notes` 中重复权限编码；直接 `new *Response()` |
 | Request Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
-| Response Model | `@Getter @Setter @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
+| Response Model | `@Getter @Builder @ApiModel @JsonInclude(JsonInclude.Include.NON_NULL) @JsonIgnoreProperties(ignoreUnknown = true)` | 业务流程、Service/DAO 依赖、`DO/DataObject` 字段 |
 
 混合 REST Controller 可以保留 `@RestController`，并在需要统一响应包装的 JSON 方法上声明 `@WrappedApiResponse`。直接写入 `HttpServletResponse` 的图片、文件或头像方法不得声明 `@WrappedApiResponse`。
 
 ## 8. CI Gate
 
 - 已有 ArchUnit 门禁继续覆盖 Request / Response 类级注解。
+- REST Controller 直接创建业务 `*Response` 的行为纳入门禁；业务响应创建固定收敛到对应 `*InterfaceAssembler`，分页响应创建固定使用 `PageResponseHelper`。
 - 已有 RestController 架构测试继续约束 REST Controller 不回流手写 `Validator`。
 - 前后台 REST Controller 已纳入 `@Api`、`@ApiOperation`、HTTP mapping 唯一性、访问口径标记和 `@RequestBody *Request` 参数 `@Valid` 门禁。
 - 新增或修改 Controller、Request、Response 时，必须按本文档人工审阅。

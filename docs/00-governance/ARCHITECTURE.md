@@ -473,6 +473,8 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - `Response` 固定表达 API 出参，归属对应 API 入口模块。
 - `InterfaceAssembler` 固定归属对应 API 入口模块，命名以 `InterfaceAssembler` 结尾。
 - `InterfaceAssembler` 只负责 API `Request` / `Response` 与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换。
+- Controller 固定通过对应 `*InterfaceAssembler` 获取完整业务 `Response`；Controller 不直接创建业务 `*Response`。
+- 业务 `Response` 固定通过 `@Builder` 一次性组装，类级注解有且仅有 `@Getter`、`@Builder`、`@ApiModel`、`@JsonInclude(JsonInclude.Include.NON_NULL)` 和 `@JsonIgnoreProperties(ignoreUnknown = true)`。
 - `InterfaceAssembler` 不调用 Service、DAO 或 Mapper。
 - `InterfaceAssembler` 不处理事务、权限、数据库查询或核心业务规则。
 - `InterfaceAssembler` 不转换 `DO` / `DataObject`。

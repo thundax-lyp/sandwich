@@ -30,7 +30,7 @@ public class UserServiceImplTest {
 
         EntityId userId = service.create(new CreateUserCommand(
                 user.getId(),
-                user.getDepartmentId(),
+                EntityIdCodec.toDomain(user.getDepartmentId()),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),
@@ -58,7 +58,7 @@ public class UserServiceImplTest {
 
         service.changeInfo(new ChangeUserInfoCommand(
                 user.getId(),
-                user.getDepartmentId(),
+                EntityIdCodec.toDomain(user.getDepartmentId()),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),

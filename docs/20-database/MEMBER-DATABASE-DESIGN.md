@@ -35,7 +35,6 @@
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - 会员主表使用 `member_` 业务域前缀。
 - 会员主表固定使用 `member_member`。
-- DAO list/page 查询固定追加 `del_flag = '0'` 条件。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
 ## 4. Naming Rules
@@ -44,7 +43,6 @@
 - 主键字段固定为 `id`。
 - 会员状态字段固定为 `status`。
 - 审计字段固定为 `create_date`、`create_by`、`update_date`、`update_by`。
-- 逻辑删除字段固定为 `del_flag`。
 
 ## 5. Table Mapping
 
@@ -79,13 +77,11 @@
 - `status` 通过 `MemberStatus.value()` 写入。
 - `status` 固定使用状态值：`PENDING`、`ACTIVE`、`SUSPENDED`、`CLOSED`。
 - `priority` 默认值固定为 `0`。
-- `del_flag` 默认值固定为 `'0'`，`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
 
 索引设计：
 
 - 主键：`pk_member_member(id)`
 - 普通索引：`idx_member_member_status(status, priority, create_date)`
-- 普通索引：`idx_member_member_del_flag(del_flag)`
 
 ## 7. Relationship Rules
 
@@ -97,14 +93,13 @@
 
 - `MemberDO` 固定映射 `member_member`。
 - `MemberMapper` 固定保持 `public interface MemberMapper extends BaseMapper<MemberDO> {}`。
-- `MemberDaoImpl` 固定负责 `Member <-> MemberDO` 转换、查询条件拆解、分页和逻辑删除过滤。
+- `MemberDaoImpl` 固定负责 `Member <-> MemberDO` 转换、查询条件拆解和分页。
 - `MemberPersistenceAssembler` 只负责 `Member <-> MemberDO` 字段转换。
 - Service 不感知 `MemberDO`。
 - Controller 不直接依赖 `MemberMapper`、`MemberDO` 或 `MemberPersistenceAssembler`。
 
 ## 9. Query Model Rules
 
-- `list/page` 查询固定过滤 `del_flag = '0'`。
 - 会员列表默认按 `priority` 和 `name` 升序。
 - `pageNo` / `pageSize` 由 Service 校验，DAO implementation 只按已校验参数执行分页。
 

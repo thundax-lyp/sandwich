@@ -10,6 +10,7 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
@@ -26,8 +27,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class StoredObjectDaoImpl implements StoredObjectDao {
 
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
     private static final Long NO_MATCH_ID = -1L;
 
     private final StoredObjectMapper mapper;
@@ -51,7 +50,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
         LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(StoredObjectDO::getId, id.value());
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+        wrapper.ne(StoredObjectDO::getObjectStatus, StoredObjectStatus.DELETED.value());
         storage = StoragePersistenceAssembler.toEntity(mapper.selectOne(wrapper));
         cacheSupport.putById(storage);
         return storage;
@@ -73,7 +72,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         if (!uncachedIdList.isEmpty()) {
             LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
             wrapper.in(StoredObjectDO::getId, uncachedIdList);
-            wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+            wrapper.ne(StoredObjectDO::getObjectStatus, StoredObjectStatus.DELETED.value());
             List<StoredObject> uncachedStorageList =
                     StoragePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
             for (StoredObject storage : uncachedStorageList) {
@@ -143,11 +142,6 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<StoredObjectDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         cacheSupport.removeById(String.valueOf(dataObject.getId()));
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -180,9 +174,9 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         int count = mapper.update(
                 null,
                 new UpdateWrapper<StoredObjectDO>()
-                        .set(DEL_FLAG_COLUMN, "1")
+                        .set("object_status", StoredObjectStatus.DELETED.value())
                         .eq("id", id.value())
-                        .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG));
+                        .ne("object_status", StoredObjectStatus.DELETED.value()));
         cacheSupport.removeById(String.valueOf(id.value()));
         return count;
     }
@@ -192,7 +186,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         return mapper
                 .selectObjs(new QueryWrapper<StoredObjectDO>()
                         .select("mime_type")
-                        .eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
+                        .ne("object_status", StoredObjectStatus.DELETED.value())
                         .groupBy("mime_type")
                         .orderByAsc("mime_type"))
                 .stream()
@@ -239,7 +233,9 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String name,
             String remarks) {
         LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
+        if (StringUtils.isBlank(objectStatus)) {
+            wrapper.ne(StoredObjectDO::getObjectStatus, StoredObjectStatus.DELETED.value());
+        }
         List<Long> storageIds = findStorageIdsByBusiness(referenceOwnerId, referenceOwnerType);
         if (storageIds != null && storageIds.isEmpty()) {
             wrapper.eq(StoredObjectDO::getId, NO_MATCH_ID);

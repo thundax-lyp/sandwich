@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -18,9 +17,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class MemberDaoImpl implements MemberDao {
-
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
 
     private final MemberMapper mapper;
     private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
@@ -59,11 +55,6 @@ public class MemberDaoImpl implements MemberDao {
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<MemberDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         return EntityIdCodec.toDomain(dataObject.getId());
     }
 
@@ -116,7 +107,6 @@ public class MemberDaoImpl implements MemberDao {
 
     private LambdaQueryWrapper<MemberDO> buildListWrapper(String status, String name, String remarks) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(status)) {
             wrapper.eq(MemberDO::getStatus, status);
         }

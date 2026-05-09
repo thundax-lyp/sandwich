@@ -16,12 +16,10 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
     `remarks` varchar(512) DEFAULT NULL,
     `create_date` datetime(3) NOT NULL,
     `update_date` datetime(3) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_key` (`storage_type`, `bucket_name`, `object_key`),
     KEY `idx_assist_storage_status` (`object_status`, `reference_status`, `create_date`),
-    KEY `idx_assist_storage_mime_type` (`mime_type`),
-    KEY `idx_assist_storage_del_flag` (`del_flag`)
+    KEY `idx_assist_storage_mime_type` (`mime_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一存储对象主数据表';
 
 CREATE TABLE IF NOT EXISTS `assist_storage_business` (

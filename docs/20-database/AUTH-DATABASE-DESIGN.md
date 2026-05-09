@@ -63,7 +63,7 @@
 - `credential_value` 固定保存密码哈希，不保存密码明文。
 - `client_secret_hash` 固定保存客户端密钥哈希，不保存客户端密钥明文。
 - `token_hash` 固定保存 OAuth token 的 SHA-256 Base64Url 哈希，不保存 token 明文。
-- 新增表不声明 `del_flag`，禁用、锁定、登出和失效通过状态字段表达。
+- 禁用、锁定、登出和失效通过状态字段表达。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
 ## 4. Naming Rules

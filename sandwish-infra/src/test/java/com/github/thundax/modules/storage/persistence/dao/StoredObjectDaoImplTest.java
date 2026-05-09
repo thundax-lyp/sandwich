@@ -49,7 +49,6 @@ public class StoredObjectDaoImplTest {
         assertParamsContain(referenceWrapper, "biz-1", "ARTICLE");
 
         Wrapper<StoredObjectDO> storageWrapper = captureStorageListWrapper(mapper);
-        assertSqlContains(storageWrapper, "del_flag");
         assertSqlContains(storageWrapper, "id");
         assertSqlContains(storageWrapper, "mime_type");
         assertSqlContains(storageWrapper, "owner_id");
@@ -62,7 +61,6 @@ public class StoredObjectDaoImplTest {
         assertSqlContains(storageWrapper, "priority asc");
         assertParamsContain(
                 storageWrapper,
-                "0",
                 Long.valueOf(5001L),
                 Long.valueOf(5002L),
                 "image/png",
@@ -86,7 +84,8 @@ public class StoredObjectDaoImplTest {
 
         Wrapper<StoredObjectDO> storageWrapper = captureStorageListWrapper(mapper);
         assertSqlContains(storageWrapper, "id");
-        assertParamsContain(storageWrapper, Long.valueOf(-1L));
+        assertSqlContains(storageWrapper, "object_status");
+        assertParamsContain(storageWrapper, "DELETED", Long.valueOf(-1L));
     }
 
     @Test
@@ -107,10 +106,9 @@ public class StoredObjectDaoImplTest {
         assertEquals(25L, pageCaptor.getValue().getSize());
         assertEquals(3L, page.getCurrent());
         assertEquals(25L, page.getSize());
-        assertSqlContains(wrapperCaptor.getValue(), "del_flag");
         assertSqlContains(wrapperCaptor.getValue(), "mime_type");
         assertSqlContains(wrapperCaptor.getValue(), "object_status");
-        assertParamsContain(wrapperCaptor.getValue(), "0", "text/plain", "ACTIVE");
+        assertParamsContain(wrapperCaptor.getValue(), "text/plain", "ACTIVE");
     }
 
     private StoredObjectDaoImpl dao(StoredObjectMapper mapper, StoredObjectReferenceMapper referenceMapper) {

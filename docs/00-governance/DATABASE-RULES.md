@@ -40,7 +40,6 @@
 - 新增表、数据库脚本和 `DO/DataObject` 不使用 `tb_` 前缀
 - 关系表后缀必须显式表达语义
 - 审计字段固定使用 `create_date` / `create_by` / `update_date` / `update_by`
-- 逻辑删除字段固定使用 `del_flag`，未逻辑删除值固定为 `'0'`
 - 当前系统不引入租户字段；只有架构文档明确进入多租户模型后，才新增租户字段规则
 - 新增业务域表名前缀前必须先盘点现有 schema，并同步更新本文档和架构测试白名单
 
@@ -60,7 +59,7 @@
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
 - `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
 - `createDate` / `createBy` / `updateDate` / `updateBy` 是持久化审计字段，由 infra 在 insert / update 时统一填充；`createBy` / `updateBy` 只透传当前请求的 `currentUserId`，Service 不预填审计字段。
-- `del_flag` 是数据库逻辑删除审计字段，默认值为 `0`；`Entity` 与 `DO/DataObject` 不声明 `delFlag`，DAO insert 时负责写入 `del_flag = '0'`，DAO list/page 查询固定追加 `del_flag = '0'` 条件。
+- 删除、禁用、隐藏、失效等生命周期含义必须通过业务字段表达；不得为新增表引入泛化逻辑删除字段。
 
 ## Primary Key Rules
 

@@ -258,7 +258,7 @@ Storage 公开入口固定使用资源型路径。
 
 - 删除前必须确认 `StoredObject` 存在。
 - 删除流程由 Storage 负责调用底层存储删除对象。
-- 删除完成后持久化层通过逻辑删除字段排除该对象。
+- 删除完成后 `StoredObject.objectStatus` 必须进入 `DELETED`。
 - 已删除对象不得再建立新引用。
 
 ### 8.6 分片上传

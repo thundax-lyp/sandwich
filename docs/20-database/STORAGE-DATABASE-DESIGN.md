@@ -42,9 +42,9 @@
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `StoredObjectReferenceDO.fileId` 映射数据库列 `file_id`，由装配器转换为 `StoredObjectReference.objectId`。
 - `StoredObjectReferenceDO.fileId` 复用 `assist_storage.id`，引用关系表不单独生成关系 ID。
-- 对象公开生命周期可使用 `object_status` 表达。
-- DAO `deleteById` 使用数据库逻辑删除字段 `del_flag` 收口删除状态；`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
-- DAO get/list/page 查询固定追加 `del_flag = '0'` 条件。
+- 对象生命周期固定由 `object_status` 表达。
+- DAO `deleteById` 将 `object_status` 更新为 `DELETED`。
+- DAO get/list/page 默认排除 `object_status = DELETED`；显式按 `DELETED` 查询时返回已删除对象。
 - 枚举字段使用 `varchar` 存储。
 - `storage_type` 固定使用 `LOCAL_FILE` 或 `OSS`。
 - `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`，默认值固定为 `ACTIVE`。
@@ -142,7 +142,7 @@
 - `file_id` 来源是 `assist_storage.id`，不生成新主键。
 - 同一个对象允许被多个业务资源引用。
 - 引用关系唯一性固定由 `file_id + reference_owner_type + reference_owner_id` 表达。
-- `StoredObjectReferenceDO` 固定不包含创建时间、更新时间和逻辑删除字段。
+- `StoredObjectReferenceDO` 固定不包含创建时间和更新时间。
 
 索引设计：
 

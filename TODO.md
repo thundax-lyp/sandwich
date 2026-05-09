@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-admin/auth`：同步后台 AuthController 和入口认证 Service
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AdminAuthService.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java
-  - 处理动作：将后台认证 Request 显式组装为 Query 或 Command，并适配 biz auth Service 新契约
-  - 验收点：后台认证入口适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-auth/principal-identity`：规约化 PrincipalIdentityService 和 PrincipalCredentialService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalIdentityService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalIdentityServiceImpl.java

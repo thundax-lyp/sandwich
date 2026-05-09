@@ -7,6 +7,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
@@ -86,7 +88,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        AuthAccessTokenResult accessToken = authService.getAccessToken(token);
+        AuthAccessTokenResult accessToken = authService.getAccessToken(tokenQuery(token));
         if (accessToken == null) {
             writeError(response);
             return;
@@ -106,7 +108,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                 permissions = permissionService.createPermissions(token, accessToken.getUserId());
             }
 
-            authService.activeAccessToken(accessToken);
+            authService.activeAccessToken(accessTokenCommand(accessToken));
             SecurityContextHolder.getContext()
                     .setAuthentication(new UsernamePasswordAuthenticationToken(
                             accessToken.getUserId(), token, toAuthorities(permissions)));
@@ -124,6 +126,18 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return request.getParameter(PARAM_TOKEN);
+    }
+
+    private AdminAuthQuery tokenQuery(String token) {
+        AdminAuthQuery query = new AdminAuthQuery();
+        query.setToken(token);
+        return query;
+    }
+
+    private AdminAuthCommand accessTokenCommand(AuthAccessTokenResult accessToken) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setAccessToken(accessToken);
+        return command;
     }
 
     private UserQuery userQuery(EntityId userId) {

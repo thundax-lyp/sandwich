@@ -38,8 +38,10 @@ import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -113,20 +115,162 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
+    public AuthAccessTokenResult createAccessToken(AdminAuthCommand command) {
+        PrincipalAuthenticationMethod authenticationMethod = command.getAuthenticationMethod();
+        if (authenticationMethod == null) {
+            authenticationMethod = PrincipalAuthenticationMethod.PASSWORD;
+        }
+        PrincipalIdentityType identityType = command.getIdentityType();
+        if (identityType == null) {
+            identityType = PrincipalIdentityType.USER_ACCOUNT;
+        }
+        return createAccessToken(
+                command.getUserId(),
+                command.getLoginName(),
+                command.getIp(),
+                command.getUserAgent(),
+                authenticationMethod,
+                identityType);
+    }
+
+    @Override
+    public AuthAccessTokenResult getAccessToken(AdminAuthQuery query) {
+        return getAccessToken(query.getToken());
+    }
+
+    @Override
+    public int deleteAccessTokensByUserId(AdminAuthCommand command) {
+        return deleteAccessTokensByUserId(command.getUserId());
+    }
+
+    @Override
+    public boolean validateToken(AdminAuthCommand command) {
+        return validateToken(command.getAccessToken());
+    }
+
+    @Override
+    public void activeAccessToken(AdminAuthCommand command) {
+        activeAccessToken(command.getAccessToken());
+    }
+
+    @Override
+    public void deleteAccessToken(AdminAuthCommand command) {
+        deleteAccessToken(command.getAccessToken(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public AuthTokenQueryResult getTokenInfo(AdminAuthQuery query) {
+        return queryToken(query.getToken());
+    }
+
+    @Override
+    public AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command) throws ApiException {
+        return refreshAccessToken(
+                command.getClientId(), command.getRefreshToken(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) throws ApiException {
+        return authorizeOAuth2(command.getClientId(), command.getRedirectUri(), command.getScopes(), command.getState());
+    }
+
+    @Override
+    public OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command) throws ApiException {
+        return decideOAuth2(
+                command.getClientId(),
+                command.getRedirectUri(),
+                command.getScopes(),
+                command.getState(),
+                command.getCodeChallenge(),
+                command.getCodeChallengeMethod(),
+                command.getUserId(),
+                command.isApproved(),
+                command.getIp(),
+                command.getUserAgent());
+    }
+
+    @Override
+    public AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command) throws ApiException {
+        return exchangeOAuth2Token(
+                command.getClientId(),
+                command.getClientSecret(),
+                command.getGrantType(),
+                command.getRedirectUri(),
+                command.getAuthorizationCode(),
+                command.getCodeVerifier(),
+                command.getRefreshToken(),
+                command.getIp(),
+                command.getUserAgent());
+    }
+
+    @Override
+    public boolean revokeAuthorizationCode(AdminAuthCommand command) throws ApiException {
+        return revokeAuthorizationCode(command.getAuthorizationCode());
+    }
+
+    @Override
+    public boolean revokeOAuth2Token(AdminAuthCommand command) throws ApiException {
+        return revokeOAuth2Token(command.getClientId(), command.getClientSecret(), command.getToken());
+    }
+
+    @Override
+    public void invalidateSessionByToken(AdminAuthCommand command) {
+        invalidateSessionByToken(command.getToken(), command.getReason());
+    }
+
+    @Override
+    public int invalidateSessionsByUserId(AdminAuthCommand command) {
+        return invalidateSessionsByUserId(command.getEntityUserId(), command.getReason());
+    }
+
+    @Override
+    public User authenticatePassword(AdminAuthCommand command) throws ApiException {
+        return authenticatePassword(
+                command.getLoginName(), command.getPlainPassword(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public User authenticateSms(AdminAuthCommand command) throws ApiException {
+        return authenticateSms(command.getMobile(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public User authenticateWecom(AdminAuthCommand command) throws ApiException {
+        return authenticateWecom(command.getCode(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public User authenticateGithub(AdminAuthCommand command) throws ApiException {
+        return authenticateGithub(command.getCode(), command.getIp(), command.getUserAgent());
+    }
+
+    @Override
+    public void recordLoginFailed(AdminAuthCommand command) {
+        recordLoginFailed(
+                command.getAuthenticationMethod(),
+                command.getIdentityType(),
+                command.getIp(),
+                command.getUserAgent(),
+                command.getReason());
+    }
+
+    @Override
+    public void validatePassword(AdminAuthCommand command) throws ApiException {
+        validatePassword(command.getUser(), command.getPlainPassword());
+    }
+
     @NonNull
-    public AuthAccessTokenResult createAccessToken(String userId) {
+    private AuthAccessTokenResult createAccessToken(String userId) {
         return createAccessToken(userId, null);
     }
 
-    @Override
     @NonNull
-    public AuthAccessTokenResult createAccessToken(String userId, String loginName) {
+    private AuthAccessTokenResult createAccessToken(String userId, String loginName) {
         return createAccessToken(userId, loginName, null, null);
     }
 
-    @Override
     @NonNull
-    public AuthAccessTokenResult createAccessToken(String userId, String loginName, String ip, String userAgent) {
+    private AuthAccessTokenResult createAccessToken(String userId, String loginName, String ip, String userAgent) {
         return createAccessToken(
                 userId,
                 loginName,
@@ -136,9 +280,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 PrincipalIdentityType.USER_ACCOUNT);
     }
 
-    @Override
     @NonNull
-    public AuthAccessTokenResult createAccessToken(
+    private AuthAccessTokenResult createAccessToken(
             String userId,
             String loginName,
             String ip,
@@ -175,8 +318,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthAccessTokenResult(token, refreshToken, accessToken);
     }
 
-    @Override
-    public AuthAccessTokenResult getAccessToken(String token) {
+    private AuthAccessTokenResult getAccessToken(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
         }
@@ -193,8 +335,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthAccessTokenResult(token, null, accessToken);
     }
 
-    @Override
-    public int deleteAccessTokensByUserId(String userId) {
+    private int deleteAccessTokensByUserId(String userId) {
         int count = 0;
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
@@ -212,25 +353,21 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return count;
     }
 
-    @Override
-    public boolean validateToken(AuthAccessTokenResult accessToken) {
+    private boolean validateToken(AuthAccessTokenResult accessToken) {
         return accessToken != null
                 && accessToken.getPrincipalAccessToken() != null
                 && accessToken.getPrincipalAccessToken().canAccess(new Date());
     }
 
-    @Override
-    public void activeAccessToken(AuthAccessTokenResult accessToken) {
+    private void activeAccessToken(AuthAccessTokenResult accessToken) {
         touchPrincipalAuthSession(accessToken.getPrincipalAccessToken());
     }
 
-    @Override
-    public void deleteAccessToken(AuthAccessTokenResult accessToken) {
+    private void deleteAccessToken(AuthAccessTokenResult accessToken) {
         deleteAccessToken(accessToken, null, null);
     }
 
-    @Override
-    public void deleteAccessToken(AuthAccessTokenResult accessToken, String ip, String userAgent) {
+    private void deleteAccessToken(AuthAccessTokenResult accessToken, String ip, String userAgent) {
         if (accessToken == null) {
             return;
         }
@@ -253,8 +390,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
     }
 
-    @Override
-    public AuthTokenQueryResult queryToken(String token) {
+    private AuthTokenQueryResult queryToken(String token) {
         AuthTokenQueryResult oauthResult = queryOAuthAccessToken(token);
         if (oauthResult != null) {
             return oauthResult;
@@ -299,13 +435,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return AuthTokenQueryResult.active(token, accessToken, session, user, getAccountLoginName(user.getId()));
     }
 
-    @Override
-    public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
+    private AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
         return refreshAccessToken(clientId, refreshToken, null, null);
     }
 
-    @Override
-    public AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken, String ip, String userAgent)
+    private AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken, String ip, String userAgent)
             throws ApiException {
         if (principalRefreshTokenDao == null) {
             throw new ApiException("refresh token 未配置");
@@ -335,8 +469,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthTokenRefreshResult(accessToken, accessToken.getRefreshToken());
     }
 
-    @Override
-    public OAuth2AuthorizationViewResult authorizeOAuth2(
+    private OAuth2AuthorizationViewResult authorizeOAuth2(
             String clientId, String redirectUri, List<String> scopes, String state) throws ApiException {
         OAuthClient client = validateOAuthClient(clientId, redirectUri, scopes);
         OAuth2AuthorizationViewResult result = new OAuth2AuthorizationViewResult();
@@ -348,8 +481,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return result;
     }
 
-    @Override
-    public OAuth2AuthorizationDecisionResult decideOAuth2(
+    private OAuth2AuthorizationDecisionResult decideOAuth2(
             String clientId,
             String redirectUri,
             List<String> scopes,
@@ -363,8 +495,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 clientId, redirectUri, scopes, state, codeChallenge, codeChallengeMethod, userId, approved, null, null);
     }
 
-    @Override
-    public OAuth2AuthorizationDecisionResult decideOAuth2(
+    private OAuth2AuthorizationDecisionResult decideOAuth2(
             String clientId,
             String redirectUri,
             List<String> scopes,
@@ -422,8 +553,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return result;
     }
 
-    @Override
-    public AuthTokenRefreshResult exchangeOAuth2Token(
+    private AuthTokenRefreshResult exchangeOAuth2Token(
             String clientId,
             String clientSecret,
             String grantType,
@@ -444,8 +574,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 null);
     }
 
-    @Override
-    public AuthTokenRefreshResult exchangeOAuth2Token(
+    private AuthTokenRefreshResult exchangeOAuth2Token(
             String clientId,
             String clientSecret,
             String grantType,
@@ -536,16 +665,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthTokenRefreshResult(oauthAccessToken, nextRefreshToken, oauthAccessToken.getToken());
     }
 
-    @Override
-    public boolean revokeAuthorizationCode(String authorizationCode) throws ApiException {
+    private boolean revokeAuthorizationCode(String authorizationCode) throws ApiException {
         if (oauthAuthorizationDao == null) {
             throw new ApiException("OAuth2 authorization 未配置");
         }
         return oauthAuthorizationDao.deleteByAuthorizationCode(authorizationCode) > 0;
     }
 
-    @Override
-    public boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException {
+    private boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException {
         validateOAuthClientSecret(clientId, clientSecret);
         Date now = new Date();
         boolean revoked = false;
@@ -570,13 +697,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return revoked;
     }
 
-    @Override
-    public void invalidateSessionByToken(String token, String reason) {
+    private void invalidateSessionByToken(String token, String reason) {
         invalidatePrincipalAuthSession(token);
     }
 
-    @Override
-    public int invalidateSessionsByUserId(EntityId userId, String reason) {
+    private int invalidateSessionsByUserId(EntityId userId, String reason) {
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
                         PrincipalKey.of(PrincipalType.USER, userId), ADMIN_CLIENT_ID, PrincipalTokenStatus.ACTIVE);
@@ -592,13 +717,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return count;
     }
 
-    @Override
-    public User authenticatePassword(String loginName, String plainPassword) throws ApiException {
+    private User authenticatePassword(String loginName, String plainPassword) throws ApiException {
         return authenticatePassword(loginName, plainPassword, null, null);
     }
 
-    @Override
-    public User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent)
+    private User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent)
             throws ApiException {
         PrincipalIdentity identity;
         try {
@@ -643,24 +766,20 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return user;
     }
 
-    @Override
-    public User authenticateSms(String mobile) throws ApiException {
+    private User authenticateSms(String mobile) throws ApiException {
         return authenticateSms(mobile, null, null);
     }
 
-    @Override
-    public User authenticateSms(String mobile, String ip, String userAgent) throws ApiException {
+    private User authenticateSms(String mobile, String ip, String userAgent) throws ApiException {
         return authenticateIdentity(
                 PrincipalIdentityType.USER_MOBILE, mobile, PrincipalAuthenticationMethod.SMS_CODE, ip, userAgent);
     }
 
-    @Override
-    public User authenticateWecom(String code) throws ApiException {
+    private User authenticateWecom(String code) throws ApiException {
         return authenticateWecom(code, null, null);
     }
 
-    @Override
-    public User authenticateWecom(String code, String ip, String userAgent) throws ApiException {
+    private User authenticateWecom(String code, String ip, String userAgent) throws ApiException {
         if (wecomLoginProvider == null) {
             throw new ApiException("企业微信登录未配置");
         }
@@ -672,13 +791,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 userAgent);
     }
 
-    @Override
-    public User authenticateGithub(String code) throws ApiException {
+    private User authenticateGithub(String code) throws ApiException {
         return authenticateGithub(code, null, null);
     }
 
-    @Override
-    public User authenticateGithub(String code, String ip, String userAgent) throws ApiException {
+    private User authenticateGithub(String code, String ip, String userAgent) throws ApiException {
         if (githubLoginProvider == null) {
             throw new ApiException("GitHub登录未配置");
         }
@@ -690,8 +807,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 userAgent);
     }
 
-    @Override
-    public void validatePassword(User user, String plainPassword) throws ApiException {
+    private void validatePassword(User user, String plainPassword) throws ApiException {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -702,8 +818,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         authenticatePassword(loginName, plainPassword);
     }
 
-    @Override
-    public void recordLoginFailed(
+    private void recordLoginFailed(
             PrincipalAuthenticationMethod authenticationMethod,
             PrincipalIdentityType identityType,
             String ip,

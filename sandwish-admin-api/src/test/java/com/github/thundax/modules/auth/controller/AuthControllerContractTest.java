@@ -16,13 +16,12 @@ import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
-import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
@@ -75,16 +74,8 @@ public class AuthControllerContractTest {
         when(preAuthSessionService.getIdByToken(any(PreAuthSessionQuery.class))).thenReturn(sessionId);
         when(preAuthSessionService.getValue(any(PreAuthSessionQuery.class)))
                 .thenReturn("1234", keyPair.getPrivateKey());
-        when(authService.authenticatePassword(eq("admin"), eq("plain-password"), any(), eq("JUnit")))
-                .thenReturn(user());
-        when(authService.createAccessToken(
-                        eq("1"),
-                        eq("admin"),
-                        any(),
-                        eq("JUnit"),
-                        eq(PrincipalAuthenticationMethod.PASSWORD),
-                        eq(PrincipalIdentityType.USER_ACCOUNT)))
-                .thenReturn(accessToken("access-token-1"));
+        when(authService.authenticatePassword(any(AdminAuthCommand.class))).thenReturn(user());
+        when(authService.createAccessToken(any(AdminAuthCommand.class))).thenReturn(accessToken("access-token-1"));
 
         mockMvc(authService, preAuthSessionService)
                 .perform(post("/api/auth/login")

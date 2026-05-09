@@ -2,174 +2,59 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
-import java.util.List;
 import org.springframework.lang.NonNull;
 
 public interface AdminAuthService {
 
     @NonNull
-    AuthAccessTokenResult createAccessToken(String userId);
+    AuthAccessTokenResult createAccessToken(AdminAuthCommand command);
 
-    @NonNull
-    AuthAccessTokenResult createAccessToken(String userId, String loginName);
+    AuthAccessTokenResult getAccessToken(AdminAuthQuery query);
 
-    @NonNull
-    default AuthAccessTokenResult createAccessToken(String userId, String loginName, String ip, String userAgent) {
-        return createAccessToken(userId, loginName);
-    }
+    int deleteAccessTokensByUserId(AdminAuthCommand command);
 
-    @NonNull
-    default AuthAccessTokenResult createAccessToken(
-            String userId,
-            String loginName,
-            String ip,
-            String userAgent,
-            PrincipalAuthenticationMethod authenticationMethod,
-            PrincipalIdentityType identityType) {
-        return createAccessToken(userId, loginName, ip, userAgent);
-    }
+    boolean validateToken(AdminAuthCommand command);
 
-    AuthAccessTokenResult getAccessToken(String token);
+    void activeAccessToken(AdminAuthCommand command);
 
-    int deleteAccessTokensByUserId(String userId);
+    void deleteAccessToken(AdminAuthCommand command);
 
-    boolean validateToken(AuthAccessTokenResult accessToken);
+    AuthTokenQueryResult getTokenInfo(AdminAuthQuery query);
 
-    void activeAccessToken(AuthAccessTokenResult accessToken);
+    AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command) throws ApiException;
 
-    void deleteAccessToken(AuthAccessTokenResult accessToken);
+    OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) throws ApiException;
 
-    default void deleteAccessToken(AuthAccessTokenResult accessToken, String ip, String userAgent) {
-        deleteAccessToken(accessToken);
-    }
+    OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command) throws ApiException;
 
-    AuthTokenQueryResult queryToken(String token);
+    AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command) throws ApiException;
 
-    AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException;
+    boolean revokeAuthorizationCode(AdminAuthCommand command) throws ApiException;
 
-    default AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken, String ip, String userAgent)
-            throws ApiException {
-        return refreshAccessToken(clientId, refreshToken);
-    }
+    boolean revokeOAuth2Token(AdminAuthCommand command) throws ApiException;
 
-    OAuth2AuthorizationViewResult authorizeOAuth2(
-            String clientId, String redirectUri, List<String> scopes, String state) throws ApiException;
-
-    OAuth2AuthorizationDecisionResult decideOAuth2(
-            String clientId,
-            String redirectUri,
-            List<String> scopes,
-            String state,
-            String codeChallenge,
-            String codeChallengeMethod,
-            String userId,
-            boolean approved)
-            throws ApiException;
-
-    default OAuth2AuthorizationDecisionResult decideOAuth2(
-            String clientId,
-            String redirectUri,
-            List<String> scopes,
-            String state,
-            String codeChallenge,
-            String codeChallengeMethod,
-            String userId,
-            boolean approved,
-            String ip,
-            String userAgent)
-            throws ApiException {
-        return decideOAuth2(clientId, redirectUri, scopes, state, codeChallenge, codeChallengeMethod, userId, approved);
-    }
-
-    AuthTokenRefreshResult exchangeOAuth2Token(
-            String clientId,
-            String clientSecret,
-            String grantType,
-            String redirectUri,
-            String authorizationCode,
-            String codeVerifier,
-            String refreshToken)
-            throws ApiException;
-
-    default AuthTokenRefreshResult exchangeOAuth2Token(
-            String clientId,
-            String clientSecret,
-            String grantType,
-            String redirectUri,
-            String authorizationCode,
-            String codeVerifier,
-            String refreshToken,
-            String ip,
-            String userAgent)
-            throws ApiException {
-        return exchangeOAuth2Token(
-                clientId, clientSecret, grantType, redirectUri, authorizationCode, codeVerifier, refreshToken);
-    }
-
-    boolean revokeAuthorizationCode(String authorizationCode) throws ApiException;
-
-    boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException;
-
-    void invalidateSessionByToken(String token, String reason);
+    void invalidateSessionByToken(AdminAuthCommand command);
 
     @LayerPublicApi(reason = "账号状态变化时按用户维度失效在线会话的业务入口")
-    int invalidateSessionsByUserId(EntityId userId, String reason);
+    int invalidateSessionsByUserId(AdminAuthCommand command);
 
-    /**
-     * 账号密码认证。
-     *
-     * @param loginName 登录名
-     * @param plainPassword 明文密码
-     * @return 认证通过的用户
-     * @throws ApiException 业务异常
-     */
-    User authenticatePassword(String loginName, String plainPassword) throws ApiException;
+    User authenticatePassword(AdminAuthCommand command) throws ApiException;
 
-    default User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent)
-            throws ApiException {
-        return authenticatePassword(loginName, plainPassword);
-    }
+    User authenticateSms(AdminAuthCommand command) throws ApiException;
 
-    User authenticateSms(String mobile) throws ApiException;
+    User authenticateWecom(AdminAuthCommand command) throws ApiException;
 
-    default User authenticateSms(String mobile, String ip, String userAgent) throws ApiException {
-        return authenticateSms(mobile);
-    }
+    User authenticateGithub(AdminAuthCommand command) throws ApiException;
 
-    User authenticateWecom(String code) throws ApiException;
+    void recordLoginFailed(AdminAuthCommand command);
 
-    default User authenticateWecom(String code, String ip, String userAgent) throws ApiException {
-        return authenticateWecom(code);
-    }
-
-    User authenticateGithub(String code) throws ApiException;
-
-    default User authenticateGithub(String code, String ip, String userAgent) throws ApiException {
-        return authenticateGithub(code);
-    }
-
-    default void recordLoginFailed(
-            PrincipalAuthenticationMethod authenticationMethod,
-            PrincipalIdentityType identityType,
-            String ip,
-            String userAgent,
-            String reason) {}
-
-    /**
-     * 校验登录密码并处理失败锁定。
-     *
-     * @param user 用户
-     * @param plainPassword 明文密码
-     * @throws ApiException 业务异常
-     */
-    void validatePassword(User user, String plainPassword) throws ApiException;
+    void validatePassword(AdminAuthCommand command) throws ApiException;
 }

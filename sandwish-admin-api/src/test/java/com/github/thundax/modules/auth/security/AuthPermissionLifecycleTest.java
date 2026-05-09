@@ -46,7 +46,10 @@ import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
+import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
+import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
@@ -148,7 +151,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldCreateTouchAndReleasePermissionValuesWithAccessToken() {
-        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
 
         Assert.assertNotNull(permissionService.getPermissions(accessToken.getToken()));
         Assert.assertNotNull(principalAuthSessionDao.getById(
@@ -161,7 +164,7 @@ public class AuthPermissionLifecycleTest {
                 .getById(accessToken.getPrincipalAccessToken().getSessionId())
                 .getLastAccessTime();
 
-        authService.activeAccessToken(accessToken);
+        authService.activeAccessToken(accessTokenCommand(accessToken));
         Assert.assertTrue(principalAuthSessionDao.getTouchCount() > 0);
         Assert.assertTrue(principalAuthSessionDao
                         .getById(accessToken.getPrincipalAccessToken().getSessionId())
@@ -169,7 +172,7 @@ public class AuthPermissionLifecycleTest {
                         .getTime()
                 >= databaseLastAccessTime.getTime());
 
-        authService.deleteAccessToken(accessToken);
+        authService.deleteAccessToken(accessTokenCommand(accessToken));
         Assert.assertNull(permissionService.getPermissions(accessToken.getToken()));
         Assert.assertNull(principalAuthSessionDao.getById(
                 accessToken.getPrincipalAccessToken().getSessionId()));
@@ -177,9 +180,9 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldInvalidateSessionByUserId() {
-        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
 
-        authService.invalidateSessionsByUserId(EntityIdCodec.toDomain(1L), "PASSWORD_RESET");
+        authService.invalidateSessionsByUserId(userSessionCommand(EntityIdCodec.toDomain(1L), "PASSWORD_RESET"));
 
         Assert.assertEquals(
                 PrincipalTokenStatus.REVOKED,
@@ -190,16 +193,16 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldQueryTokenActiveStateAndUserinfo() {
-        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
 
-        AuthTokenQueryResult result = authService.queryToken(accessToken.getToken());
+        AuthTokenQueryResult result = authService.getTokenInfo(tokenQuery(accessToken.getToken()));
 
         Assert.assertTrue(result.isActive());
         Assert.assertEquals(
                 accessToken.getPrincipalAccessToken().getSessionId(),
                 result.getSession().getId());
         Assert.assertEquals("tester", result.getUsername());
-        Assert.assertFalse(authService.queryToken("missing").isActive());
+        Assert.assertFalse(authService.getTokenInfo(tokenQuery("missing")).isActive());
     }
 
     @Test
@@ -222,7 +225,7 @@ public class AuthPermissionLifecycleTest {
         refreshTokenDao.currentToken = "plain-refresh-token";
         principalAuthSessionDao.insert(principalAuthSession(refreshToken.getSessionId(), "admin-web"), 60);
 
-        AuthTokenRefreshResult result = authService.refreshAccessToken("admin-web", "plain-refresh-token");
+        AuthTokenRefreshResult result = authService.refreshAccessToken(refreshTokenCommand("admin-web", "plain-refresh-token"));
 
         Assert.assertNotNull(result.getAccessToken().getToken());
         Assert.assertNotNull(result.getRefreshToken());
@@ -241,7 +244,7 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         OAuth2AuthorizationViewResult view = authService.authorizeOAuth2(
-                "admin-web", "http://127.0.0.1/callback", Arrays.asList("openid", "profile"), "state-1");
+                oauthCommand("admin-web", "http://127.0.0.1/callback", Arrays.asList("openid", "profile"), "state-1"));
 
         Assert.assertEquals("admin-web", view.getClientId());
         Assert.assertEquals("Admin Web", view.getClientName());
@@ -250,14 +253,15 @@ public class AuthPermissionLifecycleTest {
         String codeVerifier = "plain-verifier";
         String codeChallenge = Sha256Helper.hashBase64Url(codeVerifier);
         OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(
-                "admin-web",
-                "http://127.0.0.1/callback",
-                Arrays.asList("openid", "profile"),
-                "state-1",
-                codeChallenge,
-                "S256",
-                "1",
-                true);
+                decisionCommand(
+                        "admin-web",
+                        "http://127.0.0.1/callback",
+                        Arrays.asList("openid", "profile"),
+                        "state-1",
+                        codeChallenge,
+                        "S256",
+                        "1",
+                        true));
 
         Assert.assertTrue(decision.isApproved());
         Assert.assertNotNull(decision.getAuthorizationCode());
@@ -265,13 +269,14 @@ public class AuthPermissionLifecycleTest {
         Assert.assertFalse(authorizationDao.current.isUsed());
 
         AuthTokenRefreshResult token = authService.exchangeOAuth2Token(
-                "admin-web",
-                "secret",
-                "authorization_code",
-                "http://127.0.0.1/callback",
-                decision.getAuthorizationCode(),
-                codeVerifier,
-                null);
+                exchangeCommand(
+                        "admin-web",
+                        "secret",
+                        "authorization_code",
+                        "http://127.0.0.1/callback",
+                        decision.getAuthorizationCode(),
+                        codeVerifier,
+                        null));
 
         Assert.assertNotNull(token.getAccessToken().getToken());
         Assert.assertNotNull(token.getRefreshToken());
@@ -279,7 +284,7 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(authorizationDao.current.isUsed());
         Assert.assertEquals(PrincipalTokenStatus.ACTIVE, accessTokenDao.inserted.getStatus());
         Assert.assertEquals(PrincipalTokenStatus.ACTIVE, refreshTokenDao.inserted.getStatus());
-        AuthTokenQueryResult queryResult = authService.queryToken(token.getOauthAccessToken());
+        AuthTokenQueryResult queryResult = authService.getTokenInfo(tokenQuery(token.getOauthAccessToken()));
         Assert.assertTrue(queryResult.isActive());
         OAuth2IntrospectionResponse introspection = AuthInterfaceAssembler.toIntrospectionResponse(queryResult);
         Assert.assertEquals("admin-web", introspection.getClientId());
@@ -288,9 +293,10 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(introspection.getExpiresAt() > 0L);
         OAuth2UserinfoResponse userinfo = AuthInterfaceAssembler.toUserinfoResponse(queryResult);
         Assert.assertEquals("tester", userinfo.getPreferredUsername());
-        Assert.assertTrue(authService.revokeOAuth2Token("admin-web", "secret", token.getOauthAccessToken()));
-        Assert.assertFalse(authService.queryToken(token.getOauthAccessToken()).isActive());
-        Assert.assertTrue(authService.revokeAuthorizationCode(decision.getAuthorizationCode()));
+        Assert.assertTrue(authService.revokeOAuth2Token(
+                revokeCommand("admin-web", "secret", token.getOauthAccessToken())));
+        Assert.assertFalse(authService.getTokenInfo(tokenQuery(token.getOauthAccessToken())).isActive());
+        Assert.assertTrue(authService.revokeAuthorizationCode(authorizationCodeCommand(decision.getAuthorizationCode())));
     }
 
     @Test
@@ -316,7 +322,7 @@ public class AuthPermissionLifecycleTest {
         principalAuthSessionDao.insert(principalAuthSession(refreshToken.getSessionId(), "admin-web"), 60);
 
         AuthTokenRefreshResult result = authService.exchangeOAuth2Token(
-                "admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token");
+                exchangeCommand("admin-web", "secret", "refresh_token", null, null, null, "plain-refresh-token"));
 
         Assert.assertEquals(PrincipalTokenStatus.USED, refreshToken.getStatus());
         Assert.assertNotNull(result.getOauthAccessToken());
@@ -329,8 +335,8 @@ public class AuthPermissionLifecycleTest {
         inject(authService, "oauthClientDao", new TestOAuthClientDao());
 
         try {
-            authService.authorizeOAuth2(
-                    "admin-web", "http://127.0.0.1/callback", Collections.singletonList("admin.write"), "state-1");
+            authService.authorizeOAuth2(oauthCommand(
+                    "admin-web", "http://127.0.0.1/callback", Collections.singletonList("admin.write"), "state-1"));
             Assert.fail("invalid scope must be rejected");
         } catch (ApiException expected) {
             Assert.assertNotNull(expected);
@@ -341,7 +347,7 @@ public class AuthPermissionLifecycleTest {
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(authService.authenticateSms("13800000000").getId()));
+                EntityIdCodec.toValue(authService.authenticateSms(mobileCommand("13800000000")).getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");
         inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
@@ -349,16 +355,16 @@ public class AuthPermissionLifecycleTest {
         Assert.assertEquals(
                 Long.valueOf(1L),
                 EntityIdCodec.toValue(
-                        authService.authenticateWecom("wecom-code").getId()));
+                        authService.authenticateWecom(codeCommand("wecom-code")).getId()));
         Assert.assertEquals(
                 Long.valueOf(1L),
                 EntityIdCodec.toValue(
-                        authService.authenticateGithub("github-code").getId()));
+                        authService.authenticateGithub(codeCommand("github-code")).getId()));
     }
 
     @Test
     public void shouldAuthenticateRequestAndPopulateSpringSecurityContext() throws Exception {
-        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -383,7 +389,7 @@ public class AuthPermissionLifecycleTest {
 
     @Test
     public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
-        AuthAccessTokenResult accessToken = authService.createAccessToken("1", "tester");
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
@@ -445,18 +451,13 @@ public class AuthPermissionLifecycleTest {
     private static class TestPrincipalAuthService implements PrincipalAuthService {
 
         @Override
-        public PrincipalIdentity authenticateIdentity(PrincipalIdentityType identityType, String identityValue) {
-            return identity(identityType, identityValue);
+        public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) {
+            return identity(command.getIdentityType(), command.getIdentityValue());
         }
 
         @Override
-        public PrincipalIdentity authenticatePassword(
-                PrincipalIdentityType identityType,
-                String identityValue,
-                PrincipalCredentialType credentialType,
-                String plainPassword,
-                PrincipalPasswordPolicyDTO passwordPolicy) {
-            return identity(identityType, identityValue);
+        public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) {
+            return identity(command.getIdentityType(), command.getIdentityValue());
         }
 
         private PrincipalIdentity identity(PrincipalIdentityType identityType, String identityValue) {
@@ -473,6 +474,110 @@ public class AuthPermissionLifecycleTest {
         Field field = AdminAuthServiceImpl.class.getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(target, value);
+    }
+
+    private AuthAccessTokenResult createAccessToken(String userId, String loginName) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setUserId(userId);
+        command.setLoginName(loginName);
+        return authService.createAccessToken(command);
+    }
+
+    private AdminAuthCommand accessTokenCommand(AuthAccessTokenResult accessToken) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setAccessToken(accessToken);
+        return command;
+    }
+
+    private AdminAuthCommand userSessionCommand(EntityId userId, String reason) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setEntityUserId(userId);
+        command.setReason(reason);
+        return command;
+    }
+
+    private AdminAuthQuery tokenQuery(String token) {
+        AdminAuthQuery query = new AdminAuthQuery();
+        query.setToken(token);
+        return query;
+    }
+
+    private AdminAuthCommand refreshTokenCommand(String clientId, String refreshToken) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setRefreshToken(refreshToken);
+        return command;
+    }
+
+    private AdminAuthCommand oauthCommand(String clientId, String redirectUri, List<String> scopes, String state) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setRedirectUri(redirectUri);
+        command.setScopes(scopes);
+        command.setState(state);
+        return command;
+    }
+
+    private AdminAuthCommand decisionCommand(
+            String clientId,
+            String redirectUri,
+            List<String> scopes,
+            String state,
+            String codeChallenge,
+            String codeChallengeMethod,
+            String userId,
+            boolean approved) {
+        AdminAuthCommand command = oauthCommand(clientId, redirectUri, scopes, state);
+        command.setCodeChallenge(codeChallenge);
+        command.setCodeChallengeMethod(codeChallengeMethod);
+        command.setUserId(userId);
+        command.setApproved(approved);
+        return command;
+    }
+
+    private AdminAuthCommand exchangeCommand(
+            String clientId,
+            String clientSecret,
+            String grantType,
+            String redirectUri,
+            String authorizationCode,
+            String codeVerifier,
+            String refreshToken) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setClientSecret(clientSecret);
+        command.setGrantType(grantType);
+        command.setRedirectUri(redirectUri);
+        command.setAuthorizationCode(authorizationCode);
+        command.setCodeVerifier(codeVerifier);
+        command.setRefreshToken(refreshToken);
+        return command;
+    }
+
+    private AdminAuthCommand revokeCommand(String clientId, String clientSecret, String token) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setClientSecret(clientSecret);
+        command.setToken(token);
+        return command;
+    }
+
+    private AdminAuthCommand authorizationCodeCommand(String authorizationCode) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setAuthorizationCode(authorizationCode);
+        return command;
+    }
+
+    private AdminAuthCommand mobileCommand(String mobile) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setMobile(mobile);
+        return command;
+    }
+
+    private AdminAuthCommand codeCommand(String code) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setCode(code);
+        return command;
     }
 
     private static class TestOAuthClientDao implements OAuthClientDao {

@@ -40,7 +40,9 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
@@ -53,6 +55,7 @@ import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -118,12 +121,12 @@ public class AuthController {
         if (!validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
             createCaptcha(request.getLoginToken());
             writeLog(currentRequest, "验证码失败", request);
-            authService.recordLoginFailed(
+            authService.recordLoginFailed(loginFailedCommand(
                     PrincipalAuthenticationMethod.PASSWORD,
                     PrincipalIdentityType.USER_ACCOUNT,
                     ip(currentRequest),
                     userAgent(currentRequest),
-                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
             throw new InvalidCaptchaException();
         }
         createCaptcha(request.getLoginToken());
@@ -133,8 +136,7 @@ public class AuthController {
 
         User user;
         try {
-            user = authService.authenticatePassword(
-                    request.getUsername(), password, ip(currentRequest), userAgent(currentRequest));
+            user = authService.authenticatePassword(passwordCommand(request.getUsername(), password, currentRequest));
         } catch (ApiException e) {
             if (e.getMessage() != null && e.getMessage().contains("锁定")) {
                 writeLog(currentRequest, "用户锁定", request);
@@ -150,7 +152,7 @@ public class AuthController {
 
         releasePreAuthSession(request.getLoginToken());
 
-        authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
+        authService.deleteAccessTokensByUserId(userIdCommand(EntityIdCodec.toStringValue(user.getId())));
 
         return loginSuccess(
                 user,
@@ -165,15 +167,15 @@ public class AuthController {
     public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
         HttpServletRequest currentRequest = currentRequest();
         if (!validateSmsValidateCode(request.getLoginToken(), request.getMobile(), request.getValidateCode())) {
-            authService.recordLoginFailed(
+            authService.recordLoginFailed(loginFailedCommand(
                     PrincipalAuthenticationMethod.SMS_CODE,
                     PrincipalIdentityType.USER_MOBILE,
                     ip(currentRequest),
                     userAgent(currentRequest),
-                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID);
+                    PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
             throw new InvalidCaptchaException();
         }
-        User user = authService.authenticateSms(request.getMobile(), ip(currentRequest), userAgent(currentRequest));
+        User user = authService.authenticateSms(mobileCommand(request.getMobile(), currentRequest));
         return loginSuccess(
                 user,
                 request.getMobile(),
@@ -186,7 +188,7 @@ public class AuthController {
     @PostMapping(value = "login/wecom")
     public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
         HttpServletRequest currentRequest = currentRequest();
-        User user = authService.authenticateWecom(request.getCode(), ip(currentRequest), userAgent(currentRequest));
+        User user = authService.authenticateWecom(codeCommand(request.getCode(), currentRequest));
         return loginSuccess(
                 user, "wecom", "企业微信登录成功", PrincipalAuthenticationMethod.WECOM, PrincipalIdentityType.USER_WECOM);
     }
@@ -195,7 +197,7 @@ public class AuthController {
     @PostMapping(value = "login/github")
     public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
         HttpServletRequest currentRequest = currentRequest();
-        User user = authService.authenticateGithub(request.getCode(), ip(currentRequest), userAgent(currentRequest));
+        User user = authService.authenticateGithub(codeCommand(request.getCode(), currentRequest));
         return loginSuccess(
                 user, "github", "GitHub登录成功", PrincipalAuthenticationMethod.GITHUB, PrincipalIdentityType.USER_GITHUB);
     }
@@ -208,13 +210,13 @@ public class AuthController {
             throw new InvalidTokenException();
         }
 
-        AuthAccessTokenResult accessToken = authService.getAccessToken(request.getToken());
+        AuthAccessTokenResult accessToken = authService.getAccessToken(tokenQuery(request.getToken()));
         if (accessToken == null) {
             throw new InvalidTokenException();
         }
 
         HttpServletRequest currentRequest = currentRequest();
-        authService.deleteAccessToken(accessToken, ip(currentRequest), userAgent(currentRequest));
+        authService.deleteAccessToken(accessTokenCommand(accessToken, currentRequest));
 
         return true;
     }
@@ -222,26 +224,26 @@ public class AuthController {
     @ApiOperation(value = "校验 token")
     @PostMapping(value = "token/verify")
     public TokenVerifyResponse verifyToken(@Valid @RequestBody AuthTokenRequest request) {
-        return AuthInterfaceAssembler.toTokenVerifyResponse(authService.queryToken(request.getToken()));
+        return AuthInterfaceAssembler.toTokenVerifyResponse(authService.getTokenInfo(tokenQuery(request.getToken())));
     }
 
     @ApiOperation(value = "OAuth2 token introspection")
     @PostMapping(value = "oauth2/introspect")
     public OAuth2IntrospectionResponse introspect(@Valid @RequestBody AuthTokenRequest request) {
-        return AuthInterfaceAssembler.toIntrospectionResponse(authService.queryToken(request.getToken()));
+        return AuthInterfaceAssembler.toIntrospectionResponse(authService.getTokenInfo(tokenQuery(request.getToken())));
     }
 
     @ApiOperation(value = "OAuth2 userinfo")
     @PostMapping(value = "oauth2/userinfo")
     public OAuth2UserinfoResponse userinfo(@Valid @RequestBody AuthTokenRequest request) {
-        return AuthInterfaceAssembler.toUserinfoResponse(authService.queryToken(request.getToken()));
+        return AuthInterfaceAssembler.toUserinfoResponse(authService.getTokenInfo(tokenQuery(request.getToken())));
     }
 
     @ApiOperation(value = "刷新 token")
     @PostMapping(value = "token/refresh")
     public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.refreshAccessToken(
-                request.getClientId(), request.getRefreshToken(), ip(currentRequest()), userAgent(currentRequest())));
+                refreshTokenCommand(request.getClientId(), request.getRefreshToken(), currentRequest())));
     }
 
     @ApiOperation(value = "OAuth2 授权视图")
@@ -249,45 +251,26 @@ public class AuthController {
     public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request)
             throws ApiException {
         return AuthInterfaceAssembler.toAuthorizationViewResponse(authService.authorizeOAuth2(
-                request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState()));
+                oauthCommand(request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState())));
     }
 
     @ApiOperation(value = "OAuth2 授权决策")
     @PostMapping(value = "oauth2/decision")
     public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request)
             throws ApiException {
-        return AuthInterfaceAssembler.toAuthorizationDecisionResponse(authService.decideOAuth2(
-                request.getClientId(),
-                request.getRedirectUri(),
-                request.getScopes(),
-                request.getState(),
-                request.getCodeChallenge(),
-                request.getCodeChallengeMethod(),
-                request.getUserId(),
-                request.isApproved(),
-                ip(currentRequest()),
-                userAgent(currentRequest())));
+        return AuthInterfaceAssembler.toAuthorizationDecisionResponse(authService.decideOAuth2(decisionCommand(request)));
     }
 
     @ApiOperation(value = "OAuth2 授权码换 token")
     @PostMapping(value = "oauth2/token")
     public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
-        return AuthInterfaceAssembler.toAccessTokenResponse(authService.exchangeOAuth2Token(
-                request.getClientId(),
-                request.getClientSecret(),
-                request.getGrantType(),
-                request.getRedirectUri(),
-                request.getAuthorizationCode(),
-                request.getCodeVerifier(),
-                request.getRefreshToken(),
-                ip(currentRequest()),
-                userAgent(currentRequest())));
+        return AuthInterfaceAssembler.toAccessTokenResponse(authService.exchangeOAuth2Token(exchangeCommand(request)));
     }
 
     @ApiOperation(value = "OAuth2 撤销令牌")
     @PostMapping(value = "oauth2/revoke")
     public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
-        return authService.revokeOAuth2Token(request.getClientId(), request.getClientSecret(), request.getToken());
+        return authService.revokeOAuth2Token(revokeTokenCommand(request));
     }
 
     private PreAuthSession createPreAuthSession() throws ApiException {
@@ -428,20 +411,139 @@ public class AuthController {
             String logTitle,
             PrincipalAuthenticationMethod authenticationMethod,
             PrincipalIdentityType identityType) {
-        authService.deleteAccessTokensByUserId(EntityIdCodec.toStringValue(user.getId()));
+        authService.deleteAccessTokensByUserId(userIdCommand(EntityIdCodec.toStringValue(user.getId())));
         HttpServletRequest currentRequest = currentRequest();
         writeLog(currentRequest, logTitle, user, loginName);
-        return AuthInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(
-                EntityIdCodec.toStringValue(user.getId()),
-                loginName,
-                ip(currentRequest),
-                userAgent(currentRequest),
-                authenticationMethod,
-                identityType));
+        AdminAuthCommand command =
+                accessTokenCommand(EntityIdCodec.toStringValue(user.getId()), loginName, currentRequest);
+        command.setAuthenticationMethod(authenticationMethod);
+        command.setIdentityType(identityType);
+        return AuthInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(command));
     }
 
     private HttpServletRequest currentRequest() {
         return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+    }
+
+    private AdminAuthQuery tokenQuery(String token) {
+        AdminAuthQuery query = new AdminAuthQuery();
+        query.setToken(token);
+        return query;
+    }
+
+    private AdminAuthCommand passwordCommand(String loginName, String plainPassword, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setLoginName(loginName);
+        command.setPlainPassword(plainPassword);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand accessTokenCommand(String userId, String loginName, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setUserId(userId);
+        command.setLoginName(loginName);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand userIdCommand(String userId) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setUserId(userId);
+        return command;
+    }
+
+    private AdminAuthCommand mobileCommand(String mobile, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setMobile(mobile);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand codeCommand(String code, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setCode(code);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand accessTokenCommand(AuthAccessTokenResult accessToken, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setAccessToken(accessToken);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand refreshTokenCommand(String clientId, String refreshToken, HttpServletRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setRefreshToken(refreshToken);
+        command.setIp(ip(request));
+        command.setUserAgent(userAgent(request));
+        return command;
+    }
+
+    private AdminAuthCommand oauthCommand(String clientId, String redirectUri, List<String> scopes, String state) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(clientId);
+        command.setRedirectUri(redirectUri);
+        command.setScopes(scopes);
+        command.setState(state);
+        return command;
+    }
+
+    private AdminAuthCommand decisionCommand(OAuth2DecisionRequest request) {
+        AdminAuthCommand command =
+                oauthCommand(request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState());
+        command.setCodeChallenge(request.getCodeChallenge());
+        command.setCodeChallengeMethod(request.getCodeChallengeMethod());
+        command.setUserId(request.getUserId());
+        command.setApproved(request.isApproved());
+        command.setIp(ip(currentRequest()));
+        command.setUserAgent(userAgent(currentRequest()));
+        return command;
+    }
+
+    private AdminAuthCommand exchangeCommand(OAuth2TokenRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(request.getClientId());
+        command.setClientSecret(request.getClientSecret());
+        command.setGrantType(request.getGrantType());
+        command.setRedirectUri(request.getRedirectUri());
+        command.setAuthorizationCode(request.getAuthorizationCode());
+        command.setCodeVerifier(request.getCodeVerifier());
+        command.setRefreshToken(request.getRefreshToken());
+        command.setIp(ip(currentRequest()));
+        command.setUserAgent(userAgent(currentRequest()));
+        return command;
+    }
+
+    private AdminAuthCommand revokeTokenCommand(OAuth2TokenRequest request) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setClientId(request.getClientId());
+        command.setClientSecret(request.getClientSecret());
+        command.setToken(request.getToken());
+        return command;
+    }
+
+    private AdminAuthCommand loginFailedCommand(
+            PrincipalAuthenticationMethod authenticationMethod,
+            PrincipalIdentityType identityType,
+            String ip,
+            String userAgent,
+            String reason) {
+        AdminAuthCommand command = new AdminAuthCommand();
+        command.setAuthenticationMethod(authenticationMethod);
+        command.setIdentityType(identityType);
+        command.setIp(ip);
+        command.setUserAgent(userAgent);
+        command.setReason(reason);
+        return command;
     }
 
     private String ip(HttpServletRequest request) {

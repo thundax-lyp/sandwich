@@ -4,8 +4,6 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -21,6 +19,8 @@ import com.github.thundax.modules.sys.controller.request.DictQueryRequest;
 import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
@@ -28,13 +28,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "系统/字典")
 @SysLogger(module = {"系统", "字典"})
@@ -60,7 +61,7 @@ public class DictController {
     @SysLogger("读取")
     @PostMapping(value = "get")
     public DictResponse get(@Valid @RequestBody DictIdRequest request) throws ApiException {
-        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(request)));
+        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toId(request)));
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
@@ -110,8 +111,8 @@ public class DictController {
     @SysLogger("添加")
     @PostMapping(value = "create")
     public DictResponse add(@Valid @RequestBody DictSaveRequest request) throws ApiException {
-        EntityId id = dictService.create(DictInterfaceAssembler.toCreateCommand(request));
-        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(id)));
+        DictId id = dictService.create(DictInterfaceAssembler.toCreateCommand(request));
+        return DictInterfaceAssembler.toResponse(dictService.get(id));
     }
 
     @ApiOperation(value = "更新", notes = "sys:dict:edit")
@@ -126,13 +127,13 @@ public class DictController {
     @SysLogger("更新")
     @PostMapping(value = "update")
     public DictResponse update(@Valid @RequestBody DictSaveRequest request) throws ApiException {
-        DictQuery query = DictInterfaceAssembler.toQuery(EntityIdCodec.toDomain(request.getId()));
-        Dict dict = dictService.get(query);
+        DictId id = DictIdCodec.toDomain(request.getId());
+        Dict dict = dictService.get(id);
         if (dict == null) {
             throw new ApiException("id not exist");
         }
         dictService.changeInfo(DictInterfaceAssembler.toChangeInfoCommand(request));
-        return DictInterfaceAssembler.toResponse(dictService.get(query));
+        return DictInterfaceAssembler.toResponse(dictService.get(id));
     }
 
     @ApiOperation(value = "删除", notes = "sys:dict:edit")
@@ -149,9 +150,9 @@ public class DictController {
     public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) throws ApiException {
         List<DeleteDictCommand> commandList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {
-            Dict bean = dictService.get(DictInterfaceAssembler.toQuery(request));
+            Dict bean = dictService.get(DictInterfaceAssembler.toId(request));
             if (bean == null) {
-                throw new NullBeanException("Dict", EntityIdCodec.toDomain(request.getId()));
+                throw new NullBeanException("Dict", DictInterfaceAssembler.toId(request));
             }
             commandList.add(DictInterfaceAssembler.toDeleteCommand(request));
         }

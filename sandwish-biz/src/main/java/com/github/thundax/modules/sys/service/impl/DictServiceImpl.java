@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -9,6 +8,7 @@ import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
@@ -30,11 +30,11 @@ public class DictServiceImpl implements DictService {
         this.dao = dao;
     }
 
-    public Dict get(DictQuery query) {
-        if (query == null || query.getId() == null) {
+    public Dict get(DictId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @AuditLog(type = "Dict", id = "", action = AuditAction.CREATE, summary = "创建字典", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(CreateDictCommand command) {
+    public DictId create(CreateDictCommand command) {
         Dict dict = toEntity(command);
         dict.setId(dao.insert(dict));
         return dict.getId();

@@ -5,11 +5,12 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
+import org.springframework.stereotype.Component;
+
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
 @Component
 public class DictCacheSupport {
@@ -29,8 +30,8 @@ public class DictCacheSupport {
     }
 
     public void putById(Dict dict) {
-        if (dict != null && EntityIdCodec.toValue(dict.getId()) != null) {
-            cache.put(EntityIdCodec.toValue(dict.getId()), toCacheDTO(dict), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
+        if (dict != null && DictIdCodec.toValue(dict.getId()) != null) {
+            cache.put(DictIdCodec.toValue(dict.getId()), toCacheDTO(dict), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 
@@ -43,7 +44,7 @@ public class DictCacheSupport {
             return Optional.empty();
         }
         Dict dict = new Dict();
-        dict.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        dict.setId(DictIdCodec.toDomain(cacheDTO.id));
         dict.setType(cacheDTO.type);
         dict.setLabel(cacheDTO.label);
         dict.setValue(cacheDTO.value);
@@ -54,7 +55,7 @@ public class DictCacheSupport {
 
     private static DictCacheDTO toCacheDTO(Dict dict) {
         DictCacheDTO cacheDTO = new DictCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(dict.getId());
+        cacheDTO.id = DictIdCodec.toValue(dict.getId());
         cacheDTO.type = dict.getType();
         cacheDTO.label = dict.getLabel();
         cacheDTO.value = dict.getValue();

@@ -1,13 +1,13 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.request.DictQueryRequest;
 import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
@@ -24,7 +24,7 @@ public final class DictInterfaceAssembler {
             return DictResponse.builder().build();
         }
         return DictResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(DictIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .priority(entity.getPriority())
                 .label(entity.getLabel())
@@ -34,15 +34,8 @@ public final class DictInterfaceAssembler {
     }
 
     @NonNull
-    public static DictQuery toQuery(@NonNull DictIdRequest request) {
-        return toQuery(EntityIdCodec.toDomain(request.getId()));
-    }
-
-    @NonNull
-    public static DictQuery toQuery(@NonNull EntityId id) {
-        DictQuery query = new DictQuery();
-        query.setId(id);
-        return query;
+    public static DictId toId(@NonNull DictIdRequest request) {
+        return DictIdCodec.toDomain(request.getId());
     }
 
     @NonNull
@@ -77,7 +70,7 @@ public final class DictInterfaceAssembler {
     @NonNull
     public static ChangeDictInfoCommand toChangeInfoCommand(@NonNull DictSaveRequest request) {
         ChangeDictInfoCommand command = new ChangeDictInfoCommand();
-        command.setId(EntityIdCodec.toDomain(request.getId()));
+        command.setId(DictIdCodec.toDomain(request.getId()));
         command.setPriority(request.getPriority());
         command.setRemarks(request.getRemarks());
         command.setLabel(request.getLabel());
@@ -89,7 +82,7 @@ public final class DictInterfaceAssembler {
     @NonNull
     public static DeleteDictCommand toDeleteCommand(@NonNull DictIdRequest request) {
         DeleteDictCommand command = new DeleteDictCommand();
-        command.setId(EntityIdCodec.toDomain(request.getId()));
+        command.setId(DictIdCodec.toDomain(request.getId()));
         return command;
     }
 

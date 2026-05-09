@@ -1,15 +1,15 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import java.util.List;
 
 public interface UserDao {
 
-    User getById(EntityId id);
+    User getById(UserId id);
 
     List<User> listByIds(List<Long> idList);
 
@@ -24,13 +24,13 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    EntityId insert(User user);
+    UserId insert(User user);
 
     int update(User user);
 
     int updatePriority(User user);
 
-    int deleteById(EntityId id);
+    int deleteById(UserId id);
 
     int updateStatus(User user);
 

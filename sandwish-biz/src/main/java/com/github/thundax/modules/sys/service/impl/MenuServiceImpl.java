@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -14,6 +12,8 @@ import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
@@ -37,19 +37,19 @@ public class MenuServiceImpl implements MenuService {
         this.dao = dao;
     }
 
-    public Menu get(MenuQuery query) {
-        if (query == null || query.getId() == null) {
+    public Menu get(MenuId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     public List<Menu> list(MenuQuery query) {
         if (query != null && query.getIds() != null) {
-            return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
+            return dao.listByIds(MenuIdCodec.toValues(query.getIds()));
         }
         return dao.list(
-                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
+                query == null ? null : MenuIdCodec.toValue(query.getParentId()),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()));
     }
@@ -57,7 +57,7 @@ public class MenuServiceImpl implements MenuService {
     public PageResult<Menu> page(MenuQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
-                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
+                query == null ? null : MenuIdCodec.toValue(query.getParentId()),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()),
                 normalizedPage.getPageNo(),
@@ -69,7 +69,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @AuditLog(type = "Menu", id = "", action = AuditAction.CREATE, summary = "创建菜单", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(CreateMenuCommand command) {
+    public MenuId create(CreateMenuCommand command) {
         Menu menu = toMenu(command);
         menu.setId(dao.insert(menu));
         afterWrite(menu);
@@ -109,10 +109,8 @@ public class MenuServiceImpl implements MenuService {
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteMenuCommand command) {
-        dao.deleteMenuRole(EntityIdCodec.toValue(command.getId()));
-        MenuQuery query = new MenuQuery();
-        query.setId(command.getId());
-        Menu bean = this.get(query);
+        dao.deleteMenuRole(MenuIdCodec.toValue(command.getId()));
+        Menu bean = this.get(command.getId());
         if (bean == null) {
             return 0;
         }
@@ -128,8 +126,8 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public void move(MoveMenuCommand command) {
         dao.moveTreeNode(
-                EntityIdCodec.toValue(command.getFromId()),
-                EntityIdCodec.toValue(command.getToId()),
+                MenuIdCodec.toValue(command.getFromId()),
+                MenuIdCodec.toValue(command.getToId()),
                 command.getMoveType());
         notifyCacheChanged();
     }
@@ -139,8 +137,7 @@ public class MenuServiceImpl implements MenuService {
         return query != null
                 && query.getChildId() != null
                 && query.getAncestorId() != null
-                && dao.isChildOf(
-                        EntityIdCodec.toValue(query.getChildId()), EntityIdCodec.toValue(query.getAncestorId()));
+                && dao.isChildOf(MenuIdCodec.toValue(query.getChildId()), MenuIdCodec.toValue(query.getAncestorId()));
     }
 
     private void notifyCacheChanged() {

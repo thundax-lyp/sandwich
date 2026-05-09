@@ -5,15 +5,16 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import org.springframework.stereotype.Component;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
 @Component
 public class RoleCacheSupport {
@@ -43,8 +44,8 @@ public class RoleCacheSupport {
     }
 
     public void putById(Role role) {
-        if (role != null && EntityIdCodec.toValue(role.getId()) != null) {
-            String key = String.valueOf(EntityIdCodec.toValue(role.getId()));
+        if (role != null && RoleIdCodec.toValue(role.getId()) != null) {
+            String key = String.valueOf(RoleIdCodec.toValue(role.getId()));
             cache.put(key, toCacheDTO(role), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
@@ -131,7 +132,7 @@ public class RoleCacheSupport {
             return null;
         }
         Role role = new Role();
-        role.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        role.setId(RoleIdCodec.toDomain(cacheDTO.id));
         role.setName(cacheDTO.name);
         role.setPrivilege(cacheDTO.privilege == null ? null : RolePrivilege.from(cacheDTO.privilege));
         role.setStatus(cacheDTO.status == null ? null : RoleStatus.from(cacheDTO.status));
@@ -142,7 +143,7 @@ public class RoleCacheSupport {
 
     private static RoleCacheDTO toCacheDTO(Role role) {
         RoleCacheDTO cacheDTO = new RoleCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(role.getId());
+        cacheDTO.id = RoleIdCodec.toValue(role.getId());
         cacheDTO.name = role.getName();
         cacheDTO.privilege =
                 role.getPrivilege() == null ? null : role.getPrivilege().value();

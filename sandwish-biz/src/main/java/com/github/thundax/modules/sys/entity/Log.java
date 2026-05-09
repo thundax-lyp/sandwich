@@ -1,7 +1,7 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
 import java.util.Date;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -15,9 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Log {
-    public static final String BEAN_NAME = "Log";
-
-    private EntityId id;
+    private LogId id;
 
     private String userId;
 

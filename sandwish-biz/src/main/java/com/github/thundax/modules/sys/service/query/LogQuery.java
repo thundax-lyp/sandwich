@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -13,7 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogQuery {
-    private EntityId id;
     private LogType type;
     private String remoteAddr;
     private String title;

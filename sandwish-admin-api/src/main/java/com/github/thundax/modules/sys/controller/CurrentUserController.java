@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
@@ -29,6 +28,7 @@ import com.github.thundax.modules.sys.controller.response.PersonalInfoResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
@@ -38,11 +38,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -50,6 +45,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "系统/当前用户")
 @SysLogger(module = {"系统", "当前用户"})
@@ -108,7 +109,7 @@ public class CurrentUserController {
 
         currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
-                EntityIdCodec.toDomain(currentUser.getDepartmentId()),
+                currentUser.getDepartmentId(),
                 request.getEmail(),
                 request.getMobile(),
                 currentUser.getTel(),
@@ -166,7 +167,7 @@ public class CurrentUserController {
 
         try {
             AvatarUtils.saveAvatar(
-                    EntityIdCodec.toStringValue(currentUser.getId()),
+                    UserIdCodec.toStringValue(currentUser.getId()),
                     request.getAvatar().getInputStream());
         } catch (IOException e) {
             throw new ApiException(e.getMessage());
@@ -189,7 +190,7 @@ public class CurrentUserController {
     public PersonalAvatarResponse deleteAvatar() {
         User currentUser = UserAccessHolder.currentUser();
 
-        AvatarUtils.deleteAvatar(EntityIdCodec.toStringValue(currentUser.getId()));
+        AvatarUtils.deleteAvatar(UserIdCodec.toStringValue(currentUser.getId()));
 
         return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
     }

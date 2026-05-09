@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CurrentUserQuery {
-    private EntityId userId;
+    private UserId userId;
     private UserPrivilege privilege;
     private UserStatus status;
     private AccessRank rank;

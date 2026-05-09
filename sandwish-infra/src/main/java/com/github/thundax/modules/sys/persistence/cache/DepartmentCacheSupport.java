@@ -5,12 +5,13 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import org.springframework.stereotype.Component;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
 @Component
 public class DepartmentCacheSupport {
@@ -38,8 +39,8 @@ public class DepartmentCacheSupport {
     }
 
     public void putById(Department department) {
-        if (department != null && EntityIdCodec.toValue(department.getId()) != null) {
-            String key = String.valueOf(EntityIdCodec.toValue(department.getId()));
+        if (department != null && DepartmentIdCodec.toValue(department.getId()) != null) {
+            String key = String.valueOf(DepartmentIdCodec.toValue(department.getId()));
             cache.put(key, toCacheDTO(department), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
@@ -84,8 +85,8 @@ public class DepartmentCacheSupport {
             return null;
         }
         Department department = new Department();
-        department.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        department.setParentId(EntityIdCodec.toDomain(cacheDTO.parentId));
+        department.setId(DepartmentIdCodec.toDomain(cacheDTO.id));
+        department.setParentId(DepartmentIdCodec.toDomain(cacheDTO.parentId));
         department.setName(cacheDTO.name);
         department.setShortName(cacheDTO.shortName);
         department.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
@@ -95,8 +96,8 @@ public class DepartmentCacheSupport {
 
     private static DepartmentCacheDTO toCacheDTO(Department department) {
         DepartmentCacheDTO cacheDTO = new DepartmentCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(department.getId());
-        cacheDTO.parentId = EntityIdCodec.toValue(department.getParentId());
+        cacheDTO.id = DepartmentIdCodec.toValue(department.getId());
+        cacheDTO.parentId = DepartmentIdCodec.toValue(department.getParentId());
         cacheDTO.name = department.getName();
         cacheDTO.shortName = department.getShortName();
         cacheDTO.priority = department.getPriority();

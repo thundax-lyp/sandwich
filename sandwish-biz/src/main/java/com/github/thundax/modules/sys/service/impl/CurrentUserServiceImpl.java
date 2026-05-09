@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
@@ -22,6 +21,8 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
@@ -127,12 +128,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             return menuList;
         }
 
-        List<EntityId> menuIds = roleList.stream()
+        List<MenuId> menuIds = roleList.stream()
                 .flatMap(role -> roleService.listRoleMenus(roleQuery(role)).stream())
                 .map(Menu::getId)
                 .distinct()
                 .filter(menuId -> {
-                    Menu menu = menuService.get(menuQuery(menuId));
+                    Menu menu = menuService.get(menuId);
                     return menu != null && query.getRank().canAccess(menu.getRank());
                 })
                 .collect(Collectors.toList());
@@ -143,19 +144,13 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         return menuList;
     }
 
-    private MenuQuery menuQuery(EntityId menuId) {
-        MenuQuery query = new MenuQuery();
-        query.setId(menuId);
-        return query;
-    }
-
     private RoleQuery roleQuery(Role role) {
         RoleQuery query = new RoleQuery();
         query.setId(role.getId());
         return query;
     }
 
-    private UserQuery userQuery(EntityId userId) {
+    private UserQuery userQuery(UserId userId) {
         UserQuery query = new UserQuery();
         query.setId(userId);
         return query;
@@ -178,7 +173,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         return menuList;
     }
 
-    private PrincipalIdentity getAccountIdentity(EntityId userId) {
+    private PrincipalIdentity getAccountIdentity(UserId userId) {
         if (userId == null) {
             return null;
         }
@@ -186,12 +181,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
     }
 
-    private String getAccountLoginName(EntityId userId) {
+    private String getAccountLoginName(UserId userId) {
         PrincipalIdentity identity = getAccountIdentity(userId);
         return identity == null ? null : identity.getIdentityValue();
     }
 
-    private void upsertPassword(EntityId userId, PrincipalIdentity accountIdentity, String encryptedPassword) {
+    private void upsertPassword(UserId userId, PrincipalIdentity accountIdentity, String encryptedPassword) {
         if (userId == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
@@ -245,7 +240,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private User toUser(ChangeCurrentUserInfoCommand command) {
         User user = new User();
         user.setId(command.getUserId());
-        user.setDepartmentId(EntityIdCodec.toValue(command.getDepartmentId()));
+        user.setDepartmentId(command.getDepartmentId());
         user.setEmail(command.getEmail());
         user.setMobile(command.getMobile());
         user.setTel(command.getTel());

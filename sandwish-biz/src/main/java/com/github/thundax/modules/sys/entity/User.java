@@ -1,10 +1,11 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,9 @@ import org.springframework.lang.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Sortable {
-    public static final String BEAN_NAME = "User";
+    private UserId id;
 
-    private EntityId id;
-
-    private Long departmentId;
+    private DepartmentId departmentId;
 
     private String email;
     private String mobile;

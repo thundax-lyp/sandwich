@@ -1,9 +1,11 @@
 package com.github.thundax.modules.sys.service.command;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +17,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangeUserInfoCommand {
-    private EntityId id;
-    private EntityId departmentId;
+    private UserId id;
+    private DepartmentId departmentId;
     private String email;
     private String mobile;
     private String tel;
@@ -27,5 +29,5 @@ public class ChangeUserInfoCommand {
     private int priority;
     private String remarks;
     private String loginName;
-    private List<EntityId> roleIdList;
+    private List<RoleId> roleIdList;
 }

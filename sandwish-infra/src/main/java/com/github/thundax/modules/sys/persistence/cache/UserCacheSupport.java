@@ -5,16 +5,18 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import org.springframework.stereotype.Component;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
 @Component
 public class UserCacheSupport {
@@ -43,8 +45,8 @@ public class UserCacheSupport {
     }
 
     public void putById(User user) {
-        if (user != null && EntityIdCodec.toValue(user.getId()) != null) {
-            String key = String.valueOf(EntityIdCodec.toValue(user.getId()));
+        if (user != null && UserIdCodec.toValue(user.getId()) != null) {
+            String key = String.valueOf(UserIdCodec.toValue(user.getId()));
             cache.put(key, toCacheDTO(user), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
@@ -110,8 +112,8 @@ public class UserCacheSupport {
             return null;
         }
         User user = new User();
-        user.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        user.setDepartmentId(cacheDTO.departmentId);
+        user.setId(UserIdCodec.toDomain(cacheDTO.id));
+        user.setDepartmentId(DepartmentIdCodec.toDomain(cacheDTO.departmentId));
         user.setEmail(cacheDTO.email);
         user.setMobile(cacheDTO.mobile);
         user.setTel(cacheDTO.tel);
@@ -126,8 +128,8 @@ public class UserCacheSupport {
 
     private static UserCacheDTO toCacheDTO(User user) {
         UserCacheDTO cacheDTO = new UserCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(user.getId());
-        cacheDTO.departmentId = user.getDepartmentId();
+        cacheDTO.id = UserIdCodec.toValue(user.getId());
+        cacheDTO.departmentId = DepartmentIdCodec.toValue(user.getDepartmentId());
         cacheDTO.email = user.getEmail();
         cacheDTO.mobile = user.getMobile();
         cacheDTO.tel = user.getTel();

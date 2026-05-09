@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 public final class LogPersistenceAssembler {
 
@@ -17,7 +18,7 @@ public final class LogPersistenceAssembler {
             return null;
         }
         LogDO dataObject = new LogDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(LogIdCodec.toValue(entity.getId()));
         dataObject.setUserId(StringUtils.isBlank(entity.getUserId()) ? null : Long.valueOf(entity.getUserId()));
         dataObject.setType(typeValue(entity.getType()));
         dataObject.setLogDate(entity.getLogDate());
@@ -35,7 +36,7 @@ public final class LogPersistenceAssembler {
             return null;
         }
         Log entity = new Log();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(LogIdCodec.toDomain(dataObject.getId()));
         entity.setUserId(dataObject.getUserId() == null ? null : String.valueOf(dataObject.getUserId()));
         entity.setType(typeFrom(dataObject.getType()));
         entity.setLogDate(dataObject.getLogDate());

@@ -1,14 +1,14 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
 import java.util.Date;
 import java.util.List;
 
 public interface LogDao {
 
-    Log getById(EntityId id);
+    Log getById(LogId id);
 
     List<Log> listByIds(List<String> idList);
 
@@ -34,13 +34,13 @@ public interface LogDao {
             int pageNo,
             int pageSize);
 
-    EntityId insert(Log log);
+    LogId insert(Log log);
 
     int update(Log log);
 
-    int deleteById(EntityId id);
+    int deleteById(LogId id);
 
-    List<EntityId> batchInsert(List<Log> list);
+    List<LogId> batchInsert(List<Log> list);
 
     int batchDelete(String type, String remoteAddr, String title, String requestUri, Date beginDate, Date endDate);
 }

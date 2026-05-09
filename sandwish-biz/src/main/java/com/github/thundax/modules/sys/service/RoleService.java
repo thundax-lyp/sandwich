@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
@@ -17,13 +17,13 @@ import java.util.List;
 
 public interface RoleService {
 
-    Role get(RoleQuery query);
+    Role get(RoleId id);
 
     List<Role> list(RoleQuery query);
 
     PageResult<Role> page(RoleQuery query, PageQuery page);
 
-    EntityId create(CreateRoleCommand command);
+    RoleId create(CreateRoleCommand command);
 
     void changeInfo(ChangeRoleInfoCommand command);
 

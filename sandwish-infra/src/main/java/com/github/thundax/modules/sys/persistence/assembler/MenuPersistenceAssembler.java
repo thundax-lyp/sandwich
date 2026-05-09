@@ -1,10 +1,11 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public final class MenuPersistenceAssembler {
             return null;
         }
         MenuDO dataObject = new MenuDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setParentId(EntityIdCodec.toValue(entity.getParentId()));
+        dataObject.setId(MenuIdCodec.toValue(entity.getId()));
+        dataObject.setParentId(MenuIdCodec.toValue(entity.getParentId()));
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
@@ -36,8 +37,8 @@ public final class MenuPersistenceAssembler {
             return null;
         }
         Menu entity = new Menu();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setId(MenuIdCodec.toDomain(dataObject.getId()));
+        entity.setParentId(MenuIdCodec.toDomain(dataObject.getParentId()));
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));

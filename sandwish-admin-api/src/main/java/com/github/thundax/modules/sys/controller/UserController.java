@@ -1,12 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InsertBeanExistException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.exception.*;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
@@ -37,14 +32,7 @@ import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
-import com.github.thundax.modules.sys.controller.request.UserAvatarRequest;
-import com.github.thundax.modules.sys.controller.request.UserCheckRequest;
-import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
-import com.github.thundax.modules.sys.controller.request.UserIdRequest;
-import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
-import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
-import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
-import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
+import com.github.thundax.modules.sys.controller.request.*;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
 import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
@@ -53,6 +41,11 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -66,28 +59,24 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Api(tags = "系统/用户")
 @SysLogger(module = {"系统", "用户"})
@@ -97,7 +86,10 @@ public class UserController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+    private static final String DEPARTMENT_NAME = "department";
     private static final String PRIVATE_KEY_ITEM = "privateKey";
+    private static final String ROLE_NAME = "Role";
+    private static final String USER_NAME = "User";
 
     private final UserService userService;
     private final DepartmentService departmentService;
@@ -136,9 +128,9 @@ public class UserController {
     @PostMapping(value = "get")
     @WrappedApiResponse
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
-        User bean = userService.get(userQuery(request.getId()));
+        User bean = userService.get(UserIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+            throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
         }
         return toResponse(bean);
     }
@@ -210,9 +202,9 @@ public class UserController {
         String encryptedPassword = PasswordHelper.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
-            User bean = userService.get(userQuery(entity.getId()));
+            User bean = userService.get(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
+                throw new InsertBeanExistException(USER_NAME, entity.getId());
             }
         }
 
@@ -247,9 +239,9 @@ public class UserController {
             throw new InvalidParameterException("loginName");
         }
 
-        User bean = userService.get(userQuery(request.getId()));
+        User bean = userService.get(UserIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+            throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
         }
         User currentUser = UserAccessHolder.currentUser();
         // 非超管用户无权限开启/关闭管理员
@@ -339,9 +331,9 @@ public class UserController {
 
         List<ChangeUserStatusCommand> commandList = new ArrayList<>();
         for (UserStatusRequest request : RequestListHelper.present(list)) {
-            User bean = userService.get(userQuery(request.getId()));
+            User bean = userService.get(UserIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+                throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
@@ -376,9 +368,9 @@ public class UserController {
 
         List<DeleteUserCommand> commandList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
-            User bean = userService.get(userQuery(request.getId()));
+            User bean = userService.get(UserIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+                throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
@@ -423,7 +415,7 @@ public class UserController {
     @WrappedApiResponse
     public List<UserDepartmentResponse> departmentTree() {
         return departmentService.list(new DepartmentQuery()).stream()
-                .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, this::getDepartment))
+                .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, departmentService::get))
                 .collect(Collectors.toList());
     }
 
@@ -474,9 +466,9 @@ public class UserController {
         UserQuery query = UserInterfaceAssembler.toQuery(request);
 
         if (request.getDepartmentId() != null) {
-            Department department = getDepartment(EntityIdCodec.toDomain(request.getDepartmentId()));
+            Department department = departmentService.get(DepartmentIdCodec.toDomain(request.getDepartmentId()));
             if (department == null) {
-                throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getDepartmentId()));
+                throw new NullBeanException(DEPARTMENT_NAME, DepartmentIdCodec.toDomain(request.getDepartmentId()));
             }
 
             query.setDepartmentId(department.getId());
@@ -490,9 +482,9 @@ public class UserController {
             throw new InvalidParameterException("department.id");
 
         } else {
-            Department bean = getDepartment(EntityIdCodec.toDomain(request.getId()));
+            Department bean = departmentService.get(DepartmentIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+                throw new NullBeanException(DEPARTMENT_NAME, DepartmentIdCodec.toDomain(request.getId()));
             }
         }
     }
@@ -506,11 +498,9 @@ public class UserController {
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                RoleQuery query = new RoleQuery();
-                query.setId(EntityIdCodec.toDomain(request.getId()));
-                Role bean = roleService.get(query);
+                Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
+                    throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
                 }
             }
         }
@@ -550,23 +540,13 @@ public class UserController {
     }
 
     private UserResponse toResponse(User user) {
-        Department department = getDepartment(EntityIdCodec.toDomain(user.getDepartmentId()));
+        Department department = departmentService.get(user.getDepartmentId());
         List<Role> roleList = userService.listUserRoles(userQuery(user.getId()));
         return UserInterfaceAssembler.toResponse(
-                user, getAccountLoginName(user.getId()), department, roleList, this::getDepartment);
+                user, getAccountLoginName(user.getId()), department, roleList, departmentService::get);
     }
 
-    private Department getDepartment(EntityId departmentId) {
-        DepartmentQuery query = new DepartmentQuery();
-        query.setId(departmentId);
-        return departmentService.get(query);
-    }
-
-    private UserQuery userQuery(Long userId) {
-        return userQuery(EntityIdCodec.toDomain(userId));
-    }
-
-    private UserQuery userQuery(EntityId userId) {
+    private UserQuery userQuery(UserId userId) {
         UserQuery query = new UserQuery();
         query.setId(userId);
         return query;

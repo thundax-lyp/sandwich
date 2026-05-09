@@ -1,12 +1,12 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.request.MenuQueryRequest;
 import com.github.thundax.modules.sys.controller.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.controller.response.MenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -20,9 +20,9 @@ public final class MenuInterfaceAssembler {
         if (entity == null) {
             return MenuResponse.builder().build();
         }
-        Long parentId = EntityIdCodec.toValue(entity.getParentId());
+        Long parentId = MenuIdCodec.toValue(entity.getParentId());
         return MenuResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(MenuIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .priority(entity.getPriority())
                 .parentId(parentId)
@@ -41,8 +41,8 @@ public final class MenuInterfaceAssembler {
             return MenuResponse.builder().build();
         }
         return MenuResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
-                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .id(MenuIdCodec.toValue(entity.getId()))
+                .parentId(MenuIdCodec.toValue(entity.getParentId()))
                 .name(entity.getName())
                 .build();
     }
@@ -50,7 +50,7 @@ public final class MenuInterfaceAssembler {
     @NonNull
     public static MenuQuery toQuery(@NonNull MenuQueryRequest request) {
         MenuQuery query = new MenuQuery();
-        query.setParentId(EntityIdCodec.toDomain(request.getParentId()));
+        query.setParentId(MenuIdCodec.toDomain(request.getParentId()));
         if (request.getDisplay() != null) {
             query.setVisibility(request.getDisplay() ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         }
@@ -59,13 +59,13 @@ public final class MenuInterfaceAssembler {
 
     @NonNull
     public static Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        entity.setId(MenuIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }
         entity.setRemarks(request.getRemarks());
         if (request.getParentId() != null) {
-            entity.setParentId(EntityIdCodec.toDomain(request.getParentId()));
+            entity.setParentId(MenuIdCodec.toDomain(request.getParentId()));
         }
         entity.setName(request.getName());
         entity.setPerms(request.getPerms());

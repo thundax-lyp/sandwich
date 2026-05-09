@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -10,6 +8,8 @@ import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
@@ -30,16 +30,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         this.dao = dao;
     }
 
-    public Department get(DepartmentQuery query) {
-        if (query == null || query.getId() == null) {
+    public Department get(DepartmentId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     public List<Department> list(DepartmentQuery query) {
         return dao.list(
-                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
+                query == null ? null : DepartmentIdCodec.toValue(query.getParentId()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
@@ -47,7 +47,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public PageResult<Department> page(DepartmentQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Department> dataPage = dao.page(
-                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
+                query == null ? null : DepartmentIdCodec.toValue(query.getParentId()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
@@ -59,7 +59,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @AuditLog(type = "Department", id = "", action = AuditAction.CREATE, summary = "创建部门", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(CreateDepartmentCommand command) {
+    public DepartmentId create(CreateDepartmentCommand command) {
         Department entity = toDepartment(command);
         entity.setId(dao.insert(entity));
         return entity.getId();
@@ -81,9 +81,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteDepartmentCommand command) {
-        DepartmentQuery query = new DepartmentQuery();
-        query.setId(command.getId());
-        Department bean = this.get(query);
+        Department bean = this.get(command.getId());
         if (bean == null) {
             return 0;
         }
@@ -97,8 +95,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional(rollbackFor = Exception.class)
     public void move(MoveDepartmentCommand command) {
         dao.moveTreeNode(
-                EntityIdCodec.toValue(command.getFromId()),
-                EntityIdCodec.toValue(command.getToId()),
+                DepartmentIdCodec.toValue(command.getFromId()),
+                DepartmentIdCodec.toValue(command.getToId()),
                 command.getMoveType());
     }
 
@@ -108,7 +106,8 @@ public class DepartmentServiceImpl implements DepartmentService {
                 && query.getChildId() != null
                 && query.getAncestorId() != null
                 && dao.isChildOf(
-                        EntityIdCodec.toValue(query.getChildId()), EntityIdCodec.toValue(query.getAncestorId()));
+                        DepartmentIdCodec.toValue(query.getChildId()),
+                        DepartmentIdCodec.toValue(query.getAncestorId()));
     }
 
     private PageQuery normalizePage(PageQuery page) {

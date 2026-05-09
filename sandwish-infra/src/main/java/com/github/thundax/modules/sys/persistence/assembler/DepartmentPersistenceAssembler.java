@@ -1,8 +1,9 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +16,8 @@ public final class DepartmentPersistenceAssembler {
             return null;
         }
         DepartmentDO dataObject = new DepartmentDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setParentId(EntityIdCodec.toValue(entity.getParentId()));
+        dataObject.setId(DepartmentIdCodec.toValue(entity.getId()));
+        dataObject.setParentId(DepartmentIdCodec.toValue(entity.getParentId()));
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
@@ -29,8 +30,8 @@ public final class DepartmentPersistenceAssembler {
             return null;
         }
         Department entity = new Department();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setId(DepartmentIdCodec.toDomain(dataObject.getId()));
+        entity.setParentId(DepartmentIdCodec.toDomain(dataObject.getParentId()));
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));

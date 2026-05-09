@@ -5,22 +5,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.MenuPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.MenuCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
 import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class MenuDaoImpl implements MenuDao {
@@ -39,7 +40,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public Menu getById(EntityId id) {
+    public Menu getById(MenuId id) {
         Menu menu = cacheSupport.getById(id.value());
         if (menu != null) {
             return menu;
@@ -90,26 +91,26 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public EntityId insert(Menu entity) {
+    public MenuId insert(Menu entity) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setParentId(MenuIdCodec.toDomain(dataObject.getParentId()));
         dataObject.setLft(newPosition);
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
         cacheSupport.removeAll();
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return MenuIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
     public int update(Menu entity) {
-        MenuDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
+        MenuDO oldNode = getTreeNode(MenuIdCodec.toValue(entity.getId()));
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setParentId(MenuIdCodec.toDomain(dataObject.getParentId()));
         if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
@@ -134,12 +135,12 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MenuDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
+        cacheSupport.removeById(MenuIdCodec.toValue(entity.getId()));
         return count;
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(MenuId id) {
         MenuDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;
@@ -198,7 +199,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(MenuDO::getVisibility, dataObject.getVisibility()));
-        cacheSupport.removeById(EntityIdCodec.toValue(menu.getId()));
+        cacheSupport.removeById(MenuIdCodec.toValue(menu.getId()));
         return count;
     }
 

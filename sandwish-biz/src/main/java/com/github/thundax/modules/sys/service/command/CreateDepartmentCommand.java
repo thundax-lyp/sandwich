@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service.command;
 
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateDepartmentCommand {
-    private EntityId id;
-    private EntityId parentId;
+    private DepartmentId id;
+    private DepartmentId parentId;
     private String name;
     private String shortName;
     private int priority;

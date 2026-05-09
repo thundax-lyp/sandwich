@@ -3,11 +3,11 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.RolePersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
@@ -17,11 +17,12 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
 import com.github.thundax.modules.sys.persistence.mapper.RoleMapper;
 import com.github.thundax.modules.sys.persistence.mapper.UserRoleMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class RoleDaoImpl implements RoleDao {
@@ -47,7 +48,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public Role getById(EntityId id) {
+    public Role getById(RoleId id) {
         Role role = cacheSupport.getById(id.value());
         if (role != null) {
             return role;
@@ -94,12 +95,12 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public EntityId insert(Role entity) {
+    public RoleId insert(Role entity) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         cacheSupport.removeById(dataObject.getId());
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return RoleIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -113,7 +114,7 @@ public class RoleDaoImpl implements RoleDao {
                         .set(RoleDO::getStatus, dataObject.getStatus())
                         .set(RoleDO::getPriority, dataObject.getPriority())
                         .set(RoleDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
+        cacheSupport.removeById(RoleIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -122,12 +123,12 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(RoleDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
+        cacheSupport.removeById(RoleIdCodec.toValue(entity.getId()));
         return count;
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(RoleId id) {
         int count = mapper.deleteById(id.value());
         removeRoleCaches(id.value());
         return count;
@@ -138,7 +139,7 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
         int count =
                 mapper.update(null, buildIdUpdateWrapper(dataObject).set(RoleDO::getStatus, dataObject.getStatus()));
-        cacheSupport.removeById(EntityIdCodec.toValue(role.getId()));
+        cacheSupport.removeById(RoleIdCodec.toValue(role.getId()));
         return count;
     }
 

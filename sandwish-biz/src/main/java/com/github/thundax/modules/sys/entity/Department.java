@@ -1,7 +1,7 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 public class Department implements Sortable {
     public static final String ROOT_ID = "ROOT";
 
-    public static final String BEAN_NAME = "department";
+    private DepartmentId id;
 
-    private EntityId id;
-
-    private EntityId parentId;
+    private DepartmentId parentId;
 
     private String name;
     private String shortName;

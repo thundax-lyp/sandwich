@@ -1,7 +1,7 @@
 package com.github.thundax.modules.sys.service.command;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateLogCommand {
-    private EntityId id;
+    private LogId id;
     private String userId;
     private LogType type;
     private Date logDate;

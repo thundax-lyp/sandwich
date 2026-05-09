@@ -1,7 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.UserController;
@@ -15,6 +13,11 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -34,13 +37,13 @@ public final class UserInterfaceAssembler {
             String loginName,
             Department department,
             List<Role> roleList,
-            Function<EntityId, Department> departmentLoader) {
+            Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return UserResponse.builder().build();
         }
 
         return UserResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .priority(entity.getPriority())
                 .loginName(loginName)
@@ -49,7 +52,7 @@ public final class UserInterfaceAssembler {
                 .email(entity.getEmail())
                 .mobile(entity.getMobile())
                 .avatar(UserController.getAvatarUrl(
-                        EntityIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()))
+                        UserIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()))
                 .superAdmin(entity.isSuper())
                 .admin(entity.isAdmin())
                 .enable(entity.isEnable())
@@ -65,14 +68,14 @@ public final class UserInterfaceAssembler {
 
     @NonNull
     public static UserDepartmentResponse toDepartmentResponse(
-            Department entity, Function<EntityId, Department> departmentLoader) {
+            Department entity, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return UserDepartmentResponse.builder().build();
         }
 
         return UserDepartmentResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
-                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .id(DepartmentIdCodec.toValue(entity.getId()))
+                .parentId(DepartmentIdCodec.toValue(entity.getParentId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
@@ -85,7 +88,7 @@ public final class UserInterfaceAssembler {
         }
 
         return UserRoleResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(RoleIdCodec.toValue(entity.getId()))
                 .name(entity.getName())
                 .build();
     }
@@ -93,7 +96,7 @@ public final class UserInterfaceAssembler {
     @NonNull
     public static UserQuery toQuery(@NonNull UserQueryRequest request) {
         UserQuery query = new UserQuery();
-        query.setDepartmentId(EntityIdCodec.toDomain(request.getDepartmentId()));
+        query.setDepartmentId(DepartmentIdCodec.toDomain(request.getDepartmentId()));
         query.setLoginName(emptyToNull(request.getLoginName()));
         query.setName(emptyToNull(request.getName()));
         if (request.getEnable() != null) {
@@ -108,7 +111,7 @@ public final class UserInterfaceAssembler {
         User entity = toEntity(new User(), request);
         return new CreateUserCommand(
                 entity.getId(),
-                EntityIdCodec.toDomain(entity.getDepartmentId()),
+                entity.getDepartmentId(),
                 entity.getEmail(),
                 entity.getMobile(),
                 entity.getTel(),
@@ -128,7 +131,7 @@ public final class UserInterfaceAssembler {
         User entity = toEntity(new User(), request);
         return new ChangeUserInfoCommand(
                 entity.getId(),
-                EntityIdCodec.toDomain(entity.getDepartmentId()),
+                entity.getDepartmentId(),
                 entity.getEmail(),
                 entity.getMobile(),
                 entity.getTel(),
@@ -144,7 +147,7 @@ public final class UserInterfaceAssembler {
 
     @NonNull
     public static User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        entity.setId(UserIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }
@@ -162,18 +165,18 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
-    public static List<EntityId> toRoleIdList(@NonNull UserSaveRequest request) {
+    public static List<RoleId> toRoleIdList(@NonNull UserSaveRequest request) {
         return request.getRoleList() == null
                 ? new ArrayList<>()
                 : request.getRoleList().stream()
-                        .map(role -> EntityIdCodec.toDomain(role.getId()))
+                        .map(role -> RoleIdCodec.toDomain(role.getId()))
                         .collect(Collectors.toList());
     }
 
-    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
+    private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

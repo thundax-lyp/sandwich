@@ -1,12 +1,13 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public final class RolePersistenceAssembler {
             return null;
         }
         RoleDO dataObject = new RoleDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(RoleIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setPrivilege(privilegeValue(entity.getPrivilege()));
         dataObject.setStatus(statusValue(entity.getStatus()));
@@ -33,7 +34,7 @@ public final class RolePersistenceAssembler {
             return null;
         }
         Role entity = new Role();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(RoleIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setPrivilege(privilegeFrom(dataObject.getPrivilege()));
         entity.setStatus(statusFrom(dataObject.getStatus()));

@@ -5,8 +5,9 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.modules.sys.dao.SmsValidateCodeDao;
-import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Repository;
+
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class SmsValidateCodeDaoImpl implements SmsValidateCodeDao {

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.command;
 
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssignRoleUsersCommand {
-    private EntityId roleId;
-    private List<EntityId> userIds;
+    private RoleId roleId;
+    private List<UserId> userIds;
 }

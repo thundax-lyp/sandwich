@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.service.command;
 
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangeDictInfoCommand {
-    private EntityId id;
+    private DictId id;
     private String type;
     private String label;
     private String value;

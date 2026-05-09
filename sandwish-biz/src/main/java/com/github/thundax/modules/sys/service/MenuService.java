@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
 import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
@@ -14,13 +14,13 @@ import java.util.List;
 
 public interface MenuService {
 
-    Menu get(MenuQuery query);
+    Menu get(MenuId id);
 
     List<Menu> list(MenuQuery query);
 
     PageResult<Menu> page(MenuQuery query, PageQuery page);
 
-    EntityId create(CreateMenuCommand command);
+    MenuId create(CreateMenuCommand command);
 
     void changeInfo(ChangeMenuInfoCommand command);
 

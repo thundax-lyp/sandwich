@@ -5,14 +5,15 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import org.springframework.stereotype.Component;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MenuCacheSupport {
@@ -40,8 +41,8 @@ public class MenuCacheSupport {
     }
 
     public void putById(Menu menu) {
-        if (menu != null && EntityIdCodec.toValue(menu.getId()) != null) {
-            String key = String.valueOf(EntityIdCodec.toValue(menu.getId()));
+        if (menu != null && MenuIdCodec.toValue(menu.getId()) != null) {
+            String key = String.valueOf(MenuIdCodec.toValue(menu.getId()));
             cache.put(key, toCacheDTO(menu), OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
             rememberKey(key);
         }
@@ -86,8 +87,8 @@ public class MenuCacheSupport {
             return null;
         }
         Menu menu = new Menu();
-        menu.setId(EntityIdCodec.toDomain(cacheDTO.id));
-        menu.setParentId(EntityIdCodec.toDomain(cacheDTO.parentId));
+        menu.setId(MenuIdCodec.toDomain(cacheDTO.id));
+        menu.setParentId(MenuIdCodec.toDomain(cacheDTO.parentId));
         menu.setName(cacheDTO.name);
         menu.setPerms(cacheDTO.perms);
         menu.setRank(AccessRankCodec.toDomain(cacheDTO.rank));
@@ -102,8 +103,8 @@ public class MenuCacheSupport {
 
     private static MenuCacheDTO toCacheDTO(Menu menu) {
         MenuCacheDTO cacheDTO = new MenuCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(menu.getId());
-        cacheDTO.parentId = EntityIdCodec.toValue(menu.getParentId());
+        cacheDTO.id = MenuIdCodec.toValue(menu.getId());
+        cacheDTO.parentId = MenuIdCodec.toValue(menu.getParentId());
         cacheDTO.name = menu.getName();
         cacheDTO.perms = menu.getPerms();
         cacheDTO.rank = AccessRankCodec.toValue(menu.getRank());

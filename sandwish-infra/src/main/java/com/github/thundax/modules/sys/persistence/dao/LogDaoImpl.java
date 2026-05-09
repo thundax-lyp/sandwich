@@ -3,19 +3,20 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
+import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import com.github.thundax.modules.sys.persistence.mapper.LogMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class LogDaoImpl implements LogDao {
@@ -28,7 +29,7 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public Log getById(EntityId id) {
+    public Log getById(LogId id) {
         return LogPersistenceAssembler.toEntity(mapper.selectById(id.value()));
     }
 
@@ -78,11 +79,11 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public EntityId insert(Log entity) {
+    public LogId insert(Log entity) {
         LogDO dataObject = LogPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return LogIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -91,17 +92,17 @@ public class LogDaoImpl implements LogDao {
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(LogId id) {
         return mapper.deleteById(id.value());
     }
 
     @Override
-    public List<EntityId> batchInsert(List<Log> list) {
-        List<EntityId> idList = new ArrayList<>();
+    public List<LogId> batchInsert(List<Log> list) {
+        List<LogId> idList = new ArrayList<>();
         for (LogDO dataObject : LogPersistenceAssembler.toDataObjectList(list)) {
             dataObject.setId(idGenerator.nextId().value());
             mapper.insert(dataObject);
-            idList.add(EntityIdCodec.toDomain(dataObject.getId()));
+            idList.add(LogIdCodec.toDomain(dataObject.getId()));
         }
         return idList;
     }

@@ -4,13 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
@@ -18,11 +18,12 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserMapper;
 import com.github.thundax.modules.sys.persistence.mapper.UserRoleMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -52,7 +53,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User getById(EntityId id) {
+    public User getById(UserId id) {
         User user = cacheSupport.getById(id.value());
         if (user != null) {
             return user;
@@ -109,12 +110,12 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public EntityId insert(User entity) {
+    public UserId insert(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         removeUserCaches(dataObject.getId());
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return UserIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -133,7 +134,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getStatus, dataObject.getStatus())
                         .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks()));
-        removeUserCaches(EntityIdCodec.toValue(entity.getId()));
+        removeUserCaches(UserIdCodec.toValue(entity.getId()));
         return count;
     }
 
@@ -142,12 +143,12 @@ public class UserDaoImpl implements UserDao {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(UserDO::getPriority, dataObject.getPriority()));
-        removeUserCaches(EntityIdCodec.toValue(entity.getId()));
+        removeUserCaches(UserIdCodec.toValue(entity.getId()));
         return count;
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(UserId id) {
         int count = mapper.deleteById(id.value());
         removeUserCaches(id.value());
         roleCacheSupport.removeAll();
@@ -159,7 +160,7 @@ public class UserDaoImpl implements UserDao {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
         int count =
                 mapper.update(null, buildIdUpdateWrapper(dataObject).set(UserDO::getStatus, dataObject.getStatus()));
-        removeUserCaches(EntityIdCodec.toValue(user.getId()));
+        removeUserCaches(UserIdCodec.toValue(user.getId()));
         return count;
     }
 

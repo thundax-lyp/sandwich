@@ -1,8 +1,9 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public final class DictPersistenceAssembler {
             return null;
         }
         DictDO dataObject = new DictDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(DictIdCodec.toValue(entity.getId()));
         dataObject.setType(entity.getType());
         dataObject.setLabel(entity.getLabel());
         dataObject.setValue(entity.getValue());
@@ -29,7 +30,7 @@ public final class DictPersistenceAssembler {
             return null;
         }
         Dict entity = new Dict();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(DictIdCodec.toDomain(dataObject.getId()));
         entity.setType(dataObject.getType());
         entity.setLabel(dataObject.getLabel());
         entity.setValue(dataObject.getValue());

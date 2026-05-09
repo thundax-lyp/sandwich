@@ -1,10 +1,11 @@
 package com.github.thundax.modules.sys.controller;
 
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 服务端标签选择视图支撑入口，不承载核心业务 API 规则。

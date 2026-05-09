@@ -1,7 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.controller.request.LogPageRequest;
 import com.github.thundax.modules.sys.controller.response.LogDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.LogResponse;
@@ -9,6 +7,10 @@ import com.github.thundax.modules.sys.controller.response.LogUserResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +27,12 @@ public final class LogInterfaceAssembler {
             User user,
             String loginName,
             Department department,
-            Function<EntityId, Department> departmentLoader) {
+            Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return LogResponse.builder().build();
         }
         return LogResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(LogIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .createDate(entity.getLogDate())
                 .type(entity.getType() == null ? null : entity.getType().value())
@@ -59,12 +61,12 @@ public final class LogInterfaceAssembler {
 
     @NonNull
     private static LogUserResponse toUserResponse(
-            User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
+            User entity, String loginName, Department department, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return LogUserResponse.builder().build();
         }
         return LogUserResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toValue(entity.getId()))
                 .loginName(loginName)
                 .name(entity.getName())
                 .department(toDepartmentResponse(department, departmentLoader))
@@ -73,21 +75,21 @@ public final class LogInterfaceAssembler {
 
     @NonNull
     private static LogDepartmentResponse toDepartmentResponse(
-            Department entity, Function<EntityId, Department> departmentLoader) {
+            Department entity, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return LogDepartmentResponse.builder().build();
         }
         return LogDepartmentResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(DepartmentIdCodec.toValue(entity.getId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
     }
 
-    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
+    private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

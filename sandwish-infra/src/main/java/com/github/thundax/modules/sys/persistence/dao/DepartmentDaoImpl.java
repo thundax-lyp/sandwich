@@ -5,20 +5,21 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.DepartmentPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
 import com.github.thundax.modules.sys.persistence.mapper.DepartmentMapper;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class DepartmentDaoImpl implements DepartmentDao {
@@ -35,7 +36,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public Department getById(EntityId id) {
+    public Department getById(DepartmentId id) {
         Department department = cacheSupport.getById(id.value());
         if (department != null) {
             return department;
@@ -87,26 +88,26 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public EntityId insert(Department entity) {
+    public DepartmentId insert(Department entity) {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         Integer newPosition = allocateInsertPosition(dataObject);
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setParentId(DepartmentIdCodec.toDomain(dataObject.getParentId()));
         dataObject.setLft(newPosition);
         dataObject.setRgt(newPosition + 1);
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
         cacheSupport.removeAll();
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return DepartmentIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
     public int update(Department entity) {
-        DepartmentDO oldNode = getTreeNode(EntityIdCodec.toValue(entity.getId()));
+        DepartmentDO oldNode = getTreeNode(DepartmentIdCodec.toValue(entity.getId()));
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
-        entity.setParentId(EntityIdCodec.toDomain(dataObject.getParentId()));
+        entity.setParentId(DepartmentIdCodec.toDomain(dataObject.getParentId()));
         if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
@@ -127,12 +128,12 @@ public class DepartmentDaoImpl implements DepartmentDao {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         int count = mapper.update(
                 null, buildIdUpdateWrapper(dataObject).set(DepartmentDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
+        cacheSupport.removeById(DepartmentIdCodec.toValue(entity.getId()));
         return count;
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(DepartmentId id) {
         DepartmentDO node = getTreeNode(id.value());
         if (node == null) {
             return 0;

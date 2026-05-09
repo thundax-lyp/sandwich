@@ -1,20 +1,20 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.controller.request.RoleQueryRequest;
 import com.github.thundax.modules.sys.controller.request.RoleSaveRequest;
-import com.github.thundax.modules.sys.controller.response.RoleDepartmentResponse;
-import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
-import com.github.thundax.modules.sys.controller.response.RoleResponse;
-import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
-import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.controller.response.*;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -35,7 +35,7 @@ public final class RoleInterfaceAssembler {
         }
 
         return RoleResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(RoleIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .priority(entity.getPriority())
                 .name(entity.getName())
@@ -56,9 +56,9 @@ public final class RoleInterfaceAssembler {
             return RoleMenuResponse.builder().build();
         }
 
-        Long parentId = EntityIdCodec.toValue(entity.getParentId());
+        Long parentId = MenuIdCodec.toValue(entity.getParentId());
         return RoleMenuResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(MenuIdCodec.toValue(entity.getId()))
                 .parentId(parentId)
                 .name(entity.getName())
                 .perms(entity.getPerms())
@@ -67,13 +67,13 @@ public final class RoleInterfaceAssembler {
 
     @NonNull
     public static RoleUserResponse toUserResponse(
-            User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
+            User entity, String loginName, Department department, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return RoleUserResponse.builder().build();
         }
 
         return RoleUserResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toValue(entity.getId()))
                 .name(entity.getName())
                 .loginName(loginName)
                 .department(toDepartmentResponse(department, departmentLoader))
@@ -84,7 +84,7 @@ public final class RoleInterfaceAssembler {
     public static RoleUserTreeNodeResponse toDepartmentTreeNode(String id, Department entity) {
         return RoleUserTreeNodeResponse.builder()
                 .id(id)
-                .parentId(entity.getParentId() == null ? null : idPrefix(EntityIdCodec.toValue(entity.getParentId())))
+                .parentId(entity.getParentId() == null ? null : idPrefix(DepartmentIdCodec.toValue(entity.getParentId())))
                 .name(entity.getName())
                 .build();
     }
@@ -95,10 +95,10 @@ public final class RoleInterfaceAssembler {
             User entity,
             String loginName,
             Department department,
-            Function<EntityId, Department> departmentLoader) {
+            Function<DepartmentId, Department> departmentLoader) {
         return RoleUserTreeNodeResponse.builder()
-                .id(String.valueOf(EntityIdCodec.toValue(entity.getId())))
-                .parentId(departmentIdPrefix + entity.getDepartmentId())
+                .id(String.valueOf(UserIdCodec.toValue(entity.getId())))
+                .parentId(departmentIdPrefix + DepartmentIdCodec.toValue(entity.getDepartmentId()))
                 .name(entity.getName())
                 .user(toUserResponse(entity, loginName, department, departmentLoader))
                 .build();
@@ -116,7 +116,7 @@ public final class RoleInterfaceAssembler {
     @NonNull
     public static CreateRoleCommand toCreateCommand(@NonNull RoleSaveRequest request) {
         CreateRoleCommand command = new CreateRoleCommand();
-        command.setId(EntityIdCodec.toDomain(request.getId()));
+        command.setId(RoleIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             command.setPriority(request.getPriority());
         }
@@ -131,7 +131,7 @@ public final class RoleInterfaceAssembler {
     @NonNull
     public static ChangeRoleInfoCommand toChangeInfoCommand(@NonNull RoleSaveRequest request) {
         ChangeRoleInfoCommand command = new ChangeRoleInfoCommand();
-        command.setId(EntityIdCodec.toDomain(request.getId()));
+        command.setId(RoleIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             command.setPriority(request.getPriority());
         }
@@ -145,7 +145,7 @@ public final class RoleInterfaceAssembler {
 
     @NonNull
     public static Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
+        entity.setId(RoleIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
             entity.setPriority(request.getPriority());
         }
@@ -162,23 +162,23 @@ public final class RoleInterfaceAssembler {
         return entity;
     }
 
-    private static List<EntityId> toMenuIds(RoleSaveRequest request) {
+    private static List<MenuId> toMenuIds(RoleSaveRequest request) {
         return request.getMenuList() == null
                 ? new ArrayList<>()
                 : request.getMenuList().stream()
-                        .map(menu -> EntityIdCodec.toDomain(menu.getId()))
+                        .map(menu -> MenuIdCodec.toDomain(menu.getId()))
                         .collect(Collectors.toList());
     }
 
     @NonNull
     private static RoleDepartmentResponse toDepartmentResponse(
-            Department entity, Function<EntityId, Department> departmentLoader) {
+            Department entity, Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return RoleDepartmentResponse.builder().build();
         }
 
         return RoleDepartmentResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(DepartmentIdCodec.toValue(entity.getId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
@@ -188,10 +188,10 @@ public final class RoleInterfaceAssembler {
         return "DEPARTMENT_" + id;
     }
 
-    private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {
+    private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && EntityIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

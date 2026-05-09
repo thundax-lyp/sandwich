@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu implements Sortable, Comparable<Menu> {
-    private EntityId id;
+    private MenuId id;
 
-    private EntityId parentId;
+    private MenuId parentId;
 
     private String name;
     private String perms;

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DictQuery {
-    private EntityId id;
     private String type;
     private String remarks;
     private String label;

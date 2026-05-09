@@ -1,14 +1,14 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import java.util.List;
 
 public interface DepartmentDao {
 
-    Department getById(EntityId id);
+    Department getById(DepartmentId id);
 
     List<Department> listByIds(List<Long> idList);
 
@@ -16,13 +16,13 @@ public interface DepartmentDao {
 
     Page<Department> page(Long parentId, String name, String remarks, int pageNo, int pageSize);
 
-    EntityId insert(Department department);
+    DepartmentId insert(Department department);
 
     int update(Department department);
 
     int updatePriority(Department department);
 
-    int deleteById(EntityId id);
+    int deleteById(DepartmentId id);
 
     void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType);
 

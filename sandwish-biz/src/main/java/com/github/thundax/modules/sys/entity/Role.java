@@ -1,10 +1,10 @@
 package com.github.thundax.modules.sys.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,9 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role implements Sortable {
-    public static final String BEAN_NAME = "Role";
-
-    private EntityId id;
+    private RoleId id;
     private String name;
     private RolePrivilege privilege = RolePrivilege.NORMAL;
     private RoleStatus status;
@@ -52,7 +50,7 @@ public class Role implements Sortable {
         this.menuIdList = menuList == null
                 ? new ArrayList<>()
                 : menuList.stream()
-                        .map(menu -> EntityIdCodec.toValue(menu.getId()))
+                        .map(menu -> MenuIdCodec.toValue(menu.getId()))
                         .collect(Collectors.toList());
     }
 }

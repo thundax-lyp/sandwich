@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.UserController;
@@ -11,10 +10,13 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.utils.AvatarUtils;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
+
+import java.util.Set;
 
 public final class PersonalInterfaceAssembler {
     private PersonalInterfaceAssembler() {}
@@ -25,7 +27,7 @@ public final class PersonalInterfaceAssembler {
             return PersonalInfoResponse.builder().build();
         }
         return PersonalInfoResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toValue(entity.getId()))
                 .loginName(loginName)
                 .ranks(AccessRankCodec.toValue(entity.getRank()))
                 .name(entity.getName())
@@ -48,8 +50,8 @@ public final class PersonalInterfaceAssembler {
             return PersonalMenuResponse.builder().build();
         }
         return PersonalMenuResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
-                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .id(MenuIdCodec.toValue(entity.getId()))
+                .parentId(MenuIdCodec.toValue(entity.getParentId()))
                 .name(entity.getName())
                 .priority(entity.getPriority())
                 .url(entity.getUrl())
@@ -71,7 +73,7 @@ public final class PersonalInterfaceAssembler {
     }
 
     private static String readAvatarUrl(User entity) {
-        String id = entity == null ? null : EntityIdCodec.toStringValue(entity.getId());
+        String id = entity == null ? null : UserIdCodec.toStringValue(entity.getId());
         if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;
         }

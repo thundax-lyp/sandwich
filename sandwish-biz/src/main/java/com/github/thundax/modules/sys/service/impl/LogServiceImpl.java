@@ -1,13 +1,13 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
@@ -26,11 +26,11 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Log get(LogQuery query) {
-        if (query == null || query.getId() == null) {
+    public Log get(LogId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(CreateLogCommand command) {
+    public LogId create(CreateLogCommand command) {
         Log log = toLog(command);
         log.setId(dao.insert(log));
         return log.getId();

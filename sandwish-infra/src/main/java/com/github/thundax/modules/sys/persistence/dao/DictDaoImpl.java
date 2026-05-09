@@ -3,21 +3,22 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.DictCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class DictDaoImpl implements DictDao {
@@ -32,7 +33,7 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public Dict getById(EntityId id) {
+    public Dict getById(DictId id) {
         Optional<Dict> cachedDict = cacheSupport.getById(id.value());
         if (cachedDict.isPresent()) {
             return cachedDict.get();
@@ -81,12 +82,12 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public EntityId insert(Dict entity) {
+    public DictId insert(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         cacheSupport.putById(DictPersistenceAssembler.toEntity(dataObject));
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return DictIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -122,7 +123,7 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(DictId id) {
         int count = mapper.deleteById(id.value());
         if (count > 0) {
             cacheSupport.removeById(id.value());

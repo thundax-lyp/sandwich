@@ -1,12 +1,14 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,8 @@ public final class UserPersistenceAssembler {
             return null;
         }
         UserDO dataObject = new UserDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
-        dataObject.setDepartmentId(entity.getDepartmentId());
+        dataObject.setId(UserIdCodec.toValue(entity.getId()));
+        dataObject.setDepartmentId(DepartmentIdCodec.toValue(entity.getDepartmentId()));
         dataObject.setEmail(entity.getEmail());
         dataObject.setMobile(entity.getMobile());
         dataObject.setTel(entity.getTel());
@@ -38,8 +40,8 @@ public final class UserPersistenceAssembler {
             return null;
         }
         User entity = new User();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setDepartmentId(dataObject.getDepartmentId());
+        entity.setId(UserIdCodec.toDomain(dataObject.getId()));
+        entity.setDepartmentId(DepartmentIdCodec.toDomain(dataObject.getDepartmentId()));
         entity.setEmail(dataObject.getEmail());
         entity.setMobile(dataObject.getMobile());
         entity.setTel(dataObject.getTel());

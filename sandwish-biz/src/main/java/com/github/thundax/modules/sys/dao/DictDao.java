@@ -1,13 +1,13 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import java.util.List;
 
 public interface DictDao {
 
-    Dict getById(EntityId id);
+    Dict getById(DictId id);
 
     List<Dict> listByIds(List<Long> idList);
 
@@ -15,13 +15,13 @@ public interface DictDao {
 
     Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
 
-    EntityId insert(Dict dict);
+    DictId insert(Dict dict);
 
     int update(Dict dict);
 
     int updatePriority(Dict dict);
 
-    int deleteById(EntityId id);
+    int deleteById(DictId id);
 
     List<String> listTypes();
 }

@@ -2,8 +2,6 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -22,21 +20,21 @@ import com.github.thundax.modules.sys.controller.response.LogResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.LogQuery;
-import com.github.thundax.modules.sys.service.query.UserQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.validation.Valid;
 
 @Api(tags = "系统/日志")
 @RequestMapping(value = "/api/sys/log")
@@ -77,21 +75,9 @@ public class LogController {
     }
 
     private LogResponse toResponse(Log log) {
-        User user = userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(log.getUserId()))));
-        Department department = user == null ? null : getDepartment(EntityIdCodec.toDomain(user.getDepartmentId()));
-        return LogInterfaceAssembler.toResponse(log, user, getAccountLoginName(user), department, this::getDepartment);
-    }
-
-    private Department getDepartment(EntityId departmentId) {
-        DepartmentQuery query = new DepartmentQuery();
-        query.setId(departmentId);
-        return departmentService.get(query);
-    }
-
-    private UserQuery userQuery(EntityId userId) {
-        UserQuery query = new UserQuery();
-        query.setId(userId);
-        return query;
+        User user = userService.get(UserIdCodec.toDomain(Long.valueOf(log.getUserId())));
+        Department department = user == null ? null : departmentService.get(user.getDepartmentId());
+        return LogInterfaceAssembler.toResponse(log, user, getAccountLoginName(user), department, departmentService::get);
     }
 
     private String getAccountLoginName(User user) {

@@ -1,10 +1,9 @@
 package com.github.thundax.modules.storage.converter;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.service.query.StorageQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ public class StorageConverter {
 
     public String toPreviewUrl(StoredObject entity) {
         return StringUtils.isBlank(entity.getAccessEndpoint())
-                ? this.contentPath + EntityIdCodec.toValue(entity.getId()) + "/content"
+                ? this.contentPath + StoredObjectIdCodec.toValue(entity.getId()) + "/content"
                 : entity.getAccessEndpoint();
     }
 
@@ -31,8 +30,6 @@ public class StorageConverter {
         }
 
         String objectId = StringUtils.removeEnd(StringUtils.substringAfter(previewUrl, contentPath), "/content");
-        StorageQuery query = new StorageQuery();
-        query.setId(EntityIdCodec.toDomain(Long.valueOf(objectId)));
-        return storageService.get(query);
+        return storageService.get(StoredObjectIdCodec.toDomain(Long.valueOf(objectId)));
     }
 }

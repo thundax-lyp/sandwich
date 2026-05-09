@@ -1,12 +1,12 @@
 package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +25,7 @@ public class StoredObject implements Sortable {
 
     private static final String PATH_FORMAT = "yyyyMM";
 
-    private EntityId id;
+    private StoredObjectId id;
     private String originalFilename;
     private String contentType;
     private String name;
@@ -110,7 +110,7 @@ public class StoredObject implements Sortable {
     }
 
     public String getFileName() {
-        return EntityIdCodec.toValue(getId()) + MetaFile.DOT + this.getExtendName();
+        return StoredObjectIdCodec.toValue(getId()) + MetaFile.DOT + this.getExtendName();
     }
 
     public String getOriginalFileName() {

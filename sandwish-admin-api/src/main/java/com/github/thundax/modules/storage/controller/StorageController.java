@@ -4,7 +4,6 @@ import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -22,6 +21,8 @@ import com.github.thundax.modules.storage.controller.response.StorageUploadRespo
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
@@ -32,6 +33,17 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,21 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Api(tags = "存储")
 @RequestMapping(value = "/api/storage/object")
@@ -130,7 +127,7 @@ public class StorageController {
     @HasPermission("storage:storage:view")
     @GetMapping(value = "{id}/content")
     public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-        StoredObject storage = storageService.get(storageQuery(id));
+        StoredObject storage = storageService.get(storedObjectId(id));
         if (storage == null) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -169,9 +166,9 @@ public class StorageController {
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
         List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
-            StoredObject storage = storageService.get(storageQuery(request.getId()));
+            StoredObject storage = storageService.get(storedObjectId(request.getId()));
             if (storage == null) {
-                throw new NullBeanException("StoredObject", EntityIdCodec.toDomain(request.getId()));
+                throw new NullBeanException("StoredObject", StoredObjectIdCodec.toDomain(request.getId()));
             }
             storageList.add(storage);
         }
@@ -236,8 +233,12 @@ public class StorageController {
 
     private StorageQuery storageQuery(Long id) {
         StorageQuery query = new StorageQuery();
-        query.setId(EntityIdCodec.toDomain(id));
+        query.setId(StoredObjectIdCodec.toDomain(id));
         return query;
+    }
+
+    private StoredObjectId storedObjectId(Long id) {
+        return StoredObjectIdCodec.toDomain(id);
     }
 
     private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {

@@ -1,13 +1,13 @@
 package com.github.thundax.modules.storage.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.util.List;
 
 public interface StoredObjectDao {
 
-    StoredObject getById(EntityId id);
+    StoredObject getById(StoredObjectId id);
 
     List<StoredObject> listByIds(List<Long> idList);
 
@@ -35,11 +35,11 @@ public interface StoredObjectDao {
             int pageNo,
             int pageSize);
 
-    EntityId insert(StoredObject entity);
+    StoredObjectId insert(StoredObject entity);
 
     int update(StoredObject entity);
 
-    int deleteById(EntityId id);
+    int deleteById(StoredObjectId id);
 
     List<String> listMimeTypes();
 

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class MultipartUploadPart {
 
-    private EntityId id;
+    private MultipartUploadPartId id;
     private String uploadId;
     private Integer partNumber;
     private String etag;

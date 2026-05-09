@@ -1,11 +1,11 @@
 package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageObjectStatusCommand;
@@ -18,13 +18,13 @@ import java.util.List;
 
 public interface StorageService {
 
-    StoredObject get(StorageQuery query);
+    StoredObject get(StoredObjectId id);
 
     List<StoredObject> list(StorageQuery query);
 
     PageResult<StoredObject> page(StorageQuery query, PageQuery page);
 
-    EntityId create(CreateStorageCommand command);
+    StoredObjectId create(CreateStorageCommand command);
 
     void change(ChangeStorageCommand command);
 

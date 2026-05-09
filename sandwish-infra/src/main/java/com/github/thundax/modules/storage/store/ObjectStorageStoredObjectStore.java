@@ -1,10 +1,11 @@
 package com.github.thundax.modules.storage.store;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.model.ObjectStorageWriteResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -36,7 +37,7 @@ public class ObjectStorageStoredObjectStore implements StoredObjectStore {
         storedObject.setBucketName(bucketName);
         storedObject.setObjectKey(result.getKey());
         storedObject.setSize(result.getSize());
-        storedObject.setAccessEndpoint(contentPath + EntityIdCodec.toValue(storage.getId()) + "/content");
+        storedObject.setAccessEndpoint(contentPath + StoredObjectIdCodec.toValue(storage.getId()) + "/content");
         return storedObject;
     }
 

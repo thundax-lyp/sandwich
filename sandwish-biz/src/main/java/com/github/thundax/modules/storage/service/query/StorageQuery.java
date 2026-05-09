@@ -1,9 +1,9 @@
 package com.github.thundax.modules.storage.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +15,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StorageQuery {
-    private EntityId id;
-    private List<EntityId> ids;
+    private StoredObjectId id;
+    private List<StoredObjectId> ids;
     private String contentType;
     private String referenceOwnerId;
     private String referenceOwnerType;

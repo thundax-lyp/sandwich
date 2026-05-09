@@ -5,15 +5,16 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
-import java.util.concurrent.TimeUnit;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class StorageCacheSupport {
@@ -33,9 +34,9 @@ public class StorageCacheSupport {
     }
 
     public void putById(StoredObject storage) {
-        if (storage != null && StringUtils.isNotBlank(EntityIdCodec.toStringValue(storage.getId()))) {
+        if (storage != null && StringUtils.isNotBlank(StoredObjectIdCodec.toStringValue(storage.getId()))) {
             cache.put(
-                    EntityIdCodec.toStringValue(storage.getId()),
+                    StoredObjectIdCodec.toStringValue(storage.getId()),
                     toCacheDTO(storage),
                     OBJECT_EXPIRE_SECONDS,
                     TimeUnit.SECONDS);
@@ -51,7 +52,7 @@ public class StorageCacheSupport {
             return null;
         }
         StoredObject storage = new StoredObject();
-        storage.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        storage.setId(StoredObjectIdCodec.toDomain(cacheDTO.id));
         storage.setOriginalFilename(cacheDTO.originalFilename);
         storage.setContentType(cacheDTO.contentType);
         storage.setName(cacheDTO.name);
@@ -74,7 +75,7 @@ public class StorageCacheSupport {
 
     private static StoredObjectCacheDTO toCacheDTO(StoredObject storage) {
         StoredObjectCacheDTO cacheDTO = new StoredObjectCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(storage.getId());
+        cacheDTO.id = StoredObjectIdCodec.toValue(storage.getId());
         cacheDTO.originalFilename = storage.getOriginalFilename();
         cacheDTO.contentType = storage.getContentType();
         cacheDTO.name = storage.getName();

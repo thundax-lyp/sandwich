@@ -1,8 +1,6 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
@@ -12,6 +10,8 @@ import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
@@ -39,17 +39,17 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public StoredObject get(StorageQuery query) {
-        if (query == null || query.getId() == null) {
+    public StoredObject get(StoredObjectId id) {
+        if (id == null) {
             return null;
         }
-        return dao.getById(query.getId());
+        return dao.getById(id);
     }
 
     @Override
     public List<StoredObject> list(StorageQuery query) {
         if (query != null && query.getIds() != null) {
-            return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
+            return dao.listByIds(StoredObjectIdCodec.toValues(query.getIds()));
         }
         return dao.list(
                 query == null ? null : query.getContentType(),
@@ -84,7 +84,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId create(CreateStorageCommand command) {
+    public StoredObjectId create(CreateStorageCommand command) {
         StoredObject storage = toStoredObject(command);
         storage.setId(dao.insert(storage));
         return storage.getId();
@@ -157,7 +157,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public boolean existsReadableContent(StorageQuery query) {
-        StoredObject storage = get(query);
+        StoredObject storage = query == null ? null : get(query.getId());
         if (storage == null) {
             return false;
         }

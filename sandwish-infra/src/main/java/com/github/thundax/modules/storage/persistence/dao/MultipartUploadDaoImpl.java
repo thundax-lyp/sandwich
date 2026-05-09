@@ -2,20 +2,23 @@ package com.github.thundax.modules.storage.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartId;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadPartMapper;
 import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadSessionMapper;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class MultipartUploadDaoImpl implements MultipartUploadDao {
@@ -30,11 +33,11 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     }
 
     @Override
-    public EntityId insertMultipartSession(MultipartUploadSession session) {
+    public MultipartUploadSessionId insertMultipartSession(MultipartUploadSession session) {
         MultipartUploadSessionDO dataObject = StoragePersistenceAssembler.toMultipartSessionDataObject(session);
         dataObject.setId(idGenerator.nextId().value());
         sessionMapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return MultipartUploadSessionIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -69,11 +72,11 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
     }
 
     @Override
-    public EntityId insertMultipartPart(MultipartUploadPart part) {
+    public MultipartUploadPartId insertMultipartPart(MultipartUploadPart part) {
         MultipartUploadPartDO dataObject = StoragePersistenceAssembler.toMultipartPartDataObject(part);
         dataObject.setId(idGenerator.nextId().value());
         partMapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return MultipartUploadPartIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 @Setter
 public class MultipartUploadSession {
 
-    private EntityId id;
+    private MultipartUploadSessionId id;
     private String uploadId;
     private String ownerId;
     private StorageOwnerType ownerType;

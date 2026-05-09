@@ -1,8 +1,8 @@
 package com.github.thundax.modules.storage.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,18 +13,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoredObjectReference {
-    private EntityId objectId;
+    private StoredObjectId objectId;
 
     private String ownerId;
     private StorageOwnerType ownerType;
     private String ownerParams;
     private StoredObjectReferenceStatus referenceStatus;
 
-    public EntityId getId() {
+    public StoredObjectId getId() {
         return objectId;
     }
 
-    public void setId(EntityId id) {
+    public void setId(StoredObjectId id) {
         this.objectId = id;
     }
 

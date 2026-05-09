@@ -5,24 +5,25 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class StoredObjectDaoImpl implements StoredObjectDao {
@@ -42,7 +43,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     }
 
     @Override
-    public StoredObject getById(EntityId id) {
+    public StoredObject getById(StoredObjectId id) {
         StoredObject storage = cacheSupport.getById(String.valueOf(id.value()));
         if (storage != null) {
             return storage;
@@ -138,12 +139,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
     }
 
     @Override
-    public EntityId insert(StoredObject entity) {
+    public StoredObjectId insert(StoredObject entity) {
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
         cacheSupport.removeById(String.valueOf(dataObject.getId()));
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return StoredObjectIdCodec.toDomain(dataObject.getId());
     }
 
     @Override
@@ -165,12 +166,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus())
                         .set(StoredObjectDO::getPriority, dataObject.getPriority())
                         .set(StoredObjectDO::getRemarks, dataObject.getRemarks()));
-        cacheSupport.removeById(EntityIdCodec.toStringValue(entity.getId()));
+        cacheSupport.removeById(StoredObjectIdCodec.toStringValue(entity.getId()));
         return count;
     }
 
     @Override
-    public int deleteById(EntityId id) {
+    public int deleteById(StoredObjectId id) {
         int count = mapper.update(
                 null,
                 new UpdateWrapper<StoredObjectDO>()
@@ -201,7 +202,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         int count = mapper.update(
                 null,
                 buildIdUpdateWrapper(dataObject).set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus()));
-        cacheSupport.removeById(EntityIdCodec.toStringValue(storage.getId()));
+        cacheSupport.removeById(StoredObjectIdCodec.toStringValue(storage.getId()));
         return count;
     }
 
@@ -212,7 +213,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(StoredObjectDO::getReferenceStatus, dataObject.getReferenceStatus()));
-        cacheSupport.removeById(EntityIdCodec.toStringValue(storage.getId()));
+        cacheSupport.removeById(StoredObjectIdCodec.toStringValue(storage.getId()));
         return count;
     }
 

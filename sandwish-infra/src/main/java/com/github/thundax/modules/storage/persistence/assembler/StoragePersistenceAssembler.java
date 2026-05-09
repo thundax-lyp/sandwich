@@ -1,19 +1,18 @@
 package com.github.thundax.modules.storage.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
-import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.enums.*;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObjectDO dataObject = new StoredObjectDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(StoredObjectIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
         dataObject.setExtendName(entity.getExtendName());
         dataObject.setMimeType(entity.getMimeType());
@@ -49,7 +48,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObject entity = new StoredObject();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(StoredObjectIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
         entity.setExtendName(dataObject.getExtendName());
         entity.setMimeType(dataObject.getMimeType());
@@ -119,7 +118,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
-        dataObject.setFileId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setFileId(StoredObjectIdCodec.toValue(entity.getId()));
         dataObject.setReferenceOwnerId(entity.getBusinessId());
         dataObject.setReferenceOwnerType(entity.getBusinessType());
         dataObject.setBusinessParams(entity.getBusinessParams());
@@ -132,7 +131,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         StoredObjectReference entity = new StoredObjectReference();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getFileId()));
+        entity.setId(StoredObjectIdCodec.toDomain(dataObject.getFileId()));
         entity.setBusinessId(dataObject.getReferenceOwnerId());
         entity.setBusinessType(dataObject.getReferenceOwnerType());
         entity.setBusinessParams(dataObject.getBusinessParams());
@@ -167,7 +166,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadSessionDO dataObject = new MultipartUploadSessionDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(MultipartUploadSessionIdCodec.toValue(entity.getId()));
         dataObject.setUploadId(entity.getUploadId());
         dataObject.setOwnerId(entity.getOwnerId());
         dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
@@ -192,7 +191,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadSession entity = new MultipartUploadSession();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(MultipartUploadSessionIdCodec.toDomain(dataObject.getId()));
         entity.setUploadId(dataObject.getUploadId());
         entity.setOwnerId(dataObject.getOwnerId());
         entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
@@ -217,7 +216,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadPartDO dataObject = new MultipartUploadPartDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(MultipartUploadPartIdCodec.toValue(entity.getId()));
         dataObject.setUploadId(entity.getUploadId());
         dataObject.setPartNumber(entity.getPartNumber());
         dataObject.setEtag(entity.getEtag());
@@ -230,7 +229,7 @@ public final class StoragePersistenceAssembler {
             return null;
         }
         MultipartUploadPart entity = new MultipartUploadPart();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(MultipartUploadPartIdCodec.toDomain(dataObject.getId()));
         entity.setUploadId(dataObject.getUploadId());
         entity.setPartNumber(dataObject.getPartNumber());
         entity.setEtag(dataObject.getEtag());

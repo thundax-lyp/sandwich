@@ -1,18 +1,16 @@
 package com.github.thundax.modules.storage.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
-import com.github.thundax.modules.storage.controller.response.MultipartUploadPartResponse;
-import com.github.thundax.modules.storage.controller.response.MultipartUploadSessionResponse;
-import com.github.thundax.modules.storage.controller.response.StorageResponse;
-import com.github.thundax.modules.storage.controller.response.StorageTreeNodeResponse;
-import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
+import com.github.thundax.modules.storage.controller.response.*;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -26,7 +24,7 @@ public final class StorageInterfaceAssembler {
             return StorageUploadResponse.builder().build();
         }
         return StorageUploadResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(StoredObjectIdCodec.toValue(entity.getId()))
                 .originalFilename(entity.getOriginalFileName())
                 .extendName(entity.getExtendName())
                 .contentType(entity.getContentType())
@@ -50,7 +48,7 @@ public final class StorageInterfaceAssembler {
             return StorageResponse.builder().build();
         }
         return StorageResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(StoredObjectIdCodec.toValue(entity.getId()))
                 .originalFilename(entity.getOriginalFilename())
                 .extendName(entity.getExtendName())
                 .contentType(entity.getContentType())
@@ -105,7 +103,7 @@ public final class StorageInterfaceAssembler {
             return MultipartUploadSessionResponse.builder().build();
         }
         return MultipartUploadSessionResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(MultipartUploadSessionIdCodec.toValue(entity.getId()))
                 .uploadId(entity.getUploadId())
                 .uploadStatus(
                         entity.getUploadStatus() == null
@@ -121,7 +119,7 @@ public final class StorageInterfaceAssembler {
             return MultipartUploadPartResponse.builder().build();
         }
         return MultipartUploadPartResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(MultipartUploadPartIdCodec.toValue(entity.getId()))
                 .uploadId(entity.getUploadId())
                 .partNumber(entity.getPartNumber())
                 .etag(entity.getEtag())

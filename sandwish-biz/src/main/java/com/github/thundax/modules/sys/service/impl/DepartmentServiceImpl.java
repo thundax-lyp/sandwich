@@ -37,7 +37,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     public List<Department> list(DepartmentQuery query) {
         return dao.list(
-                query == null ? null : query.getParentId(),
+                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks());
     }
@@ -45,7 +45,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public PageResult<Department> page(DepartmentQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Department> dataPage = dao.page(
-                query == null ? null : query.getParentId(),
+                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),

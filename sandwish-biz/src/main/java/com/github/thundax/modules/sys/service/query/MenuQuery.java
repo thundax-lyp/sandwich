@@ -18,7 +18,7 @@ public class MenuQuery {
     private List<EntityId> ids;
     private EntityId childId;
     private EntityId ancestorId;
-    private Long parentId;
+    private EntityId parentId;
     private MenuVisibility visibility;
     private AccessRank maxRank;
 }

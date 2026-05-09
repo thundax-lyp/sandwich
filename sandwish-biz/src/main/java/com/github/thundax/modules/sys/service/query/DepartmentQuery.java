@@ -14,7 +14,7 @@ public class DepartmentQuery {
     private EntityId id;
     private EntityId childId;
     private EntityId ancestorId;
-    private Long parentId;
+    private EntityId parentId;
     private String name;
     private String remarks;
 }

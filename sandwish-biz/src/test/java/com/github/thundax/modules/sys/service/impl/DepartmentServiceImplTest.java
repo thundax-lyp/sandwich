@@ -33,7 +33,7 @@ public class DepartmentServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
         DepartmentQuery query = new DepartmentQuery();
-        query.setParentId(0L);
+        query.setParentId(EntityId.of(0L));
         query.setName("总部");
         query.setRemarks("备注");
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);

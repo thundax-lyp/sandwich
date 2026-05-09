@@ -97,7 +97,7 @@ public final class UserInterfaceAssembler {
     @NonNull
     public static UserQuery toQuery(@NonNull UserQueryRequest request) {
         UserQuery query = new UserQuery();
-        query.setDepartmentId(request.getDepartmentId());
+        query.setDepartmentId(EntityIdCodec.toDomain(request.getDepartmentId()));
         query.setLoginName(emptyToNull(request.getLoginName()));
         query.setName(emptyToNull(request.getName()));
         if (request.getEnable() != null) {

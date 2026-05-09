@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserQuery {
     private EntityId id;
-    private Long departmentId;
+    private EntityId departmentId;
     private String loginName;
     private String name;
     private UserStatus status;

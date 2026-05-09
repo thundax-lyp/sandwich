@@ -478,7 +478,7 @@ public class UserController {
                 throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getDepartmentId()));
             }
 
-            query.setDepartmentId(EntityIdCodec.toValue(department.getId()));
+            query.setDepartmentId(department.getId());
         }
 
         return query;

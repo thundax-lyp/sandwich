@@ -58,7 +58,7 @@ public final class DepartmentInterfaceAssembler {
     @NonNull
     public static DepartmentQuery toQuery(@NonNull DepartmentQueryRequest request) {
         DepartmentQuery query = new DepartmentQuery();
-        query.setParentId(request.getParentId());
+        query.setParentId(EntityIdCodec.toDomain(request.getParentId()));
         query.setName(request.getName());
         query.setRemarks(request.getRemarks());
         return query;

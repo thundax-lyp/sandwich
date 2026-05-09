@@ -46,7 +46,7 @@ public class MenuServiceImpl implements MenuService {
             return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
         }
         return dao.list(
-                query == null ? null : query.getParentId(),
+                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()));
     }
@@ -54,7 +54,7 @@ public class MenuServiceImpl implements MenuService {
     public PageResult<Menu> page(MenuQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
-                query == null ? null : query.getParentId(),
+                query == null ? null : EntityIdCodec.toValue(query.getParentId()),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()),
                 normalizedPage.getPageNo(),

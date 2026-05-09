@@ -54,7 +54,7 @@ public final class MenuInterfaceAssembler {
     @NonNull
     public static MenuQuery toQuery(@NonNull MenuQueryRequest request) {
         MenuQuery query = new MenuQuery();
-        query.setParentId(request.getParentId());
+        query.setParentId(EntityIdCodec.toDomain(request.getParentId()));
         if (request.getDisplay() != null) {
             query.setVisibility(request.getDisplay() ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
         }

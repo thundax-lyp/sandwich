@@ -36,7 +36,7 @@ public class MenuServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuQuery query = new MenuQuery();
-        query.setParentId(0L);
+        query.setParentId(EntityId.of(0L));
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(AccessRank.of(3));
         MenuServiceImpl service = new MenuServiceImpl(dao);
@@ -54,7 +54,7 @@ public class MenuServiceImplTest {
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         MenuQuery query = new MenuQuery();
-        query.setParentId(5000L);
+        query.setParentId(EntityId.of(5000L));
         query.setMaxRank(AccessRank.of(2));
         service.list(query);
 

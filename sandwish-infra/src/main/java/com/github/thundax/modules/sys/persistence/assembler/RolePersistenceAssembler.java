@@ -12,9 +12,6 @@ import java.util.List;
 
 public final class RolePersistenceAssembler {
 
-    private static final String LEGACY_YES = "1";
-    private static final String LEGACY_NO = "0";
-
     private RolePersistenceAssembler() {}
 
     public static RoleDO toDataObject(Role entity) {
@@ -24,8 +21,8 @@ public final class RolePersistenceAssembler {
         RoleDO dataObject = new RoleDO();
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setName(entity.getName());
-        dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
-        dataObject.setEnableFlag(statusValue(entity.getStatus()));
+        dataObject.setPrivilege(privilegeValue(entity.getPrivilege()));
+        dataObject.setStatus(statusValue(entity.getStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -42,8 +39,8 @@ public final class RolePersistenceAssembler {
         Role entity = new Role();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setName(dataObject.getName());
-        entity.setPrivilege(privilegeFrom(dataObject.getAdminFlag()));
-        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
+        entity.setPrivilege(privilegeFrom(dataObject.getPrivilege()));
+        entity.setStatus(statusFrom(dataObject.getStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -76,12 +73,12 @@ public final class RolePersistenceAssembler {
         return priority == null || priority < 0 ? 0 : priority;
     }
 
-    private static String adminFlag(RolePrivilege privilege) {
-        return RolePrivilege.ADMIN == privilege ? LEGACY_YES : LEGACY_NO;
+    private static String privilegeValue(RolePrivilege privilege) {
+        return privilege == null ? null : privilege.value();
     }
 
-    private static RolePrivilege privilegeFrom(String adminFlag) {
-        return LEGACY_YES.equals(adminFlag) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL;
+    private static RolePrivilege privilegeFrom(String privilege) {
+        return privilege == null ? null : RolePrivilege.from(privilege);
     }
 
     private static String statusValue(RoleStatus status) {

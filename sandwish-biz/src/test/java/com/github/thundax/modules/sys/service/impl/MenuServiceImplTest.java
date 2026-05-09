@@ -41,7 +41,7 @@ public class MenuServiceImplTest {
         service.list(query);
 
         assertEquals(Long.valueOf(0L), dao.parentId);
-        assertEquals("VISIBLE", dao.displayFlag);
+        assertEquals("VISIBLE", dao.visibility);
         assertEquals(Integer.valueOf(3), dao.maxRank);
     }
 
@@ -114,14 +114,14 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldBatchUpdateDisplayFlag() {
+    public void shouldBatchUpdateVisibility() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         int count = service.batchUpdateVisibility(Arrays.asList(menu(5001L), menu(5002L)));
 
         assertEquals(2, count);
-        assertEquals(2, dao.displayFlagCalls);
+        assertEquals(2, dao.visibilityCalls);
     }
 
     private static Menu menu(Long id) {
@@ -135,13 +135,13 @@ public class MenuServiceImplTest {
         private Menu getResult;
         private int getCalls;
         private Long parentId;
-        private String displayFlag;
+        private String visibility;
         private Integer maxRank;
         private Menu inserted;
         private Menu updated;
         private Long deletedMenuRoleId;
         private Long deletedId;
-        private int displayFlagCalls;
+        private int visibilityCalls;
         private int pageNo;
         private int pageSize;
 
@@ -157,18 +157,18 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public List<Menu> list(Long parentId, String displayFlag, Integer maxRank) {
+        public List<Menu> list(Long parentId, String visibility, Integer maxRank) {
             this.parentId = parentId;
-            this.displayFlag = displayFlag;
+            this.visibility = visibility;
             this.maxRank = maxRank;
             return null;
         }
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Menu> page(
-                Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+                Long parentId, String visibility, Integer maxRank, int pageNo, int pageSize) {
             this.parentId = parentId;
-            this.displayFlag = displayFlag;
+            this.visibility = visibility;
             this.maxRank = maxRank;
             this.pageNo = pageNo;
             this.pageSize = pageSize;
@@ -211,7 +211,7 @@ public class MenuServiceImplTest {
 
         @Override
         public int updateVisibility(Menu menu) {
-            this.displayFlagCalls++;
+            this.visibilityCalls++;
             return 1;
         }
 

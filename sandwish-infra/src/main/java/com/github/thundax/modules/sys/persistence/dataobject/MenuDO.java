@@ -31,7 +31,7 @@ public class MenuDO {
 
     private Integer ranks;
 
-    private String displayFlag;
+    private String visibility;
 
     private String displayParams;
 

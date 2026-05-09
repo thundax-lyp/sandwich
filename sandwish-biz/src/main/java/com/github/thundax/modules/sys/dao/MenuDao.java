@@ -12,9 +12,9 @@ public interface MenuDao {
 
     List<Menu> listByIds(List<Long> idList);
 
-    List<Menu> list(Long parentId, String displayFlag, Integer maxRank);
+    List<Menu> list(Long parentId, String visibility, Integer maxRank);
 
-    Page<Menu> page(Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize);
+    Page<Menu> page(Long parentId, String visibility, Integer maxRank, int pageNo, int pageSize);
 
     EntityId insert(Menu menu);
 

@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -21,9 +20,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class DictDaoImpl implements DictDao {
-
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
 
     private final DictMapper mapper;
     private final DictCacheSupport cacheSupport;
@@ -89,11 +85,6 @@ public class DictDaoImpl implements DictDao {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<DictDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -147,7 +138,6 @@ public class DictDaoImpl implements DictDao {
 
     private QueryWrapper<DictDO> buildQueryWrapper(String type, String label, String remarks) {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
-        wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
         if (StringUtils.isNotBlank(type)) {
             wrapper.eq("type", type);
         }

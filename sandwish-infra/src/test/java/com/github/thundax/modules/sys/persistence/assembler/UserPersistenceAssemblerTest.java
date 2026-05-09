@@ -14,15 +14,11 @@ import org.junit.Test;
 
 public class UserPersistenceAssemblerTest {
 
-    private static final String FLAG_YES = "1";
-    private static final String FLAG_NO = "0";
-
     @Test
-    public void shouldReadFlagsAndEnumStatusAsDomainValues() {
+    public void shouldReadPrivilegeAndEnumStatusAsDomainValues() {
         UserDO dataObject = new UserDO();
-        dataObject.setSuperFlag(FLAG_YES);
-        dataObject.setAdminFlag(FLAG_NO);
-        dataObject.setEnableFlag("ENABLED");
+        dataObject.setPrivilege("SUPER");
+        dataObject.setStatus("ENABLED");
 
         User entity = UserPersistenceAssembler.toEntity(dataObject);
 
@@ -31,29 +27,28 @@ public class UserPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldRejectLegacyEnableFlagValue() {
+    public void shouldRejectLegacyStatusValue() {
         UserDO dataObject = new UserDO();
-        dataObject.setEnableFlag("1");
+        dataObject.setStatus("1");
 
         try {
             UserPersistenceAssembler.toEntity(dataObject);
-            fail("Legacy enable flag value must be rejected");
+            fail("Legacy status value must be rejected");
         } catch (BizException expected) {
             assertEquals("Unknown user status: 1", expected.getMessage());
         }
     }
 
     @Test
-    public void shouldWriteDomainValuesToFlagsAndEnumStatus() {
+    public void shouldWriteDomainValuesToPrivilegeAndEnumStatus() {
         User entity = new User();
         entity.setPrivilege(UserPrivilege.ADMIN);
         entity.setStatus(UserStatus.DISABLED);
 
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
 
-        assertEquals(FLAG_NO, dataObject.getSuperFlag());
-        assertEquals(FLAG_YES, dataObject.getAdminFlag());
-        assertEquals("DISABLED", dataObject.getEnableFlag());
+        assertEquals("ADMIN", dataObject.getPrivilege());
+        assertEquals("DISABLED", dataObject.getStatus());
     }
 
     @Test

@@ -11,11 +11,9 @@ CREATE TABLE IF NOT EXISTS `sys_department` (
     `create_by` varchar(64) DEFAULT NULL,
     `update_date` datetime(3) DEFAULT NULL,
     `update_by` varchar(64) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     KEY `idx_sys_department_parent` (`parent_id`, `priority`),
-    KEY `idx_sys_department_nested` (`lft`, `rgt`),
-    KEY `idx_sys_department_del_flag` (`del_flag`)
+    KEY `idx_sys_department_nested` (`lft`, `rgt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台部门表';
 
 CREATE TABLE IF NOT EXISTS `sys_user` (
@@ -26,37 +24,32 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `tel` varchar(64) DEFAULT NULL,
     `name` varchar(128) NOT NULL,
     `ranks` int NOT NULL DEFAULT 0,
-    `super_flag` char(1) NOT NULL DEFAULT '0',
-    `admin_flag` char(1) NOT NULL DEFAULT '0',
-    `enable_flag` varchar(16) NOT NULL DEFAULT 'ENABLED',
+    `privilege` varchar(16) NOT NULL DEFAULT 'NORMAL',
+    `status` varchar(16) NOT NULL DEFAULT 'ENABLED',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     `create_date` datetime(3) NOT NULL,
     `create_by` varchar(64) DEFAULT NULL,
     `update_date` datetime(3) DEFAULT NULL,
     `update_by` varchar(64) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     KEY `idx_sys_user_department` (`department_id`),
-    KEY `idx_sys_user_status` (`enable_flag`, `priority`, `create_date`),
-    KEY `idx_sys_user_del_flag` (`del_flag`)
+    KEY `idx_sys_user_status` (`status`, `priority`, `create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户主体表';
 
 CREATE TABLE IF NOT EXISTS `sys_role` (
     `id` bigint NOT NULL,
     `name` varchar(128) NOT NULL,
-    `admin_flag` char(1) NOT NULL DEFAULT '0',
-    `enable_flag` varchar(16) NOT NULL DEFAULT 'ENABLED',
+    `privilege` varchar(16) NOT NULL DEFAULT 'NORMAL',
+    `status` varchar(16) NOT NULL DEFAULT 'ENABLED',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     `create_date` datetime(3) NOT NULL,
     `create_by` varchar(64) DEFAULT NULL,
     `update_date` datetime(3) DEFAULT NULL,
     `update_by` varchar(64) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
-    KEY `idx_sys_role_status` (`enable_flag`, `priority`, `create_date`),
-    KEY `idx_sys_role_del_flag` (`del_flag`)
+    KEY `idx_sys_role_status` (`status`, `priority`, `create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台角色表';
 
 CREATE TABLE IF NOT EXISTS `sys_menu` (
@@ -67,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
     `name` varchar(128) NOT NULL,
     `perms` varchar(512) DEFAULT NULL,
     `ranks` int NOT NULL DEFAULT 0,
-    `display_flag` varchar(16) NOT NULL DEFAULT 'VISIBLE',
+    `visibility` varchar(16) NOT NULL DEFAULT 'VISIBLE',
     `display_params` text DEFAULT NULL,
     `url` varchar(512) DEFAULT NULL,
     `target` varchar(64) DEFAULT NULL,
@@ -77,12 +70,10 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
     `create_by` varchar(64) DEFAULT NULL,
     `update_date` datetime(3) DEFAULT NULL,
     `update_by` varchar(64) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     KEY `idx_sys_menu_parent` (`parent_id`, `priority`),
     KEY `idx_sys_menu_nested` (`lft`, `rgt`),
-    KEY `idx_sys_menu_display` (`display_flag`, `ranks`),
-    KEY `idx_sys_menu_del_flag` (`del_flag`)
+    KEY `idx_sys_menu_visibility` (`visibility`, `ranks`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台菜单表';
 
 CREATE TABLE IF NOT EXISTS `sys_dict` (
@@ -96,10 +87,8 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
     `create_by` varchar(64) DEFAULT NULL,
     `update_date` datetime(3) DEFAULT NULL,
     `update_by` varchar(64) DEFAULT NULL,
-    `del_flag` char(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
-    KEY `idx_sys_dict_type` (`type`, `priority`, `create_date`),
-    KEY `idx_sys_dict_del_flag` (`del_flag`)
+    KEY `idx_sys_dict_type` (`type`, `priority`, `create_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统字典表';
 
 CREATE TABLE IF NOT EXISTS `sys_log` (

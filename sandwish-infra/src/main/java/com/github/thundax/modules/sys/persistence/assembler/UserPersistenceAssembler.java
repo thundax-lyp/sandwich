@@ -12,9 +12,6 @@ import java.util.List;
 
 public final class UserPersistenceAssembler {
 
-    private static final String LEGACY_YES = "1";
-    private static final String LEGACY_NO = "0";
-
     private UserPersistenceAssembler() {}
 
     public static UserDO toDataObject(User entity) {
@@ -29,9 +26,8 @@ public final class UserPersistenceAssembler {
         dataObject.setTel(entity.getTel());
         dataObject.setName(entity.getName());
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        dataObject.setSuperFlag(superFlag(entity.getPrivilege()));
-        dataObject.setAdminFlag(adminFlag(entity.getPrivilege()));
-        dataObject.setEnableFlag(statusValue(entity.getStatus()));
+        dataObject.setPrivilege(privilegeValue(entity.getPrivilege()));
+        dataObject.setStatus(statusValue(entity.getStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         dataObject.setCreateDate(entity.getCreateDate());
@@ -53,8 +49,8 @@ public final class UserPersistenceAssembler {
         entity.setTel(dataObject.getTel());
         entity.setName(dataObject.getName());
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
-        entity.setPrivilege(privilegeFrom(dataObject.getSuperFlag(), dataObject.getAdminFlag()));
-        entity.setStatus(statusFrom(dataObject.getEnableFlag()));
+        entity.setPrivilege(privilegeFrom(dataObject.getPrivilege()));
+        entity.setStatus(statusFrom(dataObject.getStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         entity.setCreateDate(dataObject.getCreateDate());
@@ -83,19 +79,12 @@ public final class UserPersistenceAssembler {
         return priority == null || priority < 0 ? 0 : priority;
     }
 
-    private static String superFlag(UserPrivilege privilege) {
-        return UserPrivilege.SUPER == privilege ? LEGACY_YES : LEGACY_NO;
+    private static String privilegeValue(UserPrivilege privilege) {
+        return privilege == null ? null : privilege.value();
     }
 
-    private static String adminFlag(UserPrivilege privilege) {
-        return UserPrivilege.ADMIN == privilege ? LEGACY_YES : LEGACY_NO;
-    }
-
-    private static UserPrivilege privilegeFrom(String superFlag, String adminFlag) {
-        if (LEGACY_YES.equals(superFlag)) {
-            return UserPrivilege.SUPER;
-        }
-        return LEGACY_YES.equals(adminFlag) ? UserPrivilege.ADMIN : UserPrivilege.NORMAL;
+    private static UserPrivilege privilegeFrom(String privilege) {
+        return privilege == null ? null : UserPrivilege.from(privilege);
     }
 
     private static String statusValue(UserStatus status) {

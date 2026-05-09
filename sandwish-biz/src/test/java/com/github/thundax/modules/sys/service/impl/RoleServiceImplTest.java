@@ -28,7 +28,7 @@ public class RoleServiceImplTest {
 
         service.list(query);
 
-        assertEquals("ENABLED", dao.enableFlag);
+        assertEquals("ENABLED", dao.status);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class RoleServiceImplTest {
 
         service.listEnabled();
 
-        assertEquals("ENABLED", dao.enableFlag);
+        assertEquals("ENABLED", dao.status);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class RoleServiceImplTest {
 
     private static class RecordingRoleDao implements RoleDao {
 
-        private String enableFlag;
+        private String status;
         private int pageNo;
         private int pageSize;
         private Role inserted;
@@ -134,15 +134,15 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public List<Role> list(String enableFlag) {
-            this.enableFlag = enableFlag;
+        public List<Role> list(String status) {
+            this.status = status;
             return null;
         }
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Role> page(
-                String enableFlag, int pageNo, int pageSize) {
-            this.enableFlag = enableFlag;
+                String status, int pageNo, int pageSize) {
+            this.status = status;
             this.pageNo = pageNo;
             this.pageSize = pageSize;
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Role> dataPage =

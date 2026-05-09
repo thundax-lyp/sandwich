@@ -21,9 +21,9 @@ public class RoleDO {
 
     private String name;
 
-    private String adminFlag;
+    private String privilege;
 
-    private String enableFlag;
+    private String status;
 
     private Integer priority;
 

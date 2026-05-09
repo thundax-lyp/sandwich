@@ -14,9 +14,9 @@ import org.junit.Test;
 public class MenuPersistenceAssemblerTest {
 
     @Test
-    public void shouldReadDisplayFlagAsDomainValue() {
+    public void shouldReadVisibilityAsDomainValue() {
         MenuDO dataObject = new MenuDO();
-        dataObject.setDisplayFlag("VISIBLE");
+        dataObject.setVisibility("VISIBLE");
 
         Menu entity = MenuPersistenceAssembler.toEntity(dataObject);
 
@@ -24,26 +24,26 @@ public class MenuPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldRejectLegacyDisplayFlagValue() {
+    public void shouldRejectLegacyVisibilityValue() {
         MenuDO dataObject = new MenuDO();
-        dataObject.setDisplayFlag("1");
+        dataObject.setVisibility("1");
 
         try {
             MenuPersistenceAssembler.toEntity(dataObject);
-            fail("Legacy display flag value must be rejected");
+            fail("Legacy visibility value must be rejected");
         } catch (BizException expected) {
             assertEquals("Unknown menu visibility: 1", expected.getMessage());
         }
     }
 
     @Test
-    public void shouldWriteDomainValueToDisplayFlag() {
+    public void shouldWriteDomainValueToVisibility() {
         Menu entity = new Menu();
         entity.setVisibility(MenuVisibility.HIDDEN);
 
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
 
-        assertEquals("HIDDEN", dataObject.getDisplayFlag());
+        assertEquals("HIDDEN", dataObject.getVisibility());
     }
 
     @Test

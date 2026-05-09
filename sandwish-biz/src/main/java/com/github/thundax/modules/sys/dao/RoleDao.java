@@ -11,9 +11,9 @@ public interface RoleDao {
 
     List<Role> listByIds(List<Long> idList);
 
-    List<Role> list(String enableFlag);
+    List<Role> list(String status);
 
-    Page<Role> page(String enableFlag, int pageNo, int pageSize);
+    Page<Role> page(String status, int pageNo, int pageSize);
 
     EntityId insert(Role role);
 

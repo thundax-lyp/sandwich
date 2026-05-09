@@ -13,14 +13,11 @@ import org.junit.Test;
 
 public class RolePersistenceAssemblerTest {
 
-    private static final String FLAG_YES = "1";
-    private static final String FLAG_NO = "0";
-
     @Test
-    public void shouldReadFlagAndEnumStatusAsDomainValues() {
+    public void shouldReadPrivilegeAndEnumStatusAsDomainValues() {
         RoleDO dataObject = new RoleDO();
-        dataObject.setAdminFlag(FLAG_YES);
-        dataObject.setEnableFlag("ENABLED");
+        dataObject.setPrivilege("ADMIN");
+        dataObject.setStatus("ENABLED");
 
         Role entity = RolePersistenceAssembler.toEntity(dataObject);
 
@@ -29,28 +26,28 @@ public class RolePersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldRejectLegacyEnableFlagValue() {
+    public void shouldRejectLegacyStatusValue() {
         RoleDO dataObject = new RoleDO();
-        dataObject.setEnableFlag("1");
+        dataObject.setStatus("1");
 
         try {
             RolePersistenceAssembler.toEntity(dataObject);
-            fail("Legacy enable flag value must be rejected");
+            fail("Legacy status value must be rejected");
         } catch (BizException expected) {
             assertEquals("Unknown role status: 1", expected.getMessage());
         }
     }
 
     @Test
-    public void shouldWriteDomainValuesToFlagAndEnumStatus() {
+    public void shouldWriteDomainValuesToPrivilegeAndEnumStatus() {
         Role entity = new Role();
         entity.setPrivilege(RolePrivilege.NORMAL);
         entity.setStatus(RoleStatus.DISABLED);
 
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
 
-        assertEquals(FLAG_NO, dataObject.getAdminFlag());
-        assertEquals("DISABLED", dataObject.getEnableFlag());
+        assertEquals("NORMAL", dataObject.getPrivilege());
+        assertEquals("DISABLED", dataObject.getStatus());
     }
 
     @Test

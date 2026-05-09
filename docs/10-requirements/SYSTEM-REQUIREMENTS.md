@@ -4,7 +4,7 @@
 
 本文档定义 Sandwich 后台系统管理域的业务需求边界。
 
-`System` 对应代码中的 `com.github.thundax.modules.sys`，负责后台用户主体、角色、菜单、部门、字典和系统日志。认证登录流程、登录标识和认证凭据由 `AUTH-REQUIREMENTS.md` 定义；`System` 只提供认证所需的后台用户主体资料。
+`System` 对应代码中的 `com.github.thundax.modules.sys`，负责后台用户主体、角色、菜单、部门、字典和系统日志。
 
 ## 2. Scope
 
@@ -32,15 +32,9 @@
 
 `System` 是后台管理基础域，承载管理端的组织、账号、授权资料和系统基础配置。
 
-后台认证链路中：
-
-- `User` 是后台用户主体。
-- `PrincipalIdentity` 是后台登录标识，归属 `Auth`。
-- `PrincipalCredential` 是后台认证凭据，归属 `Auth`。
-- `PrincipalAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken` 归属 `Auth`。
-
 后台授权链路中：
 
+- `User` 是后台用户主体。
 - `Role` 表达授权角色。
 - `Menu` 表达菜单、权限编码和访问等级。
 - `UserRole` 表达用户拥有的角色。
@@ -86,9 +80,8 @@
 
 - `User` 不承载角色列表；用户角色通过 `sys_user_role` 动态读取。
 - `User` 不承载认证行为数据，例如注册 IP、最近登录时间、最近登录 IP 和登录次数。
-- `User.loginName` 只作为用户保存和修改账号的输入，正式登录标识由 `PrincipalIdentity.identityValue` 承载。
-- `User.loginPass` 只作为用户保存和重置密码的输入，正式认证凭据由 `PrincipalCredential.credentialValue` 承载。
-- `User.status = DISABLED` 时，该后台用户全部后台登录方式不可用。
+- `User.loginName` 和 `User.loginPass` 不作为 System 业务状态。
+- `User.status = DISABLED` 时，该后台用户不可用。
 
 ### 5.2 Role
 
@@ -219,12 +212,10 @@
 - 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")`，且 reason 不得以测试作为理由。
 - Service `add` 方法必须返回新建主实体的 `EntityId`。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
-- `UserService` 固定承载后台用户主体、用户角色关系和用户主事务入口，不公开登录标识读取、账号名读取、密码凭据读取和密码凭据更新方法。
-- `PrincipalIdentityService` 固定承载后台用户登录标识读取和 `USER_ACCOUNT` 标识写入。
-- `PrincipalCredentialService` 固定承载后台用户认证凭据读取和 `USER_PASSWORD` 凭据写入。
+- `UserService` 固定承载后台用户主体、用户角色关系和用户主事务入口。
+- `UserService` 提供用户删除级联处理接口；接口只表达删除前清理扩展点，不在 System 文档中定义接入方和清理细节。
 - Service `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
-- `PrincipalIdentity` 和 `PrincipalCredential` 属于 Auth 认证模型，System 只在用户保存、登录名修改和密码重置流程中调用对应 Service 维护认证资料。
 - `AccessRank` 是用户和菜单共用的访问等级值对象。
 - 角色、菜单、用户、部门和字典的排序使用 `priority`。
 - 后台系统管理 API 固定归属 `sandwish-admin-api`。
@@ -234,10 +225,6 @@
 ### 7.1 用户管理
 
 - 支持读取、列表、分页、新增、更新、启停、批量删除、上传头像和删除头像。
-- 新增用户时必须创建或更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 新增用户设置初始密码时必须创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 修改登录名时必须更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 重置密码时必须更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
 - 更新用户角色时必须重写 `sys_user_role` 关系。
 - 查询用户角色时必须通过 `sys_user_role` 读取。
 
@@ -290,16 +277,13 @@
 1. Controller 接收用户保存请求。
 2. InterfaceAssembler 转换入口参数。
 3. Service 保存 `User` 主体。
-4. Service 创建 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-5. Service 创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
-6. Service 写入 `sys_user_role` 关系。
+4. Service 写入 `sys_user_role` 关系。
 
-### 8.2 修改用户登录名
+### 8.2 修改用户
 
 1. Controller 接收用户更新请求。
 2. Service 更新 `User` 主体资料。
-3. Service 更新 `USER_ACCOUNT` 类型 `PrincipalIdentity.identityValue`。
-4. Service 按请求重写用户角色关系。
+3. Service 按请求重写用户角色关系。
 
 ### 8.3 角色授权菜单
 

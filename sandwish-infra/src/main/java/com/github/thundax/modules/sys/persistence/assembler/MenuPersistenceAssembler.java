@@ -22,7 +22,7 @@ public final class MenuPersistenceAssembler {
         dataObject.setName(entity.getName());
         dataObject.setPerms(entity.getPerms());
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        dataObject.setDisplayFlag(visibilityValue(entity.getVisibility()));
+        dataObject.setVisibility(visibilityValue(entity.getVisibility()));
         dataObject.setDisplayParams(entity.getDisplayParams());
         dataObject.setUrl(entity.getUrl());
         dataObject.setTarget(entity.getTarget());
@@ -45,7 +45,7 @@ public final class MenuPersistenceAssembler {
         entity.setName(dataObject.getName());
         entity.setPerms(dataObject.getPerms());
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
-        entity.setVisibility(visibilityFrom(dataObject.getDisplayFlag()));
+        entity.setVisibility(visibilityFrom(dataObject.getVisibility()));
         entity.setDisplayParams(dataObject.getDisplayParams());
         entity.setUrl(dataObject.getUrl());
         entity.setTarget(dataObject.getTarget());

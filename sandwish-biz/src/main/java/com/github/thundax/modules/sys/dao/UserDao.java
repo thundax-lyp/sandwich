@@ -3,6 +3,8 @@ package com.github.thundax.modules.sys.dao;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import java.util.List;
 
 public interface UserDao {
@@ -11,14 +13,14 @@ public interface UserDao {
 
     List<User> listByIds(List<Long> idList);
 
-    List<User> list(Long departmentId, String loginName, String name, String enableFlag, String superFlag);
+    List<User> list(Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege);
 
     Page<User> page(
             Long departmentId,
             String loginName,
             String name,
-            String enableFlag,
-            String superFlag,
+            UserStatus status,
+            UserPrivilege privilege,
             int pageNo,
             int pageSize);
 

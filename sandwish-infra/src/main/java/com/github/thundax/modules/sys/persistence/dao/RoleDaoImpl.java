@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -26,9 +25,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class RoleDaoImpl implements RoleDao {
-
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
 
     private final RoleMapper mapper;
     private final MenuRoleMapper menuRoleMapper;
@@ -84,13 +80,13 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> list(String enableFlag) {
-        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(enableFlag)));
+    public List<Role> list(String status) {
+        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status)));
     }
 
     @Override
-    public Page<Role> page(String enableFlag, int pageNo, int pageSize) {
-        Page<RoleDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(enableFlag));
+    public Page<Role> page(String status, int pageNo, int pageSize) {
+        Page<RoleDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(status));
         Page<Role> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(RolePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -102,11 +98,6 @@ public class RoleDaoImpl implements RoleDao {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<RoleDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         cacheSupport.removeById(dataObject.getId());
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -118,8 +109,8 @@ public class RoleDaoImpl implements RoleDao {
                 null,
                 buildIdUpdateWrapper(dataObject)
                         .set(RoleDO::getName, dataObject.getName())
-                        .set(RoleDO::getAdminFlag, dataObject.getAdminFlag())
-                        .set(RoleDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(RoleDO::getPrivilege, dataObject.getPrivilege())
+                        .set(RoleDO::getStatus, dataObject.getStatus())
                         .set(RoleDO::getPriority, dataObject.getPriority())
                         .set(RoleDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(EntityIdCodec.toValue(entity.getId()));
@@ -145,8 +136,8 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int updateStatus(Role role) {
         RoleDO dataObject = RolePersistenceAssembler.toDataObject(role);
-        int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(RoleDO::getEnableFlag, dataObject.getEnableFlag()));
+        int count =
+                mapper.update(null, buildIdUpdateWrapper(dataObject).set(RoleDO::getStatus, dataObject.getStatus()));
         cacheSupport.removeById(EntityIdCodec.toValue(role.getId()));
         return count;
     }
@@ -217,11 +208,10 @@ public class RoleDaoImpl implements RoleDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<RoleDO> buildListWrapper(String enableFlag) {
+    private LambdaQueryWrapper<RoleDO> buildListWrapper(String status) {
         LambdaQueryWrapper<RoleDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
-        if (StringUtils.isNotBlank(enableFlag)) {
-            wrapper.eq(RoleDO::getEnableFlag, enableFlag);
+        if (StringUtils.isNotBlank(status)) {
+            wrapper.eq(RoleDO::getStatus, status);
         }
         wrapper.orderByAsc(RoleDO::getPriority, RoleDO::getCreateDate);
         return wrapper;

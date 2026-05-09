@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
@@ -26,8 +25,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MenuDaoImpl implements MenuDao {
 
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
     private static final Long ROOT_ID = 0L;
 
     private final MenuMapper mapper;
@@ -77,15 +74,15 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public List<Menu> list(Long parentId, String displayFlag, Integer maxRank) {
+    public List<Menu> list(Long parentId, String visibility, Integer maxRank) {
         return MenuPersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(parentId, displayFlag, maxRank)));
+                mapper.selectList(buildListWrapper(parentId, visibility, maxRank)));
     }
 
     @Override
-    public Page<Menu> page(Long parentId, String displayFlag, Integer maxRank, int pageNo, int pageSize) {
+    public Page<Menu> page(Long parentId, String visibility, Integer maxRank, int pageNo, int pageSize) {
         IPage<MenuDO> dataObjectPage =
-                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, displayFlag, maxRank));
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(parentId, visibility, maxRank));
         Page<Menu> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(MenuPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -103,11 +100,6 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<MenuDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -130,7 +122,7 @@ public class MenuDaoImpl implements MenuDao {
                         .set(MenuDO::getRanks, dataObject.getRanks())
                         .set(MenuDO::getUrl, dataObject.getUrl())
                         .set(MenuDO::getTarget, dataObject.getTarget())
-                        .set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag())
+                        .set(MenuDO::getVisibility, dataObject.getVisibility())
                         .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
                         .set(MenuDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
@@ -205,7 +197,7 @@ public class MenuDaoImpl implements MenuDao {
     public int updateVisibility(Menu menu) {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(menu);
         int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(MenuDO::getDisplayFlag, dataObject.getDisplayFlag()));
+                null, buildIdUpdateWrapper(dataObject).set(MenuDO::getVisibility, dataObject.getVisibility()));
         cacheSupport.removeById(EntityIdCodec.toValue(menu.getId()));
         return count;
     }
@@ -298,9 +290,8 @@ public class MenuDaoImpl implements MenuDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<MenuDO> buildListWrapper(Long parentId, String displayFlag, Integer maxRank) {
+    private LambdaQueryWrapper<MenuDO> buildListWrapper(Long parentId, String visibility, Integer maxRank) {
         LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (parentId != null) {
             if (ROOT_ID.equals(parentId)) {
                 wrapper.isNull(MenuDO::getParentId);
@@ -308,8 +299,8 @@ public class MenuDaoImpl implements MenuDao {
                 wrapper.eq(MenuDO::getParentId, parentId);
             }
         }
-        if (StringUtils.isNotBlank(displayFlag)) {
-            wrapper.eq(MenuDO::getDisplayFlag, displayFlag);
+        if (StringUtils.isNotBlank(visibility)) {
+            wrapper.eq(MenuDO::getVisibility, visibility);
         }
         if (maxRank != null) {
             wrapper.le(MenuDO::getRanks, maxRank);

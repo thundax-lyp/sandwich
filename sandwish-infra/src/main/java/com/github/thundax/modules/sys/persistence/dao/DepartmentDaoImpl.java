@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
@@ -24,8 +23,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class DepartmentDaoImpl implements DepartmentDao {
 
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
     private static final Long ROOT_ID = 0L;
 
     private final DepartmentMapper mapper;
@@ -100,11 +97,6 @@ public class DepartmentDaoImpl implements DepartmentDao {
         moveTreeRgts(newPosition, 2);
         moveTreeLfts(newPosition, 2);
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<DepartmentDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         cacheSupport.removeAll();
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -277,7 +269,6 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     private LambdaQueryWrapper<DepartmentDO> buildListWrapper(Long parentId, String name, String remarks) {
         LambdaQueryWrapper<DepartmentDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.apply("del_flag = {0}", NORMAL_DEL_FLAG);
         if (parentId != null) {
             if (ROOT_ID.equals(parentId)) {
                 wrapper.isNull(DepartmentDO::getParentId);

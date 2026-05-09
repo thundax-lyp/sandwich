@@ -3,13 +3,14 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.persistence.assembler.UserPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
 import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
@@ -33,9 +34,6 @@ public class UserDaoImpl implements UserDao {
     private static final String ACCOUNT_LOGIN_NAME_FILTER_SQL = "id IN (SELECT principal_id "
             + "FROM auth_principal_identity WHERE principal_type = 'USER' AND identity_type = 'USER_ACCOUNT' "
             + "AND identity_value LIKE CONCAT('%',{0},'%'))";
-    private static final String DEL_FLAG_COLUMN = "del_flag";
-    private static final String NORMAL_DEL_FLAG = "0";
-
     private final UserMapper mapper;
     private final UserRoleMapper userRoleMapper;
     private final UserCacheSupport cacheSupport;
@@ -87,9 +85,10 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> list(Long departmentId, String loginName, String name, String enableFlag, String superFlag) {
+    public List<User> list(
+            Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
         return UserPersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(departmentId, loginName, name, enableFlag, superFlag)));
+                mapper.selectList(buildListWrapper(departmentId, loginName, name, status, privilege)));
     }
 
     @Override
@@ -97,12 +96,12 @@ public class UserDaoImpl implements UserDao {
             Long departmentId,
             String loginName,
             String name,
-            String enableFlag,
-            String superFlag,
+            UserStatus status,
+            UserPrivilege privilege,
             int pageNo,
             int pageSize) {
         Page<UserDO> dataObjectPage = mapper.selectPage(
-                new Page<>(pageNo, pageSize), buildListWrapper(departmentId, loginName, name, enableFlag, superFlag));
+                new Page<>(pageNo, pageSize), buildListWrapper(departmentId, loginName, name, status, privilege));
         Page<User> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(UserPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -114,11 +113,6 @@ public class UserDaoImpl implements UserDao {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        mapper.update(
-                null,
-                new UpdateWrapper<UserDO>()
-                        .set(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG)
-                        .eq("id", dataObject.getId()));
         removeUserCaches(dataObject.getId());
         return EntityIdCodec.toDomain(dataObject.getId());
     }
@@ -135,8 +129,8 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getMobile, dataObject.getMobile())
                         .set(UserDO::getTel, dataObject.getTel())
                         .set(UserDO::getRanks, dataObject.getRanks())
-                        .set(UserDO::getAdminFlag, dataObject.getAdminFlag())
-                        .set(UserDO::getEnableFlag, dataObject.getEnableFlag())
+                        .set(UserDO::getPrivilege, dataObject.getPrivilege())
+                        .set(UserDO::getStatus, dataObject.getStatus())
                         .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks()));
         removeUserCaches(EntityIdCodec.toValue(entity.getId()));
@@ -163,8 +157,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int updateStatus(User user) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(user);
-        int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(UserDO::getEnableFlag, dataObject.getEnableFlag()));
+        int count =
+                mapper.update(null, buildIdUpdateWrapper(dataObject).set(UserDO::getStatus, dataObject.getStatus()));
         removeUserCaches(EntityIdCodec.toValue(user.getId()));
         return count;
     }
@@ -206,9 +200,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     private QueryWrapper<UserDO> buildListWrapper(
-            Long departmentId, String loginName, String name, String enableFlag, String superFlag) {
+            Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
-        wrapper.eq(DEL_FLAG_COLUMN, NORMAL_DEL_FLAG);
         if (departmentId != null) {
             wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
         }
@@ -218,11 +211,11 @@ public class UserDaoImpl implements UserDao {
         if (StringUtils.isNotBlank(name)) {
             wrapper.like("name", name);
         }
-        if (StringUtils.isNotBlank(enableFlag)) {
-            wrapper.eq("enable_flag", enableFlag);
+        if (status != null) {
+            wrapper.eq("status", status.value());
         }
-        if (StringUtils.isNotBlank(superFlag)) {
-            wrapper.eq("super_flag", superFlag);
+        if (privilege != null) {
+            wrapper.eq("privilege", privilege.value());
         }
         wrapper.orderByAsc("priority", "create_date");
         return wrapper;

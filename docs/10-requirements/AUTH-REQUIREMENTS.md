@@ -403,9 +403,9 @@
 - Controller 不直接校验验证码、解密密码或写回凭据失败次数。
 - Service 固定承接认证流程、状态校验、失败次数写回、锁定和会话创建。
 - DAO 固定承接持久化访问，不承载认证业务流程。
-- `User.loginName` 和 `User.loginPass` 仅允许作为用户创建、资料维护和认证模型初始化来源。
-- 新增用户时必须创建默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 设置或重置密码时必须创建或更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- `User.loginName` 和 `User.loginPass` 仅允许作为认证资料维护输入。
+- Auth Service 固定管理默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- Auth Service 固定管理 `USER_PASSWORD` 类型 `PrincipalCredential`。
 - 后台用户锁定语义必须收敛到凭据维度锁定。
 - 后台认证模型不得改变前台会员登录语义。
 
@@ -518,20 +518,14 @@
 - 外部身份映射不到后台用户时必须拒绝登录。
 - 多登录方式登录成功后必须复用统一 `PrincipalAuthSession`、`PrincipalAccessToken` 和 `PrincipalRefreshToken` 创建流程。
 
-### 7.13 用户保存联动
+### 7.13 认证资料维护
 
-- 新增后台用户时必须创建 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 新增后台用户并设置初始密码时必须创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 修改后台登录名时必须更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 重置后台用户密码时必须更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- 禁用后台用户时不删除 `PrincipalIdentity` 和 `PrincipalCredential`。
+- Auth Service 必须支持创建或更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- Auth Service 必须支持创建或更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- Auth Service 更新 `USER_PASSWORD` 类型 `PrincipalCredential` 时必须清零失败次数和锁定状态。
+- `PrincipalIdentity` 和 `PrincipalCredential` 的字段、状态和持久化语义归属 Auth。
 - 禁用某个登录标识时不禁用 `User`。
 - 禁用某个认证凭据时不禁用 `User`。
-
-### 7.14 认证模型初始化
-
-- 新增后台用户时必须从 `User.loginName` 初始化 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- 新增或重置后台用户密码时必须从加密后的密码初始化 `USER_PASSWORD` 类型 `PrincipalCredential`。
 - 密码认证必须读取 `PrincipalCredential.credentialValue`。
 - 后台认证主锁定语义必须落在凭据维度。
 
@@ -575,22 +569,7 @@
 4. Service 删除 `PrincipalAuthSession`。
 5. Service 写入 `PrincipalLoginEvent`。
 
-### 8.4 后台用户创建流程
-
-1. 用户 Service 保存 `User` 主体。
-2. 用户 Service 创建默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-3. 用户 Service 创建默认 `USER_PASSWORD` 类型 `PrincipalCredential`。
-4. 用户 Service 保存用户角色关系。
-
-### 8.5 后台密码重置流程
-
-1. 用户 Service 校验目标 `User` 存在。
-2. 用户 Service 定位默认 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-3. 用户 Service 更新或创建 `USER_PASSWORD` 类型 `PrincipalCredential`。
-4. 用户 Service 将失败次数和锁定状态清零。
-5. 用户 Service 按策略设置 `needChangePassword`。
-
-### 8.6 OAuth2 authorization code 流程
+### 8.4 OAuth2 authorization code 流程
 
 1. `OAuth2Controller.authorize` 接收授权请求。
 2. Controller 调用认证 Service 校验 client、redirect uri、scope 和当前会话。
@@ -601,7 +580,7 @@
 7. `OAuth2Controller.token` 使用授权码换取 access token 和 refresh token。
 8. Service 标记授权码已使用。
 
-### 8.7 refresh token 流程
+### 8.5 refresh token 流程
 
 1. `OAuth2Controller.token` 接收 refresh token 请求。
 2. Controller 调用认证 Service 校验 client 和 refresh token。
@@ -610,14 +589,14 @@
 5. Service 创建新的 access token。
 6. Service 按策略创建新的 refresh token。
 
-### 8.8 token introspection / userinfo 流程
+### 8.6 token introspection / userinfo 流程
 
 1. OAuth2 token 查询入口接收 token。
 2. Service 校验 token 是否存在、有效且未过期。
 3. introspection 返回 `active` 和 token 元数据。
 4. userinfo 返回当前用户公开信息。
 
-### 8.9 多登录方式流程
+### 8.7 多登录方式流程
 
 1. Controller 接收短信、企业微信或 GitHub 登录请求。
 2. Service 调用对应 provider 校验外部身份。

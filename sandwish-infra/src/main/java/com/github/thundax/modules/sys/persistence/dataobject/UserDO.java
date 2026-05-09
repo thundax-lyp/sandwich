@@ -33,11 +33,9 @@ public class UserDO {
     private String name;
     private Integer ranks;
 
-    private String superFlag;
+    private String privilege;
 
-    private String adminFlag;
-
-    private String enableFlag;
+    private String status;
 
     private Integer priority;
     private String remarks;

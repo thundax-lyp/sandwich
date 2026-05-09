@@ -42,14 +42,14 @@
 - 关系表使用来源主键作为联合关系字段，不单独生成关系 ID。
 - `sys_user.email` 和 `sys_user.mobile` 使用持久化加密 typeHandler。
 - `sys_user.ranks` 和 `sys_menu.ranks` 映射领域 `AccessRank rank`。
-- `super_flag` 和 `admin_flag` 是数据库布尔标记字段，由持久化装配器转换为领域权限枚举。
-- `sys_user.enable_flag` 和 `sys_role.enable_flag` 固定存储状态枚举名：`ENABLED` / `DISABLED`，默认值固定为 `ENABLED`。
-- `sys_menu.display_flag` 固定存储 `MenuVisibility` 枚举名：`VISIBLE` / `HIDDEN`，默认值固定为 `VISIBLE`。
+- `sys_user.privilege` 固定存储 `UserPrivilege` 枚举名：`NORMAL` / `ADMIN` / `SUPER`，默认值固定为 `NORMAL`。
+- `sys_user.status` 和 `sys_role.status` 固定存储状态枚举名：`ENABLED` / `DISABLED`，默认值固定为 `ENABLED`。
+- 用户 DAO 端口使用 `UserPrivilege` 和 `UserStatus` 查询条件，不向 Service 暴露 `privilege` 或 `status` 字符串。
+- `sys_menu.visibility` 固定存储 `MenuVisibility` 枚举名：`VISIBLE` / `HIDDEN`，默认值固定为 `VISIBLE`。
 - `sys_menu.lft` / `sys_menu.rgt` 和 `sys_department.lft` / `sys_department.rgt` 是 nested-set 持久化索引。
 - `Entity` 不暴露 `lft` / `rgt`。
 - `create_date` / `create_by` / `update_date` / `update_by` 是通用审计字段，由 infra 统一填充。
-- `del_flag` 是逻辑删除字段，`Entity` 与 `DO/DataObject` 不声明 `delFlag`。
-- DAO get/list/page 查询固定追加 `del_flag = '0'` 条件。
+- 删除、禁用和隐藏含义必须通过当前业务对象自身的业务字段表达。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
 ## 4. Naming Rules
@@ -93,9 +93,8 @@
 | `tel` | `tel` | `tel` | 否 | 联系电话 |
 | `name` | `name` | `name` | 是 | 用户名称 |
 | `ranks` | `ranks` | `rank` | 是 | 访问等级 |
-| `super_flag` | `superFlag` | `privilege` | 是 | 超级管理员标记 |
-| `admin_flag` | `adminFlag` | `privilege` | 是 | 管理员标记 |
-| `enable_flag` | `enableFlag` | `status` | 是 | 启用状态 |
+| `privilege` | `privilege` | `privilege` | 是 | 用户权限等级 |
+| `status` | `status` | `status` | 是 | 启用状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
@@ -108,15 +107,15 @@
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `email` 和 `mobile` 使用 `DefaultEncryptTypeHandler`。
 - `ranks` 通过 `AccessRankCodec` 与 `AccessRank` 转换。
-- `super_flag` 和 `admin_flag` 共同转换为 `UserPrivilege`。
-- `enable_flag` 转换为 `UserStatus`。
+- `privilege` 转换为 `UserPrivilege`，并由持久化查询实现负责按 `UserPrivilege` 生成字段条件。
+- `status` 转换为 `UserStatus`，并由持久化查询实现负责按 `UserStatus` 生成字段条件。
 - 注册、登录行为数据不落在 `sys_user`。
 
 索引：
 
 - 主键：`pk_sys_user(id)`
 - 普通索引：`idx_sys_user_department(department_id)`
-- 普通索引：`idx_sys_user_status(enable_flag, priority, create_date)`
+- 普通索引：`idx_sys_user_status(status, priority, create_date)`
 
 ### 6.2 sys_role
 
@@ -126,8 +125,8 @@
 | --- | --- | --- | --- | --- |
 | `id` | `id` | `id` | 是 | 角色主键 |
 | `name` | `name` | `name` | 是 | 角色名称 |
-| `admin_flag` | `adminFlag` | `privilege` | 是 | 管理员角色标记 |
-| `enable_flag` | `enableFlag` | `status` | 是 | 启用状态 |
+| `privilege` | `privilege` | `privilege` | 是 | 角色权限等级 |
+| `status` | `status` | `status` | 是 | 启用状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 | `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
@@ -138,11 +137,13 @@
 字段规则：
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
+- `privilege` 转换为 `RolePrivilege`。
+- `status` 转换为 `RoleStatus`。
 
 索引：
 
 - 主键：`pk_sys_role(id)`
-- 普通索引：`idx_sys_role_status(enable_flag, priority, create_date)`
+- 普通索引：`idx_sys_role_status(status, priority, create_date)`
 
 ### 6.3 sys_menu
 
@@ -157,7 +158,7 @@
 | `name` | `name` | `name` | 是 | 菜单名称 |
 | `perms` | `perms` | `perms` | 否 | 权限编码 |
 | `ranks` | `ranks` | `rank` | 是 | 访问等级 |
-| `display_flag` | `displayFlag` | `visibility` | 是 | 显示状态，取值固定为 `VISIBLE` / `HIDDEN` |
+| `visibility` | `visibility` | `visibility` | 是 | 显示状态，取值固定为 `VISIBLE` / `HIDDEN` |
 | `display_params` | `displayParams` | `displayParams` | 否 | 显示参数 |
 | `url` | `url` | `url` | 否 | 访问路径 |
 | `target` | `target` | `target` | 否 | 打开目标 |
@@ -178,7 +179,7 @@
 - 主键：`pk_sys_menu(id)`
 - 普通索引：`idx_sys_menu_parent(parent_id, priority)`
 - 普通索引：`idx_sys_menu_nested(lft, rgt)`
-- 普通索引：`idx_sys_menu_display(display_flag, ranks)`
+- 普通索引：`idx_sys_menu_visibility(visibility, ranks)`
 
 ### 6.4 sys_department
 

@@ -15,48 +15,46 @@ public final class MemberLoginInterfaceAssembler {
 
     @NonNull
     public static MemberLoginStatusResponse toLoginStatusResponse(MemberSpringPrincipal principal) {
-        MemberLoginStatusResponse response = new MemberLoginStatusResponse();
-        response.setLoggedIn(principal != null);
-        if (principal != null) {
-            response.setMemberId(principal.getId());
-        }
-        return response;
+        return MemberLoginStatusResponse.builder()
+                .loggedIn(principal != null)
+                .memberId(principal == null ? null : principal.getId())
+                .build();
     }
 
     @NonNull
     public static MemberLoginStatusResponse toLoginFailureResponse(String message) {
-        MemberLoginStatusResponse response = new MemberLoginStatusResponse();
-        response.setLoggedIn(false);
-        response.setMessage(message);
-        return response;
+        return MemberLoginStatusResponse.builder()
+                .loggedIn(false)
+                .message(message)
+                .build();
     }
 
     @NonNull
     public static MemberLoginStatusResponse toLogoutResponse() {
-        MemberLoginStatusResponse response = new MemberLoginStatusResponse();
-        response.setLoggedIn(false);
-        response.setMessage("退出成功");
-        return response;
+        return MemberLoginStatusResponse.builder()
+                .loggedIn(false)
+                .message("退出成功")
+                .build();
     }
 
     public static MemberLoginFormResponse toLoginFormResponse(PreAuthSession session) {
-        MemberLoginFormResponse response = new MemberLoginFormResponse();
-        response.setLoginToken(session.getToken().asString());
-        response.setRefreshToken(session.getRefreshToken().asString());
-        response.setExpiredAt(session.getExpiredAt());
-        response.setPublicKey(session.findValue(PUBLIC_KEY_ITEM));
-        return response;
+        return MemberLoginFormResponse.builder()
+                .loginToken(session.getToken().asString())
+                .refreshToken(session.getRefreshToken().asString())
+                .expiredAt(session.getExpiredAt())
+                .publicKey(session.findValue(PUBLIC_KEY_ITEM))
+                .build();
     }
 
     public static MemberTokenResponse toTokenResponse(MemberTokenResult result) {
-        MemberTokenResponse response = new MemberTokenResponse();
-        response.setMemberId(
-                result.getMemberId() == null
-                        ? null
-                        : String.valueOf(result.getMemberId().value()));
-        response.setAccessToken(result.getAccessToken());
-        response.setRefreshToken(result.getRefreshToken());
-        response.setExpiresIn(result.getExpiresIn());
-        return response;
+        return MemberTokenResponse.builder()
+                .memberId(
+                        result.getMemberId() == null
+                                ? null
+                                : String.valueOf(result.getMemberId().value()))
+                .accessToken(result.getAccessToken())
+                .refreshToken(result.getRefreshToken())
+                .expiresIn(result.getExpiresIn())
+                .build();
     }
 }

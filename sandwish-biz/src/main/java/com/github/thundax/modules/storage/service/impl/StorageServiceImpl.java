@@ -172,7 +172,7 @@ public class StorageServiceImpl implements StorageService {
 
     private PageQuery normalizePage(PageQuery page) {
         PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        normalizedPage.initialize();
+        normalizedPage.normalize();
         return normalizedPage;
     }
 

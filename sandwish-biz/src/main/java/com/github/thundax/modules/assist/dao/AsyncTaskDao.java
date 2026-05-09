@@ -1,15 +1,15 @@
 package com.github.thundax.modules.assist.dao;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.AsyncTask;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 
 public interface AsyncTaskDao {
 
-    AsyncTask getById(EntityId id);
+    AsyncTask getById(AsyncTaskId id);
 
-    EntityId insert(AsyncTask asyncTask);
+    AsyncTaskId insert(AsyncTask asyncTask);
 
     void update(AsyncTask asyncTask);
 
-    void deleteById(EntityId id);
+    void deleteById(AsyncTaskId id);
 }

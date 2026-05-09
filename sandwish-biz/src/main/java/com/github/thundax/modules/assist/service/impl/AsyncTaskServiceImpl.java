@@ -1,11 +1,10 @@
 package com.github.thundax.modules.assist.service.impl;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
 import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
-import com.github.thundax.modules.assist.service.query.AsyncTaskQuery;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import org.springframework.stereotype.Service;
@@ -20,16 +19,16 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     }
 
     @Override
-    public AsyncTask get(AsyncTaskQuery query) {
-        if (query == null || query.getId() == null) {
+    public AsyncTask get(AsyncTaskId id) {
+        if (id == null) {
             return null;
         }
-        return asyncTaskDao.getById(query.getId());
+        return asyncTaskDao.getById(id);
     }
 
     @Override
     @AuditLog(type = "AsyncTask", id = "", action = AuditAction.CREATE, summary = "创建异步任务", recordWhenUnchanged = true)
-    public EntityId create(AsyncTaskCommand command) {
+    public AsyncTaskId create(AsyncTaskCommand command) {
         AsyncTask asyncTask = command.getAsyncTask();
         return asyncTaskDao.insert(asyncTask);
     }
@@ -43,11 +42,11 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
     @Override
     @AuditLog(
             type = "AsyncTask",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除异步任务",
             recordWhenUnchanged = true)
-    public void remove(AsyncTaskCommand command) {
-        asyncTaskDao.deleteById(command.getId());
+    public void remove(AsyncTaskId id) {
+        asyncTaskDao.deleteById(id);
     }
 }

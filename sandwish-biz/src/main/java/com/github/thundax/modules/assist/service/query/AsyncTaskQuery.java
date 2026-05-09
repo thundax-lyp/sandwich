@@ -1,6 +1,5 @@
 package com.github.thundax.modules.assist.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AsyncTaskQuery {
-    private EntityId id;
     private AsyncTaskStatus status;
 }

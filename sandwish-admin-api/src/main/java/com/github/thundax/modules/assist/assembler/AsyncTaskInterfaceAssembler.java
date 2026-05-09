@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.entity.AsyncTask;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
 import org.springframework.lang.NonNull;
 
 public final class AsyncTaskInterfaceAssembler {
@@ -14,7 +14,7 @@ public final class AsyncTaskInterfaceAssembler {
             return AsyncTaskResponse.builder().build();
         }
         return AsyncTaskResponse.builder()
-                .id(EntityIdCodec.toValue(entity.getId()))
+                .id(AsyncTaskIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .priority(entity.getPriority())
                 .status(entity.getStatus().value())

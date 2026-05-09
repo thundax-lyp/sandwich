@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.entity;
 
 import com.github.thundax.common.domain.Sortable;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.sys.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import org.springframework.lang.NonNull;
 public class AsyncTask implements Sortable {
     public static final int DEFAULT_EXPIRED_SECONDS = 1800;
 
-    private EntityId id;
+    private AsyncTaskId id;
 
     private String title;
 

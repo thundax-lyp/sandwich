@@ -5,14 +5,15 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
-import java.util.concurrent.TimeUnit;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
+import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
 import org.springframework.stereotype.Repository;
+
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class AsyncTaskDaoImpl implements AsyncTaskDao {
@@ -25,14 +26,14 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     private final SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
 
     @Override
-    public AsyncTask getById(EntityId id) {
+    public AsyncTask getById(AsyncTaskId id) {
         return toDomain(cache.get(cacheKey(String.valueOf(id.value()))));
     }
 
     @Override
-    public EntityId insert(AsyncTask asyncTask) {
+    public AsyncTaskId insert(AsyncTask asyncTask) {
         if (asyncTask.getId() == null) {
-            asyncTask.setId(idGenerator.nextId());
+            asyncTask.setId(AsyncTaskIdCodec.toDomain(idGenerator.nextId().value()));
         }
         put(asyncTask);
         return asyncTask.getId();
@@ -44,8 +45,8 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
     }
 
     @Override
-    public void deleteById(EntityId id) {
-        cache.remove(cacheKey(EntityIdCodec.toStringValue(id)));
+    public void deleteById(AsyncTaskId id) {
+        cache.remove(cacheKey(AsyncTaskIdCodec.toStringValue(id)));
     }
 
     private String cacheKey(String id) {
@@ -54,7 +55,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private void put(AsyncTask asyncTask) {
         cache.put(
-                cacheKey(EntityIdCodec.toStringValue(asyncTask.getId())),
+                cacheKey(AsyncTaskIdCodec.toStringValue(asyncTask.getId())),
                 toCacheDTO(asyncTask),
                 asyncTask.getExpiredSeconds(),
                 TimeUnit.SECONDS);
@@ -65,7 +66,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
             return null;
         }
         AsyncTask asyncTask = new AsyncTask();
-        asyncTask.setId(EntityIdCodec.toDomain(cacheDTO.id));
+        asyncTask.setId(AsyncTaskIdCodec.toDomain(cacheDTO.id));
         asyncTask.setTitle(cacheDTO.title);
         asyncTask.setStatus(cacheDTO.status == null ? null : AsyncTaskStatus.from(cacheDTO.status));
         asyncTask.setMessage(cacheDTO.message);
@@ -79,7 +80,7 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
 
     private static AsyncTaskCacheDTO toCacheDTO(AsyncTask asyncTask) {
         AsyncTaskCacheDTO cacheDTO = new AsyncTaskCacheDTO();
-        cacheDTO.id = EntityIdCodec.toValue(asyncTask.getId());
+        cacheDTO.id = AsyncTaskIdCodec.toValue(asyncTask.getId());
         cacheDTO.title = asyncTask.getTitle();
         cacheDTO.status =
                 asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();

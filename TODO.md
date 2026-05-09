@@ -11,26 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.3 biz-core`：新增 Audit 领域模型和 Service 契约
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/valueobject/AuditObjectRef.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/valueobject/AuditSnapshot.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/valueobject/AuditField.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/valueobject/AuditChangedField.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/enums/AuditAction.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/enums/AuditOperatorType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/AuditMeta.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/AuditLog.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/dao/AuditMetaDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/dao/AuditLogDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/service/AuditService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/service/command/CreateAuditLogCommand.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/service/query/AuditLogQuery.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/service/query/AuditMetaQuery.java`
-  - 处理动作：新增 Audit 领域对象、值对象、枚举、DAO 契约、Service 契约和 Service 输入模型。
-  - 验收点：Audit biz 契约可编译；执行 `mvn -pl sandwish-biz -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.3 infra-core`：新增 Audit 持久化实现
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/dataobject/AuditMetaDO.java`

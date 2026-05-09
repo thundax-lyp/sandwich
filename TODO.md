@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 storage-api-response`：移除存储普通 API 响应中的审计字段
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/response/StorageResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/response/MultipartUploadSessionResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/response/MultipartUploadPartResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/assembler/StorageInterfaceAssembler.java`
-  - 处理动作：删除普通存储响应和装配器中的通用审计字段展示逻辑。
-  - 验收点：存储普通 API 响应不再暴露通用审计字段；执行 `mvn -pl sandwish-admin-api -am compile`。
-  - 重要度：8/10
-
 - [ ] `Audit 3.2 assist-domain`：拆除辅助任务业务表审计字段
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/entity/AsyncTask.java`

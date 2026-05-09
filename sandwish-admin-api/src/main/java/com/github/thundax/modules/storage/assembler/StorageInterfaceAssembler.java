@@ -64,8 +64,6 @@ public final class StorageInterfaceAssembler {
                         : entity.getReferenceStatus().value());
         response.setPriority(entity.getPriority());
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
-        response.setUpdateDate(entity.getUpdateDate());
         response.setContentUrl(storageConverter.toPreviewUrl(entity));
         return response;
     }
@@ -109,7 +107,6 @@ public final class StorageInterfaceAssembler {
                         ? null
                         : entity.getUploadStatus().value());
         response.setUploadedPartCount(entity.getUploadedPartCount());
-        response.setCreateDate(entity.getCreateDate());
         return response;
     }
 
@@ -124,7 +121,6 @@ public final class StorageInterfaceAssembler {
         response.setPartNumber(entity.getPartNumber());
         response.setEtag(entity.getEtag());
         response.setSize(entity.getSize());
-        response.setCreateDate(entity.getCreateDate());
         return response;
     }
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,8 +31,4 @@ public class MultipartUploadSessionResponse implements Serializable {
     @ApiModelProperty(name = "uploadedPartCount", value = "已上传分片数")
     @JsonProperty("uploadedPartCount")
     private Integer uploadedPartCount;
-
-    @ApiModelProperty(name = "createDate", value = "创建时间")
-    @JsonProperty("createDate")
-    private Date createDate;
 }

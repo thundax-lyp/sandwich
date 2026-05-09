@@ -27,7 +27,7 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 
 - 失败请求、登录、登出和安全事件归属 `sys_log` 或安全日志。
 - 业务数据回滚、外部审计投递和 outbox 派生能力不进入本 RUNBOOK。
-- Service 方法规约化由 [`RUNBOOK-SERVICE-METHOD-REFORM.md`](./RUNBOOK-SERVICE-METHOD-REFORM.md) 独立执行，不进入本 RUNBOOK。
+- Service 方法规约化独立于审计能力，不进入本 RUNBOOK。
 - infra Cache 只存在于 DAO implementation 内部，不进入 Audit 契约。
 
 ## 3. Execution Plan

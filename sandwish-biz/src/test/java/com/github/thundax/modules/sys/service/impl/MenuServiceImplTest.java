@@ -36,14 +36,14 @@ public class MenuServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuQuery query = new MenuQuery();
-        query.setParentId(EntityId.of(0L));
+        query.setParentId(EntityId.of(1L));
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(AccessRank.of(3));
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         service.list(query);
 
-        assertEquals(Long.valueOf(0L), dao.parentId);
+        assertEquals(Long.valueOf(1L), dao.parentId);
         assertEquals("VISIBLE", dao.visibility);
         assertEquals(Integer.valueOf(3), dao.maxRank);
     }

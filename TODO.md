@@ -11,14 +11,4 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-final/guards`：收口架构约束和残留扫描
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodParameterArchitectureTest.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodModelArchitectureTest.java
-  - 范围文件：TODO.md
-  - 范围文件：docs/30-designs/RUNBOOK-SERVICE-METHOD-REFORM.md
-  - 处理动作：清理临时放行清单、删除已完成 TODO、删除 RUNBOOK，并执行最终残留扫描
-  - 验收点：`mvn install` 通过；`git status --short` 干净；不残留已完成 TODO 或临时执行说明
-  - 重要度：10/10
-
 ## 待讨论项

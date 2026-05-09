@@ -12,14 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import org.junit.Test;
 
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
-
-    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_NAMES = new LinkedHashSet<String>();
 
     @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {
@@ -45,9 +41,6 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 continue;
             }
             for (JavaMethod method : javaClass.getMethods()) {
-                if (LEGACY_DIRTY_SERVICE_METHOD_NAMES.contains(methodKey(javaClass, method))) {
-                    continue;
-                }
                 if (isForbiddenServiceMethodName(method.getName())) {
                     violations.add(method.getFullName());
                 }
@@ -56,9 +49,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
         assertTrue(
                 "Service method names must express business actions and must not use update/save/insert/batch "
-                        + "or deleteById style names. Legacy methods still waiting for TODO cleanup are "
-                        + LEGACY_DIRTY_SERVICE_METHOD_NAMES
-                        + ". Violations: "
+                        + "or deleteById style names. Violations: "
                         + violations,
                 violations.isEmpty());
     }
@@ -132,7 +123,4 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 || "deleteById".equals(name);
     }
 
-    private String methodKey(JavaClass javaClass, JavaMethod method) {
-        return javaClass.getSimpleName() + "#" + method.getName();
-    }
 }

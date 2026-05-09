@@ -7,14 +7,10 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import org.junit.Test;
 
 public class ServiceMethodParameterArchitectureTest extends AbstractArchitectureTest {
-
-    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_PARAMETERS = new LinkedHashSet<String>();
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {
@@ -26,9 +22,6 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
                 continue;
             }
             for (JavaMethod method : javaClass.getMethods()) {
-                if (LEGACY_DIRTY_SERVICE_METHOD_PARAMETERS.contains(methodKey(javaClass, method))) {
-                    continue;
-                }
                 if (!matchesTargetShape(method)) {
                     violations.add(method.getFullName());
                 }
@@ -37,9 +30,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
 
         assertTrue(
                 "Service methods must use one of the target parameter shapes: (*Query), (*Query, PageQuery), "
-                        + "or (*Command). Legacy methods still waiting for TODO cleanup are "
-                        + LEGACY_DIRTY_SERVICE_METHOD_PARAMETERS
-                        + ". Violations: "
+                        + "or (*Command). Violations: "
                         + violations,
                 violations.isEmpty());
     }
@@ -62,7 +53,8 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
         return methodName.startsWith("get")
                 || methodName.startsWith("list")
                 || methodName.startsWith("count")
-                || methodName.startsWith("exists");
+                || methodName.startsWith("exists")
+                || methodName.startsWith("deleteBy");
     }
 
     private boolean isServiceInterface(JavaClass javaClass) {
@@ -89,7 +81,4 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
         return "com.github.thundax.common.page.PageResult".equals(javaClass.getName());
     }
 
-    private String methodKey(JavaClass javaClass, JavaMethod method) {
-        return javaClass.getSimpleName() + "#" + method.getName();
-    }
 }

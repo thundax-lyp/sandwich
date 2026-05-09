@@ -50,7 +50,6 @@
 - Service 方法规约化、方法命名、Query / PageQuery / PageResult / Command 边界：
   先读 `00-governance/ARCHITECTURE.md`
   再读 `00-governance/NAMING-AND-PLACEMENT-RULES.md`
-  再读 `30-designs/RUNBOOK-SERVICE-METHOD-REFORM.md`
 - admin-web 页面、组件、service、类型、命名或目录归属：
   再读 `00-governance/ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`
 - 新增或修改领域值对象、领域枚举、状态枚举：

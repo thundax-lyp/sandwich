@@ -3,14 +3,14 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
@@ -25,7 +25,7 @@ public class DepartmentServiceImplTest {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        assertEquals(null, service.get((DepartmentQuery) null));
+        assertEquals(null, service.get((DepartmentId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -33,7 +33,7 @@ public class DepartmentServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
         DepartmentQuery query = new DepartmentQuery();
-        query.setParentId(EntityId.of(1L));
+        query.setParentId(DepartmentIdCodec.toDomain(1L));
         query.setName("总部");
         query.setRemarks("备注");
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
@@ -66,7 +66,7 @@ public class DepartmentServiceImplTest {
         Department department = new Department();
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        EntityId id = service.create(createCommand(department));
+        DepartmentId id = service.create(createCommand(department));
 
         assertNotNull(id);
         assertNotNull(dao.inserted);
@@ -89,7 +89,7 @@ public class DepartmentServiceImplTest {
         dao.getResult = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        int count = service.remove(new DeleteDepartmentCommand(EntityId.of(6001L)));
+        int count = service.remove(new DeleteDepartmentCommand(DepartmentIdCodec.toDomain(6001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(6001L), dao.deletedId);
@@ -97,7 +97,7 @@ public class DepartmentServiceImplTest {
 
     private static Department department(Long id) {
         Department department = new Department();
-        department.setId(EntityIdCodec.toDomain(id));
+        department.setId(DepartmentIdCodec.toDomain(id));
         return department;
     }
 
@@ -136,7 +136,7 @@ public class DepartmentServiceImplTest {
         private int priorityCalls;
 
         @Override
-        public Department getById(EntityId id) {
+        public Department getById(DepartmentId id) {
             this.getCalls++;
             return getResult;
         }
@@ -169,9 +169,9 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Department department) {
+        public DepartmentId insert(Department department) {
             this.inserted = department;
-            return EntityId.of(9006L);
+            return DepartmentIdCodec.toDomain(9006L);
         }
 
         @Override
@@ -187,7 +187,7 @@ public class DepartmentServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(DepartmentId id) {
             this.deletedId = id.value();
             return 1;
         }

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.entity.valueobject;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -15,9 +14,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PrincipalKey {
     private PrincipalType principalType;
-    private EntityId principalId;
+    private Long principalId;
 
-    public static PrincipalKey of(PrincipalType principalType, EntityId principalId) {
+    public static PrincipalKey of(PrincipalType principalType, Long principalId) {
         return new PrincipalKey(principalType, principalId);
     }
 

@@ -178,7 +178,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             return null;
         }
         return principalIdentityService.get(
-                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
+                identityQuery(PrincipalKey.of(PrincipalType.USER, userId.value()), PrincipalIdentityType.USER_ACCOUNT));
     }
 
     private String getAccountLoginName(UserId userId) {
@@ -194,7 +194,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 credentialQuery(accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
-            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, userId));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, userId.value()));
             credential.setIdentityId(accountIdentity.getId());
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
             credential.setCredentialValue(encryptedPassword);

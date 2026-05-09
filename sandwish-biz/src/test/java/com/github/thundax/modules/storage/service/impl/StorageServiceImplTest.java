@@ -1,13 +1,7 @@
 package com.github.thundax.modules.storage.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
@@ -16,6 +10,8 @@ import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
@@ -35,9 +31,7 @@ public class StorageServiceImplTest {
 
         StorageServiceImpl service = storageService(dao);
 
-        StorageQuery query = new StorageQuery();
-        query.setId(EntityId.of(8101L));
-        assertSame(expected, service.get(query));
+        assertSame(expected, service.get(StoredObjectId.of(8101L)));
         assertEquals(Long.valueOf(8101L), dao.id);
     }
 
@@ -89,8 +83,8 @@ public class StorageServiceImplTest {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
 
-        int count = service.remove(new DeleteStorageCommand(EntityId.of(8101L)))
-                + service.remove(new DeleteStorageCommand(EntityId.of(8102L)));
+        int count = service.remove(new DeleteStorageCommand(StoredObjectId.of(8101L)))
+                + service.remove(new DeleteStorageCommand(StoredObjectId.of(8102L)));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList(8101L, 8102L), dao.deletedIds);
@@ -152,13 +146,13 @@ public class StorageServiceImplTest {
 
     private static StoredObject storage(Long id) {
         StoredObject storage = new StoredObject();
-        storage.setId(EntityIdCodec.toDomain(id));
+        storage.setId(StoredObjectIdCodec.toDomain(id));
         return storage;
     }
 
     private static StoredObjectReference storageBusiness(Long id) {
         StoredObjectReference storageBusiness = new StoredObjectReference();
-        storageBusiness.setId(EntityIdCodec.toDomain(id));
+        storageBusiness.setId(StoredObjectIdCodec.toDomain(id));
         return storageBusiness;
     }
 
@@ -168,7 +162,7 @@ public class StorageServiceImplTest {
 
     private static StorageQuery storageQuery(Long id, StorageOwnerType ownerType, String ownerId) {
         StorageQuery query = new StorageQuery();
-        query.setId(EntityIdCodec.toDomain(id));
+        query.setId(StoredObjectIdCodec.toDomain(id));
         query.setOwnerType(ownerType);
         query.setOwnerId(ownerId);
         return query;
@@ -217,7 +211,7 @@ public class StorageServiceImplTest {
         private String deletedBusinessKey;
 
         @Override
-        public StoredObject getById(EntityId id) {
+        public StoredObject getById(StoredObjectId id) {
             this.id = id.value();
             return getResult;
         }
@@ -269,9 +263,9 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public EntityId insert(StoredObject entity) {
+        public StoredObjectId insert(StoredObject entity) {
             this.inserted = entity;
-            return EntityId.of(9101L);
+            return StoredObjectId.of(9101L);
         }
 
         @Override
@@ -280,7 +274,7 @@ public class StorageServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(StoredObjectId id) {
             deletedIds.add(id.value());
             return 1;
         }

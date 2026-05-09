@@ -1,17 +1,15 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.LogId;
+import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
 import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.Date;
@@ -25,7 +23,7 @@ public class LogServiceImplTest {
         RecordingLogDao dao = new RecordingLogDao();
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        assertEquals(null, service.get((LogQuery) null));
+        assertEquals(null, service.get((LogId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -35,10 +33,8 @@ public class LogServiceImplTest {
         Log expected = log(7001L);
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao);
-        LogQuery query = new LogQuery();
-        query.setId(EntityId.of(7001L));
 
-        assertSame(expected, service.get(query));
+        assertSame(expected, service.get(LogId.of(7001L)));
 
         assertEquals(Long.valueOf(7001L), dao.id);
     }
@@ -96,7 +92,7 @@ public class LogServiceImplTest {
         log.setType(LogType.EXCEPTION);
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        EntityId id = service.create(createCommand(log));
+        LogId id = service.create(createCommand(log));
 
         assertNotNull(id);
         assertNotNull(dao.inserted);
@@ -132,7 +128,7 @@ public class LogServiceImplTest {
 
     private static Log log(Long id) {
         Log log = new Log();
-        log.setId(EntityIdCodec.toDomain(id));
+        log.setId(LogIdCodec.toDomain(id));
         return log;
     }
 
@@ -169,7 +165,7 @@ public class LogServiceImplTest {
         private Log inserted;
 
         @Override
-        public Log getById(EntityId id) {
+        public Log getById(LogId id) {
             this.getCalls++;
             this.id = id.value();
             return getResult;
@@ -216,9 +212,9 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Log log) {
+        public LogId insert(Log log) {
             this.inserted = log;
-            return EntityId.of(9701L);
+            return LogId.of(9701L);
         }
 
         @Override
@@ -227,12 +223,12 @@ public class LogServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(LogId id) {
             return 1;
         }
 
         @Override
-        public List<EntityId> batchInsert(List<Log> list) {
+        public List<LogId> batchInsert(List<Log> list) {
             return java.util.Collections.emptyList();
         }
 

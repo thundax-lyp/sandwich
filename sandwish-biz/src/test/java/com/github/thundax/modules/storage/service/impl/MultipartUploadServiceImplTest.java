@@ -1,22 +1,18 @@
 package com.github.thundax.modules.storage.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
-import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.enums.*;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartId;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
@@ -195,9 +191,9 @@ public class MultipartUploadServiceImplTest {
         private int multipartPartCount;
 
         @Override
-        public EntityId insertMultipartSession(MultipartUploadSession session) {
+        public MultipartUploadSessionId insertMultipartSession(MultipartUploadSession session) {
             this.insertedMultipartSession = session;
-            return EntityId.of(9301L);
+            return MultipartUploadSessionId.of(9301L);
         }
 
         @Override
@@ -212,9 +208,9 @@ public class MultipartUploadServiceImplTest {
         }
 
         @Override
-        public EntityId insertMultipartPart(MultipartUploadPart part) {
+        public MultipartUploadPartId insertMultipartPart(MultipartUploadPart part) {
             this.insertedMultipartPart = part;
-            return EntityId.of(9401L);
+            return MultipartUploadPartId.of(9401L);
         }
 
         @Override
@@ -233,7 +229,7 @@ public class MultipartUploadServiceImplTest {
         }
 
         @Override
-        public StoredObject getById(EntityId id) {
+        public StoredObject getById(StoredObjectId id) {
             return null;
         }
 
@@ -273,9 +269,9 @@ public class MultipartUploadServiceImplTest {
         }
 
         @Override
-        public EntityId insert(StoredObject entity) {
+        public StoredObjectId insert(StoredObject entity) {
             this.inserted = entity;
-            return EntityId.of(9101L);
+            return StoredObjectId.of(9101L);
         }
 
         @Override
@@ -284,7 +280,7 @@ public class MultipartUploadServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(StoredObjectId id) {
             return 1;
         }
 

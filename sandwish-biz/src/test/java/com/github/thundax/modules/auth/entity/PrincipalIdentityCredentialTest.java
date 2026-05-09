@@ -1,15 +1,8 @@
 package com.github.thundax.modules.auth.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.enums.*;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import org.junit.Test;
@@ -18,8 +11,8 @@ public class PrincipalIdentityCredentialTest {
 
     @Test
     public void shouldBuildPrincipalKey() {
-        PrincipalKey userKey = PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L));
-        PrincipalKey memberKey = PrincipalKey.of(PrincipalType.MEMBER, EntityIdCodec.toDomain(2L));
+        PrincipalKey userKey = PrincipalKey.of(PrincipalType.USER, 1L);
+        PrincipalKey memberKey = PrincipalKey.of(PrincipalType.MEMBER, 2L);
 
         assertEquals(PrincipalType.USER, userKey.getPrincipalType());
         assertEquals(PrincipalType.MEMBER, memberKey.getPrincipalType());

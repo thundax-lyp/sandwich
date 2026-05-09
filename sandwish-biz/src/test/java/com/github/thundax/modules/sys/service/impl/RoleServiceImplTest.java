@@ -3,14 +3,16 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
@@ -67,18 +69,18 @@ public class RoleServiceImplTest {
         role.setMenuIdList(Arrays.asList(5001L, 5002L));
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        EntityId id = service.create(new CreateRoleCommand(
+        RoleId id = service.create(new CreateRoleCommand(
                 role.getId(),
                 role.getName(),
                 role.getPrivilege(),
                 role.getStatus(),
                 role.getPriority(),
                 role.getRemarks(),
-                EntityIdCodec.toDomains(role.getMenuIdList())));
+                MenuIdCodec.toDomains(role.getMenuIdList())));
 
         assertNotNull(id);
         assertNotNull(dao.inserted);
-        assertEquals(EntityIdCodec.toValue(id), dao.deletedRoleMenuId);
+        assertEquals(Long.valueOf(id.value()), dao.deletedRoleMenuId);
         assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
     }
 
@@ -90,7 +92,7 @@ public class RoleServiceImplTest {
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
         service.assignUsers(
-                new AssignRoleUsersCommand(role.getId(), Arrays.asList(EntityId.of(1001L), EntityId.of(1002L))));
+                new AssignRoleUsersCommand(role.getId(), Arrays.asList(UserId.of(1001L), UserId.of(1002L))));
 
         assertEquals(Long.valueOf(4001L), dao.deletedRoleUserId);
         assertEquals(Arrays.asList(1001L, 1002L), dao.userIdList);
@@ -102,7 +104,7 @@ public class RoleServiceImplTest {
         dao.getResult = role(4001L);
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        int count = service.remove(new DeleteRoleCommand(EntityId.of(4001L)));
+        int count = service.remove(new DeleteRoleCommand(RoleId.of(4001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(4001L), dao.deletedRoleMenuId);
@@ -112,7 +114,7 @@ public class RoleServiceImplTest {
 
     private static Role role(Long id) {
         Role role = new Role();
-        role.setId(EntityIdCodec.toDomain(id));
+        role.setId(RoleIdCodec.toDomain(id));
         return role;
     }
 
@@ -130,7 +132,7 @@ public class RoleServiceImplTest {
         private Role getResult;
 
         @Override
-        public Role getById(EntityId id) {
+        public Role getById(RoleId id) {
             return getResult;
         }
 
@@ -158,9 +160,9 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Role role) {
+        public RoleId insert(Role role) {
             this.inserted = role;
-            return EntityId.of(9004L);
+            return RoleId.of(9004L);
         }
 
         @Override
@@ -174,7 +176,7 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(RoleId id) {
             this.deletedRoleId = id.value();
             return 1;
         }

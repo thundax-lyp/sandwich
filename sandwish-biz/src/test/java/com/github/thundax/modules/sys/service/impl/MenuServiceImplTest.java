@@ -3,8 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -13,6 +11,8 @@ import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
 import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
@@ -28,7 +28,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        assertEquals(null, service.get((MenuQuery) null));
+        assertEquals(null, service.get((MenuId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -36,7 +36,7 @@ public class MenuServiceImplTest {
     public void shouldExpandFindListQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuQuery query = new MenuQuery();
-        query.setParentId(EntityId.of(1L));
+        query.setParentId(MenuId.of(1L));
         query.setVisibility(MenuVisibility.VISIBLE);
         query.setMaxRank(AccessRank.of(3));
         MenuServiceImpl service = new MenuServiceImpl(dao);
@@ -54,7 +54,7 @@ public class MenuServiceImplTest {
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
         MenuQuery query = new MenuQuery();
-        query.setParentId(EntityId.of(5000L));
+        query.setParentId(MenuId.of(5000L));
         query.setMaxRank(AccessRank.of(2));
         service.list(query);
 
@@ -83,7 +83,7 @@ public class MenuServiceImplTest {
         Menu menu = new Menu();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        EntityId id = service.create(createCommand(menu));
+        MenuId id = service.create(createCommand(menu));
 
         assertNotNull(id);
         assertNotNull(dao.inserted);
@@ -107,7 +107,7 @@ public class MenuServiceImplTest {
         dao.getResult = stored;
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.remove(new DeleteMenuCommand(EntityId.of(5001L)));
+        int count = service.remove(new DeleteMenuCommand(MenuId.of(5001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(5001L), dao.deletedMenuRoleId);
@@ -119,8 +119,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count =
-                service.changeVisibility(new ChangeMenuVisibilityCommand(EntityId.of(5001L), MenuVisibility.HIDDEN));
+        int count = service.changeVisibility(new ChangeMenuVisibilityCommand(MenuId.of(5001L), MenuVisibility.HIDDEN));
 
         assertEquals(1, count);
         assertEquals(1, dao.visibilityCalls);
@@ -158,7 +157,7 @@ public class MenuServiceImplTest {
 
     private static Menu menu(Long id) {
         Menu menu = new Menu();
-        menu.setId(EntityIdCodec.toDomain(id));
+        menu.setId(MenuIdCodec.toDomain(id));
         return menu;
     }
 
@@ -178,7 +177,7 @@ public class MenuServiceImplTest {
         private int pageSize;
 
         @Override
-        public Menu getById(EntityId id) {
+        public Menu getById(MenuId id) {
             this.getCalls++;
             return getResult;
         }
@@ -211,9 +210,9 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Menu menu) {
+        public MenuId insert(Menu menu) {
             this.inserted = menu;
-            return EntityId.of(9005L);
+            return MenuId.of(9005L);
         }
 
         @Override
@@ -228,7 +227,7 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(MenuId id) {
             this.deletedId = id.value();
             return 1;
         }

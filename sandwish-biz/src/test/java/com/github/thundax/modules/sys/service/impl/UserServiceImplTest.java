@@ -1,14 +1,14 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
@@ -26,11 +26,11 @@ public class UserServiceImplTest {
         UserServiceImpl service = new UserServiceImpl(userDao, deleteHandlers());
         User user = new User();
 
-        when(userDao.insert(org.mockito.ArgumentMatchers.any(User.class))).thenReturn(EntityId.of(1001L));
+        when(userDao.insert(org.mockito.ArgumentMatchers.any(User.class))).thenReturn(UserId.of(1001L));
 
-        EntityId userId = service.create(new CreateUserCommand(
+        UserId userId = service.create(new CreateUserCommand(
                 user.getId(),
-                EntityIdCodec.toDomain(user.getDepartmentId()),
+                DepartmentIdCodec.toDomain(null),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),
@@ -42,9 +42,9 @@ public class UserServiceImplTest {
                 user.getRemarks(),
                 "tester",
                 "encrypted",
-                EntityIdCodec.toDomains(Arrays.asList(4001L, 4002L))));
+                RoleIdCodec.toDomains(Arrays.asList(4001L, 4002L))));
 
-        assertEquals(Long.valueOf(1001L), EntityIdCodec.toValue(userId));
+        assertEquals(Long.valueOf(1001L), userId.value());
         verify(userDao).deleteUserRole(1001L);
         verify(userDao).insertUserRole(1001L, Arrays.asList(4001L, 4002L));
     }
@@ -54,11 +54,11 @@ public class UserServiceImplTest {
         UserDao userDao = mock(UserDao.class);
         UserServiceImpl service = new UserServiceImpl(userDao, deleteHandlers());
         User user = new User();
-        user.setId(EntityId.of(1001L));
+        user.setId(UserId.of(1001L));
 
         service.changeInfo(new ChangeUserInfoCommand(
                 user.getId(),
-                EntityIdCodec.toDomain(user.getDepartmentId()),
+                DepartmentIdCodec.toDomain(null),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),
@@ -69,7 +69,7 @@ public class UserServiceImplTest {
                 user.getPriority(),
                 user.getRemarks(),
                 "tester",
-                Collections.singletonList(EntityId.of(4001L))));
+                Collections.singletonList(RoleId.of(4001L))));
 
         verify(userDao).update(org.mockito.ArgumentMatchers.any(User.class));
         verify(userDao).deleteUserRole(1001L);
@@ -82,17 +82,17 @@ public class UserServiceImplTest {
         UserDeleteCascadeHandler deleteCascadeHandler = mock(UserDeleteCascadeHandler.class);
         UserServiceImpl service = new UserServiceImpl(userDao, deleteHandlers(deleteCascadeHandler));
         User user = new User();
-        user.setId(EntityId.of(1001L));
-        when(userDao.getById(EntityId.of(1001L))).thenReturn(user);
-        when(userDao.deleteById(EntityId.of(1001L))).thenReturn(1);
+        user.setId(UserId.of(1001L));
+        when(userDao.getById(UserId.of(1001L))).thenReturn(user);
+        when(userDao.deleteById(UserId.of(1001L))).thenReturn(1);
 
-        int count = service.remove(new DeleteUserCommand(EntityId.of(1001L)));
+        int count = service.remove(new DeleteUserCommand(UserId.of(1001L)));
 
         assertEquals(1, count);
         InOrder inOrder = org.mockito.Mockito.inOrder(deleteCascadeHandler, userDao);
         inOrder.verify(deleteCascadeHandler).beforeDelete(user);
         inOrder.verify(userDao).deleteUserRole(1001L);
-        inOrder.verify(userDao).deleteById(EntityId.of(1001L));
+        inOrder.verify(userDao).deleteById(UserId.of(1001L));
     }
 
     @Test
@@ -100,15 +100,15 @@ public class UserServiceImplTest {
         UserDao userDao = mock(UserDao.class);
         UserServiceImpl service = new UserServiceImpl(userDao, null);
         User user = new User();
-        user.setId(EntityId.of(1001L));
-        when(userDao.getById(EntityId.of(1001L))).thenReturn(user);
-        when(userDao.deleteById(EntityId.of(1001L))).thenReturn(1);
+        user.setId(UserId.of(1001L));
+        when(userDao.getById(UserId.of(1001L))).thenReturn(user);
+        when(userDao.deleteById(UserId.of(1001L))).thenReturn(1);
 
-        int count = service.remove(new DeleteUserCommand(EntityId.of(1001L)));
+        int count = service.remove(new DeleteUserCommand(UserId.of(1001L)));
 
         assertEquals(1, count);
         verify(userDao).deleteUserRole(1001L);
-        verify(userDao).deleteById(EntityId.of(1001L));
+        verify(userDao).deleteById(UserId.of(1001L));
     }
 
     private static java.util.List<UserDeleteCascadeHandler> deleteHandlers(UserDeleteCascadeHandler... handlers) {

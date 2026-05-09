@@ -1,17 +1,15 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.entity.valueobject.DictId;
+import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
@@ -26,11 +24,9 @@ public class DictServiceImplTest {
     public void shouldReadByQueryId() {
         RecordingDictDao dao = new RecordingDictDao();
         dao.getResult = dict(1001L);
-        DictQuery query = new DictQuery();
-        query.setId(EntityId.of(1001L));
         DictServiceImpl service = new DictServiceImpl(dao);
 
-        Dict result = service.get(query);
+        Dict result = service.get(DictId.of(1001L));
 
         assertSame(dao.getResult, result);
         assertEquals(Long.valueOf(1001L), dao.getId);
@@ -73,9 +69,9 @@ public class DictServiceImplTest {
         CreateDictCommand command = new CreateDictCommand("status", "启用", "ENABLED", 10, "system");
         DictServiceImpl service = new DictServiceImpl(dao);
 
-        EntityId id = service.create(command);
+        DictId id = service.create(command);
 
-        assertEquals(EntityId.of(9001L), id);
+        assertEquals(DictId.of(9001L), id);
         assertNotNull(dao.inserted);
         assertEquals("status", dao.inserted.getType());
         assertEquals("启用", dao.inserted.getLabel());
@@ -88,7 +84,7 @@ public class DictServiceImplTest {
     public void shouldChangeDictInfoFromCommand() {
         RecordingDictDao dao = new RecordingDictDao();
         ChangeDictInfoCommand command =
-                new ChangeDictInfoCommand(EntityId.of(1001L), "status", "禁用", "DISABLED", 20, "system");
+                new ChangeDictInfoCommand(DictId.of(1001L), "status", "禁用", "DISABLED", 20, "system");
         DictServiceImpl service = new DictServiceImpl(dao);
 
         service.changeInfo(command);
@@ -107,14 +103,14 @@ public class DictServiceImplTest {
         RecordingDictDao dao = new RecordingDictDao();
         DictServiceImpl service = new DictServiceImpl(dao);
 
-        service.remove(new DeleteDictCommand(EntityId.of(1001L)));
+        service.remove(new DeleteDictCommand(DictId.of(1001L)));
 
         assertEquals(Long.valueOf(1001L), dao.deletedId);
     }
 
     private static Dict dict(Long id) {
         Dict dict = new Dict();
-        dict.setId(EntityIdCodec.toDomain(id));
+        dict.setId(DictIdCodec.toDomain(id));
         return dict;
     }
 
@@ -132,7 +128,7 @@ public class DictServiceImplTest {
         private Long deletedId;
 
         @Override
-        public Dict getById(EntityId id) {
+        public Dict getById(DictId id) {
             this.getId = id.value();
             return getResult;
         }
@@ -163,9 +159,9 @@ public class DictServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Dict dict) {
+        public DictId insert(Dict dict) {
             this.inserted = dict;
-            return EntityId.of(9001L);
+            return DictId.of(9001L);
         }
 
         @Override
@@ -180,7 +176,7 @@ public class DictServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(DictId id) {
             this.deletedId = id.value();
             return 1;
         }

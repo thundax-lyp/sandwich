@@ -12,7 +12,7 @@ public class AuditOperatorResolver {
     }
 
     public String operatorId() {
-        return UserAccessHolder.currentUserId();
+        return String.valueOf(UserAccessHolder.currentUserId());
     }
 
     public String operatorName() {

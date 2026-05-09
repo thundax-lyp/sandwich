@@ -2,12 +2,9 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -21,6 +18,8 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -53,9 +52,9 @@ public class CurrentUserServiceImplTest {
         List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(2, responses.size());
-        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals(Long.valueOf(5002L), EntityIdCodec.toValue(responses.get(1).getId()));
-        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(1).getParentId()));
+        assertEquals(Long.valueOf(5001L), responses.get(0).getId().value());
+        assertEquals(Long.valueOf(5002L), responses.get(1).getId().value());
+        assertEquals(Long.valueOf(5001L), responses.get(1).getParentId().value());
     }
 
     @Test
@@ -80,8 +79,8 @@ public class CurrentUserServiceImplTest {
         List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(2, responses.size());
-        assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals(Long.valueOf(5002L), EntityIdCodec.toValue(responses.get(1).getId()));
+        assertEquals(Long.valueOf(5001L), responses.get(0).getId().value());
+        assertEquals(Long.valueOf(5002L), responses.get(1).getId().value());
     }
 
     @Test
@@ -102,9 +101,9 @@ public class CurrentUserServiceImplTest {
         List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(3, responses.size());
-        assertEquals(Long.valueOf(5010L), EntityIdCodec.toValue(responses.get(0).getId()));
-        assertEquals(Long.valueOf(5011L), EntityIdCodec.toValue(responses.get(1).getId()));
-        assertEquals(Long.valueOf(5012L), EntityIdCodec.toValue(responses.get(2).getId()));
+        assertEquals(Long.valueOf(5010L), responses.get(0).getId().value());
+        assertEquals(Long.valueOf(5011L), responses.get(1).getId().value());
+        assertEquals(Long.valueOf(5012L), responses.get(2).getId().value());
     }
 
     @Test
@@ -124,7 +123,7 @@ public class CurrentUserServiceImplTest {
 
         User updated = service.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
-                EntityIdCodec.toDomain(currentUser.getDepartmentId()),
+                currentUser.getDepartmentId(),
                 "new@example.com",
                 "13800138000",
                 currentUser.getTel(),
@@ -174,7 +173,7 @@ public class CurrentUserServiceImplTest {
                         credentialCaptor.getValue().getPrincipalCredential().getCredentialValue()));
     }
 
-    private PrincipalIdentity accountIdentity(EntityId userId, String loginName) {
+    private PrincipalIdentity accountIdentity(UserId userId, String loginName) {
         PrincipalIdentity identity = new PrincipalIdentity();
         identity.setId(EntityId.of(2001L));
         identity.setType(PrincipalIdentityType.USER_ACCOUNT);
@@ -184,7 +183,7 @@ public class CurrentUserServiceImplTest {
 
     private User superUser() {
         User user = new User();
-        user.setId(EntityId.of(1001L));
+        user.setId(UserId.of(1001L));
         user.setPrivilege(UserPrivilege.SUPER);
         return user;
     }
@@ -199,8 +198,8 @@ public class CurrentUserServiceImplTest {
 
     private Menu menu(Long id, Long parentId, String name, MenuVisibility visibility) {
         Menu menu = new Menu();
-        menu.setId(EntityId.of(id));
-        menu.setParentId(EntityId.ofNullable(parentId));
+        menu.setId(MenuId.of(id));
+        menu.setParentId(MenuId.ofNullable(parentId));
         menu.setName(name);
         menu.setVisibility(visibility);
         return menu;

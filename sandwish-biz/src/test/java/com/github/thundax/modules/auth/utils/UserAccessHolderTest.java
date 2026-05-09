@@ -15,9 +15,9 @@ public class UserAccessHolderTest {
 
     @Test
     public void shouldSetAndClearCurrentUserAccess() {
-        UserAccessHolder.currentUserId("user-1", "token-1");
+        UserAccessHolder.currentUserId(1001L, "token-1");
 
-        assertEquals("user-1", UserAccessHolder.currentUserId());
+        assertEquals(Long.valueOf(1001L), UserAccessHolder.currentUserId());
         assertEquals("token-1", UserAccessHolder.currentToken());
 
         UserAccessHolder.clear();
@@ -28,7 +28,7 @@ public class UserAccessHolderTest {
 
     @Test
     public void shouldClearWhenCurrentUserIdIsNull() {
-        UserAccessHolder.currentUserId("user-1", "token-1");
+        UserAccessHolder.currentUserId(1001L, "token-1");
 
         UserAccessHolder.currentUserId(null, "token-2");
 

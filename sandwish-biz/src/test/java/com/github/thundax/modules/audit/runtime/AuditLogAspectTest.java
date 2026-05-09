@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
 import com.github.thundax.modules.audit.service.AuditService;
 import com.github.thundax.modules.audit.service.command.CreateAuditLogCommand;
 import java.lang.reflect.Method;
@@ -32,11 +32,11 @@ public class AuditLogAspectTest {
         when(joinPoint.getSignature()).thenReturn(signature);
         when(signature.getMethod()).thenReturn(method);
         when(joinPoint.getArgs()).thenReturn(new Object[0]);
-        when(joinPoint.proceed()).thenReturn(EntityId.of(1001L));
+        when(joinPoint.proceed()).thenReturn(AuditLogId.of(1001L));
 
         Object result = aspect.around(joinPoint, method.getAnnotation(AuditLog.class));
 
-        assertEquals(EntityId.of(1001L), result);
+        assertEquals(AuditLogId.of(1001L), result);
         assertEquals("User", auditService.command.getObjectType());
         assertEquals("1001", auditService.command.getObjectId());
         assertEquals(AuditAction.CREATE, auditService.command.getAction());
@@ -47,14 +47,14 @@ public class AuditLogAspectTest {
         private CreateAuditLogCommand command;
 
         @Override
-        public EntityId record(CreateAuditLogCommand command) {
+        public AuditLogId record(CreateAuditLogCommand command) {
             this.command = command;
-            return EntityId.of(9001L);
+            return AuditLogId.of(9001L);
         }
 
         @Override
         public com.github.thundax.modules.audit.entity.AuditLog getLog(
-                com.github.thundax.modules.audit.service.query.AuditLogQuery query) {
+                com.github.thundax.modules.audit.entity.valueobject.AuditLogId id) {
             return null;
         }
 
@@ -81,8 +81,8 @@ public class AuditLogAspectTest {
     private static class Target {
 
         @AuditLog(type = "User", id = "", action = AuditAction.CREATE, summary = "创建用户")
-        public EntityId create() {
-            return EntityId.of(1001L);
+        public AuditLogId create() {
+            return AuditLogId.of(1001L);
         }
     }
 }

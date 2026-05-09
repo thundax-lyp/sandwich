@@ -4,12 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
 import com.github.thundax.modules.audit.dao.AuditMetaDao;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.AuditMeta;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
+import com.github.thundax.modules.audit.entity.valueobject.AuditMetaId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditObjectRef;
 import com.github.thundax.modules.audit.runtime.AuditDiffService;
 import com.github.thundax.modules.audit.runtime.AuditSnapshots;
@@ -33,13 +34,13 @@ public class AuditServiceImplTest {
         command.setAfterSnapshot(AuditSnapshots.of("User", "1001", "user", AuditSnapshots.field("name", "名称", "user")));
         command.setRecordWhenUnchanged(true);
 
-        EntityId id = service.record(command);
+        AuditLogId id = service.record(command);
 
-        assertEquals(EntityId.of(9002L), id);
+        assertEquals(AuditLogId.of(9002L), id);
         assertEquals("User", metaDao.inserted.getObjectType());
-        assertEquals(EntityId.of(9001L), logDao.inserted.getMetaId());
+        assertEquals(AuditMetaId.of(9001L), logDao.inserted.getMetaId());
         assertEquals(1L, logDao.inserted.getVersion().longValue());
-        assertEquals(EntityId.of(9002L), metaDao.updated.getLastLogId());
+        assertEquals(AuditLogId.of(9002L), metaDao.updated.getLastLogId());
     }
 
     @Test
@@ -61,9 +62,9 @@ public class AuditServiceImplTest {
         }
 
         @Override
-        public EntityId insert(AuditMeta meta) {
+        public AuditMetaId insert(AuditMeta meta) {
             this.inserted = meta;
-            return EntityId.of(9001L);
+            return AuditMetaId.of(9001L);
         }
 
         @Override
@@ -78,9 +79,9 @@ public class AuditServiceImplTest {
         private AuditLog inserted;
 
         @Override
-        public EntityId insert(AuditLog log) {
+        public AuditLogId insert(AuditLog log) {
             this.inserted = log;
-            return EntityId.of(9002L);
+            return AuditLogId.of(9002L);
         }
 
         @Override
@@ -89,7 +90,7 @@ public class AuditServiceImplTest {
         }
 
         @Override
-        public AuditLog getById(EntityId id) {
+        public AuditLog getById(AuditLogId id) {
             return null;
         }
 

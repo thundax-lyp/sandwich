@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.i18n.I18nMessages;
@@ -10,11 +8,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.enums.*;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
@@ -117,7 +111,7 @@ public class PrincipalAuthServiceImplTest {
     private static PrincipalIdentity identity(long id, String identityValue, PrincipalIdentityStatus status) {
         PrincipalIdentity identity = new PrincipalIdentity();
         identity.setId(EntityIdCodec.toDomain(id));
-        identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+        identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         identity.setType(PrincipalIdentityType.USER_ACCOUNT);
         identity.setIdentityValue(identityValue);
         identity.setStatus(status);
@@ -127,7 +121,7 @@ public class PrincipalAuthServiceImplTest {
     private static PrincipalCredential credential(long id, EntityId identityId, String password) {
         PrincipalCredential credential = new PrincipalCredential();
         credential.setId(EntityIdCodec.toDomain(id));
-        credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+        credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         credential.setIdentityId(identityId);
         credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
         credential.setCredentialValue(password);

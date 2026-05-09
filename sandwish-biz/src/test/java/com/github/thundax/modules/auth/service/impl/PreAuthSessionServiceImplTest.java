@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.common.i18n.I18nMessages;

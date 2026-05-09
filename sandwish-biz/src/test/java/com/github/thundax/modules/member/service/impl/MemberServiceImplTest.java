@@ -1,14 +1,12 @@
 package com.github.thundax.modules.member.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;
@@ -24,7 +22,7 @@ public class MemberServiceImplTest {
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertSame(expected, service.get(memberQuery(EntityId.of(8001L))));
+        assertSame(expected, service.get(MemberId.of(8001L)));
         assertEquals(Long.valueOf(8001L), dao.id);
     }
 
@@ -33,7 +31,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertEquals(null, service.get(new MemberQuery()));
+        assertEquals(null, service.get((MemberId) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -76,15 +74,9 @@ public class MemberServiceImplTest {
         assertEquals(1, dao.statusUpdateCalls);
     }
 
-    private static MemberQuery memberQuery(EntityId id) {
-        MemberQuery query = new MemberQuery();
-        query.setId(id);
-        return query;
-    }
-
     private static Member member(Long id) {
         Member member = new Member();
-        member.setId(EntityIdCodec.toDomain(id));
+        member.setId(MemberIdCodec.toDomain(id));
         return member;
     }
 
@@ -100,7 +92,7 @@ public class MemberServiceImplTest {
         private int statusUpdateCalls;
 
         @Override
-        public Member getById(EntityId id) {
+        public Member getById(MemberId id) {
             this.getCalls++;
             this.id = id.value();
             return getResult;
@@ -126,9 +118,9 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public EntityId insert(Member entity) {
+        public MemberId insert(Member entity) {
             this.inserted = entity;
-            return EntityId.of(9801L);
+            return MemberIdCodec.toDomain(9801L);
         }
 
         @Override
@@ -142,7 +134,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public int deleteById(EntityId id) {
+        public int deleteById(MemberId id) {
             return 1;
         }
 

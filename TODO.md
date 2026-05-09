@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-storage/multipart`：规约化 MultipartUploadService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/MultipartUploadService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/MultipartUploadServiceImpl.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/MultipartUploadServiceImplTest.java
-  - 处理动作：新增 Multipart Upload Command，规约化初始化、分片、完成和取消入口
-  - 验收点：MultipartUploadService 写入口使用业务动作名和 Command；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：8/10
-
-- [ ] `service-method-admin/multipart`：同步 MultipartUploadController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/MultipartUploadController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/MultipartUploadCompleteRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/MultipartUploadInitRequest.java
-  - 处理动作：将分片上传 API Request 显式组装为 Multipart Upload Command
-  - 验收点：MultipartUploadController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：7/10
-
 - [ ] `service-method-auth/principal-auth`：规约化 PrincipalAuthService 和 PreAuthSessionService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalAuthService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalAuthServiceImpl.java

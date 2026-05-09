@@ -1,0 +1,27 @@
+package com.github.thundax.modules.storage.service.command;
+
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class InitMultipartUploadCommand {
+    private String uploadId;
+    private String ownerId;
+    private StorageOwnerType ownerType;
+    private String businessType;
+    private String originalFilename;
+    private String mimeType;
+    private StorageType storageType;
+    private String bucketName;
+    private String objectKey;
+    private String providerUploadId;
+    private Long totalSize;
+    private Long partSize;
+}

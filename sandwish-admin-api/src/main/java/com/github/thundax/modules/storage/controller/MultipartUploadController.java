@@ -12,12 +12,13 @@ import com.github.thundax.modules.storage.controller.response.MultipartUploadPar
 import com.github.thundax.modules.storage.controller.response.MultipartUploadSessionResponse;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
-import com.github.thundax.modules.storage.entity.MultipartUploadPart;
-import com.github.thundax.modules.storage.entity.MultipartUploadSession;
-import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.service.MultipartUploadService;
+import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.UploadMultipartPartCommand;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -62,17 +63,8 @@ public class MultipartUploadController {
     @RequestMapping(method = RequestMethod.POST)
     @WrappedApiResponse
     public MultipartUploadSessionResponse init(@Valid @RequestBody MultipartUploadInitRequest request) {
-        MultipartUploadSession session = new MultipartUploadSession();
-        session.setOwnerType(StorageOwnerType.USER);
-        session.setOwnerId(UserAccessHolder.currentUserId());
-        session.setBusinessType(request.getBusinessType());
-        session.setOriginalFilename(request.getOriginalFilename());
-        session.setMimeType(request.getMimeType());
-        session.setStorageType(storedObjectStore.type());
-        session.setTotalSize(request.getTotalSize());
-        session.setPartSize(request.getPartSize());
         return StorageInterfaceAssembler.toMultipartSessionResponse(
-                multipartUploadService.initMultipartUpload(session));
+                multipartUploadService.init(toInitMultipartUploadCommand(request)));
     }
 
     @ApiOperation(value = "上传分片", notes = "storage:storage:edit")
@@ -98,12 +90,13 @@ public class MultipartUploadController {
             throw new InvalidParameterException("file");
         }
 
-        MultipartUploadPart part = new MultipartUploadPart();
-        part.setUploadId(uploadId);
-        part.setPartNumber(readPartNumber(request));
-        part.setEtag(readEtag(request, uploadId, part.getPartNumber(), file));
-        part.setSize(file.getSize());
-        return StorageInterfaceAssembler.toMultipartPartResponse(multipartUploadService.uploadMultipartPart(part));
+        Integer partNumber = readPartNumber(request);
+        UploadMultipartPartCommand command = new UploadMultipartPartCommand();
+        command.setUploadId(uploadId);
+        command.setPartNumber(partNumber);
+        command.setEtag(readEtag(request, uploadId, partNumber, file));
+        command.setSize(file.getSize());
+        return StorageInterfaceAssembler.toMultipartPartResponse(multipartUploadService.uploadPart(command));
     }
 
     @ApiOperation(value = "完成分片上传", notes = "storage:storage:edit")
@@ -115,9 +108,8 @@ public class MultipartUploadController {
     @WrappedApiResponse
     public StorageResponse complete(
             @PathVariable("uploadId") String uploadId, @Valid @RequestBody MultipartUploadCompleteRequest request) {
-        StoredObject object = toStoredObject(request);
         return StorageInterfaceAssembler.toResponse(
-                multipartUploadService.completeMultipartUpload(uploadId, object), storageConverter);
+                multipartUploadService.complete(toCompleteMultipartUploadCommand(uploadId, request)), storageConverter);
     }
 
     @ApiOperation(value = "取消分片上传", notes = "storage:storage:edit")
@@ -128,7 +120,7 @@ public class MultipartUploadController {
     @RequestMapping(value = "{uploadId}", method = RequestMethod.DELETE)
     @WrappedApiResponse
     public Boolean abort(@PathVariable("uploadId") String uploadId) {
-        return multipartUploadService.abortMultipartUpload(uploadId) > 0;
+        return multipartUploadService.abort(new AbortMultipartUploadCommand(uploadId)) > 0;
     }
 
     private Integer readPartNumber(HttpServletRequest request) throws ApiException {
@@ -154,16 +146,31 @@ public class MultipartUploadController {
         return uploadId + "-" + partNumber;
     }
 
-    private StoredObject toStoredObject(MultipartUploadCompleteRequest request) {
-        StoredObject object = new StoredObject();
-        object.setStorageType(
+    private InitMultipartUploadCommand toInitMultipartUploadCommand(MultipartUploadInitRequest request) {
+        InitMultipartUploadCommand command = new InitMultipartUploadCommand();
+        command.setOwnerType(StorageOwnerType.USER);
+        command.setOwnerId(UserAccessHolder.currentUserId());
+        command.setBusinessType(request.getBusinessType());
+        command.setOriginalFilename(request.getOriginalFilename());
+        command.setMimeType(request.getMimeType());
+        command.setStorageType(storedObjectStore.type());
+        command.setTotalSize(request.getTotalSize());
+        command.setPartSize(request.getPartSize());
+        return command;
+    }
+
+    private CompleteMultipartUploadCommand toCompleteMultipartUploadCommand(
+            String uploadId, MultipartUploadCompleteRequest request) {
+        CompleteMultipartUploadCommand command = new CompleteMultipartUploadCommand();
+        command.setUploadId(uploadId);
+        command.setStorageType(
                 StringUtils.isBlank(request.getStorageType())
                         ? storedObjectStore.type()
                         : StorageType.from(request.getStorageType()));
-        object.setBucketName(request.getBucketName());
-        object.setObjectKey(request.getObjectKey());
-        object.setSize(request.getSize());
-        object.setAccessEndpoint(request.getAccessEndpoint());
-        return object;
+        command.setBucketName(request.getBucketName());
+        command.setObjectKey(request.getObjectKey());
+        command.setSize(request.getSize());
+        command.setAccessEndpoint(request.getAccessEndpoint());
+        return command;
     }
 }

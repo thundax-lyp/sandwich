@@ -17,6 +17,10 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.UploadMultipartPartCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,16 +34,15 @@ public class MultipartUploadServiceImplTest {
         MultipartUploadServiceImpl service = service(dao);
         MultipartUploadSession session = multipartSession();
 
-        MultipartUploadSession saved = service.initMultipartUpload(session);
+        MultipartUploadSession saved = service.init(toInitMultipartUploadCommand(session));
 
-        assertSame(session, saved);
         assertNotNull(saved.getId());
         assertNotNull(saved.getUploadId());
         assertEquals(Integer.valueOf(0), saved.getUploadedPartCount());
         assertSame(MultipartUploadStatus.INITIATED, saved.getUploadStatus());
         assertNotNull(saved.getCreateDate());
         assertNotNull(saved.getUpdateDate());
-        assertSame(session, dao.insertedMultipartSession);
+        assertSame(saved, dao.insertedMultipartSession);
     }
 
     @Test
@@ -50,12 +53,11 @@ public class MultipartUploadServiceImplTest {
         MultipartUploadServiceImpl service = service(dao);
         MultipartUploadPart part = multipartPart(1);
 
-        MultipartUploadPart saved = service.uploadMultipartPart(part);
+        MultipartUploadPart saved = service.uploadPart(toUploadMultipartPartCommand(part));
 
-        assertSame(part, saved);
         assertNotNull(saved.getId());
         assertNotNull(saved.getCreateDate());
-        assertSame(part, dao.insertedMultipartPart);
+        assertSame(saved, dao.insertedMultipartPart);
         assertSame(MultipartUploadStatus.UPLOADING, dao.updatedMultipartSession.getUploadStatus());
         assertEquals(Integer.valueOf(1), dao.updatedMultipartSession.getUploadedPartCount());
     }
@@ -66,7 +68,7 @@ public class MultipartUploadServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartPartResult = multipartPart(1);
 
-        service(dao).uploadMultipartPart(multipartPart(1));
+        service(dao).uploadPart(toUploadMultipartPartCommand(multipartPart(1)));
     }
 
     @Test(expected = BizException.class)
@@ -75,7 +77,7 @@ public class MultipartUploadServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartSessionResult.setUploadStatus(MultipartUploadStatus.COMPLETED);
 
-        service(dao).uploadMultipartPart(multipartPart(1));
+        service(dao).uploadPart(toUploadMultipartPartCommand(multipartPart(1)));
     }
 
     @Test
@@ -83,14 +85,15 @@ public class MultipartUploadServiceImplTest {
         RecordingMultipartUploadDao dao = new RecordingMultipartUploadDao();
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
-        StoredObject object = new StoredObject();
-        object.setStorageType(StorageType.LOCAL_FILE);
-        object.setBucketName("/tmp/storage/");
-        object.setObjectKey("202605/demo.png");
-        object.setSize(300L);
-        object.setAccessEndpoint("/api/storage/objects/s1/content");
+        CompleteMultipartUploadCommand command = new CompleteMultipartUploadCommand();
+        command.setUploadId("upload-1");
+        command.setStorageType(StorageType.LOCAL_FILE);
+        command.setBucketName("/tmp/storage/");
+        command.setObjectKey("202605/demo.png");
+        command.setSize(300L);
+        command.setAccessEndpoint("/api/storage/objects/s1/content");
 
-        StoredObject storage = service(dao).completeMultipartUpload("upload-1", object);
+        StoredObject storage = service(dao).complete(command);
 
         assertNotNull(storage.getId());
         assertEquals("demo", storage.getName());
@@ -116,7 +119,7 @@ public class MultipartUploadServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(3));
 
-        service(dao).completeMultipartUpload("upload-1", null);
+        service(dao).complete(new CompleteMultipartUploadCommand("upload-1", null, null, null, null, null));
     }
 
     @Test
@@ -124,7 +127,7 @@ public class MultipartUploadServiceImplTest {
         RecordingMultipartUploadDao dao = new RecordingMultipartUploadDao();
         dao.multipartSessionResult = multipartSession();
 
-        int count = service(dao).abortMultipartUpload("upload-1");
+        int count = service(dao).abort(new AbortMultipartUploadCommand("upload-1"));
 
         assertEquals(1, count);
         assertSame(MultipartUploadStatus.ABORTED, dao.updatedMultipartSession.getUploadStatus());
@@ -156,6 +159,32 @@ public class MultipartUploadServiceImplTest {
         part.setEtag("etag-" + partNumber);
         part.setSize(100L);
         return part;
+    }
+
+    private static InitMultipartUploadCommand toInitMultipartUploadCommand(MultipartUploadSession session) {
+        InitMultipartUploadCommand command = new InitMultipartUploadCommand();
+        command.setUploadId(session.getUploadId());
+        command.setOwnerId(session.getOwnerId());
+        command.setOwnerType(session.getOwnerType());
+        command.setBusinessType(session.getBusinessType());
+        command.setOriginalFilename(session.getOriginalFilename());
+        command.setMimeType(session.getMimeType());
+        command.setStorageType(session.getStorageType());
+        command.setBucketName(session.getBucketName());
+        command.setObjectKey(session.getObjectKey());
+        command.setProviderUploadId(session.getProviderUploadId());
+        command.setTotalSize(session.getTotalSize());
+        command.setPartSize(session.getPartSize());
+        return command;
+    }
+
+    private static UploadMultipartPartCommand toUploadMultipartPartCommand(MultipartUploadPart part) {
+        UploadMultipartPartCommand command = new UploadMultipartPartCommand();
+        command.setUploadId(part.getUploadId());
+        command.setPartNumber(part.getPartNumber());
+        command.setEtag(part.getEtag());
+        command.setSize(part.getSize());
+        return command;
     }
 
     private static class RecordingMultipartUploadDao implements MultipartUploadDao, StoredObjectDao {

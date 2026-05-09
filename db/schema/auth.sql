@@ -64,10 +64,6 @@ CREATE TABLE IF NOT EXISTS `auth_oauth_client` (
     `status` varchar(16) NOT NULL,
     `contact` varchar(128) DEFAULT NULL,
     `remark` varchar(255) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_auth_oauth_client_client_id` (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2客户端表';

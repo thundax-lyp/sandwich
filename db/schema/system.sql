@@ -7,10 +7,6 @@ CREATE TABLE IF NOT EXISTS `sys_department` (
     `short_name` varchar(128) DEFAULT NULL,
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_sys_department_parent` (`parent_id`, `priority`),
     KEY `idx_sys_department_nested` (`lft`, `rgt`)
@@ -28,13 +24,9 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `status` varchar(16) NOT NULL DEFAULT 'ENABLED',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_sys_user_department` (`department_id`),
-    KEY `idx_sys_user_status` (`status`, `priority`, `create_date`)
+    KEY `idx_sys_user_status` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户主体表';
 
 CREATE TABLE IF NOT EXISTS `sys_role` (
@@ -44,12 +36,8 @@ CREATE TABLE IF NOT EXISTS `sys_role` (
     `status` varchar(16) NOT NULL DEFAULT 'ENABLED',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_role_status` (`status`, `priority`, `create_date`)
+    KEY `idx_sys_role_status` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台角色表';
 
 CREATE TABLE IF NOT EXISTS `sys_menu` (
@@ -66,10 +54,6 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
     `target` varchar(64) DEFAULT NULL,
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_sys_menu_parent` (`parent_id`, `priority`),
     KEY `idx_sys_menu_nested` (`lft`, `rgt`),
@@ -83,12 +67,8 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
     `value` varchar(255) NOT NULL,
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_dict_type` (`type`, `priority`, `create_date`)
+    KEY `idx_sys_dict_type` (`type`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统字典表';
 
 CREATE TABLE IF NOT EXISTS `sys_log` (

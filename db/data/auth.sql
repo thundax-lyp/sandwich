@@ -55,16 +55,14 @@ INSERT INTO `auth_oauth_client` (
     `id`, `client_id`, `client_secret_hash`, `client_name`, `client_type`,
     `grant_types`, `scopes`, `redirect_uris`,
     `access_token_ttl_seconds`, `refresh_token_ttl_seconds`,
-    `status`, `contact`, `remark`,
-    `create_date`, `create_by`, `update_date`, `update_by`
+    `status`, `contact`, `remark`
 ) VALUES (
     1000000000000010001, 'sandwich-admin-web', 'CHANGE_ME_CLIENT_SECRET_HASH', 'Sandwich Admin Web', 'CONFIDENTIAL',
     '["authorization_code","refresh_token"]',
     '["openid","profile","user.read"]',
     '["http://127.0.0.1:5173/login/oauth2/code/sandwich"]',
     7200, 2592000,
-    'ENABLED', 'developer@sandwich.local', '系统初始化 OAuth2 client',
-    '2026-05-05 00:00:00.000', 'user-developer', NULL, NULL
+    'ENABLED', 'developer@sandwich.local', '系统初始化 OAuth2 client'
 ) ON DUPLICATE KEY UPDATE
     `client_secret_hash` = VALUES(`client_secret_hash`),
     `client_name` = VALUES(`client_name`),
@@ -76,6 +74,4 @@ INSERT INTO `auth_oauth_client` (
     `refresh_token_ttl_seconds` = VALUES(`refresh_token_ttl_seconds`),
     `status` = VALUES(`status`),
     `contact` = VALUES(`contact`),
-    `remark` = VALUES(`remark`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remark` = VALUES(`remark`);

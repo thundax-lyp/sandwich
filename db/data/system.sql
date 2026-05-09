@@ -4,10 +4,10 @@
 
 INSERT INTO `sys_department` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `short_name`,
-    `priority`, `remarks`, `create_date`, `create_by`, `update_date`, `update_by`
+    `priority`, `remarks`
 ) VALUES (
     1000000000000000001, NULL, 1, 2, 'GitHub', 'GitHub',
-    0, '系统初始化部门', '2026-05-05 00:00:00.000', 'system', NULL, NULL
+    0, '系统初始化部门'
 ) ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
     `lft` = VALUES(`lft`),
@@ -15,18 +15,14 @@ INSERT INTO `sys_department` (
     `name` = VALUES(`name`),
     `short_name` = VALUES(`short_name`),
     `priority` = VALUES(`priority`),
-    `remarks` = VALUES(`remarks`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remarks` = VALUES(`remarks`);
 
 INSERT INTO `sys_user` (
     `id`, `department_id`, `email`, `mobile`, `tel`, `name`, `ranks`,
-    `privilege`, `status`, `priority`, `remarks`,
-    `create_date`, `create_by`, `update_date`, `update_by`
+    `privilege`, `status`, `priority`, `remarks`
 ) VALUES (
     1000000000000000101, 1000000000000000001, NULL, NULL, NULL, '开发者', 0,
-    'SUPER', 'ENABLED', 0, '系统初始化开发者用户',
-    '2026-05-05 00:00:00.000', 'system', NULL, NULL
+    'SUPER', 'ENABLED', 0, '系统初始化开发者用户'
 ) ON DUPLICATE KEY UPDATE
     `department_id` = VALUES(`department_id`),
     `name` = VALUES(`name`),
@@ -34,141 +30,112 @@ INSERT INTO `sys_user` (
     `privilege` = VALUES(`privilege`),
     `status` = VALUES(`status`),
     `priority` = VALUES(`priority`),
-    `remarks` = VALUES(`remarks`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remarks` = VALUES(`remarks`);
 
 INSERT INTO `sys_role` (
-    `id`, `name`, `privilege`, `status`, `priority`, `remarks`,
-    `create_date`, `create_by`, `update_date`, `update_by`
+    `id`, `name`, `privilege`, `status`, `priority`, `remarks`
 ) VALUES (
-    1000000000000000401, '超级管理员', 'ADMIN', 'ENABLED', 0, '系统初始化角色',
-    '2026-05-05 00:00:00.000', 'system', NULL, NULL
+    1000000000000000401, '超级管理员', 'ADMIN', 'ENABLED', 0, '系统初始化角色'
 ) ON DUPLICATE KEY UPDATE
     `name` = VALUES(`name`),
     `privilege` = VALUES(`privilege`),
     `status` = VALUES(`status`),
     `priority` = VALUES(`priority`),
-    `remarks` = VALUES(`remarks`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remarks` = VALUES(`remarks`);
 
 -- Default navigation menus are permission-backed resources and must be seeded here.
 -- Dashboard is the login landing page, not a menu resource, so it is intentionally not inserted.
 INSERT INTO `sys_menu` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `perms`, `ranks`,
-    `visibility`, `display_params`, `url`, `target`, `priority`, `remarks`,
-    `create_date`, `create_by`, `update_date`, `update_by`
+    `visibility`, `display_params`, `url`, `target`, `priority`, `remarks`
 ) VALUES
     (
         1000000000000001001, NULL, 1, 30, '系统管理', NULL, 0,
-        'VISIBLE', NULL, '/system', NULL, 0, '系统管理根菜单',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system', NULL, 0, '系统管理根菜单'
     ),
     (
         1000000000000001002, 1000000000000001001, 2, 7, '用户管理', NULL, 0,
-        'VISIBLE', NULL, '/system/users', NULL, 1, '用户管理',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/users', NULL, 1, '用户管理'
     ),
     (
         1000000000000001003, 1000000000000001002, 3, 4, '用户查看', 'sys:user:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '用户查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '用户查看权限'
     ),
     (
         1000000000000001004, 1000000000000001002, 5, 6, '用户编辑', 'sys:user:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '用户编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '用户编辑权限'
     ),
     (
         1000000000000001005, 1000000000000001001, 8, 13, '角色管理', NULL, 0,
-        'VISIBLE', NULL, '/system/roles', NULL, 2, '角色管理',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/roles', NULL, 2, '角色管理'
     ),
     (
         1000000000000001006, 1000000000000001005, 9, 10, '角色查看', 'sys:role:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '角色查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '角色查看权限'
     ),
     (
         1000000000000001007, 1000000000000001005, 11, 12, '角色编辑', 'sys:role:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '角色编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '角色编辑权限'
     ),
     (
         1000000000000001008, 1000000000000001001, 14, 15, '菜单管理', 'super', 0,
-        'VISIBLE', NULL, '/system/menus', NULL, 3, '菜单管理',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/menus', NULL, 3, '菜单管理'
     ),
     (
         1000000000000001009, 1000000000000001001, 16, 21, '部门管理', NULL, 0,
-        'VISIBLE', NULL, '/system/departments', NULL, 4, '部门管理',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/departments', NULL, 4, '部门管理'
     ),
     (
         1000000000000001010, 1000000000000001009, 17, 18, '部门查看', 'sys:department:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '部门查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '部门查看权限'
     ),
     (
         1000000000000001011, 1000000000000001009, 19, 20, '部门编辑', 'sys:department:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '部门编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '部门编辑权限'
     ),
     (
         1000000000000001012, 1000000000000001001, 22, 27, '字典管理', NULL, 0,
-        'VISIBLE', NULL, '/system/dictionaries', NULL, 5, '字典管理',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/dictionaries', NULL, 5, '字典管理'
     ),
     (
         1000000000000001013, 1000000000000001012, 23, 24, '字典查看', 'sys:dict:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '字典查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '字典查看权限'
     ),
     (
         1000000000000001014, 1000000000000001012, 25, 26, '字典编辑', 'sys:dict:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '字典编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '字典编辑权限'
     ),
     (
         1000000000000001015, 1000000000000001001, 28, 29, '系统日志', 'super', 0,
-        'VISIBLE', NULL, '/system/logs', NULL, 6, '系统日志',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/system/logs', NULL, 6, '系统日志'
     ),
     (
         1000000000000001016, NULL, 31, 38, '存储管理', NULL, 0,
-        'VISIBLE', NULL, '/storage', NULL, 1, '存储管理根菜单',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/storage', NULL, 1, '存储管理根菜单'
     ),
     (
         1000000000000001017, 1000000000000001016, 32, 37, '存储对象', NULL, 0,
-        'VISIBLE', NULL, '/storage/objects', NULL, 1, '存储对象',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'VISIBLE', NULL, '/storage/objects', NULL, 1, '存储对象'
     ),
     (
         1000000000000001018, 1000000000000001017, 33, 34, '存储对象查看', 'storage:storage:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '存储对象查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '存储对象查看权限'
     ),
     (
         1000000000000001019, 1000000000000001017, 35, 36, '存储对象编辑', 'storage:storage:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '存储对象编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '存储对象编辑权限'
     ),
     (
         1000000000000001020, NULL, 39, 44, '辅助工具', NULL, 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '辅助工具权限根节点',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '辅助工具权限根节点'
     ),
     (
         1000000000000001021, 1000000000000001020, 40, 41, '签名查看', 'assist:signature:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '签名查看权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 1, '签名查看权限'
     ),
     (
         1000000000000001022, 1000000000000001020, 42, 43, '签名编辑', 'assist:signature:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '签名编辑权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        'HIDDEN', NULL, NULL, NULL, 2, '签名编辑权限'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -182,9 +149,7 @@ ON DUPLICATE KEY UPDATE
     `url` = VALUES(`url`),
     `target` = VALUES(`target`),
     `priority` = VALUES(`priority`),
-    `remarks` = VALUES(`remarks`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remarks` = VALUES(`remarks`);
 
 INSERT INTO `sys_user_role` (`user_id`, `role_id`) VALUES
     (1000000000000000101, 1000000000000000401)
@@ -218,290 +183,218 @@ ON DUPLICATE KEY UPDATE
     `menu_id` = VALUES(`menu_id`);
 
 INSERT INTO `sys_dict` (
-    `id`, `type`, `label`, `value`, `priority`, `remarks`,
-    `create_date`, `create_by`, `update_date`, `update_by`
+    `id`, `type`, `label`, `value`, `priority`, `remarks`
 ) VALUES
     (
-        1000000000000002001, 'user_status', '启用', 'ENABLED', 0, '用户启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002001, 'user_status', '启用', 'ENABLED', 0, '用户启用状态'
     ),
     (
-        1000000000000002002, 'user_status', '禁用', 'DISABLED', 1, '用户禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002002, 'user_status', '禁用', 'DISABLED', 1, '用户禁用状态'
     ),
     (
-        1000000000000002003, 'user_privilege', '普通用户', 'NORMAL', 0, '后台普通用户权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002003, 'user_privilege', '普通用户', 'NORMAL', 0, '后台普通用户权限'
     ),
     (
-        1000000000000002004, 'user_privilege', '管理员', 'ADMIN', 1, '后台管理员权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002004, 'user_privilege', '管理员', 'ADMIN', 1, '后台管理员权限'
     ),
     (
-        1000000000000002005, 'user_privilege', '超级管理员', 'SUPER', 2, '后台超级管理员权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002005, 'user_privilege', '超级管理员', 'SUPER', 2, '后台超级管理员权限'
     ),
     (
-        1000000000000002018, 'role_status', '启用', 'ENABLED', 0, '角色启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002018, 'role_status', '启用', 'ENABLED', 0, '角色启用状态'
     ),
     (
-        1000000000000002019, 'role_status', '禁用', 'DISABLED', 1, '角色禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002019, 'role_status', '禁用', 'DISABLED', 1, '角色禁用状态'
     ),
     (
-        1000000000000002020, 'role_privilege', '普通角色', 'NORMAL', 0, '普通角色权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002020, 'role_privilege', '普通角色', 'NORMAL', 0, '普通角色权限'
     ),
     (
-        1000000000000002021, 'role_privilege', '管理员角色', 'ADMIN', 1, '管理员角色权限',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002021, 'role_privilege', '管理员角色', 'ADMIN', 1, '管理员角色权限'
     ),
     (
-        1000000000000002022, 'menu_visibility', '显示', 'VISIBLE', 0, '菜单显示状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002022, 'menu_visibility', '显示', 'VISIBLE', 0, '菜单显示状态'
     ),
     (
-        1000000000000002023, 'menu_visibility', '隐藏', 'HIDDEN', 1, '菜单隐藏状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002023, 'menu_visibility', '隐藏', 'HIDDEN', 1, '菜单隐藏状态'
     ),
     (
-        1000000000000002024, 'log_type', '访问日志', 'ACCESS', 0, '系统访问日志',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002024, 'log_type', '访问日志', 'ACCESS', 0, '系统访问日志'
     ),
     (
-        1000000000000002025, 'log_type', '异常日志', 'EXCEPTION', 1, '系统异常日志',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002025, 'log_type', '异常日志', 'EXCEPTION', 1, '系统异常日志'
     ),
     (
-        1000000000000002026, 'member_status', '待激活', 'PENDING', 0, '会员待激活状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002026, 'member_status', '待激活', 'PENDING', 0, '会员待激活状态'
     ),
     (
-        1000000000000002027, 'member_status', '活跃', 'ACTIVE', 1, '会员活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002027, 'member_status', '活跃', 'ACTIVE', 1, '会员活跃状态'
     ),
     (
-        1000000000000002059, 'member_status', '暂停', 'SUSPENDED', 2, '会员暂停状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002059, 'member_status', '暂停', 'SUSPENDED', 2, '会员暂停状态'
     ),
     (
-        1000000000000002060, 'member_status', '关闭', 'CLOSED', 3, '会员关闭状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002060, 'member_status', '关闭', 'CLOSED', 3, '会员关闭状态'
     ),
     (
-        1000000000000002061, 'member_gender', '男', 'MALE', 0, '会员男性',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002061, 'member_gender', '男', 'MALE', 0, '会员男性'
     ),
     (
-        1000000000000002062, 'member_gender', '女', 'FEMALE', 1, '会员女性',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002062, 'member_gender', '女', 'FEMALE', 1, '会员女性'
     ),
     (
-        1000000000000002063, 'member_gender', '保密', 'PRIVATE', 2, '会员性别保密',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002063, 'member_gender', '保密', 'PRIVATE', 2, '会员性别保密'
     ),
     (
-        1000000000000002078, 'principal_token_status', '活跃', 'ACTIVE', 0, '统一主体 token 活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002078, 'principal_token_status', '活跃', 'ACTIVE', 0, '统一主体 token 活跃状态'
     ),
     (
-        1000000000000002079, 'principal_token_status', '已使用', 'USED', 1, '统一主体 refresh token 已使用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002079, 'principal_token_status', '已使用', 'USED', 1, '统一主体 refresh token 已使用状态'
     ),
     (
-        1000000000000002080, 'principal_token_status', '已撤销', 'REVOKED', 2, '统一主体 token 撤销状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002080, 'principal_token_status', '已撤销', 'REVOKED', 2, '统一主体 token 撤销状态'
     ),
     (
-        1000000000000002081, 'principal_token_status', '已过期', 'EXPIRED', 3, '统一主体 token 过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002081, 'principal_token_status', '已过期', 'EXPIRED', 3, '统一主体 token 过期状态'
     ),
     (
-        1000000000000002087, 'principal_type', '后台用户', 'USER', 0, '后台用户认证主体',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002087, 'principal_type', '后台用户', 'USER', 0, '后台用户认证主体'
     ),
     (
-        1000000000000002088, 'principal_type', '前台会员', 'MEMBER', 1, '前台会员认证主体',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002088, 'principal_type', '前台会员', 'MEMBER', 1, '前台会员认证主体'
     ),
     (
-        1000000000000002089, 'principal_identity_type', '后台账号', 'USER_ACCOUNT', 0, '后台账号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002089, 'principal_identity_type', '后台账号', 'USER_ACCOUNT', 0, '后台账号登录标识'
     ),
     (
-        1000000000000002090, 'principal_identity_type', '后台手机号', 'USER_MOBILE', 1, '后台手机号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002090, 'principal_identity_type', '后台手机号', 'USER_MOBILE', 1, '后台手机号登录标识'
     ),
     (
-        1000000000000002091, 'principal_identity_type', '后台邮箱', 'USER_EMAIL', 2, '后台邮箱登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002091, 'principal_identity_type', '后台邮箱', 'USER_EMAIL', 2, '后台邮箱登录标识'
     ),
     (
-        1000000000000002092, 'principal_identity_type', '企业微信', 'USER_WECOM', 3, '后台企业微信登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002092, 'principal_identity_type', '企业微信', 'USER_WECOM', 3, '后台企业微信登录标识'
     ),
     (
-        1000000000000002093, 'principal_identity_type', 'GitHub', 'USER_GITHUB', 4, '后台 GitHub 登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002093, 'principal_identity_type', 'GitHub', 'USER_GITHUB', 4, '后台 GitHub 登录标识'
     ),
     (
-        1000000000000002094, 'principal_identity_type', '会员账号', 'MEMBER_ACCOUNT', 5, '会员账号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002094, 'principal_identity_type', '会员账号', 'MEMBER_ACCOUNT', 5, '会员账号登录标识'
     ),
     (
-        1000000000000002095, 'principal_identity_type', '会员手机号', 'MEMBER_MOBILE', 6, '会员手机号登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002095, 'principal_identity_type', '会员手机号', 'MEMBER_MOBILE', 6, '会员手机号登录标识'
     ),
     (
-        1000000000000002096, 'principal_identity_type', '会员邮箱', 'MEMBER_EMAIL', 7, '会员邮箱登录标识',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002096, 'principal_identity_type', '会员邮箱', 'MEMBER_EMAIL', 7, '会员邮箱登录标识'
     ),
     (
-        1000000000000002097, 'principal_identity_status', '启用', 'ENABLED', 0, '统一认证主体标识启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002097, 'principal_identity_status', '启用', 'ENABLED', 0, '统一认证主体标识启用状态'
     ),
     (
-        1000000000000002098, 'principal_identity_status', '禁用', 'DISABLED', 1, '统一认证主体标识禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002098, 'principal_identity_status', '禁用', 'DISABLED', 1, '统一认证主体标识禁用状态'
     ),
     (
-        1000000000000002099, 'principal_credential_type', '后台密码', 'USER_PASSWORD', 0, '后台用户密码凭据',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002099, 'principal_credential_type', '后台密码', 'USER_PASSWORD', 0, '后台用户密码凭据'
     ),
     (
-        1000000000000002100, 'principal_credential_type', '会员密码', 'MEMBER_PASSWORD', 1, '前台会员密码凭据',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002100, 'principal_credential_type', '会员密码', 'MEMBER_PASSWORD', 1, '前台会员密码凭据'
     ),
     (
-        1000000000000002101, 'principal_credential_status', '活跃', 'ACTIVE', 0, '统一认证主体凭据活跃状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002101, 'principal_credential_status', '活跃', 'ACTIVE', 0, '统一认证主体凭据活跃状态'
     ),
     (
-        1000000000000002102, 'principal_credential_status', '锁定', 'LOCKED', 1, '统一认证主体凭据锁定状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002102, 'principal_credential_status', '锁定', 'LOCKED', 1, '统一认证主体凭据锁定状态'
     ),
     (
-        1000000000000002103, 'principal_credential_status', '过期', 'EXPIRED', 2, '统一认证主体凭据过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002103, 'principal_credential_status', '过期', 'EXPIRED', 2, '统一认证主体凭据过期状态'
     ),
     (
-        1000000000000002104, 'principal_credential_status', '禁用', 'DISABLED', 3, '统一认证主体凭据禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002104, 'principal_credential_status', '禁用', 'DISABLED', 3, '统一认证主体凭据禁用状态'
     ),
     (
-        1000000000000002032, 'oauth_client_status', '启用', 'ENABLED', 0, 'OAuth2 客户端启用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002032, 'oauth_client_status', '启用', 'ENABLED', 0, 'OAuth2 客户端启用状态'
     ),
     (
-        1000000000000002033, 'oauth_client_status', '禁用', 'DISABLED', 1, 'OAuth2 客户端禁用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002033, 'oauth_client_status', '禁用', 'DISABLED', 1, 'OAuth2 客户端禁用状态'
     ),
     (
-        1000000000000002034, 'oauth_access_token_status', '有效', 'ACTIVE', 0, 'OAuth2 访问令牌有效状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002034, 'oauth_access_token_status', '有效', 'ACTIVE', 0, 'OAuth2 访问令牌有效状态'
     ),
     (
-        1000000000000002035, 'oauth_access_token_status', '已撤销', 'REVOKED', 1, 'OAuth2 访问令牌撤销状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002035, 'oauth_access_token_status', '已撤销', 'REVOKED', 1, 'OAuth2 访问令牌撤销状态'
     ),
     (
-        1000000000000002036, 'oauth_access_token_status', '已过期', 'EXPIRED', 2, 'OAuth2 访问令牌过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002036, 'oauth_access_token_status', '已过期', 'EXPIRED', 2, 'OAuth2 访问令牌过期状态'
     ),
     (
-        1000000000000002037, 'oauth_refresh_token_status', '有效', 'ACTIVE', 0, 'OAuth2 刷新令牌有效状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002037, 'oauth_refresh_token_status', '有效', 'ACTIVE', 0, 'OAuth2 刷新令牌有效状态'
     ),
     (
-        1000000000000002038, 'oauth_refresh_token_status', '已使用', 'USED', 1, 'OAuth2 刷新令牌已使用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002038, 'oauth_refresh_token_status', '已使用', 'USED', 1, 'OAuth2 刷新令牌已使用状态'
     ),
     (
-        1000000000000002039, 'oauth_refresh_token_status', '已撤销', 'REVOKED', 2, 'OAuth2 刷新令牌撤销状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002039, 'oauth_refresh_token_status', '已撤销', 'REVOKED', 2, 'OAuth2 刷新令牌撤销状态'
     ),
     (
-        1000000000000002040, 'oauth_refresh_token_status', '已过期', 'EXPIRED', 3, 'OAuth2 刷新令牌过期状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002040, 'oauth_refresh_token_status', '已过期', 'EXPIRED', 3, 'OAuth2 刷新令牌过期状态'
     ),
     (
-        1000000000000002041, 'storage_type', '本地文件', 'LOCAL_FILE', 0, '本地文件存储后端',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002041, 'storage_type', '本地文件', 'LOCAL_FILE', 0, '本地文件存储后端'
     ),
     (
-        1000000000000002042, 'storage_type', '对象存储', 'OSS', 1, '对象存储后端',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002042, 'storage_type', '对象存储', 'OSS', 1, '对象存储后端'
     ),
     (
-        1000000000000002043, 'storage_owner_type', '后台用户', 'USER', 0, '后台用户存储归属',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002043, 'storage_owner_type', '后台用户', 'USER', 0, '后台用户存储归属'
     ),
     (
-        1000000000000002044, 'storage_owner_type', '前台会员', 'MEMBER', 1, '前台会员存储归属',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002044, 'storage_owner_type', '前台会员', 'MEMBER', 1, '前台会员存储归属'
     ),
     (
-        1000000000000002045, 'stored_object_status', '可用', 'ACTIVE', 0, '存储对象可用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002045, 'stored_object_status', '可用', 'ACTIVE', 0, '存储对象可用状态'
     ),
     (
-        1000000000000002046, 'stored_object_status', '删除中', 'DELETING', 1, '存储对象删除中状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002046, 'stored_object_status', '删除中', 'DELETING', 1, '存储对象删除中状态'
     ),
     (
-        1000000000000002047, 'stored_object_status', '已删除', 'DELETED', 2, '存储对象已删除状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002047, 'stored_object_status', '已删除', 'DELETED', 2, '存储对象已删除状态'
     ),
     (
-        1000000000000002048, 'stored_object_reference_status', '未引用', 'UNREFERENCED', 0, '存储对象未引用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002048, 'stored_object_reference_status', '未引用', 'UNREFERENCED', 0, '存储对象未引用状态'
     ),
     (
-        1000000000000002049, 'stored_object_reference_status', '已引用', 'REFERENCED', 1, '存储对象已引用状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002049, 'stored_object_reference_status', '已引用', 'REFERENCED', 1, '存储对象已引用状态'
     ),
     (
-        1000000000000002050, 'multipart_upload_status', '已初始化', 'INITIATED', 0, '分片上传初始化状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002050, 'multipart_upload_status', '已初始化', 'INITIATED', 0, '分片上传初始化状态'
     ),
     (
-        1000000000000002051, 'multipart_upload_status', '上传中', 'UPLOADING', 1, '分片上传进行中状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002051, 'multipart_upload_status', '上传中', 'UPLOADING', 1, '分片上传进行中状态'
     ),
     (
-        1000000000000002052, 'multipart_upload_status', '已完成', 'COMPLETED', 2, '分片上传完成状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002052, 'multipart_upload_status', '已完成', 'COMPLETED', 2, '分片上传完成状态'
     ),
     (
-        1000000000000002053, 'multipart_upload_status', '已中止', 'ABORTED', 3, '分片上传中止状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002053, 'multipart_upload_status', '已中止', 'ABORTED', 3, '分片上传中止状态'
     ),
     (
-        1000000000000002054, 'async_task_status', '空闲', 'IDLE', 0, '异步任务空闲状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002054, 'async_task_status', '空闲', 'IDLE', 0, '异步任务空闲状态'
     ),
     (
-        1000000000000002055, 'async_task_status', '执行中', 'ACTIVE', 1, '异步任务执行中状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002055, 'async_task_status', '执行中', 'ACTIVE', 1, '异步任务执行中状态'
     ),
     (
-        1000000000000002056, 'async_task_status', '已暂停', 'SUSPENDED', 2, '异步任务暂停状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002056, 'async_task_status', '已暂停', 'SUSPENDED', 2, '异步任务暂停状态'
     ),
     (
-        1000000000000002057, 'async_task_status', '成功', 'SUCCESS', 3, '异步任务成功状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002057, 'async_task_status', '成功', 'SUCCESS', 3, '异步任务成功状态'
     ),
     (
-        1000000000000002058, 'async_task_status', '失败', 'ERROR', 4, '异步任务失败状态',
-        '2026-05-05 00:00:00.000', 'system', NULL, NULL
+        1000000000000002058, 'async_task_status', '失败', 'ERROR', 4, '异步任务失败状态'
     )
 ON DUPLICATE KEY UPDATE
     `type` = VALUES(`type`),
     `label` = VALUES(`label`),
     `value` = VALUES(`value`),
     `priority` = VALUES(`priority`),
-    `remarks` = VALUES(`remarks`),
-    `update_date` = VALUES(`update_date`),
-    `update_by` = VALUES(`update_by`);
+    `remarks` = VALUES(`remarks`);

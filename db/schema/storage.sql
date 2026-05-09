@@ -14,11 +14,9 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
     `reference_status` varchar(32) NOT NULL DEFAULT 'UNREFERENCED',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_key` (`storage_type`, `bucket_name`, `object_key`),
-    KEY `idx_assist_storage_status` (`object_status`, `reference_status`, `create_date`),
+    KEY `idx_assist_storage_status` (`object_status`, `reference_status`),
     KEY `idx_assist_storage_mime_type` (`mime_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一存储对象主数据表';
 
@@ -49,14 +47,12 @@ CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload` (
     `part_size` bigint NOT NULL,
     `uploaded_part_count` int NOT NULL DEFAULT 0,
     `upload_status` varchar(32) NOT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
     `completed_date` datetime(3) DEFAULT NULL,
     `aborted_date` datetime(3) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_multipart_upload_upload_id` (`upload_id`),
     KEY `idx_assist_storage_multipart_upload_object_key` (`storage_type`, `bucket_name`, `object_key`),
-    KEY `idx_assist_storage_multipart_upload_owner` (`owner_type`, `owner_id`, `upload_status`, `create_date`)
+    KEY `idx_assist_storage_multipart_upload_owner` (`owner_type`, `owner_id`, `upload_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分片上传会话表';
 
 CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload_part` (
@@ -65,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload_part` (
     `part_number` int NOT NULL,
     `etag` varchar(128) NOT NULL,
     `size` bigint NOT NULL,
-    `create_date` datetime(3) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_multipart_upload_part` (`upload_id`, `part_number`),
     KEY `idx_assist_storage_multipart_upload_part_upload_id` (`upload_id`)

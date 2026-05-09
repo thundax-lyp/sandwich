@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 sql-baseline`：同步业务表 schema/data 基线
-  - 范围文件：
-    - `db/schema/system.sql`
-    - `db/schema/auth.sql`
-    - `db/schema/storage.sql`
-    - `db/schema/member.sql`
-    - `db/data/system.sql`
-    - `db/data/auth.sql`
-    - `db/data/member.sql`
-  - 处理动作：删除业务表中的通用审计列和初始化值；不修改 `audit.sql`，不新增 migration 脚本。
-  - 验收点：schema/data 中业务表不再声明或写入 `create_date/create_by/update_date/update_by`；无需 Maven 命令。
-  - 重要度：10/10
-
 - [ ] `Audit 3.2 sys-domain`：拆除系统管理领域业务表审计字段
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/common/domain/Auditable.java`

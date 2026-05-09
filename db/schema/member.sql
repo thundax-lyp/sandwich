@@ -5,10 +5,6 @@ CREATE TABLE IF NOT EXISTS `member_member` (
     `status` varchar(32) NOT NULL DEFAULT 'ACTIVE',
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(500) DEFAULT NULL,
-    `create_date` datetime(3) NOT NULL,
-    `create_by` varchar(64) DEFAULT NULL,
-    `update_date` datetime(3) DEFAULT NULL,
-    `update_by` varchar(64) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_member_member_status` (`status`, `priority`, `create_date`)
+    KEY `idx_member_member_status` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

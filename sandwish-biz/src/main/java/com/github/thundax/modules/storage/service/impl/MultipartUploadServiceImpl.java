@@ -102,8 +102,7 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int abort(AbortMultipartUploadCommand command) {
-        MultipartUploadSession session =
-                requireActiveMultipartSession(command == null ? null : command.getUploadId());
+        MultipartUploadSession session = requireActiveMultipartSession(command == null ? null : command.getUploadId());
         Date now = new Date();
         session.setUploadStatus(MultipartUploadStatus.ABORTED);
         session.setAbortedDate(now);
@@ -162,15 +161,14 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         storage.setMimeType(session.getMimeType());
         storage.setOwnerId(session.getOwnerId());
         storage.setOwnerType(session.getOwnerType());
-        storage.setStorageType(command == null || command.getStorageType() == null
-                ? session.getStorageType()
-                : command.getStorageType());
-        storage.setBucketName(command == null || command.getBucketName() == null
-                ? session.getBucketName()
-                : command.getBucketName());
-        storage.setObjectKey(command == null || command.getObjectKey() == null
-                ? session.getObjectKey()
-                : command.getObjectKey());
+        storage.setStorageType(
+                command == null || command.getStorageType() == null
+                        ? session.getStorageType()
+                        : command.getStorageType());
+        storage.setBucketName(
+                command == null || command.getBucketName() == null ? session.getBucketName() : command.getBucketName());
+        storage.setObjectKey(
+                command == null || command.getObjectKey() == null ? session.getObjectKey() : command.getObjectKey());
         storage.setSize(command == null || command.getSize() == null ? session.getTotalSize() : command.getSize());
         storage.setAccessEndpoint(command == null ? null : command.getAccessEndpoint());
         storage.setObjectStatus(StoredObjectStatus.ACTIVE);

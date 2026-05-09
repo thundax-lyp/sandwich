@@ -139,7 +139,16 @@ public class LoginController {
         preAuthSessionService.release(
                 new ReleasePreAuthSessionCommand(requireSessionIdByToken(request.getLoginToken())));
         return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.loginSms(memberAuthCommand(
-                null, null, request.getMobile(), null, null, null, null, ip(httpRequest), userAgent(httpRequest), null)));
+                null,
+                null,
+                request.getMobile(),
+                null,
+                null,
+                null,
+                null,
+                ip(httpRequest),
+                userAgent(httpRequest),
+                null)));
     }
 
     @ApiOperation(value = "刷新 access token")
@@ -257,7 +266,8 @@ public class LoginController {
         }
         return StringUtils.equals(
                 captcha,
-                preAuthSessionService.getValue(new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
+                preAuthSessionService.getValue(
+                        new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
     }
 
     private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
@@ -313,7 +323,8 @@ public class LoginController {
     }
 
     private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
-        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
+        PreAuthSessionId sessionId =
+                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
         if (sessionId == null) {
             throw new ApiException("登录表单已失效");
         }

@@ -61,10 +61,7 @@ public class LogServiceImpl implements LogService {
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         return PageResult.of(
-                (int) dataPage.getCurrent(),
-                (int) dataPage.getSize(),
-                dataPage.getTotal(),
-                dataPage.getRecords());
+                (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
 
     @Override

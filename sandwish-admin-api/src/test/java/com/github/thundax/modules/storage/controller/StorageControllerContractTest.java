@@ -34,11 +34,10 @@ public class StorageControllerContractTest {
         StorageService storageService = mock(StorageService.class);
         StorageController controller =
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
-        when(storageService.page(any(StorageQuery.class), any(PageQuery.class)))
-                .thenAnswer(invocation -> {
-                    PageQuery page = invocation.getArgument(1);
-                    return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
-                });
+        when(storageService.page(any(StorageQuery.class), any(PageQuery.class))).thenAnswer(invocation -> {
+            PageQuery page = invocation.getArgument(1);
+            return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
+        });
 
         StoragePageRequest request = new StoragePageRequest();
         request.setPageNo(0);

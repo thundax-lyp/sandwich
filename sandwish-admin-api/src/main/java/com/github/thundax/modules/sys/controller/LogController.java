@@ -79,8 +79,7 @@ public class LogController {
     private LogResponse toResponse(Log log) {
         User user = userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(log.getUserId()))));
         Department department = user == null ? null : getDepartment(EntityIdCodec.toDomain(user.getDepartmentId()));
-        return LogInterfaceAssembler.toResponse(
-                log, user, getAccountLoginName(user), department, this::getDepartment);
+        return LogInterfaceAssembler.toResponse(log, user, getAccountLoginName(user), department, this::getDepartment);
     }
 
     private Department getDepartment(EntityId departmentId) {

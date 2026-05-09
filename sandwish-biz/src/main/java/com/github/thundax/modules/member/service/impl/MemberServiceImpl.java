@@ -56,10 +56,7 @@ public class MemberServiceImpl implements MemberService {
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         return PageResult.of(
-                (int) dataPage.getCurrent(),
-                (int) dataPage.getSize(),
-                dataPage.getTotal(),
-                dataPage.getRecords());
+                (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
 
     @Override

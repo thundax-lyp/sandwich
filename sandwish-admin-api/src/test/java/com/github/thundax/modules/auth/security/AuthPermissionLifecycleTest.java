@@ -51,13 +51,13 @@ import com.github.thundax.modules.auth.service.command.AuthenticateIdentityComma
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
-import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
-import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
-import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
@@ -229,7 +229,8 @@ public class AuthPermissionLifecycleTest {
         refreshTokenDao.currentToken = "plain-refresh-token";
         principalAuthSessionDao.insert(principalAuthSession(refreshToken.getSessionId(), "admin-web"), 60);
 
-        AuthTokenRefreshResult result = authService.refreshAccessToken(refreshTokenCommand("admin-web", "plain-refresh-token"));
+        AuthTokenRefreshResult result =
+                authService.refreshAccessToken(refreshTokenCommand("admin-web", "plain-refresh-token"));
 
         Assert.assertNotNull(result.getAccessToken().getToken());
         Assert.assertNotNull(result.getRefreshToken());
@@ -256,31 +257,29 @@ public class AuthPermissionLifecycleTest {
 
         String codeVerifier = "plain-verifier";
         String codeChallenge = Sha256Helper.hashBase64Url(codeVerifier);
-        OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(
-                decisionCommand(
-                        "admin-web",
-                        "http://127.0.0.1/callback",
-                        Arrays.asList("openid", "profile"),
-                        "state-1",
-                        codeChallenge,
-                        "S256",
-                        "1",
-                        true));
+        OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(decisionCommand(
+                "admin-web",
+                "http://127.0.0.1/callback",
+                Arrays.asList("openid", "profile"),
+                "state-1",
+                codeChallenge,
+                "S256",
+                "1",
+                true));
 
         Assert.assertTrue(decision.isApproved());
         Assert.assertNotNull(decision.getAuthorizationCode());
         Assert.assertEquals("state-1", decision.getState());
         Assert.assertFalse(authorizationDao.current.isUsed());
 
-        AuthTokenRefreshResult token = authService.exchangeOAuth2Token(
-                exchangeCommand(
-                        "admin-web",
-                        "secret",
-                        "authorization_code",
-                        "http://127.0.0.1/callback",
-                        decision.getAuthorizationCode(),
-                        codeVerifier,
-                        null));
+        AuthTokenRefreshResult token = authService.exchangeOAuth2Token(exchangeCommand(
+                "admin-web",
+                "secret",
+                "authorization_code",
+                "http://127.0.0.1/callback",
+                decision.getAuthorizationCode(),
+                codeVerifier,
+                null));
 
         Assert.assertNotNull(token.getAccessToken().getToken());
         Assert.assertNotNull(token.getRefreshToken());
@@ -297,10 +296,13 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(introspection.getExpiresAt() > 0L);
         OAuth2UserinfoResponse userinfo = AuthInterfaceAssembler.toUserinfoResponse(queryResult);
         Assert.assertEquals("tester", userinfo.getPreferredUsername());
-        Assert.assertTrue(authService.revokeOAuth2Token(
-                revokeCommand("admin-web", "secret", token.getOauthAccessToken())));
-        Assert.assertFalse(authService.getTokenInfo(tokenQuery(token.getOauthAccessToken())).isActive());
-        Assert.assertTrue(authService.revokeAuthorizationCode(authorizationCodeCommand(decision.getAuthorizationCode())));
+        Assert.assertTrue(
+                authService.revokeOAuth2Token(revokeCommand("admin-web", "secret", token.getOauthAccessToken())));
+        Assert.assertFalse(authService
+                .getTokenInfo(tokenQuery(token.getOauthAccessToken()))
+                .isActive());
+        Assert.assertTrue(
+                authService.revokeAuthorizationCode(authorizationCodeCommand(decision.getAuthorizationCode())));
     }
 
     @Test
@@ -351,7 +353,9 @@ public class AuthPermissionLifecycleTest {
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(authService.authenticateSms(mobileCommand("13800000000")).getId()));
+                EntityIdCodec.toValue(authService
+                        .authenticateSms(mobileCommand("13800000000"))
+                        .getId()));
 
         inject(authService, "wecomLoginProvider", (WecomLoginProvider) code -> "wecom-user-1");
         inject(authService, "githubLoginProvider", (GithubLoginProvider) code -> "github-user-1");
@@ -362,8 +366,9 @@ public class AuthPermissionLifecycleTest {
                         authService.authenticateWecom(codeCommand("wecom-code")).getId()));
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(
-                        authService.authenticateGithub(codeCommand("github-code")).getId()));
+                EntityIdCodec.toValue(authService
+                        .authenticateGithub(codeCommand("github-code"))
+                        .getId()));
     }
 
     @Test
@@ -1030,8 +1035,7 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        public PageResult<com.github.thundax.modules.sys.entity.Role> page(
-                RoleQuery query, PageQuery page) {
+        public PageResult<com.github.thundax.modules.sys.entity.Role> page(RoleQuery query, PageQuery page) {
             return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 

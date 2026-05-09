@@ -41,11 +41,11 @@ import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
-import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
-import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
+import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
 import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
@@ -172,7 +172,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) throws ApiException {
-        return authorizeOAuth2(command.getClientId(), command.getRedirectUri(), command.getScopes(), command.getState());
+        return authorizeOAuth2(
+                command.getClientId(), command.getRedirectUri(), command.getScopes(), command.getState());
     }
 
     @Override

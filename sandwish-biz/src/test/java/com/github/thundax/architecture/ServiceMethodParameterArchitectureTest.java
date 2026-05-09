@@ -80,5 +80,4 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
     private boolean isPageResult(JavaClass javaClass) {
         return "com.github.thundax.common.page.PageResult".equals(javaClass.getName());
     }
-
 }

@@ -119,7 +119,8 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.changeVisibility(new ChangeMenuVisibilityCommand(EntityId.of(5001L), MenuVisibility.HIDDEN));
+        int count =
+                service.changeVisibility(new ChangeMenuVisibilityCommand(EntityId.of(5001L), MenuVisibility.HIDDEN));
 
         assertEquals(1, count);
         assertEquals(1, dao.visibilityCalls);

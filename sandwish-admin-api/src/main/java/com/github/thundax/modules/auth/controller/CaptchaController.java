@@ -124,8 +124,8 @@ public class CaptchaController {
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
-        PreAuthSessionId sessionId =
-                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
+                new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
             throw new InvalidParameterException("loginToken");
         }

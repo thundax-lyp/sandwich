@@ -122,5 +122,4 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
                 || "do".equals(name)
                 || "deleteById".equals(name);
     }
-
 }

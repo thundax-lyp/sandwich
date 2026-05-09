@@ -53,8 +53,7 @@ public class PreAuthSessionServiceImplTest {
         PreAuthSessionToken oldToken = session.getToken();
         PreAuthSessionToken oldRefreshToken = session.getRefreshToken();
 
-        PreAuthSession refreshed =
-                service.refresh(new RefreshPreAuthSessionCommand(session.getId(), 60, 60));
+        PreAuthSession refreshed = service.refresh(new RefreshPreAuthSessionCommand(session.getId(), 60, 60));
 
         assertEquals(session.getId(), refreshed.getId());
         assertNotEquals(oldToken, refreshed.getToken());

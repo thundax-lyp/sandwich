@@ -48,7 +48,8 @@ public class AuthControllerContractTest {
         AdminAuthService authService = mock(AdminAuthService.class);
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSession session = preAuthSession();
-        when(preAuthSessionService.create(any(CreatePreAuthSessionCommand.class))).thenReturn(session);
+        when(preAuthSessionService.create(any(CreatePreAuthSessionCommand.class)))
+                .thenReturn(session);
         when(preAuthSessionService.get(any(PreAuthSessionQuery.class))).thenReturn(session);
 
         mockMvc(authService, preAuthSessionService)

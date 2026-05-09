@@ -41,11 +41,10 @@ public class DictControllerContractTest {
     public void shouldNormalizePageRequestBeforeCallingService() throws Exception {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
-        when(dictService.page(any(DictQuery.class), any(PageQuery.class)))
-                .thenAnswer(invocation -> {
-                    PageQuery page = invocation.getArgument(1);
-                    return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
-                });
+        when(dictService.page(any(DictQuery.class), any(PageQuery.class))).thenAnswer(invocation -> {
+            PageQuery page = invocation.getArgument(1);
+            return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
+        });
 
         DictPageRequest request = new DictPageRequest();
         request.setPageNo(0);

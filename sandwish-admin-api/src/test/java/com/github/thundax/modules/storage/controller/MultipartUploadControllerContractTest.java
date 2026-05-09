@@ -57,8 +57,7 @@ public class MultipartUploadControllerContractTest {
 
         MultipartUploadSessionResponse response = controller.init(request);
 
-        ArgumentCaptor<InitMultipartUploadCommand> captor =
-                ArgumentCaptor.forClass(InitMultipartUploadCommand.class);
+        ArgumentCaptor<InitMultipartUploadCommand> captor = ArgumentCaptor.forClass(InitMultipartUploadCommand.class);
         verify(service).init(captor.capture());
         assertEquals(Long.valueOf(9301L), response.getId());
         assertEquals("upload-1", response.getUploadId());
@@ -86,8 +85,7 @@ public class MultipartUploadControllerContractTest {
 
         MultipartUploadPartResponse response = controller.uploadPart("upload-1", request);
 
-        ArgumentCaptor<UploadMultipartPartCommand> captor =
-                ArgumentCaptor.forClass(UploadMultipartPartCommand.class);
+        ArgumentCaptor<UploadMultipartPartCommand> captor = ArgumentCaptor.forClass(UploadMultipartPartCommand.class);
         verify(service).uploadPart(captor.capture());
         assertEquals(Long.valueOf(9401L), response.getId());
         assertEquals("upload-1", captor.getValue().getUploadId());

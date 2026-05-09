@@ -108,8 +108,7 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
-    public static CreateUserCommand toCreateCommand(
-            @NonNull UserSaveRequest request, String encryptedPassword) {
+    public static CreateUserCommand toCreateCommand(@NonNull UserSaveRequest request, String encryptedPassword) {
         User entity = toEntity(new User(), request);
         return new CreateUserCommand(
                 entity.getId(),

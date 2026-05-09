@@ -37,10 +37,10 @@ import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
-import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
@@ -250,15 +250,16 @@ public class AuthController {
     @PostMapping(value = "oauth2/authorize")
     public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request)
             throws ApiException {
-        return AuthInterfaceAssembler.toAuthorizationViewResponse(authService.authorizeOAuth2(
-                oauthCommand(request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState())));
+        return AuthInterfaceAssembler.toAuthorizationViewResponse(authService.authorizeOAuth2(oauthCommand(
+                request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState())));
     }
 
     @ApiOperation(value = "OAuth2 授权决策")
     @PostMapping(value = "oauth2/decision")
     public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request)
             throws ApiException {
-        return AuthInterfaceAssembler.toAuthorizationDecisionResponse(authService.decideOAuth2(decisionCommand(request)));
+        return AuthInterfaceAssembler.toAuthorizationDecisionResponse(
+                authService.decideOAuth2(decisionCommand(request)));
     }
 
     @ApiOperation(value = "OAuth2 授权码换 token")
@@ -300,8 +301,8 @@ public class AuthController {
     }
 
     private void releasePreAuthSession(String loginToken) {
-        PreAuthSessionId sessionId =
-                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(loginToken), null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
+                new PreAuthSessionQuery(null, PreAuthSessionToken.of(loginToken), null, null));
         if (sessionId != null) {
             preAuthSessionService.release(new ReleasePreAuthSessionCommand(sessionId));
         }
@@ -361,8 +362,8 @@ public class AuthController {
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) throws InvalidTokenException {
-        PreAuthSessionId sessionId =
-                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
+                new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
             throw new InvalidTokenException();
         }

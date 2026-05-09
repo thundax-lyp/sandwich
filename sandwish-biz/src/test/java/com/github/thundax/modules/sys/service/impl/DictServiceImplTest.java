@@ -87,8 +87,8 @@ public class DictServiceImplTest {
     @Test
     public void shouldChangeDictInfoFromCommand() {
         RecordingDictDao dao = new RecordingDictDao();
-        ChangeDictInfoCommand command = new ChangeDictInfoCommand(
-                EntityId.of(1001L), "status", "禁用", "DISABLED", 20, "system");
+        ChangeDictInfoCommand command =
+                new ChangeDictInfoCommand(EntityId.of(1001L), "status", "禁用", "DISABLED", 20, "system");
         DictServiceImpl service = new DictServiceImpl(dao);
 
         service.changeInfo(command);

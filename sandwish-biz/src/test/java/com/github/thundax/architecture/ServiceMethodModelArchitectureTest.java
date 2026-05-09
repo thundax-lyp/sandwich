@@ -51,8 +51,7 @@ public class ServiceMethodModelArchitectureTest extends AbstractArchitectureTest
         }
 
         assertTrue(
-                "Query, Command, PageQuery and PageResult must keep separate model responsibilities: "
-                        + violations,
+                "Query, Command, PageQuery and PageResult must keep separate model responsibilities: " + violations,
                 violations.isEmpty());
     }
 

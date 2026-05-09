@@ -100,64 +100,95 @@ public final class AuditInterfaceAssembler {
     }
 
     public static AuditMetaResponse toMetaResponse(AuditMeta entity) {
-        AuditMetaResponse response = new AuditMetaResponse();
         if (entity == null) {
-            return response;
+            return AuditMetaResponse.builder().build();
         }
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setObjectType(entity.getObjectType());
-        response.setObjectId(entity.getObjectId());
-        response.setVersion(entity.getVersion());
-        response.setLastAction(
-                entity.getLastAction() == null ? null : entity.getLastAction().value());
-        response.setLastOperatorName(entity.getLastOperatorName());
-        response.setLastOperatedAt(entity.getLastOperatedAt());
-        response.setCreatedAt(entity.getCreatedAt());
-        return response;
+        return AuditMetaResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .objectType(entity.getObjectType())
+                .objectId(entity.getObjectId())
+                .version(entity.getVersion())
+                .lastAction(
+                        entity.getLastAction() == null
+                                ? null
+                                : entity.getLastAction().value())
+                .lastOperatorName(entity.getLastOperatorName())
+                .lastOperatedAt(entity.getLastOperatedAt())
+                .createdAt(entity.getCreatedAt())
+                .build();
     }
 
     public static AuditLogResponse toLogResponse(AuditLog entity) {
-        AuditLogResponse response = new AuditLogResponse();
-        fillLogResponse(response, entity);
-        return response;
+        if (entity == null) {
+            return AuditLogResponse.builder().changedFields(new ArrayList<>()).build();
+        }
+        return logResponseBuilder(entity).build();
     }
 
     public static AuditLogDetailResponse toLogDetailResponse(AuditLog entity) {
-        AuditLogDetailResponse response = new AuditLogDetailResponse();
-        fillLogResponse(response, entity);
         if (entity == null) {
-            return response;
+            return AuditLogDetailResponse.builder()
+                    .changedFields(new ArrayList<>())
+                    .build();
         }
-        response.setIdempotencyKey(entity.getIdempotencyKey());
-        response.setPreviousVersion(entity.getPreviousVersion());
-        response.setBeforeSnapshot(toSnapshotResponse(entity.getBeforeSnapshot()));
-        response.setAfterSnapshot(toSnapshotResponse(entity.getAfterSnapshot()));
-        return response;
+        return AuditLogDetailResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .objectType(entity.getObjectType())
+                .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
+                .objectId(entity.getObjectId())
+                .objectDisplayName(displayName(entity))
+                .version(entity.getVersion())
+                .action(entity.getAction() == null ? null : entity.getAction().value())
+                .actionLabel(actionLabel(entity.getAction()))
+                .operatorType(
+                        entity.getOperatorType() == null
+                                ? null
+                                : entity.getOperatorType().value())
+                .operatorTypeLabel(operatorTypeLabel(entity.getOperatorType()))
+                .operatorId(entity.getOperatorId())
+                .operatorName(entity.getOperatorName())
+                .source(entity.getSource())
+                .requestId(entity.getRequestId())
+                .traceId(entity.getTraceId())
+                .remoteAddr(entity.getRemoteAddr())
+                .summary(entity.getSummary())
+                .occurredAt(entity.getOccurredAt())
+                .changedFields(toChangedFieldResponses(entity.getChangedFields()))
+                .changedFieldCount(
+                        entity.getChangedFields() == null
+                                ? 0
+                                : entity.getChangedFields().size())
+                .idempotencyKey(entity.getIdempotencyKey())
+                .previousVersion(entity.getPreviousVersion())
+                .beforeSnapshot(toSnapshotResponse(entity.getBeforeSnapshot()))
+                .afterSnapshot(toSnapshotResponse(entity.getAfterSnapshot()))
+                .build();
     }
 
     public static AuditObjectOverviewResponse toOverviewResponse(AuditMeta meta, PageResult<AuditLog> latestLogs) {
-        AuditObjectOverviewResponse response = new AuditObjectOverviewResponse();
-        response.setMeta(toMetaResponse(meta));
-        if (latestLogs != null && latestLogs.getRecords() != null) {
-            response.setLatestLogs(latestLogs.getRecords().stream()
-                    .map(AuditInterfaceAssembler::toLogResponse)
-                    .collect(Collectors.toList()));
-        }
-        return response;
+        return AuditObjectOverviewResponse.builder()
+                .meta(toMetaResponse(meta))
+                .latestLogs(
+                        latestLogs == null || latestLogs.getRecords() == null
+                                ? null
+                                : latestLogs.getRecords().stream()
+                                        .map(AuditInterfaceAssembler::toLogResponse)
+                                        .collect(Collectors.toList()))
+                .build();
     }
 
     public static AuditOptionsResponse toOptionsResponse() {
-        AuditOptionsResponse response = new AuditOptionsResponse();
-        response.setObjectTypes(OBJECT_TYPE_LABELS.entrySet().stream()
-                .map(entry -> option(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList()));
-        response.setActions(Arrays.stream(AuditAction.values())
-                .map(action -> option(action.value(), actionLabel(action)))
-                .collect(Collectors.toList()));
-        response.setOperatorTypes(Arrays.stream(AuditOperatorType.values())
-                .map(type -> option(type.value(), operatorTypeLabel(type)))
-                .collect(Collectors.toList()));
-        return response;
+        return AuditOptionsResponse.builder()
+                .objectTypes(OBJECT_TYPE_LABELS.entrySet().stream()
+                        .map(entry -> option(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList()))
+                .actions(Arrays.stream(AuditAction.values())
+                        .map(action -> option(action.value(), actionLabel(action)))
+                        .collect(Collectors.toList()))
+                .operatorTypes(Arrays.stream(AuditOperatorType.values())
+                        .map(type -> option(type.value(), operatorTypeLabel(type)))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     public static List<AuditObjectFieldResponse> toFieldResponses(String objectType) {
@@ -170,49 +201,46 @@ public final class AuditInterfaceAssembler {
                 .collect(Collectors.toList());
     }
 
-    private static void fillLogResponse(AuditLogResponse response, AuditLog entity) {
-        if (entity == null) {
-            return;
-        }
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setObjectType(entity.getObjectType());
-        response.setObjectTypeLabel(objectTypeLabel(entity.getObjectType()));
-        response.setObjectId(entity.getObjectId());
-        response.setObjectDisplayName(displayName(entity));
-        response.setVersion(entity.getVersion());
-        response.setAction(
-                entity.getAction() == null ? null : entity.getAction().value());
-        response.setActionLabel(actionLabel(entity.getAction()));
-        response.setOperatorType(
-                entity.getOperatorType() == null
-                        ? null
-                        : entity.getOperatorType().value());
-        response.setOperatorTypeLabel(operatorTypeLabel(entity.getOperatorType()));
-        response.setOperatorId(entity.getOperatorId());
-        response.setOperatorName(entity.getOperatorName());
-        response.setSource(entity.getSource());
-        response.setRequestId(entity.getRequestId());
-        response.setTraceId(entity.getTraceId());
-        response.setRemoteAddr(entity.getRemoteAddr());
-        response.setSummary(entity.getSummary());
-        response.setOccurredAt(entity.getOccurredAt());
-        response.setChangedFields(toChangedFieldResponses(entity.getChangedFields()));
-        response.setChangedFieldCount(
-                entity.getChangedFields() == null
-                        ? 0
-                        : entity.getChangedFields().size());
+    private static AuditLogResponse.AuditLogResponseBuilder logResponseBuilder(AuditLog entity) {
+        return AuditLogResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .objectType(entity.getObjectType())
+                .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
+                .objectId(entity.getObjectId())
+                .objectDisplayName(displayName(entity))
+                .version(entity.getVersion())
+                .action(entity.getAction() == null ? null : entity.getAction().value())
+                .actionLabel(actionLabel(entity.getAction()))
+                .operatorType(
+                        entity.getOperatorType() == null
+                                ? null
+                                : entity.getOperatorType().value())
+                .operatorTypeLabel(operatorTypeLabel(entity.getOperatorType()))
+                .operatorId(entity.getOperatorId())
+                .operatorName(entity.getOperatorName())
+                .source(entity.getSource())
+                .requestId(entity.getRequestId())
+                .traceId(entity.getTraceId())
+                .remoteAddr(entity.getRemoteAddr())
+                .summary(entity.getSummary())
+                .occurredAt(entity.getOccurredAt())
+                .changedFields(toChangedFieldResponses(entity.getChangedFields()))
+                .changedFieldCount(
+                        entity.getChangedFields() == null
+                                ? 0
+                                : entity.getChangedFields().size());
     }
 
     private static AuditSnapshotResponse toSnapshotResponse(AuditSnapshot snapshot) {
         if (snapshot == null) {
             return null;
         }
-        AuditSnapshotResponse response = new AuditSnapshotResponse();
-        response.setObjectType(snapshot.getObjectType());
-        response.setObjectId(snapshot.getObjectId());
-        response.setDisplayName(snapshot.getDisplayName());
-        response.setFields(toSnapshotFieldResponses(snapshot.getFields()));
-        return response;
+        return AuditSnapshotResponse.builder()
+                .objectType(snapshot.getObjectType())
+                .objectId(snapshot.getObjectId())
+                .displayName(snapshot.getDisplayName())
+                .fields(toSnapshotFieldResponses(snapshot.getFields()))
+                .build();
     }
 
     private static List<AuditSnapshotFieldResponse> toSnapshotFieldResponses(List<AuditField> fields) {
@@ -221,14 +249,14 @@ public final class AuditInterfaceAssembler {
             return responses;
         }
         for (AuditField field : fields) {
-            AuditSnapshotFieldResponse response = new AuditSnapshotFieldResponse();
-            response.setFieldName(field.getFieldName());
-            response.setFieldLabel(field.getFieldLabel());
-            response.setValue(field.getValue());
-            response.setDisplayValue(field.getDisplayValue());
-            response.setValueType(field.getValueType());
-            response.setSensitive(field.isSensitive());
-            responses.add(response);
+            responses.add(AuditSnapshotFieldResponse.builder()
+                    .fieldName(field.getFieldName())
+                    .fieldLabel(field.getFieldLabel())
+                    .value(field.getValue())
+                    .displayValue(field.getDisplayValue())
+                    .valueType(field.getValueType())
+                    .sensitive(field.isSensitive())
+                    .build());
         }
         return responses;
     }
@@ -239,12 +267,12 @@ public final class AuditInterfaceAssembler {
             return responses;
         }
         for (AuditChangedField field : fields) {
-            AuditFieldResponse response = new AuditFieldResponse();
-            response.setFieldName(field.getFieldName());
-            response.setFieldLabel(field.getFieldLabel());
-            response.setBeforeDisplayValue(field.getBeforeDisplayValue());
-            response.setAfterDisplayValue(field.getAfterDisplayValue());
-            responses.add(response);
+            responses.add(AuditFieldResponse.builder()
+                    .fieldName(field.getFieldName())
+                    .fieldLabel(field.getFieldLabel())
+                    .beforeDisplayValue(field.getBeforeDisplayValue())
+                    .afterDisplayValue(field.getAfterDisplayValue())
+                    .build());
         }
         return responses;
     }
@@ -314,17 +342,14 @@ public final class AuditInterfaceAssembler {
     }
 
     private static AuditOptionResponse option(String value, String label) {
-        AuditOptionResponse response = new AuditOptionResponse();
-        response.setValue(value);
-        response.setLabel(label);
-        return response;
+        return AuditOptionResponse.builder().value(value).label(label).build();
     }
 
     private static AuditObjectFieldResponse field(String fieldName, String fieldLabel) {
-        AuditObjectFieldResponse response = new AuditObjectFieldResponse();
-        response.setFieldName(fieldName);
-        response.setFieldLabel(fieldLabel);
-        return response;
+        return AuditObjectFieldResponse.builder()
+                .fieldName(fieldName)
+                .fieldLabel(fieldLabel)
+                .build();
     }
 
     private static List<AuditObjectFieldResponse> fields(AuditObjectFieldResponse... fields) {

@@ -11,6 +11,7 @@ import com.github.thundax.modules.assist.controller.request.AsyncTaskIdRequest;
 import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import com.github.thundax.modules.assist.service.query.AsyncTaskQuery;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,7 +47,7 @@ public class AsyncTaskController {
     @HasPermission("user")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
-        AsyncTask bean = asyncTaskService.getById(EntityIdCodec.toDomain(request.getId()));
+        AsyncTask bean = asyncTaskService.get(toQuery(request));
         if (bean == null) {
             return new AsyncTaskResponse();
         }
@@ -56,5 +57,11 @@ public class AsyncTaskController {
         }
 
         return AsyncTaskInterfaceAssembler.toResponse(bean);
+    }
+
+    private AsyncTaskQuery toQuery(AsyncTaskIdRequest request) {
+        AsyncTaskQuery query = new AsyncTaskQuery();
+        query.setId(EntityIdCodec.toDomain(request.getId()));
+        return query;
     }
 }

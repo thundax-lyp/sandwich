@@ -14,6 +14,7 @@ import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import com.github.thundax.modules.assist.service.query.AsyncTaskQuery;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
@@ -57,7 +58,7 @@ public class AsyncTaskControllerContractTest {
         task.setStatus(AsyncTaskStatus.SUCCESS);
         task.setMessage("done");
         task.setData("{\"ok\":true}");
-        when(asyncTaskService.getById(EntityId.of(1001L))).thenReturn(task);
+        when(asyncTaskService.get(org.mockito.ArgumentMatchers.argThat(queryWithId(1001L)))).thenReturn(task);
 
         AsyncTaskResponse response = controller.get(idRequest(1001L));
 
@@ -74,7 +75,7 @@ public class AsyncTaskControllerContractTest {
         AsyncTask task = task(1001L);
         task.setPrivate(true);
         task.setCreateUserId("2001");
-        when(asyncTaskService.getById(EntityId.of(1001L))).thenReturn(task);
+        when(asyncTaskService.get(org.mockito.ArgumentMatchers.argThat(queryWithId(1001L)))).thenReturn(task);
         UserAccessHolder.currentUserId("2002", "token-1");
         mockCurrentUser(2002L);
 
@@ -85,6 +86,10 @@ public class AsyncTaskControllerContractTest {
         AsyncTaskIdRequest request = new AsyncTaskIdRequest();
         request.setId(id);
         return request;
+    }
+
+    private org.mockito.ArgumentMatcher<AsyncTaskQuery> queryWithId(Long id) {
+        return query -> query != null && EntityId.of(id).equals(query.getId());
     }
 
     private AsyncTask task(Long id) {

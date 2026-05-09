@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-admin/async-task`：同步 AsyncTaskController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/AsyncTaskController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/AsyncTaskIdRequest.java
-  - 处理动作：将 AsyncTask API Request 显式组装为 Query 或 Command，并适配 AsyncTaskService 新契约
-  - 验收点：AsyncTaskController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：7/10
-
 - [ ] `service-method-final/guards`：收口架构约束和残留扫描
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodParameterArchitectureTest.java

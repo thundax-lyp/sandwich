@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.1 query-cleanup`：移除现有基于通用审计字段的查询条件
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/query/AsyncTaskQuery.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dao/AsyncTaskDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/LogDaoImpl.java`
-  - 处理动作：删除 `createUserId` / `updateUserId` / `createBy` / `updateBy` 查询过滤和排序依赖，不新增替代审计查询字段。
-  - 验收点：`rg "createUserId|updateUserId|createBy|updateBy" ... -g "*Query.java" -g "*DaoImpl.java"` 不再命中上述查询链路；执行 `mvn -pl sandwish-biz -am compile` 和 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.2 common-mybatis`：删除通用审计字段自动填充拦截器
   - 范围文件：
     - `sandwish-common/sandwish-common-mybatis/src/main/java/com/github/thundax/common/mybatis/interceptor/AuditFieldInterceptor.java`

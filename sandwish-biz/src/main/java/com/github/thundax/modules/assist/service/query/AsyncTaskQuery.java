@@ -14,5 +14,4 @@ import lombok.Setter;
 public class AsyncTaskQuery {
     private EntityId id;
     private AsyncTaskStatus status;
-    private String createUserId;
 }

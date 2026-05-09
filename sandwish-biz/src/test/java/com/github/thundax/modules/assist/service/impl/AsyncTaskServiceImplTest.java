@@ -20,7 +20,7 @@ public class AsyncTaskServiceImplTest {
         dao.getResult = task;
         AsyncTaskServiceImpl service = new AsyncTaskServiceImpl(dao);
 
-        AsyncTask result = service.get(new AsyncTaskQuery(EntityId.of(1001L), null, null));
+        AsyncTask result = service.get(new AsyncTaskQuery(EntityId.of(1001L), null));
 
         assertSame(task, result);
         assertEquals(EntityId.of(1001L), dao.getId);

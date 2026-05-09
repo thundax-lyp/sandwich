@@ -1,11 +1,16 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.modules.sys.controller.request.DictIdRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.request.DictQueryRequest;
 import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
+import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDictCommand;
+import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -31,6 +36,18 @@ public final class DictInterfaceAssembler {
     }
 
     @NonNull
+    public static DictQuery toQuery(@NonNull DictIdRequest request) {
+        return toQuery(EntityIdCodec.toDomain(request.getId()));
+    }
+
+    @NonNull
+    public static DictQuery toQuery(@NonNull EntityId id) {
+        DictQuery query = new DictQuery();
+        query.setId(id);
+        return query;
+    }
+
+    @NonNull
     public static DictQuery toQuery(@NonNull DictQueryRequest request) {
         DictQuery query = new DictQuery();
         query.setLabel(emptyToNull(request.getLabel()));
@@ -49,17 +66,33 @@ public final class DictInterfaceAssembler {
     }
 
     @NonNull
-    public static Dict toEntity(@NonNull Dict entity, @NonNull DictSaveRequest request) {
-        entity.setId(EntityIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
-        entity.setRemarks(request.getRemarks());
-        entity.setLabel(request.getLabel());
-        entity.setType(request.getType());
-        entity.setValue(request.getValue());
-        entity.setRemarks(request.getRemarks());
-        return entity;
+    public static CreateDictCommand toCreateCommand(@NonNull DictSaveRequest request) {
+        CreateDictCommand command = new CreateDictCommand();
+        command.setPriority(request.getPriority());
+        command.setRemarks(request.getRemarks());
+        command.setLabel(request.getLabel());
+        command.setType(request.getType());
+        command.setValue(request.getValue());
+        return command;
+    }
+
+    @NonNull
+    public static ChangeDictInfoCommand toChangeInfoCommand(@NonNull DictSaveRequest request) {
+        ChangeDictInfoCommand command = new ChangeDictInfoCommand();
+        command.setId(EntityIdCodec.toDomain(request.getId()));
+        command.setPriority(request.getPriority());
+        command.setRemarks(request.getRemarks());
+        command.setLabel(request.getLabel());
+        command.setType(request.getType());
+        command.setValue(request.getValue());
+        return command;
+    }
+
+    @NonNull
+    public static DeleteDictCommand toDeleteCommand(@NonNull DictIdRequest request) {
+        DeleteDictCommand command = new DeleteDictCommand();
+        command.setId(EntityIdCodec.toDomain(request.getId()));
+        return command;
     }
 
     private static String emptyToNull(String value) {

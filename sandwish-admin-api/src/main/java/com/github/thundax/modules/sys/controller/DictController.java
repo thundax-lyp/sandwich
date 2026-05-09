@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
@@ -21,6 +22,7 @@ import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -58,7 +60,7 @@ public class DictController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public DictResponse get(@Valid @RequestBody DictIdRequest request) throws ApiException {
-        return DictInterfaceAssembler.toResponse(dictService.getById(EntityIdCodec.toDomain(request.getId())));
+        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(request)));
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:dict:view")
@@ -108,9 +110,8 @@ public class DictController {
     @SysLogger("添加")
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public DictResponse add(@Valid @RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = DictInterfaceAssembler.toEntity(new Dict(), request);
-        dictService.add(dict);
-        return DictInterfaceAssembler.toResponse(dict);
+        EntityId id = dictService.create(DictInterfaceAssembler.toCreateCommand(request));
+        return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(id)));
     }
 
     @ApiOperation(value = "更新", notes = "sys:dict:edit")
@@ -125,13 +126,13 @@ public class DictController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public DictResponse update(@Valid @RequestBody DictSaveRequest request) throws ApiException {
-        Dict dict = dictService.getById(EntityIdCodec.toDomain(request.getId()));
+        DictQuery query = DictInterfaceAssembler.toQuery(EntityIdCodec.toDomain(request.getId()));
+        Dict dict = dictService.get(query);
         if (dict == null) {
             throw new ApiException("id not exist");
         }
-        Dict entity = DictInterfaceAssembler.toEntity(dict, request);
-        dictService.update(entity);
-        return DictInterfaceAssembler.toResponse(entity);
+        dictService.changeInfo(DictInterfaceAssembler.toChangeInfoCommand(request));
+        return DictInterfaceAssembler.toResponse(dictService.get(query));
     }
 
     @ApiOperation(value = "删除", notes = "sys:dict:edit")
@@ -146,18 +147,20 @@ public class DictController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) throws ApiException {
-        List<Dict> beanList = new ArrayList<>();
+        List<DeleteDictCommand> commandList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {
-            Dict bean = dictService.getById(EntityIdCodec.toDomain(request.getId()));
+            Dict bean = dictService.get(DictInterfaceAssembler.toQuery(request));
             if (bean == null) {
                 throw new NullBeanException("Dict", EntityIdCodec.toDomain(request.getId()));
             }
-            beanList.add(bean);
+            commandList.add(DictInterfaceAssembler.toDeleteCommand(request));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
-        dictService.batchDeleteById(beanList.stream().map(Dict::getId).collect(Collectors.toList()));
+        for (DeleteDictCommand command : commandList) {
+            dictService.remove(command);
+        }
         return true;
     }
 

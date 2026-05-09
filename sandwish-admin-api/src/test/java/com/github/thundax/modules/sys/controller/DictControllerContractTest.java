@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.controller;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -23,10 +24,11 @@ import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
@@ -89,15 +91,21 @@ public class DictControllerContractTest {
     public void shouldBatchDeleteExistingDicts() throws Exception {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
-        when(dictService.getById(EntityIdCodec.toDomain(1L))).thenReturn(dict(1L));
-        when(dictService.getById(EntityIdCodec.toDomain(2L))).thenReturn(dict(2L));
+        when(dictService.get(any(DictQuery.class))).thenAnswer(invocation -> {
+            DictQuery query = invocation.getArgument(0);
+            return dict(EntityIdCodec.toValue(query.getId()));
+        });
 
         Boolean deleted = controller.delete(Arrays.asList(idRequest(1L), idRequest(2L)));
 
-        ArgumentCaptor<List> idsCaptor = ArgumentCaptor.forClass(List.class);
-        verify(dictService).batchDeleteById(idsCaptor.capture());
+        ArgumentCaptor<DeleteDictCommand> commandCaptor = ArgumentCaptor.forClass(DeleteDictCommand.class);
+        verify(dictService, times(2)).remove(commandCaptor.capture());
         assertEquals(Boolean.TRUE, deleted);
-        assertEquals(Arrays.asList(EntityIdCodec.toDomain(1L), EntityIdCodec.toDomain(2L)), idsCaptor.getValue());
+        assertEquals(
+                Arrays.asList(EntityIdCodec.toDomain(1L), EntityIdCodec.toDomain(2L)),
+                commandCaptor.getAllValues().stream()
+                        .map(DeleteDictCommand::getId)
+                        .collect(Collectors.toList()));
     }
 
     @Test(expected = InvalidParameterException.class)

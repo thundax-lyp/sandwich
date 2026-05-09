@@ -8,11 +8,12 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.service.DictService;
+import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDictCommand;
+import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,22 +28,20 @@ public class DictServiceImpl implements DictService {
         this.dao = dao;
     }
 
-    public Dict getById(EntityId id) {
-        if (id == null) {
+    public Dict get(DictQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
+        return dao.getById(query.getId());
     }
 
     @Override
-    public List<String> listTypes() {
+    public List<String> listTypes(DictQuery query) {
         return dao.listTypes();
     }
 
-    public List<String> listLabels(String type) {
+    public List<String> listLabels(DictQuery query) {
         List<String> result = new ArrayList<String>();
-        DictQuery query = new DictQuery();
-        query.setType(type);
         List<Dict> list = list(query);
         String s = "";
         for (Dict item : list) {
@@ -78,36 +77,24 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(Dict dict) {
+    public EntityId create(CreateDictCommand command) {
+        Dict dict = toEntity(command);
         dict.setId(dao.insert(dict));
         return dict.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Dict dict) {
-        dao.update(dict);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        return id == null ? 0 : dao.deleteById(id);
+    public void changeInfo(ChangeDictInfoCommand command) {
+        dao.update(toEntity(command));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
+    public void remove(DeleteDictCommand command) {
+        if (command != null && command.getId() != null) {
+            dao.deleteById(command.getId());
         }
-        return count;
     }
 
     private PageQuery normalizePage(PageQuery page) {
@@ -119,5 +106,36 @@ public class DictServiceImpl implements DictService {
             normalizedPage.setPageSize(PageRules.defaultPageSize());
         }
         return normalizedPage;
+    }
+
+    private Dict toEntity(CreateDictCommand command) {
+        Dict dict = new Dict();
+        if (command == null) {
+            return dict;
+        }
+        dict.setType(command.getType());
+        dict.setLabel(command.getLabel());
+        dict.setValue(command.getValue());
+        if (command.getPriority() != null) {
+            dict.setPriority(command.getPriority());
+        }
+        dict.setRemarks(command.getRemarks());
+        return dict;
+    }
+
+    private Dict toEntity(ChangeDictInfoCommand command) {
+        Dict dict = new Dict();
+        if (command == null) {
+            return dict;
+        }
+        dict.setId(command.getId());
+        dict.setType(command.getType());
+        dict.setLabel(command.getLabel());
+        dict.setValue(command.getValue());
+        if (command.getPriority() != null) {
+            dict.setPriority(command.getPriority());
+        }
+        dict.setRemarks(command.getRemarks());
+        return dict;
     }
 }

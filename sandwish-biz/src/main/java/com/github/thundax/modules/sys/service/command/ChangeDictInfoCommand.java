@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DictQuery {
+public class ChangeDictInfoCommand {
     private EntityId id;
     private String type;
-    private String remarks;
     private String label;
+    private String value;
+    private Integer priority;
+    private String remarks;
 }

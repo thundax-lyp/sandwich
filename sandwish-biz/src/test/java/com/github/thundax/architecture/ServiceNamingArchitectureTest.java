@@ -27,8 +27,6 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
             "CurrentUserService#updatePassword",
             "DepartmentService#batchDeleteById",
             "DepartmentService#update",
-            "DictService#batchDeleteById",
-            "DictService#update",
             "LogService#batchDelete",
             "LogService#batchInsert",
             "LogService#deleteById",

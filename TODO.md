@@ -11,25 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/dict`：规约化 DictService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DictService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/DictQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/DictServiceImplTest.java
-  - 处理动作：新增 Dict Command 和 DictServiceImplTest，改造查询和写入口为 Query、PageQuery、PageResult、Command 三态，并将宽泛写方法拆成业务动作
-  - 验收点：DictService 方法名不重复主体名、不含 `update/batch*` 等禁止词；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：9/10
-
-- [ ] `service-method-admin/dict`：同步 DictController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DictController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictPageRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictQueryRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictSaveRequest.java
-  - 处理动作：将 API Request 显式组装为 Dict Query 或 Command，不把 Request 直接下沉到 Service
-  - 验收点：DictController 调用新的 DictService 契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-sys/role`：规约化 RoleService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/RoleService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/RoleServiceImpl.java

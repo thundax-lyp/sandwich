@@ -23,10 +23,6 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
     private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_NAMES = new LinkedHashSet<String>(Arrays.asList(
             "AsyncTaskService#deleteById",
             "AsyncTaskService#update",
-            "LogService#batchDelete",
-            "LogService#batchInsert",
-            "LogService#deleteById",
-            "LogService#update",
             "MemberService#batchDeleteById",
             "MemberService#batchUpdateStatus",
             "MemberService#deleteById",

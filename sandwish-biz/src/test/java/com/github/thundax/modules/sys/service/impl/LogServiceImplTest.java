@@ -12,8 +12,8 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class LogServiceImplTest {
         RecordingLogDao dao = new RecordingLogDao();
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        assertEquals(null, service.getById((EntityId) null));
+        assertEquals(null, service.get((LogQuery) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -35,8 +35,10 @@ public class LogServiceImplTest {
         Log expected = log(7001L);
         dao.getResult = expected;
         LogServiceImpl service = new LogServiceImpl(dao);
+        LogQuery query = new LogQuery();
+        query.setId(EntityId.of(7001L));
 
-        assertSame(expected, service.getById(EntityId.of(7001L)));
+        assertSame(expected, service.get(query));
 
         assertEquals(Long.valueOf(7001L), dao.id);
     }
@@ -94,32 +96,10 @@ public class LogServiceImplTest {
         log.setType(LogType.EXCEPTION);
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        service.add(log);
+        EntityId id = service.create(createCommand(log));
 
-        assertNotNull(log.getId());
-        assertEquals(null, log.getCreateDate());
-        assertSame(log, dao.inserted);
-    }
-
-    @Test
-    public void shouldBatchInsertAndPrepareEveryLog() {
-        RecordingLogDao dao = new RecordingLogDao();
-        LogServiceImpl service = new LogServiceImpl(dao);
-        List<Log> logs = new ArrayList<>();
-        for (int i = 0; i < 51; i++) {
-            logs.add(new Log());
-        }
-
-        int count = service.batchInsert(logs);
-
-        assertEquals(51, count);
-        assertEquals(2, dao.batchInsertCalls);
-        assertEquals(50, dao.firstBatchSize);
-        assertEquals(1, dao.secondBatchSize);
-        for (Log log : logs) {
-            assertNotNull(log.getId());
-            assertEquals(null, log.getCreateDate());
-        }
+        assertNotNull(id);
+        assertNotNull(dao.inserted);
     }
 
     @Test
@@ -138,7 +118,7 @@ public class LogServiceImplTest {
         query.setEndDate(end);
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        service.batchDelete(query);
+        service.deleteByCondition(query);
 
         assertEquals("EXCEPTION", dao.type);
         assertEquals("10.0.0.1", dao.remoteAddr);
@@ -154,6 +134,21 @@ public class LogServiceImplTest {
         Log log = new Log();
         log.setId(EntityIdCodec.toDomain(id));
         return log;
+    }
+
+    private static CreateLogCommand createCommand(Log log) {
+        return new CreateLogCommand(
+                log.getId(),
+                log.getUserId(),
+                log.getType(),
+                log.getLogDate(),
+                log.getTitle(),
+                log.getRemoteAddr(),
+                log.getUserAgent(),
+                log.getMethod(),
+                log.getRequestUri(),
+                log.getRequestParams(),
+                log.getRemarks());
     }
 
     private static class RecordingLogDao implements LogDao {
@@ -172,9 +167,6 @@ public class LogServiceImplTest {
         private int pageNo;
         private int pageSize;
         private Log inserted;
-        private int batchInsertCalls;
-        private int firstBatchSize;
-        private int secondBatchSize;
 
         @Override
         public Log getById(EntityId id) {
@@ -241,17 +233,7 @@ public class LogServiceImplTest {
 
         @Override
         public List<EntityId> batchInsert(List<Log> list) {
-            this.batchInsertCalls++;
-            if (batchInsertCalls == 1) {
-                firstBatchSize = list.size();
-            } else {
-                secondBatchSize = list.size();
-            }
-            List<EntityId> idList = new ArrayList<>();
-            for (int i = 0; i < list.size(); i++) {
-                idList.add(EntityId.of(9700L + batchInsertCalls * 100L + i));
-            }
-            return idList;
+            return java.util.Collections.emptyList();
         }
 
         @Override

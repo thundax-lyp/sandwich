@@ -7,6 +7,7 @@ import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.io.File;
 import java.text.DateFormat;
@@ -70,7 +71,7 @@ public class SysLogUtils {
         try {
             Log sysLog = JsonUtils.fromJson(paramString, Log.class);
             if (sysLog != null) {
-                logService.add(sysLog);
+                sysLog.setId(logService.create(toCreateCommand(sysLog)));
 
                 try {
                     String filename = LOG_FILENAME_FORMAT.format(sysLog.getLogDate()) + LOG_EXTEND_NAME;
@@ -97,6 +98,21 @@ public class SysLogUtils {
         LogQuery query = new LogQuery();
         query.setBeginDate(DateUtils.addDays(new Date(), -9999));
         query.setEndDate(DateUtils.addDays(new Date(), -properties.getAliveDays()));
-        logService.batchDelete(query);
+        logService.deleteByCondition(query);
+    }
+
+    private CreateLogCommand toCreateCommand(Log log) {
+        return new CreateLogCommand(
+                log.getId(),
+                log.getUserId(),
+                log.getType(),
+                log.getLogDate(),
+                log.getTitle(),
+                log.getRemoteAddr(),
+                log.getUserAgent(),
+                log.getMethod(),
+                log.getRequestUri(),
+                log.getRequestParams(),
+                log.getRemarks());
     }
 }

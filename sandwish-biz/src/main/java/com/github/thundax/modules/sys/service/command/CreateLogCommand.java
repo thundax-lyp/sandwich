@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.LogType;
@@ -12,14 +12,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogQuery {
+public class CreateLogCommand {
     private EntityId id;
+    private String userId;
     private LogType type;
-    private String remoteAddr;
+    private Date logDate;
     private String title;
+    private String remoteAddr;
+    private String userAgent;
+    private String method;
     private String requestUri;
-    private String userLoginName;
-    private String userName;
-    private Date beginDate;
-    private Date endDate;
+    private String requestParams;
+    private String remarks;
 }

@@ -11,22 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/log`：规约化 LogService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/LogService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/LogServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/LogQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/LogServiceImplTest.java
-  - 处理动作：规约化日志查询和条件清理入口，条件删除使用 `deleteByXxx(*Query)` 窄口径，不使用 `batch*`
-  - 验收点：LogService 查询和清理入口符合 Query / PageQuery / PageResult / Command 三态例外口径
-  - 重要度：7/10
-
-- [ ] `service-method-admin/log`：同步 LogController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/LogController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/LogPageRequest.java
-  - 处理动作：将 Log API Request 显式组装为 Log Query 和 PageQuery，并适配条件清理入口
-  - 验收点：LogController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：7/10
-
 - [ ] `service-method-storage/storage`：规约化 StorageService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java

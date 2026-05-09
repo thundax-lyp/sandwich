@@ -9,8 +9,8 @@ import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class LogServiceImpl implements LogService {
 
-    private static final int BATCH_INSERT_SIZE = 50;
     private final LogDao dao;
 
     public LogServiceImpl(LogDao dao) {
@@ -27,11 +26,11 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public Log getById(EntityId id) {
-        if (id == null) {
+    public Log get(LogQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
+        return dao.getById(query.getId());
     }
 
     @Override
@@ -70,51 +69,15 @@ public class LogServiceImpl implements LogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(Log log) {
+    public EntityId create(CreateLogCommand command) {
+        Log log = toLog(command);
         log.setId(dao.insert(log));
         return log.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Log log) {
-        dao.update(log);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        return id == null ? 0 : dao.deleteById(id);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int batchInsert(List<Log> list) {
-        if (list == null || list.isEmpty()) {
-            return 0;
-        }
-
-        int count = 0;
-
-        int pageSize = BATCH_INSERT_SIZE;
-        int totalPage = (list.size() + pageSize - 1) / pageSize;
-        for (int pageNo = 0; pageNo < totalPage; pageNo++) {
-            int fromIndex = pageSize * pageNo;
-            int toIndex = Math.min(fromIndex + pageSize, list.size());
-            List<Log> subList = new ArrayList<>(list.subList(fromIndex, toIndex));
-            List<EntityId> idList = dao.batchInsert(subList);
-            for (int i = 0; i < idList.size(); i++) {
-                subList.get(i).setId(idList.get(i));
-            }
-            count += idList.size();
-        }
-
-        return count;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int batchDelete(LogQuery query) {
+    public int deleteByCondition(LogQuery query) {
         return dao.batchDelete(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
@@ -137,5 +100,21 @@ public class LogServiceImpl implements LogService {
 
     private String typeValue(LogType type) {
         return type == null ? null : type.value();
+    }
+
+    private Log toLog(CreateLogCommand command) {
+        Log log = new Log();
+        log.setId(command.getId());
+        log.setUserId(command.getUserId());
+        log.setType(command.getType());
+        log.setLogDate(command.getLogDate());
+        log.setTitle(command.getTitle());
+        log.setRemoteAddr(command.getRemoteAddr());
+        log.setUserAgent(command.getUserAgent());
+        log.setMethod(command.getMethod());
+        log.setRequestUri(command.getRequestUri());
+        log.setRequestParams(command.getRequestParams());
+        log.setRemarks(command.getRemarks());
+        return log;
     }
 }

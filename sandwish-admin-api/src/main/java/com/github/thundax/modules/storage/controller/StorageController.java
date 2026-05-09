@@ -85,7 +85,7 @@ public class StorageController {
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         PageQuery page = readStoragePage(request);
-        return PageResponseHelper.fromEntityPage(
+        return PageResponseHelper.fromPageResult(
                 storageService.page(query, page),
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
     }

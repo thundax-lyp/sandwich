@@ -11,7 +11,7 @@ public final class PageResponseHelper {
 
     private PageResponseHelper() {}
 
-    public static <T, R> PageResponse<R> fromEntityPage(PageResult<T> page, Function<T, R> mappingFunction) {
+    public static <T, R> PageResponse<R> fromPageResult(PageResult<T> page, Function<T, R> mappingFunction) {
         PageResponse<R> pageResponse = new PageResponse<>();
 
         pageResponse.setPageNo(page.getPageNo());

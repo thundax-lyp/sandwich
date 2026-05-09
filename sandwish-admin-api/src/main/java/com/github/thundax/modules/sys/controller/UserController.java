@@ -176,7 +176,7 @@ public class UserController {
         UserQuery query = readQuery(request);
         PageQuery page = readUserPage(request);
 
-        return PageResponseHelper.fromEntityPage(userService.page(query, page), this::toResponse);
+        return PageResponseHelper.fromPageResult(userService.page(query, page), this::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")

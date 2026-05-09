@@ -55,8 +55,8 @@ public class StorageControllerContractTest {
         verify(storageService).page(queryCaptor.capture(), pageCaptor.capture());
         assertEquals(PageRules.firstPageIndex(), pageCaptor.getValue().getPageNo());
         assertEquals(PageRules.defaultPageSize(), pageCaptor.getValue().getPageSize());
-        assertEquals(Integer.valueOf(PageRules.firstPageIndex()), response.getPageNo());
-        assertEquals(Integer.valueOf(PageRules.defaultPageSize()), response.getPageSize());
+        assertEquals(PageRules.firstPageIndex(), response.getPageNo());
+        assertEquals(PageRules.defaultPageSize(), response.getPageSize());
         assertEquals("image/png", queryCaptor.getValue().getContentType());
         assertEquals("avatar", queryCaptor.getValue().getOriginalFilename());
         assertEquals("profile", queryCaptor.getValue().getRemarks());

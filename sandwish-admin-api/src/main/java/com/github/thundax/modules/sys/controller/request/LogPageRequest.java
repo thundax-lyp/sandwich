@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.thundax.common.web.request.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
 import java.util.Date;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,18 +17,7 @@ import lombok.Setter;
 @ApiModel(value = "LogPageRequest", description = "日志分页查询请求")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LogPageRequest implements Serializable {
-
-    @ApiModelProperty(name = "pageNo", value = "页码，从1开始", example = "1")
-    @JsonProperty("pageNo")
-    @Min(value = 1, message = "页码不能小于1")
-    private Integer pageNo = 1;
-
-    @ApiModelProperty(name = "pageSize", value = "单页记录数", example = "5")
-    @JsonProperty("pageSize")
-    @Min(value = 1, message = "单页记录数不能小于1")
-    @Max(value = 500, message = "单页记录数不能超过500")
-    private Integer pageSize = 10;
+public class LogPageRequest extends PageRequest {
 
     @ApiModelProperty(name = "title", value = "标题")
     @JsonProperty("title")

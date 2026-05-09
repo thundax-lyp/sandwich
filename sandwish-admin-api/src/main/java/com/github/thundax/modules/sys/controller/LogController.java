@@ -73,7 +73,7 @@ public class LogController {
     public PageResponse<LogResponse> page(@Valid @RequestBody LogPageRequest request) throws ApiException {
         LogQuery query = LogInterfaceAssembler.toQuery(request);
 
-        return PageResponseHelper.fromEntityPage(logService.page(query, readLogPage(request)), this::toResponse);
+        return PageResponseHelper.fromPageResult(logService.page(query, readLogPage(request)), this::toResponse);
     }
 
     private LogResponse toResponse(Log log) {

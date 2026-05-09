@@ -95,7 +95,7 @@ public class DictController {
     public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         PageQuery page = readDictPage(request);
-        return PageResponseHelper.fromEntityPage(dictService.page(query, page), DictInterfaceAssembler::toResponse);
+        return PageResponseHelper.fromPageResult(dictService.page(query, page), DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")

@@ -5,6 +5,7 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.request.PageRequest;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.audit.assembler.AuditInterfaceAssembler;
@@ -118,7 +119,7 @@ public class AuditController {
     })
     @RequestMapping(value = "object/page", method = RequestMethod.POST)
     public PageResponse<AuditLogResponse> objectPage(@Valid @RequestBody AuditObjectPageRequest request) {
-        return PageResponseHelper.fromEntityPage(
+        return PageResponseHelper.fromPageResult(
                 auditService.page(AuditInterfaceAssembler.toLogQuery(request), readPage(request)),
                 AuditInterfaceAssembler::toLogResponse);
     }
@@ -135,7 +136,7 @@ public class AuditController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageResponse<AuditLogResponse> page(@Valid @RequestBody AuditLogPageRequest request) {
         PageQuery pageQuery = readPage(request);
-        return PageResponseHelper.fromEntityPage(
+        return PageResponseHelper.fromPageResult(
                 auditService.page(AuditInterfaceAssembler.toLogQuery(request), pageQuery),
                 AuditInterfaceAssembler::toLogResponse);
     }
@@ -168,15 +169,9 @@ public class AuditController {
         return AuditInterfaceAssembler.toFieldResponses(request.getObjectType());
     }
 
-    private PageQuery readPage(AuditLogPageRequest request) {
-        return readPage(request.getPageNo(), request.getPageSize());
-    }
-
-    private PageQuery readPage(AuditObjectPageRequest request) {
-        return readPage(request.getPageNo(), request.getPageSize());
-    }
-
-    private PageQuery readPage(Integer pageNo, Integer pageSize) {
+    private PageQuery readPage(PageRequest request) {
+        Integer pageNo = request.getPageNo();
+        Integer pageSize = request.getPageSize();
         if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
             pageNo = PageRules.firstPageIndex();
         }

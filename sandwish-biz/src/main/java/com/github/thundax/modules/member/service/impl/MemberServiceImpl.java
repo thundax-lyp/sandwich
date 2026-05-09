@@ -5,6 +5,8 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.modules.audit.annotation.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -60,6 +62,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @AuditLog(type = "Member", id = "", action = AuditAction.CREATE, summary = "创建会员", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public EntityId create(MemberCommand command) {
         Member member = command.getMember();
@@ -68,24 +71,33 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员")
     @Transactional(rollbackFor = Exception.class)
     public void change(MemberCommand command) {
         dao.update(command.getMember());
     }
 
     @Override
+    @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员信息")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(MemberCommand command) {
         dao.updateInfo(command.getMember());
     }
 
     @Override
+    @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(MemberCommand command) {
         return dao.updateStatus(command.getMember());
     }
 
     @Override
+    @AuditLog(
+            type = "Member",
+            id = "#command.id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除会员",
+            recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public int remove(MemberCommand command) {
         EntityId id = command.getId();

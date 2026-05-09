@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.5 assist-member-access`：接入 AsyncTask 和 Member 审计
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/assist/AsyncTaskAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/assist/AsyncTaskAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/member/MemberAuditObjectLoader.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/member/MemberAuditSnapshotAssembler.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java`
-  - 处理动作：为 AsyncTask 和 Member 补 loader、snapshot assembler，并在单对象写方法上声明 Audit 注解。
-  - 验收点：两个目标对象审计接入代码可编译；执行 `mvn -pl sandwish-biz -am compile`。
-  - 重要度：9/10
-
 - [ ] `Audit 3.6 admin-api`：新增后台审计查询 API
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/AuditController.java`

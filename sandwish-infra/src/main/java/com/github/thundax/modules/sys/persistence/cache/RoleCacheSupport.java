@@ -6,7 +6,6 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -15,17 +14,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RoleCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final int VERSION_EXPIRE_SECONDS = OBJECT_EXPIRE_SECONDS + 5;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.role.";
     private static final String ID_PREFIX = "id_";
-    private static final String VERSION_KEY = "version";
     private static final String USERS_PREFIX = "users_";
     private static final String MENUS_PREFIX = "menus_";
     private static final String KEY_INDEX = "keys";
@@ -40,7 +36,7 @@ public class RoleCacheSupport {
     @CreateCache(
             name = CACHE_SECTION + "keys.",
             cacheType = CacheType.REMOTE,
-            expire = VERSION_EXPIRE_SECONDS,
+            expire = OBJECT_EXPIRE_SECONDS,
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
@@ -60,7 +56,6 @@ public class RoleCacheSupport {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
-        touchVersion();
     }
 
     public void removeAll() {
@@ -69,7 +64,6 @@ public class RoleCacheSupport {
             cache.removeAll(keys);
         }
         keyIndexCache.remove(KEY_INDEX);
-        touchVersion();
     }
 
     @SuppressWarnings("unchecked")
@@ -106,19 +100,6 @@ public class RoleCacheSupport {
         forgetKey(key);
     }
 
-    public String currentVersion() {
-        String version = (String) cache.get(versionKey());
-        if (StringUtils.isBlank(version)) {
-            version = UuidHelper.compact();
-            cache.put(versionKey(), version);
-        }
-        return version;
-    }
-
-    public void touchVersion() {
-        cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
-    }
-
     private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
     }
@@ -131,17 +112,13 @@ public class RoleCacheSupport {
         return CACHE_SECTION + MENUS_PREFIX + roleId;
     }
 
-    private String versionKey() {
-        return CACHE_SECTION + VERSION_KEY;
-    }
-
     private void rememberKey(String key) {
         Set<String> keys = keyIndexCache.get(KEY_INDEX);
         if (keys == null) {
             keys = new HashSet<>();
         }
         if (keys.add(key)) {
-            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            keyIndexCache.put(KEY_INDEX, keys, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 
@@ -151,7 +128,7 @@ public class RoleCacheSupport {
             return;
         }
         if (keys.remove(key)) {
-            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            keyIndexCache.put(KEY_INDEX, keys, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 

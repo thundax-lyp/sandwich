@@ -131,11 +131,6 @@ public class DictDaoImpl implements DictDao {
         return mapper.selectObjs(wrapper).stream().map(String::valueOf).collect(Collectors.toList());
     }
 
-    @Override
-    public String getDictionaryRevision() {
-        return cacheSupport.currentVersion();
-    }
-
     private QueryWrapper<DictDO> buildQueryWrapper(String type, String label, String remarks) {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(type)) {

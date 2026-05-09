@@ -6,7 +6,6 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
@@ -14,17 +13,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MenuCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final int VERSION_EXPIRE_SECONDS = OBJECT_EXPIRE_SECONDS + 5;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.menu.";
     private static final String ID_PREFIX = "id_";
-    private static final String VERSION_KEY = "version";
     private static final String KEY_INDEX = "keys";
 
     @CreateCache(
@@ -37,7 +33,7 @@ public class MenuCacheSupport {
     @CreateCache(
             name = CACHE_SECTION + "keys.",
             cacheType = CacheType.REMOTE,
-            expire = VERSION_EXPIRE_SECONDS,
+            expire = OBJECT_EXPIRE_SECONDS,
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;
 
@@ -57,7 +53,6 @@ public class MenuCacheSupport {
         String key = objectKey(id);
         cache.remove(key);
         forgetKey(key);
-        touchVersion();
     }
 
     public void removeAll() {
@@ -66,28 +61,10 @@ public class MenuCacheSupport {
             cache.removeAll(keys);
         }
         keyIndexCache.remove(KEY_INDEX);
-        touchVersion();
-    }
-
-    public String currentVersion() {
-        String version = (String) cache.get(versionKey());
-        if (StringUtils.isBlank(version)) {
-            version = UuidHelper.compact();
-            cache.put(versionKey(), version);
-        }
-        return version;
-    }
-
-    public void touchVersion() {
-        cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(Long id) {
         return CACHE_SECTION + ID_PREFIX + id;
-    }
-
-    private String versionKey() {
-        return CACHE_SECTION + VERSION_KEY;
     }
 
     private void rememberKey(String key) {
@@ -96,7 +73,7 @@ public class MenuCacheSupport {
             keys = new HashSet<>();
         }
         if (keys.add(key)) {
-            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            keyIndexCache.put(KEY_INDEX, keys, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 
@@ -106,7 +83,7 @@ public class MenuCacheSupport {
             return;
         }
         if (keys.remove(key)) {
-            keyIndexCache.put(KEY_INDEX, keys, VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
+            keyIndexCache.put(KEY_INDEX, keys, OBJECT_EXPIRE_SECONDS, TimeUnit.SECONDS);
         }
     }
 

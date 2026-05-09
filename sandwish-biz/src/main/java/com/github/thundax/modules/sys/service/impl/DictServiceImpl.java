@@ -99,11 +99,6 @@ public class DictServiceImpl implements DictService {
         return batchOperate(ids, this::deleteById);
     }
 
-    @Override
-    public String getDictionaryRevision() {
-        return dao.getDictionaryRevision();
-    }
-
     private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
         int count = 0;
         if (collection != null && !collection.isEmpty()) {

@@ -23,6 +23,4 @@ public interface DictService {
     List<String> listTypes();
 
     List<String> listLabels(String type);
-
-    String getDictionaryRevision();
 }

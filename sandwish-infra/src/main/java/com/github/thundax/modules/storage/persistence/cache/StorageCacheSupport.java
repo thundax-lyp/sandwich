@@ -6,7 +6,6 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
@@ -21,10 +20,8 @@ import org.springframework.stereotype.Component;
 public class StorageCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final int VERSION_EXPIRE_SECONDS = OBJECT_EXPIRE_SECONDS + 5;
     private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "assist.storage.";
     private static final String ID_PREFIX = "id_";
-    private static final String VERSION_KEY = "version";
 
     @CreateCache(
             name = CACHE_SECTION,
@@ -49,28 +46,10 @@ public class StorageCacheSupport {
 
     public void removeById(String id) {
         cache.remove(objectKey(id));
-        touchVersion();
-    }
-
-    public String currentVersion() {
-        String version = (String) cache.get(versionKey());
-        if (StringUtils.isBlank(version)) {
-            version = UuidHelper.compact();
-            cache.put(versionKey(), version);
-        }
-        return version;
-    }
-
-    public void touchVersion() {
-        cache.put(versionKey(), UuidHelper.compact(), VERSION_EXPIRE_SECONDS, TimeUnit.SECONDS);
     }
 
     private String objectKey(String id) {
         return CACHE_SECTION + ID_PREFIX + id;
-    }
-
-    private String versionKey() {
-        return CACHE_SECTION + VERSION_KEY;
     }
 
     private static StoredObject toDomain(StoredObjectCacheDTO cacheDTO) {

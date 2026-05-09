@@ -24,6 +24,4 @@ public interface DictDao {
     int deleteById(EntityId id);
 
     List<String> listTypes();
-
-    String getDictionaryRevision();
 }

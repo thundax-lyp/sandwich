@@ -22,6 +22,8 @@ import com.github.thundax.modules.sys.controller.request.DepartmentSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -63,11 +65,11 @@ public class DepartmentController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public DepartmentResponse get(@Valid @RequestBody DepartmentIdRequest request) throws ApiException {
-        Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
+        Department bean = departmentService.get(departmentQuery(request.getId()));
         if (bean == null) {
             throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
-        return DepartmentInterfaceAssembler.toResponse(bean, departmentService::getById);
+        return DepartmentInterfaceAssembler.toResponse(bean, this::getDepartment);
     }
 
     @ApiOperation(value = "获取列表", notes = "sys:department:view")
@@ -85,7 +87,7 @@ public class DepartmentController {
         DepartmentQuery query = DepartmentInterfaceAssembler.toQuery(request);
 
         return departmentService.list(query).stream()
-                .map(department -> DepartmentInterfaceAssembler.toResponse(department, departmentService::getById))
+                .map(department -> DepartmentInterfaceAssembler.toResponse(department, this::getDepartment))
                 .collect(Collectors.toList());
     }
 
@@ -103,22 +105,22 @@ public class DepartmentController {
     public DepartmentResponse add(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
         Department entity = DepartmentInterfaceAssembler.toEntity(new Department(), request);
         if (entity.getId() != null) {
-            Department bean = departmentService.getById(entity.getId());
+            Department bean = departmentService.get(departmentQuery(entity.getId()));
             if (bean != null) {
                 throw new InsertBeanExistException(Department.BEAN_NAME, entity.getId());
             }
         }
 
         if (entity.getParentId() != null) {
-            Department parent = departmentService.getById(entity.getParentId());
+            Department parent = departmentService.get(departmentQuery(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        departmentService.add(entity);
+        entity.setId(departmentService.create(DepartmentInterfaceAssembler.toCreateCommand(request)));
 
-        return DepartmentInterfaceAssembler.toResponse(entity, departmentService::getById);
+        return DepartmentInterfaceAssembler.toResponse(entity, this::getDepartment);
     }
 
     @ApiOperation(value = "更新", notes = "sys:department:edit")
@@ -133,13 +135,13 @@ public class DepartmentController {
     @SysLogger("更新")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public DepartmentResponse update(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
-        Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
+        Department bean = departmentService.get(departmentQuery(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (request.getParentId() != null) {
-            Department parent = departmentService.getById(EntityIdCodec.toDomain(request.getParentId()));
+            Department parent = departmentService.get(departmentQuery(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -147,9 +149,9 @@ public class DepartmentController {
 
         Department entity = DepartmentInterfaceAssembler.toEntity(bean, request);
 
-        departmentService.update(entity);
+        departmentService.changeInfo(DepartmentInterfaceAssembler.toChangeInfoCommand(request));
 
-        return DepartmentInterfaceAssembler.toResponse(entity, departmentService::getById);
+        return DepartmentInterfaceAssembler.toResponse(entity, this::getDepartment);
     }
 
     @ApiOperation(value = "删除", notes = "sys:department:edit")
@@ -164,20 +166,19 @@ public class DepartmentController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@Valid @RequestBody List<DepartmentIdRequest> list) throws ApiException {
-        List<Department> beanList = new ArrayList<>();
+        List<DeleteDepartmentCommand> commandList = new ArrayList<>();
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
-            Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
+            Department bean = departmentService.get(departmentQuery(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
-            beanList.add(bean);
+            commandList.add(new DeleteDepartmentCommand(bean.getId()));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
 
-        departmentService.batchDeleteById(
-                beanList.stream().map(Department::getId).collect(Collectors.toList()));
+        commandList.forEach(departmentService::remove);
 
         return true;
     }
@@ -194,7 +195,7 @@ public class DepartmentController {
     @SysLogger("读取")
     @RequestMapping(value = "tree", method = RequestMethod.POST)
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
-        List<Department> beanList = departmentService.listAll();
+        List<Department> beanList = departmentService.list(new DepartmentQuery());
 
         Set<EntityId> excludeIds =
                 new HashSet<>(RequestListHelper.map(excludeList, request -> EntityIdCodec.toDomain(request.getId())));
@@ -238,24 +239,25 @@ public class DepartmentController {
     @SysLogger("移动")
     @RequestMapping(value = "move", method = RequestMethod.POST)
     public Boolean move(@Valid @RequestBody DepartmentMoveRequest request) throws ApiException {
-        Department fromBean = departmentService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
+        Department fromBean = departmentService.get(departmentQuery(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getFromNodeId()));
         }
 
-        Department toBean = departmentService.getById(EntityIdCodec.toDomain(request.getToNodeId()));
+        Department toBean = departmentService.get(departmentQuery(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
-        if (toBean.equals(fromBean) || departmentService.isChildOf(toBean, fromBean)) {
+        if (toBean.equals(fromBean) || departmentService.existsChildRelation(childRelationQuery(toBean, fromBean))) {
             throw new MoveTreeNodeException(
                     Department.BEAN_NAME,
                     EntityIdCodec.toDomain(request.getFromNodeId()),
                     EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
-        departmentService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));
+        departmentService.move(
+                new MoveDepartmentCommand(fromBean.getId(), toBean.getId(), readMoveTreeNodeType(request)));
 
         return true;
     }
@@ -271,5 +273,26 @@ public class DepartmentController {
             default:
                 return TreeNodeMoveType.AFTER;
         }
+    }
+
+    private DepartmentQuery childRelationQuery(Department child, Department ancestor) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setChildId(child.getId());
+        query.setAncestorId(ancestor.getId());
+        return query;
+    }
+
+    private Department getDepartment(EntityId departmentId) {
+        return departmentService.get(departmentQuery(departmentId));
+    }
+
+    private DepartmentQuery departmentQuery(EntityId departmentId) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setId(departmentId);
+        return query;
+    }
+
+    private DepartmentQuery departmentQuery(Long departmentId) {
+        return departmentQuery(EntityIdCodec.toDomain(departmentId));
     }
 }

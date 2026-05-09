@@ -6,14 +6,15 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,15 +28,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         this.dao = dao;
     }
 
-    public Department getById(EntityId id) {
-        if (id == null) {
+    public Department get(DepartmentQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
-    }
-
-    public List<Department> listAll() {
-        return list((DepartmentQuery) null);
+        return dao.getById(query.getId());
     }
 
     public List<Department> list(DepartmentQuery query) {
@@ -62,20 +59,24 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(Department entity) {
+    public EntityId create(CreateDepartmentCommand command) {
+        Department entity = toDepartment(command);
         entity.setId(dao.insert(entity));
         return entity.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Department entity) {
+    public void changeInfo(ChangeDepartmentInfoCommand command) {
+        Department entity = toDepartment(command);
         dao.update(entity);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        Department bean = this.getById(id);
+    public int remove(DeleteDepartmentCommand command) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setId(command.getId());
+        Department bean = this.get(query);
         if (bean == null) {
             return 0;
         }
@@ -87,31 +88,20 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
+    public void move(MoveDepartmentCommand command) {
+        dao.moveTreeNode(
+                EntityIdCodec.toValue(command.getFromId()),
+                EntityIdCodec.toValue(command.getToId()),
+                command.getMoveType());
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void moveTreeNode(Department from, Department to, TreeNodeMoveType moveType) {
-        dao.moveTreeNode(EntityIdCodec.toValue(from.getId()), EntityIdCodec.toValue(to.getId()), moveType);
-    }
-
-    @Override
-    public boolean isChildOf(Department child, Department parent) {
-        return child != null
-                && parent != null
-                && dao.isChildOf(EntityIdCodec.toValue(child.getId()), EntityIdCodec.toValue(parent.getId()));
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
+    public boolean existsChildRelation(DepartmentQuery query) {
+        return query != null
+                && query.getChildId() != null
+                && query.getAncestorId() != null
+                && dao.isChildOf(
+                        EntityIdCodec.toValue(query.getChildId()), EntityIdCodec.toValue(query.getAncestorId()));
     }
 
     private PageQuery normalizePage(PageQuery page) {
@@ -123,5 +113,27 @@ public class DepartmentServiceImpl implements DepartmentService {
             normalizedPage.setPageSize(PageRules.defaultPageSize());
         }
         return normalizedPage;
+    }
+
+    private Department toDepartment(CreateDepartmentCommand command) {
+        Department department = new Department();
+        department.setId(command.getId());
+        department.setParentId(command.getParentId());
+        department.setName(command.getName());
+        department.setShortName(command.getShortName());
+        department.setPriority(command.getPriority());
+        department.setRemarks(command.getRemarks());
+        return department;
+    }
+
+    private Department toDepartment(ChangeDepartmentInfoCommand command) {
+        Department department = new Department();
+        department.setId(command.getId());
+        department.setParentId(command.getParentId());
+        department.setName(command.getName());
+        department.setShortName(command.getShortName());
+        department.setPriority(command.getPriority());
+        department.setRemarks(command.getRemarks());
+        return department;
     }
 }

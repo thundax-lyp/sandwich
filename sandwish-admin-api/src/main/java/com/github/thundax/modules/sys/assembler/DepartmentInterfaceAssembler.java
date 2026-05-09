@@ -6,6 +6,8 @@ import com.github.thundax.modules.sys.controller.request.DepartmentQueryRequest;
 import com.github.thundax.modules.sys.controller.request.DepartmentSaveRequest;
 import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +77,30 @@ public final class DepartmentInterfaceAssembler {
         entity.setName(request.getName());
         entity.setShortName(request.getShortName());
         return entity;
+    }
+
+    @NonNull
+    public static CreateDepartmentCommand toCreateCommand(@NonNull DepartmentSaveRequest request) {
+        Department entity = toEntity(new Department(), request);
+        return new CreateDepartmentCommand(
+                entity.getId(),
+                entity.getParentId(),
+                entity.getName(),
+                entity.getShortName(),
+                entity.getPriority(),
+                entity.getRemarks());
+    }
+
+    @NonNull
+    public static ChangeDepartmentInfoCommand toChangeInfoCommand(@NonNull DepartmentSaveRequest request) {
+        Department entity = toEntity(new Department(), request);
+        return new ChangeDepartmentInfoCommand(
+                entity.getId(),
+                entity.getParentId(),
+                entity.getName(),
+                entity.getShortName(),
+                entity.getPriority(),
+                entity.getRemarks());
     }
 
     private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {

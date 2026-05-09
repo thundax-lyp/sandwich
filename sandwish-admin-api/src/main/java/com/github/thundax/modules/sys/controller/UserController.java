@@ -54,6 +54,7 @@ import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
@@ -420,8 +421,8 @@ public class UserController {
     @RequestMapping(value = "department/tree", method = RequestMethod.POST)
     @WrappedApiResponse
     public List<UserDepartmentResponse> departmentTree() {
-        return departmentService.listAll().stream()
-                .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, departmentService::getById))
+        return departmentService.list(new DepartmentQuery()).stream()
+                .map(department -> UserInterfaceAssembler.toDepartmentResponse(department, this::getDepartment))
                 .collect(Collectors.toList());
     }
 
@@ -472,7 +473,7 @@ public class UserController {
         UserQuery query = UserInterfaceAssembler.toQuery(request);
 
         if (request.getDepartmentId() != null) {
-            Department department = departmentService.getById(EntityIdCodec.toDomain(request.getDepartmentId()));
+            Department department = getDepartment(EntityIdCodec.toDomain(request.getDepartmentId()));
             if (department == null) {
                 throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getDepartmentId()));
             }
@@ -488,7 +489,7 @@ public class UserController {
             throw new InvalidParameterException("department.id");
 
         } else {
-            Department bean = departmentService.getById(EntityIdCodec.toDomain(request.getId()));
+            Department bean = getDepartment(EntityIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(Department.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
@@ -548,10 +549,16 @@ public class UserController {
     }
 
     private UserResponse toResponse(User user) {
-        Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
+        Department department = getDepartment(EntityIdCodec.toDomain(user.getDepartmentId()));
         List<Role> roleList = userService.listUserRoles(userQuery(user.getId()));
         return UserInterfaceAssembler.toResponse(
-                user, getAccountLoginName(user.getId()), department, roleList, departmentService::getById);
+                user, getAccountLoginName(user.getId()), department, roleList, this::getDepartment);
+    }
+
+    private Department getDepartment(EntityId departmentId) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setId(departmentId);
+        return departmentService.get(query);
     }
 
     private UserQuery userQuery(Long userId) {

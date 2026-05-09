@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
 import lombok.AllArgsConstructor;
@@ -10,11 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepartmentQuery {
+public class DeleteDepartmentCommand {
     private EntityId id;
-    private EntityId childId;
-    private EntityId ancestorId;
-    private Long parentId;
-    private String name;
-    private String remarks;
 }

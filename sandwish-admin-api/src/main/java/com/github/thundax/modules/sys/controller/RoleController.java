@@ -28,6 +28,7 @@ import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -40,6 +41,7 @@ import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
+import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -293,7 +295,7 @@ public class RoleController {
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
-        list.addAll(departmentService.listAll().stream()
+        list.addAll(departmentService.list(new DepartmentQuery()).stream()
                 .map(department -> RoleInterfaceAssembler.toDepartmentTreeNode(
                         DEPARTMENT_ID_PREFIX + department.getId(), department))
                 .collect(Collectors.toList()));
@@ -303,8 +305,8 @@ public class RoleController {
                         DEPARTMENT_ID_PREFIX,
                         user,
                         getAccountLoginName(user),
-                        departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
-                        departmentService::getById))
+                        getDepartment(EntityIdCodec.toDomain(user.getDepartmentId())),
+                        this::getDepartment))
                 .collect(Collectors.toList()));
 
         return list;
@@ -362,8 +364,14 @@ public class RoleController {
         return RoleInterfaceAssembler.toUserResponse(
                 user,
                 getAccountLoginName(user),
-                departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId())),
-                departmentService::getById);
+                getDepartment(EntityIdCodec.toDomain(user.getDepartmentId())),
+                this::getDepartment);
+    }
+
+    private Department getDepartment(EntityId departmentId) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setId(departmentId);
+        return departmentService.get(query);
     }
 
     private String getAccountLoginName(User user) {

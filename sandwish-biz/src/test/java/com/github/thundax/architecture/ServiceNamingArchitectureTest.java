@@ -25,8 +25,6 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
             "AsyncTaskService#update",
             "CurrentUserService#updateInfo",
             "CurrentUserService#updatePassword",
-            "DepartmentService#batchDeleteById",
-            "DepartmentService#update",
             "LogService#batchDelete",
             "LogService#batchInsert",
             "LogService#deleteById",

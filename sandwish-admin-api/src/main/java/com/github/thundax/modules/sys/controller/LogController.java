@@ -24,6 +24,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import io.swagger.annotations.Api;
@@ -76,10 +77,15 @@ public class LogController {
 
     private LogResponse toResponse(Log log) {
         User user = userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(log.getUserId()))));
-        Department department =
-                user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
+        Department department = user == null ? null : getDepartment(EntityIdCodec.toDomain(user.getDepartmentId()));
         return LogInterfaceAssembler.toResponse(
-                log, user, getAccountLoginName(user), department, departmentService::getById);
+                log, user, getAccountLoginName(user), department, this::getDepartment);
+    }
+
+    private Department getDepartment(EntityId departmentId) {
+        DepartmentQuery query = new DepartmentQuery();
+        query.setId(departmentId);
+        return departmentService.get(query);
     }
 
     private UserQuery userQuery(EntityId userId) {

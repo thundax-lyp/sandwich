@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -12,6 +11,9 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.List;
 import org.junit.Test;
@@ -23,7 +25,7 @@ public class DepartmentServiceImplTest {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        assertEquals(null, service.getById((EntityId) null));
+        assertEquals(null, service.get((DepartmentQuery) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -64,11 +66,10 @@ public class DepartmentServiceImplTest {
         Department department = new Department();
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        service.add(department);
+        EntityId id = service.create(createCommand(department));
 
-        assertNotNull(department.getId());
-        assertEquals(null, department.getCreateDate());
-        assertSame(department, dao.inserted);
+        assertNotNull(id);
+        assertNotNull(dao.inserted);
     }
 
     @Test
@@ -77,10 +78,9 @@ public class DepartmentServiceImplTest {
         Department department = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        service.update(department);
+        service.changeInfo(changeCommand(department));
 
-        assertEquals(null, department.getUpdateDate());
-        assertSame(department, dao.updated);
+        assertNotNull(dao.updated);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class DepartmentServiceImplTest {
         dao.getResult = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of(6001L));
+        int count = service.remove(new DeleteDepartmentCommand(EntityId.of(6001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(6001L), dao.deletedId);
@@ -99,6 +99,26 @@ public class DepartmentServiceImplTest {
         Department department = new Department();
         department.setId(EntityIdCodec.toDomain(id));
         return department;
+    }
+
+    private static CreateDepartmentCommand createCommand(Department department) {
+        return new CreateDepartmentCommand(
+                department.getId(),
+                department.getParentId(),
+                department.getName(),
+                department.getShortName(),
+                department.getPriority(),
+                department.getRemarks());
+    }
+
+    private static ChangeDepartmentInfoCommand changeCommand(Department department) {
+        return new ChangeDepartmentInfoCommand(
+                department.getId(),
+                department.getParentId(),
+                department.getName(),
+                department.getShortName(),
+                department.getPriority(),
+                department.getRemarks());
     }
 
     private static class RecordingDepartmentDao implements DepartmentDao {

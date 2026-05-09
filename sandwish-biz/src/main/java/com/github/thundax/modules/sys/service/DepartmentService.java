@@ -3,28 +3,29 @@ package com.github.thundax.modules.sys.service;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
+import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.List;
 
 public interface DepartmentService {
 
-    Department getById(EntityId id);
-
-    List<Department> listAll();
+    Department get(DepartmentQuery query);
 
     List<Department> list(DepartmentQuery query);
 
     PageResult<Department> page(DepartmentQuery query, PageQuery page);
 
-    EntityId add(Department department);
+    EntityId create(CreateDepartmentCommand command);
 
-    void update(Department department);
+    void changeInfo(ChangeDepartmentInfoCommand command);
 
-    int batchDeleteById(List<EntityId> ids);
+    int remove(DeleteDepartmentCommand command);
 
-    void moveTreeNode(Department fromBean, Department toBean, TreeNodeMoveType moveType);
+    void move(MoveDepartmentCommand command);
 
-    boolean isChildOf(Department child, Department parent);
+    boolean existsChildRelation(DepartmentQuery query);
 }

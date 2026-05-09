@@ -11,25 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/department`：规约化 DepartmentService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DepartmentService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DepartmentServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/DepartmentQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/DepartmentServiceImplTest.java
-  - 处理动作：新增 Department Command，规约化部门创建、信息变更、移动和删除入口
-  - 验收点：DepartmentService 写入口使用 Command；方法名表达业务动作
-  - 重要度：8/10
-
-- [ ] `service-method-admin/department`：同步 DepartmentController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DepartmentController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentMoveRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentQueryRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentSaveRequest.java
-  - 处理动作：将 Department API Request 显式组装为 Department Query 或 Command，并移除对旧 Service 写入口的调用
-  - 验收点：DepartmentController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-sys/current-user`：规约化 CurrentUserService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/CurrentUserService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImpl.java

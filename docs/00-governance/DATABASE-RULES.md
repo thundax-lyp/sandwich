@@ -39,7 +39,6 @@
 - 新增数据库表必须使用业务域前缀，当前固定前缀为 `sys_`、`auth_`、`assist_`、`member_`、`audit_`
 - 新增表、数据库脚本和 `DO/DataObject` 不使用 `tb_` 前缀
 - 关系表后缀必须显式表达语义
-- 审计字段固定使用 `create_date` / `create_by` / `update_date` / `update_by`
 - 当前系统不引入租户字段；只有架构文档明确进入多租户模型后，才新增租户字段规则
 - 新增业务域表名前缀前必须先盘点现有 schema，并同步更新本文档和架构测试白名单
 
@@ -57,8 +56,8 @@
 - Java 8 项目默认沿用现有日期时间类型
 - 日期时间类型保持当前 Java 8 技术栈可直接支持的形态
 - 密码、令牌、密钥、验证码等敏感信息不得明文落库
-- `DO/DataObject` 审计字段按数据库列语义命名为 `createBy` / `updateBy`；业务 `Entity` 可以继续使用 `createUserId` / `updateUserId` 表达业务含义，由 `PersistenceAssembler` 显式转换。
-- `createDate` / `createBy` / `updateDate` / `updateBy` 是持久化审计字段，由 infra 在 insert / update 时统一填充；`createBy` / `updateBy` 只透传当前请求的 `currentUserId`，Service 不预填审计字段。
+- 业务表不得新增或保留 `create_date` / `create_by` / `update_date` / `update_by` 等通用审计字段；对象变更审计固定归属 Audit 模块。
+- 业务确实需要按创建人、更新人、创建时间或更新时间筛选时，必须使用具备具体业务语义的字段重新建模，不复用通用审计字段。
 - 删除、禁用、隐藏、失效等生命周期含义必须通过业务字段表达；不得为新增表引入泛化逻辑删除字段。
 
 ## Primary Key Rules
@@ -93,7 +92,6 @@
 - 禁止新增 Mapper XML、注解 SQL 或 SQL Provider 作为业务持久化实现入口。
 - `PersistenceAssembler` 只负责 `Entity <-> DO/DataObject` 转换，不调用 Service、DAO 或 Mapper。
 - DAO implementation 负责调用 MyBatis Mapper 并通过 `PersistenceAssembler` 完成模型转换。
-- 数据库表审计字段填充固定使用 infra 统一持久化拦截能力，不在各个 DAO implementation 的业务写法中散落设置。
 - Service 不感知 `DO/DataObject`。
 - Controller 不直接依赖 DAO、Mapper、`DO/DataObject` 或 `PersistenceAssembler`。
 - `DO/DataObject` 只承载数据库字段、必要关系字段和持久化查询所需的显式字段。

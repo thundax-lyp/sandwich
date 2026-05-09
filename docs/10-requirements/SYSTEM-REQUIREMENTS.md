@@ -73,8 +73,6 @@
 - `status`：用户状态。
 - `priority`：排序值。
 - `remarks`：备注。
-- `createDate` / `createUserId`：创建审计信息。
-- `updateDate` / `updateUserId`：更新审计信息。
 
 固定约束：
 
@@ -96,8 +94,6 @@
 - `priority`：排序值。
 - `remarks`：备注。
 - `menuIdList`：角色授权菜单 ID 列表。
-- `createDate` / `createUserId`：创建审计信息。
-- `updateDate` / `updateUserId`：更新审计信息。
 
 固定约束：
 
@@ -122,8 +118,6 @@
 - `target`：打开目标。
 - `priority`：排序值。
 - `remarks`：备注。
-- `createDate` / `createUserId`：创建审计信息。
-- `updateDate` / `updateUserId`：更新审计信息。
 
 固定约束：
 
@@ -145,8 +139,6 @@
 - `shortName`：部门简称。
 - `priority`：排序值。
 - `remarks`：备注。
-- `createDate` / `createUserId`：创建审计信息。
-- `updateDate` / `updateUserId`：更新审计信息。
 
 固定约束：
 
@@ -166,8 +158,6 @@
 - `value`：字典值。
 - `priority`：排序值。
 - `remarks`：备注。
-- `createDate` / `createUserId`：创建审计信息。
-- `updateDate` / `updateUserId`：更新审计信息。
 
 固定约束：
 
@@ -264,7 +254,7 @@
 ### 7.6 字典管理
 
 - 支持读取、列表、分页、新增、更新、删除、读取类型列表、读取标签列表和读取字典修订号。
-- 字典列表按 `type`、`priority`、`createDate` 排序。
+- 字典列表按 `type`、`priority` 排序。
 
 ### 7.7 日志管理
 

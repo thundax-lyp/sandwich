@@ -104,8 +104,6 @@
 | `reference_status` | `referenceStatus` | `referenceStatus` | 是 | 引用状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 
 字段规则：
 
@@ -122,7 +120,7 @@
 
 - 主键：`pk_assist_storage(id)`
 - 唯一索引：`uk_assist_storage_key(storage_type, bucket_name, object_key)`
-- 普通索引：`idx_assist_storage_status(object_status, reference_status, create_date)`
+- 普通索引：`idx_assist_storage_status(object_status, reference_status`
 - 普通索引：`idx_assist_storage_mime_type(mime_type)`
 
 ### 6.2 assist_storage_business
@@ -170,8 +168,6 @@
 | `part_size` | `partSize` | `partSize` | 是 | 固定分片大小，字节 |
 | `uploaded_part_count` | `uploadedPartCount` | `uploadedPartCount` | 是 | 已上传分片数 |
 | `upload_status` | `uploadStatus` | `uploadStatus` | 是 | 分片上传状态 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
 | `completed_date` | `completedDate` | `completedDate` | 否 | 完成时间 |
 | `aborted_date` | `abortedDate` | `abortedDate` | 否 | 取消时间 |
 
@@ -188,7 +184,7 @@
 - 主键：`pk_assist_storage_multipart_upload(id)`
 - 唯一索引：`uk_assist_storage_multipart_upload_upload_id(upload_id)`
 - 普通索引：`idx_assist_storage_multipart_upload_object_key(storage_type, bucket_name, object_key)`
-- 普通索引：`idx_assist_storage_multipart_upload_owner(owner_type, owner_id, upload_status, create_date)`
+- 普通索引：`idx_assist_storage_multipart_upload_owner(owner_type, owner_id, upload_status`
 
 ### 6.4 assist_storage_multipart_upload_part
 
@@ -201,7 +197,6 @@
 | `part_number` | `partNumber` | `partNumber` | 是 | 分片序号 |
 | `etag` | `etag` | `etag` | 是 | 分片校验标识 |
 | `size` | `size` | `size` | 是 | 分片大小，字节 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
 
 字段规则：
 
@@ -272,8 +267,8 @@
 
 目标 DAO list/page 排序固定为：
 
-1. `create_date` 降序。
-2. `priority` 升序。
+1. `priority` 升序。
+2. `id` 降序。
 
 ## 10. Open Items
 

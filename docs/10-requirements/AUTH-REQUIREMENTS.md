@@ -112,8 +112,6 @@
 - `rank`：用户访问等级，使用 `AccessRank`；持久化到 `sys_user.ranks`。
 - `privilege`：用户权限等级。
 - `status`：用户状态。
-- `createDate`：创建时间。
-- `updateDate`：更新时间。
 
 固定约束：
 

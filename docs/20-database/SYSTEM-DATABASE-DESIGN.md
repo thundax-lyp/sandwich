@@ -48,7 +48,6 @@
 - `sys_menu.visibility` 固定存储 `MenuVisibility` 枚举名：`VISIBLE` / `HIDDEN`，默认值固定为 `VISIBLE`。
 - `sys_menu.lft` / `sys_menu.rgt` 和 `sys_department.lft` / `sys_department.rgt` 是 nested-set 持久化索引。
 - `Entity` 不暴露 `lft` / `rgt`。
-- `create_date` / `create_by` / `update_date` / `update_by` 是通用审计字段，由 infra 统一填充。
 - 删除、禁用和隐藏含义必须通过当前业务对象自身的业务字段表达。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
@@ -97,10 +96,6 @@
 | `status` | `status` | `status` | 是 | 启用状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -115,7 +110,7 @@
 
 - 主键：`pk_sys_user(id)`
 - 普通索引：`idx_sys_user_department(department_id)`
-- 普通索引：`idx_sys_user_status(status, priority, create_date)`
+- 普通索引：`idx_sys_user_status(status, priority`
 
 ### 6.2 sys_role
 
@@ -129,10 +124,6 @@
 | `status` | `status` | `status` | 是 | 启用状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -143,7 +134,7 @@
 索引：
 
 - 主键：`pk_sys_role(id)`
-- 普通索引：`idx_sys_role_status(status, priority, create_date)`
+- 普通索引：`idx_sys_role_status(status, priority`
 
 ### 6.3 sys_menu
 
@@ -164,10 +155,6 @@
 | `target` | `target` | `target` | 否 | 打开目标 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -195,10 +182,6 @@
 | `short_name` | `shortName` | `shortName` | 否 | 部门简称 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -226,10 +209,6 @@
 | `value` | `value` | `value` | 是 | 字典值 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -239,7 +218,7 @@
 索引：
 
 - 主键：`pk_sys_dict(id)`
-- 普通索引：`idx_sys_dict_type(type, priority, create_date)`
+- 普通索引：`idx_sys_dict_type(type, priority`
 
 ### 6.6 sys_log
 
@@ -384,11 +363,11 @@
 
 排序规则：
 
-- 用户默认按 `priority`、`create_date` 升序。
-- 角色默认按 `priority`、`create_date` 升序。
+- 用户默认按 `priority` 升序。
+- 角色默认按 `priority` 升序。
 - 菜单默认按 `lft` 升序。
 - 部门默认按 `lft` 升序。
-- 字典默认按 `type`、`priority`、`create_date` 升序。
+- 字典默认按 `type`、`priority` 升序。
 - 日志默认按 `log_date` 降序。
 
 ## 10. Open Items

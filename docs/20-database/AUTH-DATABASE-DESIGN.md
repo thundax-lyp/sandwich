@@ -82,7 +82,7 @@
 - 凭据类型字段固定为 `credential_type`。
 - 凭据值字段固定为 `credential_value`。
 - 状态字段固定为 `status`。
-- 配置类表使用 `create_date`、`create_by`、`update_date`、`update_by`；会话事实和授权码事实不使用通用审计字段。
+- 认证运行态对象、会话事实和授权码事实不使用通用审计字段。
 
 ## 5. Table Mapping
 
@@ -218,10 +218,6 @@
 | `status` | `status` | `status` | 是 | 客户端状态 |
 | `contact` | `contact` | `contact` | 否 | 联系方式 |
 | `remark` | `remark` | `remark` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -351,7 +347,7 @@
 
 分页规则：
 
-- 后台身份和凭据管理分页查询按 `create_date` 降序。
+- 后台身份和凭据管理分页查询按主键 `id` 降序。
 - 分页参数有效性由 Service 校验。
 - DAO implementation 只按已校验参数执行持久化分页。
 

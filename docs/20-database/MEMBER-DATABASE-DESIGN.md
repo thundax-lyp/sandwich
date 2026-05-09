@@ -42,7 +42,6 @@
 - 会员主表固定为 `member_member`。
 - 主键字段固定为 `id`。
 - 会员状态字段固定为 `status`。
-- 审计字段固定为 `create_date`、`create_by`、`update_date`、`update_by`。
 
 ## 5. Table Mapping
 
@@ -64,10 +63,6 @@
 | `status` | `status` | `status` | 是 | 会员生命周期状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
-| `create_date` | `createDate` | `createDate` | 是 | 创建时间 |
-| `create_by` | `createBy` | `createUserId` | 否 | 创建人 |
-| `update_date` | `updateDate` | `updateDate` | 否 | 更新时间 |
-| `update_by` | `updateBy` | `updateUserId` | 否 | 更新人 |
 
 字段规则：
 
@@ -81,7 +76,7 @@
 索引设计：
 
 - 主键：`pk_member_member(id)`
-- 普通索引：`idx_member_member_status(status, priority, create_date)`
+- 普通索引：`idx_member_member_status(status, priority`
 
 ## 7. Relationship Rules
 

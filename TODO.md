@@ -11,19 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 docs`：同步业务表审计字段退出规则
-  - 范围文件：
-    - `docs/00-governance/DATABASE-RULES.md`
-    - `docs/10-requirements/AUDIT-REQUIREMENTS.md`
-    - `docs/10-requirements/SYSTEM-REQUIREMENTS.md`
-    - `docs/20-database/AUTH-DATABASE-DESIGN.md`
-    - `docs/20-database/MEMBER-DATABASE-DESIGN.md`
-    - `docs/20-database/STORAGE-DATABASE-DESIGN.md`
-    - `docs/20-database/SYSTEM-DATABASE-DESIGN.md`
-  - 处理动作：删除业务表固定通用审计字段的规则、需求和数据库设计描述，保留 Audit 自身表和 `sys_log` 排除边界。
-  - 验收点：业务表文档不再要求 `createdAt/createUserId/updatedAt/updateUserId` 等通用审计字段；无需 Maven 命令。
-  - 重要度：10/10
-
 - [ ] `Audit 3.2 sql-baseline`：同步业务表 schema/data 基线
   - 范围文件：
     - `db/schema/system.sql`

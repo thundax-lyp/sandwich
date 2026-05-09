@@ -78,8 +78,6 @@
 - `accessEndpoint`：派生访问端点。
 - `objectStatus`：对象状态。
 - `referenceStatus`：引用状态。
-- `createDate`：创建时间。
-- `updateDate`：更新时间。
 
 说明：
 
@@ -152,8 +150,6 @@
 - `partSize`：固定分片大小。
 - `uploadedPartCount`：已上传分片数。
 - `uploadStatus`：分片上传状态。
-- `createDate`：创建时间。
-- `updateDate`：更新时间。
 - `completedDate`：完成时间。
 - `abortedDate`：取消时间。
 
@@ -168,7 +164,6 @@
 - `partNumber`：分片序号。
 - `etag`：分片校验标识。
 - `size`：分片大小。
-- `createDate`：创建时间。
 
 ### 5.8 MultipartUploadStatus
 

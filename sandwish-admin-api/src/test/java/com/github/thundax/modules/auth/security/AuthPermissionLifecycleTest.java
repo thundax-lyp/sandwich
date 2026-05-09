@@ -365,7 +365,7 @@ public class AuthPermissionLifecycleTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {
-            Assert.assertEquals("1", UserAccessHolder.currentUserId());
+            Assert.assertEquals(Long.valueOf(1L), UserAccessHolder.currentUserId());
             Assert.assertEquals(accessToken.getToken(), UserAccessHolder.currentToken());
         });
 

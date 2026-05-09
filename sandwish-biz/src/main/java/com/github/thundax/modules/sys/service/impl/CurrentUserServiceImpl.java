@@ -113,7 +113,9 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         List<Role> roleList = userService.listUserRoles(userQuery(currentUser));
         boolean isAdmin = currentUser.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
         if (isAdmin) {
-            List<Menu> menuList = menuService.list(new MenuQuery(null, null, currentUser.getRank()));
+            MenuQuery menuQuery = new MenuQuery();
+            menuQuery.setMaxRank(currentUser.getRank());
+            List<Menu> menuList = menuService.list(menuQuery);
             menuList.sort(Menu::compareTo);
             return menuList;
         }
@@ -123,13 +125,21 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 .map(Menu::getId)
                 .distinct()
                 .filter(menuId -> {
-                    Menu menu = menuService.getById(menuId);
+                    Menu menu = menuService.get(menuQuery(menuId));
                     return menu != null && currentUser.getRank().canAccess(menu.getRank());
                 })
                 .collect(Collectors.toList());
-        List<Menu> menuList = menuService.listByIds(menuIds);
+        MenuQuery menuQuery = new MenuQuery();
+        menuQuery.setIds(menuIds);
+        List<Menu> menuList = menuService.list(menuQuery);
         menuList.sort(Menu::compareTo);
         return menuList;
+    }
+
+    private MenuQuery menuQuery(EntityId menuId) {
+        MenuQuery query = new MenuQuery();
+        query.setId(menuId);
+        return query;
     }
 
     private RoleQuery roleQuery(Role role) {

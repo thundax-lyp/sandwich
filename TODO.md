@@ -11,26 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/menu`：规约化 MenuService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/MenuService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/MenuServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/MenuQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/MenuServiceImplTest.java
-  - 处理动作：新增 Menu Command，规约化菜单创建、信息变更、显示状态、移动和删除入口
-  - 验收点：MenuService 写方法使用业务动作名；菜单查询符合 Query / PageQuery / PageResult 参数和返回规则
-  - 重要度：9/10
-
-- [ ] `service-method-admin/menu`：同步 MenuController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/MenuController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuDisplayRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuMoveRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuQueryRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuSaveRequest.java
-  - 处理动作：将 Menu API Request 显式组装为 Menu Query 或 Command，并移除对旧 Service 写入口的调用
-  - 验收点：MenuController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-sys/department`：规约化 DepartmentService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DepartmentService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DepartmentServiceImpl.java

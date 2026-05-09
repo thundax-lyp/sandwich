@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -14,8 +13,11 @@ import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
+import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
+import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
@@ -26,7 +28,7 @@ public class MenuServiceImplTest {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        assertEquals(null, service.getById((EntityId) null));
+        assertEquals(null, service.get((MenuQuery) null));
         assertEquals(0, dao.getCalls);
     }
 
@@ -81,11 +83,10 @@ public class MenuServiceImplTest {
         Menu menu = new Menu();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        service.add(menu);
+        EntityId id = service.create(createCommand(menu));
 
-        assertNotNull(menu.getId());
-        assertEquals(null, menu.getCreateDate());
-        assertSame(menu, dao.inserted);
+        assertNotNull(id);
+        assertNotNull(dao.inserted);
     }
 
     @Test
@@ -94,10 +95,9 @@ public class MenuServiceImplTest {
         Menu menu = menu(5001L);
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        service.update(menu);
+        service.changeInfo(changeCommand(menu));
 
-        assertEquals(null, menu.getUpdateDate());
-        assertSame(menu, dao.updated);
+        assertNotNull(dao.updated);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class MenuServiceImplTest {
         dao.getResult = stored;
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of(5001L));
+        int count = service.remove(new DeleteMenuCommand(EntityId.of(5001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(5001L), dao.deletedMenuRoleId);
@@ -115,14 +115,44 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldBatchUpdateVisibility() {
+    public void shouldChangeVisibility() {
         RecordingMenuDao dao = new RecordingMenuDao();
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.batchUpdateVisibility(Arrays.asList(menu(5001L), menu(5002L)));
+        int count = service.changeVisibility(new ChangeMenuVisibilityCommand(EntityId.of(5001L), MenuVisibility.HIDDEN));
 
-        assertEquals(2, count);
-        assertEquals(2, dao.visibilityCalls);
+        assertEquals(1, count);
+        assertEquals(1, dao.visibilityCalls);
+    }
+
+    private static CreateMenuCommand createCommand(Menu menu) {
+        return new CreateMenuCommand(
+                menu.getId(),
+                menu.getParentId(),
+                menu.getName(),
+                menu.getPerms(),
+                menu.getRank(),
+                menu.getVisibility(),
+                menu.getDisplayParams(),
+                menu.getUrl(),
+                menu.getTarget(),
+                menu.getPriority(),
+                menu.getRemarks());
+    }
+
+    private static ChangeMenuInfoCommand changeCommand(Menu menu) {
+        return new ChangeMenuInfoCommand(
+                menu.getId(),
+                menu.getParentId(),
+                menu.getName(),
+                menu.getPerms(),
+                menu.getRank(),
+                menu.getVisibility(),
+                menu.getDisplayParams(),
+                menu.getUrl(),
+                menu.getTarget(),
+                menu.getPriority(),
+                menu.getRemarks());
     }
 
     private static Menu menu(Long id) {

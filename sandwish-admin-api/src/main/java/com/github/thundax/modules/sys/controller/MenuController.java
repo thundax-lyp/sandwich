@@ -24,6 +24,9 @@ import com.github.thundax.modules.sys.controller.response.MenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
+import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
+import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -67,7 +70,7 @@ public class MenuController {
     @SysLogger("读取")
     @RequestMapping(value = "get", method = RequestMethod.POST)
     public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
-        Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+        Menu bean = menuService.get(menuQuery(request.getId()));
         if (bean == null) {
             throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
         }
@@ -107,20 +110,20 @@ public class MenuController {
     public MenuResponse add(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
-            Menu bean = menuService.getById(entity.getId());
+            Menu bean = menuService.get(menuQuery(entity.getId()));
             if (bean != null) {
                 throw new InsertBeanExistException(MENU_NAME, entity.getId());
             }
         }
 
         if (entity.getParentId() != null) {
-            Menu parent = menuService.getById(entity.getParentId());
+            Menu parent = menuService.get(menuQuery(entity.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
         }
 
-        menuService.add(entity);
+        entity.setId(menuService.create(MenuInterfaceAssembler.toCreateCommand(request)));
 
         return MenuInterfaceAssembler.toResponse(entity);
     }
@@ -137,13 +140,13 @@ public class MenuController {
     @SysLogger("修改")
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public MenuResponse update(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
-        Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+        Menu bean = menuService.get(menuQuery(request.getId()));
         if (bean == null) {
             throw new InvalidParameterException("id");
         }
 
         if (request.getParentId() != null) {
-            Menu parent = menuService.getById(EntityIdCodec.toDomain(request.getParentId()));
+            Menu parent = menuService.get(menuQuery(request.getParentId()));
             if (parent == null) {
                 throw new InvalidParameterException("parentId");
             }
@@ -151,7 +154,7 @@ public class MenuController {
 
         Menu entity = MenuInterfaceAssembler.toEntity(bean, request);
 
-        menuService.update(entity);
+        menuService.changeInfo(MenuInterfaceAssembler.toChangeInfoCommand(request));
 
         return MenuInterfaceAssembler.toResponse(entity);
     }
@@ -168,21 +171,21 @@ public class MenuController {
     @SysLogger("显示")
     @RequestMapping(value = "display", method = RequestMethod.POST)
     public Boolean updateVisibility(@Valid @RequestBody List<MenuDisplayRequest> list) throws ApiException {
-        List<Menu> beanList = new ArrayList<>();
+        List<ChangeMenuVisibilityCommand> commandList = new ArrayList<>();
         for (MenuDisplayRequest request : RequestListHelper.present(list)) {
-            Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+            Menu bean = menuService.get(menuQuery(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
             }
-            bean.setVisibility(
-                    Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN);
-            beanList.add(bean);
+            commandList.add(new ChangeMenuVisibilityCommand(
+                    bean.getId(),
+                    Boolean.TRUE.equals(request.getDisplay()) ? MenuVisibility.VISIBLE : MenuVisibility.HIDDEN));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
 
-        menuService.batchUpdateVisibility(beanList);
+        commandList.forEach(menuService::changeVisibility);
 
         return true;
     }
@@ -199,19 +202,19 @@ public class MenuController {
     @SysLogger("删除")
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Boolean delete(@Valid @RequestBody List<MenuIdRequest> list) throws ApiException {
-        List<Menu> beanList = new ArrayList<>();
+        List<DeleteMenuCommand> commandList = new ArrayList<>();
         for (MenuIdRequest request : RequestListHelper.present(list)) {
-            Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+            Menu bean = menuService.get(menuQuery(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
             }
-            beanList.add(bean);
+            commandList.add(new DeleteMenuCommand(bean.getId()));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
 
-        menuService.batchDeleteById(beanList.stream().map(Menu::getId).collect(Collectors.toList()));
+        commandList.forEach(menuService::remove);
 
         return true;
     }
@@ -272,24 +275,24 @@ public class MenuController {
     @SysLogger("排序")
     @RequestMapping(value = "move", method = RequestMethod.POST)
     public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
-        Menu fromBean = menuService.getById(EntityIdCodec.toDomain(request.getFromNodeId()));
+        Menu fromBean = menuService.get(menuQuery(request.getFromNodeId()));
         if (fromBean == null) {
             throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getFromNodeId()));
         }
 
-        Menu toBean = menuService.getById(EntityIdCodec.toDomain(request.getToNodeId()));
+        Menu toBean = menuService.get(menuQuery(request.getToNodeId()));
         if (toBean == null) {
             throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
-        if (toBean.equals(fromBean) || menuService.isChildOf(toBean, fromBean)) {
+        if (toBean.equals(fromBean) || menuService.existsChildRelation(childRelationQuery(toBean, fromBean))) {
             throw new MoveTreeNodeException(
                     MENU_NAME,
                     EntityIdCodec.toDomain(request.getFromNodeId()),
                     EntityIdCodec.toDomain(request.getToNodeId()));
         }
 
-        menuService.moveTreeNode(fromBean, toBean, readMoveTreeNodeType(request));
+        menuService.move(new MoveMenuCommand(fromBean.getId(), toBean.getId(), readMoveTreeNodeType(request)));
 
         return true;
     }
@@ -305,5 +308,22 @@ public class MenuController {
             default:
                 return TreeNodeMoveType.AFTER;
         }
+    }
+
+    private MenuQuery childRelationQuery(Menu child, Menu ancestor) {
+        MenuQuery query = new MenuQuery();
+        query.setChildId(child.getId());
+        query.setAncestorId(ancestor.getId());
+        return query;
+    }
+
+    private MenuQuery menuQuery(EntityId menuId) {
+        MenuQuery query = new MenuQuery();
+        query.setId(menuId);
+        return query;
+    }
+
+    private MenuQuery menuQuery(Long menuId) {
+        return menuQuery(EntityIdCodec.toDomain(menuId));
     }
 }

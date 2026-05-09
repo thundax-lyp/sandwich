@@ -7,6 +7,8 @@ import com.github.thundax.modules.sys.controller.request.MenuSaveRequest;
 import com.github.thundax.modules.sys.controller.response.MenuResponse;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
+import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import org.springframework.lang.NonNull;
 
@@ -77,5 +79,39 @@ public final class MenuInterfaceAssembler {
         entity.setDisplayParams(request.getDisplayParams());
         entity.setUrl(request.getUrl());
         return entity;
+    }
+
+    @NonNull
+    public static CreateMenuCommand toCreateCommand(@NonNull MenuSaveRequest request) {
+        Menu entity = toEntity(new Menu(), request);
+        return new CreateMenuCommand(
+                entity.getId(),
+                entity.getParentId(),
+                entity.getName(),
+                entity.getPerms(),
+                entity.getRank(),
+                entity.getVisibility(),
+                entity.getDisplayParams(),
+                entity.getUrl(),
+                entity.getTarget(),
+                entity.getPriority(),
+                entity.getRemarks());
+    }
+
+    @NonNull
+    public static ChangeMenuInfoCommand toChangeInfoCommand(@NonNull MenuSaveRequest request) {
+        Menu entity = toEntity(new Menu(), request);
+        return new ChangeMenuInfoCommand(
+                entity.getId(),
+                entity.getParentId(),
+                entity.getName(),
+                entity.getPerms(),
+                entity.getRank(),
+                entity.getVisibility(),
+                entity.getDisplayParams(),
+                entity.getUrl(),
+                entity.getTarget(),
+                entity.getPriority(),
+                entity.getRemarks());
     }
 }

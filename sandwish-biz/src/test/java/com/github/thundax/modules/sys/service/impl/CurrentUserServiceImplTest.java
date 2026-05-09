@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,6 +22,7 @@ import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +44,6 @@ public class CurrentUserServiceImplTest {
         List<Menu> menus = Arrays.asList(menu(5001L, null, "系统管理"), menu(5002L, 5001L, "用户管理"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
-        when(menuService.listByIds(anyList())).thenReturn(menus);
 
         List<Menu> responses = service.listVisibleMenus(superUser());
 
@@ -72,7 +71,6 @@ public class CurrentUserServiceImplTest {
                 menu(5005L, 5099L, "散落菜单"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
-        when(menuService.listByIds(anyList())).thenReturn(menus);
 
         List<Menu> responses = service.listVisibleMenus(superUser());
 
@@ -127,7 +125,7 @@ public class CurrentUserServiceImplTest {
         assertEquals("New Name", updated.getName());
         assertEquals("new@example.com", updated.getEmail());
         assertEquals("13800138000", updated.getMobile());
-        verify(userService).update(currentUser, "tester", null);
+        verify(userService).changeInfo(org.mockito.ArgumentMatchers.any(ChangeUserInfoCommand.class));
     }
 
     @Test

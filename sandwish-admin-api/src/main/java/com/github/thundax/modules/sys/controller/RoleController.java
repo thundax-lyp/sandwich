@@ -422,11 +422,17 @@ public class RoleController {
                 throw new InvalidParameterException("menus.id");
 
             } else {
-                Menu bean = menuService.getById(EntityIdCodec.toDomain(request.getId()));
+                Menu bean = menuService.get(menuQuery(EntityIdCodec.toDomain(request.getId())));
                 if (bean == null) {
                     throw new NullBeanException(MENU_NAME, EntityIdCodec.toDomain(request.getId()));
                 }
             }
         }
+    }
+
+    private MenuQuery menuQuery(EntityId menuId) {
+        MenuQuery query = new MenuQuery();
+        query.setId(menuId);
+        return query;
     }
 }

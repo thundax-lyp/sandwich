@@ -8,7 +8,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -67,15 +66,20 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
+import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
+import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -847,29 +851,20 @@ public class AuthPermissionLifecycleTest {
     private static class TestMenuService implements MenuService {
 
         @Override
-        public int updateVisibility(Menu menu) {
+        public int changeVisibility(ChangeMenuVisibilityCommand command) {
             return 1;
         }
 
         @Override
-        public int batchUpdateVisibility(List<Menu> list) {
-            return list.size();
-        }
+        public void move(MoveMenuCommand command) {}
 
         @Override
-        public void moveTreeNode(Menu fromBean, Menu toBean, TreeNodeMoveType moveType) {}
-
-        @Override
-        public boolean isChildOf(Menu child, Menu parent) {
+        public boolean existsChildRelation(MenuQuery query) {
             return false;
         }
 
-        public Menu getById(EntityId id) {
+        public Menu get(MenuQuery query) {
             return menus().get(0);
-        }
-
-        public List<Menu> listByIds(List<EntityId> ids) {
-            return menus();
         }
 
         public List<Menu> list(MenuQuery query) {
@@ -881,19 +876,15 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId add(Menu entity) {
+        public EntityId create(CreateMenuCommand command) {
             return EntityId.of(6001L);
         }
 
         @Override
-        public void update(Menu entity) {}
+        public void changeInfo(ChangeMenuInfoCommand command) {}
 
-        public int deleteById(EntityId id) {
+        public int remove(DeleteMenuCommand command) {
             return 1;
-        }
-
-        public int batchDeleteById(List<EntityId> ids) {
-            return ids.size();
         }
 
         private List<Menu> menus() {

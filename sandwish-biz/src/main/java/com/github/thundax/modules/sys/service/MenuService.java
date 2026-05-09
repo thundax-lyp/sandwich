@@ -3,32 +3,32 @@ package com.github.thundax.modules.sys.service;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Menu;
+import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
+import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
+import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
+import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.List;
 
 public interface MenuService {
 
-    Menu getById(EntityId id);
-
-    List<Menu> listByIds(List<EntityId> ids);
+    Menu get(MenuQuery query);
 
     List<Menu> list(MenuQuery query);
 
     PageResult<Menu> page(MenuQuery query, PageQuery page);
 
-    EntityId add(Menu menu);
+    EntityId create(CreateMenuCommand command);
 
-    void update(Menu menu);
+    void changeInfo(ChangeMenuInfoCommand command);
 
-    int batchDeleteById(List<EntityId> ids);
+    int remove(DeleteMenuCommand command);
 
-    int updateVisibility(Menu menu);
+    int changeVisibility(ChangeMenuVisibilityCommand command);
 
-    int batchUpdateVisibility(List<Menu> list);
+    void move(MoveMenuCommand command);
 
-    void moveTreeNode(Menu fromBean, Menu toBean, TreeNodeMoveType moveType);
-
-    boolean isChildOf(Menu child, Menu parent);
+    boolean existsChildRelation(MenuQuery query);
 }

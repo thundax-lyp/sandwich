@@ -25,6 +25,8 @@ public final class ApiAnnotationArchitectureRuleSupport {
             Pattern.compile("public\\s+[^{;]+\\s+([A-Za-z0-9_]+)\\s*\\(");
     private static final Pattern API_TAGS_PATTERN = Pattern.compile("@Api\\s*\\([^)]*tags\\s*=\\s*\"([^\"]+)\"");
     private static final Pattern API_TAG_NUMERIC_PREFIX_PATTERN = Pattern.compile("^\\d+(?:-\\d+)*\\.\\s*");
+    private static final Pattern RESPONSE_CONSTRUCTOR_PATTERN =
+            Pattern.compile("new\\s+([A-Za-z0-9_]+Response)\\s*\\(");
 
     private ApiAnnotationArchitectureRuleSupport() {}
 
@@ -119,6 +121,19 @@ public final class ApiAnnotationArchitectureRuleSupport {
         }
 
         assertTrue("RequestBody request parameters must declare @Valid: " + violations, violations.isEmpty());
+    }
+
+    public static void assertControllersDoNotCreateResponses(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectResponseConstructorViolations(root, path, violations));
+        }
+
+        assertTrue(
+                "Controllers must create *Response through *InterfaceAssembler: " + violations, violations.isEmpty());
     }
 
     private static void collectAccessAnnotationViolations(Path root, Path path, List<String> violations) {
@@ -234,6 +249,17 @@ public final class ApiAnnotationArchitectureRuleSupport {
             if (signature.contains("@RequestBody") && signature.contains("Request") && !signature.contains("@Valid")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
             }
+        }
+    }
+
+    private static void collectResponseConstructorViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSourceWithoutComments(path);
+        if (restControllerClassAnnotations(content).length() == 0) {
+            return;
+        }
+        Matcher matcher = RESPONSE_CONSTRUCTOR_PATTERN.matcher(content);
+        while (matcher.find()) {
+            violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " response=" + matcher.group(1));
         }
     }
 

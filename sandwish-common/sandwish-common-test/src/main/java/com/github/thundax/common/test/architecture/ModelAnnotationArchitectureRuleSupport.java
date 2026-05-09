@@ -35,7 +35,7 @@ public final class ModelAnnotationArchitectureRuleSupport {
 
     private static final Set<String> RESPONSE_REQUIRED_ANNOTATIONS = new LinkedHashSet<String>(Arrays.asList(
             "lombok.Getter",
-            "lombok.Setter",
+            "lombok.Builder",
             "io.swagger.annotations.ApiModel",
             "com.fasterxml.jackson.annotation.JsonInclude",
             "com.fasterxml.jackson.annotation.JsonIgnoreProperties"));

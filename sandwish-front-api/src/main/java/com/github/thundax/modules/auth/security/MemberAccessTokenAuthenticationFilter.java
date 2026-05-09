@@ -34,8 +34,8 @@ public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter 
             PrincipalAccessToken token = memberAuthService.getValidAccessToken(memberAuthQuery(accessToken));
             if (token != null) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        new MemberSpringPrincipal(String.valueOf(
-                                token.getPrincipalKey().getPrincipalId().value())),
+                        new MemberSpringPrincipal(
+                                String.valueOf(token.getPrincipalKey().getPrincipalId())),
                         null,
                         Collections.singletonList(new SimpleGrantedAuthority(MEMBER_PERMISSION)));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

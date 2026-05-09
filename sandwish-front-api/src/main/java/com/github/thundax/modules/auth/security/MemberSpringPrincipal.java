@@ -1,7 +1,7 @@
 package com.github.thundax.modules.auth.security;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import java.io.Serializable;
 
 public class MemberSpringPrincipal implements Serializable {
@@ -13,7 +13,7 @@ public class MemberSpringPrincipal implements Serializable {
     }
 
     public MemberSpringPrincipal(Member member) {
-        this.id = EntityIdCodec.toStringValue(member.getId());
+        this.id = MemberIdCodec.toStringValue(member.getId());
     }
 
     public String getId() {

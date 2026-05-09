@@ -32,6 +32,7 @@ import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.service.MemberService;
+import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -284,11 +285,17 @@ public class MemberAuthServiceImpl implements MemberAuthService {
     }
 
     private Member requireActiveMember(EntityId memberId) throws ApiException {
-        Member member = memberService.getById(memberId);
+        Member member = memberService.get(memberQuery(memberId));
         if (member == null || !member.isActive()) {
             throw new ApiException("会员状态不可用");
         }
         return member;
+    }
+
+    private MemberQuery memberQuery(EntityId memberId) {
+        MemberQuery query = new MemberQuery();
+        query.setId(memberId);
+        return query;
     }
 
     private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) throws ApiException {

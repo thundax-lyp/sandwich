@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-member/member`：规约化 MemberService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/query/MemberQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberServiceImplTest.java
-  - 处理动作：新增 Member Command，规约化会员创建、资料变更、状态变更和查询入口
-  - 验收点：MemberService 符合 Query / PageQuery / PageResult / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-front/member-auth`：同步前台会员认证入口
   - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/LoginController.java
   - 范围文件：sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/RegisterController.java

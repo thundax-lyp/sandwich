@@ -9,8 +9,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class MemberServiceImplTest {
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertSame(expected, service.getById(EntityId.of(8001L)));
+        assertSame(expected, service.get(memberQuery(EntityId.of(8001L))));
         assertEquals(Long.valueOf(8001L), dao.id);
     }
 
@@ -33,7 +33,7 @@ public class MemberServiceImplTest {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        assertEquals(null, service.getById((EntityId) null));
+        assertEquals(null, service.get(new MemberQuery()));
         assertEquals(0, dao.getCalls);
     }
 
@@ -59,7 +59,7 @@ public class MemberServiceImplTest {
         Member member = new Member();
 
         MemberServiceImpl service = new MemberServiceImpl(dao);
-        service.add(member);
+        service.create(new MemberCommand(null, member));
 
         assertNotNull(member.getId());
         assertEquals(null, member.getCreateDate());
@@ -68,14 +68,20 @@ public class MemberServiceImplTest {
     }
 
     @Test
-    public void shouldBatchStatusUpdate() {
+    public void shouldChangeStatus() {
         RecordingMemberDao dao = new RecordingMemberDao();
         MemberServiceImpl service = new MemberServiceImpl(dao);
 
-        int count = service.batchUpdateStatus(Arrays.asList(member(8001L), member(8002L)));
+        int count = service.changeStatus(new MemberCommand(null, member(8001L)));
 
-        assertEquals(2, count);
-        assertEquals(2, dao.statusUpdateCalls);
+        assertEquals(1, count);
+        assertEquals(1, dao.statusUpdateCalls);
+    }
+
+    private static MemberQuery memberQuery(EntityId id) {
+        MemberQuery query = new MemberQuery();
+        query.setId(id);
+        return query;
     }
 
     private static Member member(Long id) {

@@ -19,16 +19,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
             "AsyncTaskService#add",
             "AsyncTaskService#deleteById",
             "AsyncTaskService#getById",
-            "AsyncTaskService#update",
-            "MemberService#add",
-            "MemberService#batchDeleteById",
-            "MemberService#batchUpdateStatus",
-            "MemberService#deleteById",
-            "MemberService#getById",
-            "MemberService#listByIds",
-            "MemberService#update",
-            "MemberService#updateInfo",
-            "MemberService#updateStatus"));
+            "AsyncTaskService#update"));
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {

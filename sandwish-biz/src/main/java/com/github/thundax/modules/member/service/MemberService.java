@@ -4,6 +4,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.member.entity.Member;
+import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;
 
@@ -12,25 +13,19 @@ import java.util.List;
  */
 public interface MemberService {
 
-    Member getById(EntityId id);
-
-    List<Member> listByIds(List<EntityId> ids);
+    Member get(MemberQuery query);
 
     List<Member> list(MemberQuery query);
 
     PageResult<Member> page(MemberQuery query, PageQuery page);
 
-    EntityId add(Member member);
+    EntityId create(MemberCommand command);
 
-    void update(Member member);
+    void change(MemberCommand command);
 
-    int deleteById(EntityId id);
+    void changeInfo(MemberCommand command);
 
-    int batchDeleteById(List<EntityId> ids);
+    int changeStatus(MemberCommand command);
 
-    void updateInfo(Member member);
-
-    int updateStatus(Member member);
-
-    int batchUpdateStatus(List<Member> list);
+    int remove(MemberCommand command);
 }

@@ -9,10 +9,9 @@ import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
+import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,20 +28,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member getById(EntityId id) {
-        if (id == null) {
+    public Member get(MemberQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
-    }
-
-    @Override
-    public List<Member> listByIds(List<EntityId> ids) {
-        return dao.listByIds(EntityIdCodec.toValues(ids));
+        return dao.getById(query.getId());
     }
 
     @Override
     public List<Member> list(MemberQuery query) {
+        if (query != null && query.getIds() != null) {
+            return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
+        }
         return dao.list(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getName(),
@@ -67,55 +64,35 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(Member member) {
+    public EntityId create(MemberCommand command) {
+        Member member = command.getMember();
         member.setId(dao.insert(member));
         return member.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Member member) {
-        dao.update(member);
+    public void change(MemberCommand command) {
+        dao.update(command.getMember());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateInfo(Member member) {
-        dao.updateInfo(member);
+    public void changeInfo(MemberCommand command) {
+        dao.updateInfo(command.getMember());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(Member member) {
-        return dao.updateStatus(member);
+    public int changeStatus(MemberCommand command) {
+        return dao.updateStatus(command.getMember());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchUpdateStatus(List<Member> list) {
-        return batchOperate(list, this::updateStatus);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
+    public int remove(MemberCommand command) {
+        EntityId id = command.getId();
         return id == null ? 0 : dao.deleteById(id);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
     }
 
     private PageQuery normalizePage(PageQuery page) {

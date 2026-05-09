@@ -30,6 +30,7 @@ import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.service.MemberService;
+import com.github.thundax.modules.member.service.command.MemberCommand;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -166,7 +167,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         Member member = new Member();
         member.setName(name);
         member.setStatus(MemberStatus.ACTIVE);
-        member.setId(memberService.add(member));
+        member.setId(memberService.create(new MemberCommand(null, member)));
         return member;
     }
 

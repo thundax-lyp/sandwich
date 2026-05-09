@@ -74,7 +74,7 @@ public class RoleServiceImplTest {
                 role.getStatus(),
                 role.getPriority(),
                 role.getRemarks(),
-                role.getMenuIdList()));
+                EntityIdCodec.toDomains(role.getMenuIdList())));
 
         assertNotNull(id);
         assertNotNull(dao.inserted);

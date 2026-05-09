@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
@@ -228,7 +229,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private User toUser(ChangeCurrentUserInfoCommand command) {
         User user = new User();
         user.setId(command.getUserId());
-        user.setDepartmentId(command.getDepartmentId());
+        user.setDepartmentId(EntityIdCodec.toValue(command.getDepartmentId()));
         user.setEmail(command.getEmail());
         user.setMobile(command.getMobile());
         user.setTel(command.getTel());

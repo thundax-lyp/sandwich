@@ -113,7 +113,7 @@ public final class UserInterfaceAssembler {
         User entity = toEntity(new User(), request);
         return new CreateUserCommand(
                 entity.getId(),
-                entity.getDepartmentId(),
+                EntityIdCodec.toDomain(entity.getDepartmentId()),
                 entity.getEmail(),
                 entity.getMobile(),
                 entity.getTel(),
@@ -133,7 +133,7 @@ public final class UserInterfaceAssembler {
         User entity = toEntity(new User(), request);
         return new ChangeUserInfoCommand(
                 entity.getId(),
-                entity.getDepartmentId(),
+                EntityIdCodec.toDomain(entity.getDepartmentId()),
                 entity.getEmail(),
                 entity.getMobile(),
                 entity.getTel(),
@@ -167,10 +167,12 @@ public final class UserInterfaceAssembler {
     }
 
     @NonNull
-    public static List<Long> toRoleIdList(@NonNull UserSaveRequest request) {
+    public static List<EntityId> toRoleIdList(@NonNull UserSaveRequest request) {
         return request.getRoleList() == null
                 ? new ArrayList<>()
-                : request.getRoleList().stream().map(role -> role.getId()).collect(Collectors.toList());
+                : request.getRoleList().stream()
+                        .map(role -> EntityIdCodec.toDomain(role.getId()))
+                        .collect(Collectors.toList());
     }
 
     private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {

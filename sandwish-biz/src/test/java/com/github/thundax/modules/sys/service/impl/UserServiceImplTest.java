@@ -42,7 +42,7 @@ public class UserServiceImplTest {
                 user.getRemarks(),
                 "tester",
                 "encrypted",
-                Arrays.asList(4001L, 4002L)));
+                EntityIdCodec.toDomains(Arrays.asList(4001L, 4002L))));
 
         assertEquals(Long.valueOf(1001L), EntityIdCodec.toValue(userId));
         verify(userDao).deleteUserRole(1001L);
@@ -69,7 +69,7 @@ public class UserServiceImplTest {
                 user.getPriority(),
                 user.getRemarks(),
                 "tester",
-                Collections.singletonList(4001L)));
+                Collections.singletonList(EntityId.of(4001L))));
 
         verify(userDao).update(org.mockito.ArgumentMatchers.any(User.class));
         verify(userDao).deleteUserRole(1001L);

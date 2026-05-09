@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChangeUserInfoCommand {
     private EntityId id;
-    private Long departmentId;
+    private EntityId departmentId;
     private String email;
     private String mobile;
     private String tel;
@@ -27,5 +27,5 @@ public class ChangeUserInfoCommand {
     private int priority;
     private String remarks;
     private String loginName;
-    private List<Long> roleIdList;
+    private List<EntityId> roleIdList;
 }

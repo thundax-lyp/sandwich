@@ -168,11 +168,11 @@ public final class RoleInterfaceAssembler {
         return entity;
     }
 
-    private static List<Long> toMenuIds(RoleSaveRequest request) {
+    private static List<EntityId> toMenuIds(RoleSaveRequest request) {
         return request.getMenuList() == null
                 ? new ArrayList<>()
                 : request.getMenuList().stream()
-                        .map(menu -> menu.getId())
+                        .map(menu -> EntityIdCodec.toDomain(menu.getId()))
                         .collect(Collectors.toList());
     }
 

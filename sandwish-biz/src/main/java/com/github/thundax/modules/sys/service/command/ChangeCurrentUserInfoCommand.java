@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChangeCurrentUserInfoCommand {
     private EntityId userId;
-    private Long departmentId;
+    private EntityId departmentId;
     private String email;
     private String mobile;
     private String tel;

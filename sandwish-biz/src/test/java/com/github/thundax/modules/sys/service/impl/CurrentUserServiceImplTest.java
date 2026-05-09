@@ -125,7 +125,7 @@ public class CurrentUserServiceImplTest {
 
         User updated = service.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
-                currentUser.getDepartmentId(),
+                EntityIdCodec.toDomain(currentUser.getDepartmentId()),
                 "new@example.com",
                 "13800138000",
                 currentUser.getTel(),

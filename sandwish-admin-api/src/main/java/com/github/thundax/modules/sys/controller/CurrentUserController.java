@@ -106,7 +106,7 @@ public class CurrentUserController {
 
         currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
-                currentUser.getDepartmentId(),
+                EntityIdCodec.toDomain(currentUser.getDepartmentId()),
                 request.getEmail(),
                 request.getMobile(),
                 currentUser.getTel(),
@@ -250,11 +250,11 @@ public class CurrentUserController {
     }
 
     private String getPrivateKey(String token) throws InvalidTokenException {
-        PreAuthSessionId sessionId = preAuthSessionService.findIdByToken(PreAuthSessionToken.of(token));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, PreAuthSessionToken.of(token, null, null)));
         if (sessionId == null) {
             throw new InvalidTokenException();
         }
-        String privateKey = preAuthSessionService.findValue(sessionId, PRIVATE_KEY_ITEM);
+        String privateKey = preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw new InvalidTokenException();
         }

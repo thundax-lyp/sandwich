@@ -84,11 +84,11 @@ public class UserServiceImpl implements UserService {
         rewriteUserRoles(user.getId(), command.getRoleIdList());
     }
 
-    private void rewriteUserRoles(EntityId userId, List<Long> roleIdList) {
+    private void rewriteUserRoles(EntityId userId, List<EntityId> roleIdList) {
         if (roleIdList != null) {
             dao.deleteUserRole(EntityIdCodec.toValue(userId));
             if (!roleIdList.isEmpty()) {
-                dao.insertUserRole(EntityIdCodec.toValue(userId), roleIdList);
+                dao.insertUserRole(EntityIdCodec.toValue(userId), EntityIdCodec.toValues(roleIdList));
             }
         }
     }
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
     private User toUser(CreateUserCommand command) {
         User user = new User();
         user.setId(command.getId());
-        user.setDepartmentId(command.getDepartmentId());
+        user.setDepartmentId(EntityIdCodec.toValue(command.getDepartmentId()));
         user.setEmail(command.getEmail());
         user.setMobile(command.getMobile());
         user.setTel(command.getTel());
@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
     private User toUser(ChangeUserInfoCommand command) {
         User user = new User();
         user.setId(command.getId());
-        user.setDepartmentId(command.getDepartmentId());
+        user.setDepartmentId(EntityIdCodec.toValue(command.getDepartmentId()));
         user.setEmail(command.getEmail());
         user.setMobile(command.getMobile());
         user.setTel(command.getTel());

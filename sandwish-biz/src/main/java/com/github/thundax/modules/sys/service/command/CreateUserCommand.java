@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateUserCommand {
     private EntityId id;
-    private Long departmentId;
+    private EntityId departmentId;
     private String email;
     private String mobile;
     private String tel;
@@ -28,5 +28,5 @@ public class CreateUserCommand {
     private String remarks;
     private String loginName;
     private String encryptedPassword;
-    private List<Long> roleIdList;
+    private List<EntityId> roleIdList;
 }

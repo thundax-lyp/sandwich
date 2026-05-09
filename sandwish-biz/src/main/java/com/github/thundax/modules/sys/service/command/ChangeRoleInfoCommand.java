@@ -20,5 +20,5 @@ public class ChangeRoleInfoCommand {
     private RoleStatus status;
     private int priority;
     private String remarks;
-    private List<Long> menuIdList;
+    private List<EntityId> menuIdList;
 }

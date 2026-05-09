@@ -11,18 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.7 architecture-tests`：补齐架构约束和审计回归测试源码
-  - 范围文件：
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/audit/service/impl/AuditServiceImplTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/audit/runtime/AuditDiffServiceTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/audit/runtime/AuditLogAspectTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/architecture/AuditArchitectureTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/architecture/DataObjectAnnotationArchitectureTest.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/architecture/AuditApiArchitectureTest.java`
-  - 处理动作：新增审计流程和架构约束测试源码，更新 DO 架构测试以禁止业务表通用审计字段回流。
-  - 验收点：测试源码可编译；执行 `mvn -pl sandwish-biz -am compile`、`mvn -pl sandwish-infra -am compile` 和 `mvn -pl sandwish-admin-api -am compile`，不单独跑 test。
-  - 重要度：10/10
-
 - [ ] `Audit 3.8 final-cleanup`：最终完整验证并清理 RUNBOOK 现场
   - 范围文件：
     - `TODO.md`

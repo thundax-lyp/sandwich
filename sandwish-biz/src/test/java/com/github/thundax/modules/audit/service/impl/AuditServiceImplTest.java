@@ -1,0 +1,102 @@
+package com.github.thundax.modules.audit.service.impl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.modules.audit.dao.AuditLogDao;
+import com.github.thundax.modules.audit.dao.AuditMetaDao;
+import com.github.thundax.modules.audit.entity.AuditLog;
+import com.github.thundax.modules.audit.entity.AuditMeta;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.audit.entity.valueobject.AuditObjectRef;
+import com.github.thundax.modules.audit.runtime.AuditDiffService;
+import com.github.thundax.modules.audit.runtime.AuditSnapshots;
+import com.github.thundax.modules.audit.service.command.CreateAuditLogCommand;
+import com.github.thundax.modules.audit.service.query.AuditLogQuery;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Test;
+
+public class AuditServiceImplTest {
+
+    @Test
+    public void shouldInsertMetaAndLogForNewObject() {
+        RecordingAuditMetaDao metaDao = new RecordingAuditMetaDao();
+        RecordingAuditLogDao logDao = new RecordingAuditLogDao();
+        AuditServiceImpl service = new AuditServiceImpl(metaDao, logDao, new AuditDiffService());
+        CreateAuditLogCommand command = new CreateAuditLogCommand();
+        command.setObjectType("User");
+        command.setObjectId("1001");
+        command.setAction(AuditAction.CREATE);
+        command.setAfterSnapshot(AuditSnapshots.of("User", "1001", "user", AuditSnapshots.field("name", "名称", "user")));
+        command.setRecordWhenUnchanged(true);
+
+        EntityId id = service.record(command);
+
+        assertEquals(EntityId.of(9002L), id);
+        assertEquals("User", metaDao.inserted.getObjectType());
+        assertEquals(EntityId.of(9001L), logDao.inserted.getMetaId());
+        assertEquals(1L, logDao.inserted.getVersion().longValue());
+        assertEquals(EntityId.of(9002L), metaDao.updated.getLastLogId());
+    }
+
+    @Test
+    public void shouldSkipInvalidCommand() {
+        AuditServiceImpl service =
+                new AuditServiceImpl(new RecordingAuditMetaDao(), new RecordingAuditLogDao(), new AuditDiffService());
+
+        assertNull(service.record(null));
+    }
+
+    private static class RecordingAuditMetaDao implements AuditMetaDao {
+
+        private AuditMeta inserted;
+        private AuditMeta updated;
+
+        @Override
+        public AuditMeta getByObjectRef(AuditObjectRef objectRef) {
+            return null;
+        }
+
+        @Override
+        public EntityId insert(AuditMeta meta) {
+            this.inserted = meta;
+            return EntityId.of(9001L);
+        }
+
+        @Override
+        public int update(AuditMeta meta) {
+            this.updated = meta;
+            return 1;
+        }
+    }
+
+    private static class RecordingAuditLogDao implements AuditLogDao {
+
+        private AuditLog inserted;
+
+        @Override
+        public EntityId insert(AuditLog log) {
+            this.inserted = log;
+            return EntityId.of(9002L);
+        }
+
+        @Override
+        public AuditLog getByIdempotencyKey(String idempotencyKey) {
+            return null;
+        }
+
+        @Override
+        public List<AuditLog> listByObject(String objectType, String objectId) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public Page<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
+            return new Page<>();
+        }
+    }
+}

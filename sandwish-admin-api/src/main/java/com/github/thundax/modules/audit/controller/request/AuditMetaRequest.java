@@ -1,0 +1,22 @@
+package com.github.thundax.modules.audit.controller.request;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@ApiModel(value = "AuditMetaRequest", description = "审计元数据请求")
+public class AuditMetaRequest implements Serializable {
+
+    @NotBlank
+    @ApiModelProperty(name = "objectType", value = "对象类型")
+    private String objectType;
+
+    @NotBlank
+    @ApiModelProperty(name = "objectId", value = "对象ID")
+    private String objectId;
+}

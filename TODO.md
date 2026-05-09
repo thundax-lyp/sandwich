@@ -11,20 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.6 admin-api`：新增后台审计查询 API
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/AuditController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/request/AuditLogPageRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/request/AuditObjectHistoryRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/request/AuditMetaRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/response/AuditLogResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/response/AuditMetaResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/controller/response/AuditFieldResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/audit/assembler/AuditInterfaceAssembler.java`
-  - 处理动作：新增后台对象审计历史、审计日志分页和审计元数据读取接口。
-  - 验收点：后台审计查询 API 可编译；执行 `mvn -pl sandwish-admin-api -am compile`。
-  - 重要度：9/10
-
 - [ ] `Audit 3.7 architecture-tests`：补齐架构约束和审计回归测试源码
   - 范围文件：
     - `sandwish-biz/src/test/java/com/github/thundax/modules/audit/service/impl/AuditServiceImplTest.java`

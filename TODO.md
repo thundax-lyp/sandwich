@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-assist/async-task`：规约化 AsyncTaskService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImplTest.java
-  - 处理动作：新增 AsyncTask Query、Command 和 AsyncTaskServiceImplTest，规约化异步任务创建、状态推进、查询和条件清理入口
-  - 验收点：AsyncTaskService 符合 Query / PageQuery / PageResult / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：7/10
-
 - [ ] `service-method-admin/async-task`：同步 AsyncTaskController 入口适配
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/AsyncTaskController.java
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/AsyncTaskIdRequest.java

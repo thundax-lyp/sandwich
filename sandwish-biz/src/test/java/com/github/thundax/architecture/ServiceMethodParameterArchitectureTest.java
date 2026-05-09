@@ -7,7 +7,6 @@ import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,11 +14,7 @@ import org.junit.Test;
 
 public class ServiceMethodParameterArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_PARAMETERS = new LinkedHashSet<String>(Arrays.asList(
-            "AsyncTaskService#add",
-            "AsyncTaskService#deleteById",
-            "AsyncTaskService#getById",
-            "AsyncTaskService#update"));
+    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_PARAMETERS = new LinkedHashSet<String>();
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {

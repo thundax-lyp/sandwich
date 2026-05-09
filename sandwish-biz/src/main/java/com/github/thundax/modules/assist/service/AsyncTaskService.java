@@ -2,14 +2,16 @@ package com.github.thundax.modules.assist.service;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.assist.entity.AsyncTask;
+import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
+import com.github.thundax.modules.assist.service.query.AsyncTaskQuery;
 
 public interface AsyncTaskService {
 
-    AsyncTask getById(EntityId id);
+    AsyncTask get(AsyncTaskQuery query);
 
-    EntityId add(AsyncTask asyncTask);
+    EntityId create(AsyncTaskCommand command);
 
-    void update(AsyncTask asyncTask);
+    void change(AsyncTaskCommand command);
 
-    void deleteById(EntityId id);
+    void remove(AsyncTaskCommand command);
 }

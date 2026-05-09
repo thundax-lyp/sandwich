@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,9 +19,7 @@ import org.junit.Test;
 
 public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
 
-    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_NAMES = new LinkedHashSet<String>(Arrays.asList(
-            "AsyncTaskService#deleteById",
-            "AsyncTaskService#update"));
+    private static final Set<String> LEGACY_DIRTY_SERVICE_METHOD_NAMES = new LinkedHashSet<String>();
 
     @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {

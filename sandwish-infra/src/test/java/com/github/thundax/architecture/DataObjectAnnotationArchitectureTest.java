@@ -132,9 +132,6 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
             if (!isDataObjectClass(javaClass)) {
                 continue;
             }
-            assertFalse(
-                    javaClass.getFullName() + " must not declare delFlag field",
-                    javaClass.tryGetField("delFlag").isPresent());
             for (JavaField field : javaClass.getFields()) {
                 if (!field.isAnnotatedWith(TableField.class)) {
                     continue;

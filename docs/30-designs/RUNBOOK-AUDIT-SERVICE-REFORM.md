@@ -34,33 +34,33 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 
 本 RUNBOOK 分 8 个阶段完成。每个阶段必须进入 `TODO.md` 拆成文件级任务，经人工审核后执行。
 
-### 3.1 按 domain 拆除旧持久化审计字段和 del_flag
+### 3.1 按 domain 拆除旧持久化审计字段
 
 目标：
 
 - 在新 Audit 模块进入代码实现前，拆除旧的数据库技术审计字段体系。
 - 将 `AuditFieldInterceptor` 从通用持久化自动填充能力中移除或改造成无旧审计字段依赖的能力。
-- 按模块拆除 `create_date` / `create_by` / `update_date` / `update_by` / `del_flag` 对 Entity、DO、DAO 和 SQL 的影响。
+- 按模块拆除旧持久化审计字段对 Entity、DO、DAO 和 SQL 的影响。
 
 执行内容：
 
 - 调整或删除 `AuditFieldInterceptor`。
 - 调整 `MybatisPlusConfiguration` 中与 `AuditFieldInterceptor` 相关的 bean。
 - 更新 common-mybatis 测试。
-- 按模块拆除数据库设计文档中的旧持久化审计字段和 `del_flag`。
-- 按模块拆除 `db/schema/*.sql` 中的旧持久化审计字段和 `del_flag`。
-- 按模块拆除 `db/data/*.sql` 中的旧持久化审计字段和 `del_flag` 初始化值。
+- 按模块拆除数据库设计文档中的旧持久化审计字段。
+- 按模块拆除 `db/schema/*.sql` 中的旧持久化审计字段。
+- 按模块拆除 `db/data/*.sql` 中的旧持久化审计字段初始化值。
 - 按模块拆除 DO、PersistenceAssembler、DAO 查询条件和测试中的旧字段依赖。
 - 删除 `Auditable` 或收窄为仍具备明确业务意义的模型。
 
 固定执行顺序：
 
 1. `common-mybatis`：调整或删除 `AuditFieldInterceptor`，同步 MyBatis-Plus 配置和测试。
-2. `sys`：拆除系统管理域旧持久化审计字段和 `del_flag`。
-3. `auth`：拆除认证域旧持久化审计字段和 `del_flag`。
-4. `storage`：拆除存储域旧持久化审计字段和 `del_flag`。
+2. `sys`：拆除系统管理域旧持久化审计字段。
+3. `auth`：拆除认证域旧持久化审计字段。
+4. `storage`：拆除存储域旧持久化审计字段。
 5. `assist`：拆除辅助域旧持久化审计字段。
-6. `member`：拆除会员域旧持久化审计字段和 `del_flag`。
+6. `member`：拆除会员域旧持久化审计字段。
 
 执行策略：
 
@@ -82,14 +82,14 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 mvn -pl sandwish-common-mybatis -am test
 mvn -pl sandwish-biz -am test
 mvn -pl sandwish-infra -am test
-rg "AuditFieldInterceptor|Auditable|createUserId|updateUserId|createBy|updateBy|delFlag|del_flag" sandwish-common sandwish-biz sandwish-infra db docs
+rg "AuditFieldInterceptor|Auditable|createUserId|updateUserId|createBy|updateBy" sandwish-common sandwish-biz sandwish-infra db docs
 ```
 
 提交边界：
 
 - common-mybatis 拦截器改造单独提交。
 - 业务模块按 domain 提交。
-- 本阶段结束后，旧持久化审计字段和 `del_flag` 只允许出现在已审阅且仍具备业务意义的位置。
+- 本阶段结束后，旧持久化审计字段只允许出现在已审阅且仍具备业务意义的位置。
 
 ### 3.2 实现 Audit 核心模块
 
@@ -316,7 +316,7 @@ mvn install
 可验证点：
 
 ```bash
-rg "Auditable|createUserId|updateUserId|createBy|updateBy|delFlag|del_flag" sandwish-biz sandwish-infra sandwish-admin-api db docs
+rg "Auditable|createUserId|updateUserId|createBy|updateBy" sandwish-biz sandwish-infra sandwish-admin-api db docs
 rg "batchUpdate|batchDelete|batchDeleteById|batchUpdateStatus" sandwish-biz sandwish-admin-api
 rg "@BatchAuditLog" sandwish-biz sandwish-infra sandwish-admin-api
 rg "audit_meta|audit_log|AuditObjectRef|@AuditLog" sandwish-biz sandwish-infra sandwish-admin-api db docs

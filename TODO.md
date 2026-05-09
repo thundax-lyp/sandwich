@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-rules/docs`：同步 Service 方法规约文档
-  - 范围文件：docs/AGENT.md
-  - 范围文件：docs/00-governance/ARCHITECTURE.md
-  - 范围文件：docs/00-governance/NAMING-AND-PLACEMENT-RULES.md
-  - 范围文件：docs/10-requirements/SYSTEM-REQUIREMENTS.md
-  - 范围文件：docs/10-requirements/STORAGE-REQUIREMENTS.md
-  - 范围文件：docs/10-requirements/AUTH-REQUIREMENTS.md
-  - 处理动作：补充 Service 方法规约化任务文档路由，并将 Service 入参三态、方法名禁止名单、`PageQuery` / `PageResult` / `Command` 放置目录和相关需求文档旧口径同步为一致规则
-  - 验收点：Service 方法规约化任务有明确读取入口；治理文档和相关需求文档不再要求或暗示旧式 Service 写入口
-  - 重要度：9/10
-
 - [ ] `service-method-test/baseline`：补齐 Service 方法规约架构测试
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodParameterArchitectureTest.java

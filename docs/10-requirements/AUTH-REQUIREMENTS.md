@@ -77,6 +77,8 @@
 - 后台上下文仍由 `UserAccessHolder` 建立和读取，前台上下文仍由 `MemberSecurityContext` 建立和读取。
 - API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话、验证码图片输出和响应装配适配；可复用的认证业务流程固定收敛到 `sandwish-biz` 的 auth Service。
 - `sandwish-biz` 的 auth Service 不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
+- `sandwish-biz` 的 auth Service 写入口固定使用业务动作名并接收 `*Command`。
+- `sandwish-biz` 的 auth Service 查询入口固定使用 `*Query`，分页查询固定使用 `*Query + PageQuery` 并返回 `PageResult<T>`。
 
 ## 4. Module Mapping
 
@@ -520,9 +522,9 @@
 
 ### 7.13 认证资料维护
 
-- Auth Service 必须支持创建或更新 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
-- Auth Service 必须支持创建或更新 `USER_PASSWORD` 类型 `PrincipalCredential`。
-- Auth Service 更新 `USER_PASSWORD` 类型 `PrincipalCredential` 时必须清零失败次数和锁定状态。
+- Auth Service 必须支持维护 `USER_ACCOUNT` 类型 `PrincipalIdentity`。
+- Auth Service 必须支持维护 `USER_PASSWORD` 类型 `PrincipalCredential`。
+- Auth Service 变更 `USER_PASSWORD` 类型 `PrincipalCredential` 时必须清零失败次数和锁定状态。
 - `PrincipalIdentity` 和 `PrincipalCredential` 的字段、状态和持久化语义归属 Auth。
 - 禁用某个登录标识时不禁用 `User`。
 - 禁用某个认证凭据时不禁用 `User`。

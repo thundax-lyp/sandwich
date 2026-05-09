@@ -409,16 +409,22 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 可以依赖 `sandwish-common` 的通用工具和基础服务。
 - 对外提供稳定业务方法，避免让 Controller 感知过多持久化细节。
 - 跨模块业务复用优先放在 `sandwish-biz` 的 Service。
-- 方法入参固定使用 `*DTO`、`*Query`、业务 `Entity` 或 Java-Type。
+- 方法入参固定为 `*Query`、`*Query + PageQuery` 或 `*Command` 三种形态。
+- 方法参数最多 2 个。
+- 查询入口固定接收一个 `*Query`。
+- 分页查询入口固定接收一个 `*Query` 和一个 `PageQuery`。
+- 写入口固定接收一个 `*Command`，并使用明确业务动作命名。
 - 方法返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type。
 - Java-Type 包含 primitive / boxed primitive、`String`、`BigDecimal`、`Date`、`Enum`、数组、`java.*` 集合容器和项目统一标识值类型。
-- 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
+- 分页返回结果固定使用 `PageResult<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
 - Service 接口应该显式声明当前业务需要暴露的方法。
 - Service 公开方法不得仅由测试代码调用；测试不得成为公开方法存在的唯一理由。
 - 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")` 并说明非测试原因。
 - 不新增空 `BaseService`、空 marker Service、通用 `BaseServiceImpl` 或泛型 CRUD / Tree Service 公共契约。
 - 不直接依赖 API `Request` / `Response`。
 - 不直接依赖 `DO` / `DataObject`。
+- 写入口不接收业务 `Entity`、散落业务字段、API `Request` / `Response` 或持久化实现对象。
+- 不使用 `update*`、`save*`、`insert*`、`batch*` 等泛化方法名表达 Service 写入口；按条件清理允许使用 `deleteByXxx(*Query)` 窄口径。
 - 不直接暴露 MyBatis-Plus `Page`、`IPage`、`Wrapper` 或其他持久化实现类型。
 - 不负责 API 响应字段裁剪、HTTP 状态语义或入口展示模型组装。
 
@@ -439,7 +445,7 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型。
 - DAO interface 方法返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`。
 - DAO 分页入参固定使用 `int pageNo, int pageSize`，分页返回固定使用 MyBatis-Plus `Page<Entity>`。
-- DAO interface 不接收或返回 `*DTO`、API `Request` / `Response`、`DO` / `DataObject` 或 common `PageDTO`。
+- DAO interface 不接收或返回 `*DTO`、API `Request` / `Response`、`DO` / `DataObject`、common `PageQuery` 或 common `PageResult`。
 - Redis DAO 属于 infra 持久化实现；Redis 持久化不要求新增 MyBatis Mapper。
 - 树结构的 `lft` / `rgt` 属于 nested-set 持久化索引，只允许存在于 `DO/DataObject`、Mapper 和 infra DAO implementation 中。
 - 当测试为生产 DAO implementation 提供 InMemory implementation 时，InMemory implementation 固定放在 `src/test/java` 并标记 `@Profile("test")`；对应生产 DAO implementation 必须标记 `@Profile("!test")`，防止测试上下文误加载生产实现。
@@ -451,7 +457,10 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 不在 DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
 - `*Query` 固定作为 Service 入参读取条件模型。
-- Service `add` 方法必须返回新建主实体的 `EntityId`，不得依赖入参回填副作用表达创建结果。
+- `PageQuery` 固定作为 Service 分页输入窗口，只承载 `pageNo` 和 `pageSize`。
+- `PageResult` 固定作为 Service 分页返回结果，不作为 Service 入参。
+- `*Command` 固定作为 Service 写入口入参模型，承载一次业务写操作的目标对象标识、业务动作上下文和并发控制参数。
+- Service 创建方法必须返回新建主实体的 `EntityId`，不得依赖入参回填副作用表达创建结果。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
 - `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。

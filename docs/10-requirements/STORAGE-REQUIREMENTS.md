@@ -241,7 +241,9 @@ Storage 公开入口固定使用资源型路径。
 ### 8.3 查询
 
 - 分页查询必须支持 `contentType`、`ownerId`、`ownerType`、`objectStatus`、`referenceStatus`、`referenceOwnerId`、`referenceOwnerType`、`originalFilename` 和 `remarks` 筛选。
-- Service 列表和分页查询必须使用查询对象表达过滤条件。
+- Service 列表查询必须使用查询对象表达过滤条件。
+- Service 分页查询必须使用查询对象表达过滤条件，使用 `PageQuery` 表达分页窗口，并返回 `PageResult<T>`。
+- Service 写入口固定使用业务动作名并接收 `*Command`。
 - 管理端可以查询所有对象元数据。
 - 业务模块按对象 ID 查询时只能获取稳定对象信息，不获取底层存储实现细节。
 

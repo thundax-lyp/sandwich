@@ -39,6 +39,9 @@
 - API 响应对象：`Response`
 - 接口传输对象：`DTO`
 - Service 查询对象：`XxxQuery`
+- Service 写入口对象：`XxxCommand`
+- Service 分页输入对象：`PageQuery`
+- Service 分页返回对象：`PageResult`
 - API 模型装配器：`InterfaceAssembler`
 - 通用技术能力：`Utils` / `Helper`
 - 静态资源：放在所属 API 模块静态资源目录
@@ -49,22 +52,25 @@
 
 - `PATH_INFRA_PERSISTENCE_OWNERSHIP`：DAO implementation、MyBatis Mapper、`DO/DataObject`、`PersistenceAssembler` 固定归属 `sandwish-infra/src/main/java/com/github/thundax/modules/{module}/persistence/`，DAO implementation 放 `persistence/dao`，MyBatis Mapper 放 `persistence/mapper`，`DO/DataObject` 放 `persistence/dataobject`，`PersistenceAssembler` 放 `persistence/assembler`。
 - `PATH_DATA_OBJECT_INFRA_ONLY`：生产代码中 `DO/DataObject` 只能在 `sandwish-infra` 定义和引用，其他模块不得定义、导入、作为字段、参数、返回值或泛型使用。
-- `PATH_BIZ_MODULE_PACKAGE`：业务域代码固定按 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/` 组织，领域对象放 `entity`，领域枚举放 `entity/enums`，领域值对象放 `entity/valueobject`，DAO interface 放 `dao`，Service interface 放 `service`，Service implementation 放 `service/impl`，Service 查询对象放 `service/query`。
+- `PATH_BIZ_MODULE_PACKAGE`：业务域代码固定按 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/` 组织，领域对象放 `entity`，领域枚举放 `entity/enums`，领域值对象放 `entity/valueobject`，DAO interface 放 `dao`，Service interface 放 `service`，Service implementation 放 `service/impl`，Service 查询对象放 `service/query`，Service 写入口对象放 `service/command`。
 - `PATH_API_MODULE_PACKAGE`：API 入口代码固定按 `{api-module}/src/main/java/com/github/thundax/modules/{module}/` 组织，Controller 放 `controller`，API 请求对象放 `controller/request`，API 响应对象放 `controller/response`，`InterfaceAssembler` 放 `assembler`。
 - `PATH_FRONT_AUTH_MODULE_PACKAGE`：`sandwish-front-api` 中会员登录、注册、token、认证过滤器和认证上下文固定归属 `com.github.thundax.modules.auth`；`com.github.thundax.modules.member` 在前台入口只用于非认证类会员业务接口。
 - `PATH_INTERFACE_ASSEMBLER_API_OWNERSHIP`：`InterfaceAssembler` 固定归属对应 API 入口模块，不进入 `sandwish-biz` 或 `sandwish-infra`
 - `PATH_REQUEST_RESPONSE_API_OWNERSHIP`：API `Request` / `Response` 固定归属对应 API 入口模块，并下沉到对应业务模块的 `controller/request` 与 `controller/response` 包；不进入 `sandwish-biz`、`sandwish-infra` 或 `sandwish-common`
 - `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
+- `PATH_SERVICE_COMMAND_BIZ_OWNERSHIP`：Service 写入口对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/command/`，不进入 API、Entity、DAO、infra 或 common 包。
+- `PATH_COMMON_PAGE_MODEL`：`PageQuery` 和 `PageResult` 固定归属 `sandwish-common-core` 的 `com.github.thundax.common.page` 包。
 - `PATH_ENTRY_SERVICE_API_ONLY`：入口注册编排 Service 固定归属 API 入口模块；前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；后台权限会话适配 Service 固定归属 `sandwish-admin-api` 的 `auth.service`；可复用认证业务 Service 可以归属 `sandwish-biz` 的 `auth.service`，但不得依赖 API Request / Response、Servlet、安全框架上下文或入口专用 provider；`sandwish-biz` 不得声明 `*RegistrationService`、`PermissionService` 或对应 `*ServiceImpl`。
 
 ### Layer
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装；入口模型放在同业务模块的 `controller/request` 与 `controller/response` 包，不下沉到 Service
-- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定使用 `*DTO`、`*Query`、业务 `Entity` 或 Java-Type；返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper` 或其他持久化实现类型。
-- `LAYER_SERVICE_PAGE_DTO`：Service 分页业务数据固定使用 `PageDTO<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型。
+- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定为 `*Query`、`*Query + PageQuery` 或 `*Command` 三种形态；方法参数最多 2 个；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper` 或其他持久化实现类型。
+- `LAYER_SERVICE_PAGE_RESULT`：Service 分页返回结果固定使用 `PageResult<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型；`PageResult` 不作为 Service 方法入参。
+- `LAYER_SERVICE_WRITE_COMMAND`：Service 写入口固定接收一个 `*Command`，不接收业务 `Entity`、散落业务字段或 API `Request`。
 - `LAYER_SERVICE_NO_EMPTY_BASE`：不得新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`；Service 共性能力必须有明确方法契约或具体业务价值。
-- `LAYER_DAO_BOUNDARY_TYPES`：DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型；返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`；不得接收或返回 `*DTO`、API `Request` / `Response`、`DO/DataObject` 或 common `PageDTO`。
+- `LAYER_DAO_BOUNDARY_TYPES`：DAO interface 方法入参固定使用业务 `Entity` 或 Java 标准类型；返回值固定使用业务 `Entity`、Java 标准类型或 MyBatis-Plus `Page<Entity>`；不得接收或返回 `*DTO`、API `Request` / `Response`、`DO/DataObject`、common `PageQuery` 或 common `PageResult`。
 - `LAYER_SERVICE_QUERY_MODEL`：Service 读取条件使用 `XxxQuery` 表达时，`XxxQuery` 固定作为 Service 输入模型，只承载读取过滤条件，不承载 HTTP、Session、权限适配、分页状态、持久化实现类型或 request 字符串解析逻辑。
 - `LAYER_SERVICE_QUERY_NO_SETTER_LOGIC`：`XxxQuery` 源码不得声明手写 `setXxx` 方法；JDK8 下使用 class 承载字段定义，request 到 query 的枚举解析、日期归一化和字段装配固定放在对应 `InterfaceAssembler`。
 - `LAYER_INTERFACE_ASSEMBLER_PURE_CONVERSION`：`InterfaceAssembler` 只负责 API 模型与 Service `Entity` / 稳定业务参数 / 业务结果之间的转换，不调用 Service、DAO 或 Mapper，不处理事务、权限、数据库查询或核心业务规则
@@ -98,6 +104,8 @@
 - `NAME_DECLARATION_ORDER`：类成员固定按 Checkstyle `DeclarationOrder` 排列；类级静态常量和静态字段放在实例字段前，同类成员按可见性顺序排列。
 - `NAME_DTO`：Service 边界传输对象必须以 `DTO` 结尾。
 - `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 API `Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
+- `NAME_SERVICE_COMMAND`：Service 写入口对象命名固定为 `{业务动作}{业务对象}Command` 或 `{业务动作}Command`，例如 `CreateDictCommand`、`RenameRoleCommand`、`BindRoleMenusCommand`；不得使用 API `Request`、`Param`、`DTO` 或业务 `Entity` 替代。
+- `NAME_SERVICE_METHOD_BUSINESS_ACTION`：Service 写方法固定使用业务动作名，不使用 `update*`、`save*`、`insert*`、`batch*` 等泛化或过时命名；条件清理动作允许使用 `deleteByXxx(*Query)` 窄口径。
 
 ## Review Rules（AI/人工审阅，暂不强门禁）
 
@@ -140,7 +148,7 @@
 - DAO interface 命名应保持“DAO 端口”而非 Service 流程语义；优先用 `getById/getByXxx/list/listByIds/page/count/deleteById/batchXxx` 表达持久化访问形状
 - DAO interface 的 `list/page/count` 条件参数顺序必须一致，`pageNo/pageSize` 固定放在分页方法参数末尾
 - DAO interface 参数名优先使用 `status`、`visibility`、`privilege`、`ownerType` 等业务名
-- Service 的通用 CRUD 方法与 DAO 形状保持一致，业务流程方法不为贴合 CRUD 而弱化业务语义；例如 `verifySign/removeBusiness/updateStatus` 优先保留业务动词
+- Service 方法优先表达业务动作，不为贴合 CRUD 而弱化业务语义；例如 `verifySign/removeBusiness/changeStatus` 优先保留业务动词
 
 ## Open Items
 

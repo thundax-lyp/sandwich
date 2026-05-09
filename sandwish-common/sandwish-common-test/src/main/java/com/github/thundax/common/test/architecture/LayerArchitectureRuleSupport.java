@@ -110,8 +110,8 @@ public final class LayerArchitectureRuleSupport {
         }
 
         assertTrue(
-                "Service method parameters must be *DTO, *Query, Entity, or Java-Type, and return values must be "
-                        + "*DTO, Entity, or Java-Type. Known dirty types that still need cleanup are "
+                "Service method boundary types must stay inside service-safe models such as *Query, PageQuery, "
+                        + "PageResult, *Command, *DTO, Entity, or Java-Type. Known dirty types still need cleanup: "
                         + legacyDirtyTypes
                         + ". New violations: "
                         + violations,
@@ -259,11 +259,16 @@ public final class LayerArchitectureRuleSupport {
     }
 
     private static boolean isAllowedServiceReturnType(JavaClass type) {
-        return isVoid(type) || isJavaType(type) || isModuleEntity(type) || isDto(type);
+        return isVoid(type) || isJavaType(type) || isModuleEntity(type) || isDto(type) || isPageResult(type);
     }
 
     private static boolean isAllowedServiceParameterType(JavaClass type) {
-        return isAllowedServiceReturnType(type) || isServiceQuery(type);
+        return isJavaType(type)
+                || isModuleEntity(type)
+                || isDto(type)
+                || isServiceQuery(type)
+                || isServiceCommand(type)
+                || isPageQuery(type);
     }
 
     private static boolean isAllowedDaoResultType(JavaMethod method, JavaClass type) {
@@ -314,6 +319,18 @@ public final class LayerArchitectureRuleSupport {
 
     private static boolean isServiceQuery(JavaClass type) {
         return type.getSimpleName().endsWith("Query") && type.getPackageName().contains(".service.query");
+    }
+
+    private static boolean isServiceCommand(JavaClass type) {
+        return type.getSimpleName().endsWith("Command") && type.getPackageName().contains(".service.command");
+    }
+
+    private static boolean isPageQuery(JavaClass type) {
+        return "com.github.thundax.common.page.PageQuery".equals(type.getName());
+    }
+
+    private static boolean isPageResult(JavaClass type) {
+        return "com.github.thundax.common.page.PageResult".equals(type.getName());
     }
 
     private static boolean isMyBatisPlusPage(JavaClass type) {

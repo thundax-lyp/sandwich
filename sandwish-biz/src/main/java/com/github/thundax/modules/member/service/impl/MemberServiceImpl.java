@@ -3,7 +3,8 @@ package com.github.thundax.modules.member.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -49,19 +50,19 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public PageDTO<Member> page(MemberQuery query, PageDTO<Member> page) {
-        PageDTO<Member> normalizedPage = normalizePage(page);
+    public PageResult<Member> page(MemberQuery query, PageQuery page) {
+        PageQuery normalizedPage = normalizePage(page);
         IPage<Member> dataPage = dao.page(
                 query == null ? null : statusValue(query.getStatus()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
+        return PageResult.of(
+                (int) dataPage.getCurrent(),
+                (int) dataPage.getSize(),
+                dataPage.getTotal(),
+                dataPage.getRecords());
     }
 
     @Override
@@ -117,8 +118,8 @@ public class MemberServiceImpl implements MemberService {
         return count;
     }
 
-    private PageDTO<Member> normalizePage(PageDTO<Member> page) {
-        PageDTO<Member> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageQuery normalizePage(PageQuery page) {
+        PageQuery normalizedPage = page == null ? new PageQuery() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }

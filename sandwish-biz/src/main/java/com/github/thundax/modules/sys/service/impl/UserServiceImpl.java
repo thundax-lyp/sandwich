@@ -3,7 +3,8 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
@@ -51,8 +52,8 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : query.getPrivilege());
     }
 
-    public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
-        PageDTO<User> normalizedPage = normalizePage(page);
+    public PageResult<User> page(UserQuery query, PageQuery page) {
+        PageQuery normalizedPage = normalizePage(page);
         IPage<User> dataPage = dao.page(
                 query == null ? null : query.getDepartmentId(),
                 query == null ? null : query.getLoginName(),
@@ -61,11 +62,11 @@ public class UserServiceImpl implements UserService {
                 query == null ? null : query.getPrivilege(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
+        return PageResult.of(
+                (int) dataPage.getCurrent(),
+                (int) dataPage.getSize(),
+                dataPage.getTotal(),
+                dataPage.getRecords());
     }
 
     @Override
@@ -148,8 +149,8 @@ public class UserServiceImpl implements UserService {
         return count;
     }
 
-    private PageDTO<User> normalizePage(PageDTO<User> page) {
-        PageDTO<User> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageQuery normalizePage(PageQuery page) {
+        PageQuery normalizedPage = page == null ? new PageQuery() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

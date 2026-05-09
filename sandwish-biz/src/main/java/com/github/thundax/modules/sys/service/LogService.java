@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.util.List;
@@ -12,7 +13,7 @@ public interface LogService {
 
     List<Log> list(LogQuery query);
 
-    PageDTO<Log> page(LogQuery query, PageDTO<Log> page);
+    PageResult<Log> page(LogQuery query, PageQuery page);
 
     EntityId add(Log log);
 

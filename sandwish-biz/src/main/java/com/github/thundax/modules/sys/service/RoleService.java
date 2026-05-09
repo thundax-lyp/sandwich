@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -14,7 +15,7 @@ public interface RoleService {
 
     List<Role> list(RoleQuery query);
 
-    PageDTO<Role> page(RoleQuery query, PageDTO<Role> page);
+    PageResult<Role> page(RoleQuery query, PageQuery page);
 
     EntityId add(Role role);
 

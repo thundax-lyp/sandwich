@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -15,7 +16,7 @@ public interface MenuService {
 
     List<Menu> list(MenuQuery query);
 
-    PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page);
+    PageResult<Menu> page(MenuQuery query, PageQuery page);
 
     EntityId add(Menu menu);
 

@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-page-model`：拆分分页输入输出模型
-  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageDTO.java
-  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageQuery.java
-  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageResult.java
-  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageRules.java
-  - 范围文件：sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/response/PageResponseHelper.java
-  - 处理动作：新增 PageQuery 和 PageResult，迁移 PageResponseHelper，并删除混合输入输出职责的 PageDTO
-  - 验收点：common 中不再存在 PageDTO；PageQuery 只承载分页输入，PageResult 只承载分页结果；`mvn -pl sandwish-common-web -am test` 通过
-  - 重要度：10/10
-
 - [ ] `service-method-sys/dict`：规约化 DictService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DictService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java

@@ -12,7 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
@@ -38,8 +39,11 @@ public class DictControllerContractTest {
     public void shouldNormalizePageRequestBeforeCallingService() throws Exception {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
-        when(dictService.page(any(DictQuery.class), any(PageDTO.class)))
-                .thenAnswer(invocation -> invocation.getArgument(1));
+        when(dictService.page(any(DictQuery.class), any(PageQuery.class)))
+                .thenAnswer(invocation -> {
+                    PageQuery page = invocation.getArgument(1);
+                    return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
+                });
 
         DictPageRequest request = new DictPageRequest();
         request.setPageNo(0);
@@ -51,7 +55,7 @@ public class DictControllerContractTest {
         PageResponse<DictResponse> response = controller.page(request);
 
         ArgumentCaptor<DictQuery> queryCaptor = ArgumentCaptor.forClass(DictQuery.class);
-        ArgumentCaptor<PageDTO> pageCaptor = ArgumentCaptor.forClass(PageDTO.class);
+        ArgumentCaptor<PageQuery> pageCaptor = ArgumentCaptor.forClass(PageQuery.class);
         verify(dictService).page(queryCaptor.capture(), pageCaptor.capture());
         assertEquals(PageRules.firstPageIndex(), pageCaptor.getValue().getPageNo());
         assertEquals(PageRules.defaultPageSize(), pageCaptor.getValue().getPageSize());
@@ -65,12 +69,8 @@ public class DictControllerContractTest {
     @Test
     public void shouldWrapPageJsonResponseWithApiResponseAdvice() throws Exception {
         DictService dictService = mock(DictService.class);
-        PageDTO<Dict> page = new PageDTO<>();
-        page.setPageNo(1);
-        page.setPageSize(10);
-        page.setCount(1L);
-        page.setList(Collections.singletonList(dict(1L)));
-        when(dictService.page(any(DictQuery.class), any(PageDTO.class))).thenReturn(page);
+        PageResult<Dict> page = PageResult.of(1, 10, 1L, Collections.singletonList(dict(1L)));
+        when(dictService.page(any(DictQuery.class), any(PageQuery.class))).thenReturn(page);
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new DictController(dictService))
                 .setControllerAdvice(new ApiResponseBodyAdvice())

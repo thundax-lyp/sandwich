@@ -8,7 +8,8 @@ import static org.mockito.Mockito.when;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
@@ -34,8 +35,11 @@ public class StorageControllerContractTest {
         StorageService storageService = mock(StorageService.class);
         StorageController controller =
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
-        when(storageService.page(any(StorageQuery.class), any(PageDTO.class)))
-                .thenAnswer(invocation -> invocation.getArgument(1));
+        when(storageService.page(any(StorageQuery.class), any(PageQuery.class)))
+                .thenAnswer(invocation -> {
+                    PageQuery page = invocation.getArgument(1);
+                    return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
+                });
 
         StoragePageRequest request = new StoragePageRequest();
         request.setPageNo(0);
@@ -49,7 +53,7 @@ public class StorageControllerContractTest {
         PageResponse<StorageResponse> response = controller.page(request);
 
         ArgumentCaptor<StorageQuery> queryCaptor = ArgumentCaptor.forClass(StorageQuery.class);
-        ArgumentCaptor<PageDTO> pageCaptor = ArgumentCaptor.forClass(PageDTO.class);
+        ArgumentCaptor<PageQuery> pageCaptor = ArgumentCaptor.forClass(PageQuery.class);
         verify(storageService).page(queryCaptor.capture(), pageCaptor.capture());
         assertEquals(PageRules.firstPageIndex(), pageCaptor.getValue().getPageNo());
         assertEquals(PageRules.defaultPageSize(), pageCaptor.getValue().getPageSize());

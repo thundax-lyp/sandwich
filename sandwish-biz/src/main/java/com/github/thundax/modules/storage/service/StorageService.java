@@ -2,7 +2,8 @@ package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
@@ -17,7 +18,7 @@ public interface StorageService {
 
     List<StoredObject> list(StorageQuery query);
 
-    PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page);
+    PageResult<StoredObject> page(StorageQuery query, PageQuery page);
 
     EntityId add(StoredObject storage);
 

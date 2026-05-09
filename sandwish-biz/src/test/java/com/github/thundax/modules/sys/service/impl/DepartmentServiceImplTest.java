@@ -6,7 +6,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
@@ -45,16 +46,16 @@ public class DepartmentServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingDepartmentDao dao = new RecordingDepartmentDao();
-        PageDTO<Department> page = new PageDTO<>();
+        PageQuery page = new PageQuery();
         page.setPageNo(0);
         page.setPageSize(0);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        service.page(new DepartmentQuery(), page);
+        PageResult<Department> result = service.page(new DepartmentQuery(), page);
 
         assertEquals(PageRules.firstPageIndex(), dao.pageNo);
         assertEquals(PageRules.defaultPageSize(), dao.pageSize);
-        assertEquals(1L, page.getCount());
+        assertEquals(1L, result.getTotalCount());
     }
 
     @Test

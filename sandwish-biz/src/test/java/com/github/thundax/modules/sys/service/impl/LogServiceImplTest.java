@@ -6,7 +6,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
@@ -54,10 +55,10 @@ public class LogServiceImplTest {
         query.setRequestUri("/login");
         query.setBeginDate(begin);
         query.setEndDate(end);
-        PageDTO<Log> page = new PageDTO<>(2, 20, 100);
+        PageQuery page = new PageQuery(2, 20);
         LogServiceImpl service = new LogServiceImpl(dao);
 
-        service.page(query, page);
+        PageResult<Log> result = service.page(query, page);
 
         assertEquals("ACCESS", dao.type);
         assertEquals("127.0.0.1", dao.remoteAddr);
@@ -69,13 +70,13 @@ public class LogServiceImplTest {
         assertEquals(end, dao.endDate);
         assertEquals(2, dao.pageNo);
         assertEquals(20, dao.pageSize);
-        assertEquals(1L, page.getCount());
+        assertEquals(1L, result.getTotalCount());
     }
 
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingLogDao dao = new RecordingLogDao();
-        PageDTO<Log> page = new PageDTO<>();
+        PageQuery page = new PageQuery();
         page.setPageNo(0);
         page.setPageSize(0);
         LogServiceImpl service = new LogServiceImpl(dao);

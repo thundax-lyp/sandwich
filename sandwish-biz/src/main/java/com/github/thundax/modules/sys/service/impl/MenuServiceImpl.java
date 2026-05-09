@@ -3,7 +3,8 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.SpringContextHolder;
@@ -50,19 +51,19 @@ public class MenuServiceImpl implements MenuService {
                 query == null ? null : rankValue(query.getMaxRank()));
     }
 
-    public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
-        PageDTO<Menu> normalizedPage = normalizePage(page);
+    public PageResult<Menu> page(MenuQuery query, PageQuery page) {
+        PageQuery normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
+        return PageResult.of(
+                (int) dataPage.getCurrent(),
+                (int) dataPage.getSize(),
+                dataPage.getTotal(),
+                dataPage.getRecords());
     }
 
     @Override
@@ -157,8 +158,8 @@ public class MenuServiceImpl implements MenuService {
         return count;
     }
 
-    private PageDTO<Menu> normalizePage(PageDTO<Menu> page) {
-        PageDTO<Menu> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageQuery normalizePage(PageQuery page) {
+        PageQuery normalizedPage = page == null ? new PageQuery() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

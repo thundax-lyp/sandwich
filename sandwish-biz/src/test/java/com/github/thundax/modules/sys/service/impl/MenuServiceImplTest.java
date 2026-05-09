@@ -6,7 +6,8 @@ import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.MenuDao;
@@ -62,16 +63,16 @@ public class MenuServiceImplTest {
     @Test
     public void shouldNormalizeInvalidPageBeforeQuery() {
         RecordingMenuDao dao = new RecordingMenuDao();
-        PageDTO<Menu> page = new PageDTO<>();
+        PageQuery page = new PageQuery();
         page.setPageNo(0);
         page.setPageSize(0);
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        service.page(new MenuQuery(), page);
+        PageResult<Menu> result = service.page(new MenuQuery(), page);
 
         assertEquals(PageRules.firstPageIndex(), dao.pageNo);
         assertEquals(PageRules.defaultPageSize(), dao.pageSize);
-        assertEquals(1L, page.getCount());
+        assertEquals(1L, result.getTotalCount());
     }
 
     @Test

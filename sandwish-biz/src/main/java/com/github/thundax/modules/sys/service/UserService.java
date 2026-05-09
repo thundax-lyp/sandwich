@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -15,7 +16,7 @@ public interface UserService {
 
     List<User> list(UserQuery query);
 
-    PageDTO<User> page(UserQuery query, PageDTO<User> page);
+    PageResult<User> page(UserQuery query, PageQuery page);
 
     EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList);
 

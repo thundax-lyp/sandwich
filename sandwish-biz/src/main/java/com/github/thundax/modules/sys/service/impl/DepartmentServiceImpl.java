@@ -3,7 +3,8 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
@@ -44,19 +45,19 @@ public class DepartmentServiceImpl implements DepartmentService {
                 query == null ? null : query.getRemarks());
     }
 
-    public PageDTO<Department> page(DepartmentQuery query, PageDTO<Department> page) {
-        PageDTO<Department> normalizedPage = normalizePage(page);
+    public PageResult<Department> page(DepartmentQuery query, PageQuery page) {
+        PageQuery normalizedPage = normalizePage(page);
         IPage<Department> dataPage = dao.page(
                 query == null ? null : query.getParentId(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
+        return PageResult.of(
+                (int) dataPage.getCurrent(),
+                (int) dataPage.getSize(),
+                dataPage.getTotal(),
+                dataPage.getRecords());
     }
 
     @Override
@@ -113,8 +114,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         return count;
     }
 
-    private PageDTO<Department> normalizePage(PageDTO<Department> page) {
-        PageDTO<Department> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageQuery normalizePage(PageQuery page) {
+        PageQuery normalizedPage = page == null ? new PageQuery() : page;
         if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
             normalizedPage.setPageNo(PageRules.firstPageIndex());
         }

@@ -106,7 +106,7 @@
 - 需要按树子孙范围过滤时，Service / Controller 固定传递业务字段，区间读取和 SQL join 固定在 infra 持久化实现中完成。
 - MyBatis-Plus 分页插件数据库类型必须从 `spring.datasource.url` 或 `spring.datasource.driver-class-name` 推断；当前只支持 MySQL 和 DM，其他类型必须启动失败，不允许在 common-mybatis 中写死方言或新增重复数据库类型配置。
 - 业务 DAO / Service 显式声明当前业务需要暴露的方法，不通过通用 CRUD / Tree 基类继承业务端口。
-- DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service / Controller 分页业务数据应该使用 `com.github.thundax.common.page.PageDTO`。
+- DAO 分页方法应该返回 `com.baomidou.mybatisplus.extension.plugins.pagination.Page<Entity>`，分页参数使用 `int pageNo, int pageSize`；Service 分页输入使用 `com.github.thundax.common.page.PageQuery`，分页输出使用 `com.github.thundax.common.page.PageResult`。
 - `pageNo` / `pageSize` 有效性由 Service 校验，DAO implementation 只负责按已校验参数执行持久化分页。
 
 ## Index And Uniqueness

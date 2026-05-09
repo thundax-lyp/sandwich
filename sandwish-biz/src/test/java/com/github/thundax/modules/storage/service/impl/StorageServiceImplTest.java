@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -48,7 +48,7 @@ public class StorageServiceImplTest {
         query.setReferenceOwnerType("Article");
         query.setOriginalFilename("avatar");
         query.setRemarks("remark");
-        PageDTO<StoredObject> page = new PageDTO<>(2, 20);
+        PageQuery page = new PageQuery(2, 20);
 
         StorageServiceImpl service = storageService(dao);
         service.page(query, page);

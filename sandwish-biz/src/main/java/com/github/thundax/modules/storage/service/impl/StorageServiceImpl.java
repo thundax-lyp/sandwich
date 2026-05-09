@@ -3,7 +3,8 @@ package com.github.thundax.modules.storage.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -60,8 +61,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public PageDTO<StoredObject> page(StorageQuery query, PageDTO<StoredObject> page) {
-        PageDTO<StoredObject> normalizedPage = normalizePage(page);
+    public PageResult<StoredObject> page(StorageQuery query, PageQuery page) {
+        PageQuery normalizedPage = normalizePage(page);
         IPage<StoredObject> dataPage = dao.page(
                 query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
@@ -74,11 +75,11 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getRemarks(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
-        normalizedPage.setPageNo((int) dataPage.getCurrent());
-        normalizedPage.setPageSize((int) dataPage.getSize());
-        normalizedPage.setCount(dataPage.getTotal());
-        normalizedPage.setList(dataPage.getRecords());
-        return normalizedPage;
+        return PageResult.of(
+                (int) dataPage.getCurrent(),
+                (int) dataPage.getSize(),
+                dataPage.getTotal(),
+                dataPage.getRecords());
     }
 
     @Override
@@ -169,8 +170,8 @@ public class StorageServiceImpl implements StorageService {
         return count;
     }
 
-    private PageDTO<StoredObject> normalizePage(PageDTO<StoredObject> page) {
-        PageDTO<StoredObject> normalizedPage = page == null ? new PageDTO<>() : page;
+    private PageQuery normalizePage(PageQuery page) {
+        PageQuery normalizedPage = page == null ? new PageQuery() : page;
         normalizedPage.initialize();
         return normalizedPage;
     }

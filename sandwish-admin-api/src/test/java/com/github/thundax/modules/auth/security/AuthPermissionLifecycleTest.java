@@ -6,7 +6,8 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
@@ -717,8 +718,8 @@ public class AuthPermissionLifecycleTest {
             return Collections.singletonList(user());
         }
 
-        public PageDTO<User> page(UserQuery query, PageDTO<User> page) {
-            return page;
+        public PageResult<User> page(UserQuery query, PageQuery page) {
+            return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override
@@ -878,8 +879,8 @@ public class AuthPermissionLifecycleTest {
             return menus();
         }
 
-        public PageDTO<Menu> page(MenuQuery query, PageDTO<Menu> page) {
-            return page;
+        public PageResult<Menu> page(MenuQuery query, PageQuery page) {
+            return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override
@@ -961,9 +962,9 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        public PageDTO<com.github.thundax.modules.sys.entity.Role> page(
-                RoleQuery query, PageDTO<com.github.thundax.modules.sys.entity.Role> page) {
-            return page;
+        public PageResult<com.github.thundax.modules.sys.entity.Role> page(
+                RoleQuery query, PageQuery page) {
+            return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override

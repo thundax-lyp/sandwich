@@ -1,7 +1,8 @@
 package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageDTO;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
@@ -15,7 +16,7 @@ public interface DepartmentService {
 
     List<Department> list(DepartmentQuery query);
 
-    PageDTO<Department> page(DepartmentQuery query, PageDTO<Department> page);
+    PageResult<Department> page(DepartmentQuery query, PageQuery page);
 
     EntityId add(Department department);
 

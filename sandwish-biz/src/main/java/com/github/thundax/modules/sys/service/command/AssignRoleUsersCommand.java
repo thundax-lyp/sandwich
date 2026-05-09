@@ -1,7 +1,7 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleQuery {
-    private EntityId id;
-    private RoleStatus status;
+public class AssignRoleUsersCommand {
+    private EntityId roleId;
+    private List<EntityId> userIds;
 }

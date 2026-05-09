@@ -66,6 +66,12 @@ import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
+import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -912,30 +918,20 @@ public class AuthPermissionLifecycleTest {
     private static class TestRoleService implements RoleService {
 
         @Override
-        public List<com.github.thundax.modules.sys.entity.Role> listEnabled() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public int updateStatus(com.github.thundax.modules.sys.entity.Role role) {
+        public int changeStatus(ChangeRoleStatusCommand command) {
             return 1;
         }
 
         @Override
-        public int batchUpdateStatus(List<com.github.thundax.modules.sys.entity.Role> list) {
-            return list.size();
-        }
+        public void assignUsers(AssignRoleUsersCommand command) {}
 
         @Override
-        public void updateUserList(com.github.thundax.modules.sys.entity.Role role, List<User> userList) {}
-
-        @Override
-        public List<User> listRoleUsers(com.github.thundax.modules.sys.entity.Role role) {
+        public List<User> listRoleUsers(RoleQuery query) {
             return Collections.emptyList();
         }
 
         @Override
-        public List<Menu> listRoleMenus(com.github.thundax.modules.sys.entity.Role role) {
+        public List<Menu> listRoleMenus(RoleQuery query) {
             return Collections.emptyList();
         }
 
@@ -945,8 +941,8 @@ public class AuthPermissionLifecycleTest {
             return role;
         }
 
-        public com.github.thundax.modules.sys.entity.Role getById(EntityId id) {
-            return role(id.value());
+        public com.github.thundax.modules.sys.entity.Role get(RoleQuery query) {
+            return role(query.getId().value());
         }
 
         public List<com.github.thundax.modules.sys.entity.Role> listByIds(List<EntityId> ids) {
@@ -968,23 +964,19 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId add(com.github.thundax.modules.sys.entity.Role entity) {
+        public EntityId create(CreateRoleCommand command) {
             return EntityId.of(10001L);
         }
 
         @Override
-        public void update(com.github.thundax.modules.sys.entity.Role entity) {}
+        public void changeInfo(ChangeRoleInfoCommand command) {}
 
-        public int deleteById(EntityId id) {
+        public int remove(DeleteRoleCommand command) {
             return 1;
         }
 
-        public int batchDeleteById(List<EntityId> ids) {
-            return ids.size();
-        }
-
-        public int updatePriority(List<com.github.thundax.modules.sys.entity.Role> list) {
-            return list.size();
+        public int changePriority(ChangeRolePriorityCommand command) {
+            return 1;
         }
     }
 }

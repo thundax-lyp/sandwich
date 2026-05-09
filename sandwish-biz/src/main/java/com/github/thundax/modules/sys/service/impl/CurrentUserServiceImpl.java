@@ -22,6 +22,7 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
 import java.util.List;
 import java.util.Objects;
@@ -103,7 +104,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         }
 
         List<EntityId> menuIds = roleList.stream()
-                .flatMap(role -> roleService.listRoleMenus(role).stream())
+                .flatMap(role -> roleService.listRoleMenus(roleQuery(role)).stream())
                 .map(Menu::getId)
                 .distinct()
                 .filter(menuId -> {
@@ -114,6 +115,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         List<Menu> menuList = menuService.listByIds(menuIds);
         menuList.sort(Menu::compareTo);
         return menuList;
+    }
+
+    private RoleQuery roleQuery(Role role) {
+        RoleQuery query = new RoleQuery();
+        query.setId(role.getId());
+        return query;
     }
 
     @Override

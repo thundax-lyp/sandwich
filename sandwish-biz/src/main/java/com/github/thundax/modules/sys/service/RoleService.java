@@ -6,36 +6,36 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
+import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.List;
 
 public interface RoleService {
 
-    Role getById(EntityId id);
+    Role get(RoleQuery query);
 
     List<Role> list(RoleQuery query);
 
     PageResult<Role> page(RoleQuery query, PageQuery page);
 
-    EntityId add(Role role);
+    EntityId create(CreateRoleCommand command);
 
-    void update(Role role);
+    void changeInfo(ChangeRoleInfoCommand command);
 
-    int deleteById(EntityId id);
+    int remove(DeleteRoleCommand command);
 
-    int batchDeleteById(List<EntityId> ids);
+    int changePriority(ChangeRolePriorityCommand command);
 
-    int updatePriority(List<Role> list);
+    int changeStatus(ChangeRoleStatusCommand command);
 
-    List<Role> listEnabled();
+    void assignUsers(AssignRoleUsersCommand command);
 
-    int updateStatus(Role role);
+    List<User> listRoleUsers(RoleQuery query);
 
-    int batchUpdateStatus(List<Role> list);
-
-    void updateUserList(Role role, List<User> userList);
-
-    List<User> listRoleUsers(Role role);
-
-    List<Menu> listRoleMenus(Role role);
+    List<Menu> listRoleMenus(RoleQuery query);
 }

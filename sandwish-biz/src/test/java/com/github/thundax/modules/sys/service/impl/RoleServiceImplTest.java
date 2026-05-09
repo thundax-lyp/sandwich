@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -11,8 +10,10 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
-import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
+import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
+import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +37,10 @@ public class RoleServiceImplTest {
     public void shouldListEnabledRolesWithEnabledStatus() {
         RecordingRoleDao dao = new RecordingRoleDao();
         RoleServiceImpl service = new RoleServiceImpl(dao);
+        RoleQuery query = new RoleQuery();
+        query.setStatus(RoleStatus.ENABLED);
 
-        service.listEnabled();
+        service.list(query);
 
         assertEquals("ENABLED", dao.status);
     }
@@ -64,11 +67,18 @@ public class RoleServiceImplTest {
         role.setMenuIdList(Arrays.asList(5001L, 5002L));
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        service.add(role);
+        EntityId id = service.create(new CreateRoleCommand(
+                role.getId(),
+                role.getName(),
+                role.getPrivilege(),
+                role.getStatus(),
+                role.getPriority(),
+                role.getRemarks(),
+                role.getMenuIdList()));
 
-        assertNotNull(role.getId());
-        assertSame(role, dao.inserted);
-        assertEquals(EntityIdCodec.toValue(role.getId()), dao.deletedRoleMenuId);
+        assertNotNull(id);
+        assertNotNull(dao.inserted);
+        assertEquals(EntityIdCodec.toValue(id), dao.deletedRoleMenuId);
         assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
     }
 
@@ -79,7 +89,8 @@ public class RoleServiceImplTest {
         role.setMenuIdList(Arrays.asList());
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        service.updateUserList(role, Arrays.asList(user(1001L), user(1002L)));
+        service.assignUsers(
+                new AssignRoleUsersCommand(role.getId(), Arrays.asList(EntityId.of(1001L), EntityId.of(1002L))));
 
         assertEquals(Long.valueOf(4001L), dao.deletedRoleUserId);
         assertEquals(Arrays.asList(1001L, 1002L), dao.userIdList);
@@ -91,7 +102,7 @@ public class RoleServiceImplTest {
         dao.getResult = role(4001L);
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        int count = service.deleteById(EntityId.of(4001L));
+        int count = service.remove(new DeleteRoleCommand(EntityId.of(4001L)));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(4001L), dao.deletedRoleMenuId);
@@ -103,12 +114,6 @@ public class RoleServiceImplTest {
         Role role = new Role();
         role.setId(EntityIdCodec.toDomain(id));
         return role;
-    }
-
-    private static User user(Long id) {
-        User user = new User();
-        user.setId(EntityIdCodec.toDomain(id));
-        return user;
     }
 
     private static class RecordingRoleDao implements RoleDao {

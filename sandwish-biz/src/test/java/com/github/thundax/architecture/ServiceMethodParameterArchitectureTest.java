@@ -85,18 +85,6 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
             "PrincipalIdentityService#listByPrincipalKeyAndStatus",
             "PrincipalIdentityService#update",
             "PrincipalIdentityService#updateStatus",
-            "RoleService#add",
-            "RoleService#batchDeleteById",
-            "RoleService#batchUpdateStatus",
-            "RoleService#deleteById",
-            "RoleService#getById",
-            "RoleService#listEnabled",
-            "RoleService#listRoleMenus",
-            "RoleService#listRoleUsers",
-            "RoleService#update",
-            "RoleService#updatePriority",
-            "RoleService#updateStatus",
-            "RoleService#updateUserList",
             "StorageService#add",
             "StorageService#addReferences",
             "StorageService#batchDeleteById",
@@ -176,7 +164,8 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
     }
 
     private boolean isServiceQuery(JavaClass javaClass) {
-        return javaClass.getSimpleName().endsWith("Query") && javaClass.getPackageName().contains(".service.query");
+        return javaClass.getSimpleName().endsWith("Query")
+                && javaClass.getPackageName().contains(".service.query");
     }
 
     private boolean isServiceCommand(JavaClass javaClass) {

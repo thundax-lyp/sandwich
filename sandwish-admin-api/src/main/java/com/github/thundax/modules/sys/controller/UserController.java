@@ -47,10 +47,12 @@ import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
@@ -435,7 +437,9 @@ public class UserController {
     @RequestMapping(value = "role/list", method = RequestMethod.POST)
     @WrappedApiResponse
     public List<UserRoleResponse> roleList() {
-        return roleService.listEnabled().stream()
+        RoleQuery query = new RoleQuery();
+        query.setStatus(RoleStatus.ENABLED);
+        return roleService.list(query).stream()
                 .map(role -> UserInterfaceAssembler.toRoleResponse(role))
                 .collect(Collectors.toList());
     }
@@ -500,7 +504,9 @@ public class UserController {
                 throw new InvalidParameterException("roles.id");
 
             } else {
-                Role bean = roleService.getById(EntityIdCodec.toDomain(request.getId()));
+                RoleQuery query = new RoleQuery();
+                query.setId(EntityIdCodec.toDomain(request.getId()));
+                Role bean = roleService.get(query);
                 if (bean == null) {
                     throw new NullBeanException(Role.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
                 }

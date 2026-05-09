@@ -1,7 +1,6 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleQuery {
+public class DeleteRoleCommand {
     private EntityId id;
-    private RoleStatus status;
 }

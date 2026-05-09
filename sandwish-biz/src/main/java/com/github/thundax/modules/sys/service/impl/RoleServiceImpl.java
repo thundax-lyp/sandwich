@@ -14,12 +14,16 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
+import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
+import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +42,11 @@ public class RoleServiceImpl implements RoleService {
         this.dao = dao;
     }
 
-    public Role getById(EntityId id) {
-        if (id == null) {
+    public Role get(RoleQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
+        return dao.getById(query.getId());
     }
 
     public List<Role> list(RoleQuery query) {
@@ -56,22 +60,13 @@ public class RoleServiceImpl implements RoleService {
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         return PageResult.of(
-                (int) dataPage.getCurrent(),
-                (int) dataPage.getSize(),
-                dataPage.getTotal(),
-                dataPage.getRecords());
-    }
-
-    @Override
-    public List<Role> listEnabled() {
-        RoleQuery query = new RoleQuery();
-        query.setStatus(RoleStatus.ENABLED);
-        return this.list(query);
+                (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(Role role) {
+    public EntityId create(CreateRoleCommand command) {
+        Role role = toRole(command);
         role.setId(dao.insert(role));
         afterWrite(role);
         return role.getId();
@@ -79,7 +74,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(Role role) {
+    public void changeInfo(ChangeRoleInfoCommand command) {
+        Role role = toRole(command);
         dao.update(role);
         afterWrite(role);
     }
@@ -95,15 +91,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateUserList(Role role, List<User> userList) {
-        dao.deleteRoleUser(EntityIdCodec.toValue(role.getId()));
+    public void assignUsers(AssignRoleUsersCommand command) {
+        dao.deleteRoleUser(EntityIdCodec.toValue(command.getRoleId()));
 
-        if (userList != null && !userList.isEmpty()) {
+        if (command.getUserIds() != null && !command.getUserIds().isEmpty()) {
             dao.insertRoleUser(
-                    EntityIdCodec.toValue(role.getId()),
-                    userList.stream()
-                            .map(user -> EntityIdCodec.toValue(user.getId()))
-                            .collect(Collectors.toList()));
+                    EntityIdCodec.toValue(command.getRoleId()),
+                    command.getUserIds().stream().map(EntityIdCodec::toValue).collect(Collectors.toList()));
         }
 
         notifyCacheChanged();
@@ -111,7 +105,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(Role role) {
+    public int changeStatus(ChangeRoleStatusCommand command) {
+        Role role = new Role();
+        role.setId(command.getId());
+        role.setStatus(command.getStatus());
         int result = dao.updateStatus(role);
 
         notifyCacheChanged();
@@ -119,15 +116,12 @@ public class RoleServiceImpl implements RoleService {
         return result;
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchUpdateStatus(List<Role> list) {
-        return batchOperate(list, this::updateStatus);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        Role role = getById(id);
+    public int remove(DeleteRoleCommand command) {
+        EntityId id = command.getId();
+        RoleQuery query = new RoleQuery();
+        query.setId(id);
+        Role role = get(query);
         if (role == null) {
             return 0;
         }
@@ -142,23 +136,23 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<User> listRoleUsers(Role role) {
+    public List<User> listRoleUsers(RoleQuery query) {
         List<Long> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
-                        EntityIdCodec.toValue(role.getId()),
-                        roleId -> dao.listRoleUsers(EntityIdCodec.toValue(role.getId())));
+                        EntityIdCodec.toValue(query.getId()),
+                        roleId -> dao.listRoleUsers(EntityIdCodec.toValue(query.getId())));
 
         return userIdList.stream().map(this::newUser).collect(Collectors.toList());
     }
 
     @Override
-    public List<Menu> listRoleMenus(Role role) {
+    public List<Menu> listRoleMenus(RoleQuery query) {
         List<Long> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)
                 .computeIfAbsent(
-                        EntityIdCodec.toValue(role.getId()),
-                        roleId -> dao.listRoleMenus(EntityIdCodec.toValue(role.getId())));
+                        EntityIdCodec.toValue(query.getId()),
+                        roleId -> dao.listRoleMenus(EntityIdCodec.toValue(query.getId())));
 
         return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
     }
@@ -195,27 +189,35 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int updatePriority(List<Role> list) {
-        return batchOperate(list, this::updatePriority);
-    }
-
-    private int updatePriority(Role role) {
+    public int changePriority(ChangeRolePriorityCommand command) {
+        Role role = new Role();
+        role.setId(command.getId());
+        role.setPriority(command.getPriority());
         return dao.updatePriority(role);
     }
 
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
+    private Role toRole(CreateRoleCommand command) {
+        Role role = new Role();
+        role.setId(command.getId());
+        role.setName(command.getName());
+        role.setPrivilege(command.getPrivilege());
+        role.setStatus(command.getStatus());
+        role.setPriority(command.getPriority());
+        role.setRemarks(command.getRemarks());
+        role.setMenuIdList(command.getMenuIdList());
+        return role;
+    }
+
+    private Role toRole(ChangeRoleInfoCommand command) {
+        Role role = new Role();
+        role.setId(command.getId());
+        role.setName(command.getName());
+        role.setPrivilege(command.getPrivilege());
+        role.setStatus(command.getStatus());
+        role.setPriority(command.getPriority());
+        role.setRemarks(command.getRemarks());
+        role.setMenuIdList(command.getMenuIdList());
+        return role;
     }
 
     private PageQuery normalizePage(PageQuery page) {

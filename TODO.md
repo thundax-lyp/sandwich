@@ -11,29 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/role`：规约化 RoleService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/RoleService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/RoleServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/RoleQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/RoleServiceImplTest.java
-  - 处理动作：新增 Role Command，规约化角色创建、改名、授权、排序、状态和菜单/用户关系写入口
-  - 验收点：RoleService 写方法使用业务动作名和 `*Command`；分页使用 `RoleQuery + PageQuery` 并返回 `PageResult`
-  - 重要度：9/10
-
-- [ ] `service-method-admin/role`：同步 RoleController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/RoleController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleAssignUserRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleMenuRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RolePriorityRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleQueryRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleSaveRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleStatusRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleUserRequest.java
-  - 处理动作：将 Role API Request 显式组装为 Role Query 或 Command，并移除对旧 Service 写入口的调用
-  - 验收点：RoleController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-sys/user`：规约化 UserService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java

@@ -15,6 +15,8 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
+import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +120,36 @@ public final class RoleInterfaceAssembler {
     }
 
     @NonNull
+    public static CreateRoleCommand toCreateCommand(@NonNull RoleSaveRequest request) {
+        CreateRoleCommand command = new CreateRoleCommand();
+        command.setId(EntityIdCodec.toDomain(request.getId()));
+        if (request.getPriority() != null) {
+            command.setPriority(request.getPriority());
+        }
+        command.setRemarks(request.getRemarks());
+        command.setName(request.getName());
+        command.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
+        command.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
+        command.setMenuIdList(toMenuIds(request));
+        return command;
+    }
+
+    @NonNull
+    public static ChangeRoleInfoCommand toChangeInfoCommand(@NonNull RoleSaveRequest request) {
+        ChangeRoleInfoCommand command = new ChangeRoleInfoCommand();
+        command.setId(EntityIdCodec.toDomain(request.getId()));
+        if (request.getPriority() != null) {
+            command.setPriority(request.getPriority());
+        }
+        command.setRemarks(request.getRemarks());
+        command.setName(request.getName());
+        command.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
+        command.setStatus(Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED);
+        command.setMenuIdList(toMenuIds(request));
+        return command;
+    }
+
+    @NonNull
     public static Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
         entity.setId(EntityIdCodec.toDomain(request.getId()));
         if (request.getPriority() != null) {
@@ -134,6 +166,14 @@ public final class RoleInterfaceAssembler {
                                 .map(menu -> menu.getId())
                                 .collect(Collectors.toList()));
         return entity;
+    }
+
+    private static List<Long> toMenuIds(RoleSaveRequest request) {
+        return request.getMenuList() == null
+                ? new ArrayList<>()
+                : request.getMenuList().stream()
+                        .map(menu -> menu.getId())
+                        .collect(Collectors.toList());
     }
 
     @NonNull

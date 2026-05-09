@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleQuery {
+public class ChangeRoleStatusCommand {
     private EntityId id;
     private RoleStatus status;
 }

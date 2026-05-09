@@ -21,7 +21,11 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 - Audit 是独立业务支撑模块。
 - Audit 拥有完整领域模型、数据库持久化、同步审计运行时和后台查询入口。
 - 所有被审计对象都可以生成可读、可查、可 diff 的审计日志。
-- 测试和架构约束可以阻止业务 Audit 能力回流到数据库技术审计字段体系。
+- 业务表不再保存 `create_date` / `create_by` / `update_date` / `update_by` 等通用审计字段。
+- 业务 Entity、DO、DAO、Mapper、Query、缓存 DTO 和 API 查询入口不再依赖 `createUserId` / `updateUserId` / `createBy` / `updateBy`。
+- API 响应模型不再暴露业务表通用审计字段。
+- 审计字段集中由 Audit 模块管理；业务对象变更事实固定写入 `audit_log`，当前审计状态固定写入 `audit_meta`。
+- 测试和架构约束可以阻止审计能力回流到业务表审计字段体系。
 
 边界：
 
@@ -29,58 +33,143 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 - 业务数据回滚、外部审计投递和 outbox 派生能力不进入本 RUNBOOK。
 - Service 方法规约化是 Audit 接入前置条件，不进入本 RUNBOOK 执行范围。
 - infra Cache 只存在于 DAO implementation 内部，不进入 Audit 契约。
-- 数据库技术审计字段 `create_date` / `create_by` / `update_date` / `update_by` 继续保留为持久化元信息，不替代 `audit_log`。
-- 业务 Entity 中现有 `createUserId` / `updateUserId` 只作为持久化元信息透出线索，不作为新 Audit 设计依据。
+- 如果未来某个业务确实需要按创建人、更新人、创建时间或更新时间筛选，该字段必须作为该业务对象的业务字段重新建模，不得复用通用审计字段。
+- 当前项目先统一移除基于通用审计字段的查询条件，不新增替代业务字段。
+- Audit 自身表字段不属于拆除范围。
+- `sys_log` 不是业务 Audit，不进入本 RUNBOOK 的字段拆除范围。
+- Auth token、session 和 login event 运行态对象与本 RUNBOOK 无关。
+
+通用审计字段等价名固定包括：
+
+- 业务模型字段：`createdAt`、`createAt`、`createDate`、`createUserId`、`createdBy`、`createBy`、`updatedAt`、`updateAt`、`updateDate`、`updateUserId`、`updatedBy`、`updateBy`。
+- 持久化字段：`createDate`、`createBy`、`updateDate`、`updateBy`。
+- 数据库列：`created_at`、`create_at`、`create_date`、`created_by`、`create_by`、`create_user_id`、`updated_at`、`update_at`、`update_date`、`updated_by`、`update_by`、`update_user_id`。
+
+允许使用的业务时间或业务主体字段必须带具体业务语义，例如 `publishedAt`、`submittedAt`、`lastLoginAt`、`lockedUntil`、`expiredAt`。
 
 ## 3. Execution Plan
 
-本 RUNBOOK 分 7 个阶段完成。每个阶段必须进入 `TODO.md` 拆成文件级任务，经人工审核后执行。
+本 RUNBOOK 分 8 个阶段完成。每个阶段必须进入 `TODO.md` 拆成文件级任务，经人工审核后执行。
 
-### 3.1 固定 Audit 与持久化元信息边界
+### 3.1 移除基于审计字段的查询
 
 目标：
 
-- 在新 Audit 模块进入代码实现前，明确当前代码中的数据库技术审计字段仍然保留。
-- 固定 `AuditFieldInterceptor` 只负责 `createBy` / `updateBy` 等持久化元信息自动填充。
-- 固定 `Auditable` 和 `createUserId` / `updateUserId` 不再作为新业务 Audit 的建模入口。
+- 在拆除业务表审计字段前，先移除所有基于通用审计字段的查询入口。
+- Service Query、DAO 条件、Mapper SQL、缓存 DTO 和 API 查询请求不再使用 `createUserId` / `updateUserId` / `createBy` / `updateBy` 作为过滤条件。
+- 后台列表查询不再支持按通用审计字段过滤。
+- 列表默认排序、显式排序和 Mapper order by 不再依赖 `create_date` / `update_date` 等通用审计字段。
 
 执行内容：
 
-- 检查 `AuditFieldInterceptor`、`MybatisPlusConfiguration` 和 common-mybatis 测试，确认其语义只停留在持久化元信息。
-- 检查 `DATABASE-RULES.md`、业务需求和数据库设计，确认数据库技术审计字段与业务 Audit 的边界一致。
-- 盘点当前实现 `Auditable` 的 Entity、缓存 DTO 和持久化转换位置，作为后续 domain 接入时的清理线索。
-- 不在本阶段批量删除 `createBy` / `updateBy` / `createUserId` / `updateUserId` 字段。
-- 不在本阶段批量拆除 `AuditFieldInterceptor`。
+- 删除 `*Query` 中仅用于通用审计字段过滤的字段。
+- 删除 API `*QueryRequest` 中仅用于通用审计字段过滤的字段。
+- 删除 InterfaceAssembler 中通用审计字段查询条件装配。
+- 删除 DAO interface、DAO implementation、Mapper XML 和测试中通用审计字段过滤逻辑。
+- 删除 Wrapper、LambdaQuery、Mapper XML 和手写 SQL 中通用审计字段过滤与排序逻辑。
+- 本阶段只移除查询条件；展示属性和存量字段在 3.2 按 domain 拆除。
 
 固定执行顺序：
 
-1. 校准治理文档和 RUNBOOK 口径。
-2. 盘点现有 `Auditable`、持久化审计字段和自动填充拦截器。
-3. 将后续需要清理的文件级任务放入 `TODO.md` 待审阅任务项。
+1. `sys`：移除系统管理查询中的通用审计字段过滤。
+2. `auth`：移除认证配置和运行态查询中的通用审计字段过滤。
+3. `storage`：移除存储查询中的通用审计字段过滤。
+4. `assist`：移除辅助任务查询中的通用审计字段过滤。
+5. `member`：移除会员查询中的通用审计字段过滤。
 
 执行策略：
 
-- 本阶段是设计边界校准阶段，不引入业务运行时代码。
-- 只有发现治理文档与当前代码口径冲突时，才同步文档。
-- 后续 domain 接入 Audit 时，才能按该 domain 局部删除或收窄 `Auditable` 依赖。
+- 本阶段按 domain 提交。
+- 每个 domain 的 Query、DAO、Mapper 和测试必须在同一提交内闭环。
+- 删除查询能力后，不新增按创建人、更新人、创建时间或更新时间过滤的替代字段。
+- 如果列表排序依赖通用审计字段，改用 `priority`、`id` 或已有业务时间字段；不得新增替代审计排序字段。
 
 临时编译窗口：
 
-- 本阶段不允许不可编译。
+- 单个 domain 开发期间允许该 domain 相关测试短暂失败。
+- 每个 domain 提交前，相关模块必须可编译。
 
 可验证点：
 
 ```bash
-rg "AuditFieldInterceptor|Auditable|createUserId|updateUserId|createBy|updateBy" sandwish-common sandwish-biz sandwish-infra db docs
-rg "audit_meta|audit_log" db docs
+mvn -pl sandwish-biz -am compile
+mvn -pl sandwish-infra -am compile
+rg "createUserId|updateUserId|createBy|updateBy" sandwish-biz sandwish-infra sandwish-admin-api sandwish-front-api -g "*Query.java" -g "*QueryRequest.java" -g "*Dao.java" -g "*DaoImpl.java" -g "*Mapper.xml" -g "*InterfaceAssembler.java"
 ```
 
 提交边界：
 
-- 单独提交边界校准文档和 `TODO.md` 待审阅任务。
-- 本阶段结束后，RUNBOOK 不再要求先全量拆除数据库技术审计字段。
+- 按 domain 提交。
+- 每个提交必须移除该 domain 的通用审计字段查询能力。
 
-### 3.2 实现 Audit 核心模块
+### 3.2 按 domain 拆除业务表审计字段
+
+目标：
+
+- 从业务表、业务 Entity、DO、PersistenceAssembler、缓存 DTO 和测试中移除通用审计字段。
+- 删除 `Auditable` 对业务 Entity 的约束。
+- 删除 `AuditFieldInterceptor`，使 common-mybatis 不再为业务表填充通用审计字段。
+- 普通业务 API 响应不再透出通用审计字段。
+
+执行内容：
+
+- 删除 `Auditable` 接口及业务 Entity 的 `implements Auditable`。
+- 删除业务 Entity 的 `createUserId` / `updateUserId` 字段。
+- 删除 DO/DataObject 的 `createBy` / `updateBy` 字段。
+- 删除 PersistenceAssembler 中 `createBy` / `updateBy` 与 `createUserId` / `updateUserId` 的转换。
+- 删除缓存 DTO 中通用审计字段。
+- 删除 API Response、InterfaceAssembler 和相关测试中的通用审计字段展示逻辑。
+- 删除 `db/schema/*.sql` 业务表中的 `create_date` / `create_by` / `update_date` / `update_by` 列。
+- 删除 `db/data/*.sql` 中业务表通用审计字段初始化值。
+- 删除业务数据库设计文档中的通用审计字段描述。
+- 删除需求文档中通用审计字段作为业务对象属性的描述。
+- 删除 `DATABASE-RULES.md` 中业务表固定声明通用审计字段的规则。
+- 删除 `AuditFieldInterceptor` 和 `MybatisPlusConfiguration` 中对应 bean。
+- 更新 common-mybatis、biz、infra 和架构测试。
+
+固定执行顺序：
+
+1. `common-mybatis`：删除 `AuditFieldInterceptor`，同步 MyBatis-Plus 配置和测试。
+2. 治理和业务文档：同步 `DATABASE-RULES.md`、相关 `*-REQUIREMENTS.md`、相关 `*-DATABASE-DESIGN.md`。
+3. SQL 基线：同步 `db/schema/*.sql` 和 `db/data/*.sql`。
+4. `sys`：拆除系统管理域业务表审计字段。
+5. `auth`：拆除认证域业务表审计字段。
+6. `storage`：拆除存储域业务表审计字段。
+7. `assist`：拆除辅助域业务表审计字段。
+8. `member`：拆除会员域业务表审计字段。
+
+执行策略：
+
+- 本阶段必须按固定执行顺序推进。
+- 每个 domain 必须在 `TODO.md` 中列出文件级任务。
+- 每个 domain 完成后必须形成可提交边界。
+- 每个存在目标审计对象的 domain，必须先完成业务表审计字段拆除，再进入同一 domain 的 Audit 接入任务。
+- 当前项目只维护 schema/data 基线，不新增 migration 脚本。
+
+临时编译窗口：
+
+- common-mybatis 改造期间，允许依赖旧拦截器的模块在当前未提交工作区短暂不可编译。
+- 单个 domain 拆除期间，允许该 domain 相关 infra 和测试短暂不可编译。
+- 不允许跨 domain 共享不可编译状态。
+- 每个 domain 提交前，相关模块必须可编译。
+
+可验证点：
+
+```bash
+mvn -pl sandwish-common/sandwish-common-mybatis -am compile
+mvn -pl sandwish-biz -am compile
+mvn -pl sandwish-infra -am compile
+rg "Auditable|AuditFieldInterceptor|createUserId|updateUserId|createBy|updateBy|create_date|update_date|create_by|update_by" sandwish-common sandwish-biz sandwish-infra db docs
+```
+
+提交边界：
+
+- common-mybatis 拦截器改造单独提交。
+- 治理文档、需求文档、数据库设计和 SQL 基线按同一语义提交。
+- 业务模块按 domain 提交。
+- 本阶段结束后，业务表通用审计字段只允许出现在明确列入 Open Items 的位置。
+
+### 3.3 实现 Audit 核心模块
 
 目标：
 
@@ -101,8 +190,8 @@ rg "audit_meta|audit_log" db docs
 可验证点：
 
 ```bash
-mvn -pl sandwish-biz -am test
-mvn -pl sandwish-infra -am test
+mvn -pl sandwish-biz -am compile
+mvn -pl sandwish-infra -am compile
 ```
 
 提交边界：
@@ -110,7 +199,7 @@ mvn -pl sandwish-infra -am test
 - 可以拆成 biz 契约提交和 infra 实现提交。
 - 每个提交必须保证该提交影响到的模块可编译。
 
-### 3.3 实现审计运行时
+### 3.4 实现审计运行时
 
 目标：
 
@@ -135,14 +224,14 @@ mvn -pl sandwish-infra -am test
 可验证点：
 
 ```bash
-mvn -pl sandwish-biz -am test
+mvn -pl sandwish-biz -am compile
 ```
 
 提交边界：
 
 - 单独提交审计运行时。
 
-### 3.4 接入所有目标审计对象
+### 3.5 接入所有目标审计对象
 
 目标：
 
@@ -157,46 +246,45 @@ mvn -pl sandwish-biz -am test
 
 目标对象：
 
-目标对象由 Audit 接入清单显式声明。当前实现 `Auditable` 的 domain 实体只作为历史扫描线索，不作为新审计设计依据。
+目标对象由 Audit 接入清单显式声明。`Auditable` 不是审计对象来源。
 
 - `sys`：`User`、`Role`、`Menu`、`Department`、`Dict`。
 - `assist`：`AsyncTask`。
 - `member`：`Member`。
 
-暂缓目标对象：
+排除目标对象：
 
-- `auth`：`OAuthClient` 可以在认证配置管理能力稳定后接入。
-- `auth`：`OAuthAuthorization`、`PrincipalAccessToken`、`PrincipalRefreshToken` 和 `PrincipalLoginEvent` 暂不进入首批接入；登录、登出、token 生命周期和安全事件优先归属 `sys_log` 或安全日志。
+- `auth`：`OAuthClient` 只进入业务表审计字段拆除，不进入本 RUNBOOK 的 Audit 接入。
+- `auth`：`OAuthAuthorization`、`PrincipalAccessToken`、`PrincipalRefreshToken` 和 `PrincipalLoginEvent` 不进入业务 Audit；登录、登出、token 生命周期和安全事件归属 `sys_log` 或安全日志。
 
 执行策略：
 
 - 本阶段按 domain 执行。
+- 每个 domain 必须完成业务表审计字段拆除任务后，才能进入本阶段。
 - 每个 domain 必须完成 Service 方法规约化任务后，才能进入本阶段。
 - 每个 domain 必须同时补齐审计测试。
-- 每个 domain 接入时，必须局部检查并删除、收窄或保留该 domain 的 `Auditable` 依赖。
-- `TODO.md` 必须体现同一目标审计 domain 的执行串联：Service 方法规约化完成后，再执行 Audit 接入和该 domain 的旧审计线索清理。
+- `TODO.md` 必须体现同一目标审计 domain 的执行串联：移除审计字段查询、拆除业务表审计字段、Service 方法规约化完成后，再执行 Audit 接入。
 
 临时编译窗口：
 
 - loader、snapshot assembler 和注解接入必须在同一 domain 内闭环。
 - 单个 domain 开发期间允许该 domain 测试短暂失败。
-- 每个 domain 提交前，审计运行时、目标对象 Service 和测试必须通过。
+- 每个 domain 提交前，审计运行时、目标对象 Service 和测试源码必须可编译。
 
 可验证点：
 
 ```bash
-mvn -pl sandwish-biz -am test
-mvn -pl sandwish-infra -am test
-rg "Auditable|createUserId|updateUserId" sandwish-biz/src/main/java/com/github/thundax/modules/{target-domain} sandwish-infra/src/main/java/com/github/thundax/modules/{target-domain}
+mvn -pl sandwish-biz -am compile
+mvn -pl sandwish-infra -am compile
+rg "Auditable|createUserId|updateUserId|createBy|updateBy|create_date|update_date|create_by|update_by" sandwish-biz/src/main/java/com/github/thundax/modules/{target-domain} sandwish-infra/src/main/java/com/github/thundax/modules/{target-domain} db docs
 ```
 
 提交边界：
 
 - 按 domain 提交。
 - 每个提交必须包含对应 domain 的审计测试。
-- 每个提交必须说明该 domain 中 `Auditable` 和持久化元信息字段的保留、删除或收窄判断。
 
-### 3.5 新增后台审计查询 API
+### 3.6 新增后台审计查询 API
 
 目标：
 
@@ -217,14 +305,14 @@ rg "Auditable|createUserId|updateUserId" sandwish-biz/src/main/java/com/github/t
 可验证点：
 
 ```bash
-mvn -pl sandwish-admin-api -am test
+mvn -pl sandwish-admin-api -am compile
 ```
 
 提交边界：
 
 - 单独提交后台审计查询 API。
 
-### 3.6 补齐架构约束和回归测试
+### 3.7 补齐架构约束和回归测试
 
 目标：
 
@@ -236,28 +324,27 @@ mvn -pl sandwish-admin-api -am test
 - 覆盖幂等键、审计版本推进、无变化默认不记录、强制记录无变化动作。
 - 增加前台禁止审计直查入口的架构约束。
 - 增加 `@BatchAuditLog` 禁止回流的架构约束。
-- 增加业务 Audit 不得依赖 `Auditable`、`createUserId` 或 `updateUserId` 的架构约束。
-- 增加 `AuditFieldInterceptor` 不得写入 `audit_meta` / `audit_log` 的架构约束。
+- 增加业务表、业务 Entity、DO、Query、API Request、API Response 和缓存 DTO 不得声明通用审计字段的架构约束。
+- 增加 `AuditFieldInterceptor` 禁止回流的架构约束。
 
 临时编译窗口：
 
 - 架构测试新增过程中允许测试先红。
-- 本阶段提交前，所有新增和既有相关测试必须通过。
+- 本阶段提交前，生产代码和测试源码必须可编译。
 
 可验证点：
 
 ```bash
-mvn -pl sandwish-biz -am test
-mvn -pl sandwish-infra -am test
-mvn -pl sandwish-admin-api -am test
-mvn install
+mvn -pl sandwish-biz -am compile
+mvn -pl sandwish-infra -am compile
+mvn -pl sandwish-admin-api -am compile
 ```
 
 提交边界：
 
 - 单独提交测试和架构约束。
 
-### 3.7 最终收口
+### 3.8 最终收口
 
 目标：
 
@@ -265,24 +352,24 @@ mvn install
 
 执行内容：
 
+- 执行最终完整验证。
 - 删除、拆分或收窄已完成 `TODO.md` 项。
 - 删除本 RUNBOOK。
 - 执行残留扫描。
-- 执行最终全量验证。
+- 最终残留扫描只允许命中 Audit 自身表、Audit 领域模型、Audit 查询模型、`sys_log`、Open Items 明确列出的业务字段和本 RUNBOOK 收口前自身内容。
 
 临时编译窗口：
 
 - 本阶段不允许不可编译。
-- 本阶段不允许测试失败。
+- 本阶段不允许 `mvn clean install` 失败。
 
 可验证点：
 
 ```bash
-rg "Auditable|createUserId|updateUserId|createBy|updateBy" sandwish-biz sandwish-infra sandwish-admin-api db docs
+mvn clean install
+rg "Auditable|AuditFieldInterceptor|createdAt|createAt|createDate|createUserId|createdBy|createBy|updatedAt|updateAt|updateDate|updateUserId|updatedBy|updateBy|created_at|create_at|create_date|created_by|create_by|create_user_id|updated_at|update_at|update_date|updated_by|update_by|update_user_id" sandwish-common sandwish-biz sandwish-infra sandwish-admin-api db docs
 rg "@BatchAuditLog" sandwish-biz sandwish-infra sandwish-admin-api
 rg "audit_meta|audit_log|AuditObjectRef|@AuditLog" sandwish-biz sandwish-infra sandwish-admin-api db docs
-rg "AuditFieldInterceptor" sandwish-common sandwish-biz sandwish-infra sandwish-admin-api
-mvn install
 git status --short
 ```
 
@@ -297,20 +384,21 @@ git status --short
 - 允许不可编译只存在于当前未提交工作区。
 - 不可编译窗口必须限制在当前阶段或当前 domain 内。
 - 跨阶段推进前必须执行当前阶段可验证点。
-- 进入最终收口前必须保证 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api` 和 `sandwish-front-api` 均通过测试。
-- 最终收口必须执行 `mvn install`。
+- 执行任务过程中只运行 `compile` 目标，不单独运行 `test` 目标。
+- 完整 `mvn clean install` 只在最终清理现场前执行。
 
 模块验证口径：
 
-- 只改 common 基础能力：执行 `mvn -pl sandwish-common-core -am test`。
-- 只改 biz 契约和业务逻辑：执行 `mvn -pl sandwish-biz -am test`。
-- 改 infra 持久化：执行 `mvn -pl sandwish-infra -am test`。
-- 改后台 API：执行 `mvn -pl sandwish-admin-api -am test`。
-- 跨模块收口：执行 `mvn install`。
+- 只改 common 基础能力：执行 `mvn -pl sandwish-common-core -am compile`。
+- 改 common-mybatis 持久化基础能力：执行 `mvn -pl sandwish-common/sandwish-common-mybatis -am compile`。
+- 只改 biz 契约和业务逻辑：执行 `mvn -pl sandwish-biz -am compile`。
+- 改 infra 持久化：执行 `mvn -pl sandwish-infra -am compile`。
+- 改后台 API：执行 `mvn -pl sandwish-admin-api -am compile`。
+- 跨模块收口：执行 `mvn clean install`。
 
 ## 5. TODO Boundary
 
-`TODO.md` 固定承担流水账职责。
+`TODO.md` 固定承担文件级执行队列职责。
 
 TODO 任务必须精确到：
 

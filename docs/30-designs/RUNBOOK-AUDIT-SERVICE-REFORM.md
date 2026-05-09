@@ -20,19 +20,19 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 
 - Audit 是独立业务支撑模块。
 - Audit 拥有完整领域模型、数据库持久化、同步审计运行时和后台查询入口。
-- 所有需要审计的 Service 写入口都使用明确业务动作 Command。
 - 所有被审计对象都可以生成可读、可查、可 diff 的审计日志。
-- 测试和架构约束可以阻止 Service 写入口退回散参数、真正批量写和泛化动作入口。
+- 测试和架构约束可以阻止审计能力回流到旧持久化审计字段体系。
 
 边界：
 
 - 失败请求、登录、登出和安全事件归属 `sys_log` 或安全日志。
 - 业务数据回滚、外部审计投递和 outbox 派生能力不进入本 RUNBOOK。
+- Service 方法规约化由 [`RUNBOOK-SERVICE-METHOD-REFORM.md`](./RUNBOOK-SERVICE-METHOD-REFORM.md) 独立执行，不进入本 RUNBOOK。
 - infra Cache 只存在于 DAO implementation 内部，不进入 Audit 契约。
 
 ## 3. Execution Plan
 
-本 RUNBOOK 分 8 个阶段完成。每个阶段必须进入 `TODO.md` 拆成文件级任务，经人工审核后执行。
+本 RUNBOOK 分 7 个阶段完成。每个阶段必须进入 `TODO.md` 拆成文件级任务，经人工审核后执行。
 
 ### 3.1 按 domain 拆除旧持久化审计字段
 
@@ -67,7 +67,7 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 - 本阶段必须按固定执行顺序推进。
 - 每个 domain 必须在 `TODO.md` 中列出文件级任务。
 - 每个 domain 完成后必须形成可提交边界。
-- 每个存在目标审计对象的 domain，必须先完成旧字段拆除任务，再进入同一 domain 的 Command 改造和 Audit 接入任务。
+- 每个存在目标审计对象的 domain，必须先完成旧字段拆除任务，再进入同一 domain 的 Audit 接入任务。
 
 临时编译窗口：
 
@@ -127,6 +127,10 @@ mvn -pl sandwish-infra -am test
 
 - 建立 Service 注解到 before/after 快照、diff 和审计写入的同步事务主链路。
 
+前置条件：
+
+- Service 方法规约化 RUNBOOK 已完成，或当前目标 domain 的 Service 写入口已经完成规约化。
+
 执行内容：
 
 - 实现 `@AuditLog(type, id, action, summary, condition, recordWhenUnchanged)`。
@@ -148,47 +152,7 @@ mvn -pl sandwish-biz -am test
 
 - 单独提交审计运行时。
 
-### 3.4 改造 Service 写入口
-
-目标：
-
-- 将所有需要审计的 Service 写入口改造成明确业务动作 Command。
-
-执行内容：
-
-- Service 写方法改为接收 Command。
-- Command 按业务动作命名。
-- Service 写方法按业务动作命名。
-- 状态变更、关系维护、凭证重置等动作使用明确入口。
-- 批量 HTTP 请求拆解为多个单对象 Command。
-- 需要并发控制的对象引入业务 `version` 和 `expectedVersion`。
-
-执行策略：
-
-- 本阶段按 domain 执行。
-- 每个 domain 必须完成旧字段拆除任务后，才能进入本阶段。
-- 每个 domain 在 `TODO.md` 中列出对象范围和文件级任务。
-- 每个 domain 完成后必须形成可提交边界。
-
-临时编译窗口：
-
-- 单个 domain 迁移过程中，允许当前 domain 相关 Controller / Service / 测试短暂不可编译。
-- 不允许跨 domain 共享不可编译状态。
-- 每个 domain 提交前，相关模块必须可编译。
-
-可验证点：
-
-```bash
-mvn -pl sandwish-biz -am test
-mvn -pl sandwish-admin-api -am test
-```
-
-提交边界：
-
-- 按 domain 提交。
-- 每个提交必须保持对应 domain 的 Controller、Service、DAO、测试同步可用。
-
-### 3.5 接入所有目标审计对象
+### 3.4 接入所有目标审计对象
 
 目标：
 
@@ -203,7 +167,7 @@ mvn -pl sandwish-admin-api -am test
 
 目标对象：
 
-目标对象来自当前实现 `Auditable` 的 domain 实体。
+目标对象由 Audit 接入清单显式声明。当前实现 `Auditable` 的 domain 实体只作为历史扫描线索，不作为新审计设计依据。
 
 - `sys`：`User`、`Role`、`Menu`、`Department`、`Dict`。
 - `auth`：`OAuthClient`、`OAuthAuthorization`、`PrincipalAccessToken`、`PrincipalRefreshToken`、`PrincipalLoginEvent`。
@@ -213,9 +177,10 @@ mvn -pl sandwish-admin-api -am test
 执行策略：
 
 - 本阶段按 domain 执行。
-- 每个 domain 必须完成旧字段拆除任务和 Command 改造后，才能进入本阶段。
+- 每个 domain 必须完成旧字段拆除任务后，才能进入本阶段。
+- 每个 domain 必须完成 Service 方法规约化任务后，才能进入本阶段。
 - 每个 domain 必须同时补齐审计测试。
-- `TODO.md` 必须体现同一目标审计 domain 的执行串联：拆旧字段完成后，执行 Command 改造，再执行 Audit 接入。
+- `TODO.md` 必须体现同一目标审计 domain 的执行串联：拆旧字段和 Service 方法规约化完成后，再执行 Audit 接入。
 
 临时编译窗口：
 
@@ -235,7 +200,7 @@ mvn -pl sandwish-infra -am test
 - 按 domain 提交。
 - 每个提交必须包含对应 domain 的审计测试。
 
-### 3.6 新增后台审计查询 API
+### 3.5 新增后台审计查询 API
 
 目标：
 
@@ -263,7 +228,7 @@ mvn -pl sandwish-admin-api -am test
 
 - 单独提交后台审计查询 API。
 
-### 3.7 补齐架构约束和回归测试
+### 3.6 补齐架构约束和回归测试
 
 目标：
 
@@ -273,7 +238,6 @@ mvn -pl sandwish-admin-api -am test
 
 - 覆盖 create/update/delete/relation 审计流程。
 - 覆盖幂等键、审计版本推进、无变化默认不记录、强制记录无变化动作。
-- 增加 Service 写入口架构约束。
 - 增加前台禁止审计直查入口的架构约束。
 - 增加 `@BatchAuditLog` 禁止回流的架构约束。
 
@@ -295,7 +259,7 @@ mvn install
 
 - 单独提交测试和架构约束。
 
-### 3.8 最终收口
+### 3.7 最终收口
 
 目标：
 
@@ -317,7 +281,6 @@ mvn install
 
 ```bash
 rg "Auditable|createUserId|updateUserId|createBy|updateBy" sandwish-biz sandwish-infra sandwish-admin-api db docs
-rg "batchUpdate|batchDelete|batchDeleteById|batchUpdateStatus" sandwish-biz sandwish-admin-api
 rg "@BatchAuditLog" sandwish-biz sandwish-infra sandwish-admin-api
 rg "audit_meta|audit_log|AuditObjectRef|@AuditLog" sandwish-biz sandwish-infra sandwish-admin-api db docs
 mvn install

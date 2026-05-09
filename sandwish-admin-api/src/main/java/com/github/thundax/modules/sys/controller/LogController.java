@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
@@ -24,6 +25,7 @@ import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.LogQuery;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -73,11 +75,17 @@ public class LogController {
     }
 
     private LogResponse toResponse(Log log) {
-        User user = userService.getById(EntityIdCodec.toDomain(Long.valueOf(log.getUserId())));
+        User user = userService.get(userQuery(EntityIdCodec.toDomain(Long.valueOf(log.getUserId()))));
         Department department =
                 user == null ? null : departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
         return LogInterfaceAssembler.toResponse(
                 log, user, getAccountLoginName(user), department, departmentService::getById);
+    }
+
+    private UserQuery userQuery(EntityId userId) {
+        UserQuery query = new UserQuery();
+        query.setId(userId);
+        return query;
     }
 
     private String getAccountLoginName(User user) {

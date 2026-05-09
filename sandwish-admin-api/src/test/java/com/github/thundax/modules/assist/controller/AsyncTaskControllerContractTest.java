@@ -98,7 +98,7 @@ public class AsyncTaskControllerContractTest {
         User currentUser = new User();
         currentUser.setId(EntityId.of(userId));
         UserService userService = mock(UserService.class);
-        when(userService.getById(EntityId.of(userId))).thenReturn(currentUser);
+        when(userService.get(org.mockito.ArgumentMatchers.any())).thenReturn(currentUser);
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean(UserService.class)).thenReturn(userService);
         SpringContextHolder.setApplicationContext(applicationContext);

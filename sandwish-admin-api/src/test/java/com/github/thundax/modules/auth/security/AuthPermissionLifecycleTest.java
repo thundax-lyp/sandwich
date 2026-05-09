@@ -70,8 +70,12 @@ import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
+import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
+import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -694,29 +698,20 @@ public class AuthPermissionLifecycleTest {
     private static class TestUserService implements UserService {
 
         @Override
-        public int updateStatus(User user) {
+        public int changeStatus(ChangeUserStatusCommand command) {
             return 1;
         }
 
         @Override
-        public int batchUpdateStatus(List<User> list) {
-            return list.size();
-        }
-
-        @Override
-        public List<com.github.thundax.modules.sys.entity.Role> listUserRoles(User user) {
+        public List<com.github.thundax.modules.sys.entity.Role> listUserRoles(UserQuery query) {
             return Collections.emptyList();
         }
 
-        public User getById(EntityId id) {
+        public User get(UserQuery query) {
             return user();
         }
 
         public List<User> listByIds(List<EntityId> ids) {
-            return Collections.singletonList(user());
-        }
-
-        public List<User> listAll() {
             return Collections.singletonList(user());
         }
 
@@ -729,19 +724,15 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId add(User entity, String loginName, String encryptedPassword, List<Long> roleIdList) {
+        public EntityId create(CreateUserCommand command) {
             return EntityId.of(1L);
         }
 
         @Override
-        public void update(User entity, String loginName, List<Long> roleIdList) {}
+        public void changeInfo(ChangeUserInfoCommand command) {}
 
-        public int deleteById(EntityId id) {
+        public int remove(DeleteUserCommand command) {
             return 1;
-        }
-
-        public int batchDeleteById(List<EntityId> ids) {
-            return ids.size();
         }
 
         private User user() {

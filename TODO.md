@@ -11,29 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/user`：规约化 UserService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/UserQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/UserServiceImplTest.java
-  - 处理动作：新增 User Command，规约化用户创建、资料变更、状态、部门、角色和删除级联入口
-  - 验收点：UserService 写入口不接收 User Entity；查询和分页符合三态参数规则
-  - 重要度：10/10
-
-- [ ] `service-method-admin/user`：同步 UserController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/UserController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserAvatarRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserCheckRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserDepartmentRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserQueryRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserRoleRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserSaveRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserStatusRequest.java
-  - 处理动作：将 User API Request 显式组装为 User Query 或 Command，并移除对旧 Service 写入口的调用
-  - 验收点：UserController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：9/10
-
 - [ ] `service-method-sys/menu`：规约化 MenuService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/MenuService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/MenuServiceImpl.java

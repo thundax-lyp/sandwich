@@ -21,8 +21,10 @@ import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +64,20 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         currentUser.setName(name);
         currentUser.setEmail(email);
         currentUser.setMobile(mobile);
-        userService.update(currentUser, getAccountLoginName(currentUser.getId()), null);
+        userService.changeInfo(new ChangeUserInfoCommand(
+                currentUser.getId(),
+                currentUser.getDepartmentId(),
+                currentUser.getEmail(),
+                currentUser.getMobile(),
+                currentUser.getTel(),
+                currentUser.getName(),
+                currentUser.getRank(),
+                currentUser.getPrivilege(),
+                currentUser.getStatus(),
+                currentUser.getPriority(),
+                currentUser.getRemarks(),
+                getAccountLoginName(currentUser.getId()),
+                null));
         return currentUser;
     }
 
@@ -95,7 +110,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             return menuList;
         }
 
-        List<Role> roleList = userService.listUserRoles(currentUser);
+        List<Role> roleList = userService.listUserRoles(userQuery(currentUser));
         boolean isAdmin = currentUser.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
         if (isAdmin) {
             List<Menu> menuList = menuService.list(new MenuQuery(null, null, currentUser.getRank()));
@@ -120,6 +135,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     private RoleQuery roleQuery(Role role) {
         RoleQuery query = new RoleQuery();
         query.setId(role.getId());
+        return query;
+    }
+
+    private UserQuery userQuery(User user) {
+        UserQuery query = new UserQuery();
+        query.setId(user.getId());
         return query;
     }
 

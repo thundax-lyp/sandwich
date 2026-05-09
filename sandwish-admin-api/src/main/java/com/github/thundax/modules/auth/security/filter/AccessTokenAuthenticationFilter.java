@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.security.filter;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.service.AdminAuthService;
@@ -10,6 +11,7 @@ import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -92,7 +94,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
         UserAccessHolder.currentUserId(accessToken.getUserId(), token);
         try {
-            User currentUser = userService.getById(EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
+            User currentUser = userService.get(userQuery(
+                    EntityIdCodec.toDomain(Long.valueOf(accessToken.getUserId()))));
             if (currentUser.getId() == null || !currentUser.isEnable()) {
                 writeError(response);
                 return;
@@ -121,6 +124,12 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return request.getParameter(PARAM_TOKEN);
+    }
+
+    private UserQuery userQuery(EntityId userId) {
+        UserQuery query = new UserQuery();
+        query.setId(userId);
+        return query;
     }
 
     private Collection<SimpleGrantedAuthority> toAuthorities(Collection<String> permissions) {

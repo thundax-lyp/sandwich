@@ -48,6 +48,7 @@ import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisio
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -264,7 +265,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (session == null) {
             return AuthTokenQueryResult.inactive(token);
         }
-        User user = userService.getById(session.getPrincipalKey().getPrincipalId());
+        User user = getUser(session.getPrincipalKey().getPrincipalId());
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
@@ -289,7 +290,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (session == null) {
             return AuthTokenQueryResult.inactive(token);
         }
-        User user = userService.getById(accessToken.getPrincipalKey().getPrincipalId());
+        User user = getUser(accessToken.getPrincipalKey().getPrincipalId());
         if (user == null || !user.isEnable()) {
             return AuthTokenQueryResult.inactive(token);
         }
@@ -615,7 +616,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             throw new InvalidUsernamePasswordException();
         }
 
-        User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
+        User user = getUser(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
             recordLoginFailed(
                     PrincipalAuthenticationMethod.PASSWORD,
@@ -732,7 +733,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);
             throw new InvalidUsernamePasswordException();
         }
-        User user = userService.getById(identity.getPrincipalKey().getPrincipalId());
+        User user = getUser(identity.getPrincipalKey().getPrincipalId());
         if (user == null) {
             recordLoginFailed(
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
@@ -762,6 +763,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return null;
         }
         return session;
+    }
+
+    private User getUser(EntityId userId) {
+        UserQuery query = new UserQuery();
+        query.setId(userId);
+        return userService.get(query);
     }
 
     private PrincipalAuthSession getActivePrincipalAuthSession(PrincipalRefreshToken refreshToken, Date now) {

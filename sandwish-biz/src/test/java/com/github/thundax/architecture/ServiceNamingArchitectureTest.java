@@ -50,11 +50,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
             "StorageService#deleteById",
             "StorageService#update",
             "StorageService#updateObjectStatus",
-            "StorageService#updateReferenceStatus",
-            "UserService#batchDeleteById",
-            "UserService#batchUpdateStatus",
-            "UserService#update",
-            "UserService#updateStatus"));
+            "StorageService#updateReferenceStatus"));
 
     @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {

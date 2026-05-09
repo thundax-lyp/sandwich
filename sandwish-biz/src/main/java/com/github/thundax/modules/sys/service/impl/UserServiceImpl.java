@@ -10,12 +10,14 @@ import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateUserCommand;
+import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import com.github.thundax.modules.sys.service.query.UserQuery;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +34,11 @@ public class UserServiceImpl implements UserService {
         this.deleteCascadeHandlers = deleteCascadeHandlers == null ? Collections.emptyList() : deleteCascadeHandlers;
     }
 
-    public User getById(EntityId id) {
-        if (id == null) {
+    public User get(UserQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
-    }
-
-    public List<User> listAll() {
-        return list((UserQuery) null);
+        return dao.getById(query.getId());
     }
 
     public List<User> list(UserQuery query) {
@@ -71,43 +69,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList) {
+    public EntityId create(CreateUserCommand command) {
+        User user = toUser(command);
         user.setId(dao.insert(user));
-        rewriteUserRoles(user, roleIdList);
+        rewriteUserRoles(user.getId(), command.getRoleIdList());
         return user.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(User user, String loginName, List<Long> roleIdList) {
+    public void changeInfo(ChangeUserInfoCommand command) {
+        User user = toUser(command);
         dao.update(user);
-        rewriteUserRoles(user, roleIdList);
+        rewriteUserRoles(user.getId(), command.getRoleIdList());
     }
 
-    private void rewriteUserRoles(User user, List<Long> roleIdList) {
+    private void rewriteUserRoles(EntityId userId, List<Long> roleIdList) {
         if (roleIdList != null) {
-            dao.deleteUserRole(EntityIdCodec.toValue(user.getId()));
+            dao.deleteUserRole(EntityIdCodec.toValue(userId));
             if (!roleIdList.isEmpty()) {
-                dao.insertUserRole(EntityIdCodec.toValue(user.getId()), roleIdList);
+                dao.insertUserRole(EntityIdCodec.toValue(userId), roleIdList);
             }
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateStatus(User user) {
+    public int changeStatus(ChangeUserStatusCommand command) {
+        User user = new User();
+        user.setId(command.getId());
+        user.setStatus(command.getStatus());
         return dao.updateStatus(user);
     }
 
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public int batchUpdateStatus(List<User> list) {
-        return batchOperate(list, this::updateStatus);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        User user = getById(id);
+    public int remove(DeleteUserCommand command) {
+        UserQuery query = new UserQuery();
+        query.setId(command.getId());
+        User user = get(query);
         if (user == null) {
             return 0;
         }
@@ -115,14 +114,14 @@ public class UserServiceImpl implements UserService {
         for (UserDeleteCascadeHandler deleteCascadeHandler : deleteCascadeHandlers) {
             deleteCascadeHandler.beforeDelete(user);
         }
-        dao.deleteUserRole(EntityIdCodec.toValue(id));
+        dao.deleteUserRole(EntityIdCodec.toValue(command.getId()));
 
-        return dao.deleteById(id);
+        return dao.deleteById(command.getId());
     }
 
     @Override
-    public List<Role> listUserRoles(User user) {
-        return dao.listUserRoles(EntityIdCodec.toValue(user.getId())).stream()
+    public List<Role> listUserRoles(UserQuery query) {
+        return dao.listUserRoles(EntityIdCodec.toValue(query.getId())).stream()
                 .map(this::newRole)
                 .collect(Collectors.toList());
     }
@@ -131,22 +130,6 @@ public class UserServiceImpl implements UserService {
         Role role = new Role();
         role.setId(EntityIdCodec.toDomain(id));
         return role;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
     }
 
     private PageQuery normalizePage(PageQuery page) {
@@ -158,5 +141,37 @@ public class UserServiceImpl implements UserService {
             normalizedPage.setPageSize(PageRules.defaultPageSize());
         }
         return normalizedPage;
+    }
+
+    private User toUser(CreateUserCommand command) {
+        User user = new User();
+        user.setId(command.getId());
+        user.setDepartmentId(command.getDepartmentId());
+        user.setEmail(command.getEmail());
+        user.setMobile(command.getMobile());
+        user.setTel(command.getTel());
+        user.setName(command.getName());
+        user.setRank(command.getRank());
+        user.setPrivilege(command.getPrivilege());
+        user.setStatus(command.getStatus());
+        user.setPriority(command.getPriority());
+        user.setRemarks(command.getRemarks());
+        return user;
+    }
+
+    private User toUser(ChangeUserInfoCommand command) {
+        User user = new User();
+        user.setId(command.getId());
+        user.setDepartmentId(command.getDepartmentId());
+        user.setEmail(command.getEmail());
+        user.setMobile(command.getMobile());
+        user.setTel(command.getTel());
+        user.setName(command.getName());
+        user.setRank(command.getRank());
+        user.setPrivilege(command.getPrivilege());
+        user.setStatus(command.getStatus());
+        user.setPriority(command.getPriority());
+        user.setRemarks(command.getRemarks());
+        return user;
     }
 }

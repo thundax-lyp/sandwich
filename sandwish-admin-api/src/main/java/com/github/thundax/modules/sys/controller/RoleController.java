@@ -42,6 +42,7 @@ import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
+import com.github.thundax.modules.sys.service.query.UserQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -297,7 +298,7 @@ public class RoleController {
                         DEPARTMENT_ID_PREFIX + department.getId(), department))
                 .collect(Collectors.toList()));
 
-        list.addAll(userService.listAll().stream()
+        list.addAll(userService.list(new UserQuery()).stream()
                 .map(user -> RoleInterfaceAssembler.toUserTreeNode(
                         DEPARTMENT_ID_PREFIX,
                         user,
@@ -326,7 +327,7 @@ public class RoleController {
         }
 
         return roleService.listRoleUsers(roleQuery(request.getId())).stream()
-                .map(user -> toUserResponse(userService.getById(user.getId())))
+                .map(user -> toUserResponse(userService.get(userQuery(user.getId()))))
                 .collect(Collectors.toList());
     }
 
@@ -385,11 +386,21 @@ public class RoleController {
         }
 
         for (RoleUserRequest userRequest : request.getUsers()) {
-            User userBean = userService.getById(EntityIdCodec.toDomain(userRequest.getId()));
+            User userBean = userService.get(userQuery(userRequest.getId()));
             if (userBean == null) {
                 throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(userRequest.getId()));
             }
         }
+    }
+
+    private UserQuery userQuery(EntityId userId) {
+        UserQuery query = new UserQuery();
+        query.setId(userId);
+        return query;
+    }
+
+    private UserQuery userQuery(Long userId) {
+        return userQuery(EntityIdCodec.toDomain(userId));
     }
 
     private RoleQuery roleQuery(Role role) {

@@ -98,15 +98,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
             "StorageService#removeReferences",
             "StorageService#update",
             "StorageService#updateObjectStatus",
-            "StorageService#updateReferenceStatus",
-            "UserService#add",
-            "UserService#batchDeleteById",
-            "UserService#batchUpdateStatus",
-            "UserService#getById",
-            "UserService#listAll",
-            "UserService#listUserRoles",
-            "UserService#update",
-            "UserService#updateStatus"));
+            "StorageService#updateReferenceStatus"));
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {

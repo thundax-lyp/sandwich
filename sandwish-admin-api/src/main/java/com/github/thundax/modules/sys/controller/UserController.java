@@ -52,6 +52,8 @@ import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
+import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
@@ -129,7 +131,7 @@ public class UserController {
     @RequestMapping(value = "get", method = RequestMethod.POST)
     @WrappedApiResponse
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
-        User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+        User bean = userService.get(userQuery(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
@@ -200,17 +202,16 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
-        List<Long> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
         String encryptedPassword = PasswordHelper.encrypt(request.getLoginPass());
 
         if (entity.getId() != null) {
-            User bean = userService.getById(entity.getId());
+            User bean = userService.get(userQuery(entity.getId()));
             if (bean != null) {
                 throw new InsertBeanExistException(User.BEAN_NAME, entity.getId());
             }
         }
 
-        userService.add(entity, request.getLoginName(), encryptedPassword, roleIdList);
+        entity.setId(userService.create(UserInterfaceAssembler.toCreateCommand(request, encryptedPassword)));
 
         return toResponse(entity);
     }
@@ -241,7 +242,7 @@ public class UserController {
             throw new InvalidParameterException("loginName");
         }
 
-        User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+        User bean = userService.get(userQuery(request.getId()));
         if (bean == null) {
             throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
         }
@@ -259,9 +260,8 @@ public class UserController {
         }
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
-        List<Long> roleIdList = UserInterfaceAssembler.toRoleIdList(request);
 
-        userService.update(entity, request.getLoginName(), roleIdList);
+        userService.changeInfo(UserInterfaceAssembler.toChangeInfoCommand(request));
 
         if (StringUtils.isNotBlank(request.getLoginPass())) {
             upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()));
@@ -335,9 +335,9 @@ public class UserController {
     public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = new ArrayList<>();
+        List<ChangeUserStatusCommand> commandList = new ArrayList<>();
         for (UserStatusRequest request : RequestListHelper.present(list)) {
-            User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+            User bean = userService.get(userQuery(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
@@ -345,14 +345,14 @@ public class UserController {
                     || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw new PermissionDeniedException();
             }
-            bean.setStatus(Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED);
-            beanList.add(bean);
+            commandList.add(new ChangeUserStatusCommand(
+                    bean.getId(), Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
 
-        userService.batchUpdateStatus(beanList);
+        commandList.forEach(userService::changeStatus);
 
         return true;
     }
@@ -372,9 +372,9 @@ public class UserController {
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
-        List<User> beanList = new ArrayList<>();
+        List<DeleteUserCommand> commandList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
-            User bean = userService.getById(EntityIdCodec.toDomain(request.getId()));
+            User bean = userService.get(userQuery(request.getId()));
             if (bean == null) {
                 throw new NullBeanException(User.BEAN_NAME, EntityIdCodec.toDomain(request.getId()));
             }
@@ -382,13 +382,13 @@ public class UserController {
                     || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw new PermissionDeniedException();
             }
-            beanList.add(bean);
+            commandList.add(new DeleteUserCommand(bean.getId()));
         }
-        if (beanList.isEmpty()) {
+        if (commandList.isEmpty()) {
             throw new InvalidParameterException("list");
         }
 
-        userService.batchDeleteById(beanList.stream().map(User::getId).collect(Collectors.toList()));
+        commandList.forEach(userService::remove);
 
         return true;
     }
@@ -549,9 +549,19 @@ public class UserController {
 
     private UserResponse toResponse(User user) {
         Department department = departmentService.getById(EntityIdCodec.toDomain(user.getDepartmentId()));
-        List<Role> roleList = userService.listUserRoles(user);
+        List<Role> roleList = userService.listUserRoles(userQuery(user.getId()));
         return UserInterfaceAssembler.toResponse(
                 user, getAccountLoginName(user.getId()), department, roleList, departmentService::getById);
+    }
+
+    private UserQuery userQuery(Long userId) {
+        return userQuery(EntityIdCodec.toDomain(userId));
+    }
+
+    private UserQuery userQuery(EntityId userId) {
+        UserQuery query = new UserQuery();
+        query.setId(userId);
+        return query;
     }
 
     private String getAccountLoginName(EntityId userId) {

@@ -71,7 +71,7 @@ public class CurrentUserControllerContractTest {
         List<Menu> menus = Arrays.asList(menu(10L, null, "系统管理"), menu(11L, 10L, "用户管理"));
         User currentUser = superUser();
 
-        when(userService.getById(EntityId.of(1L))).thenReturn(currentUser);
+        when(userService.get(org.mockito.ArgumentMatchers.any())).thenReturn(currentUser);
         when(currentUserService.listVisibleMenus(currentUser)).thenReturn(menus);
         mockApplicationContext(userService);
         UserAccessHolder.currentUserId("1", "token-1");

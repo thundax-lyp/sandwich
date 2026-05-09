@@ -15,6 +15,8 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -103,6 +105,46 @@ public final class UserInterfaceAssembler {
         }
         query.setOrderBy(emptyToNull(request.getOrderBy()));
         return query;
+    }
+
+    @NonNull
+    public static CreateUserCommand toCreateCommand(
+            @NonNull UserSaveRequest request, String encryptedPassword) {
+        User entity = toEntity(new User(), request);
+        return new CreateUserCommand(
+                entity.getId(),
+                entity.getDepartmentId(),
+                entity.getEmail(),
+                entity.getMobile(),
+                entity.getTel(),
+                entity.getName(),
+                entity.getRank(),
+                entity.getPrivilege(),
+                entity.getStatus(),
+                entity.getPriority(),
+                entity.getRemarks(),
+                request.getLoginName(),
+                encryptedPassword,
+                toRoleIdList(request));
+    }
+
+    @NonNull
+    public static ChangeUserInfoCommand toChangeInfoCommand(@NonNull UserSaveRequest request) {
+        User entity = toEntity(new User(), request);
+        return new ChangeUserInfoCommand(
+                entity.getId(),
+                entity.getDepartmentId(),
+                entity.getEmail(),
+                entity.getMobile(),
+                entity.getTel(),
+                entity.getName(),
+                entity.getRank(),
+                entity.getPrivilege(),
+                entity.getStatus(),
+                entity.getPriority(),
+                entity.getRemarks(),
+                request.getLoginName(),
+                toRoleIdList(request));
     }
 
     @NonNull

@@ -1,7 +1,6 @@
-package com.github.thundax.modules.sys.service.query;
+package com.github.thundax.modules.sys.service.command;
 
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,12 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserQuery {
+public class ChangeUserStatusCommand {
     private EntityId id;
-    private Long departmentId;
-    private String loginName;
-    private String name;
     private UserStatus status;
-    private UserPrivilege privilege;
-    private String orderBy;
 }

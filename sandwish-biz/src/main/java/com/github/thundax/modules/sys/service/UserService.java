@@ -5,28 +5,28 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
+import com.github.thundax.modules.sys.service.command.CreateUserCommand;
+import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.List;
 
 public interface UserService {
 
-    User getById(EntityId id);
-
-    List<User> listAll();
+    User get(UserQuery query);
 
     List<User> list(UserQuery query);
 
     PageResult<User> page(UserQuery query, PageQuery page);
 
-    EntityId add(User user, String loginName, String encryptedPassword, List<Long> roleIdList);
+    EntityId create(CreateUserCommand command);
 
-    void update(User user, String loginName, List<Long> roleIdList);
+    void changeInfo(ChangeUserInfoCommand command);
 
-    int batchDeleteById(List<EntityId> ids);
+    int remove(DeleteUserCommand command);
 
-    int updateStatus(User user);
+    int changeStatus(ChangeUserStatusCommand command);
 
-    int batchUpdateStatus(List<User> list);
-
-    List<Role> listUserRoles(User user);
+    List<Role> listUserRoles(UserQuery query);
 }

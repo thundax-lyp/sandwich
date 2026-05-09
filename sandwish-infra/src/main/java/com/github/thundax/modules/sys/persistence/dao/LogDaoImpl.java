@@ -11,12 +11,11 @@ import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
 import com.github.thundax.modules.sys.persistence.assembler.LogPersistenceAssembler;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
 import com.github.thundax.modules.sys.persistence.mapper.LogMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class LogDaoImpl implements LogDao {

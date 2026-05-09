@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalLoginEventIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
 import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
@@ -71,13 +70,13 @@ public final class PrincipalLoginEventPersistenceAssembler {
     }
 
     private static Long principalIdValue(PrincipalKey principalKey) {
-        return principalKey == null ? null : EntityIdCodec.toValue(principalKey.getPrincipalId());
+        return principalKey == null || principalKey.getPrincipalId() == null ? null : principalKey.getPrincipalId();
     }
 
     private static PrincipalKey principalKeyFrom(String principalType, Long principalId) {
         return principalType == null || principalId == null
                 ? null
-                : PrincipalKey.of(PrincipalType.from(principalType), EntityIdCodec.toDomain(principalId));
+                : PrincipalKey.of(PrincipalType.from(principalType), principalId);
     }
 
     private static String eventTypeValue(PrincipalLoginEventType eventType) {

@@ -5,7 +5,6 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
@@ -72,8 +71,7 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         }
         return PrincipalAuthSession.restore(
                 PrincipalAuthSessionIdCodec.toDomain(cacheDTO.id),
-                PrincipalKey.of(
-                        PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)),
+                PrincipalKey.of(PrincipalType.from(cacheDTO.principalType), cacheDTO.principalId),
                 cacheDTO.clientId,
                 toEntityValues(cacheDTO.values),
                 cacheDTO.issuedAt,
@@ -85,7 +83,7 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         PrincipalAuthSessionCacheDTO cacheDTO = new PrincipalAuthSessionCacheDTO();
         cacheDTO.id = PrincipalAuthSessionIdCodec.toValue(session.getId());
         cacheDTO.principalType = session.getPrincipalKey().getPrincipalType().value();
-        cacheDTO.principalId = EntityIdCodec.toValue(session.getPrincipalKey().getPrincipalId());
+        cacheDTO.principalId = session.getPrincipalKey().getPrincipalId();
         cacheDTO.clientId = session.getClientId();
         cacheDTO.values = toCacheValues(session.getValues());
         cacheDTO.issuedAt = session.getIssuedAt();

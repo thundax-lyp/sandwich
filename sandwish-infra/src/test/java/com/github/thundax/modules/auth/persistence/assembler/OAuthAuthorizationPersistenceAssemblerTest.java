@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
@@ -24,7 +22,7 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         entity.setId(EntityId.of(4002L));
         entity.setAuthorizationCode("code-1");
         entity.setClientId("admin-web");
-        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)));
+        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1001L));
         entity.setRedirectUri("http://127.0.0.1/callback");
         entity.setScopes(new LinkedHashSet<>(Arrays.asList("openid", "profile")));
         entity.setState("state-1");
@@ -68,7 +66,7 @@ public class OAuthAuthorizationPersistenceAssemblerTest {
         assertEquals(Long.valueOf(4002L), entity.getId().value());
         assertEquals("code-1", entity.getAuthorizationCode());
         assertEquals("admin-web", entity.getClientId());
-        assertEquals(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)), entity.getPrincipalKey());
+        assertEquals(PrincipalKey.of(PrincipalType.USER, 1001L), entity.getPrincipalKey());
         assertTrue(entity.getScopes().contains("openid"));
         assertTrue(entity.canConsume(new Date(1000L)));
         assertFalse(entity.canConsume(new Date(3000L)));

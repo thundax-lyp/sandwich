@@ -18,12 +18,11 @@ import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.UserMapper;
 import com.github.thundax.modules.sys.persistence.mapper.UserRoleMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDaoImpl implements UserDao {

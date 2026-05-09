@@ -15,10 +15,9 @@ import com.github.thundax.modules.storage.persistence.dataobject.MultipartUpload
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadPartMapper;
 import com.github.thundax.modules.storage.persistence.mapper.MultipartUploadSessionMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class MultipartUploadDaoImpl implements MultipartUploadDao {

@@ -11,9 +11,8 @@ import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
-import org.springframework.stereotype.Repository;
-
 import java.util.concurrent.TimeUnit;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class AsyncTaskDaoImpl implements AsyncTaskDao {

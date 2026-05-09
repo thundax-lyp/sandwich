@@ -7,10 +7,9 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
-import org.springframework.stereotype.Component;
-
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DictCacheSupport {

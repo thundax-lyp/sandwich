@@ -110,7 +110,7 @@ public class PrincipalCredentialDaoImpl implements PrincipalCredentialDao {
         wrapper.eq(
                 PrincipalCredentialDO::getPrincipalType,
                 principalKey.getPrincipalType().value());
-        wrapper.eq(PrincipalCredentialDO::getPrincipalId, EntityIdCodec.toValue(principalKey.getPrincipalId()));
+        wrapper.eq(PrincipalCredentialDO::getPrincipalId, principalKey.getPrincipalId());
         return wrapper;
     }
 

@@ -2,7 +2,6 @@ package com.github.thundax.modules.auth.persistence.assembler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalLoginEvent;
 import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -21,7 +20,7 @@ public class PrincipalLoginEventPersistenceAssemblerTest {
         Date occurredAt = new Date(1000L);
         PrincipalLoginEvent entity = new PrincipalLoginEvent();
         entity.setId(PrincipalLoginEventId.of("abc1"));
-        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)));
+        entity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1001L));
         entity.setClientId("admin-api");
         entity.setEventType(PrincipalLoginEventType.LOGIN_SUCCESS);
         entity.setAuthenticationMethod(PrincipalAuthenticationMethod.PASSWORD);
@@ -62,7 +61,7 @@ public class PrincipalLoginEventPersistenceAssemblerTest {
         PrincipalLoginEvent entity = PrincipalLoginEventPersistenceAssembler.toEntity(dataObject);
 
         assertEquals(PrincipalLoginEventId.of("abc1"), entity.getId());
-        assertEquals(PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)), entity.getPrincipalKey());
+        assertEquals(PrincipalKey.of(PrincipalType.USER, 1001L), entity.getPrincipalKey());
         assertEquals(PrincipalLoginEventType.LOGIN_FAILED, entity.getEventType());
         assertEquals(PrincipalAuthenticationMethod.PASSWORD, entity.getAuthenticationMethod());
         assertEquals(PrincipalIdentityType.USER_ACCOUNT, entity.getIdentityType());

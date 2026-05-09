@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.persistence.assembler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Role;

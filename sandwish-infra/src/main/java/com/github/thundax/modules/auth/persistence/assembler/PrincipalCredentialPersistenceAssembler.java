@@ -41,8 +41,8 @@ public final class PrincipalCredentialPersistenceAssembler {
         }
         PrincipalCredential entity = new PrincipalCredential();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setPrincipalKey(PrincipalKey.of(
-                principalTypeFrom(dataObject.getPrincipalType()), EntityIdCodec.toDomain(dataObject.getPrincipalId())));
+        entity.setPrincipalKey(
+                PrincipalKey.of(principalTypeFrom(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
         entity.setIdentityId(EntityIdCodec.toDomain(dataObject.getIdentityId()));
         entity.setCredentialType(credentialTypeFrom(dataObject.getCredentialType()));
         entity.setCredentialValue(dataObject.getCredentialValue());
@@ -82,7 +82,7 @@ public final class PrincipalCredentialPersistenceAssembler {
     }
 
     private static Long principalIdValue(PrincipalKey principalKey) {
-        return principalKey == null ? null : EntityIdCodec.toValue(principalKey.getPrincipalId());
+        return principalKey == null || principalKey.getPrincipalId() == null ? null : principalKey.getPrincipalId();
     }
 
     private static PrincipalType principalTypeFrom(String principalType) {

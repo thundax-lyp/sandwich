@@ -29,7 +29,7 @@ public final class OAuthAuthorizationPersistenceAssembler {
         dataObject.setAuthorizationCode(entity.getAuthorizationCode());
         dataObject.setClientId(entity.getClientId());
         dataObject.setPrincipalType(entity.getPrincipalKey().getPrincipalType().value());
-        dataObject.setPrincipalId(EntityIdCodec.toValue(entity.getPrincipalKey().getPrincipalId()));
+        dataObject.setPrincipalId(entity.getPrincipalKey().getPrincipalId());
         dataObject.setRedirectUri(entity.getRedirectUri());
         dataObject.setScopes(writeStringSet(entity.getScopes()));
         dataObject.setState(entity.getState());
@@ -49,9 +49,8 @@ public final class OAuthAuthorizationPersistenceAssembler {
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setAuthorizationCode(dataObject.getAuthorizationCode());
         entity.setClientId(dataObject.getClientId());
-        entity.setPrincipalKey(PrincipalKey.of(
-                PrincipalType.from(dataObject.getPrincipalType()),
-                EntityIdCodec.toDomain(dataObject.getPrincipalId())));
+        entity.setPrincipalKey(
+                PrincipalKey.of(PrincipalType.from(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
         entity.setRedirectUri(dataObject.getRedirectUri());
         entity.setScopes(readStringSet(dataObject.getScopes()));
         entity.setState(dataObject.getState());

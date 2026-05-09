@@ -17,13 +17,12 @@ import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectMapper;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class StoredObjectDaoImpl implements StoredObjectDao {

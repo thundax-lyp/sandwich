@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

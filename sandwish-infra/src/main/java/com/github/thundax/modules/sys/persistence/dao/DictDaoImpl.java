@@ -12,13 +12,12 @@ import com.github.thundax.modules.sys.persistence.assembler.DictPersistenceAssem
 import com.github.thundax.modules.sys.persistence.cache.DictCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
 import com.github.thundax.modules.sys.persistence.mapper.DictMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class DictDaoImpl implements DictDao {

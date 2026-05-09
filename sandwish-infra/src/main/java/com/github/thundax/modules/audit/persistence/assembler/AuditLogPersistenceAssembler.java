@@ -9,7 +9,6 @@ import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

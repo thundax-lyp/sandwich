@@ -4,10 +4,9 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.entity.valueobject.LogIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public final class LogPersistenceAssembler {
 

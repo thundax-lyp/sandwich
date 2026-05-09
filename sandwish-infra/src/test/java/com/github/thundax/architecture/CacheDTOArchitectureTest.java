@@ -11,11 +11,7 @@ import com.github.thundax.modules.auth.persistence.dao.PrincipalAccessTokenDaoIm
 import com.github.thundax.modules.auth.persistence.dao.PrincipalAuthSessionDaoImpl;
 import com.github.thundax.modules.auth.persistence.dao.PrincipalRefreshTokenDaoImpl;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
-import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
-import com.github.thundax.modules.sys.persistence.cache.DictCacheSupport;
-import com.github.thundax.modules.sys.persistence.cache.MenuCacheSupport;
-import com.github.thundax.modules.sys.persistence.cache.RoleCacheSupport;
-import com.github.thundax.modules.sys.persistence.cache.UserCacheSupport;
+import com.github.thundax.modules.sys.persistence.cache.*;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;

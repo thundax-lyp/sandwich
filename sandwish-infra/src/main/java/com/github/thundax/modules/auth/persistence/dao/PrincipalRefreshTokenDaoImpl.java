@@ -5,7 +5,6 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -179,7 +178,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         return PRINCIPAL_INDEX_PREFIX
                 + principalKey.getPrincipalType().value()
                 + "_"
-                + EntityIdCodec.toStringValue(principalKey.getPrincipalId())
+                + principalKey.getPrincipalId()
                 + "_"
                 + StringUtils.defaultIfBlank(clientId, "DEFAULT")
                 + "_"
@@ -215,8 +214,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         refreshToken.setAccessTokenId(PrincipalAccessTokenIdCodec.toDomain(cacheDTO.accessTokenId));
         refreshToken.setClientId(cacheDTO.clientId);
         refreshToken.setSessionId(PrincipalAuthSessionIdCodec.toDomain(cacheDTO.sessionId));
-        refreshToken.setPrincipalKey(PrincipalKey.of(
-                PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
+        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.from(cacheDTO.principalType), cacheDTO.principalId));
         refreshToken.setIssuedAt(cacheDTO.issuedAt);
         refreshToken.setExpireAt(cacheDTO.expireAt);
         refreshToken.setStatus(PrincipalTokenStatus.from(cacheDTO.status));
@@ -232,8 +230,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         cacheDTO.sessionId = PrincipalAuthSessionIdCodec.toValue(refreshToken.getSessionId());
         cacheDTO.principalType =
                 refreshToken.getPrincipalKey().getPrincipalType().value();
-        cacheDTO.principalId =
-                EntityIdCodec.toValue(refreshToken.getPrincipalKey().getPrincipalId());
+        cacheDTO.principalId = refreshToken.getPrincipalKey().getPrincipalId();
         cacheDTO.issuedAt = refreshToken.getIssuedAt();
         cacheDTO.expireAt = refreshToken.getExpireAt();
         cacheDTO.status = refreshToken.getStatus().value();

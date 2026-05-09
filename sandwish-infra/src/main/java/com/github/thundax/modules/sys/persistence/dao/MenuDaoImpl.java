@@ -17,11 +17,10 @@ import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
 import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class MenuDaoImpl implements MenuDao {

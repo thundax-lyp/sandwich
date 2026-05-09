@@ -3,11 +3,11 @@ package com.github.thundax.modules.storage.store;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.model.ObjectStorageWriteResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class ObjectStorageStoredObjectStoreTest {
 
     private StoredObject storage() {
         StoredObject storage = new StoredObject();
-        storage.setId(EntityId.of(5001L));
+        storage.setId(StoredObjectId.of(5001L));
         storage.setExtendName("txt");
         return storage;
     }

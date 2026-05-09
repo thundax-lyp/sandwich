@@ -5,7 +5,6 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

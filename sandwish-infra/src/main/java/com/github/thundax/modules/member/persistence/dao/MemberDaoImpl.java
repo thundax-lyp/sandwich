@@ -11,10 +11,9 @@ import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.persistence.assembler.MemberPersistenceAssembler;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import com.github.thundax.modules.member.persistence.mapper.MemberMapper;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public class MemberDaoImpl implements MemberDao {

@@ -7,7 +7,6 @@ import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.MenuRoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.RoleDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -12,11 +12,10 @@ import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
 import com.github.thundax.modules.audit.persistence.assembler.AuditLogPersistenceAssembler;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO;
 import com.github.thundax.modules.audit.persistence.mapper.AuditLogMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class AuditLogDaoImpl implements AuditLogDao {

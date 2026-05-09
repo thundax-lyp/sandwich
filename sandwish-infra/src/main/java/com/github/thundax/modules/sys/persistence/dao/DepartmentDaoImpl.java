@@ -15,11 +15,10 @@ import com.github.thundax.modules.sys.persistence.assembler.DepartmentPersistenc
 import com.github.thundax.modules.sys.persistence.cache.DepartmentCacheSupport;
 import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
 import com.github.thundax.modules.sys.persistence.mapper.DepartmentMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class DepartmentDaoImpl implements DepartmentDao {

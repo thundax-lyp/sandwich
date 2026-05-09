@@ -8,11 +8,10 @@ import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.persistence.assembler.StoragePersistenceAssembler;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
 import com.github.thundax.modules.storage.persistence.mapper.StoredObjectReferenceMapper;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {

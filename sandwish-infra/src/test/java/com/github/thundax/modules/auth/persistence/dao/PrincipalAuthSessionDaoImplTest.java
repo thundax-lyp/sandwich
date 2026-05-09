@@ -5,18 +5,13 @@ import static org.junit.Assert.assertNull;
 
 import com.alicp.jetcache.Cache;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
@@ -35,7 +30,7 @@ public class PrincipalAuthSessionDaoImplTest {
         PrincipalAuthSession stored = dao.getById(PrincipalAuthSessionId.of("fa1"));
         assertEquals(PrincipalAuthSessionId.of("fa1"), stored.getId());
         assertEquals(PrincipalType.USER, stored.getPrincipalKey().getPrincipalType());
-        assertEquals(EntityId.of(1001L), stored.getPrincipalKey().getPrincipalId());
+        assertEquals(Long.valueOf(1001L), stored.getPrincipalKey().getPrincipalId());
         assertEquals("admin-api", stored.getClientId());
         assertEquals(
                 new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")),
@@ -59,7 +54,7 @@ public class PrincipalAuthSessionDaoImplTest {
         values.put(SAMPLE_VALUE_NAME, new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")));
         return PrincipalAuthSession.restore(
                 PrincipalAuthSessionId.of("fa1"),
-                PrincipalKey.of(PrincipalType.USER, EntityId.of(1001L)),
+                PrincipalKey.of(PrincipalType.USER, 1001L),
                 "admin-api",
                 values,
                 new Date(1000L),

@@ -1,14 +1,12 @@
 package com.github.thundax.modules.member.persistence.assembler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
+import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
 import org.junit.Test;
 
@@ -40,7 +38,7 @@ public class MemberPersistenceAssemblerTest {
     @Test
     public void shouldWriteDomainValueToStatus() {
         Member entity = new Member();
-        entity.setId(EntityId.of(5001L));
+        entity.setId(MemberId.of(5001L));
         entity.setStatus(MemberStatus.SUSPENDED);
 
         MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);

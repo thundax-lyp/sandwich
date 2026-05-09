@@ -5,7 +5,6 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -198,7 +197,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
         return PRINCIPAL_INDEX_PREFIX
                 + principalKey.getPrincipalType().value()
                 + "_"
-                + EntityIdCodec.toStringValue(principalKey.getPrincipalId())
+                + principalKey.getPrincipalId()
                 + "_"
                 + StringUtils.defaultIfBlank(clientId, "DEFAULT")
                 + "_"
@@ -233,8 +232,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
         accessToken.setTokenCode(PrincipalAccessTokenCode.ofNullable(cacheDTO.tokenCode));
         accessToken.setClientId(cacheDTO.clientId);
         accessToken.setSessionId(PrincipalAuthSessionIdCodec.toDomain(cacheDTO.sessionId));
-        accessToken.setPrincipalKey(PrincipalKey.of(
-                PrincipalType.from(cacheDTO.principalType), EntityIdCodec.toDomain(cacheDTO.principalId)));
+        accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.from(cacheDTO.principalType), cacheDTO.principalId));
         accessToken.setScopes(new LinkedHashSet<>(cacheDTO.scopes));
         accessToken.setIssuedAt(cacheDTO.issuedAt);
         accessToken.setExpireAt(cacheDTO.expireAt);
@@ -252,8 +250,7 @@ public class PrincipalAccessTokenDaoImpl implements PrincipalAccessTokenDao {
         cacheDTO.sessionId = PrincipalAuthSessionIdCodec.toValue(accessToken.getSessionId());
         cacheDTO.principalType =
                 accessToken.getPrincipalKey().getPrincipalType().value();
-        cacheDTO.principalId =
-                EntityIdCodec.toValue(accessToken.getPrincipalKey().getPrincipalId());
+        cacheDTO.principalId = accessToken.getPrincipalKey().getPrincipalId();
         cacheDTO.scopes =
                 accessToken.getScopes() == null ? new ArrayList<>() : new ArrayList<>(accessToken.getScopes());
         cacheDTO.issuedAt = accessToken.getIssuedAt();

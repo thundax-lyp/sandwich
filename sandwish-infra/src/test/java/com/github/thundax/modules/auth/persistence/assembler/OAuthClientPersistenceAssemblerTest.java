@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.OAuthClient;

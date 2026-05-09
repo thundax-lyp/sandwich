@@ -34,8 +34,8 @@ public final class PrincipalIdentityPersistenceAssembler {
         }
         PrincipalIdentity entity = new PrincipalIdentity();
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
-        entity.setPrincipalKey(PrincipalKey.of(
-                principalTypeFrom(dataObject.getPrincipalType()), EntityIdCodec.toDomain(dataObject.getPrincipalId())));
+        entity.setPrincipalKey(
+                PrincipalKey.of(principalTypeFrom(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
         entity.setType(identityTypeFrom(dataObject.getIdentityType()));
         entity.setIdentityValue(dataObject.getIdentityValue());
         entity.setStatus(statusFrom(dataObject.getStatus()));
@@ -60,7 +60,7 @@ public final class PrincipalIdentityPersistenceAssembler {
     }
 
     private static Long principalIdValue(PrincipalKey principalKey) {
-        return principalKey == null ? null : EntityIdCodec.toValue(principalKey.getPrincipalId());
+        return principalKey == null || principalKey.getPrincipalId() == null ? null : principalKey.getPrincipalId();
     }
 
     private static PrincipalType principalTypeFrom(String principalType) {

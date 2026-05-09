@@ -1,20 +1,15 @@
 package com.github.thundax.modules.storage.persistence.assembler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
-import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
-import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.enums.*;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartId;
+import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO;
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
@@ -146,7 +141,7 @@ public class StoragePersistenceAssemblerTest {
         Date completedDate = new Date(3000L);
         Date abortedDate = new Date(4000L);
         MultipartUploadSession entity = new MultipartUploadSession();
-        entity.setId(EntityId.of(5002L));
+        entity.setId(MultipartUploadSessionId.of(5002L));
         entity.setUploadId("upload-1");
         entity.setOwnerId("u1");
         entity.setOwnerType(StorageOwnerType.USER);
@@ -200,7 +195,7 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldMapMultipartPartFields() {
         MultipartUploadPart entity = new MultipartUploadPart();
-        entity.setId(EntityId.of(5003L));
+        entity.setId(MultipartUploadPartId.of(5003L));
         entity.setUploadId("upload-1");
         entity.setPartNumber(1);
         entity.setEtag("etag-1");

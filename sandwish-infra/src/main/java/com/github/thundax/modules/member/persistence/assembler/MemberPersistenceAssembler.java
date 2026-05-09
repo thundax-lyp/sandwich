@@ -5,7 +5,6 @@ import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.persistence.dataobject.MemberDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

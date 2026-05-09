@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.DictDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

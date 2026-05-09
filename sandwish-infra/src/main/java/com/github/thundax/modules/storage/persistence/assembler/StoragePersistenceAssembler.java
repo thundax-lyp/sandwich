@@ -4,7 +4,11 @@ import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
-import com.github.thundax.modules.storage.entity.enums.*;
+import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StorageType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
@@ -12,7 +16,6 @@ import com.github.thundax.modules.storage.persistence.dataobject.MultipartUpload
 import com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

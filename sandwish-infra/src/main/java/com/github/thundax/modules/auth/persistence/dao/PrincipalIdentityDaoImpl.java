@@ -90,7 +90,7 @@ public class PrincipalIdentityDaoImpl implements PrincipalIdentityDao {
         wrapper.eq(
                 PrincipalIdentityDO::getPrincipalType,
                 principalKey.getPrincipalType().value());
-        wrapper.eq(PrincipalIdentityDO::getPrincipalId, EntityIdCodec.toValue(principalKey.getPrincipalId()));
+        wrapper.eq(PrincipalIdentityDO::getPrincipalId, principalKey.getPrincipalId());
         return wrapper;
     }
 

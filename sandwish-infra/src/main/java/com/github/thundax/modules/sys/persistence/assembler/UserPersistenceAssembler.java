@@ -8,7 +8,6 @@ import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.persistence.dataobject.UserDO;
 import com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO;
-
 import java.util.ArrayList;
 import java.util.List;
 

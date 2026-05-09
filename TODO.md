@@ -11,20 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.3 infra-core`：新增 Audit 持久化实现
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/dataobject/AuditMetaDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/dataobject/AuditLogDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/mapper/AuditMetaMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/mapper/AuditLogMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/assembler/AuditMetaPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/assembler/AuditLogPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/dao/AuditMetaDaoImpl.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/audit/persistence/dao/AuditLogDaoImpl.java`
-  - 处理动作：实现 `audit_meta` / `audit_log` 的 DO、Mapper、assembler 和 DAO implementation。
-  - 验收点：Audit infra 持久化实现可编译；执行 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：10/10
-
 - [ ] `Audit 3.4 runtime`：新增 Audit 注解运行时
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/annotation/AuditLog.java`

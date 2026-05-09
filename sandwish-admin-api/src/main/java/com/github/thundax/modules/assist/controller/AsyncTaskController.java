@@ -49,7 +49,7 @@ public class AsyncTaskController {
     public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
         AsyncTask bean = asyncTaskService.get(toQuery(request));
         if (bean == null) {
-            return new AsyncTaskResponse();
+            return AsyncTaskInterfaceAssembler.toResponse(null);
         }
 
         if (bean.isPrivate() && !bean.isBelongTo(UserAccessHolder.currentUser())) {

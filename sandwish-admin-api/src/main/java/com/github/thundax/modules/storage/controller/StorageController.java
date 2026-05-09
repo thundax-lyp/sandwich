@@ -103,7 +103,7 @@ public class StorageController {
         }
 
         Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
-        StorageUploadResponse response = new StorageUploadResponse();
+        StorageUploadResponse response = StorageInterfaceAssembler.toUploadEmptyResponse();
         for (MultipartFile file : fileMap.values()) {
             StorageUploadResponse validatedResponse = validateUploadFile(file);
             if (validatedResponse.getError() != null) {
@@ -204,7 +204,7 @@ public class StorageController {
         if (!properties.getAllowSuffix().contains(extendName)) {
             return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
         }
-        return new StorageUploadResponse();
+        return StorageInterfaceAssembler.toUploadEmptyResponse();
     }
 
     private PageQuery readStoragePage(StoragePageRequest request) {

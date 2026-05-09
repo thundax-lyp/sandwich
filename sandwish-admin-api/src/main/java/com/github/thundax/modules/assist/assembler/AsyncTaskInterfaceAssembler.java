@@ -11,15 +11,15 @@ public final class AsyncTaskInterfaceAssembler {
     @NonNull
     public static AsyncTaskResponse toResponse(AsyncTask entity) {
         if (entity == null) {
-            return new AsyncTaskResponse();
+            return AsyncTaskResponse.builder().build();
         }
-        AsyncTaskResponse response = new AsyncTaskResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
-        response.setStatus(entity.getStatus().value());
-        response.setMessage(entity.getMessage());
-        response.setData(entity.getData());
-        return response;
+        return AsyncTaskResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .status(entity.getStatus().value())
+                .message(entity.getMessage())
+                .data(entity.getData())
+                .build();
     }
 }

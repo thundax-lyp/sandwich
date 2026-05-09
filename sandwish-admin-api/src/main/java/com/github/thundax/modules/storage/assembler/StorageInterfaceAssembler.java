@@ -23,49 +23,54 @@ public final class StorageInterfaceAssembler {
     @NonNull
     public static StorageUploadResponse toUploadResponse(StoredObject entity, StorageConverter storageConverter) {
         if (entity == null) {
-            return new StorageUploadResponse();
+            return StorageUploadResponse.builder().build();
         }
-        StorageUploadResponse response = new StorageUploadResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setOriginalFilename(entity.getOriginalFileName());
-        response.setExtendName(entity.getExtendName());
-        response.setContentType(entity.getContentType());
-        response.setContentUrl(storageConverter.toPreviewUrl(entity));
-        return response;
+        return StorageUploadResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .originalFilename(entity.getOriginalFileName())
+                .extendName(entity.getExtendName())
+                .contentType(entity.getContentType())
+                .contentUrl(storageConverter.toPreviewUrl(entity))
+                .build();
     }
 
     @NonNull
     public static StorageUploadResponse toUploadErrorResponse(String error) {
-        StorageUploadResponse response = new StorageUploadResponse();
-        response.setError(error);
-        return response;
+        return StorageUploadResponse.builder().error(error).build();
+    }
+
+    @NonNull
+    public static StorageUploadResponse toUploadEmptyResponse() {
+        return StorageUploadResponse.builder().build();
     }
 
     @NonNull
     public static StorageResponse toResponse(StoredObject entity, StorageConverter storageConverter) {
         if (entity == null) {
-            return new StorageResponse();
+            return StorageResponse.builder().build();
         }
-        StorageResponse response = new StorageResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setOriginalFilename(entity.getOriginalFilename());
-        response.setExtendName(entity.getExtendName());
-        response.setContentType(entity.getContentType());
-        response.setOwnerId(entity.getOwnerId());
-        response.setOwnerType(
-                entity.getOwnerType() == null ? null : entity.getOwnerType().value());
-        response.setObjectStatus(
-                entity.getObjectStatus() == null
-                        ? null
-                        : entity.getObjectStatus().value());
-        response.setReferenceStatus(
-                entity.getReferenceStatus() == null
-                        ? null
-                        : entity.getReferenceStatus().value());
-        response.setPriority(entity.getPriority());
-        response.setRemarks(entity.getRemarks());
-        response.setContentUrl(storageConverter.toPreviewUrl(entity));
-        return response;
+        return StorageResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .originalFilename(entity.getOriginalFilename())
+                .extendName(entity.getExtendName())
+                .contentType(entity.getContentType())
+                .ownerId(entity.getOwnerId())
+                .ownerType(
+                        entity.getOwnerType() == null
+                                ? null
+                                : entity.getOwnerType().value())
+                .objectStatus(
+                        entity.getObjectStatus() == null
+                                ? null
+                                : entity.getObjectStatus().value())
+                .referenceStatus(
+                        entity.getReferenceStatus() == null
+                                ? null
+                                : entity.getReferenceStatus().value())
+                .priority(entity.getPriority())
+                .remarks(entity.getRemarks())
+                .contentUrl(storageConverter.toPreviewUrl(entity))
+                .build();
     }
 
     @NonNull
@@ -87,40 +92,40 @@ public final class StorageInterfaceAssembler {
 
     @NonNull
     public static StorageTreeNodeResponse toBusinessTypeTreeNode(String businessType) {
-        StorageTreeNodeResponse response = new StorageTreeNodeResponse();
-        response.setId(businessType);
-        response.setParentId("ROOT");
-        response.setName(businessType);
-        return response;
+        return StorageTreeNodeResponse.builder()
+                .id(businessType)
+                .parentId("ROOT")
+                .name(businessType)
+                .build();
     }
 
     @NonNull
     public static MultipartUploadSessionResponse toMultipartSessionResponse(MultipartUploadSession entity) {
         if (entity == null) {
-            return new MultipartUploadSessionResponse();
+            return MultipartUploadSessionResponse.builder().build();
         }
-        MultipartUploadSessionResponse response = new MultipartUploadSessionResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setUploadId(entity.getUploadId());
-        response.setUploadStatus(
-                entity.getUploadStatus() == null
-                        ? null
-                        : entity.getUploadStatus().value());
-        response.setUploadedPartCount(entity.getUploadedPartCount());
-        return response;
+        return MultipartUploadSessionResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .uploadId(entity.getUploadId())
+                .uploadStatus(
+                        entity.getUploadStatus() == null
+                                ? null
+                                : entity.getUploadStatus().value())
+                .uploadedPartCount(entity.getUploadedPartCount())
+                .build();
     }
 
     @NonNull
     public static MultipartUploadPartResponse toMultipartPartResponse(MultipartUploadPart entity) {
         if (entity == null) {
-            return new MultipartUploadPartResponse();
+            return MultipartUploadPartResponse.builder().build();
         }
-        MultipartUploadPartResponse response = new MultipartUploadPartResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setUploadId(entity.getUploadId());
-        response.setPartNumber(entity.getPartNumber());
-        response.setEtag(entity.getEtag());
-        response.setSize(entity.getSize());
-        return response;
+        return MultipartUploadPartResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .uploadId(entity.getUploadId())
+                .partNumber(entity.getPartNumber())
+                .etag(entity.getEtag())
+                .size(entity.getSize())
+                .build();
     }
 }

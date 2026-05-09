@@ -16,7 +16,7 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 - Service 写入口使用 Command 参数表达一次业务写操作。
 - Command 固定承载写操作入参、目标对象标识、业务动作上下文和并发控制参数。
 - Service 写入口固定表达单对象业务变更。
-- Service 查询入口固定使用 Query 和 PageDTO 表达读取条件与分页窗口。
+- Service 查询入口固定使用 Query 和 PageQuery 表达读取条件与分页窗口。
 - Controller 负责请求对象到 Command 的入口适配。
 - Service 测试围绕业务动作和 Command 编写。
 - 架构约束可以阻止 Service 写入口回退为散参数、泛化动作入口和真正批量写入口。
@@ -28,7 +28,7 @@ RUNBOOK 固定说明执行顺序、依赖关系、允许的临时不可编译窗
 - 本 RUNBOOK 不改变数据库表结构，除非某个业务对象明确需要新增业务并发 `version`。
 - 本 RUNBOOK 不把 Command 作为 Controller 请求模型复用。
 - 本 RUNBOOK 不要求读方法使用 Command。
-- 本 RUNBOOK 不要求 DAO interface 使用 Query、PageDTO 或 Command。
+- 本 RUNBOOK 不要求 DAO interface 使用 Query、PageQuery、PageResult 或 Command。
 
 ## 3. Target Shape
 
@@ -67,7 +67,7 @@ Role get(RoleQuery query);
 
 List<Role> list(RoleQuery query);
 
-PageDTO<Role> page(RoleQuery query, PageDTO<Role> page);
+PageResult<Role> page(RoleQuery query, PageQuery page);
 
 EntityId create(CreateRoleCommand command);
 
@@ -85,7 +85,7 @@ Service 方法参数固定只有三种形态：
 ```java
 get(Query)
 
-page(Query, PageDTO)
+page(Query, PageQuery)
 
 write(Command)
 ```
@@ -94,12 +94,12 @@ write(Command)
 
 - Service 方法参数最多 2 个。
 - 非分页查询方法固定接收一个 `*Query`。
-- 分页查询方法固定接收一个 `*Query` 和一个 `PageDTO`。
+- 分页查询方法固定接收一个 `*Query` 和一个 `PageQuery`。
 - 写方法固定接收一个 `*Command`。
 - Service 方法不接收 Domain Entity 作为写入口参数。
 - Service 方法不接收散落业务字段作为公开入口参数。
 - Service 方法不接收 Controller Request、Response 或 infra DO/DataObject。
-- Service 方法不使用 `*PageQuery`。
+- Service 方法分页返回值固定使用 `PageResult<T>`。
 
 参数示例：
 
@@ -108,7 +108,7 @@ Role get(RoleQuery query);
 
 List<Role> list(RoleQuery query);
 
-PageDTO<Role> page(RoleQuery query, PageDTO<Role> page);
+PageResult<Role> page(RoleQuery query, PageQuery page);
 
 EntityId create(CreateRoleCommand command);
 
@@ -124,7 +124,27 @@ Query 固定满足：
 - Query 不承载分页窗口。
 - Query 不承载 HTTP、Session、权限适配、持久化实现类型或 request 字符串解析逻辑。
 
-### 3.4 Command
+### 3.4 PageQuery And PageResult
+
+PageQuery 固定表达分页输入窗口。
+
+固定规则：
+
+- PageQuery 只承载 `pageNo` 和 `pageSize`。
+- PageQuery 不承载业务过滤条件。
+- PageQuery 不承载分页结果、总数或记录列表。
+- 分页输入归一化固定由 PageQuery 或 PageRules 承载，不下沉到 Controller 私有逻辑。
+
+PageResult 固定表达分页返回结果。
+
+固定规则：
+
+- PageResult 固定包含 `pageNo`、`pageSize`、`totalCount`、`totalPage` 和 `records`。
+- PageResult 不作为 Service 方法入参。
+- PageResult 不承载分页输入归一化逻辑。
+- 历史 `PageDTO` 必须迁移为 PageQuery 和 PageResult 后删除。
+
+### 3.5 Command
 
 Command 固定满足：
 
@@ -148,7 +168,7 @@ RenameRoleCommand
 BindRoleMenusCommand
 ```
 
-### 3.5 Domain Entity Boundary
+### 3.6 Domain Entity Boundary
 
 Service 写入口固定不接收 Domain Entity。
 
@@ -160,7 +180,7 @@ Service 写入口固定不接收 Domain Entity。
 - 业务确实存在“编辑基础信息”动作时，使用 `changeXxxInfo(*Command)` 表达。
 - Command 只列出本业务动作允许修改的字段。
 
-### 3.6 Batch Boundary
+### 3.7 Batch Boundary
 
 Service 层固定不提供真正批量写业务语义。
 
@@ -184,14 +204,14 @@ Service 层固定不提供真正批量写业务语义。
 执行内容：
 
 - 更新 `docs/00-governance/ARCHITECTURE.md` 的 Service 边界规则。
-- 更新 `docs/00-governance/NAMING-AND-PLACEMENT-RULES.md` 的 Service 命名、Query、Command 和 PageDTO 放置规则。
+- 更新 `docs/00-governance/NAMING-AND-PLACEMENT-RULES.md` 的 Service 命名、Query、PageQuery、PageResult 和 Command 放置规则。
 - 更新 `docs/AGENT.md` 的文档路由，使 Service 方法规约化任务能定位到本 RUNBOOK 和治理文档。
 - 必要时更新相关需求文档中仍保留旧 Service 入参口径的位置。
 
 可验证点：
 
 ```bash
-rg "LAYER_SERVICE_BOUNDARY_TYPES|NAME_SERVICE_QUERY|Service 方法|Command|PageDTO" docs/00-governance docs/AGENT.md docs/10-requirements
+rg "LAYER_SERVICE_BOUNDARY_TYPES|NAME_SERVICE_QUERY|Service 方法|Command|PageQuery|PageResult|PageDTO" docs/00-governance docs/AGENT.md docs/10-requirements
 ```
 
 提交边界：
@@ -208,7 +228,7 @@ rg "LAYER_SERVICE_BOUNDARY_TYPES|NAME_SERVICE_QUERY|Service 方法|Command|PageD
 
 - 新增或扩展 `sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java`。
 - 新增 Service 参数组合架构测试。
-- 新增 Command / Query / PageDTO 边界架构测试。
+- 新增 Command / Query / PageQuery / PageResult 边界架构测试。
 - 新增 `batch*` 方法名禁止测试。
 - 在测试中维护临时放行清单；放行清单不写入规约正文。
 
@@ -258,7 +278,7 @@ rg "interface .*Service|class .*ServiceImpl|batch|deleteById|update|insert|save|
 - 新增或调整 `*Query`。
 - 新增或调整 `*Command`。
 - Command 按业务动作聚合，不按字段机械拆分。
-- 查询分页继续使用 `*Query` + `PageDTO`，不新增 `*PageQuery`。
+- 查询分页使用 `*Query` + `PageQuery`，分页返回使用 `PageResult<T>`。
 - 保持 DAO 契约不因 Query / Command 规约化被迫改造。
 
 可验证点：
@@ -281,7 +301,7 @@ mvn -pl sandwish-biz -am test
 
 - 调整 Service interface。
 - 调整 Service implementation。
-- 将查询入口改为 `*Query` 或 `*Query, PageDTO`。
+- 将查询入口改为 `*Query` 或 `*Query, PageQuery`。
 - 将写入口改为 `*Command`。
 - 将 `update(DomainEntity entity)` 拆成明确业务动作。
 - 将方法名改为业务动作，不重复 Service 主体名。

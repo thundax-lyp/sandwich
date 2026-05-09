@@ -18,7 +18,7 @@
   - 范围文件：docs/10-requirements/SYSTEM-REQUIREMENTS.md
   - 范围文件：docs/10-requirements/STORAGE-REQUIREMENTS.md
   - 范围文件：docs/10-requirements/AUTH-REQUIREMENTS.md
-  - 处理动作：补充 Service 方法规约化任务文档路由，并将 Service 入参三态、方法名禁止名单、`Command` 放置目录和相关需求文档旧口径同步为一致规则
+  - 处理动作：补充 Service 方法规约化任务文档路由，并将 Service 入参三态、方法名禁止名单、`PageQuery` / `PageResult` / `Command` 放置目录和相关需求文档旧口径同步为一致规则
   - 验收点：Service 方法规约化任务有明确读取入口；治理文档和相关需求文档不再要求或暗示旧式 Service 写入口
   - 重要度：9/10
 
@@ -26,8 +26,18 @@
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceNamingArchitectureTest.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodParameterArchitectureTest.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/architecture/ServiceMethodModelArchitectureTest.java
-  - 处理动作：补齐 Service 方法名禁止名单、参数三态、Query/Command 边界和临时放行清单测试
+  - 处理动作：补齐 Service 方法名禁止名单、参数三态、Query/PageQuery/PageResult/Command 边界和临时放行清单测试
   - 验收点：测试能识别 `batch*`、散参数、Domain Entity 写入口参数、Controller Request、DO/DataObject 和非法多参数组合；`mvn -pl sandwish-biz -am test` 通过
+  - 重要度：10/10
+
+- [ ] `service-method-page-model`：拆分分页输入输出模型
+  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageDTO.java
+  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageQuery.java
+  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageResult.java
+  - 范围文件：sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/page/PageRules.java
+  - 范围文件：sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/response/PageResponseHelper.java
+  - 处理动作：新增 PageQuery 和 PageResult，迁移 PageResponseHelper，并删除混合输入输出职责的 PageDTO
+  - 验收点：common 中不再存在 PageDTO；PageQuery 只承载分页输入，PageResult 只承载分页结果；`mvn -pl sandwish-common-web -am test` 通过
   - 重要度：10/10
 
 - [ ] `service-method-sys/dict`：规约化 DictService
@@ -35,7 +45,7 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/DictQuery.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/DictServiceImplTest.java
-  - 处理动作：新增 Dict Command 和 DictServiceImplTest，改造查询和写入口为 Query、PageDTO、Command 三态，并将宽泛写方法拆成业务动作
+  - 处理动作：新增 Dict Command 和 DictServiceImplTest，改造查询和写入口为 Query、PageQuery、PageResult、Command 三态，并将宽泛写方法拆成业务动作
   - 验收点：DictService 方法名不重复主体名、不含 `update/batch*` 等禁止词；`mvn -pl sandwish-biz -am test` 通过
   - 重要度：9/10
 
@@ -55,7 +65,7 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/RoleQuery.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/RoleServiceImplTest.java
   - 处理动作：新增 Role Command，规约化角色创建、改名、授权、排序、状态和菜单/用户关系写入口
-  - 验收点：RoleService 写方法使用业务动作名和 `*Command`；分页使用 `RoleQuery + PageDTO`
+  - 验收点：RoleService 写方法使用业务动作名和 `*Command`；分页使用 `RoleQuery + PageQuery` 并返回 `PageResult`
   - 重要度：9/10
 
 - [ ] `service-method-admin/role`：同步 RoleController 入口适配
@@ -101,7 +111,7 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/MenuQuery.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/MenuServiceImplTest.java
   - 处理动作：新增 Menu Command，规约化菜单创建、信息变更、显示状态、移动和删除入口
-  - 验收点：MenuService 写方法使用业务动作名；菜单查询符合 Query / PageDTO 参数规则
+  - 验收点：MenuService 写方法使用业务动作名；菜单查询符合 Query / PageQuery / PageResult 参数和返回规则
   - 重要度：9/10
 
 - [ ] `service-method-admin/menu`：同步 MenuController 入口适配
@@ -157,13 +167,13 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/LogQuery.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/LogServiceImplTest.java
   - 处理动作：规约化日志查询和条件清理入口，条件删除使用 `deleteByXxx(*Query)` 窄口径，不使用 `batch*`
-  - 验收点：LogService 查询和清理入口符合 Query / PageDTO / Command 三态例外口径
+  - 验收点：LogService 查询和清理入口符合 Query / PageQuery / PageResult / Command 三态例外口径
   - 重要度：7/10
 
 - [ ] `service-method-admin/log`：同步 LogController 入口适配
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/LogController.java
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/LogPageRequest.java
-  - 处理动作：将 Log API Request 显式组装为 Log Query 和 PageDTO，并适配条件清理入口
+  - 处理动作：将 Log API Request 显式组装为 Log Query 和 PageQuery，并适配条件清理入口
   - 验收点：LogController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
   - 重要度：7/10
 
@@ -180,7 +190,7 @@
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StorageIdRequest.java
   - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StoragePageRequest.java
-  - 处理动作：将 Storage API Request 显式组装为 Storage Query 或 Command，并适配 PageDTO 分页
+  - 处理动作：将 Storage API Request 显式组装为 Storage Query、PageQuery 或 Command，并适配 PageResult 分页返回
   - 验收点：StorageController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
   - 重要度：7/10
 
@@ -234,7 +244,7 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/query/MemberQuery.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/member/service/impl/MemberServiceImplTest.java
   - 处理动作：新增 Member Command，规约化会员创建、资料变更、状态变更和查询入口
-  - 验收点：MemberService 符合 Query / PageDTO / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
+  - 验收点：MemberService 符合 Query / PageQuery / PageResult / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
   - 重要度：8/10
 
 - [ ] `service-method-front/member-auth`：同步前台会员认证入口
@@ -253,7 +263,7 @@
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java
   - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImplTest.java
   - 处理动作：新增 AsyncTask Query、Command 和 AsyncTaskServiceImplTest，规约化异步任务创建、状态推进、查询和条件清理入口
-  - 验收点：AsyncTaskService 符合 Query / PageDTO / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
+  - 验收点：AsyncTaskService 符合 Query / PageQuery / PageResult / Command 三态规则；`mvn -pl sandwish-biz -am test` 通过
   - 重要度：7/10
 
 - [ ] `service-method-admin/async-task`：同步 AsyncTaskController 入口适配

@@ -17,7 +17,6 @@ import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
-import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
@@ -84,16 +83,15 @@ public class StorageControllerContractTest {
         controller.content(404L, response);
 
         assertEquals(404, response.getStatus());
-        verify(storageService).getById(EntityIdCodec.toDomain(404L));
+        verify(storageService).get(any(StorageQuery.class));
     }
 
     @Test
     public void shouldReturnForbiddenWhenCurrentUserCannotReadContent() throws Exception {
         StoredObject storage = storage(1001L);
         StorageService storageService = mock(StorageService.class);
-        when(storageService.getById(EntityIdCodec.toDomain(1001L))).thenReturn(storage);
-        when(storageService.canReadContent(storage, StorageOwnerType.USER, null))
-                .thenReturn(false);
+        when(storageService.get(any(StorageQuery.class))).thenReturn(storage);
+        when(storageService.existsReadableContent(any(StorageQuery.class))).thenReturn(false);
         StorageController controller =
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -108,9 +106,8 @@ public class StorageControllerContractTest {
         StoredObject storage = storage(1001L);
         StorageService storageService = mock(StorageService.class);
         StoredObjectStore objectStore = mock(StoredObjectStore.class);
-        when(storageService.getById(EntityIdCodec.toDomain(1001L))).thenReturn(storage);
-        when(storageService.canReadContent(storage, StorageOwnerType.USER, null))
-                .thenReturn(true);
+        when(storageService.get(any(StorageQuery.class))).thenReturn(storage);
+        when(storageService.existsReadableContent(any(StorageQuery.class))).thenReturn(true);
         when(objectStore.exists(storage)).thenReturn(true);
         when(objectStore.open(storage)).thenReturn(new ByteArrayInputStream("hello".getBytes("UTF-8")));
         StorageController controller = controller(storageService, mock(StorageConverter.class), objectStore);

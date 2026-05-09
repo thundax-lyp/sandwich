@@ -4,6 +4,7 @@ import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,8 @@ public class StorageConverter {
         }
 
         String objectId = StringUtils.removeEnd(StringUtils.substringAfter(previewUrl, contentPath), "/content");
-        return storageService.getById(EntityIdCodec.toDomain(Long.valueOf(objectId)));
+        StorageQuery query = new StorageQuery();
+        query.setId(EntityIdCodec.toDomain(Long.valueOf(objectId)));
+        return storageService.get(query);
     }
 }

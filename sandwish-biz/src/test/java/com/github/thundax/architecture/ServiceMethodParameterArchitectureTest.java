@@ -58,21 +58,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
             "PrincipalIdentityService#getByPrincipalKeyAndType",
             "PrincipalIdentityService#listByPrincipalKeyAndStatus",
             "PrincipalIdentityService#update",
-            "PrincipalIdentityService#updateStatus",
-            "StorageService#add",
-            "StorageService#addReferences",
-            "StorageService#batchDeleteById",
-            "StorageService#canReadContent",
-            "StorageService#deleteById",
-            "StorageService#getById",
-            "StorageService#listByIds",
-            "StorageService#listMimeTypes",
-            "StorageService#listReferenceOwnerTypes",
-            "StorageService#listReferences",
-            "StorageService#removeReferences",
-            "StorageService#update",
-            "StorageService#updateObjectStatus",
-            "StorageService#updateReferenceStatus"));
+            "PrincipalIdentityService#updateStatus"));
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {

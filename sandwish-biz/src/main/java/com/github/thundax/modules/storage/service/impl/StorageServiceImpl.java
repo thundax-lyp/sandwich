@@ -13,10 +13,15 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
+import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
+import com.github.thundax.modules.storage.service.command.ChangeStorageObjectStatusCommand;
+import com.github.thundax.modules.storage.service.command.ChangeStorageReferenceStatusCommand;
+import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
+import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
+import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,20 +39,18 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public StoredObject getById(EntityId id) {
-        if (id == null) {
+    public StoredObject get(StorageQuery query) {
+        if (query == null || query.getId() == null) {
             return null;
         }
-        return dao.getById(id);
-    }
-
-    @Override
-    public List<StoredObject> listByIds(List<EntityId> ids) {
-        return dao.listByIds(EntityIdCodec.toValues(ids));
+        return dao.getById(query.getId());
     }
 
     @Override
     public List<StoredObject> list(StorageQuery query) {
+        if (query != null && query.getIds() != null) {
+            return dao.listByIds(EntityIdCodec.toValues(query.getIds()));
+        }
         return dao.list(
                 query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
@@ -84,70 +87,80 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId add(StoredObject storage) {
+    public EntityId create(CreateStorageCommand command) {
+        StoredObject storage = toStoredObject(command);
         storage.setId(dao.insert(storage));
         return storage.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void update(StoredObject storage) {
-        dao.update(storage);
+    public void change(ChangeStorageCommand command) {
+        dao.update(toStoredObject(command));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteById(EntityId id) {
-        return id == null ? 0 : dao.deleteById(id);
+    public int remove(DeleteStorageCommand command) {
+        if (command == null || command.getId() == null) {
+            return 0;
+        }
+        return dao.deleteById(command.getId());
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int batchDeleteById(List<EntityId> ids) {
-        return batchOperate(ids, this::deleteById);
-    }
-
-    @Override
-    public List<String> listMimeTypes() {
+    public List<String> listMimeTypes(StorageQuery query) {
         return dao.listMimeTypes();
     }
 
     @Override
-    public List<String> listReferenceOwnerTypes() {
+    public List<String> listReferenceOwnerTypes(StorageQuery query) {
         return businessDao.listReferenceOwnerTypes();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateObjectStatus(StoredObject storage) {
+    public int changeObjectStatus(ChangeStorageObjectStatusCommand command) {
+        StoredObject storage = new StoredObject();
+        storage.setId(command.getId());
+        storage.setObjectStatus(command.getObjectStatus());
         return dao.updateObjectStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateReferenceStatus(StoredObject storage) {
+    public int changeReferenceStatus(ChangeStorageReferenceStatusCommand command) {
+        StoredObject storage = new StoredObject();
+        storage.setId(command.getId());
+        storage.setReferenceStatus(command.getReferenceStatus());
         return dao.updateReferenceStatus(storage);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int removeReferences(StorageOwnerType ownerType, String ownerId) {
-        return businessDao.deleteByOwner(ownerTypeValue(ownerType), ownerId);
+    public int removeReferences(RemoveStorageReferencesCommand command) {
+        if (command == null) {
+            return 0;
+        }
+        return businessDao.deleteByOwner(ownerTypeValue(command.getOwnerType()), command.getOwnerId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addReferences(List<StoredObjectReference> list) {
-        businessDao.insertReferences(list);
+    public void addReferences(AddStorageReferencesCommand command) {
+        businessDao.insertReferences(command.getReferences());
     }
 
     @Override
-    public List<StoredObjectReference> listReferences(StoredObject entity) {
+    public List<StoredObjectReference> listReferences(StorageQuery query) {
+        StoredObject entity = new StoredObject();
+        entity.setId(query.getId());
         return businessDao.listReferences(entity);
     }
 
     @Override
-    public boolean canReadContent(StoredObject storage, StorageOwnerType ownerType, String ownerId) {
+    public boolean existsReadableContent(StorageQuery query) {
+        StoredObject storage = get(query);
         if (storage == null) {
             return false;
         }
@@ -155,19 +168,9 @@ public class StorageServiceImpl implements StorageService {
             return true;
         }
         return StoredObjectReferenceStatus.UNREFERENCED == storage.getReferenceStatus()
-                && storage.getOwnerType() == ownerType
-                && StringUtils.isNotBlank(ownerId)
-                && StringUtils.equals(storage.getOwnerId(), ownerId);
-    }
-
-    private <T> int batchOperate(Collection<T> collection, Function<T, Integer> operator) {
-        int count = 0;
-        if (collection != null && !collection.isEmpty()) {
-            for (T entity : collection) {
-                count += operator.apply(entity);
-            }
-        }
-        return count;
+                && storage.getOwnerType() == query.getOwnerType()
+                && StringUtils.isNotBlank(query.getOwnerId())
+                && StringUtils.equals(storage.getOwnerId(), query.getOwnerId());
     }
 
     private PageQuery normalizePage(PageQuery page) {
@@ -186,5 +189,53 @@ public class StorageServiceImpl implements StorageService {
 
     private String referenceStatusValue(StoredObjectReferenceStatus referenceStatus) {
         return referenceStatus == null ? null : referenceStatus.value();
+    }
+
+    private StoredObject toStoredObject(CreateStorageCommand command) {
+        StoredObject storage = new StoredObject();
+        storage.setId(command.getId());
+        storage.setOriginalFilename(command.getOriginalFilename());
+        storage.setContentType(command.getContentType());
+        storage.setName(command.getName());
+        storage.setExtendName(command.getExtendName());
+        storage.setMimeType(command.getMimeType());
+        storage.setOwnerId(command.getOwnerId());
+        storage.setOwnerType(command.getOwnerType());
+        storage.setStorageType(command.getStorageType());
+        storage.setBucketName(command.getBucketName());
+        storage.setObjectKey(command.getObjectKey());
+        storage.setSize(command.getSize());
+        storage.setAccessEndpoint(command.getAccessEndpoint());
+        storage.setObjectStatus(command.getObjectStatus());
+        storage.setReferenceStatus(command.getReferenceStatus());
+        storage.setPriority(command.getPriority());
+        storage.setRemarks(command.getRemarks());
+        storage.setCreateDate(command.getCreateDate());
+        storage.setUpdateDate(command.getUpdateDate());
+        return storage;
+    }
+
+    private StoredObject toStoredObject(ChangeStorageCommand command) {
+        StoredObject storage = new StoredObject();
+        storage.setId(command.getId());
+        storage.setOriginalFilename(command.getOriginalFilename());
+        storage.setContentType(command.getContentType());
+        storage.setName(command.getName());
+        storage.setExtendName(command.getExtendName());
+        storage.setMimeType(command.getMimeType());
+        storage.setOwnerId(command.getOwnerId());
+        storage.setOwnerType(command.getOwnerType());
+        storage.setStorageType(command.getStorageType());
+        storage.setBucketName(command.getBucketName());
+        storage.setObjectKey(command.getObjectKey());
+        storage.setSize(command.getSize());
+        storage.setAccessEndpoint(command.getAccessEndpoint());
+        storage.setObjectStatus(command.getObjectStatus());
+        storage.setReferenceStatus(command.getReferenceStatus());
+        storage.setPriority(command.getPriority());
+        storage.setRemarks(command.getRemarks());
+        storage.setCreateDate(command.getCreateDate());
+        storage.setUpdateDate(command.getUpdateDate());
+        return storage;
     }
 }

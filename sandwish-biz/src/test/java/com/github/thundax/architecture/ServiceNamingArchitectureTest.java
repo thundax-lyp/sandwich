@@ -33,12 +33,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
             "PrincipalCredentialService#updateStatus",
             "PrincipalCredentialService#updateVerifyState",
             "PrincipalIdentityService#update",
-            "PrincipalIdentityService#updateStatus",
-            "StorageService#batchDeleteById",
-            "StorageService#deleteById",
-            "StorageService#update",
-            "StorageService#updateObjectStatus",
-            "StorageService#updateReferenceStatus"));
+            "PrincipalIdentityService#updateStatus"));
 
     @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {

@@ -11,23 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-storage/storage`：规约化 StorageService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/query/StorageQuery.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/storage/service/impl/StorageServiceImplTest.java
-  - 处理动作：新增 Storage Command，规约化上传、读取、分页、删除和引用关系入口
-  - 验收点：StorageService 方法参数符合三态规则；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：8/10
-
-- [ ] `service-method-admin/storage`：同步 StorageController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StorageIdRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StoragePageRequest.java
-  - 处理动作：将 Storage API Request 显式组装为 Storage Query、PageQuery 或 Command，并适配 PageResult 分页返回
-  - 验收点：StorageController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：7/10
-
 - [ ] `service-method-storage/multipart`：规约化 MultipartUploadService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/MultipartUploadService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/MultipartUploadServiceImpl.java

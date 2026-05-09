@@ -16,6 +16,10 @@ import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
+import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
+import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
+import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +35,9 @@ public class StorageServiceImplTest {
 
         StorageServiceImpl service = storageService(dao);
 
-        assertSame(expected, service.getById(EntityId.of(8101L)));
+        StorageQuery query = new StorageQuery();
+        query.setId(EntityId.of(8101L));
+        assertSame(expected, service.get(query));
         assertEquals(Long.valueOf(8101L), dao.id);
     }
 
@@ -72,12 +78,12 @@ public class StorageServiceImplTest {
         StoredObject storage = new StoredObject();
 
         StorageServiceImpl service = storageService(dao);
-        service.add(storage);
+        storage.setId(service.create(toCreateStorageCommand(storage)));
 
         assertNotNull(storage.getId());
-        assertEquals(null, storage.getCreateDate());
-        assertEquals(null, storage.getUpdateDate());
-        assertSame(storage, dao.inserted);
+        assertEquals(null, dao.inserted.getCreateDate());
+        assertEquals(null, dao.inserted.getUpdateDate());
+        assertEquals(storage.getId(), dao.inserted.getId());
     }
 
     @Test
@@ -85,7 +91,8 @@ public class StorageServiceImplTest {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
 
-        int count = service.batchDeleteById(Arrays.asList(EntityId.of(8101L), EntityId.of(8102L)));
+        int count = service.remove(new DeleteStorageCommand(EntityId.of(8101L)))
+                + service.remove(new DeleteStorageCommand(EntityId.of(8102L)));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList(8101L, 8102L), dao.deletedIds);
@@ -97,8 +104,8 @@ public class StorageServiceImplTest {
         StorageServiceImpl service = storageService(dao);
         List<StoredObjectReference> list = Arrays.asList(storageBusiness(8201L));
 
-        service.addReferences(list);
-        service.removeReferences(StorageOwnerType.USER, "u1");
+        service.addReferences(new AddStorageReferencesCommand(list));
+        service.removeReferences(new RemoveStorageReferencesCommand(StorageOwnerType.USER, "u1"));
 
         assertSame(list, dao.businessList);
         assertEquals("USER:u1", dao.deletedBusinessKey);
@@ -106,36 +113,43 @@ public class StorageServiceImplTest {
 
     @Test
     public void shouldAllowPublicStorageAccess() {
-        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
+        dao.getResult = storage;
+        StorageServiceImpl service = storageService(dao);
 
-        assertTrue(service.canReadContent(storage, null, null));
+        assertTrue(service.existsReadableContent(storageQuery(8101L, null, null)));
     }
 
     @Test
     public void shouldAllowPrivateStorageOwnerAccess() {
-        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
+        dao.getResult = storage;
+        StorageServiceImpl service = storageService(dao);
 
-        assertTrue(service.canReadContent(storage, StorageOwnerType.USER, "u1"));
+        assertTrue(service.existsReadableContent(storageQuery(8101L, StorageOwnerType.USER, "u1")));
     }
 
     @Test
     public void shouldDenyPrivateStorageAccessForOtherOwner() {
-        StorageServiceImpl service = storageService(new RecordingStoredObjectDao());
         StoredObject storage = storage(8101L);
         storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
         storage.setOwnerType(StorageOwnerType.USER);
         storage.setOwnerId("u1");
+        RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
+        dao.getResult = storage;
+        StorageServiceImpl service = storageService(dao);
 
-        assertFalse(service.canReadContent(storage, StorageOwnerType.USER, "u2"));
-        assertFalse(service.canReadContent(storage, StorageOwnerType.MEMBER, "u1"));
-        assertFalse(service.canReadContent(storage, StorageOwnerType.USER, null));
-        assertFalse(service.canReadContent(null, StorageOwnerType.USER, "u1"));
+        assertFalse(service.existsReadableContent(storageQuery(8101L, StorageOwnerType.USER, "u2")));
+        assertFalse(service.existsReadableContent(storageQuery(8101L, StorageOwnerType.MEMBER, "u1")));
+        assertFalse(service.existsReadableContent(storageQuery(8101L, StorageOwnerType.USER, null)));
+        dao.getResult = null;
+        assertFalse(service.existsReadableContent(storageQuery(8101L, StorageOwnerType.USER, "u1")));
     }
 
     private static StoredObject storage(Long id) {
@@ -152,6 +166,38 @@ public class StorageServiceImplTest {
 
     private static StorageServiceImpl storageService(RecordingStoredObjectDao dao) {
         return new StorageServiceImpl(dao, dao);
+    }
+
+    private static StorageQuery storageQuery(Long id, StorageOwnerType ownerType, String ownerId) {
+        StorageQuery query = new StorageQuery();
+        query.setId(EntityIdCodec.toDomain(id));
+        query.setOwnerType(ownerType);
+        query.setOwnerId(ownerId);
+        return query;
+    }
+
+    private static CreateStorageCommand toCreateStorageCommand(StoredObject storage) {
+        CreateStorageCommand command = new CreateStorageCommand();
+        command.setId(storage.getId());
+        command.setOriginalFilename(storage.getOriginalFilename());
+        command.setContentType(storage.getContentType());
+        command.setName(storage.getName());
+        command.setExtendName(storage.getExtendName());
+        command.setMimeType(storage.getMimeType());
+        command.setOwnerId(storage.getOwnerId());
+        command.setOwnerType(storage.getOwnerType());
+        command.setStorageType(storage.getStorageType());
+        command.setBucketName(storage.getBucketName());
+        command.setObjectKey(storage.getObjectKey());
+        command.setSize(storage.getSize());
+        command.setAccessEndpoint(storage.getAccessEndpoint());
+        command.setObjectStatus(storage.getObjectStatus());
+        command.setReferenceStatus(storage.getReferenceStatus());
+        command.setPriority(storage.getPriority());
+        command.setRemarks(storage.getRemarks());
+        command.setCreateDate(storage.getCreateDate());
+        command.setUpdateDate(storage.getUpdateDate());
+        return command;
     }
 
     private static class RecordingStoredObjectDao implements StoredObjectDao, StoredObjectReferenceDao {

@@ -23,6 +23,8 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
+import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.storage.utils.StorageUtils;
@@ -117,7 +119,7 @@ public class StorageController {
             } catch (IOException e) {
                 return StorageInterfaceAssembler.toUploadErrorResponse(e.getMessage());
             }
-            storageService.add(storage);
+            storage.setId(storageService.create(toCreateStorageCommand(storage)));
             response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
         }
         return response;
@@ -127,12 +129,15 @@ public class StorageController {
     @HasPermission("storage:storage:view")
     @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
     public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-        StoredObject storage = storageService.getById(EntityIdCodec.toDomain(id));
+        StoredObject storage = storageService.get(storageQuery(id));
         if (storage == null) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
-        if (!storageService.canReadContent(storage, StorageOwnerType.USER, UserAccessHolder.currentUserId())) {
+        StorageQuery accessQuery = storageQuery(id);
+        accessQuery.setOwnerType(StorageOwnerType.USER);
+        accessQuery.setOwnerId(UserAccessHolder.currentUserId());
+        if (!storageService.existsReadableContent(accessQuery)) {
             response.sendError(HttpStatus.SC_FORBIDDEN);
             return;
         }
@@ -163,7 +168,7 @@ public class StorageController {
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
         List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
-            StoredObject storage = storageService.getById(EntityIdCodec.toDomain(request.getId()));
+            StoredObject storage = storageService.get(storageQuery(request.getId()));
             if (storage == null) {
                 throw new NullBeanException("StoredObject", EntityIdCodec.toDomain(request.getId()));
             }
@@ -173,8 +178,9 @@ public class StorageController {
             throw new InvalidParameterException("list");
         }
 
-        storageService.batchDeleteById(
-                storageList.stream().map(StoredObject::getId).collect(Collectors.toList()));
+        for (StoredObject storage : storageList) {
+            storageService.remove(new DeleteStorageCommand(storage.getId()));
+        }
         return true;
     }
 
@@ -183,7 +189,7 @@ public class StorageController {
     @RequestMapping(value = "treeData", method = RequestMethod.POST)
     @WrappedApiResponse
     public List<StorageTreeNodeResponse> treeData() {
-        return storageService.listReferenceOwnerTypes().stream()
+        return storageService.listReferenceOwnerTypes(new StorageQuery()).stream()
                 .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)
                 .collect(Collectors.toList());
     }
@@ -225,5 +231,35 @@ public class StorageController {
         storage.setObjectKey(object.getObjectKey());
         storage.setSize(object.getSize());
         storage.setAccessEndpoint(object.getAccessEndpoint());
+    }
+
+    private StorageQuery storageQuery(Long id) {
+        StorageQuery query = new StorageQuery();
+        query.setId(EntityIdCodec.toDomain(id));
+        return query;
+    }
+
+    private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {
+        CreateStorageCommand command = new CreateStorageCommand();
+        command.setId(storage.getId());
+        command.setOriginalFilename(storage.getOriginalFilename());
+        command.setContentType(storage.getContentType());
+        command.setName(storage.getName());
+        command.setExtendName(storage.getExtendName());
+        command.setMimeType(storage.getMimeType());
+        command.setOwnerId(storage.getOwnerId());
+        command.setOwnerType(storage.getOwnerType());
+        command.setStorageType(storage.getStorageType());
+        command.setBucketName(storage.getBucketName());
+        command.setObjectKey(storage.getObjectKey());
+        command.setSize(storage.getSize());
+        command.setAccessEndpoint(storage.getAccessEndpoint());
+        command.setObjectStatus(storage.getObjectStatus());
+        command.setReferenceStatus(storage.getReferenceStatus());
+        command.setPriority(storage.getPriority());
+        command.setRemarks(storage.getRemarks());
+        command.setCreateDate(storage.getCreateDate());
+        command.setUpdateDate(storage.getUpdateDate());
+        return command;
     }
 }

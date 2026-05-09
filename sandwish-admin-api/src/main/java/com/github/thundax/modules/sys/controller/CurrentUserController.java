@@ -28,6 +28,9 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.service.CurrentUserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
+import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
 import com.github.thundax.modules.utils.AvatarUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -101,8 +104,18 @@ public class CurrentUserController {
     public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
-        currentUser =
-                currentUserService.updateInfo(currentUser, request.getName(), request.getEmail(), request.getMobile());
+        currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
+                currentUser.getId(),
+                currentUser.getDepartmentId(),
+                request.getEmail(),
+                request.getMobile(),
+                currentUser.getTel(),
+                request.getName(),
+                currentUser.getRank(),
+                currentUser.getPrivilege(),
+                currentUser.getStatus(),
+                currentUser.getPriority(),
+                currentUser.getRemarks()));
 
         return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
     }
@@ -129,7 +142,8 @@ public class CurrentUserController {
 
         User currentUser = UserAccessHolder.currentUser();
 
-        currentUserService.updatePassword(currentUser, oldPassword, password);
+        currentUserService.changePassword(
+                new ChangeCurrentUserPasswordCommand(currentUser.getId(), oldPassword, password));
 
         return true;
     }
@@ -192,7 +206,7 @@ public class CurrentUserController {
     })
     @RequestMapping(value = "menus", method = RequestMethod.POST)
     public List<PersonalMenuResponse> menus() {
-        return currentUserService.listVisibleMenus(UserAccessHolder.currentUser()).stream()
+        return currentUserService.listVisibleMenus(toQuery(UserAccessHolder.currentUser())).stream()
                 .map(PersonalInterfaceAssembler::toMenuResponse)
                 .collect(Collectors.toList());
     }
@@ -225,6 +239,14 @@ public class CurrentUserController {
         PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
                 PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private CurrentUserQuery toQuery(User currentUser) {
+        return new CurrentUserQuery(
+                currentUser.getId(),
+                currentUser.getPrivilege(),
+                currentUser.getStatus(),
+                currentUser.getRank());
     }
 
     private String getPrivateKey(String token) throws InvalidTokenException {

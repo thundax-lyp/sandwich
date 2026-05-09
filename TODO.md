@@ -11,23 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-sys/current-user`：规约化 CurrentUserService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/CurrentUserService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImpl.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImplTest.java
-  - 处理动作：新增当前用户相关 Command 或 Query，规约化资料、密码、头像和菜单读取入口
-  - 验收点：CurrentUserService 公开方法符合参数三态；`mvn -pl sandwish-biz -am test` 通过
-  - 重要度：8/10
-
-- [ ] `service-method-admin/current-user`：同步 CurrentUserController 入口适配
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/CurrentUserController.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/PersonalAvatarUploadRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/PersonalInfoUpdateRequest.java
-  - 范围文件：sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/PersonalPasswordUpdateRequest.java
-  - 处理动作：将当前用户 API Request 显式组装为 Query 或 Command，并移除对旧 Service 写入口的调用
-  - 验收点：CurrentUserController 适配新契约；`mvn -pl sandwish-admin-api -am test` 通过
-  - 重要度：8/10
-
 - [ ] `service-method-sys/log`：规约化 LogService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/LogService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/LogServiceImpl.java

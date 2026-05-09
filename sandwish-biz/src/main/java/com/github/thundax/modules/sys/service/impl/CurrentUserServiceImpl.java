@@ -17,11 +17,15 @@ import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -60,37 +64,36 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public User updateInfo(User currentUser, String name, String email, String mobile) {
-        currentUser.setName(name);
-        currentUser.setEmail(email);
-        currentUser.setMobile(mobile);
+    public User changeInfo(ChangeCurrentUserInfoCommand command) {
         userService.changeInfo(new ChangeUserInfoCommand(
-                currentUser.getId(),
-                currentUser.getDepartmentId(),
-                currentUser.getEmail(),
-                currentUser.getMobile(),
-                currentUser.getTel(),
-                currentUser.getName(),
-                currentUser.getRank(),
-                currentUser.getPrivilege(),
-                currentUser.getStatus(),
-                currentUser.getPriority(),
-                currentUser.getRemarks(),
-                getAccountLoginName(currentUser.getId()),
+                command.getUserId(),
+                command.getDepartmentId(),
+                command.getEmail(),
+                command.getMobile(),
+                command.getTel(),
+                command.getName(),
+                command.getRank(),
+                command.getPrivilege(),
+                command.getStatus(),
+                command.getPriority(),
+                command.getRemarks(),
+                getAccountLoginName(command.getUserId()),
                 null));
-        return currentUser;
+        return toUser(command);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updatePassword(User currentUser, String oldPassword, String password) throws ApiException {
+    public void changePassword(ChangeCurrentUserPasswordCommand command) throws ApiException {
+        String oldPassword = command.getOldPassword();
+        String password = command.getPassword();
         if (StringUtils.isBlank(password)) {
             throw new InvalidParameterException("password");
         } else if (!password.matches(SysApiUtils.PASSWORD_VALIDATE_PATTERN)) {
             throw new ApiException(SysApiUtils.PASSWORD_VALIDATE_MESSAGE);
         }
 
-        PrincipalIdentity accountIdentity = getAccountIdentity(currentUser.getId());
+        PrincipalIdentity accountIdentity = getAccountIdentity(command.getUserId());
         PrincipalCredential credential = accountIdentity == null
                 ? null
                 : principalCredentialService.getByIdentityIdAndType(
@@ -99,22 +102,22 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             throw new InvalidPasswordException();
         }
 
-        upsertPassword(currentUser, accountIdentity, PasswordHelper.encrypt(password));
+        upsertPassword(command.getUserId(), accountIdentity, PasswordHelper.encrypt(password));
     }
 
     @Override
-    public List<Menu> listAccessibleMenus(User currentUser) {
-        if (currentUser.isSuper()) {
+    public List<Menu> listAccessibleMenus(CurrentUserQuery query) {
+        if (isSuper(query)) {
             List<Menu> menuList = menuService.list(new MenuQuery());
             menuList.sort(Menu::compareTo);
             return menuList;
         }
 
-        List<Role> roleList = userService.listUserRoles(userQuery(currentUser));
-        boolean isAdmin = currentUser.isAdmin() || roleList.stream().anyMatch(Role::isAdmin);
+        List<Role> roleList = userService.listUserRoles(userQuery(query.getUserId()));
+        boolean isAdmin = isAdmin(query) || roleList.stream().anyMatch(Role::isAdmin);
         if (isAdmin) {
             MenuQuery menuQuery = new MenuQuery();
-            menuQuery.setMaxRank(currentUser.getRank());
+            menuQuery.setMaxRank(query.getRank());
             List<Menu> menuList = menuService.list(menuQuery);
             menuList.sort(Menu::compareTo);
             return menuList;
@@ -126,7 +129,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 .distinct()
                 .filter(menuId -> {
                     Menu menu = menuService.get(menuQuery(menuId));
-                    return menu != null && currentUser.getRank().canAccess(menu.getRank());
+                    return menu != null && query.getRank().canAccess(menu.getRank());
                 })
                 .collect(Collectors.toList());
         MenuQuery menuQuery = new MenuQuery();
@@ -148,15 +151,15 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         return query;
     }
 
-    private UserQuery userQuery(User user) {
+    private UserQuery userQuery(EntityId userId) {
         UserQuery query = new UserQuery();
-        query.setId(user.getId());
+        query.setId(userId);
         return query;
     }
 
     @Override
-    public List<Menu> listVisibleMenus(User currentUser) {
-        List<Menu> visibleMenus = listAccessibleMenus(currentUser).stream()
+    public List<Menu> listVisibleMenus(CurrentUserQuery query) {
+        List<Menu> visibleMenus = listAccessibleMenus(query).stream()
                 .filter(Menu::isDisplay)
                 .collect(Collectors.toList());
         List<Menu> menuList =
@@ -185,15 +188,15 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         return identity == null ? null : identity.getIdentityValue();
     }
 
-    private void upsertPassword(User user, PrincipalIdentity accountIdentity, String encryptedPassword) {
-        if (user == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
+    private void upsertPassword(EntityId userId, PrincipalIdentity accountIdentity, String encryptedPassword) {
+        if (userId == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
         PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
                 accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
         if (credential == null) {
             credential = new PrincipalCredential();
-            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, userId));
             credential.setIdentityId(accountIdentity.getId());
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
             credential.setCredentialValue(encryptedPassword);
@@ -212,5 +215,29 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
         principalCredentialService.update(credential);
+    }
+
+    private boolean isSuper(CurrentUserQuery query) {
+        return query != null && UserPrivilege.SUPER == query.getPrivilege();
+    }
+
+    private boolean isAdmin(CurrentUserQuery query) {
+        return query != null && UserPrivilege.ADMIN == query.getPrivilege();
+    }
+
+    private User toUser(ChangeCurrentUserInfoCommand command) {
+        User user = new User();
+        user.setId(command.getUserId());
+        user.setDepartmentId(command.getDepartmentId());
+        user.setEmail(command.getEmail());
+        user.setMobile(command.getMobile());
+        user.setTel(command.getTel());
+        user.setName(command.getName());
+        user.setRank(command.getRank());
+        user.setPrivilege(command.getPrivilege());
+        user.setStatus(command.getStatus());
+        user.setPriority(command.getPriority());
+        user.setRemarks(command.getRemarks());
+        return user;
     }
 }

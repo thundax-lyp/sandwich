@@ -22,7 +22,10 @@ import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +48,7 @@ public class CurrentUserServiceImplTest {
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
 
-        List<Menu> responses = service.listVisibleMenus(superUser());
+        List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(2, responses.size());
         assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
@@ -72,7 +75,7 @@ public class CurrentUserServiceImplTest {
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
 
-        List<Menu> responses = service.listVisibleMenus(superUser());
+        List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(2, responses.size());
         assertEquals(Long.valueOf(5001L), EntityIdCodec.toValue(responses.get(0).getId()));
@@ -94,7 +97,7 @@ public class CurrentUserServiceImplTest {
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
 
-        List<Menu> responses = service.listVisibleMenus(superUser());
+        List<Menu> responses = service.listVisibleMenus(currentUserQuery(superUser()));
 
         assertEquals(3, responses.size());
         assertEquals(Long.valueOf(5010L), EntityIdCodec.toValue(responses.get(0).getId()));
@@ -120,7 +123,18 @@ public class CurrentUserServiceImplTest {
                         org.mockito.ArgumentMatchers.eq(PrincipalIdentityType.USER_ACCOUNT)))
                 .thenReturn(identity);
 
-        User updated = service.updateInfo(currentUser, "New Name", "new@example.com", "13800138000");
+        User updated = service.changeInfo(new ChangeCurrentUserInfoCommand(
+                currentUser.getId(),
+                currentUser.getDepartmentId(),
+                "new@example.com",
+                "13800138000",
+                currentUser.getTel(),
+                "New Name",
+                currentUser.getRank(),
+                currentUser.getPrivilege(),
+                currentUser.getStatus(),
+                currentUser.getPriority(),
+                currentUser.getRemarks()));
 
         assertEquals("New Name", updated.getName());
         assertEquals("new@example.com", updated.getEmail());
@@ -152,7 +166,7 @@ public class CurrentUserServiceImplTest {
         when(principalCredentialService.getByIdentityIdAndType(identity.getId(), PrincipalCredentialType.USER_PASSWORD))
                 .thenReturn(credential);
 
-        service.updatePassword(currentUser, "OldPass1$", "NewPass1$");
+        service.changePassword(new ChangeCurrentUserPasswordCommand(currentUser.getId(), "OldPass1$", "NewPass1$"));
 
         ArgumentCaptor<PrincipalCredential> credentialCaptor = ArgumentCaptor.forClass(PrincipalCredential.class);
         verify(principalCredentialService).update(credentialCaptor.capture());
@@ -174,6 +188,10 @@ public class CurrentUserServiceImplTest {
         user.setId(EntityId.of(1001L));
         user.setPrivilege(UserPrivilege.SUPER);
         return user;
+    }
+
+    private CurrentUserQuery currentUserQuery(User user) {
+        return new CurrentUserQuery(user.getId(), user.getPrivilege(), user.getStatus(), user.getRank());
     }
 
     private Menu menu(Long id, Long parentId, String name) {

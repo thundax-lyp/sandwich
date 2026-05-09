@@ -72,7 +72,7 @@ public class CurrentUserControllerContractTest {
         User currentUser = superUser();
 
         when(userService.get(org.mockito.ArgumentMatchers.any())).thenReturn(currentUser);
-        when(currentUserService.listVisibleMenus(currentUser)).thenReturn(menus);
+        when(currentUserService.listVisibleMenus(org.mockito.ArgumentMatchers.any())).thenReturn(menus);
         mockApplicationContext(userService);
         UserAccessHolder.currentUserId("1", "token-1");
 

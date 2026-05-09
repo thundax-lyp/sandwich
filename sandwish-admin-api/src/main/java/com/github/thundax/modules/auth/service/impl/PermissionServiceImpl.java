@@ -19,6 +19,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.PermissionCode;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,7 +88,7 @@ public class PermissionServiceImpl implements PermissionService {
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
-        List<Menu> menuList = currentUserService.listAccessibleMenus(user);
+        List<Menu> menuList = currentUserService.listAccessibleMenus(currentUserQuery(user));
         if (menuList != null && !menuList.isEmpty()) {
             menuList.forEach(menu -> {
                 if (StringUtils.isNotBlank(menu.getPerms())) {
@@ -130,6 +131,10 @@ public class PermissionServiceImpl implements PermissionService {
         UserQuery query = new UserQuery();
         query.setId(userId);
         return query;
+    }
+
+    private CurrentUserQuery currentUserQuery(User user) {
+        return new CurrentUserQuery(user.getId(), user.getPrivilege(), user.getStatus(), user.getRank());
     }
 
     private Set<String> toPermissionSet(Object value) {

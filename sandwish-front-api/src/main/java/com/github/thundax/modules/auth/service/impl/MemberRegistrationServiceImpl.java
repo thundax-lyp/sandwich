@@ -18,8 +18,12 @@ import com.github.thundax.modules.auth.service.MemberRegistrationService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
@@ -167,27 +171,27 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     private void ensureIdentityAvailable(PrincipalIdentityType identityType, String identityValue) throws ApiException {
-        if (principalIdentityService.getByIdentity(identityType, identityValue) != null) {
+        if (principalIdentityService.get(identityQuery(identityType, identityValue)) != null) {
             throw new ApiException("会员标识已存在");
         }
     }
 
     private PrincipalIdentity updateIdentity(Member member, PrincipalIdentityType identityType, String identityValue) {
         PrincipalKey principalKey = PrincipalKey.of(PrincipalType.MEMBER, member.getId());
-        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(principalKey, identityType);
+        PrincipalIdentity identity = principalIdentityService.get(identityQuery(principalKey, identityType));
         if (identity == null) {
             identity = new PrincipalIdentity();
             identity.setPrincipalKey(principalKey);
             identity.setType(identityType);
             identity.setIdentityValue(identityValue);
             identity.setStatus(PrincipalIdentityStatus.ENABLED);
-            principalIdentityService.add(identity);
+            principalIdentityService.create(new PrincipalIdentityCommand(identity));
             return identity;
         }
 
         identity.setIdentityValue(identityValue);
         identity.setStatus(PrincipalIdentityStatus.ENABLED);
-        principalIdentityService.update(identity);
+        principalIdentityService.change(new PrincipalIdentityCommand(identity));
         return identity;
     }
 
@@ -195,8 +199,8 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         if (member == null || identity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
-        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
-                identity.getId(), PrincipalCredentialType.MEMBER_PASSWORD);
+        PrincipalCredential credential = principalCredentialService.get(
+                credentialQuery(identity.getId(), PrincipalCredentialType.MEMBER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
             credential.setPrincipalKey(PrincipalKey.of(PrincipalType.MEMBER, member.getId()));
@@ -207,7 +211,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
             credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            principalCredentialService.add(credential);
+            principalCredentialService.create(new PrincipalCredentialCommand(credential));
             return;
         }
 
@@ -217,7 +221,28 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         credential.setFailedCount(0);
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
-        principalCredentialService.update(credential);
+        principalCredentialService.change(new PrincipalCredentialCommand(credential));
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalIdentityType identityType, String identityValue) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setIdentityType(identityType);
+        query.setIdentityValue(identityValue);
+        return query;
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
+    }
+
+    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+        PrincipalCredentialQuery query = new PrincipalCredentialQuery();
+        query.setIdentityId(identityId);
+        query.setCredentialType(credentialType);
+        return query;
     }
 
     private void requireText(String value, String field) throws ApiException {

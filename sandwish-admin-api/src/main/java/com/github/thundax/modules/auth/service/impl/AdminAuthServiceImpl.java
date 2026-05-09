@@ -42,6 +42,7 @@ import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
 import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
@@ -1099,9 +1100,16 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (userId == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+        PrincipalIdentity identity = principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
     }
 
     private PrincipalPasswordPolicyDTO passwordPolicy() {

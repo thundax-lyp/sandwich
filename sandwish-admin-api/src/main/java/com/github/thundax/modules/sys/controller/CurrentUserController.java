@@ -16,6 +16,7 @@ import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -237,9 +238,16 @@ public class CurrentUserController {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        PrincipalIdentity identity = principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
     }
 
     private CurrentUserQuery toQuery(User currentUser) {

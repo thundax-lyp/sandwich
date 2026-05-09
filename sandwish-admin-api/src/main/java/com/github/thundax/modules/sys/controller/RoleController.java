@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InsertBeanExistException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
@@ -14,6 +15,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.RoleAssignUserRequest;
@@ -378,9 +380,16 @@ public class RoleController {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        PrincipalIdentity identity = principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
     }
 
     private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {

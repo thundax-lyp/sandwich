@@ -20,7 +20,11 @@ import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import java.util.List;
 import java.util.Locale;
@@ -135,40 +139,36 @@ public class PrincipalAuthServiceImplTest {
         private PrincipalIdentity identity;
 
         @Override
-        public PrincipalIdentity getById(EntityId id) {
-            return identity;
-        }
-
-        @Override
-        public PrincipalIdentity getByIdentity(PrincipalIdentityType identityType, String identityValue) {
-            if (identity != null && identity.getType() == identityType && identity.matches(identityValue)) {
+        public PrincipalIdentity get(PrincipalIdentityQuery query) {
+            if (query.getId() != null) {
+                return identity;
+            }
+            if (identity != null
+                    && identity.getType() == query.getIdentityType()
+                    && identity.matches(query.getIdentityValue())) {
+                return identity;
+            }
+            if (query.getPrincipalKey() != null && query.getIdentityType() != null) {
                 return identity;
             }
             return null;
         }
 
         @Override
-        public PrincipalIdentity getByPrincipalKeyAndType(
-                PrincipalKey principalKey, PrincipalIdentityType identityType) {
-            return identity;
-        }
-
-        @Override
-        public List<PrincipalIdentity> listByPrincipalKeyAndStatus(
-                PrincipalKey principalKey, PrincipalIdentityStatus status) {
+        public List<PrincipalIdentity> list(PrincipalIdentityQuery query) {
             return null;
         }
 
         @Override
-        public EntityId add(PrincipalIdentity principalIdentity) {
-            return principalIdentity.getId();
+        public EntityId create(PrincipalIdentityCommand command) {
+            return command.getPrincipalIdentity().getId();
         }
 
         @Override
-        public void update(PrincipalIdentity principalIdentity) {}
+        public void change(PrincipalIdentityCommand command) {}
 
         @Override
-        public void updateStatus(PrincipalIdentity principalIdentity) {}
+        public void changeStatus(PrincipalIdentityCommand command) {}
     }
 
     private static class RecordingPrincipalCredentialService implements PrincipalCredentialService {
@@ -176,45 +176,39 @@ public class PrincipalAuthServiceImplTest {
         private Integer updateVerifyStateCalls = 0;
 
         @Override
-        public PrincipalCredential getById(EntityId id) {
-            return credential;
-        }
-
-        @Override
-        public PrincipalCredential getByIdentityIdAndType(EntityId identityId, PrincipalCredentialType credentialType) {
+        public PrincipalCredential get(PrincipalCredentialQuery query) {
+            if (query.getId() != null) {
+                return credential;
+            }
             if (credential != null
-                    && credential.getIdentityId().equals(identityId)
-                    && credential.getCredentialType() == credentialType) {
+                    && credential.getIdentityId().equals(query.getIdentityId())
+                    && credential.getCredentialType() == query.getCredentialType()) {
+                return credential;
+            }
+            if (query.getPrincipalKey() != null && query.getCredentialType() != null) {
                 return credential;
             }
             return null;
         }
 
         @Override
-        public PrincipalCredential getByPrincipalKeyAndType(
-                PrincipalKey principalKey, PrincipalCredentialType credentialType) {
-            return credential;
-        }
-
-        @Override
-        public List<PrincipalCredential> listByPrincipalKeyAndStatus(
-                PrincipalKey principalKey, PrincipalCredentialStatus status) {
+        public List<PrincipalCredential> list(PrincipalCredentialQuery query) {
             return null;
         }
 
         @Override
-        public EntityId add(PrincipalCredential principalCredential) {
-            return principalCredential.getId();
+        public EntityId create(PrincipalCredentialCommand command) {
+            return command.getPrincipalCredential().getId();
         }
 
         @Override
-        public void update(PrincipalCredential principalCredential) {}
+        public void change(PrincipalCredentialCommand command) {}
 
         @Override
-        public void updateStatus(PrincipalCredential principalCredential) {}
+        public void changeStatus(PrincipalCredentialCommand command) {}
 
         @Override
-        public void updateVerifyState(PrincipalCredential principalCredential) {
+        public void changeVerifyState(PrincipalCredentialCommand command) {
             updateVerifyStateCalls++;
         }
     }

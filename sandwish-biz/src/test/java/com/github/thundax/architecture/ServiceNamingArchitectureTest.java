@@ -28,12 +28,7 @@ public class ServiceNamingArchitectureTest extends AbstractArchitectureTest {
             "MemberService#deleteById",
             "MemberService#update",
             "MemberService#updateInfo",
-            "MemberService#updateStatus",
-            "PrincipalCredentialService#update",
-            "PrincipalCredentialService#updateStatus",
-            "PrincipalCredentialService#updateVerifyState",
-            "PrincipalIdentityService#update",
-            "PrincipalIdentityService#updateStatus"));
+            "MemberService#updateStatus"));
 
     @Test
     public void shouldReturnCreatedEntityIdFromServiceAddMethods() {

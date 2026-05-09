@@ -10,10 +10,12 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
@@ -118,10 +120,7 @@ public class CurrentUserServiceImplTest {
         User currentUser = superUser();
         PrincipalIdentity identity = accountIdentity(currentUser.getId(), "tester");
 
-        when(principalIdentityService.getByPrincipalKeyAndType(
-                        org.mockito.ArgumentMatchers.any(),
-                        org.mockito.ArgumentMatchers.eq(PrincipalIdentityType.USER_ACCOUNT)))
-                .thenReturn(identity);
+        when(principalIdentityService.get(any(PrincipalIdentityQuery.class))).thenReturn(identity);
 
         User updated = service.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
@@ -159,20 +158,20 @@ public class CurrentUserServiceImplTest {
         credential.setIdentityId(identity.getId());
         credential.setCredentialValue(PasswordHelper.encrypt("OldPass1$"));
 
-        when(principalIdentityService.getByPrincipalKeyAndType(
-                        org.mockito.ArgumentMatchers.any(),
-                        org.mockito.ArgumentMatchers.eq(PrincipalIdentityType.USER_ACCOUNT)))
-                .thenReturn(identity);
-        when(principalCredentialService.getByIdentityIdAndType(identity.getId(), PrincipalCredentialType.USER_PASSWORD))
+        when(principalIdentityService.get(any(PrincipalIdentityQuery.class))).thenReturn(identity);
+        when(principalCredentialService.get(any(PrincipalCredentialQuery.class)))
                 .thenReturn(credential);
 
         service.changePassword(new ChangeCurrentUserPasswordCommand(currentUser.getId(), "OldPass1$", "NewPass1$"));
 
-        ArgumentCaptor<PrincipalCredential> credentialCaptor = ArgumentCaptor.forClass(PrincipalCredential.class);
-        verify(principalCredentialService).update(credentialCaptor.capture());
+        ArgumentCaptor<PrincipalCredentialCommand> credentialCaptor =
+                ArgumentCaptor.forClass(PrincipalCredentialCommand.class);
+        verify(principalCredentialService).change(credentialCaptor.capture());
         assertEquals(
                 true,
-                PasswordHelper.validate("NewPass1$", credentialCaptor.getValue().getCredentialValue()));
+                PasswordHelper.validate(
+                        "NewPass1$",
+                        credentialCaptor.getValue().getPrincipalCredential().getCredentialValue()));
     }
 
     private PrincipalIdentity accountIdentity(EntityId userId, String loginName) {

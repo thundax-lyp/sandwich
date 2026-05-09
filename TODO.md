@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `service-method-auth/principal-identity`：规约化 PrincipalIdentityService 和 PrincipalCredentialService
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalIdentityService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalIdentityServiceImpl.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalCredentialService.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalCredentialServiceImpl.java
-  - 处理动作：新增 Principal Identity / Credential Command，规约化标识和凭据创建、更新、锁定、清零失败次数入口
-  - 验收点：PrincipalIdentityService 和 PrincipalCredentialService 写入口使用业务动作名和 Command
-  - 重要度：9/10
-
 - [ ] `service-method-member/member`：规约化 MemberService
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java

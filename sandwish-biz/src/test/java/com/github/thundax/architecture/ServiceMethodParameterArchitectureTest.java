@@ -28,22 +28,7 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
             "MemberService#listByIds",
             "MemberService#update",
             "MemberService#updateInfo",
-            "MemberService#updateStatus",
-            "PrincipalCredentialService#add",
-            "PrincipalCredentialService#getById",
-            "PrincipalCredentialService#getByIdentityIdAndType",
-            "PrincipalCredentialService#getByPrincipalKeyAndType",
-            "PrincipalCredentialService#listByPrincipalKeyAndStatus",
-            "PrincipalCredentialService#update",
-            "PrincipalCredentialService#updateStatus",
-            "PrincipalCredentialService#updateVerifyState",
-            "PrincipalIdentityService#add",
-            "PrincipalIdentityService#getById",
-            "PrincipalIdentityService#getByIdentity",
-            "PrincipalIdentityService#getByPrincipalKeyAndType",
-            "PrincipalIdentityService#listByPrincipalKeyAndStatus",
-            "PrincipalIdentityService#update",
-            "PrincipalIdentityService#updateStatus"));
+            "MemberService#updateStatus"));
 
     @Test
     public void shouldUseQueryPageQueryOrCommandForServiceParameters() {

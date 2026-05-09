@@ -15,6 +15,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.sys.assembler.LogInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.LogPageRequest;
 import com.github.thundax.modules.sys.controller.response.LogResponse;
@@ -98,9 +99,16 @@ public class LogController {
         if (user == null || user.getId() == null) {
             return null;
         }
-        PrincipalIdentity identity = principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT);
+        PrincipalIdentity identity = principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, user.getId()), PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
     }
 
     private PageQuery readLogPage(LogPageRequest request) {

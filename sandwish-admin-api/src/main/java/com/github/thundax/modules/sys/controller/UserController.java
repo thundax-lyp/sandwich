@@ -29,6 +29,9 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -539,7 +542,7 @@ public class UserController {
             return true;
         }
         PrincipalIdentity identity =
-                principalIdentityService.getByIdentity(PrincipalIdentityType.USER_ACCOUNT, loginName);
+                principalIdentityService.get(identityQuery(PrincipalIdentityType.USER_ACCOUNT, loginName));
         if (identity == null) {
             return true;
         }
@@ -581,8 +584,8 @@ public class UserController {
         if (userId == null) {
             return null;
         }
-        return principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+        return principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
     }
 
     private void upsertPassword(User user, String encryptedPassword) {
@@ -590,8 +593,8 @@ public class UserController {
         if (accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
-        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
-                accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+        PrincipalCredential credential = principalCredentialService.get(
+                credentialQuery(accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
             credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, user.getId()));
@@ -602,7 +605,7 @@ public class UserController {
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
             credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            principalCredentialService.add(credential);
+            principalCredentialService.create(new PrincipalCredentialCommand(credential));
             return;
         }
         credential.setCredentialValue(encryptedPassword);
@@ -611,7 +614,28 @@ public class UserController {
         credential.setFailedCount(0);
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
-        principalCredentialService.update(credential);
+        principalCredentialService.change(new PrincipalCredentialCommand(credential));
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalIdentityType identityType, String identityValue) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setIdentityType(identityType);
+        query.setIdentityValue(identityValue);
+        return query;
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
+    }
+
+    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+        PrincipalCredentialQuery query = new PrincipalCredentialQuery();
+        query.setIdentityId(identityId);
+        query.setCredentialType(credentialType);
+        return query;
     }
 
     private String getPrivateKey(String token) throws InvalidTokenException {

@@ -49,7 +49,11 @@ import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
@@ -857,38 +861,30 @@ public class AuthPermissionLifecycleTest {
     private static class TestPrincipalIdentityService implements PrincipalIdentityService {
 
         @Override
-        public PrincipalIdentity getById(EntityId id) {
+        public PrincipalIdentity get(PrincipalIdentityQuery query) {
+            if (query.getIdentityValue() != null) {
+                return identity(query.getIdentityValue());
+            }
             return identity("tester");
         }
 
         @Override
-        public PrincipalIdentity getByIdentity(PrincipalIdentityType identityType, String identityValue) {
-            return identity(identityValue);
-        }
-
-        @Override
-        public PrincipalIdentity getByPrincipalKeyAndType(
-                PrincipalKey principalKey, PrincipalIdentityType identityType) {
-            return identity("tester");
-        }
-
-        @Override
-        public List<PrincipalIdentity> listByPrincipalKeyAndStatus(
-                PrincipalKey principalKey, PrincipalIdentityStatus status) {
+        public List<PrincipalIdentity> list(PrincipalIdentityQuery query) {
             return Collections.singletonList(identity("tester"));
         }
 
         @Override
-        public EntityId add(PrincipalIdentity principalIdentity) {
+        public EntityId create(PrincipalIdentityCommand command) {
+            PrincipalIdentity principalIdentity = command.getPrincipalIdentity();
             principalIdentity.setId(EntityId.of(8001L));
             return principalIdentity.getId();
         }
 
         @Override
-        public void update(PrincipalIdentity principalIdentity) {}
+        public void change(PrincipalIdentityCommand command) {}
 
         @Override
-        public void updateStatus(PrincipalIdentity principalIdentity) {}
+        public void changeStatus(PrincipalIdentityCommand command) {}
 
         private PrincipalIdentity identity(String loginName) {
             PrincipalIdentity identity = new PrincipalIdentity();
@@ -904,41 +900,30 @@ public class AuthPermissionLifecycleTest {
     private static class TestPrincipalCredentialService implements PrincipalCredentialService {
 
         @Override
-        public PrincipalCredential getById(EntityId id) {
+        public PrincipalCredential get(PrincipalCredentialQuery query) {
             return credential();
         }
 
         @Override
-        public PrincipalCredential getByIdentityIdAndType(EntityId identityId, PrincipalCredentialType credentialType) {
-            return credential();
-        }
-
-        @Override
-        public PrincipalCredential getByPrincipalKeyAndType(
-                PrincipalKey principalKey, PrincipalCredentialType credentialType) {
-            return credential();
-        }
-
-        @Override
-        public List<PrincipalCredential> listByPrincipalKeyAndStatus(
-                PrincipalKey principalKey, PrincipalCredentialStatus status) {
+        public List<PrincipalCredential> list(PrincipalCredentialQuery query) {
             return Collections.singletonList(credential());
         }
 
         @Override
-        public EntityId add(PrincipalCredential principalCredential) {
+        public EntityId create(PrincipalCredentialCommand command) {
+            PrincipalCredential principalCredential = command.getPrincipalCredential();
             principalCredential.setId(EntityId.of(9001L));
             return principalCredential.getId();
         }
 
         @Override
-        public void update(PrincipalCredential principalCredential) {}
+        public void change(PrincipalCredentialCommand command) {}
 
         @Override
-        public void updateStatus(PrincipalCredential principalCredential) {}
+        public void changeStatus(PrincipalCredentialCommand command) {}
 
         @Override
-        public void updateVerifyState(PrincipalCredential principalCredential) {}
+        public void changeVerifyState(PrincipalCredentialCommand command) {}
 
         private PrincipalCredential credential() {
             PrincipalCredential credential = new PrincipalCredential();

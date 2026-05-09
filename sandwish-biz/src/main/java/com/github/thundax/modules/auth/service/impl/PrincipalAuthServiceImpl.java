@@ -1,15 +1,20 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
 import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
 import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import java.util.Date;
 import org.springframework.stereotype.Service;
@@ -28,8 +33,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
 
     @Override
     public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) throws ApiException {
-        PrincipalIdentity identity =
-                principalIdentityService.getByIdentity(command.getIdentityType(), command.getIdentityValue());
+        PrincipalIdentity identity = principalIdentityService.get(identityQuery(command));
         if (identity == null || !identity.isEnabled()) {
             throw invalidPrincipalCredential();
         }
@@ -38,10 +42,10 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
 
     @Override
     public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) throws ApiException {
-        PrincipalIdentity identity = authenticateIdentity(new AuthenticateIdentityCommand(
-                command.getIdentityType(), command.getIdentityValue()));
+        PrincipalIdentity identity = authenticateIdentity(
+                new AuthenticateIdentityCommand(command.getIdentityType(), command.getIdentityValue()));
         PrincipalCredential credential =
-                principalCredentialService.getByIdentityIdAndType(identity.getId(), command.getCredentialType());
+                principalCredentialService.get(credentialQuery(identity.getId(), command.getCredentialType()));
         if (credential == null) {
             throw invalidPrincipalCredential();
         }
@@ -65,7 +69,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
 
         if (PasswordHelper.validate(plainPassword, credential.getCredentialValue())) {
             credential.markVerified(now);
-            principalCredentialService.updateVerifyState(credential);
+            principalCredentialService.changeVerifyState(new PrincipalCredentialCommand(credential));
             return;
         }
 
@@ -78,7 +82,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         }
         Date lockedUntil = new Date(now.getTime() + passwordPolicy.getLockSeconds() * 1000L);
         credential.markFailed(lockedUntil);
-        principalCredentialService.updateVerifyState(credential);
+        principalCredentialService.changeVerifyState(new PrincipalCredentialCommand(credential));
         if (credential.isLocked(now)) {
             throw new ApiException("帐号已被锁定，请等待（" + passwordPolicy.getLockSeconds() + "）秒后自动解锁!");
         }
@@ -91,6 +95,20 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
 
     private PrincipalPasswordPolicyDTO effectivePolicy(PrincipalPasswordPolicyDTO passwordPolicy) {
         return passwordPolicy == null ? PrincipalPasswordPolicyDTO.disabled() : passwordPolicy;
+    }
+
+    private PrincipalIdentityQuery identityQuery(AuthenticateIdentityCommand command) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setIdentityType(command.getIdentityType());
+        query.setIdentityValue(command.getIdentityValue());
+        return query;
+    }
+
+    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+        PrincipalCredentialQuery query = new PrincipalCredentialQuery();
+        query.setIdentityId(identityId);
+        query.setCredentialType(credentialType);
+        return query;
     }
 
     private long lockedExpireSeconds(

@@ -14,6 +14,9 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
+import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -97,8 +100,8 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         PrincipalIdentity accountIdentity = getAccountIdentity(command.getUserId());
         PrincipalCredential credential = accountIdentity == null
                 ? null
-                : principalCredentialService.getByIdentityIdAndType(
-                        accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+                : principalCredentialService.get(
+                        credentialQuery(accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD));
         if (credential == null || !PasswordHelper.validate(oldPassword, credential.getCredentialValue())) {
             throw new InvalidPasswordException();
         }
@@ -160,9 +163,8 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
     @Override
     public List<Menu> listVisibleMenus(CurrentUserQuery query) {
-        List<Menu> visibleMenus = listAccessibleMenus(query).stream()
-                .filter(Menu::isDisplay)
-                .collect(Collectors.toList());
+        List<Menu> visibleMenus =
+                listAccessibleMenus(query).stream().filter(Menu::isDisplay).collect(Collectors.toList());
         List<Menu> menuList =
                 visibleMenus.stream().filter(menu -> menu.getParentId() == null).collect(Collectors.toList());
 
@@ -180,8 +182,8 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         if (userId == null) {
             return null;
         }
-        return principalIdentityService.getByPrincipalKeyAndType(
-                PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT);
+        return principalIdentityService.get(
+                identityQuery(PrincipalKey.of(PrincipalType.USER, userId), PrincipalIdentityType.USER_ACCOUNT));
     }
 
     private String getAccountLoginName(EntityId userId) {
@@ -193,8 +195,8 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         if (userId == null || accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
-        PrincipalCredential credential = principalCredentialService.getByIdentityIdAndType(
-                accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD);
+        PrincipalCredential credential = principalCredentialService.get(
+                credentialQuery(accountIdentity.getId(), PrincipalCredentialType.USER_PASSWORD));
         if (credential == null) {
             credential = new PrincipalCredential();
             credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, userId));
@@ -205,7 +207,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             credential.setNeedChangePassword(false);
             credential.setFailedCount(0);
             credential.setFailedLimit(DEFAULT_PASSWORD_FAILED_LIMIT);
-            principalCredentialService.add(credential);
+            principalCredentialService.create(new PrincipalCredentialCommand(credential));
             return;
         }
 
@@ -215,7 +217,21 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         credential.setFailedCount(0);
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
-        principalCredentialService.update(credential);
+        principalCredentialService.change(new PrincipalCredentialCommand(credential));
+    }
+
+    private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {
+        PrincipalIdentityQuery query = new PrincipalIdentityQuery();
+        query.setPrincipalKey(principalKey);
+        query.setIdentityType(identityType);
+        return query;
+    }
+
+    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+        PrincipalCredentialQuery query = new PrincipalCredentialQuery();
+        query.setIdentityId(identityId);
+        query.setCredentialType(credentialType);
+        return query;
     }
 
     private boolean isSuper(CurrentUserQuery query) {

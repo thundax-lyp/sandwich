@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "系统/字典")
 @SysLogger(module = {"系统", "字典"})
@@ -58,7 +58,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("读取")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     public DictResponse get(@Valid @RequestBody DictIdRequest request) throws ApiException {
         return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(request)));
     }
@@ -73,7 +73,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("列表")
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping(value = "list")
     public List<DictResponse> list(@Valid @RequestBody DictQueryRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         return dictService.list(query).stream()
@@ -91,7 +91,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("分页")
-    @RequestMapping(value = "page", method = RequestMethod.POST)
+    @PostMapping(value = "page")
     public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         PageQuery page = readDictPage(request);
@@ -108,7 +108,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("添加")
-    @RequestMapping(value = "add", method = RequestMethod.POST)
+    @PostMapping(value = "create")
     public DictResponse add(@Valid @RequestBody DictSaveRequest request) throws ApiException {
         EntityId id = dictService.create(DictInterfaceAssembler.toCreateCommand(request));
         return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toQuery(id)));
@@ -124,7 +124,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("更新")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping(value = "update")
     public DictResponse update(@Valid @RequestBody DictSaveRequest request) throws ApiException {
         DictQuery query = DictInterfaceAssembler.toQuery(EntityIdCodec.toDomain(request.getId()));
         Dict dict = dictService.get(query);
@@ -145,7 +145,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @SysLogger("删除")
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) throws ApiException {
         List<DeleteDictCommand> commandList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {

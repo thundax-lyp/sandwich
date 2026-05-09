@@ -56,9 +56,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "系统/权限")
 @SysLogger(module = {"系统", "权限"})
@@ -100,7 +100,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:view")
     @SysLogger("读取")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     public RoleResponse get(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.get(roleQuery(request.getId()));
         if (bean == null) {
@@ -119,7 +119,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:view")
     @SysLogger("列表")
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping(value = "list")
     public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) throws ApiException {
         RoleQuery query = RoleInterfaceAssembler.toQuery(request);
 
@@ -136,7 +136,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("添加")
-    @RequestMapping(value = "add", method = RequestMethod.POST)
+    @PostMapping(value = "create")
     public RoleResponse add(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
@@ -163,7 +163,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("更新")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping(value = "update")
     public RoleResponse update(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
         validateMenus(request.getMenuList());
 
@@ -189,7 +189,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("启用")
-    @RequestMapping(value = "enable", method = RequestMethod.POST)
+    @PostMapping(value = "enable")
     public Boolean updateStatus(@Valid @RequestBody List<RoleStatusRequest> list) throws ApiException {
         List<ChangeRoleStatusCommand> commandList = new ArrayList<>();
         for (RoleStatusRequest request : RequestListHelper.present(list)) {
@@ -219,7 +219,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("排序")
-    @RequestMapping(value = "priority", method = RequestMethod.POST)
+    @PostMapping(value = "priority")
     public Boolean updatePriority(@Valid @RequestBody List<RolePriorityRequest> list) throws ApiException {
         List<ChangeRolePriorityCommand> commandList = new ArrayList<>();
         for (RolePriorityRequest request : RequestListHelper.present(list)) {
@@ -249,7 +249,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("删除")
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) throws ApiException {
         List<DeleteRoleCommand> commandList = new ArrayList<>();
         for (RoleIdRequest request : RequestListHelper.present(list)) {
@@ -277,7 +277,7 @@ public class RoleController {
                 dataTypeClass = String.class),
     })
     @HasPermission({"sys:role:view", "sys:role:edit"})
-    @RequestMapping(value = "menu/tree", method = RequestMethod.POST)
+    @PostMapping(value = "menu/tree")
     public List<RoleMenuResponse> menuTree() {
         return menuService.list(new MenuQuery()).stream()
                 .map(menu -> RoleInterfaceAssembler.toMenuResponse(menu))
@@ -293,7 +293,7 @@ public class RoleController {
                 dataTypeClass = String.class),
     })
     @HasPermission({"sys:role:view", "sys:role:edit"})
-    @RequestMapping(value = "user/tree", method = RequestMethod.POST)
+    @PostMapping(value = "user/tree")
     public List<RoleUserTreeNodeResponse> userTree() {
         List<RoleUserTreeNodeResponse> list = new ArrayList<>();
 
@@ -323,7 +323,7 @@ public class RoleController {
                 dataTypeClass = String.class),
     })
     @HasPermission({"sys:role:view", "sys:role:edit"})
-    @RequestMapping(value = "user/list", method = RequestMethod.POST)
+    @PostMapping(value = "user/list")
     public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) throws ApiException {
         Role bean = roleService.get(roleQuery(request.getId()));
         if (bean == null) {
@@ -345,7 +345,7 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("授权")
-    @RequestMapping(value = "user/assign", method = RequestMethod.POST)
+    @PostMapping(value = "user/assign")
     public Boolean assignUser(@Valid @RequestBody RoleAssignUserRequest request) throws ApiException {
         validateAssignUser(request);
 

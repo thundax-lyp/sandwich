@@ -67,7 +67,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Api(tags = "鉴权")
-@RequestMapping(value = "/api/auth")
+@RequestMapping(value = "/api/auth/session")
 @SysLogger(module = {"系统", "登录"})
 @WrappedApiController
 @PublicApi

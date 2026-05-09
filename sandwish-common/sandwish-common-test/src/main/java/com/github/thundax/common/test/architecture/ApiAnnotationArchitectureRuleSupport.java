@@ -14,8 +14,8 @@ import java.util.stream.Stream;
 
 public final class ApiAnnotationArchitectureRuleSupport {
 
-    private static final String[] HTTP_MAPPING_ANNOTATIONS = {
-        "@RequestMapping", "@GetMapping", "@PostMapping", "@PutMapping", "@DeleteMapping", "@PatchMapping"
+    private static final String[] METHOD_MAPPING_ANNOTATIONS = {
+        "@GetMapping", "@PostMapping", "@PutMapping", "@DeleteMapping", "@PatchMapping"
     };
     private static final String[] REST_CONTROLLER_ANNOTATIONS = {"@RestController", "@WrappedApiController"};
 
@@ -25,6 +25,8 @@ public final class ApiAnnotationArchitectureRuleSupport {
             Pattern.compile("public\\s+[^{;]+\\s+([A-Za-z0-9_]+)\\s*\\(");
     private static final Pattern API_TAGS_PATTERN = Pattern.compile("@Api\\s*\\([^)]*tags\\s*=\\s*\"([^\"]+)\"");
     private static final Pattern API_TAG_NUMERIC_PREFIX_PATTERN = Pattern.compile("^\\d+(?:-\\d+)*\\.\\s*");
+    private static final Pattern REQUEST_MAPPING_VALUE_PATTERN =
+            Pattern.compile("@RequestMapping\\s*\\(\\s*(?:value\\s*=\\s*)?\"([^\"]+)\"");
     private static final Pattern RESPONSE_CONSTRUCTOR_PATTERN =
             Pattern.compile("new\\s+([A-Za-z0-9_]+Response)\\s*\\(");
 
@@ -60,6 +62,20 @@ public final class ApiAnnotationArchitectureRuleSupport {
         }
 
         assertTrue("REST controllers must declare class-level @RequestMapping: " + violations, violations.isEmpty());
+    }
+
+    public static void assertRestControllerRequestMappingsUseApiResourcePath(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectRequestMappingPathViolations(root, path, violations));
+        }
+
+        assertTrue(
+                "REST controller request mappings must use /api/{domain}/{resource}: " + violations,
+                violations.isEmpty());
     }
 
     public static void assertRestControllersDeclareApi(Path sourceRoot) throws IOException {
@@ -109,6 +125,44 @@ public final class ApiAnnotationArchitectureRuleSupport {
 
         assertTrue(
                 "Mapped controller methods must declare exactly one HTTP mapping: " + violations, violations.isEmpty());
+    }
+
+    public static void assertMappedMethodsUsePostOrGetMapping(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectPostOrGetMappingViolations(root, path, violations));
+        }
+
+        assertTrue(
+                "Mapped controller methods must use @PostMapping or @GetMapping only: " + violations,
+                violations.isEmpty());
+    }
+
+    public static void assertJsonRequestMethodsUsePostMapping(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectJsonPostMappingViolations(root, path, violations));
+        }
+
+        assertTrue("JSON request methods must use @PostMapping: " + violations, violations.isEmpty());
+    }
+
+    public static void assertGetMappingMethodsReturnVoid(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("Controller.java"))
+                    .forEach(path -> collectGetMappingReturnViolations(root, path, violations));
+        }
+
+        assertTrue("GET mapping methods must be non-JSON void responses: " + violations, violations.isEmpty());
     }
 
     public static void assertRequestBodyRequestParametersDeclareValid(Path sourceRoot) throws IOException {
@@ -183,6 +237,21 @@ public final class ApiAnnotationArchitectureRuleSupport {
         }
     }
 
+    private static void collectRequestMappingPathViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        String annotations = restControllerClassAnnotations(content);
+        if (annotations.length() == 0) {
+            return;
+        }
+        Matcher matcher = REQUEST_MAPPING_VALUE_PATTERN.matcher(annotations);
+        String mapping = matcher.find() ? matcher.group(1) : "<missing>";
+        if (!isApiResourcePath(mapping)) {
+            String className = path.getFileName().toString().replace(".java", "");
+            violations.add(
+                    ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className + " path=" + mapping);
+        }
+    }
+
     private static void collectApiTagNumericPrefixViolations(Path root, Path path, List<String> violations) {
         String content = ArchitectureSourceSupport.readSource(path);
         String classAnnotations = restControllerClassAnnotations(content);
@@ -233,6 +302,66 @@ public final class ApiAnnotationArchitectureRuleSupport {
         }
     }
 
+    private static void collectPostOrGetMappingViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        if (restControllerClassAnnotations(content).length() == 0) {
+            return;
+        }
+        Matcher matcher = PUBLIC_METHOD_DECLARATION_PATTERN.matcher(content);
+        int previousMethodEnd = restControllerClassEnd(content);
+        while (matcher.find()) {
+            String annotations = content.substring(previousMethodEnd, matcher.start());
+            String methodName = matcher.group(1);
+            if (annotations.contains("@RequestMapping")
+                    || annotations.contains("@PutMapping")
+                    || annotations.contains("@DeleteMapping")
+                    || annotations.contains("@PatchMapping")) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
+            }
+            previousMethodEnd = matcher.end();
+        }
+    }
+
+    private static void collectJsonPostMappingViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        if (restControllerClassAnnotations(content).length() == 0) {
+            return;
+        }
+        Matcher matcher = PUBLIC_METHOD_DECLARATION_PATTERN.matcher(content);
+        int previousMethodEnd = restControllerClassEnd(content);
+        while (matcher.find()) {
+            String annotations = content.substring(previousMethodEnd, matcher.start());
+            String methodName = matcher.group(1);
+            int methodBodyStart = content.indexOf("{", matcher.end());
+            if (methodBodyStart < 0) {
+                continue;
+            }
+            String signature = content.substring(matcher.start(), methodBodyStart);
+            if (signature.contains("@RequestBody") && !annotations.contains("@PostMapping")) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
+            }
+            previousMethodEnd = matcher.end();
+        }
+    }
+
+    private static void collectGetMappingReturnViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSource(path);
+        if (restControllerClassAnnotations(content).length() == 0) {
+            return;
+        }
+        Matcher matcher = PUBLIC_METHOD_DECLARATION_PATTERN.matcher(content);
+        int previousMethodEnd = restControllerClassEnd(content);
+        while (matcher.find()) {
+            String annotations = content.substring(previousMethodEnd, matcher.start());
+            String methodName = matcher.group(1);
+            String declaration = content.substring(matcher.start(), matcher.end());
+            if (annotations.contains("@GetMapping") && !declaration.startsWith("public void ")) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " method=" + methodName);
+            }
+            previousMethodEnd = matcher.end();
+        }
+    }
+
     private static void collectRequestBodyValidViolations(Path root, Path path, List<String> violations) {
         String content = ArchitectureSourceSupport.readSource(path);
         if (restControllerClassAnnotations(content).length() == 0) {
@@ -265,7 +394,7 @@ public final class ApiAnnotationArchitectureRuleSupport {
 
     private static int httpMappingCount(String annotations) {
         int count = 0;
-        for (String annotation : HTTP_MAPPING_ANNOTATIONS) {
+        for (String annotation : METHOD_MAPPING_ANNOTATIONS) {
             if (annotations.contains(annotation)) {
                 count++;
             }
@@ -296,5 +425,13 @@ public final class ApiAnnotationArchitectureRuleSupport {
             }
         }
         return false;
+    }
+
+    private static boolean isApiResourcePath(String path) {
+        if (path == null || !path.startsWith("/api/")) {
+            return false;
+        }
+        String[] segments = path.split("/");
+        return segments.length >= 4 && segments[2].length() > 0 && segments[3].length() > 0;
     }
 }

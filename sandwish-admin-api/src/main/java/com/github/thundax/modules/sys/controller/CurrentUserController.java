@@ -47,9 +47,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "系统/当前用户")
 @SysLogger(module = {"系统", "当前用户"})
@@ -82,7 +82,7 @@ public class CurrentUserController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "info", method = RequestMethod.POST)
+    @PostMapping(value = "info")
     public PersonalInfoResponse info() throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
         if (currentUser.getId() == null || !currentUser.isEnable()) {
@@ -102,7 +102,7 @@ public class CurrentUserController {
                 dataTypeClass = String.class),
     })
     @SysLogger("更新")
-    @RequestMapping(value = "info/update", method = RequestMethod.POST)
+    @PostMapping(value = "info/update")
     public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -132,7 +132,7 @@ public class CurrentUserController {
                 dataTypeClass = String.class),
     })
     @SysLogger("更新密码")
-    @RequestMapping(value = "password/update", method = RequestMethod.POST)
+    @PostMapping(value = "password/update")
     public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
 
         // 解密密码（数据需要加密传输）
@@ -160,10 +160,7 @@ public class CurrentUserController {
                 dataTypeClass = String.class),
     })
     @SysLogger("上传头像")
-    @RequestMapping(
-            value = "avatar/upload",
-            method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -188,7 +185,7 @@ public class CurrentUserController {
                 dataTypeClass = String.class),
     })
     @SysLogger("删除头像")
-    @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
+    @PostMapping(value = "avatar/delete")
     public PersonalAvatarResponse deleteAvatar() {
         User currentUser = UserAccessHolder.currentUser();
 
@@ -206,7 +203,7 @@ public class CurrentUserController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "menus", method = RequestMethod.POST)
+    @PostMapping(value = "menus")
     public List<PersonalMenuResponse> menus() {
         return currentUserService.listVisibleMenus(toQuery(UserAccessHolder.currentUser())).stream()
                 .map(PersonalInterfaceAssembler::toMenuResponse)
@@ -222,7 +219,7 @@ public class CurrentUserController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "perms", method = RequestMethod.POST)
+    @PostMapping(value = "perms")
     public PersonalPermsResponse perms() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

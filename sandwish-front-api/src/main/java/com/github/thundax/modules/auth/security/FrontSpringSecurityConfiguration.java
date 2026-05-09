@@ -33,10 +33,10 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .authorizeRequests()
                 .antMatchers(
                         "/static/**",
-                        "/auth/register/**",
-                        "/auth/pre-auth-session",
-                        "/auth/pre-auth-session/refresh",
-                        "/auth/login/**")
+                        "/api/auth/register/**",
+                        "/api/auth/session/pre-auth-session",
+                        "/api/auth/session/pre-auth-session/refresh",
+                        "/api/auth/session/login/**")
                 .permitAll()
                 .antMatchers("/member/**")
                 .authenticated()
@@ -44,7 +44,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
                 .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/auth/logout")
+                .logoutUrl("/api/auth/session/logout")
                 .logoutSuccessHandler((request, response, authentication) -> writeLogoutResponse(response))
                 .and()
                 .addFilterBefore(

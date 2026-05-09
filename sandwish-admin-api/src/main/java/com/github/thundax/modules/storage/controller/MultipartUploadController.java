@@ -29,15 +29,15 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Api(tags = "存储分片上传")
-@RequestMapping(value = "/api/storage/objects/multipart")
+@RequestMapping(value = "/api/storage/multipart-upload")
 @RestController
 public class MultipartUploadController {
 
@@ -60,7 +60,7 @@ public class MultipartUploadController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @WrappedApiResponse
     public MultipartUploadSessionResponse init(@Valid @RequestBody MultipartUploadInitRequest request) {
         return StorageInterfaceAssembler.toMultipartSessionResponse(
@@ -74,7 +74,7 @@ public class MultipartUploadController {
         @ApiImplicitParam(name = "partNumber", value = "分片序号", paramType = "query", dataTypeClass = Integer.class),
         @ApiImplicitParam(name = "etag", value = "分片ETag", paramType = "query", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "{uploadId}/parts", method = RequestMethod.POST)
+    @PostMapping(value = "{uploadId}/parts")
     @WrappedApiResponse
     public MultipartUploadPartResponse uploadPart(@PathVariable("uploadId") String uploadId, HttpServletRequest request)
             throws ApiException {
@@ -104,7 +104,7 @@ public class MultipartUploadController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "{uploadId}/complete", method = RequestMethod.POST)
+    @PostMapping(value = "{uploadId}/complete")
     @WrappedApiResponse
     public StorageResponse complete(
             @PathVariable("uploadId") String uploadId, @Valid @RequestBody MultipartUploadCompleteRequest request) {
@@ -117,7 +117,7 @@ public class MultipartUploadController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "{uploadId}", method = RequestMethod.DELETE)
+    @PostMapping(value = "{uploadId}/abort")
     @WrappedApiResponse
     public Boolean abort(@PathVariable("uploadId") String uploadId) {
         return multipartUploadService.abort(new AbortMultipartUploadCommand(uploadId)) > 0;

@@ -39,9 +39,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "系统/菜单")
 @SysLogger(module = {"系统", "菜单"})
@@ -68,7 +68,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("读取")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     public MenuResponse get(@Valid @RequestBody MenuIdRequest request) throws ApiException {
         Menu bean = menuService.get(menuQuery(request.getId()));
         if (bean == null) {
@@ -87,7 +87,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("读取")
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping(value = "list")
     public List<MenuResponse> list(@Valid @RequestBody MenuQueryRequest request) throws ApiException {
         MenuQuery query = MenuInterfaceAssembler.toQuery(request);
 
@@ -106,7 +106,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("添加")
-    @RequestMapping(value = "add", method = RequestMethod.POST)
+    @PostMapping(value = "create")
     public MenuResponse add(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu entity = MenuInterfaceAssembler.toEntity(new Menu(), request);
         if (entity.getId() != null) {
@@ -138,7 +138,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("修改")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping(value = "update")
     public MenuResponse update(@Valid @RequestBody MenuSaveRequest request) throws ApiException {
         Menu bean = menuService.get(menuQuery(request.getId()));
         if (bean == null) {
@@ -169,7 +169,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("显示")
-    @RequestMapping(value = "display", method = RequestMethod.POST)
+    @PostMapping(value = "display")
     public Boolean updateVisibility(@Valid @RequestBody List<MenuDisplayRequest> list) throws ApiException {
         List<ChangeMenuVisibilityCommand> commandList = new ArrayList<>();
         for (MenuDisplayRequest request : RequestListHelper.present(list)) {
@@ -200,7 +200,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("删除")
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<MenuIdRequest> list) throws ApiException {
         List<DeleteMenuCommand> commandList = new ArrayList<>();
         for (MenuIdRequest request : RequestListHelper.present(list)) {
@@ -229,7 +229,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("读取")
-    @RequestMapping(value = "tree", method = RequestMethod.POST)
+    @PostMapping(value = "tree")
     public List<MenuResponse> tree(@Valid @RequestBody List<MenuIdRequest> excludeList) {
         List<Menu> beanList = menuService.list(new MenuQuery());
 
@@ -273,7 +273,7 @@ public class MenuController {
     })
     @HasPermission("super")
     @SysLogger("排序")
-    @RequestMapping(value = "move", method = RequestMethod.POST)
+    @PostMapping(value = "move")
     public Boolean move(@Valid @RequestBody MenuMoveRequest request) throws ApiException {
         Menu fromBean = menuService.get(menuQuery(request.getFromNodeId()));
         if (fromBean == null) {

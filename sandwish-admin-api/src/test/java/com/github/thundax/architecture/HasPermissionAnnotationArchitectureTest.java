@@ -21,10 +21,14 @@ public class HasPermissionAnnotationArchitectureTest {
         Path sourceRoot = projectRoot().resolve("sandwish-admin-api/src/main/java/com/github/thundax/modules");
 
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertRestControllerRequestMappingsUseApiResourcePath(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertApiTagsDoNotUseNumericPrefix(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsUsePostOrGetMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertJsonRequestMethodsUsePostMapping(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertGetMappingMethodsReturnVoid(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertRequestBodyRequestParametersDeclareValid(sourceRoot);
     }
 

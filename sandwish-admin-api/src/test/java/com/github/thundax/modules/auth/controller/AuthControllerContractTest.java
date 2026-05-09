@@ -53,7 +53,7 @@ public class AuthControllerContractTest {
         when(preAuthSessionService.get(any(PreAuthSessionQuery.class))).thenReturn(session);
 
         mockMvc(authService, preAuthSessionService)
-                .perform(post("/api/auth/pre-auth-session").contentType(MediaType.APPLICATION_JSON))
+                .perform(post("/api/auth/session/pre-auth-session").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
@@ -79,7 +79,7 @@ public class AuthControllerContractTest {
         when(authService.createAccessToken(any(AdminAuthCommand.class))).thenReturn(accessToken("access-token-1"));
 
         mockMvc(authService, preAuthSessionService)
-                .perform(post("/api/auth/login")
+                .perform(post("/api/auth/session/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("user-agent", "JUnit")
                         .content("{\"loginToken\":\"login-token-1\",\"userName\":\"admin\"," + "\"password\":\""

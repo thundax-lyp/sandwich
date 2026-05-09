@@ -82,9 +82,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,7 +133,7 @@ public class UserController {
     })
     @HasPermission("sys:user:view")
     @SysLogger("读取")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     @WrappedApiResponse
     public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
         User bean = userService.get(userQuery(request.getId()));
@@ -153,7 +153,7 @@ public class UserController {
     })
     @HasPermission("sys:user:view")
     @SysLogger("列表")
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping(value = "list")
     @WrappedApiResponse
     public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         UserQuery query = readQuery(request);
@@ -171,7 +171,7 @@ public class UserController {
     })
     @HasPermission("sys:user:view")
     @SysLogger("分页")
-    @RequestMapping(value = "page", method = RequestMethod.POST)
+    @PostMapping(value = "page")
     public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) throws ApiException {
         UserQuery query = readQuery(request);
         PageQuery page = readUserPage(request);
@@ -189,7 +189,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("添加")
-    @RequestMapping(value = "add", method = RequestMethod.POST)
+    @PostMapping(value = "create")
     @WrappedApiResponse
     public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
@@ -231,7 +231,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("更新")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping(value = "update")
     @WrappedApiResponse
     public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
         // 解密密码（数据需要加密传输）
@@ -286,10 +286,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("上传头像")
-    @RequestMapping(
-            value = "avatar/upload",
-            method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @WrappedApiResponse
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
         return true;
@@ -305,7 +302,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("删除头像")
-    @RequestMapping(value = "avatar/delete", method = RequestMethod.POST)
+    @PostMapping(value = "avatar/delete")
     @WrappedApiResponse
     public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
         return true;
@@ -320,7 +317,7 @@ public class UserController {
                 dataTypeClass = String.class),
     })
     @HasPermission("sys:user:view")
-    @RequestMapping(value = "avatar", method = RequestMethod.POST)
+    @PostMapping(value = "avatar")
     public String avatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
         return "";
     }
@@ -335,7 +332,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("启用")
-    @RequestMapping(value = "enable", method = RequestMethod.POST)
+    @PostMapping(value = "enable")
     @WrappedApiResponse
     public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
@@ -372,7 +369,7 @@ public class UserController {
     })
     @HasPermission("sys:user:edit")
     @SysLogger("删除")
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) throws ApiException {
         User currentUser = UserAccessHolder.currentUser();
@@ -407,7 +404,7 @@ public class UserController {
                 dataTypeClass = String.class),
     })
     @HasPermission("sys:user:view")
-    @RequestMapping(value = "check", method = RequestMethod.POST)
+    @PostMapping(value = "check")
     @WrappedApiResponse
     public Boolean check(@Valid @RequestBody UserCheckRequest request) {
         return isLoginNameAvailable(request.getLoginName(), request.getId());
@@ -422,7 +419,7 @@ public class UserController {
                 dataTypeClass = String.class),
     })
     @HasPermission("sys:user:view")
-    @RequestMapping(value = "department/tree", method = RequestMethod.POST)
+    @PostMapping(value = "department/tree")
     @WrappedApiResponse
     public List<UserDepartmentResponse> departmentTree() {
         return departmentService.list(new DepartmentQuery()).stream()
@@ -439,7 +436,7 @@ public class UserController {
                 dataTypeClass = String.class),
     })
     @HasPermission("sys:user:view")
-    @RequestMapping(value = "role/list", method = RequestMethod.POST)
+    @PostMapping(value = "role/list")
     @WrappedApiResponse
     public List<UserRoleResponse> roleList() {
         RoleQuery query = new RoleQuery();

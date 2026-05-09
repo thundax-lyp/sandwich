@@ -25,8 +25,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 public class CurrentUserControllerContractTest {
 
@@ -41,27 +41,27 @@ public class CurrentUserControllerContractTest {
         assertEquals(
                 "系统/当前用户", CurrentUserController.class.getAnnotation(Api.class).tags()[0]);
         assertMapping(CurrentUserController.class.getAnnotation(RequestMapping.class), "/api/sys/current-user");
-        assertMapping(CurrentUserController.class.getMethod("info").getAnnotation(RequestMapping.class), "info");
-        assertMapping(
+        assertPostMapping(CurrentUserController.class.getMethod("info").getAnnotation(PostMapping.class), "info");
+        assertPostMapping(
                 CurrentUserController.class
                         .getMethod("updateInfo", PersonalInfoUpdateRequest.class)
-                        .getAnnotation(RequestMapping.class),
+                        .getAnnotation(PostMapping.class),
                 "info/update");
-        assertMapping(
+        assertPostMapping(
                 CurrentUserController.class
                         .getMethod("updatePassword", PersonalPasswordUpdateRequest.class)
-                        .getAnnotation(RequestMapping.class),
+                        .getAnnotation(PostMapping.class),
                 "password/update");
-        assertMapping(
+        assertPostMapping(
                 CurrentUserController.class
                         .getMethod("uploadAvatar", PersonalAvatarUploadRequest.class)
-                        .getAnnotation(RequestMapping.class),
+                        .getAnnotation(PostMapping.class),
                 "avatar/upload");
-        assertMapping(
-                CurrentUserController.class.getMethod("deleteAvatar").getAnnotation(RequestMapping.class),
+        assertPostMapping(
+                CurrentUserController.class.getMethod("deleteAvatar").getAnnotation(PostMapping.class),
                 "avatar/delete");
-        assertMapping(CurrentUserController.class.getMethod("menus").getAnnotation(RequestMapping.class), "menus");
-        assertMapping(CurrentUserController.class.getMethod("perms").getAnnotation(RequestMapping.class), "perms");
+        assertPostMapping(CurrentUserController.class.getMethod("menus").getAnnotation(PostMapping.class), "menus");
+        assertPostMapping(CurrentUserController.class.getMethod("perms").getAnnotation(PostMapping.class), "perms");
     }
 
     @Test
@@ -92,10 +92,12 @@ public class CurrentUserControllerContractTest {
         Assert.assertNotNull(mapping);
         assertEquals(1, mapping.value().length);
         assertEquals(value, mapping.value()[0]);
-        if (!value.startsWith("/api/")) {
-            assertEquals(1, mapping.method().length);
-            assertEquals(RequestMethod.POST, mapping.method()[0]);
-        }
+    }
+
+    private void assertPostMapping(PostMapping mapping, String value) {
+        Assert.assertNotNull(mapping);
+        assertEquals(1, mapping.value().length);
+        assertEquals(value, mapping.value()[0]);
     }
 
     private void mockApplicationContext(UserService userService) {

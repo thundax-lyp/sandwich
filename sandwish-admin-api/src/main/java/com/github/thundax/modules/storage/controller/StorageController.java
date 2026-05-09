@@ -46,16 +46,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Api(tags = "存储")
-@RequestMapping(value = "/api/storage")
+@RequestMapping(value = "/api/storage/object")
 @RestController
 public class StorageController {
 
@@ -81,7 +82,7 @@ public class StorageController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "page", method = RequestMethod.POST)
+    @PostMapping(value = "page")
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         PageQuery page = readStoragePage(request);
@@ -95,7 +96,7 @@ public class StorageController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "upload", method = RequestMethod.POST)
+    @PostMapping(value = "upload")
     @WrappedApiResponse
     public StorageUploadResponse upload(HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
@@ -127,7 +128,7 @@ public class StorageController {
 
     @ApiOperation(value = "读取存储对象内容", notes = "storage:storage:view")
     @HasPermission("storage:storage:view")
-    @RequestMapping(value = "objects/{id}/content", method = RequestMethod.GET)
+    @GetMapping(value = "{id}/content")
     public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
         StoredObject storage = storageService.get(storageQuery(id));
         if (storage == null) {
@@ -163,7 +164,7 @@ public class StorageController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
         List<StoredObject> storageList = new ArrayList<>();
@@ -186,9 +187,9 @@ public class StorageController {
 
     @ApiOperation(value = "获取业务类型树", notes = "storage:storage:view")
     @HasPermission("storage:storage:view")
-    @RequestMapping(value = "treeData", method = RequestMethod.POST)
+    @PostMapping(value = "tree")
     @WrappedApiResponse
-    public List<StorageTreeNodeResponse> treeData() {
+    public List<StorageTreeNodeResponse> tree() {
         return storageService.listReferenceOwnerTypes(new StorageQuery()).stream()
                 .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)
                 .collect(Collectors.toList());

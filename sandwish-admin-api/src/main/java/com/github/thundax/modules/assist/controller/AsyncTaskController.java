@@ -19,9 +19,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "辅助/异步任务")
 @RequestMapping(value = "/api/assist/async-task")
@@ -45,7 +45,7 @@ public class AsyncTaskController {
                 dataTypeClass = String.class),
     })
     @HasPermission("user")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     public AsyncTaskResponse get(@Valid @RequestBody AsyncTaskIdRequest request) throws ApiException {
         AsyncTask bean = asyncTaskService.get(toQuery(request));
         if (bean == null) {

@@ -35,7 +35,6 @@ import io.swagger.annotations.ApiOperation;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "会员认证")
 @RestController
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/api/auth/session")
 @PublicApi
 public class LoginController {
 
@@ -169,14 +168,14 @@ public class LoginController {
     }
 
     @ApiOperation(value = "登录状态")
-    @GetMapping("login")
+    @PostMapping("login/status")
     public MemberLoginStatusResponse login() {
         MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
     }
 
     @ApiOperation(value = "检查登录状态")
-    @GetMapping("check-login")
+    @PostMapping("check-login")
     public MemberLoginStatusResponse checkLogin() {
         MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);

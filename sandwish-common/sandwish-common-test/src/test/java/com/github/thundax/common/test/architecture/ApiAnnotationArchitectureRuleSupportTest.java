@@ -79,7 +79,7 @@ public class ApiAnnotationArchitectureRuleSupportTest {
                         + "@RequestMapping(\"/api/sys/user\")\n"
                         + "@WrappedApiController\n"
                         + "public class FixtureController {\n"
-                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    @PostMapping(value = \"list\")\n"
                         + "    @ApiOperation(value = \"list\", notes = \"sys:user:view\")\n"
                         + "    @HasPermission(\"sys:user:view\")\n"
                         + "    public void list() {}\n"
@@ -88,7 +88,31 @@ public class ApiAnnotationArchitectureRuleSupportTest {
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareRequestMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertRestControllersDeclareApi(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareApiOperation(sourceRoot);
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsUsePostOrGetMapping(sourceRoot);
         ApiAnnotationArchitectureRuleSupport.assertApiOperationDeclaresAccessAnnotation(sourceRoot);
+    }
+
+    @Test
+    public void shouldPassWhenRestControllerUsesApiResourcePath() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("apiResourcePath").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "@RequestMapping(\"/api/sys/user\")\n"
+                        + "public class FixtureController {\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertRestControllerRequestMappingsUseApiResourcePath(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectRestControllerWithoutApiResourcePath() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("invalidApiResourcePath").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n" + "@RequestMapping(\"/api/sys\")\n" + "public class FixtureController {\n" + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertRestControllerRequestMappingsUseApiResourcePath(sourceRoot);
     }
 
     @Test(expected = AssertionError.class)
@@ -124,7 +148,7 @@ public class ApiAnnotationArchitectureRuleSupportTest {
                 sourceRoot,
                 "@RestController\n"
                         + "public class FixtureController {\n"
-                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    @PostMapping(value = \"list\")\n"
                         + "    @ApiOperation(value = \"list\", notes = \"ignore\")\n"
                         + "    public void list() {}\n"
                         + "}\n");
@@ -154,7 +178,7 @@ public class ApiAnnotationArchitectureRuleSupportTest {
                 sourceRoot,
                 "@RestController\n"
                         + "public class FixtureController {\n"
-                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    @PostMapping(value = \"list\")\n"
                         + "    public void list() {}\n"
                         + "}\n");
 
@@ -174,6 +198,81 @@ public class ApiAnnotationArchitectureRuleSupportTest {
                         + "}\n");
 
         ApiAnnotationArchitectureRuleSupport.assertMappedMethodsDeclareSingleHttpMapping(sourceRoot);
+    }
+
+    @Test
+    public void shouldPassWhenMappedMethodUsesPostOrGetMapping() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("postOrGetMapping").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "public class FixtureController {\n"
+                        + "    @ApiOperation(value = \"list\")\n"
+                        + "    @PostMapping(value = \"list\")\n"
+                        + "    public void list() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsUsePostOrGetMapping(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectMappedMethodWithMethodRequestMapping() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("methodRequestMapping").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "public class FixtureController {\n"
+                        + "    @ApiOperation(value = \"list\")\n"
+                        + "    @RequestMapping(value = \"list\")\n"
+                        + "    public void list() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertMappedMethodsUsePostOrGetMapping(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectRequestBodyMethodWithoutPostMapping() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("requestBodyGet").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "public class FixtureController {\n"
+                        + "    @ApiOperation(value = \"list\")\n"
+                        + "    @GetMapping(value = \"list\")\n"
+                        + "    public void list(@RequestBody UserRequest request) {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertJsonRequestMethodsUsePostMapping(sourceRoot);
+    }
+
+    @Test
+    public void shouldPassWhenGetMappingMethodReturnsVoid() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("getVoid").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "public class FixtureController {\n"
+                        + "    @ApiOperation(value = \"image\")\n"
+                        + "    @GetMapping(value = \"image\")\n"
+                        + "    public void image() {}\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertGetMappingMethodsReturnVoid(sourceRoot);
+    }
+
+    @Test(expected = AssertionError.class)
+    public void shouldRejectGetMappingMethodReturningJsonModel() throws IOException {
+        Path sourceRoot = temporaryFolder.newFolder("getJson").toPath();
+        writeControllerClass(
+                sourceRoot,
+                "@RestController\n"
+                        + "public class FixtureController {\n"
+                        + "    @ApiOperation(value = \"status\")\n"
+                        + "    @GetMapping(value = \"status\")\n"
+                        + "    public UserResponse status() { return null; }\n"
+                        + "}\n");
+
+        ApiAnnotationArchitectureRuleSupport.assertGetMappingMethodsReturnVoid(sourceRoot);
     }
 
     @Test(expected = AssertionError.class)

@@ -29,12 +29,12 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "审计")
-@RequestMapping(value = "/api/audit")
+@RequestMapping(value = "/api/audit/log")
 @WrappedApiController
 public class AuditController {
 
@@ -53,7 +53,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "meta", method = RequestMethod.POST)
+    @PostMapping(value = "meta")
     public AuditMetaResponse meta(@Valid @RequestBody AuditMetaRequest request) {
         return AuditInterfaceAssembler.toMetaResponse(
                 auditService.getMeta(AuditInterfaceAssembler.toMetaQuery(request)));
@@ -68,7 +68,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "history", method = RequestMethod.POST)
+    @PostMapping(value = "history")
     public List<AuditLogResponse> history(@Valid @RequestBody AuditObjectHistoryRequest request) {
         return auditService.list(AuditInterfaceAssembler.toMetaQuery(request)).stream()
                 .map(AuditInterfaceAssembler::toLogResponse)
@@ -84,7 +84,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "detail", method = RequestMethod.POST)
+    @PostMapping(value = "detail")
     public AuditLogDetailResponse detail(@Valid @RequestBody AuditLogDetailRequest request) {
         return AuditInterfaceAssembler.toLogDetailResponse(
                 auditService.getLog(AuditInterfaceAssembler.toLogQuery(request)));
@@ -99,7 +99,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "object/overview", method = RequestMethod.POST)
+    @PostMapping(value = "object/overview")
     public AuditObjectOverviewResponse objectOverview(@Valid @RequestBody AuditMetaRequest request) {
         return AuditInterfaceAssembler.toOverviewResponse(
                 auditService.getMeta(AuditInterfaceAssembler.toMetaQuery(request)),
@@ -117,7 +117,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "object/page", method = RequestMethod.POST)
+    @PostMapping(value = "object/page")
     public PageResponse<AuditLogResponse> objectPage(@Valid @RequestBody AuditObjectPageRequest request) {
         return PageResponseHelper.fromPageResult(
                 auditService.page(AuditInterfaceAssembler.toLogQuery(request), readPage(request)),
@@ -133,7 +133,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "page", method = RequestMethod.POST)
+    @PostMapping(value = "page")
     public PageResponse<AuditLogResponse> page(@Valid @RequestBody AuditLogPageRequest request) {
         PageQuery pageQuery = readPage(request);
         return PageResponseHelper.fromPageResult(
@@ -150,7 +150,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "options", method = RequestMethod.POST)
+    @PostMapping(value = "options")
     public AuditOptionsResponse options() {
         return AuditInterfaceAssembler.toOptionsResponse();
     }
@@ -164,7 +164,7 @@ public class AuditController {
                 paramType = "header",
                 dataTypeClass = String.class),
     })
-    @RequestMapping(value = "fields", method = RequestMethod.POST)
+    @PostMapping(value = "fields")
     public List<AuditObjectFieldResponse> fields(@Valid @RequestBody AuditObjectFieldRequest request) {
         return AuditInterfaceAssembler.toFieldResponses(request.getObjectType());
     }

@@ -36,9 +36,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api(tags = "系统/部门")
 @SysLogger(module = {"系统", "部门"})
@@ -63,7 +63,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:view")
     @SysLogger("读取")
-    @RequestMapping(value = "get", method = RequestMethod.POST)
+    @PostMapping(value = "get")
     public DepartmentResponse get(@Valid @RequestBody DepartmentIdRequest request) throws ApiException {
         Department bean = departmentService.get(departmentQuery(request.getId()));
         if (bean == null) {
@@ -82,7 +82,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:view")
     @SysLogger("列表")
-    @RequestMapping(value = "list", method = RequestMethod.POST)
+    @PostMapping(value = "list")
     public List<DepartmentResponse> list(@Valid @RequestBody DepartmentQueryRequest request) throws ApiException {
         DepartmentQuery query = DepartmentInterfaceAssembler.toQuery(request);
 
@@ -101,7 +101,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:edit")
     @SysLogger("添加")
-    @RequestMapping(value = "add", method = RequestMethod.POST)
+    @PostMapping(value = "create")
     public DepartmentResponse add(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
         Department entity = DepartmentInterfaceAssembler.toEntity(new Department(), request);
         if (entity.getId() != null) {
@@ -133,7 +133,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:edit")
     @SysLogger("更新")
-    @RequestMapping(value = "update", method = RequestMethod.POST)
+    @PostMapping(value = "update")
     public DepartmentResponse update(@Valid @RequestBody DepartmentSaveRequest request) throws ApiException {
         Department bean = departmentService.get(departmentQuery(request.getId()));
         if (bean == null) {
@@ -164,7 +164,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:edit")
     @SysLogger("删除")
-    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<DepartmentIdRequest> list) throws ApiException {
         List<DeleteDepartmentCommand> commandList = new ArrayList<>();
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
@@ -193,7 +193,7 @@ public class DepartmentController {
     })
     @HasPermission("super")
     @SysLogger("读取")
-    @RequestMapping(value = "tree", method = RequestMethod.POST)
+    @PostMapping(value = "tree")
     public List<DepartmentResponse> tree(@Valid @RequestBody List<DepartmentIdRequest> excludeList) {
         List<Department> beanList = departmentService.list(new DepartmentQuery());
 
@@ -237,7 +237,7 @@ public class DepartmentController {
     })
     @HasPermission("sys:department:edit")
     @SysLogger("移动")
-    @RequestMapping(value = "move", method = RequestMethod.POST)
+    @PostMapping(value = "move")
     public Boolean move(@Valid @RequestBody DepartmentMoveRequest request) throws ApiException {
         Department fromBean = departmentService.get(departmentQuery(request.getFromNodeId()));
         if (fromBean == null) {

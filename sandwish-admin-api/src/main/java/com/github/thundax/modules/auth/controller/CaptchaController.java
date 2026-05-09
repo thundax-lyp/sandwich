@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "鉴权/图形验证码")
-@RequestMapping(value = "/api/auth")
+@RequestMapping(value = "/api/auth/captcha")
 @RestController
 @PublicApi
 public class CaptchaController {
@@ -67,7 +67,7 @@ public class CaptchaController {
     }
 
     @ApiOperation(value = "图形验证码")
-    @GetMapping(value = "captcha")
+    @GetMapping
     public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String loginToken = request.getParameter("loginToken");
         if (StringUtils.isBlank(loginToken)) {
@@ -85,7 +85,7 @@ public class CaptchaController {
     }
 
     @ApiOperation(value = "刷新图形验证码")
-    @PostMapping(value = "captcha/refresh")
+    @PostMapping(value = "refresh")
     @WrappedApiResponse
     public CaptchaRefreshResponse refreshCaptcha(@Valid @RequestBody CaptchaRefreshRequest request)
             throws ApiException {

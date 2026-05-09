@@ -5,13 +5,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
-import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
 import com.github.thundax.modules.audit.entity.AuditLog;
+import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.persistence.assembler.AuditLogPersistenceAssembler;
 import com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO;
 import com.github.thundax.modules.audit.persistence.mapper.AuditLogMapper;
-import com.github.thundax.modules.audit.service.query.AuditLogQuery;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
@@ -54,37 +55,49 @@ public class AuditLogDaoImpl implements AuditLogDao {
     }
 
     @Override
-    public Page<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
-        LambdaQueryWrapper<AuditLogDO> wrapper = buildWrapper(query);
+    public Page<AuditLog> page(
+            String objectType,
+            String objectId,
+            AuditAction action,
+            AuditOperatorType operatorType,
+            String operatorId,
+            String source,
+            String requestId,
+            Date beginDate,
+            Date endDate,
+            int pageNo,
+            int pageSize) {
+        LambdaQueryWrapper<AuditLogDO> wrapper = buildWrapper(
+                objectType, objectId, action, operatorType, operatorId, source, requestId, beginDate, endDate);
         wrapper.orderByDesc(AuditLogDO::getOccurredAt, AuditLogDO::getId);
-        Page<AuditLogDO> dataObjectPage =
-                mapper.selectPage(new Page<>(pageQuery.getPageNo(), pageQuery.getPageSize()), wrapper);
+        Page<AuditLogDO> dataObjectPage = mapper.selectPage(new Page<>(pageNo, pageSize), wrapper);
         Page<AuditLog> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(AuditLogPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
     }
 
-    private LambdaQueryWrapper<AuditLogDO> buildWrapper(AuditLogQuery query) {
+    private LambdaQueryWrapper<AuditLogDO> buildWrapper(
+            String objectType,
+            String objectId,
+            AuditAction action,
+            AuditOperatorType operatorType,
+            String operatorId,
+            String source,
+            String requestId,
+            Date beginDate,
+            Date endDate) {
         LambdaQueryWrapper<AuditLogDO> wrapper = new LambdaQueryWrapper<>();
-        if (query == null) {
-            return wrapper;
-        }
-        wrapper.eq(StringUtils.isNotBlank(query.getObjectType()), AuditLogDO::getObjectType, query.getObjectType());
-        wrapper.eq(StringUtils.isNotBlank(query.getObjectId()), AuditLogDO::getObjectId, query.getObjectId());
+        wrapper.eq(StringUtils.isNotBlank(objectType), AuditLogDO::getObjectType, objectType);
+        wrapper.eq(StringUtils.isNotBlank(objectId), AuditLogDO::getObjectId, objectId);
+        wrapper.eq(action != null, AuditLogDO::getAction, action == null ? null : action.value());
         wrapper.eq(
-                query.getAction() != null,
-                AuditLogDO::getAction,
-                query.getAction() == null ? null : query.getAction().value());
-        wrapper.eq(
-                query.getOperatorType() != null,
-                AuditLogDO::getOperatorType,
-                query.getOperatorType() == null ? null : query.getOperatorType().value());
-        wrapper.eq(StringUtils.isNotBlank(query.getOperatorId()), AuditLogDO::getOperatorId, query.getOperatorId());
-        wrapper.eq(StringUtils.isNotBlank(query.getSource()), AuditLogDO::getSource, query.getSource());
-        wrapper.eq(StringUtils.isNotBlank(query.getRequestId()), AuditLogDO::getRequestId, query.getRequestId());
-        wrapper.ge(query.getBeginDate() != null, AuditLogDO::getOccurredAt, query.getBeginDate());
-        wrapper.le(query.getEndDate() != null, AuditLogDO::getOccurredAt, query.getEndDate());
+                operatorType != null, AuditLogDO::getOperatorType, operatorType == null ? null : operatorType.value());
+        wrapper.eq(StringUtils.isNotBlank(operatorId), AuditLogDO::getOperatorId, operatorId);
+        wrapper.eq(StringUtils.isNotBlank(source), AuditLogDO::getSource, source);
+        wrapper.eq(StringUtils.isNotBlank(requestId), AuditLogDO::getRequestId, requestId);
+        wrapper.ge(beginDate != null, AuditLogDO::getOccurredAt, beginDate);
+        wrapper.le(endDate != null, AuditLogDO::getOccurredAt, endDate);
         return wrapper;
     }
 }

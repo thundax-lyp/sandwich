@@ -1,5 +1,7 @@
 package com.github.thundax.modules.audit.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -9,6 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel(value = "AuditFieldResponse", description = "审计字段响应")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuditFieldResponse implements Serializable {
 
     @ApiModelProperty(name = "fieldName", value = "字段名")

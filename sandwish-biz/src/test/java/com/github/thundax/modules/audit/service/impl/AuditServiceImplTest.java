@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNull;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
 import com.github.thundax.modules.audit.dao.AuditMetaDao;
 import com.github.thundax.modules.audit.entity.AuditLog;
@@ -15,8 +14,8 @@ import com.github.thundax.modules.audit.entity.valueobject.AuditObjectRef;
 import com.github.thundax.modules.audit.runtime.AuditDiffService;
 import com.github.thundax.modules.audit.runtime.AuditSnapshots;
 import com.github.thundax.modules.audit.service.command.CreateAuditLogCommand;
-import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 
@@ -95,7 +94,18 @@ public class AuditServiceImplTest {
         }
 
         @Override
-        public Page<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
+        public Page<AuditLog> page(
+                String objectType,
+                String objectId,
+                AuditAction action,
+                com.github.thundax.modules.audit.entity.enums.AuditOperatorType operatorType,
+                String operatorId,
+                String source,
+                String requestId,
+                Date beginDate,
+                Date endDate,
+                int pageNo,
+                int pageSize) {
             return new Page<>();
         }
     }

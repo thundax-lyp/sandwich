@@ -29,6 +29,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO"
     };
     private static final String[] SNOWFLAKE_ID_DATA_OBJECTS = {
+        "com.github.thundax.modules.audit.persistence.dataobject.AuditLogDO",
+        "com.github.thundax.modules.audit.persistence.dataobject.AuditMetaDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthAuthorizationDO",
         "com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO",
@@ -223,6 +225,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         if (tableName.startsWith("sys_")
                 || tableName.startsWith("auth_")
                 || tableName.startsWith("assist_")
+                || tableName.startsWith("audit_")
                 || tableName.startsWith("member_")) {
             return;
         }

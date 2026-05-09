@@ -1,5 +1,7 @@
 package com.github.thundax.modules.audit.controller.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -9,6 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @ApiModel(value = "AuditLogPageRequest", description = "审计日志分页请求")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuditLogPageRequest {
 
     @ApiModelProperty(name = "pageNo", value = "页码")

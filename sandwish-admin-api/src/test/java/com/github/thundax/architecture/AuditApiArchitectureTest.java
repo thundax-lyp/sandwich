@@ -19,7 +19,8 @@ public class AuditApiArchitectureTest {
 
         for (Method method : AuditController.class.getDeclaredMethods()) {
             if (method.isAnnotationPresent(RequestMapping.class)) {
-                assertTrue(method.getName() + " must declare permission", method.isAnnotationPresent(HasPermission.class));
+                assertTrue(
+                        method.getName() + " must declare permission", method.isAnnotationPresent(HasPermission.class));
             }
         }
     }

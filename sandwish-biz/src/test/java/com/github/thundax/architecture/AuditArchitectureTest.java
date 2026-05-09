@@ -27,7 +27,8 @@ public class AuditArchitectureTest {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".java"))
                     .filter(path -> !normalizePath(path).contains("/modules/audit/"))
-                    .filter(path -> BUSINESS_AUDIT_FIELD_PATTERN.matcher(read(path)).find())
+                    .filter(path ->
+                            BUSINESS_AUDIT_FIELD_PATTERN.matcher(read(path)).find())
                     .map(path -> normalizePath(root.relativize(path)))
                     .forEach(violations::add);
         }

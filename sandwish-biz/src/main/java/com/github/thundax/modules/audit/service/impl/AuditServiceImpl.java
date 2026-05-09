@@ -1,8 +1,9 @@
 package com.github.thundax.modules.audit.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
 import com.github.thundax.modules.audit.dao.AuditMetaDao;
 import com.github.thundax.modules.audit.entity.AuditLog;
@@ -121,12 +122,25 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    public List<AuditLog> history(AuditMetaQuery query) {
+    public List<AuditLog> list(AuditMetaQuery query) {
         return auditLogDao.listByObject(query.getObjectType(), query.getObjectId());
     }
 
     @Override
-    public Page<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
-        return auditLogDao.page(query, pageQuery);
+    public PageResult<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
+        IPage<AuditLog> dataPage = auditLogDao.page(
+                query == null ? null : query.getObjectType(),
+                query == null ? null : query.getObjectId(),
+                query == null ? null : query.getAction(),
+                query == null ? null : query.getOperatorType(),
+                query == null ? null : query.getOperatorId(),
+                query == null ? null : query.getSource(),
+                query == null ? null : query.getRequestId(),
+                query == null ? null : query.getBeginDate(),
+                query == null ? null : query.getEndDate(),
+                pageQuery.getPageNo(),
+                pageQuery.getPageSize());
+        return PageResult.of(
+                (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
 }

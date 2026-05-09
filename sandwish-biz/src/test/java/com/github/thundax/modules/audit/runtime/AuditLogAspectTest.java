@@ -59,17 +59,16 @@ public class AuditLogAspectTest {
         }
 
         @Override
-        public java.util.List<com.github.thundax.modules.audit.entity.AuditLog> history(
+        public java.util.List<com.github.thundax.modules.audit.entity.AuditLog> list(
                 com.github.thundax.modules.audit.service.query.AuditMetaQuery query) {
             return Collections.emptyList();
         }
 
         @Override
-        public com.baomidou.mybatisplus.extension.plugins.pagination.Page<com.github.thundax.modules.audit.entity.AuditLog>
-                page(
-                        com.github.thundax.modules.audit.service.query.AuditLogQuery query,
-                        com.github.thundax.common.page.PageQuery pageQuery) {
-            return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>();
+        public com.github.thundax.common.page.PageResult<com.github.thundax.modules.audit.entity.AuditLog> page(
+                com.github.thundax.modules.audit.service.query.AuditLogQuery query,
+                com.github.thundax.common.page.PageQuery pageQuery) {
+            return new com.github.thundax.common.page.PageResult<>();
         }
     }
 

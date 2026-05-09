@@ -1,5 +1,8 @@
 package com.github.thundax.modules.audit.entity.enums;
 
+import com.github.thundax.common.exception.BizException;
+import java.util.Arrays;
+
 public enum AuditOperatorType {
     USER,
     MEMBER,
@@ -14,6 +17,9 @@ public enum AuditOperatorType {
         if (value == null) {
             return null;
         }
-        return AuditOperatorType.valueOf(value);
+        return Arrays.stream(values())
+                .filter(item -> item.name().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new BizException("Unknown audit operator type: " + value));
     }
 }

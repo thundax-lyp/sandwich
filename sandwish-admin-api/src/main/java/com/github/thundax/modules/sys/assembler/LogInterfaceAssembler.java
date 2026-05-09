@@ -33,7 +33,7 @@ public final class LogInterfaceAssembler {
         LogResponse response = new LogResponse();
         response.setId(EntityIdCodec.toValue(entity.getId()));
         response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getCreateDate());
+        response.setCreateDate(entity.getLogDate());
         response.setType(entity.getType() == null ? null : entity.getType().value());
         response.setTitle(entity.getTitle());
         response.setRemoteAddr(entity.getRemoteAddr());
@@ -41,7 +41,6 @@ public final class LogInterfaceAssembler {
         response.setMethod(entity.getMethod());
         response.setRequestUri(entity.getRequestUri());
         response.setRequestParams(entity.getRequestParams());
-        response.setCreateDate(entity.getLogDate());
         response.setCreateUser(toUserResponse(user, loginName, department, departmentLoader));
         return response;
     }

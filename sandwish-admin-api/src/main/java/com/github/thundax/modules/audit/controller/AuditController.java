@@ -1,19 +1,18 @@
 package com.github.thundax.modules.audit.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.audit.assembler.AuditInterfaceAssembler;
 import com.github.thundax.modules.audit.controller.request.AuditLogPageRequest;
 import com.github.thundax.modules.audit.controller.request.AuditMetaRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectHistoryRequest;
 import com.github.thundax.modules.audit.controller.response.AuditLogResponse;
 import com.github.thundax.modules.audit.controller.response.AuditMetaResponse;
-import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.service.AuditService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -63,7 +62,7 @@ public class AuditController {
     })
     @RequestMapping(value = "history", method = RequestMethod.POST)
     public List<AuditLogResponse> history(@Valid @RequestBody AuditObjectHistoryRequest request) {
-        return auditService.history(AuditInterfaceAssembler.toMetaQuery(request)).stream()
+        return auditService.list(AuditInterfaceAssembler.toMetaQuery(request)).stream()
                 .map(AuditInterfaceAssembler::toLogResponse)
                 .collect(Collectors.toList());
     }
@@ -80,16 +79,9 @@ public class AuditController {
     @RequestMapping(value = "page", method = RequestMethod.POST)
     public PageResponse<AuditLogResponse> page(@Valid @RequestBody AuditLogPageRequest request) {
         PageQuery pageQuery = readPage(request);
-        Page<AuditLog> page = auditService.page(AuditInterfaceAssembler.toLogQuery(request), pageQuery);
-        PageResponse<AuditLogResponse> response = new PageResponse<>();
-        response.setPageNo((int) page.getCurrent());
-        response.setPageSize((int) page.getSize());
-        response.setCount(page.getTotal());
-        response.setTotalPage((int) page.getPages());
-        response.setRecords(page.getRecords().stream()
-                .map(AuditInterfaceAssembler::toLogResponse)
-                .collect(Collectors.toList()));
-        return response;
+        return PageResponseHelper.fromEntityPage(
+                auditService.page(AuditInterfaceAssembler.toLogQuery(request), pageQuery),
+                AuditInterfaceAssembler::toLogResponse);
     }
 
     private PageQuery readPage(AuditLogPageRequest request) {

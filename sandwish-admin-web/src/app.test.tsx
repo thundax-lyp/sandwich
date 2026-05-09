@@ -152,7 +152,7 @@ describe("App", () => {
     it("loads permissions as part of successful login", async () => {
         vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
             const url = String(input);
-            if (url.endsWith("/auth/form")) {
+            if (url.endsWith("/auth/session/pre-auth-session")) {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
@@ -173,7 +173,7 @@ describe("App", () => {
                 );
             }
 
-            if (url.endsWith("/auth/login")) {
+            if (url.endsWith("/auth/session/login")) {
                 expect(init).toEqual(
                     expect.objectContaining({
                         body: JSON.stringify({
@@ -346,7 +346,7 @@ describe("App", () => {
         await userEvent.click(await screen.findByRole("button", { name: /退出登录/ }));
 
         expect(globalThis.fetch).toHaveBeenCalledWith(
-            "/admin-api/api/auth/logout",
+            "/admin-api/api/auth/session/logout",
             expect.objectContaining({
                 body: JSON.stringify({ token: "test-token" }),
                 headers: expect.objectContaining({

@@ -24,7 +24,7 @@ export interface LogoutRequest {
 }
 
 export const createLoginForm = () => {
-    return postJson<LoginFormResponse>("/auth/form");
+    return postJson<LoginFormResponse>("/auth/session/pre-auth-session");
 };
 
 export const refreshCaptcha = (loginToken: string) => {
@@ -34,13 +34,13 @@ export const refreshCaptcha = (loginToken: string) => {
 };
 
 export const login = (request: LoginRequest) => {
-    return postJson<AccessTokenResponse, LoginRequest>("/auth/login", {
+    return postJson<AccessTokenResponse, LoginRequest>("/auth/session/login", {
         body: request
     });
 };
 
 export const logout = (request: LogoutRequest) => {
-    return postJson<boolean, LogoutRequest>("/auth/logout", {
+    return postJson<boolean, LogoutRequest>("/auth/session/logout", {
         body: request
     });
 };

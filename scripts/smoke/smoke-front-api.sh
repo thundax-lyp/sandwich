@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 smoke_require curl
 
-smoke_get "$(smoke_url "${SANDWICH_FRONT_BASE_URL}" "/auth/check-login")"
+smoke_post "$(smoke_url "${SANDWICH_FRONT_BASE_URL}" "/api/auth/session/check-login")"
 smoke_expect_2xx "front login status"
 smoke_expect_body "front login status"
 

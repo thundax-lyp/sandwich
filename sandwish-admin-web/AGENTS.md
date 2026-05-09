@@ -30,7 +30,7 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 ## Auth And Permission Rules
 
 - Login session setup must bind token and current-user permissions together.
-- After successful `/auth/login`, immediately load `/sys/current-user/perms` before navigating into protected pages.
+- After successful `/auth/session/login`, immediately load `/sys/current-user/perms` before navigating into protected pages.
 - If permission loading fails during login setup, clear the access token and permissions.
 - Clearing the access token must also clear stored permissions.
 - Use server-loaded menus for navigation display. Use stored permissions for finer UI capability checks.

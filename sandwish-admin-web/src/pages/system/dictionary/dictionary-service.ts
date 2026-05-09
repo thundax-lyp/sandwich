@@ -36,7 +36,7 @@ export const pageDictionaries = (request: DictPageRequest = {}) => {
 };
 
 export const addDictionary = (request: DictSaveRequest) => {
-    return postJson<DictResponse, DictSaveRequest>("/sys/dict/add", {
+    return postJson<DictResponse, DictSaveRequest>("/sys/dict/create", {
         body: request
     });
 };

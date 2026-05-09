@@ -70,9 +70,7 @@ public class OAuthClientDaoImpl implements OAuthClientDao {
                         .set(OAuthClientDO::getRefreshTokenTtlSeconds, dataObject.getRefreshTokenTtlSeconds())
                         .set(OAuthClientDO::getStatus, dataObject.getStatus())
                         .set(OAuthClientDO::getContact, dataObject.getContact())
-                        .set(OAuthClientDO::getRemark, dataObject.getRemark())
-                        .set(OAuthClientDO::getUpdateDate, dataObject.getUpdateDate())
-                        .set(OAuthClientDO::getUpdateBy, dataObject.getUpdateBy()));
+                        .set(OAuthClientDO::getRemark, dataObject.getRemark()));
     }
 
     private LambdaUpdateWrapper<OAuthClientDO> buildIdUpdateWrapper(OAuthClientDO dataObject) {

@@ -9,7 +9,6 @@ import com.github.thundax.modules.auth.entity.OAuthClient;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
 import com.github.thundax.modules.auth.persistence.dataobject.OAuthClientDO;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import org.junit.Test;
 
@@ -17,8 +16,6 @@ public class OAuthClientPersistenceAssemblerTest {
 
     @Test
     public void shouldMapOAuthClientEntityToDataObject() {
-        Date createDate = new Date(1000L);
-        Date updateDate = new Date(2000L);
         OAuthClient entity = new OAuthClient();
         entity.setId(EntityId.of(4001L));
         entity.setClientId("admin-web");
@@ -33,10 +30,6 @@ public class OAuthClientPersistenceAssemblerTest {
         entity.setStatus(OAuthClientStatus.ENABLED);
         entity.setContact("admin@example.com");
         entity.setRemark("seed client");
-        entity.setCreateDate(createDate);
-        entity.setCreateUserId("admin");
-        entity.setUpdateDate(updateDate);
-        entity.setUpdateUserId("operator");
 
         OAuthClientDO dataObject = OAuthClientPersistenceAssembler.toDataObject(entity);
 
@@ -49,10 +42,6 @@ public class OAuthClientPersistenceAssemblerTest {
         assertEquals(7200L, dataObject.getAccessTokenTtlSeconds());
         assertEquals(2592000L, dataObject.getRefreshTokenTtlSeconds());
         assertEquals("ENABLED", dataObject.getStatus());
-        assertEquals(createDate, dataObject.getCreateDate());
-        assertEquals("admin", dataObject.getCreateBy());
-        assertEquals(updateDate, dataObject.getUpdateDate());
-        assertEquals("operator", dataObject.getUpdateBy());
     }
 
     @Test

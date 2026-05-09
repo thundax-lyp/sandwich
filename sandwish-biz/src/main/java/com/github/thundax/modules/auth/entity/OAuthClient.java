@@ -1,9 +1,7 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.domain.Auditable;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -18,7 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OAuthClient implements Auditable {
+public class OAuthClient {
     private EntityId id;
     private String clientId;
     private String clientSecretHash;
@@ -32,10 +30,6 @@ public class OAuthClient implements Auditable {
     private OAuthClientStatus status = OAuthClientStatus.ENABLED;
     private String contact;
     private String remark;
-    private Date createDate;
-    private Date updateDate;
-    private String createUserId;
-    private String updateUserId;
 
     public boolean isEnabled() {
         return OAuthClientStatus.ENABLED == status;

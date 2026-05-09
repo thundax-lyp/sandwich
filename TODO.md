@@ -11,16 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `Audit 3.2 auth-oauth-client`：拆除 OAuthClient 业务表审计字段
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/OAuthClient.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/dataobject/OAuthClientDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/auth/persistence/assembler/OAuthClientPersistenceAssembler.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/auth/persistence/assembler/OAuthClientPersistenceAssemblerTest.java`
-  - 处理动作：删除 OAuthClient 业务表通用审计字段及持久化转换、测试断言。
-  - 验收点：OAuthClient 不再包含通用审计字段；执行 `mvn -pl sandwish-biz -am compile` 和 `mvn -pl sandwish-infra -am compile`。
-  - 重要度：9/10
-
 - [ ] `Audit 3.2 storage-domain`：拆除存储领域业务表审计字段
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/StoredObject.java`

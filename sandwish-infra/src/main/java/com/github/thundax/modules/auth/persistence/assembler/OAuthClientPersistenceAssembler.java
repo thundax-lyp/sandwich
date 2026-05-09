@@ -37,10 +37,6 @@ public final class OAuthClientPersistenceAssembler {
         dataObject.setStatus(statusValue(entity.getStatus()));
         dataObject.setContact(entity.getContact());
         dataObject.setRemark(entity.getRemark());
-        dataObject.setCreateDate(entity.getCreateDate());
-        dataObject.setCreateBy(entity.getCreateUserId());
-        dataObject.setUpdateDate(entity.getUpdateDate());
-        dataObject.setUpdateBy(entity.getUpdateUserId());
         return dataObject;
     }
 
@@ -62,10 +58,6 @@ public final class OAuthClientPersistenceAssembler {
         entity.setStatus(statusFrom(dataObject.getStatus()));
         entity.setContact(dataObject.getContact());
         entity.setRemark(dataObject.getRemark());
-        entity.setCreateDate(dataObject.getCreateDate());
-        entity.setCreateUserId(dataObject.getCreateBy());
-        entity.setUpdateDate(dataObject.getUpdateDate());
-        entity.setUpdateUserId(dataObject.getUpdateBy());
         return entity;
     }
 

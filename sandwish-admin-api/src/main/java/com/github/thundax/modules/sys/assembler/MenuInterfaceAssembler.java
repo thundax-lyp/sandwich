@@ -18,35 +18,33 @@ public final class MenuInterfaceAssembler {
     @NonNull
     public static MenuResponse toResponse(Menu entity) {
         if (entity == null) {
-            return new MenuResponse();
+            return MenuResponse.builder().build();
         }
-        MenuResponse response = new MenuResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
         Long parentId = EntityIdCodec.toValue(entity.getParentId());
-        if (parentId != null) {
-            response.setParentId(parentId);
-        }
-        response.setName(entity.getName());
-        response.setPerms(entity.getPerms());
-        response.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        response.setDisplay(entity.isDisplay());
-        response.setDisplayParams(entity.getDisplayParams());
-        response.setUrl(entity.getUrl());
-        return response;
+        return MenuResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .parentId(parentId)
+                .name(entity.getName())
+                .perms(entity.getPerms())
+                .ranks(AccessRankCodec.toValue(entity.getRank()))
+                .display(entity.isDisplay())
+                .displayParams(entity.getDisplayParams())
+                .url(entity.getUrl())
+                .build();
     }
 
     @NonNull
     public static MenuResponse toTreeResponse(Menu entity) {
         if (entity == null) {
-            return new MenuResponse();
+            return MenuResponse.builder().build();
         }
-        MenuResponse response = new MenuResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
-        response.setName(entity.getName());
-        return response;
+        return MenuResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .name(entity.getName())
+                .build();
     }
 
     @NonNull

@@ -22,48 +22,44 @@ public final class PersonalInterfaceAssembler {
     @NonNull
     public static PersonalInfoResponse toInfoResponse(User entity, String loginName) {
         if (entity == null) {
-            return new PersonalInfoResponse();
+            return PersonalInfoResponse.builder().build();
         }
-        PersonalInfoResponse response = new PersonalInfoResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setLoginName(loginName);
-        response.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        response.setName(entity.getName());
-        response.setMobile(entity.getMobile());
-        response.setEmail(entity.getEmail());
-        response.setAvatar(readAvatarUrl(entity));
-        response.setAdmin(entity.isAdmin());
-        response.setSuperAdmin(entity.isSuper());
-        return response;
+        return PersonalInfoResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .loginName(loginName)
+                .ranks(AccessRankCodec.toValue(entity.getRank()))
+                .name(entity.getName())
+                .mobile(entity.getMobile())
+                .email(entity.getEmail())
+                .avatar(readAvatarUrl(entity))
+                .admin(entity.isAdmin())
+                .superAdmin(entity.isSuper())
+                .build();
     }
 
     @NonNull
     public static PersonalAvatarResponse toAvatarResponse(User entity) {
-        PersonalAvatarResponse response = new PersonalAvatarResponse();
-        response.setAvatar(readAvatarUrl(entity));
-        return response;
+        return PersonalAvatarResponse.builder().avatar(readAvatarUrl(entity)).build();
     }
 
     @NonNull
     public static PersonalMenuResponse toMenuResponse(Menu entity) {
         if (entity == null) {
-            return new PersonalMenuResponse();
+            return PersonalMenuResponse.builder().build();
         }
-        PersonalMenuResponse response = new PersonalMenuResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
-        response.setName(entity.getName());
-        response.setPriority(entity.getPriority());
-        response.setUrl(entity.getUrl());
-        response.setDisplayParams(entity.getDisplayParams());
-        return response;
+        return PersonalMenuResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .name(entity.getName())
+                .priority(entity.getPriority())
+                .url(entity.getUrl())
+                .displayParams(entity.getDisplayParams())
+                .build();
     }
 
     @NonNull
     public static PersonalPermsResponse toPermsResponse(Set<String> perms) {
-        PersonalPermsResponse response = new PersonalPermsResponse();
-        response.setPerms(perms);
-        return response;
+        return PersonalPermsResponse.builder().perms(perms).build();
     }
 
     @NonNull

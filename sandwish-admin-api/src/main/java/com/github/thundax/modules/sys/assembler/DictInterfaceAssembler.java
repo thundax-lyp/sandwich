@@ -21,16 +21,16 @@ public final class DictInterfaceAssembler {
     @NonNull
     public static DictResponse toResponse(Dict entity) {
         if (entity == null) {
-            return new DictResponse();
+            return DictResponse.builder().build();
         }
-        DictResponse response = new DictResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
-        response.setLabel(entity.getLabel());
-        response.setType(entity.getType());
-        response.setValue(entity.getValue());
-        return response;
+        return DictResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .label(entity.getLabel())
+                .type(entity.getType())
+                .value(entity.getValue())
+                .build();
     }
 
     @NonNull

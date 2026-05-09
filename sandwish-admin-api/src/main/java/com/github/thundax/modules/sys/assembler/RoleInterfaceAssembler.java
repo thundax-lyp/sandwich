@@ -31,66 +31,62 @@ public final class RoleInterfaceAssembler {
     @NonNull
     public static RoleResponse toResponse(Role entity, List<Menu> menuList) {
         if (entity == null) {
-            return new RoleResponse();
+            return RoleResponse.builder().build();
         }
 
-        RoleResponse response = new RoleResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
-        response.setName(entity.getName());
-        response.setAdmin(entity.isAdmin());
-        response.setEnable(entity.isEnable());
-        response.setMenuList(
-                menuList == null
-                        ? new ArrayList<>()
-                        : menuList.stream()
-                                .map(RoleInterfaceAssembler::toMenuResponse)
-                                .collect(Collectors.toList()));
-        return response;
+        return RoleResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .name(entity.getName())
+                .admin(entity.isAdmin())
+                .enable(entity.isEnable())
+                .menuList(
+                        menuList == null
+                                ? new ArrayList<>()
+                                : menuList.stream()
+                                        .map(RoleInterfaceAssembler::toMenuResponse)
+                                        .collect(Collectors.toList()))
+                .build();
     }
 
     @NonNull
     public static RoleMenuResponse toMenuResponse(Menu entity) {
         if (entity == null) {
-            return new RoleMenuResponse();
+            return RoleMenuResponse.builder().build();
         }
 
-        RoleMenuResponse response = new RoleMenuResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
         Long parentId = EntityIdCodec.toValue(entity.getParentId());
-        if (parentId != null) {
-            response.setParentId(parentId);
-        }
-        response.setName(entity.getName());
-        response.setPerms(entity.getPerms());
-        return response;
+        return RoleMenuResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .parentId(parentId)
+                .name(entity.getName())
+                .perms(entity.getPerms())
+                .build();
     }
 
     @NonNull
     public static RoleUserResponse toUserResponse(
             User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new RoleUserResponse();
+            return RoleUserResponse.builder().build();
         }
 
-        RoleUserResponse response = new RoleUserResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
-        response.setLoginName(loginName);
-        response.setDepartment(toDepartmentResponse(department, departmentLoader));
-        return response;
+        return RoleUserResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .name(entity.getName())
+                .loginName(loginName)
+                .department(toDepartmentResponse(department, departmentLoader))
+                .build();
     }
 
     @NonNull
     public static RoleUserTreeNodeResponse toDepartmentTreeNode(String id, Department entity) {
-        RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
-        response.setId(id);
-        if (entity.getParentId() != null) {
-            response.setParentId(idPrefix(EntityIdCodec.toValue(entity.getParentId())));
-        }
-        response.setName(entity.getName());
-        return response;
+        return RoleUserTreeNodeResponse.builder()
+                .id(id)
+                .parentId(entity.getParentId() == null ? null : idPrefix(EntityIdCodec.toValue(entity.getParentId())))
+                .name(entity.getName())
+                .build();
     }
 
     @NonNull
@@ -100,12 +96,12 @@ public final class RoleInterfaceAssembler {
             String loginName,
             Department department,
             Function<EntityId, Department> departmentLoader) {
-        RoleUserTreeNodeResponse response = new RoleUserTreeNodeResponse();
-        response.setId(String.valueOf(EntityIdCodec.toValue(entity.getId())));
-        response.setParentId(departmentIdPrefix + entity.getDepartmentId());
-        response.setName(entity.getName());
-        response.setUser(toUserResponse(entity, loginName, department, departmentLoader));
-        return response;
+        return RoleUserTreeNodeResponse.builder()
+                .id(String.valueOf(EntityIdCodec.toValue(entity.getId())))
+                .parentId(departmentIdPrefix + entity.getDepartmentId())
+                .name(entity.getName())
+                .user(toUserResponse(entity, loginName, department, departmentLoader))
+                .build();
     }
 
     @NonNull
@@ -178,14 +174,14 @@ public final class RoleInterfaceAssembler {
     private static RoleDepartmentResponse toDepartmentResponse(
             Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new RoleDepartmentResponse();
+            return RoleDepartmentResponse.builder().build();
         }
 
-        RoleDepartmentResponse response = new RoleDepartmentResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
-        response.setNamePath(namePath(entity, departmentLoader));
-        return response;
+        return RoleDepartmentResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .name(entity.getName())
+                .namePath(namePath(entity, departmentLoader))
+                .build();
     }
 
     private static String idPrefix(Long id) {

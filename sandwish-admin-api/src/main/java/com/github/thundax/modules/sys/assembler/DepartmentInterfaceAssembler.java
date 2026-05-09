@@ -21,36 +21,30 @@ public final class DepartmentInterfaceAssembler {
     @NonNull
     public static DepartmentResponse toResponse(Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new DepartmentResponse();
+            return DepartmentResponse.builder().build();
         }
-
-        DepartmentResponse response = new DepartmentResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
-        if (entity.getParentId() != null) {
-            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
-        }
-        response.setName(entity.getName());
-        response.setShortName(entity.getShortName());
-        response.setNamePath(namePath(entity, departmentLoader));
-        return response;
+        return DepartmentResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .name(entity.getName())
+                .shortName(entity.getShortName())
+                .namePath(namePath(entity, departmentLoader))
+                .build();
     }
 
     @NonNull
     public static DepartmentResponse toTreeResponse(Department entity) {
         if (entity == null) {
-            return new DepartmentResponse();
+            return DepartmentResponse.builder().build();
         }
-
-        DepartmentResponse response = new DepartmentResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        if (entity.getParentId() != null) {
-            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
-        }
-        response.setName(entity.getName());
-        response.setShortName(entity.getShortName());
-        return response;
+        return DepartmentResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .name(entity.getName())
+                .shortName(entity.getShortName())
+                .build();
     }
 
     @NonNull

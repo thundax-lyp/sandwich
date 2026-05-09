@@ -36,60 +36,58 @@ public final class UserInterfaceAssembler {
             List<Role> roleList,
             Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new UserResponse();
+            return UserResponse.builder().build();
         }
 
-        UserResponse response = new UserResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setPriority(entity.getPriority());
-        response.setLoginName(loginName);
-        response.setRanks(AccessRankCodec.toValue(entity.getRank()));
-        response.setName(entity.getName());
-        response.setEmail(entity.getEmail());
-        response.setMobile(entity.getMobile());
-        response.setAvatar(UserController.getAvatarUrl(
-                EntityIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()));
-        response.setSuperAdmin(entity.isSuper());
-        response.setAdmin(entity.isAdmin());
-        response.setEnable(entity.isEnable());
-        response.setDepartment(toDepartmentResponse(department, departmentLoader));
-        response.setRoleList(
-                roleList == null
-                        ? new ArrayList<>()
-                        : roleList.stream()
-                                .map(UserInterfaceAssembler::toRoleResponse)
-                                .collect(Collectors.toList()));
-        return response;
+        return UserResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .priority(entity.getPriority())
+                .loginName(loginName)
+                .ranks(AccessRankCodec.toValue(entity.getRank()))
+                .name(entity.getName())
+                .email(entity.getEmail())
+                .mobile(entity.getMobile())
+                .avatar(UserController.getAvatarUrl(
+                        EntityIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()))
+                .superAdmin(entity.isSuper())
+                .admin(entity.isAdmin())
+                .enable(entity.isEnable())
+                .department(toDepartmentResponse(department, departmentLoader))
+                .roleList(
+                        roleList == null
+                                ? new ArrayList<>()
+                                : roleList.stream()
+                                        .map(UserInterfaceAssembler::toRoleResponse)
+                                        .collect(Collectors.toList()))
+                .build();
     }
 
     @NonNull
     public static UserDepartmentResponse toDepartmentResponse(
             Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new UserDepartmentResponse();
+            return UserDepartmentResponse.builder().build();
         }
 
-        UserDepartmentResponse response = new UserDepartmentResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        if (entity.getParentId() != null) {
-            response.setParentId(EntityIdCodec.toValue(entity.getParentId()));
-        }
-        response.setName(entity.getName());
-        response.setNamePath(namePath(entity, departmentLoader));
-        return response;
+        return UserDepartmentResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .parentId(EntityIdCodec.toValue(entity.getParentId()))
+                .name(entity.getName())
+                .namePath(namePath(entity, departmentLoader))
+                .build();
     }
 
     @NonNull
     public static UserRoleResponse toRoleResponse(Role entity) {
         if (entity == null) {
-            return new UserRoleResponse();
+            return UserRoleResponse.builder().build();
         }
 
-        UserRoleResponse response = new UserRoleResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
-        return response;
+        return UserRoleResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .name(entity.getName())
+                .build();
     }
 
     @NonNull

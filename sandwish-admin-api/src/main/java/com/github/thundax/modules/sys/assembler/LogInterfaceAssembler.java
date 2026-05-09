@@ -27,22 +27,21 @@ public final class LogInterfaceAssembler {
             Department department,
             Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new LogResponse();
+            return LogResponse.builder().build();
         }
-
-        LogResponse response = new LogResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setRemarks(entity.getRemarks());
-        response.setCreateDate(entity.getLogDate());
-        response.setType(entity.getType() == null ? null : entity.getType().value());
-        response.setTitle(entity.getTitle());
-        response.setRemoteAddr(entity.getRemoteAddr());
-        response.setUserAgent(entity.getUserAgent());
-        response.setMethod(entity.getMethod());
-        response.setRequestUri(entity.getRequestUri());
-        response.setRequestParams(entity.getRequestParams());
-        response.setCreateUser(toUserResponse(user, loginName, department, departmentLoader));
-        return response;
+        return LogResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .remarks(entity.getRemarks())
+                .createDate(entity.getLogDate())
+                .type(entity.getType() == null ? null : entity.getType().value())
+                .title(entity.getTitle())
+                .remoteAddr(entity.getRemoteAddr())
+                .userAgent(entity.getUserAgent())
+                .method(entity.getMethod())
+                .requestUri(entity.getRequestUri())
+                .requestParams(entity.getRequestParams())
+                .createUser(toUserResponse(user, loginName, department, departmentLoader))
+                .build();
     }
 
     @NonNull
@@ -62,29 +61,27 @@ public final class LogInterfaceAssembler {
     private static LogUserResponse toUserResponse(
             User entity, String loginName, Department department, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new LogUserResponse();
+            return LogUserResponse.builder().build();
         }
-
-        LogUserResponse response = new LogUserResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setLoginName(loginName);
-        response.setName(entity.getName());
-        response.setDepartment(toDepartmentResponse(department, departmentLoader));
-        return response;
+        return LogUserResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .loginName(loginName)
+                .name(entity.getName())
+                .department(toDepartmentResponse(department, departmentLoader))
+                .build();
     }
 
     @NonNull
     private static LogDepartmentResponse toDepartmentResponse(
             Department entity, Function<EntityId, Department> departmentLoader) {
         if (entity == null) {
-            return new LogDepartmentResponse();
+            return LogDepartmentResponse.builder().build();
         }
-
-        LogDepartmentResponse response = new LogDepartmentResponse();
-        response.setId(EntityIdCodec.toValue(entity.getId()));
-        response.setName(entity.getName());
-        response.setNamePath(namePath(entity, departmentLoader));
-        return response;
+        return LogDepartmentResponse.builder()
+                .id(EntityIdCodec.toValue(entity.getId()))
+                .name(entity.getName())
+                .namePath(namePath(entity, departmentLoader))
+                .build();
     }
 
     private static String namePath(Department department, Function<EntityId, Department> departmentLoader) {

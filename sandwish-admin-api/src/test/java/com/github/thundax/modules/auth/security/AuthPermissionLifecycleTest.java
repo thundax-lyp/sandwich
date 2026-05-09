@@ -15,42 +15,13 @@ import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
-import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
-import com.github.thundax.modules.auth.dao.OAuthClientDao;
-import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
-import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
-import com.github.thundax.modules.auth.dao.PrincipalRefreshTokenDao;
-import com.github.thundax.modules.auth.entity.OAuthAuthorization;
-import com.github.thundax.modules.auth.entity.OAuthClient;
-import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
-import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
-import com.github.thundax.modules.auth.entity.PrincipalCredential;
-import com.github.thundax.modules.auth.entity.PrincipalIdentity;
-import com.github.thundax.modules.auth.entity.PrincipalRefreshToken;
-import com.github.thundax.modules.auth.entity.enums.OAuthClientStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
-import com.github.thundax.modules.auth.entity.enums.PrincipalTokenStatus;
-import com.github.thundax.modules.auth.entity.enums.PrincipalType;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenId;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
-import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenId;
+import com.github.thundax.modules.auth.dao.*;
+import com.github.thundax.modules.auth.entity.*;
+import com.github.thundax.modules.auth.entity.enums.*;
+import com.github.thundax.modules.auth.entity.valueobject.*;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
-import com.github.thundax.modules.auth.service.AdminAuthService;
-import com.github.thundax.modules.auth.service.PermissionService;
-import com.github.thundax.modules.auth.service.PrincipalAuthService;
-import com.github.thundax.modules.auth.service.PrincipalCredentialService;
-import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
-import com.github.thundax.modules.auth.service.command.AuthenticateIdentityCommand;
-import com.github.thundax.modules.auth.service.command.AuthenticatePasswordCommand;
-import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
-import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
+import com.github.thundax.modules.auth.service.*;
+import com.github.thundax.modules.auth.service.command.*;
 import com.github.thundax.modules.auth.service.impl.AdminAuthServiceImpl;
 import com.github.thundax.modules.auth.service.impl.PermissionServiceImpl;
 import com.github.thundax.modules.auth.service.provider.GithubLoginProvider;
@@ -58,45 +29,29 @@ import com.github.thundax.modules.auth.service.provider.WecomLoginProvider;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
-import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
-import com.github.thundax.modules.auth.service.result.AuthTokenQueryResult;
-import com.github.thundax.modules.auth.service.result.AuthTokenRefreshResult;
-import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisionResult;
-import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
+import com.github.thundax.modules.auth.service.result.*;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
+import com.github.thundax.modules.sys.entity.valueobject.MenuId;
+import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
+import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
+import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
-import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
-import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
-import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
-import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
-import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
-import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
-import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
-import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
-import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
-import com.github.thundax.modules.sys.service.command.CreateUserCommand;
-import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
-import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
-import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
-import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
+import com.github.thundax.modules.sys.service.command.*;
 import com.github.thundax.modules.sys.service.impl.CurrentUserServiceImpl;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -186,7 +141,7 @@ public class AuthPermissionLifecycleTest {
     public void shouldInvalidateSessionByUserId() {
         AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
 
-        authService.invalidateSessionsByUserId(userSessionCommand(EntityIdCodec.toDomain(1L), "PASSWORD_RESET"));
+        authService.invalidateSessionsByUserId(userSessionCommand(1L, "PASSWORD_RESET"));
 
         Assert.assertEquals(
                 PrincipalTokenStatus.REVOKED,
@@ -221,7 +176,7 @@ public class AuthPermissionLifecycleTest {
         refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
         refreshToken.setSessionId(PrincipalAuthSessionId.of("oauth-session-1"));
-        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
@@ -319,7 +274,7 @@ public class AuthPermissionLifecycleTest {
         refreshToken.setAccessTokenId(PrincipalAccessTokenId.of("old-access-token"));
         refreshToken.setClientId("admin-web");
         refreshToken.setSessionId(PrincipalAuthSessionId.of("oauth-session-2"));
-        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+        refreshToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         refreshToken.setIssuedAt(new Date(1000L));
         refreshToken.setExpireAt(new Date(System.currentTimeMillis() + 60000L));
         refreshToken.setStatus(PrincipalTokenStatus.ACTIVE);
@@ -353,7 +308,7 @@ public class AuthPermissionLifecycleTest {
     public void shouldAuthenticateSmsWecomAndGithubIdentity() throws Exception {
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(authService
+                UserIdCodec.toValue(authService
                         .authenticateSms(mobileCommand("13800000000"))
                         .getId()));
 
@@ -362,11 +317,11 @@ public class AuthPermissionLifecycleTest {
 
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(
+                UserIdCodec.toValue(
                         authService.authenticateWecom(codeCommand("wecom-code")).getId()));
         Assert.assertEquals(
                 Long.valueOf(1L),
-                EntityIdCodec.toValue(authService
+                UserIdCodec.toValue(authService
                         .authenticateGithub(codeCommand("github-code"))
                         .getId()));
     }
@@ -472,7 +427,7 @@ public class AuthPermissionLifecycleTest {
         private PrincipalIdentity identity(PrincipalIdentityType identityType, String identityValue) {
             PrincipalIdentity identity = new PrincipalIdentity();
             identity.setId(EntityIdCodec.toDomain(1001L));
-            identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)));
+            identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             identity.setType(identityType);
             identity.setIdentityValue(identityValue);
             return identity;
@@ -498,9 +453,9 @@ public class AuthPermissionLifecycleTest {
         return command;
     }
 
-    private AdminAuthCommand userSessionCommand(EntityId userId, String reason) {
+    private AdminAuthCommand userSessionCommand(Long userId, String reason) {
         AdminAuthCommand command = new AdminAuthCommand();
-        command.setEntityUserId(userId);
+        command.setEntityUserId(EntityId.of(userId));
         command.setReason(reason);
         return command;
     }
@@ -805,7 +760,7 @@ public class AuthPermissionLifecycleTest {
         Date now = new Date();
         return PrincipalAuthSession.restore(
                 id,
-                PrincipalKey.of(PrincipalType.USER, EntityIdCodec.toDomain(1L)),
+                PrincipalKey.of(PrincipalType.USER, 1L),
                 clientId,
                 null,
                 now,
@@ -825,25 +780,28 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        public User get(UserQuery query) {
+        @Override
+        public User get(UserId id) {
             return user();
         }
 
-        public List<User> listByIds(List<EntityId> ids) {
+        public List<User> listByIds(List<UserId> ids) {
             return Collections.singletonList(user());
         }
 
+        @Override
         public List<User> list(UserQuery query) {
             return Collections.singletonList(user());
         }
 
+        @Override
         public PageResult<User> page(UserQuery query, PageQuery page) {
             return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override
-        public EntityId create(CreateUserCommand command) {
-            return EntityId.of(1L);
+        public UserId create(CreateUserCommand command) {
+            return UserIdCodec.toDomain(1L);
         }
 
         @Override
@@ -855,7 +813,7 @@ public class AuthPermissionLifecycleTest {
 
         private User user() {
             User user = new User();
-            user.setId(EntityIdCodec.toDomain(1L));
+            user.setId(UserIdCodec.toDomain(1L));
             user.setStatus(UserStatus.ENABLED);
             user.setPrivilege(UserPrivilege.SUPER);
             user.setRank(AccessRank.of(0));
@@ -894,7 +852,7 @@ public class AuthPermissionLifecycleTest {
         private PrincipalIdentity identity(String loginName) {
             PrincipalIdentity identity = new PrincipalIdentity();
             identity.setId(EntityId.of(8001L));
-            identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+            identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             identity.setType(PrincipalIdentityType.USER_ACCOUNT);
             identity.setIdentityValue(loginName);
             identity.setStatus(PrincipalIdentityStatus.ENABLED);
@@ -933,7 +891,7 @@ public class AuthPermissionLifecycleTest {
         private PrincipalCredential credential() {
             PrincipalCredential credential = new PrincipalCredential();
             credential.setId(EntityId.of(9001L));
-            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, EntityId.of(1L)));
+            credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             credential.setIdentityId(EntityId.of(8001L));
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
             credential.setCredentialValue("secret");
@@ -958,21 +916,24 @@ public class AuthPermissionLifecycleTest {
             return false;
         }
 
-        public Menu get(MenuQuery query) {
+        @Override
+        public Menu get(MenuId id) {
             return menus().get(0);
         }
 
+        @Override
         public List<Menu> list(MenuQuery query) {
             return menus();
         }
 
+        @Override
         public PageResult<Menu> page(MenuQuery query, PageQuery page) {
             return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override
-        public EntityId create(CreateMenuCommand command) {
-            return EntityId.of(6001L);
+        public MenuId create(CreateMenuCommand command) {
+            return MenuIdCodec.toDomain(6001L);
         }
 
         @Override
@@ -984,7 +945,7 @@ public class AuthPermissionLifecycleTest {
 
         private List<Menu> menus() {
             Menu menu = new Menu();
-            menu.setId(EntityIdCodec.toDomain(6001L));
+            menu.setId(MenuIdCodec.toDomain(6001L));
             menu.setPerms("sys:role,sys:user:view");
             menu.setName("system");
             menu.setRank(AccessRank.of(0));
@@ -1012,17 +973,18 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
-        private com.github.thundax.modules.sys.entity.Role role(Long id) {
+        private com.github.thundax.modules.sys.entity.Role role(RoleId id) {
             com.github.thundax.modules.sys.entity.Role role = new com.github.thundax.modules.sys.entity.Role();
-            role.setId(EntityIdCodec.toDomain(id));
+            role.setId(id);
             return role;
         }
 
-        public com.github.thundax.modules.sys.entity.Role get(RoleQuery query) {
-            return role(query.getId().value());
+        @Override
+        public com.github.thundax.modules.sys.entity.Role get(RoleId id) {
+            return role(id);
         }
 
-        public List<com.github.thundax.modules.sys.entity.Role> listByIds(List<EntityId> ids) {
+        public List<com.github.thundax.modules.sys.entity.Role> listByIds(List<RoleId> ids) {
             return Collections.emptyList();
         }
 
@@ -1031,17 +993,19 @@ public class AuthPermissionLifecycleTest {
             return Collections.emptyList();
         }
 
+        @Override
         public List<com.github.thundax.modules.sys.entity.Role> list(RoleQuery query) {
             return Collections.emptyList();
         }
 
+        @Override
         public PageResult<com.github.thundax.modules.sys.entity.Role> page(RoleQuery query, PageQuery page) {
             return PageResult.of(page.getPageNo(), page.getPageSize(), 0, Collections.emptyList());
         }
 
         @Override
-        public EntityId create(CreateRoleCommand command) {
-            return EntityId.of(10001L);
+        public RoleId create(CreateRoleCommand command) {
+            return RoleIdCodec.toDomain(10001L);
         }
 
         @Override

@@ -372,6 +372,7 @@ public final class NamingArchitectureRuleSupport {
                 || name.equals("page")
                 || name.equals("deleteAll")
                 || name.startsWith("getBy")
+                || name.startsWith("max")
                 || name.startsWith("list")
                 || name.startsWith("count")
                 || name.startsWith("insert")

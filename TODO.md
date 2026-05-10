@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `SYS 入参装配清理`：禁止 API 入参修改实体 priority
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/RoleInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/RoleInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/UserInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/UserInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DepartmentInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DepartmentInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/MenuInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/MenuInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/PersonalInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/PersonalInterfaceAssembler.java)
-  - 处理动作：移除 assembler 中的 `setPriority` 赋值逻辑。
-  - 验收点：创建/更新流程不再通过 HTTP request 更改实体 priority。
-  - 重要度：9/10
-
 - [ ] `SYS 命令对象清理`：移除 Dict/Role/User/Department/Menu 的 priority 输入字段
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDictCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDictCommand.java)

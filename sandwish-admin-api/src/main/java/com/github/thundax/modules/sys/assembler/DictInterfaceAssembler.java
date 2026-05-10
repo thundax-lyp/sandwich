@@ -26,7 +26,6 @@ public final class DictInterfaceAssembler {
         return DictResponse.builder()
                 .id(DictIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .label(entity.getLabel())
                 .type(entity.getType())
                 .value(entity.getValue())
@@ -59,7 +58,6 @@ public final class DictInterfaceAssembler {
     @NonNull
     public static CreateDictCommand toCreateCommand(@NonNull DictSaveRequest request) {
         CreateDictCommand command = new CreateDictCommand();
-        command.setPriority(request.getPriority());
         command.setRemarks(request.getRemarks());
         command.setLabel(request.getLabel());
         command.setType(request.getType());
@@ -71,7 +69,6 @@ public final class DictInterfaceAssembler {
     public static ChangeDictInfoCommand toChangeInfoCommand(@NonNull DictSaveRequest request) {
         ChangeDictInfoCommand command = new ChangeDictInfoCommand();
         command.setId(DictIdCodec.toDomain(request.getId()));
-        command.setPriority(request.getPriority());
         command.setRemarks(request.getRemarks());
         command.setLabel(request.getLabel());
         command.setType(request.getType());

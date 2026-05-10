@@ -52,7 +52,6 @@ public final class PersonalInterfaceAssembler {
                 .id(MenuIdCodec.toValue(entity.getId()))
                 .parentId(MenuIdCodec.toValue(entity.getParentId()))
                 .name(entity.getName())
-                .priority(entity.getPriority())
                 .url(entity.getUrl())
                 .displayParams(entity.getDisplayParams())
                 .build();

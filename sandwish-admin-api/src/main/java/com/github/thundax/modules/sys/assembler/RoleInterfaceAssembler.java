@@ -41,7 +41,6 @@ public final class RoleInterfaceAssembler {
         return RoleResponse.builder()
                 .id(RoleIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .name(entity.getName())
                 .admin(entity.isAdmin())
                 .enable(entity.isEnable())
@@ -122,9 +121,6 @@ public final class RoleInterfaceAssembler {
     public static CreateRoleCommand toCreateCommand(@NonNull RoleSaveRequest request) {
         CreateRoleCommand command = new CreateRoleCommand();
         command.setId(RoleIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            command.setPriority(request.getPriority());
-        }
         command.setRemarks(request.getRemarks());
         command.setName(request.getName());
         command.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
@@ -137,9 +133,6 @@ public final class RoleInterfaceAssembler {
     public static ChangeRoleInfoCommand toChangeInfoCommand(@NonNull RoleSaveRequest request) {
         ChangeRoleInfoCommand command = new ChangeRoleInfoCommand();
         command.setId(RoleIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            command.setPriority(request.getPriority());
-        }
         command.setRemarks(request.getRemarks());
         command.setName(request.getName());
         command.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);
@@ -151,9 +144,6 @@ public final class RoleInterfaceAssembler {
     @NonNull
     public static Role toEntity(@NonNull Role entity, @NonNull RoleSaveRequest request) {
         entity.setId(RoleIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
         entity.setRemarks(request.getRemarks());
         entity.setName(request.getName());
         entity.setPrivilege(Boolean.TRUE.equals(request.getAdmin()) ? RolePrivilege.ADMIN : RolePrivilege.NORMAL);

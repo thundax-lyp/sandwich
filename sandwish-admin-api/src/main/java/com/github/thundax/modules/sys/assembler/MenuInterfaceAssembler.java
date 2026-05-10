@@ -24,7 +24,6 @@ public final class MenuInterfaceAssembler {
         return MenuResponse.builder()
                 .id(MenuIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .parentId(parentId)
                 .name(entity.getName())
                 .perms(entity.getPerms())
@@ -60,9 +59,6 @@ public final class MenuInterfaceAssembler {
     @NonNull
     public static Menu toEntity(@NonNull Menu entity, @NonNull MenuSaveRequest request) {
         entity.setId(MenuIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
         entity.setRemarks(request.getRemarks());
         if (request.getParentId() != null) {
             entity.setParentId(MenuIdCodec.toDomain(request.getParentId()));
@@ -90,7 +86,6 @@ public final class MenuInterfaceAssembler {
                 entity.getDisplayParams(),
                 entity.getUrl(),
                 entity.getTarget(),
-                entity.getPriority(),
                 entity.getRemarks());
     }
 
@@ -107,7 +102,6 @@ public final class MenuInterfaceAssembler {
                 entity.getDisplayParams(),
                 entity.getUrl(),
                 entity.getTarget(),
-                entity.getPriority(),
                 entity.getRemarks());
     }
 }

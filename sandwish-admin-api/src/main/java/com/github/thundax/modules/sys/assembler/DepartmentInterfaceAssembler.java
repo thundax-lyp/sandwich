@@ -27,7 +27,6 @@ public final class DepartmentInterfaceAssembler {
         return DepartmentResponse.builder()
                 .id(DepartmentIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .parentId(DepartmentIdCodec.toValue(entity.getParentId()))
                 .name(entity.getName())
                 .shortName(entity.getShortName())
@@ -60,9 +59,6 @@ public final class DepartmentInterfaceAssembler {
     @NonNull
     public static Department toEntity(@NonNull Department entity, @NonNull DepartmentSaveRequest request) {
         entity.setId(DepartmentIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
         entity.setRemarks(request.getRemarks());
         if (request.getParentId() != null) {
             entity.setParentId(DepartmentIdCodec.toDomain(request.getParentId()));
@@ -80,7 +76,6 @@ public final class DepartmentInterfaceAssembler {
                 entity.getParentId(),
                 entity.getName(),
                 entity.getShortName(),
-                entity.getPriority(),
                 entity.getRemarks());
     }
 
@@ -92,7 +87,6 @@ public final class DepartmentInterfaceAssembler {
                 entity.getParentId(),
                 entity.getName(),
                 entity.getShortName(),
-                entity.getPriority(),
                 entity.getRemarks());
     }
 

@@ -45,7 +45,6 @@ public final class UserInterfaceAssembler {
         return UserResponse.builder()
                 .id(UserIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .loginName(loginName)
                 .ranks(AccessRankCodec.toValue(entity.getRank()))
                 .name(entity.getName())
@@ -119,7 +118,6 @@ public final class UserInterfaceAssembler {
                 entity.getRank(),
                 entity.getPrivilege(),
                 entity.getStatus(),
-                entity.getPriority(),
                 entity.getRemarks(),
                 request.getLoginName(),
                 encryptedPassword,
@@ -139,7 +137,6 @@ public final class UserInterfaceAssembler {
                 entity.getRank(),
                 entity.getPrivilege(),
                 entity.getStatus(),
-                entity.getPriority(),
                 entity.getRemarks(),
                 request.getLoginName(),
                 toRoleIdList(request));
@@ -148,9 +145,6 @@ public final class UserInterfaceAssembler {
     @NonNull
     public static User toEntity(@NonNull User entity, @NonNull UserSaveRequest request) {
         entity.setId(UserIdCodec.toDomain(request.getId()));
-        if (request.getPriority() != null) {
-            entity.setPriority(request.getPriority());
-        }
         entity.setRemarks(request.getRemarks());
         if (request.getDepartment() != null) {
             entity.setDepartmentId(

@@ -10,39 +10,6 @@
 ## 当前任务项
 
 
-- [ ] `Storage.Service 接口`：确认/补齐排序方向参数
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java](sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java)
-  - 处理动作：确认 sort 接口仅支持 orderedIds 与 SortDirection。
-  - 验收点：无 priority 直接写入参数。
-  - 重要度：8/10
-
-- [ ] `Storage.Service 与 DAO`：核对 stored object 排序一致性与并发兜底
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectDao.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StoredObjectDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StoredObjectDaoImpl.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StoredObjectMapper.java](sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StoredObjectMapper.java)
-  - 处理动作：按 `max(priority)+10`+交换式方式复核并收敛异常映射。
-  - 验收点：排序失败可回滚，返回 SORT 约定码。
-  - 重要度：9/10
-
-- [ ] `Storage.Controller 协议`：复用已有 sort 请求并去除外露字段
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StorageSortRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/request/StorageSortRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/assembler/StorageInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/assembler/StorageInterfaceAssembler.java)
-  - 处理动作：确认只支持 orderedIds + sortDirection，不返回 priority。
-  - 验收点：存储排序 API 完全对齐 runbook 协议。
-  - 重要度：8/10
-
-- [ ] `StoredObject.数据库约束`：补齐存储 priority 全局唯一性索引
-  - 范围文件：
-    - [db/schema/storage.sql](db/schema/storage.sql)
-  - 处理动作：为 `assist_storage` 补充全局优先级唯一约束与历史重复清理。
-  - 验收点：全局重复/交换冲突可被 DB 检测。
-  - 重要度：8/10
-
 - [ ] `AsyncTask.Service 接口`：补齐异步任务排序能力
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java)

@@ -12,6 +12,7 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -41,6 +42,7 @@ import com.github.thundax.modules.sys.controller.request.UserCheckRequest;
 import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
 import com.github.thundax.modules.sys.controller.request.UserIdRequest;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
+import com.github.thundax.modules.sys.controller.request.UserSortRequest;
 import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
@@ -362,6 +364,25 @@ public class UserController {
 
         commandList.forEach(userService::changeStatus);
 
+        return true;
+    }
+
+    @ApiOperation(value = "排序", notes = "sys:user:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @HasPermission("sys:user:edit")
+    @SysLogger("排序")
+    @PostMapping(value = "sort")
+    @WrappedApiResponse
+    public Boolean sort(@Valid @RequestBody UserSortRequest request) throws ApiException {
+        userService.sort(
+                RequestListHelper.map(request == null ? null : request.getOrderedIds(), UserIdCodec::toDomain),
+                request == null ? SortDirection.ASC : request.getSortDirection());
         return true;
     }
 

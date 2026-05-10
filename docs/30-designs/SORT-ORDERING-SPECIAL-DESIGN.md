@@ -6,7 +6,7 @@
 核心目标：
 - 前端在排序操作时，仅提交有序实体 ID；不携带列表快照，不携带 priority 值；
 - 后端通过顺序写回 `priority` 实现排序；
-- `priority` 在平铺域内唯一且由服务端全权管理；
+- `priority` 在全局范围内唯一且由服务端全权管理；
 - 多用户并发情况下排序结果可预期、可重复、可回放。
 
 ## 2. Scope
@@ -60,7 +60,7 @@
 1. `priority` 不允许外部任意输入。
 2. 仅 `FlatSort` 域支持 `priority` 重排；`TreeSort` 不支持 `priority` 重排。
 3. `TreeSort` 列表查询固定按 `lft` 排序；`FlatSort` 列表查询固定按 `priority` 排序。
-4. `FlatSort` 同一次交换序列内 `priority` 不重复。
+4. `FlatSort` 全局 `priority` 不重复（以数据库约束为主保护）。
 5. 重排请求必须为 `orderedIds`，不接收优先级数值。
 6. 重排默认覆盖该域内完整排序集合，不允许仅交换局部片段导致歧义。
 7. 重排接口必须在一次事务中执行并保证幂等。
@@ -77,7 +77,7 @@
 - 写入策略：
   - 不使用插值，不执行 `1,2,3...` 等重写策略。
   - 每次交换仅改动交换对两个实体的 `priority`。
-  - `FlatSort` 排序域内 `priority` 唯一性通过交换边界检查与数据库约束兜底保证。
+  - `FlatSort` 的 `priority` 唯一性通过全局唯一约束与交换边界检查兜底保证。
   - 目标 `orderedIds` 与最终顺序保持一一映射。
 - 支持前端多次拖拽快速重试：同一 `orderedIds` 的重排结果一致。
 
@@ -143,7 +143,7 @@
 5. 不写入任何 `priority`，保持原状。
 
 ## 9. Key Flows（数据库约束）
-- `FlatSort` 对排序域内 `priority` 执行唯一约束与索引优化。
+- `FlatSort` 对 `priority` 执行全局唯一约束与索引优化。
 - 部署时先清理历史重复后再启用唯一约束。
 - `FlatSort` 查询列表按 `ORDER BY priority`，方向由 `sortDirection` 决定，并按约定追加必要过滤条件。
 - `TreeSort` 查询列表固定 `ORDER BY lft ASC`，并保持树形边界约束。
@@ -158,7 +158,7 @@
 - 重复提交同一 `orderedIds` 不产生差异值。
 - 重排排序域外 ID 提交被拒绝且无半成功。
 - 跨端调用（admin/front）共享同一排序语义。
-- 平铺重排排序域内 `priority` 不重复（数据约束可验证）。
+- 平铺重排 `priority` 全局不重复（数据约束可验证）。
 - 树形实体顺序仅受 `lft` 约束，`priority` 改动不影响树序结果。
 
 ## 12. Open Items

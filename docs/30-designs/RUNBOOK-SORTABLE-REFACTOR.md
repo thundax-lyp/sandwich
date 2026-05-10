@@ -20,7 +20,7 @@
 2. 允许 `sortDirection = ASC | DESC`，默认 `ASC`。
 3. `priority` 不出现在请求体、响应体、命令模型中。
 4. 排序过程只允许执行“实体间 priority 交换”，严禁插值重排（如 `1,2,3...` 全量重算）。
-5. 每个 `FlatSort` 域内 `priority` 唯一。
+5. `FlatSort` 全局 `priority` 唯一（不分 domain）。
 6. 单次排序请求在事务内完成，失败全回滚。
 7. 并发冲突返回统一错误码。
 8. 任何排序校验失败按错误码快速失败，不允许部分更新。
@@ -29,7 +29,7 @@
 - 替换所有单点 priority 修改接口（如 `changePriority`）为批量排序接口。
 - 剔除列表快照、列表签名等非核心字段。
 - 统一排序接口、响应与错误码。
-- 建立 `Scope` 约束与唯一性索引，避免“同域冲突”。
+- 建立 `priority` 全局唯一约束，避免重复值导致交换排序冲突。
 
 ## 5. 统一 API 协议
 - 请求体：
@@ -59,10 +59,10 @@
 ## 7. 创建路径（Create Domain）
 - 创建新实体时不参与排序链路决策。
 - 新增 `priority` 写法：
-  - `newPriority = max(priority in scope) + step`
+  - `newPriority = max(priority) + step`
   - `step = 10`（固定）
 - 空域：从 `10` 起始。
-- 由 DB 唯一约束与服务重试兜底并发。
+- 由 DB 全局唯一约束与服务重试兜底并发。
 
 ## 8. 并发与事务
 - 排序方法使用事务。
@@ -75,8 +75,8 @@
   - 未覆盖到的异常写入原始错误码并返回 `SORT_DB_FAILURE`
 
 ## 9. 数据库约束
-- FlatSort 域必须添加域内唯一索引：`UNIQUE(scope, priority)`。
-- 若历史存在重复，先清洗再建索引。
+- FlatSort 必须满足全局唯一约束：`UNIQUE(priority)`。
+- 若历史存在重复，先清洗再建约束。
 - 列表查询索引应覆盖 `scope + priority + id`（或当前最常用过滤字段 + priority）。
 
 ## 10. 全量落地执行步骤（按域）
@@ -116,9 +116,8 @@
 - `sortDirection` 生效（ASC/DESC 均验证）。
 - 重复提交同一序列结果稳定。
 - 并发冲突可回放，异常码可观测。
-- DB 层 `scope + priority` 唯一约束生效。
+- DB 层 `priority` 全局唯一约束生效。
 
 ## 12. 任务终止条件
 - 上述清单逐项通过且有对应变更记录后，可关闭 SORTABLE 改造任务。
 - 未通过条目不允许收尾提交。
-

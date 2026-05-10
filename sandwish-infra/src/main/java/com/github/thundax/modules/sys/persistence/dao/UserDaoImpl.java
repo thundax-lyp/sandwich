@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
@@ -87,8 +88,41 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> list(
             Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
+        return list(departmentId, loginName, name, status, privilege, SortDirection.ASC);
+    }
+
+    @Override
+    public List<User> list(
+            Long departmentId,
+            String loginName,
+            String name,
+            UserStatus status,
+            UserPrivilege privilege,
+            SortDirection sortDirection) {
         return UserPersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(departmentId, loginName, name, status, privilege)));
+                mapper.selectList(buildListWrapper(departmentId, loginName, name, status, privilege, sortDirection)));
+    }
+
+    @Override
+    public int maxPriorityByScope(
+            Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
+        Object max = mapper.selectObjs(
+                        buildListWrapper(departmentId, loginName, name, status, privilege, SortDirection.ASC)
+                                .select("max(priority)"))
+                .stream()
+                .findFirst()
+                .orElse(null);
+        if (max == null) {
+            return 0;
+        }
+        if (max instanceof Number) {
+            return ((Number) max).intValue();
+        }
+        try {
+            return Integer.parseInt(String.valueOf(max));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
     }
 
     @Override
@@ -201,6 +235,16 @@ public class UserDaoImpl implements UserDao {
 
     private QueryWrapper<UserDO> buildListWrapper(
             Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
+        return buildListWrapper(departmentId, loginName, name, status, privilege, SortDirection.ASC);
+    }
+
+    private QueryWrapper<UserDO> buildListWrapper(
+            Long departmentId,
+            String loginName,
+            String name,
+            UserStatus status,
+            UserPrivilege privilege,
+            SortDirection sortDirection) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
         if (departmentId != null) {
             wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
@@ -217,7 +261,12 @@ public class UserDaoImpl implements UserDao {
         if (privilege != null) {
             wrapper.eq("privilege", privilege.value());
         }
-        wrapper.orderByAsc("priority", "id");
+        if (SortDirection.DESC == sortDirection) {
+            wrapper.orderByDesc("priority");
+        } else {
+            wrapper.orderByAsc("priority");
+        }
+        wrapper.orderByAsc("id");
         return wrapper;
     }
 

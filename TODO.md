@@ -10,64 +10,12 @@
 ## 当前任务项
 
 
-- [ ] `User.Service 接口`：补齐 User FlatSort 协议
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java)
-  - 处理动作：新增 `sort(List<UserId> orderedIds, SortDirection sortDirection)`。
-  - 验收点：服务接口不再依赖单条 priority 入参。
-  - 重要度：10/10
-
-- [ ] `User.Service 实现`：实现 User 交换式排序与并发回滚
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java)
-  - 处理动作：按可见域校验并执行 exchanges，创建使用 `max+10`。
-  - 验收点：ASC/DESC 均可复现请求顺序。
-  - 重要度：10/10
-
-- [ ] `User.DAO 接口`：补齐 User 域查询能力
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/UserDao.java)
-  - 处理动作：新增 max、列表顺序与优先级更新 API。
-  - 验收点：排序前置检查可全量拉取当前域。
-  - 重要度：9/10
-
-- [ ] `User.DAO 实现`：补齐 User Mapper/DAO 语义
-  - 范围文件：
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/UserDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/UserDaoImpl.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/UserMapper.java](sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/UserMapper.java)
-  - 处理动作：按 `sortDirection` 查询与更新。
-  - 验收点：User 列表排序逻辑与 sort API 方向保持一致。
-  - 重要度：9/10
-
-- [ ] `User.Query 协议`：收敛 User 查询方向到 SortDirection
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/UserQuery.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/query/UserQuery.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java)
-  - 处理动作：移除自由 `orderBy`，改为 SortDirection。
-  - 验收点：非 FlatSort 查询不再通过字符串 orderBy 控制排序。
-  - 重要度：8/10
-
-- [ ] `User.Controller/API 协议`：新增 User sort 接口
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/UserController.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/UserController.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserSortRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserSortRequest.java)
-  - 处理动作：新增 sort 入口并接收 orderedIds 与 sortDirection。
-  - 验收点：排序请求返回值与失败码与 Runbook 一致。
-  - 重要度：9/10
-
-- [ ] `User.数据库约束`：补齐 User 排序域唯一索引
-  - 范围文件：
-    - [db/schema/system.sql](db/schema/system.sql)
-  - 处理动作：为 `sys_user` 的排序域加 `UNIQUE(department_id, priority)`。
-  - 验收点：同域出现 duplicate priority 时数据库可拒绝。
-  - 重要度：8/10
-
 - [ ] `Member.Service/DAO`：核对 Member 已有排序链路与 create 落位
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java)
     - [sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java)
     - [sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java)
-  - 处理动作：对齐 exchange sort 与 `max(priority in scope)+10` 约定，补齐 scope 取值边界。
+  - 处理动作：对齐 exchange sort 与 `max(priority)+10` 约定，确认排序域完整性边界。
   - 验收点：排序异常只通过 `SORT_*` 路径返回，列表查询方向正确。
   - 重要度：9/10
 
@@ -80,11 +28,11 @@
   - 验收点：排序更新可在 DAO 一次完成。
   - 重要度：8/10
 
-- [ ] `Member.数据库约束`：补齐成员排序域唯一索引
+- [ ] `Member.数据库约束`：补齐成员 priority 全局唯一索引
   - 范围文件：
     - [db/schema/member.sql](db/schema/member.sql)
-  - 处理动作：为 member 表补充域内优先级唯一约束。
-  - 验收点：同域重复 priority 被数据库拒绝。
+  - 处理动作：为 member 表补充全局优先级唯一约束。
+  - 验收点：全局重复 priority 被数据库拒绝。
   - 重要度：8/10
 
 - [ ] `Storage.Service 接口`：确认/补齐排序方向参数
@@ -100,7 +48,7 @@
     - [sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/storage/dao/StoredObjectDao.java)
     - [sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StoredObjectDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/dao/StoredObjectDaoImpl.java)
     - [sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StoredObjectMapper.java](sandwish-infra/src/main/java/com/github/thundax/modules/storage/persistence/mapper/StoredObjectMapper.java)
-  - 处理动作：按 `max+10`+交换式方式复核并收敛异常映射。
+  - 处理动作：按 `max(priority)+10`+交换式方式复核并收敛异常映射。
   - 验收点：排序失败可回滚，返回 SORT 约定码。
   - 重要度：9/10
 
@@ -113,11 +61,11 @@
   - 验收点：存储排序 API 完全对齐 runbook 协议。
   - 重要度：8/10
 
-- [ ] `StoredObject.数据库约束`：补齐存储排序域唯一性索引
+- [ ] `StoredObject.数据库约束`：补齐存储 priority 全局唯一性索引
   - 范围文件：
     - [db/schema/storage.sql](db/schema/storage.sql)
-  - 处理动作：为 `assist_storage` 添加同域唯一性约束与历史重复清理。
-  - 验收点：插入/交换冲突可被 DB 检测。
+  - 处理动作：为 `assist_storage` 补充全局优先级唯一约束与历史重复清理。
+  - 验收点：全局重复/交换冲突可被 DB 检测。
   - 重要度：8/10
 
 - [ ] `AsyncTask.Service 接口`：补齐异步任务排序能力
@@ -131,7 +79,7 @@
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java)
     - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/query/AsyncTaskQuery.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/query/AsyncTaskQuery.java)
-  - 处理动作：按 scope 校验并执行交换更新。
+  - 处理动作：按当前可见集合校验并执行交换更新。
   - 验收点：无插值重排，重复提交幂等。
   - 重要度：8/10
 

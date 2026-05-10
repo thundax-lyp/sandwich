@@ -136,7 +136,6 @@ public class MenuServiceImplTest {
                 menu.getDisplayParams(),
                 menu.getUrl(),
                 menu.getTarget(),
-                menu.getPriority(),
                 menu.getRemarks());
     }
 
@@ -151,7 +150,6 @@ public class MenuServiceImplTest {
                 menu.getDisplayParams(),
                 menu.getUrl(),
                 menu.getTarget(),
-                menu.getPriority(),
                 menu.getRemarks());
     }
 

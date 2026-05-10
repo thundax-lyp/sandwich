@@ -107,7 +107,6 @@ public class DepartmentServiceImplTest {
                 department.getParentId(),
                 department.getName(),
                 department.getShortName(),
-                department.getPriority(),
                 department.getRemarks());
     }
 
@@ -117,7 +116,6 @@ public class DepartmentServiceImplTest {
                 department.getParentId(),
                 department.getName(),
                 department.getShortName(),
-                department.getPriority(),
                 department.getRemarks());
     }
 

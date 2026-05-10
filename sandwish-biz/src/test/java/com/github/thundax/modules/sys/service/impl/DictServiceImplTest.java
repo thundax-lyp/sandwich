@@ -66,7 +66,7 @@ public class DictServiceImplTest {
     @Test
     public void shouldCreateDictFromCommand() {
         RecordingDictDao dao = new RecordingDictDao();
-        CreateDictCommand command = new CreateDictCommand("status", "启用", "ENABLED", 10, "system");
+        CreateDictCommand command = new CreateDictCommand("status", "启用", "ENABLED", "system");
         DictServiceImpl service = new DictServiceImpl(dao);
 
         DictId id = service.create(command);
@@ -76,7 +76,6 @@ public class DictServiceImplTest {
         assertEquals("status", dao.inserted.getType());
         assertEquals("启用", dao.inserted.getLabel());
         assertEquals("ENABLED", dao.inserted.getValue());
-        assertEquals(10, dao.inserted.getPriority());
         assertEquals("system", dao.inserted.getRemarks());
     }
 
@@ -84,7 +83,7 @@ public class DictServiceImplTest {
     public void shouldChangeDictInfoFromCommand() {
         RecordingDictDao dao = new RecordingDictDao();
         ChangeDictInfoCommand command =
-                new ChangeDictInfoCommand(DictId.of(1001L), "status", "禁用", "DISABLED", 20, "system");
+                new ChangeDictInfoCommand(DictId.of(1001L), "status", "禁用", "DISABLED", "system");
         DictServiceImpl service = new DictServiceImpl(dao);
 
         service.changeInfo(command);
@@ -94,7 +93,6 @@ public class DictServiceImplTest {
         assertEquals("status", dao.updated.getType());
         assertEquals("禁用", dao.updated.getLabel());
         assertEquals("DISABLED", dao.updated.getValue());
-        assertEquals(20, dao.updated.getPriority());
         assertEquals("system", dao.updated.getRemarks());
     }
 

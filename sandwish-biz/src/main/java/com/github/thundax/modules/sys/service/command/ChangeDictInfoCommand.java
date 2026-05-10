@@ -15,6 +15,5 @@ public class ChangeDictInfoCommand {
     private String type;
     private String label;
     private String value;
-    private Integer priority;
     private String remarks;
 }

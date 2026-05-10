@@ -213,7 +213,6 @@ public class RoleServiceImpl implements RoleService {
         role.setName(command.getName());
         role.setPrivilege(command.getPrivilege());
         role.setStatus(command.getStatus());
-        role.setPriority(command.getPriority());
         role.setRemarks(command.getRemarks());
         role.setMenuIdList(MenuIdCodec.toValues(command.getMenuIdList()));
         return role;
@@ -225,7 +224,6 @@ public class RoleServiceImpl implements RoleService {
         role.setName(command.getName());
         role.setPrivilege(command.getPrivilege());
         role.setStatus(command.getStatus());
-        role.setPriority(command.getPriority());
         role.setRemarks(command.getRemarks());
         role.setMenuIdList(MenuIdCodec.toValues(command.getMenuIdList()));
         return role;

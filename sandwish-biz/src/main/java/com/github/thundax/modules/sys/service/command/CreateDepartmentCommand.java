@@ -15,6 +15,5 @@ public class CreateDepartmentCommand {
     private DepartmentId parentId;
     private String name;
     private String shortName;
-    private int priority;
     private String remarks;
 }

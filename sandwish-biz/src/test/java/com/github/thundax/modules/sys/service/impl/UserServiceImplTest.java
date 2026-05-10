@@ -38,7 +38,6 @@ public class UserServiceImplTest {
                 user.getRank(),
                 user.getPrivilege(),
                 user.getStatus(),
-                user.getPriority(),
                 user.getRemarks(),
                 "tester",
                 "encrypted",
@@ -66,7 +65,6 @@ public class UserServiceImplTest {
                 user.getRank(),
                 user.getPrivilege(),
                 user.getStatus(),
-                user.getPriority(),
                 user.getRemarks(),
                 "tester",
                 Collections.singletonList(RoleId.of(4001L))));

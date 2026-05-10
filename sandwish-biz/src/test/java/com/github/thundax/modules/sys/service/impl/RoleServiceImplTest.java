@@ -74,7 +74,6 @@ public class RoleServiceImplTest {
                 role.getName(),
                 role.getPrivilege(),
                 role.getStatus(),
-                role.getPriority(),
                 role.getRemarks(),
                 MenuIdCodec.toDomains(role.getMenuIdList())));
 

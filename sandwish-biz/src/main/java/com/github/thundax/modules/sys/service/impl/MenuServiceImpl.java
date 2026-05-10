@@ -184,7 +184,6 @@ public class MenuServiceImpl implements MenuService {
         menu.setDisplayParams(command.getDisplayParams());
         menu.setUrl(command.getUrl());
         menu.setTarget(command.getTarget());
-        menu.setPriority(command.getPriority());
         menu.setRemarks(command.getRemarks());
         return menu;
     }
@@ -200,7 +199,6 @@ public class MenuServiceImpl implements MenuService {
         menu.setDisplayParams(command.getDisplayParams());
         menu.setUrl(command.getUrl());
         menu.setTarget(command.getTarget());
-        menu.setPriority(command.getPriority());
         menu.setRemarks(command.getRemarks());
         return menu;
     }

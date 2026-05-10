@@ -127,7 +127,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setParentId(command.getParentId());
         department.setName(command.getName());
         department.setShortName(command.getShortName());
-        department.setPriority(command.getPriority());
         department.setRemarks(command.getRemarks());
         return department;
     }
@@ -138,7 +137,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         department.setParentId(command.getParentId());
         department.setName(command.getName());
         department.setShortName(command.getShortName());
-        department.setPriority(command.getPriority());
         department.setRemarks(command.getRemarks());
         return department;
     }

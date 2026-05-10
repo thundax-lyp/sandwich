@@ -80,7 +80,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 command.getRank(),
                 command.getPrivilege(),
                 command.getStatus(),
-                command.getPriority(),
                 command.getRemarks(),
                 getAccountLoginName(command.getUserId()),
                 null));
@@ -248,7 +247,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         user.setRank(command.getRank());
         user.setPrivilege(command.getPrivilege());
         user.setStatus(command.getStatus());
-        user.setPriority(command.getPriority());
         user.setRemarks(command.getRemarks());
         return user;
     }

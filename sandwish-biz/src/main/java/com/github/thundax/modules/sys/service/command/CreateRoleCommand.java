@@ -19,7 +19,6 @@ public class CreateRoleCommand {
     private String name;
     private RolePrivilege privilege;
     private RoleStatus status;
-    private int priority;
     private String remarks;
     private List<MenuId> menuIdList;
 }

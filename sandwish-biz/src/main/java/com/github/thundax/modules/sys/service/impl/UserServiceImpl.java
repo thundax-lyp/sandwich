@@ -163,7 +163,6 @@ public class UserServiceImpl implements UserService {
         user.setRank(command.getRank());
         user.setPrivilege(command.getPrivilege());
         user.setStatus(command.getStatus());
-        user.setPriority(command.getPriority());
         user.setRemarks(command.getRemarks());
         return user;
     }
@@ -179,7 +178,6 @@ public class UserServiceImpl implements UserService {
         user.setRank(command.getRank());
         user.setPrivilege(command.getPrivilege());
         user.setStatus(command.getStatus());
-        user.setPriority(command.getPriority());
         user.setRemarks(command.getRemarks());
         return user;
     }

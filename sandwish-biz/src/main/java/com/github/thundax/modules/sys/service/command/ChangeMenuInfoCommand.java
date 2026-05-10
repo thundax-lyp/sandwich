@@ -22,6 +22,5 @@ public class ChangeMenuInfoCommand {
     private String displayParams;
     private String url;
     private String target;
-    private int priority;
     private String remarks;
 }

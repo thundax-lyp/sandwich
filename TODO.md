@@ -9,21 +9,7 @@
 
 ## 当前任务项
 
-- [ ] `SYS 命令对象清理`：移除 Dict/Role/User/Department/Menu 的 priority 输入字段
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDictCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDictCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeDictInfoCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeDictInfoCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateRoleCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateRoleCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeRoleInfoCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeRoleInfoCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateUserCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateUserCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeUserInfoCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeUserInfoCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDepartmentCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateDepartmentCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeDepartmentInfoCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeDepartmentInfoCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateMenuCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/CreateMenuCommand.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeMenuInfoCommand.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/command/ChangeMenuInfoCommand.java)
-  - 处理动作：删除命令参数中的 priority，并同步构造/转换逻辑。
-  - 验收点：新增/变更业务入口不再接受 priority 输入。
-  - 重要度：9/10
+
 
 - [ ] `SYS 接口服务定义`：补齐 Sys 领域排序服务接口
   - 范围文件：

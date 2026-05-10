@@ -123,9 +123,6 @@ public class DictServiceImpl implements DictService {
         dict.setType(command.getType());
         dict.setLabel(command.getLabel());
         dict.setValue(command.getValue());
-        if (command.getPriority() != null) {
-            dict.setPriority(command.getPriority());
-        }
         dict.setRemarks(command.getRemarks());
         return dict;
     }
@@ -139,9 +136,6 @@ public class DictServiceImpl implements DictService {
         dict.setType(command.getType());
         dict.setLabel(command.getLabel());
         dict.setValue(command.getValue());
-        if (command.getPriority() != null) {
-            dict.setPriority(command.getPriority());
-        }
         dict.setRemarks(command.getRemarks());
         return dict;
     }

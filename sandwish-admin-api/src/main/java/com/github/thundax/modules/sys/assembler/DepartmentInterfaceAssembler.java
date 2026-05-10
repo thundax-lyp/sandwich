@@ -72,22 +72,14 @@ public final class DepartmentInterfaceAssembler {
     public static CreateDepartmentCommand toCreateCommand(@NonNull DepartmentSaveRequest request) {
         Department entity = toEntity(new Department(), request);
         return new CreateDepartmentCommand(
-                entity.getId(),
-                entity.getParentId(),
-                entity.getName(),
-                entity.getShortName(),
-                entity.getRemarks());
+                entity.getId(), entity.getParentId(), entity.getName(), entity.getShortName(), entity.getRemarks());
     }
 
     @NonNull
     public static ChangeDepartmentInfoCommand toChangeInfoCommand(@NonNull DepartmentSaveRequest request) {
         Department entity = toEntity(new Department(), request);
         return new ChangeDepartmentInfoCommand(
-                entity.getId(),
-                entity.getParentId(),
-                entity.getName(),
-                entity.getShortName(),
-                entity.getRemarks());
+                entity.getId(), entity.getParentId(), entity.getName(), entity.getShortName(), entity.getRemarks());
     }
 
     private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {

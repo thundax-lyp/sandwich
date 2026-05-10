@@ -3,7 +3,6 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
@@ -14,6 +13,7 @@ import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import com.github.thundax.modules.assist.service.command.AsyncTaskSortCommand;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -72,9 +72,9 @@ public class AsyncTaskController {
     @HasPermission("user")
     @PostMapping(value = "sort")
     public Boolean sort(@Valid @RequestBody AsyncTaskSortRequest request) throws ApiException {
-        asyncTaskService.sort(
+        asyncTaskService.sort(new AsyncTaskSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), AsyncTaskIdCodec::toDomain),
-                request == null ? SortDirection.ASC : request.getSortDirection());
+                request == null ? null : request.getSortDirection()));
         return true;
     }
 }

@@ -4,7 +4,6 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -25,6 +24,7 @@ import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
+import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -177,9 +177,9 @@ public class DictController {
     })
     @PostMapping(value = "sort")
     public Boolean sort(@Valid @RequestBody DictSortRequest request) throws ApiException {
-        dictService.sort(
+        dictService.sort(new DictSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), DictIdCodec::toDomain),
-                request == null ? SortDirection.ASC : request.getSortDirection());
+                request == null ? null : request.getSortDirection()));
         return true;
     }
 

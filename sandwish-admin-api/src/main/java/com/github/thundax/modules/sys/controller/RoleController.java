@@ -8,7 +8,6 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
@@ -45,6 +44,7 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
+import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
@@ -226,9 +226,9 @@ public class RoleController {
     @SysLogger("排序")
     @PostMapping(value = "sort")
     public Boolean updatePriority(@Valid @RequestBody RoleSortRequest request) throws ApiException {
-        roleService.sort(
+        roleService.sort(new RoleSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), RoleIdCodec::toDomain),
-                request == null ? SortDirection.ASC : request.getSortDirection());
+                request == null ? null : request.getSortDirection()));
         return true;
     }
 

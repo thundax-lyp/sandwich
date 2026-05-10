@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -17,16 +18,16 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
-import com.github.thundax.modules.sys.controller.request.DictSortRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
+import com.github.thundax.modules.sys.controller.request.DictSortRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
+import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.Arrays;
 import java.util.Collections;
@@ -127,11 +128,12 @@ public class DictControllerContractTest {
 
         controller.sort(request);
 
-        ArgumentCaptor<java.util.List<DictId>> idCaptor = ArgumentCaptor.forClass(List.class);
-        ArgumentCaptor<SortDirection> directionCaptor = ArgumentCaptor.forClass(SortDirection.class);
-        verify(dictService).sort(idCaptor.capture(), directionCaptor.capture());
-        assertEquals(Arrays.asList(DictIdCodec.toDomain(101L), DictIdCodec.toDomain(102L)), idCaptor.getValue());
-        assertEquals(SortDirection.DESC, directionCaptor.getValue());
+        ArgumentCaptor<DictSortCommand> commandCaptor = ArgumentCaptor.forClass(DictSortCommand.class);
+        verify(dictService).sort(commandCaptor.capture());
+        DictSortCommand sortCommand = commandCaptor.getValue();
+        assertEquals(
+                Arrays.asList(DictIdCodec.toDomain(101L), DictIdCodec.toDomain(102L)), sortCommand.getOrderedIds());
+        assertEquals(SortDirection.DESC, sortCommand.getSortDirection());
     }
 
     private DictIdRequest idRequest(Long id) {

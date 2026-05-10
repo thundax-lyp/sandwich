@@ -1,8 +1,8 @@
 package com.github.thundax.modules.assist.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,19 +19,19 @@ import com.github.thundax.modules.assist.entity.enums.AsyncTaskStatus;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
+import com.github.thundax.modules.assist.service.command.AsyncTaskSortCommand;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.UserService;
-import java.util.Locale;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.StaticMessageSource;
-import org.mockito.ArgumentCaptor;
 
 public class AsyncTaskControllerContractTest {
 
@@ -104,15 +104,13 @@ public class AsyncTaskControllerContractTest {
         assertNotNull(result);
         assertEquals(Boolean.TRUE, result);
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<AsyncTaskId>> orderedIds =
-                ArgumentCaptor.forClass((Class<List<AsyncTaskId>>) (Class<?>) List.class);
-        ArgumentCaptor<SortDirection> direction = ArgumentCaptor.forClass(SortDirection.class);
-        verify(asyncTaskService).sort(orderedIds.capture(), direction.capture());
-        assertEquals(2, orderedIds.getValue().size());
-        assertEquals(AsyncTaskIdCodec.toDomain(1001L), orderedIds.getValue().get(0));
-        assertEquals(AsyncTaskIdCodec.toDomain(1002L), orderedIds.getValue().get(1));
-        assertEquals(SortDirection.DESC, direction.getValue());
+        ArgumentCaptor<AsyncTaskSortCommand> commandCaptor = ArgumentCaptor.forClass(AsyncTaskSortCommand.class);
+        verify(asyncTaskService).sort(commandCaptor.capture());
+        AsyncTaskSortCommand command = commandCaptor.getValue();
+        assertEquals(2, command.getOrderedIds().size());
+        assertEquals(AsyncTaskIdCodec.toDomain(1001L), command.getOrderedIds().get(0));
+        assertEquals(AsyncTaskIdCodec.toDomain(1002L), command.getOrderedIds().get(1));
+        assertEquals(SortDirection.DESC, command.getSortDirection());
     }
 
     private AsyncTaskIdRequest idRequest(Long id) {

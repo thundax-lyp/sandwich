@@ -12,7 +12,6 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -42,9 +41,9 @@ import com.github.thundax.modules.sys.controller.request.UserCheckRequest;
 import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
 import com.github.thundax.modules.sys.controller.request.UserIdRequest;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
-import com.github.thundax.modules.sys.controller.request.UserSortRequest;
 import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
+import com.github.thundax.modules.sys.controller.request.UserSortRequest;
 import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
@@ -63,6 +62,7 @@ import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -380,9 +380,9 @@ public class UserController {
     @PostMapping(value = "sort")
     @WrappedApiResponse
     public Boolean sort(@Valid @RequestBody UserSortRequest request) throws ApiException {
-        userService.sort(
+        userService.sort(new UserSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), UserIdCodec::toDomain),
-                request == null ? SortDirection.ASC : request.getSortDirection());
+                request == null ? null : request.getSortDirection()));
         return true;
     }
 

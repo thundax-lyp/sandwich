@@ -9,23 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `SYS 字段清理`：清理 Dict/Role/User/Department/Menu API 入参与响应中的 priority 暴露
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictSaveRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictSaveRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleSaveRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/RoleSaveRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserSaveRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/UserSaveRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentSaveRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DepartmentSaveRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuSaveRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/MenuSaveRequest.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DictResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DictResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/RoleResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/RoleResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/UserResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/UserResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DepartmentResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/DepartmentResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/MenuResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/MenuResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/PersonalMenuResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/response/PersonalMenuResponse.java)
-  - 处理动作：从相关 Request/Response 移除 priority 字段和映射代码。
-  - 验收点：接口与返回体不再包含 priority 字段，前端不能提交或读取 sorting key。
-  - 重要度：10/10
-
 - [ ] `SYS 入参装配清理`：禁止 API 入参修改实体 priority
   - 范围文件：
     - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/assembler/DictInterfaceAssembler.java)

@@ -21,10 +21,6 @@ public class UserResponse implements Serializable {
     @JsonProperty("id")
     private Long id;
 
-    @ApiModelProperty(name = "priority", value = "排序数")
-    @JsonProperty("priority")
-    private Integer priority;
-
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
     private String remarks;

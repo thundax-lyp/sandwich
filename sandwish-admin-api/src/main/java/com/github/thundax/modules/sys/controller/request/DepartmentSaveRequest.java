@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import lombok.Getter;
@@ -23,11 +22,6 @@ public class DepartmentSaveRequest implements Serializable {
     @JsonProperty("id")
     @Size(max = 64, message = "ID长度不能超过64")
     private Long id;
-
-    @ApiModelProperty(name = "priority", value = "排序数", example = "0")
-    @JsonProperty("priority")
-    @Min(value = 0, message = "\"排序数\"必须不能小于 0")
-    private Integer priority;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

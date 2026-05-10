@@ -28,10 +28,6 @@ public class PersonalMenuResponse implements Serializable {
     @JsonProperty("name")
     private String name;
 
-    @ApiModelProperty(name = "priority", value = "排序数")
-    @JsonProperty("priority")
-    private Integer priority;
-
     @ApiModelProperty(name = "url", value = "URL")
     @JsonProperty("url")
     private String url;

@@ -9,6 +9,7 @@ import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
+import com.github.thundax.common.domain.SortDirection;
 import java.util.List;
 import org.junit.Test;
 
@@ -88,6 +89,7 @@ public class MemberServiceImplTest {
         private String status;
         private String name;
         private String remarks;
+        private SortDirection sortDirection;
         private Member inserted;
         private int statusUpdateCalls;
 
@@ -104,17 +106,23 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public List<Member> list(String status, String name, String remarks) {
+        public List<Member> list(String status, String name, String remarks, SortDirection sortDirection) {
             this.status = status;
             this.name = name;
             this.remarks = remarks;
+            this.sortDirection = sortDirection;
             return null;
         }
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> page(
-                String status, String name, String remarks, int pageNo, int pageSize) {
+                String status, String name, String remarks, SortDirection sortDirection, int pageNo, int pageSize) {
             return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
+        }
+
+        @Override
+        public int maxPriority() {
+            return 0;
         }
 
         @Override
@@ -129,7 +137,7 @@ public class MemberServiceImplTest {
         }
 
         @Override
-        public int updatePriority(Member entity) {
+        public int updatePriority(MemberId id, int priority) {
             return 1;
         }
 

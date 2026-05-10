@@ -2,8 +2,10 @@ package com.github.thundax.modules.member.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
@@ -36,18 +38,44 @@ public class MemberDaoImpl implements MemberDao {
     }
 
     @Override
-    public List<Member> list(String status, String name, String remarks) {
-        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status, name, remarks)));
+    public List<Member> list(String status, String name, String remarks, SortDirection sortDirection) {
+        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status, name, remarks, sortDirection)));
     }
 
     @Override
-    public Page<Member> page(String status, String name, String remarks, int pageNo, int pageSize) {
+    public Page<Member> page(
+            String status,
+            String name,
+            String remarks,
+            SortDirection sortDirection,
+            int pageNo,
+            int pageSize) {
         Page<MemberDO> dataObjectPage =
-                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(status, name, remarks));
+                mapper.selectPage(
+                        new Page<>(pageNo, pageSize),
+                        buildListWrapper(status, name, remarks, sortDirection));
         Page<Member> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
         return entityPage;
+    }
+
+    @Override
+    public int maxPriority() {
+        Object max = mapper.selectObjs(new QueryWrapper<MemberDO>().select("max(priority)")).stream()
+                .findFirst()
+                .orElse(null);
+        if (max == null) {
+            return 0;
+        }
+        if (max instanceof Number) {
+            return ((Number) max).intValue();
+        }
+        try {
+            return Integer.parseInt(String.valueOf(max));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
     }
 
     @Override
@@ -67,15 +95,15 @@ public class MemberDaoImpl implements MemberDao {
                         .set(MemberDO::getName, dataObject.getName())
                         .set(MemberDO::getGender, dataObject.getGender())
                         .set(MemberDO::getStatus, dataObject.getStatus())
-                        .set(MemberDO::getPriority, dataObject.getPriority())
                         .set(MemberDO::getRemarks, dataObject.getRemarks()));
     }
 
     @Override
-    public int updatePriority(Member entity) {
-        MemberDO dataObject = MemberPersistenceAssembler.toDataObject(entity);
+    public int updatePriority(MemberId id, int priority) {
         return mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(MemberDO::getPriority, dataObject.getPriority()));
+                null,
+                buildIdUpdateWrapper(id)
+                        .set(MemberDO::getPriority, priority));
     }
 
     @Override
@@ -105,7 +133,14 @@ public class MemberDaoImpl implements MemberDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<MemberDO> buildListWrapper(String status, String name, String remarks) {
+    private LambdaUpdateWrapper<MemberDO> buildIdUpdateWrapper(MemberId id) {
+        LambdaUpdateWrapper<MemberDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(MemberDO::getId, id.value());
+        return wrapper;
+    }
+
+    private LambdaQueryWrapper<MemberDO> buildListWrapper(
+            String status, String name, String remarks, SortDirection sortDirection) {
         LambdaQueryWrapper<MemberDO> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isNotBlank(status)) {
             wrapper.eq(MemberDO::getStatus, status);
@@ -116,7 +151,12 @@ public class MemberDaoImpl implements MemberDao {
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like(MemberDO::getRemarks, remarks);
         }
-        wrapper.orderByAsc(MemberDO::getPriority, MemberDO::getName);
+        if (SortDirection.DESC == sortDirection) {
+            wrapper.orderByDesc(MemberDO::getPriority);
+        } else {
+            wrapper.orderByAsc(MemberDO::getPriority);
+        }
+        wrapper.orderByAsc(MemberDO::getId);
         return wrapper;
     }
 }

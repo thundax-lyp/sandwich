@@ -2,6 +2,8 @@ package com.github.thundax.modules.member.service;
 
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.common.domain.SortDirection;
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.service.command.MemberCommand;
@@ -28,4 +30,6 @@ public interface MemberService {
     int changeStatus(MemberCommand command);
 
     int remove(MemberCommand command);
+
+    void sort(List<MemberId> orderedIds, SortDirection sortDirection) throws ApiException;
 }

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.util.List;
@@ -20,7 +21,8 @@ public interface StoredObjectDao {
             String referenceOwnerId,
             String referenceOwnerType,
             String name,
-            String remarks);
+            String remarks,
+            SortDirection sortDirection);
 
     Page<StoredObject> page(
             String mimeType,
@@ -32,12 +34,17 @@ public interface StoredObjectDao {
             String referenceOwnerType,
             String name,
             String remarks,
+            SortDirection sortDirection,
             int pageNo,
             int pageSize);
 
     StoredObjectId insert(StoredObject entity);
 
     int update(StoredObject entity);
+
+    int maxPriority();
+
+    int updatePriority(StoredObjectId id, int priority);
 
     int deleteById(StoredObjectId id);
 

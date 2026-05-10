@@ -30,6 +30,5 @@ public class ChangeStorageCommand {
     private String accessEndpoint;
     private StoredObjectStatus objectStatus;
     private StoredObjectReferenceStatus referenceStatus;
-    private int priority;
     private String remarks;
 }

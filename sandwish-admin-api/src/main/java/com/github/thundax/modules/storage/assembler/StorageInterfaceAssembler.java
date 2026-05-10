@@ -69,7 +69,6 @@ public final class StorageInterfaceAssembler {
                         entity.getReferenceStatus() == null
                                 ? null
                                 : entity.getReferenceStatus().value())
-                .priority(entity.getPriority())
                 .remarks(entity.getRemarks())
                 .contentUrl(storageConverter.toPreviewUrl(entity))
                 .build();

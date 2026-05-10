@@ -1,6 +1,8 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
@@ -21,7 +23,14 @@ import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
+import com.github.thundax.common.domain.SortDirection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class StorageServiceImpl implements StorageService {
+
+    private static final int PRIORITY_STEP = 10;
 
     private final StoredObjectDao dao;
     private final StoredObjectReferenceDao businessDao;
@@ -60,7 +71,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getReferenceOwnerId(),
                 query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getOriginalFilename(),
-                query == null ? null : query.getRemarks());
+                query == null ? null : query.getRemarks(),
+                query == null ? null : query.getSortDirection());
     }
 
     @Override
@@ -76,6 +88,7 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getOriginalFilename(),
                 query == null ? null : query.getRemarks(),
+                query == null ? null : query.getSortDirection(),
                 normalizedPage.getPageNo(),
                 normalizedPage.getPageSize());
         return PageResult.of(
@@ -85,13 +98,93 @@ public class StorageServiceImpl implements StorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public StoredObjectId create(CreateStorageCommand command) {
+        if (command == null) {
+            return null;
+        }
         StoredObject storage = toStoredObject(command);
+        storage.setPriority(dao.maxPriority() + PRIORITY_STEP);
         storage.setId(dao.insert(storage));
         return storage.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void sort(List<StoredObjectId> orderedIds, SortDirection sortDirection) throws ApiException {
+        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
+        List<StoredObjectId> orderedIdList = normalizeOrderedIds(orderedIds);
+        if (orderedIdList.isEmpty()) {
+            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+        }
+
+        List<StoredObject> currentStorage = dao.list(
+                null, null, null, null, null, null, null, null, null, effectiveDirection);
+        if (currentStorage == null || currentStorage.isEmpty()) {
+            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+        }
+
+        if (currentStorage.size() != orderedIdList.size()) {
+            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+        }
+
+        Map<Long, Integer> indexById = new HashMap<>(currentStorage.size());
+        Map<Long, Integer> priorityById = new HashMap<>(currentStorage.size());
+        List<StoredObjectId> currentOrderedIds = new ArrayList<>(currentStorage.size());
+
+        for (int i = 0; i < currentStorage.size(); i++) {
+            StoredObject storage = currentStorage.get(i);
+            if (storage == null || storage.getId() == null) {
+                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            }
+            long storageId = storage.getId().value();
+            indexById.put(storageId, i);
+            priorityById.put(storageId, storage.getPriority());
+            currentOrderedIds.add(storage.getId());
+        }
+
+        for (StoredObjectId orderedId : orderedIdList) {
+            if (orderedId == null || !indexById.containsKey(orderedId.value())) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+        }
+
+        try {
+            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
+            for (int i = 0; i < currentOrderedIds.size(); i++) {
+                StoredObjectId targetId = orderedIdList.get(i);
+                StoredObjectId currentId = currentOrderedIds.get(i);
+                if (targetId.equals(currentId)) {
+                    continue;
+                }
+
+                int targetIndex = indexById.get(targetId.value());
+                int currentPriority = priorityById.get(currentId.value());
+                int targetPriority = priorityById.get(targetId.value());
+
+                updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
+                updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
+                updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
+
+                priorityById.put(targetId.value(), currentPriority);
+                priorityById.put(currentId.value(), targetPriority);
+
+                currentOrderedIds.set(i, targetId);
+                currentOrderedIds.set(targetIndex, currentId);
+                indexById.put(targetId.value(), i);
+                indexById.put(currentId.value(), targetIndex);
+            }
+        } catch (RuntimeException exception) {
+            if (isConcurrentModification(exception)) {
+                throw new ApiException(
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
+            }
+            throw new ApiException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(),
+                    ErrorCode.SORT_DB_FAILURE.getMessage());
+        }
+    }
+
+    @Override
     public void change(ChangeStorageCommand command) {
         dao.update(toStoredObject(command));
     }
@@ -188,6 +281,56 @@ public class StorageServiceImpl implements StorageService {
         return referenceStatus == null ? null : referenceStatus.value();
     }
 
+    private List<StoredObjectId> normalizeOrderedIds(List<StoredObjectId> orderedIds) throws ApiException {
+        if (orderedIds == null) {
+            return new ArrayList<>();
+        }
+        Set<Long> uniqueIdValues = new HashSet<>(orderedIds.size());
+        List<StoredObjectId> normalized = new ArrayList<>(orderedIds.size());
+        for (StoredObjectId orderedId : orderedIds) {
+            if (orderedId == null || orderedId.value() == null) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+            if (!uniqueIdValues.add(orderedId.value())) {
+                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+            }
+            normalized.add(orderedId);
+        }
+        return normalized;
+    }
+
+    private boolean isConcurrentModification(RuntimeException exception) {
+        Throwable cursor = exception;
+        while (cursor != null) {
+            if (cursor instanceof SQLException) {
+                return isConcurrentSqlFailure((SQLException) cursor);
+            }
+            cursor = cursor.getCause();
+        }
+        return false;
+    }
+
+    private boolean isConcurrentSqlFailure(SQLException sqlException) {
+        int errorCode = sqlException.getErrorCode();
+        String sqlState = sqlException.getSQLState();
+        if (errorCode == 1205 || errorCode == 1213 || errorCode == 1207) {
+            return true;
+        }
+        if (errorCode == 1222) {
+            return true;
+        }
+        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+                || "23505".equals(sqlState);
+    }
+
+    private void updatePriorityOrThrow(StoredObjectId id, int priority, String message)
+            throws ApiException {
+        int updated = dao.updatePriority(id, priority);
+        if (updated != 1) {
+            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+        }
+    }
+
     private StoredObject toStoredObject(CreateStorageCommand command) {
         StoredObject storage = new StoredObject();
         storage.setId(command.getId());
@@ -205,7 +348,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setAccessEndpoint(command.getAccessEndpoint());
         storage.setObjectStatus(command.getObjectStatus());
         storage.setReferenceStatus(command.getReferenceStatus());
-        storage.setPriority(command.getPriority());
         storage.setRemarks(command.getRemarks());
         return storage;
     }
@@ -227,7 +369,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setAccessEndpoint(command.getAccessEndpoint());
         storage.setObjectStatus(command.getObjectStatus());
         storage.setReferenceStatus(command.getReferenceStatus());
-        storage.setPriority(command.getPriority());
         storage.setRemarks(command.getRemarks());
         return storage;
     }

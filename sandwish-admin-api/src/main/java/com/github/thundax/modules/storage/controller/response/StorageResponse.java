@@ -48,10 +48,6 @@ public class StorageResponse implements Serializable {
     @JsonProperty("referenceStatus")
     private String referenceStatus;
 
-    @ApiModelProperty(name = "priority", value = "排序数")
-    @JsonProperty("priority")
-    private Integer priority;
-
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
     private String remarks;

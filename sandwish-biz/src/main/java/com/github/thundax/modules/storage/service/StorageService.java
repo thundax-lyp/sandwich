@@ -1,8 +1,10 @@
 package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
+import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
@@ -47,4 +49,6 @@ public interface StorageService {
     List<StoredObjectReference> listReferences(StorageQuery query);
 
     boolean existsReadableContent(StorageQuery query);
+
+    void sort(List<StoredObjectId> orderedIds, SortDirection sortDirection) throws ApiException;
 }

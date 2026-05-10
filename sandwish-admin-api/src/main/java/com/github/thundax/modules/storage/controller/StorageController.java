@@ -14,6 +14,7 @@ import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.request.StorageIdRequest;
+import com.github.thundax.modules.storage.controller.request.StorageSortRequest;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.controller.response.StorageTreeNodeResponse;
@@ -186,6 +187,26 @@ public class StorageController {
         return true;
     }
 
+    @ApiOperation(value = "排序", notes = "storage:storage:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @HasPermission("storage:storage:edit")
+    @PostMapping(value = "sort")
+    @WrappedApiResponse
+    public Boolean sort(@Valid @RequestBody StorageSortRequest request) throws ApiException {
+        storageService.sort(
+                RequestListHelper.map(
+                        request == null ? null : request.getOrderedIds(),
+                        StoredObjectIdCodec::toDomain),
+                request == null ? null : request.getSortDirection());
+        return true;
+    }
+
     @ApiOperation(value = "获取业务类型树", notes = "storage:storage:view")
     @HasPermission("storage:storage:view")
     @PostMapping(value = "tree")
@@ -262,7 +283,6 @@ public class StorageController {
         command.setAccessEndpoint(storage.getAccessEndpoint());
         command.setObjectStatus(storage.getObjectStatus());
         command.setReferenceStatus(storage.getReferenceStatus());
-        command.setPriority(storage.getPriority());
         command.setRemarks(storage.getRemarks());
         return command;
     }

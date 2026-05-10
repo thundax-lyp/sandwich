@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -93,7 +94,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String referenceOwnerId,
             String referenceOwnerType,
             String name,
-            String remarks) {
+            String remarks,
+            SortDirection sortDirection) {
         return StoragePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(
                 mimeType,
                 ownerId,
@@ -103,7 +105,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                 referenceOwnerId,
                 referenceOwnerType,
                 name,
-                remarks)));
+                remarks,
+                sortDirection)));
     }
 
     @Override
@@ -117,6 +120,7 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String referenceOwnerType,
             String name,
             String remarks,
+            SortDirection sortDirection,
             int pageNo,
             int pageSize) {
         Page<StoredObjectDO> dataObjectPage = mapper.selectPage(
@@ -130,7 +134,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         referenceOwnerId,
                         referenceOwnerType,
                         name,
-                        remarks));
+                        remarks,
+                        sortDirection));
         Page<StoredObject> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(StoragePersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -167,6 +172,34 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(StoredObjectDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(StoredObjectIdCodec.toStringValue(entity.getId()));
         return count;
+    }
+
+    @Override
+    public int updatePriority(StoredObjectId id, int priority) {
+        int count = mapper.update(null, buildIdUpdateWrapper(id).set(StoredObjectDO::getPriority, priority));
+        cacheSupport.removeById(StoredObjectIdCodec.toStringValue(id));
+        return count;
+    }
+
+    @Override
+    public int maxPriority() {
+        Object max = mapper.selectObjs(new QueryWrapper<StoredObjectDO>()
+                        .select("max(priority)")
+                        .ne("object_status", StoredObjectStatus.DELETED.value()))
+                .stream()
+                .findFirst()
+                .orElse(null);
+        if (max == null) {
+            return 0;
+        }
+        if (max instanceof Number) {
+            return ((Number) max).intValue();
+        }
+        try {
+            return Integer.parseInt(String.valueOf(max));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
     }
 
     @Override
@@ -222,6 +255,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         return wrapper;
     }
 
+    private LambdaUpdateWrapper<StoredObjectDO> buildIdUpdateWrapper(StoredObjectId id) {
+        LambdaUpdateWrapper<StoredObjectDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(StoredObjectDO::getId, id.value());
+        return wrapper;
+    }
+
     private LambdaQueryWrapper<StoredObjectDO> buildListWrapper(
             String mimeType,
             String ownerId,
@@ -231,7 +270,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
             String referenceOwnerId,
             String referenceOwnerType,
             String name,
-            String remarks) {
+            String remarks,
+            SortDirection sortDirection) {
         LambdaQueryWrapper<StoredObjectDO> wrapper = new LambdaQueryWrapper<>();
         if (StringUtils.isBlank(objectStatus)) {
             wrapper.ne(StoredObjectDO::getObjectStatus, StoredObjectStatus.DELETED.value());
@@ -263,8 +303,12 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
         if (StringUtils.isNotBlank(remarks)) {
             wrapper.like(StoredObjectDO::getRemarks, remarks);
         }
-        wrapper.orderByDesc(StoredObjectDO::getId);
-        wrapper.orderByAsc(StoredObjectDO::getPriority);
+        if (SortDirection.DESC == sortDirection) {
+            wrapper.orderByDesc(StoredObjectDO::getPriority);
+        } else {
+            wrapper.orderByAsc(StoredObjectDO::getPriority);
+        }
+        wrapper.orderByAsc(StoredObjectDO::getId);
         return wrapper;
     }
 

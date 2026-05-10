@@ -3,7 +3,6 @@ package com.github.thundax.modules.storage.service.impl;
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
-import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -11,10 +10,12 @@ import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.service.MultipartUploadService;
+import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.UploadMultipartPartCommand;
+import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.utils.MetaFile;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,11 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MultipartUploadServiceImpl implements MultipartUploadService {
 
     private final MultipartUploadDao multipartUploadDao;
-    private final StoredObjectDao storedObjectDao;
+    private final StorageService storageService;
 
-    public MultipartUploadServiceImpl(MultipartUploadDao multipartUploadDao, StoredObjectDao storedObjectDao) {
+    public MultipartUploadServiceImpl(MultipartUploadDao multipartUploadDao, StorageService storageService) {
         this.multipartUploadDao = multipartUploadDao;
-        this.storedObjectDao = storedObjectDao;
+        this.storageService = storageService;
     }
 
     @Override
@@ -83,7 +84,7 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         validateMultipartParts(session, parts);
 
         StoredObject storage = toCompletedStorage(session, command);
-        storage.setId(storedObjectDao.insert(storage));
+        storage.setId(storageService.create(toCreateStorageCommand(storage)));
 
         Date now = new Date();
         session.setUploadStatus(MultipartUploadStatus.COMPLETED);
@@ -187,6 +188,27 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         session.setTotalSize(command.getTotalSize());
         session.setPartSize(command.getPartSize());
         return session;
+    }
+
+    private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {
+        CreateStorageCommand command = new CreateStorageCommand();
+        command.setId(storage.getId());
+        command.setOriginalFilename(storage.getOriginalFilename());
+        command.setContentType(storage.getContentType());
+        command.setName(storage.getName());
+        command.setExtendName(storage.getExtendName());
+        command.setMimeType(storage.getMimeType());
+        command.setOwnerId(storage.getOwnerId());
+        command.setOwnerType(storage.getOwnerType());
+        command.setStorageType(storage.getStorageType());
+        command.setBucketName(storage.getBucketName());
+        command.setObjectKey(storage.getObjectKey());
+        command.setSize(storage.getSize());
+        command.setAccessEndpoint(storage.getAccessEndpoint());
+        command.setObjectStatus(storage.getObjectStatus());
+        command.setReferenceStatus(storage.getReferenceStatus());
+        command.setRemarks(storage.getRemarks());
+        return command;
     }
 
     private MultipartUploadPart toMultipartPart(UploadMultipartPartCommand command) {

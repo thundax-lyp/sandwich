@@ -104,12 +104,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public int maxPriorityByScope(
-            Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
-        Object max = mapper.selectObjs(
-                        buildListWrapper(departmentId, loginName, name, status, privilege, SortDirection.ASC)
-                                .select("max(priority)"))
-                .stream()
+    public int maxPriority() {
+        Object max = mapper.selectObjs(new QueryWrapper<UserDO>().select("max(priority)")).stream()
                 .findFirst()
                 .orElse(null);
         if (max == null) {

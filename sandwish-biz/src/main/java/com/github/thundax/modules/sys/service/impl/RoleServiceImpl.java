@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -81,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public RoleId create(CreateRoleCommand command) {
         Role role = toRole(command);
-        role.setPriority(dao.maxPriorityByScope(statusValue(role.getStatus())) + PRIORITY_STEP);
+        role.setPriority(dao.maxPriority() + PRIORITY_STEP);
         role.setId(dao.insert(role));
         afterWrite(role);
         return role.getId();
@@ -101,17 +100,9 @@ public class RoleServiceImpl implements RoleService {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
-        Map<Long, String> statusById = new HashMap<>();
-        String roleStatus = null;
         for (Role role : selectedRoles) {
             if (role == null || role.getId() == null) {
-                continue;
-            }
-            long roleId = role.getId().value();
-            String currentStatus = statusValue(role.getStatus());
-            statusById.put(roleId, currentStatus);
-            if (roleStatus == null) {
-                roleStatus = currentStatus;
+                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
             }
         }
 
@@ -119,14 +110,9 @@ public class RoleServiceImpl implements RoleService {
             if (orderedId == null || orderedId.value() == null) {
                 throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
             }
-            Long roleId = orderedId.value();
-            String currentStatus = statusById.get(roleId);
-            if (!Objects.equals(roleStatus, currentStatus)) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
-            }
         }
 
-        List<Role> currentRoles = dao.listByScope(roleStatus, effectiveDirection);
+        List<Role> currentRoles = dao.list(effectiveDirection);
         if (currentRoles == null || currentRoles.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
@@ -155,7 +141,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         try {
-            int temporaryPriority = dao.maxPriorityByScope(roleStatus) + PRIORITY_STEP;
+            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
             for (int i = 0; i < currentOrderedIds.size(); i++) {
                 RoleId targetId = orderedIdList.get(i);
                 RoleId currentId = currentOrderedIds.get(i);
@@ -357,7 +343,9 @@ public class RoleServiceImpl implements RoleService {
         if (errorCode == 1222) {
             return true;
         }
-        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+        return "55P03".equals(sqlState)
+                || "40P01".equals(sqlState)
+                || "40001".equals(sqlState)
                 || "23505".equals(sqlState);
     }
 

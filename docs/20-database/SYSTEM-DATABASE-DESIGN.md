@@ -135,6 +135,7 @@
 
 - 主键：`pk_sys_role(id)`
 - 普通索引：`idx_sys_role_status(status, priority`
+- 唯一索引：`uk_sys_role_priority(priority)`
 
 ### 6.3 sys_menu
 

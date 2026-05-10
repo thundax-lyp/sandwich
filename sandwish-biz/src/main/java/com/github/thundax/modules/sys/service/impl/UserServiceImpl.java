@@ -94,8 +94,7 @@ public class UserServiceImpl implements UserService {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
-        List<User> currentUsers =
-                dao.list(null, null, null, null, null, effectiveDirection);
+        List<User> currentUsers = dao.list(null, null, null, null, null, effectiveDirection);
         if (currentUsers == null || currentUsers.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
@@ -125,7 +124,7 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            int temporaryPriority = dao.maxPriorityByScope(null, null, null, null, null) + PRIORITY_STEP;
+            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
             for (int i = 0; i < currentOrderedIds.size(); i++) {
                 UserId targetId = orderedIdList.get(i);
                 UserId currentId = currentOrderedIds.get(i);

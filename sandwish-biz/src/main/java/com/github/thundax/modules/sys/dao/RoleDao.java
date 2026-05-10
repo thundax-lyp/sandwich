@@ -14,9 +14,9 @@ public interface RoleDao {
 
     List<Role> list(String status);
 
-    int maxPriorityByScope(String status);
+    int maxPriority();
 
-    List<Role> listByScope(String status, SortDirection sortDirection);
+    List<Role> list(SortDirection sortDirection);
 
     Page<Role> page(String status, int pageNo, int pageSize);
 

@@ -2,6 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
@@ -84,7 +85,7 @@ public class RoleServiceImplTest {
         assertNotNull(dao.inserted);
         assertEquals(Long.valueOf(id.value()), dao.deletedRoleMenuId);
         assertEquals(Integer.valueOf(10), dao.inserted.getPriority());
-        assertEquals("ENABLED", dao.maxPriorityByScopeStatus);
+        assertTrue(dao.maxPriorityInvoked);
         assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
     }
 
@@ -106,7 +107,7 @@ public class RoleServiceImplTest {
 
         assertNotNull(id);
         assertEquals(Integer.valueOf(47), dao.inserted.getPriority());
-        assertEquals("ENABLED", dao.maxPriorityByScopeStatus);
+        assertTrue(dao.maxPriorityInvoked);
     }
 
     @Test
@@ -156,7 +157,7 @@ public class RoleServiceImplTest {
         private List<Long> userIdList;
         private Role getResult;
         private int maxPriority;
-        private String maxPriorityByScopeStatus;
+        private boolean maxPriorityInvoked;
 
         @Override
         public Role getById(RoleId id) {
@@ -175,13 +176,13 @@ public class RoleServiceImplTest {
         }
 
         @Override
-        public int maxPriorityByScope(String status) {
-            this.maxPriorityByScopeStatus = status;
+        public int maxPriority() {
+            this.maxPriorityInvoked = true;
             return maxPriority;
         }
 
         @Override
-        public List<Role> listByScope(String status, SortDirection sortDirection) {
+        public List<Role> list(SortDirection sortDirection) {
             return Collections.emptyList();
         }
 

@@ -87,11 +87,8 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public int maxPriorityByScope(String status) {
+    public int maxPriority() {
         QueryWrapper<RoleDO> wrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(status)) {
-            wrapper.eq("status", status);
-        }
         Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream().findFirst().orElse(null);
         if (max == null) {
             return 0;
@@ -107,8 +104,8 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> listByScope(String status, SortDirection sortDirection) {
-        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListByScopeWrapper(status, sortDirection)));
+    public List<Role> list(SortDirection sortDirection) {
+        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(sortDirection)));
     }
 
     @Override
@@ -244,11 +241,8 @@ public class RoleDaoImpl implements RoleDao {
         return wrapper;
     }
 
-    private LambdaQueryWrapper<RoleDO> buildListByScopeWrapper(String status, SortDirection sortDirection) {
+    private LambdaQueryWrapper<RoleDO> buildListWrapper(SortDirection sortDirection) {
         LambdaQueryWrapper<RoleDO> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(status)) {
-            wrapper.eq(RoleDO::getStatus, status);
-        }
         if (SortDirection.DESC == sortDirection) {
             wrapper.orderByDesc(RoleDO::getPriority);
         } else {

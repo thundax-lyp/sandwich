@@ -33,7 +33,7 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    int maxPriorityByScope(Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege);
+    int maxPriority();
 
     UserId insert(User user);
 

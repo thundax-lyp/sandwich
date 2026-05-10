@@ -14,15 +14,14 @@ public interface MemberDao {
 
     List<Member> list(String status, String name, String remarks, SortDirection sortDirection);
 
+    List<Member> listByScope(String status, String name, String remarks, SortDirection sortDirection);
+
     Page<Member> page(
-            String status,
-            String name,
-            String remarks,
-            SortDirection sortDirection,
-            int pageNo,
-            int pageSize);
+            String status, String name, String remarks, SortDirection sortDirection, int pageNo, int pageSize);
 
     int maxPriority();
+
+    int maxPriorityByScope(String status, String name, String remarks);
 
     MemberId insert(Member entity);
 

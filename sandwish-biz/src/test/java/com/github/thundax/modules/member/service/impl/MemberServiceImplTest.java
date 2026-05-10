@@ -2,6 +2,7 @@ package com.github.thundax.modules.member.service.impl;
 
 import static org.junit.Assert.*;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -9,7 +10,6 @@ import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.command.MemberCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
-import com.github.thundax.common.domain.SortDirection;
 import java.util.List;
 import org.junit.Test;
 
@@ -115,6 +115,11 @@ public class MemberServiceImplTest {
         }
 
         @Override
+        public List<Member> listByScope(String status, String name, String remarks, SortDirection sortDirection) {
+            return null;
+        }
+
+        @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Member> page(
                 String status, String name, String remarks, SortDirection sortDirection, int pageNo, int pageSize) {
             return new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageNo, pageSize);
@@ -122,6 +127,11 @@ public class MemberServiceImplTest {
 
         @Override
         public int maxPriority() {
+            return 0;
+        }
+
+        @Override
+        public int maxPriorityByScope(String status, String name, String remarks) {
             return 0;
         }
 

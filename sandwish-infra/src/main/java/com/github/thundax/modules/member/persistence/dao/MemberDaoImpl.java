@@ -39,6 +39,11 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public List<Member> list(String status, String name, String remarks, SortDirection sortDirection) {
+        return listByScope(status, name, remarks, sortDirection);
+    }
+
+    @Override
+    public List<Member> listByScope(String status, String name, String remarks, SortDirection sortDirection) {
         return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status, name, remarks, sortDirection)));
     }
 
@@ -62,7 +67,22 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public int maxPriority() {
-        Object max = mapper.selectObjs(new QueryWrapper<MemberDO>().select("max(priority)")).stream()
+        return maxPriorityByScope(null, null, null);
+    }
+
+    @Override
+    public int maxPriorityByScope(String status, String name, String remarks) {
+        QueryWrapper<MemberDO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(status)) {
+            wrapper.eq("status", status);
+        }
+        if (StringUtils.isNotBlank(name)) {
+            wrapper.like("name", name);
+        }
+        if (StringUtils.isNotBlank(remarks)) {
+            wrapper.like("remarks", remarks);
+        }
+        Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream()
                 .findFirst()
                 .orElse(null);
         if (max == null) {

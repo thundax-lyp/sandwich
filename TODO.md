@@ -10,31 +10,6 @@
 ## 当前任务项
 
 
-- [ ] `Member.Service/DAO`：核对 Member 已有排序链路与 create 落位
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java)
-  - 处理动作：对齐 exchange sort 与 `max(priority)+10` 约定，确认排序域完整性边界。
-  - 验收点：排序异常只通过 `SORT_*` 路径返回，列表查询方向正确。
-  - 重要度：9/10
-
-- [ ] `Member.DAO/Mapper 实现`：补齐 Member 排序域 SQL 映射
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/member/dao/MemberDao.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/dao/MemberDaoImpl.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberMapper.java](sandwish-infra/src/main/java/com/github/thundax/modules/member/persistence/mapper/MemberMapper.java)
-  - 处理动作：补齐 max/list/sort/update priority 的 mapper 能力。
-  - 验收点：排序更新可在 DAO 一次完成。
-  - 重要度：8/10
-
-- [ ] `Member.数据库约束`：补齐成员 priority 全局唯一索引
-  - 范围文件：
-    - [db/schema/member.sql](db/schema/member.sql)
-  - 处理动作：为 member 表补充全局优先级唯一约束。
-  - 验收点：全局重复 priority 被数据库拒绝。
-  - 重要度：8/10
-
 - [ ] `Storage.Service 接口`：确认/补齐排序方向参数
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java](sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java)

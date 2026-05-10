@@ -76,7 +76,8 @@
 索引设计：
 
 - 主键：`pk_member_member(id)`
-- 普通索引：`idx_member_member_status(status, priority`
+- 普通索引：`idx_member_member_status(status, priority)`
+- 唯一索引：`uk_member_member_priority(priority)`
 
 ## 7. Relationship Rules
 

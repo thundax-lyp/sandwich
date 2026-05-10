@@ -2,10 +2,10 @@ package com.github.thundax.modules.member.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.ErrorCode;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.member.dao.MemberDao;
@@ -93,7 +93,7 @@ public class MemberServiceImpl implements MemberService {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
-        List<Member> currentMembers = dao.list(null, null, null, effectiveDirection);
+        List<Member> currentMembers = dao.listByScope(null, null, null, effectiveDirection);
         if (currentMembers == null || currentMembers.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
@@ -124,7 +124,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         try {
-            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
+            int temporaryPriority = dao.maxPriorityByScope(null, null, null) + PRIORITY_STEP;
             for (int i = 0; i < currentOrderedIds.size(); i++) {
                 MemberId targetId = orderedIdList.get(i);
                 MemberId currentId = currentOrderedIds.get(i);
@@ -240,7 +240,9 @@ public class MemberServiceImpl implements MemberService {
         if (errorCode == 1222) {
             return true;
         }
-        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+        return "55P03".equals(sqlState)
+                || "40P01".equals(sqlState)
+                || "40001".equals(sqlState)
                 || "23505".equals(sqlState);
     }
 

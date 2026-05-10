@@ -1,6 +1,9 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.domain.SortDirection;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -20,14 +23,18 @@ import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
-import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class RoleServiceImpl implements RoleService {
+
+    private static final int PRIORITY_STEP = 10;
 
     private final RoleDao dao;
 
@@ -72,9 +81,112 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public RoleId create(CreateRoleCommand command) {
         Role role = toRole(command);
+        role.setPriority(dao.maxPriorityByScope(statusValue(role.getStatus())) + PRIORITY_STEP);
         role.setId(dao.insert(role));
         afterWrite(role);
         return role.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void sort(List<RoleId> orderedIds, SortDirection sortDirection) throws ApiException {
+        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
+        List<RoleId> orderedIdList = normalizeOrderedIds(orderedIds);
+        if (orderedIdList.isEmpty()) {
+            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+        }
+
+        List<Role> selectedRoles = dao.listByIds(toValues(orderedIdList));
+        if (selectedRoles == null || selectedRoles.isEmpty()) {
+            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+        }
+
+        Map<Long, String> statusById = new HashMap<>();
+        String roleStatus = null;
+        for (Role role : selectedRoles) {
+            if (role == null || role.getId() == null) {
+                continue;
+            }
+            long roleId = role.getId().value();
+            String currentStatus = statusValue(role.getStatus());
+            statusById.put(roleId, currentStatus);
+            if (roleStatus == null) {
+                roleStatus = currentStatus;
+            }
+        }
+
+        for (RoleId orderedId : orderedIdList) {
+            if (orderedId == null || orderedId.value() == null) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+            Long roleId = orderedId.value();
+            String currentStatus = statusById.get(roleId);
+            if (!Objects.equals(roleStatus, currentStatus)) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+        }
+
+        List<Role> currentRoles = dao.listByScope(roleStatus, effectiveDirection);
+        if (currentRoles == null || currentRoles.isEmpty()) {
+            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+        }
+        if (currentRoles.size() != orderedIdList.size()) {
+            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+        }
+
+        Map<Long, Integer> indexById = new HashMap<>(currentRoles.size());
+        Map<Long, Integer> priorityById = new HashMap<>(currentRoles.size());
+        List<RoleId> currentOrderedIds = new ArrayList<>(currentRoles.size());
+        for (int i = 0; i < currentRoles.size(); i++) {
+            Role role = currentRoles.get(i);
+            if (role == null || role.getId() == null) {
+                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            }
+            long roleId = role.getId().value();
+            indexById.put(roleId, i);
+            priorityById.put(roleId, role.getPriority());
+            currentOrderedIds.add(role.getId());
+        }
+
+        for (RoleId orderedId : orderedIdList) {
+            if (!indexById.containsKey(orderedId.value())) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+        }
+
+        try {
+            int temporaryPriority = dao.maxPriorityByScope(roleStatus) + PRIORITY_STEP;
+            for (int i = 0; i < currentOrderedIds.size(); i++) {
+                RoleId targetId = orderedIdList.get(i);
+                RoleId currentId = currentOrderedIds.get(i);
+                if (targetId.equals(currentId)) {
+                    continue;
+                }
+
+                int targetIndex = indexById.get(targetId.value());
+                int currentPriority = priorityById.get(currentId.value());
+                int targetPriority = priorityById.get(targetId.value());
+
+                updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
+                updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
+                updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
+
+                priorityById.put(targetId.value(), currentPriority);
+                priorityById.put(currentId.value(), targetPriority);
+
+                currentOrderedIds.set(i, targetId);
+                currentOrderedIds.set(targetIndex, currentId);
+                indexById.put(targetId.value(), i);
+                indexById.put(currentId.value(), targetIndex);
+            }
+        } catch (RuntimeException exception) {
+            if (isConcurrentModification(exception)) {
+                throw new ApiException(
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
+            }
+            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+        }
     }
 
     @Override
@@ -198,13 +310,65 @@ public class RoleServiceImpl implements RoleService {
         return status == null ? null : status.value();
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public int changePriority(ChangeRolePriorityCommand command) {
+    private List<RoleId> normalizeOrderedIds(List<RoleId> orderedIds) throws ApiException {
+        if (orderedIds == null) {
+            return new ArrayList<>();
+        }
+
+        Set<Long> uniqueIdValues = new HashSet<>(orderedIds.size());
+        List<RoleId> normalized = new ArrayList<>(orderedIds.size());
+        for (RoleId orderedId : orderedIds) {
+            if (orderedId == null || orderedId.value() == null) {
+                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            }
+            if (!uniqueIdValues.add(orderedId.value())) {
+                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+            }
+            normalized.add(orderedId);
+        }
+        return normalized;
+    }
+
+    private List<Long> toValues(List<RoleId> ids) {
+        List<Long> values = new ArrayList<>(ids.size());
+        for (RoleId id : ids) {
+            values.add(id.value());
+        }
+        return values;
+    }
+
+    private boolean isConcurrentModification(RuntimeException exception) {
+        Throwable cursor = exception;
+        while (cursor != null) {
+            if (cursor instanceof SQLException) {
+                return isConcurrentSqlFailure((SQLException) cursor);
+            }
+            cursor = cursor.getCause();
+        }
+        return false;
+    }
+
+    private boolean isConcurrentSqlFailure(SQLException sqlException) {
+        int errorCode = sqlException.getErrorCode();
+        String sqlState = sqlException.getSQLState();
+        if (errorCode == 1205 || errorCode == 1213 || errorCode == 1207) {
+            return true;
+        }
+        if (errorCode == 1222) {
+            return true;
+        }
+        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+                || "23505".equals(sqlState);
+    }
+
+    private void updatePriorityOrThrow(RoleId id, int priority, String message) throws ApiException {
         Role role = new Role();
-        role.setId(command.getId());
-        role.setPriority(command.getPriority());
-        return dao.updatePriority(role);
+        role.setId(id);
+        role.setPriority(priority);
+        int updated = dao.updatePriority(role);
+        if (updated != 1) {
+            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+        }
     }
 
     private Role toRole(CreateRoleCommand command) {

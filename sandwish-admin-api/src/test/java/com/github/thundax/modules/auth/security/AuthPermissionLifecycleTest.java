@@ -6,6 +6,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
@@ -33,12 +34,12 @@ import com.github.thundax.modules.auth.service.result.*;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
-import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -1015,8 +1016,7 @@ public class AuthPermissionLifecycleTest {
             return 1;
         }
 
-        public int changePriority(ChangeRolePriorityCommand command) {
-            return 1;
+        public void sort(List<RoleId> orderedIds, SortDirection sortDirection) {
         }
     }
 }

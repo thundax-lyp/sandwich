@@ -8,6 +8,7 @@ import com.github.thundax.common.exception.NullBeanException;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
@@ -19,9 +20,9 @@ import com.github.thundax.modules.sys.assembler.RoleInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.RoleAssignUserRequest;
 import com.github.thundax.modules.sys.controller.request.RoleIdRequest;
 import com.github.thundax.modules.sys.controller.request.RoleMenuRequest;
-import com.github.thundax.modules.sys.controller.request.RolePriorityRequest;
 import com.github.thundax.modules.sys.controller.request.RoleQueryRequest;
 import com.github.thundax.modules.sys.controller.request.RoleSaveRequest;
+import com.github.thundax.modules.sys.controller.request.RoleSortRequest;
 import com.github.thundax.modules.sys.controller.request.RoleStatusRequest;
 import com.github.thundax.modules.sys.controller.request.RoleUserRequest;
 import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
@@ -42,7 +43,6 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
-import com.github.thundax.modules.sys.service.command.ChangeRolePriorityCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
@@ -224,23 +224,11 @@ public class RoleController {
     })
     @HasPermission("sys:role:edit")
     @SysLogger("排序")
-    @PostMapping(value = "priority")
-    public Boolean updatePriority(@Valid @RequestBody List<RolePriorityRequest> list) throws ApiException {
-        List<ChangeRolePriorityCommand> commandList = new ArrayList<>();
-        for (RolePriorityRequest request : RequestListHelper.present(list)) {
-            Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
-            if (bean == null) {
-                throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
-            }
-            commandList.add(new ChangeRolePriorityCommand(
-                    bean.getId(), request.getPriority() == null ? 0 : request.getPriority()));
-        }
-        if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
-        }
-
-        commandList.forEach(roleService::changePriority);
-
+    @PostMapping(value = "sort")
+    public Boolean updatePriority(@Valid @RequestBody RoleSortRequest request) throws ApiException {
+        roleService.sort(
+                RequestListHelper.map(request == null ? null : request.getOrderedIds(), RoleIdCodec::toDomain),
+                request == null ? SortDirection.ASC : request.getSortDirection());
         return true;
     }
 

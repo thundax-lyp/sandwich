@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
@@ -18,6 +19,7 @@ import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
 
@@ -67,6 +69,7 @@ public class RoleServiceImplTest {
         RecordingRoleDao dao = new RecordingRoleDao();
         Role role = new Role();
         role.setMenuIdList(Arrays.asList(5001L, 5002L));
+        role.setStatus(RoleStatus.ENABLED);
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
         RoleId id = service.create(new CreateRoleCommand(
@@ -80,7 +83,30 @@ public class RoleServiceImplTest {
         assertNotNull(id);
         assertNotNull(dao.inserted);
         assertEquals(Long.valueOf(id.value()), dao.deletedRoleMenuId);
+        assertEquals(Integer.valueOf(10), dao.inserted.getPriority());
+        assertEquals("ENABLED", dao.maxPriorityByScopeStatus);
         assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
+    }
+
+    @Test
+    public void shouldInitRolePriorityFromStatusScope() {
+        RecordingRoleDao dao = new RecordingRoleDao();
+        dao.maxPriority = 37;
+        Role role = new Role();
+        role.setStatus(RoleStatus.ENABLED);
+        RoleServiceImpl service = new RoleServiceImpl(dao);
+
+        RoleId id = service.create(new CreateRoleCommand(
+                role.getId(),
+                role.getName(),
+                role.getPrivilege(),
+                role.getStatus(),
+                role.getRemarks(),
+                Collections.emptyList()));
+
+        assertNotNull(id);
+        assertEquals(Integer.valueOf(47), dao.inserted.getPriority());
+        assertEquals("ENABLED", dao.maxPriorityByScopeStatus);
     }
 
     @Test
@@ -129,6 +155,8 @@ public class RoleServiceImplTest {
         private List<Long> menuIdList;
         private List<Long> userIdList;
         private Role getResult;
+        private int maxPriority;
+        private String maxPriorityByScopeStatus;
 
         @Override
         public Role getById(RoleId id) {
@@ -144,6 +172,17 @@ public class RoleServiceImplTest {
         public List<Role> list(String status) {
             this.status = status;
             return null;
+        }
+
+        @Override
+        public int maxPriorityByScope(String status) {
+            this.maxPriorityByScopeStatus = status;
+            return maxPriority;
+        }
+
+        @Override
+        public List<Role> listByScope(String status, SortDirection sortDirection) {
+            return Collections.emptyList();
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import java.util.List;
@@ -12,6 +13,10 @@ public interface RoleDao {
     List<Role> listByIds(List<Long> idList);
 
     List<Role> list(String status);
+
+    int maxPriorityByScope(String status);
+
+    List<Role> listByScope(String status, SortDirection sortDirection);
 
     Page<Role> page(String status, int pageNo, int pageSize);
 

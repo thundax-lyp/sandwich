@@ -1,9 +1,11 @@
 package com.github.thundax.modules.sys.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.valueobject.RoleId;
@@ -82,6 +84,31 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public List<Role> list(String status) {
         return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status)));
+    }
+
+    @Override
+    public int maxPriorityByScope(String status) {
+        QueryWrapper<RoleDO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(status)) {
+            wrapper.eq("status", status);
+        }
+        Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream().findFirst().orElse(null);
+        if (max == null) {
+            return 0;
+        }
+        if (max instanceof Number) {
+            return ((Number) max).intValue();
+        }
+        try {
+            return Integer.parseInt(String.valueOf(max));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
+    }
+
+    @Override
+    public List<Role> listByScope(String status, SortDirection sortDirection) {
+        return RolePersistenceAssembler.toEntityList(mapper.selectList(buildListByScopeWrapper(status, sortDirection)));
     }
 
     @Override
@@ -214,6 +241,20 @@ public class RoleDaoImpl implements RoleDao {
             wrapper.eq(RoleDO::getStatus, status);
         }
         wrapper.orderByAsc(RoleDO::getPriority, RoleDO::getId);
+        return wrapper;
+    }
+
+    private LambdaQueryWrapper<RoleDO> buildListByScopeWrapper(String status, SortDirection sortDirection) {
+        LambdaQueryWrapper<RoleDO> wrapper = new LambdaQueryWrapper<>();
+        if (StringUtils.isNotBlank(status)) {
+            wrapper.eq(RoleDO::getStatus, status);
+        }
+        if (SortDirection.DESC == sortDirection) {
+            wrapper.orderByDesc(RoleDO::getPriority);
+        } else {
+            wrapper.orderByAsc(RoleDO::getPriority);
+        }
+        wrapper.orderByAsc(RoleDO::getId);
         return wrapper;
     }
 

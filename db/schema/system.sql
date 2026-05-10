@@ -37,7 +37,8 @@ CREATE TABLE IF NOT EXISTS `sys_role` (
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_role_status` (`status`, `priority`)
+    KEY `idx_sys_role_status` (`status`, `priority`),
+    UNIQUE KEY `uk_sys_role_status_priority` (`status`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台角色表';
 
 CREATE TABLE IF NOT EXISTS `sys_menu` (

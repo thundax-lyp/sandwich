@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
@@ -14,8 +15,8 @@ import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.request.StorageIdRequest;
-import com.github.thundax.modules.storage.controller.request.StorageSortRequest;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
+import com.github.thundax.modules.storage.controller.request.StorageSortRequest;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.controller.response.StorageTreeNodeResponse;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
@@ -27,6 +28,7 @@ import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
+import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.storage.utils.StorageUtils;
@@ -199,11 +201,9 @@ public class StorageController {
     @PostMapping(value = "sort")
     @WrappedApiResponse
     public Boolean sort(@Valid @RequestBody StorageSortRequest request) throws ApiException {
-        storageService.sort(
-                RequestListHelper.map(
-                        request == null ? null : request.getOrderedIds(),
-                        StoredObjectIdCodec::toDomain),
-                request == null ? null : request.getSortDirection());
+        storageService.sort(new StorageSortCommand(
+                RequestListHelper.map(request == null ? null : request.getOrderedIds(), StoredObjectIdCodec::toDomain),
+                request == null ? null : request.getSortDirection()));
         return true;
     }
 

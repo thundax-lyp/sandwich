@@ -9,49 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `Dict.Service 接口`：补齐 Dict 排序入口为 FlatSort 统一签名
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DictService.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DictService.java)
-  - 处理动作：移除单值 priority 操作，新增/统一 `sort(List<DictId> orderedIds, SortDirection sortDirection)`。
-  - 验收点：Sortable Dict 接口不再暴露 `changePriority`。
-  - 重要度：10/10
-
-- [ ] `Dict.Service 实现`：实现 Dict create+sort 的交换式排序链路
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java)
-  - 处理动作：按 `orderedIds + sortDirection` 验证集合一致性并执行交换更新，新增实体采用 `max+10`。
-  - 验收点：排序无插值重排且失败全回滚。
-  - 重要度：10/10
-
-- [ ] `Dict.DAO 接口`：补齐 Dict 排序查询与更新能力
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/DictDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/dao/DictDao.java)
-  - 处理动作：新增域内最大优先级、按 ID 列表查询、按方向排序与批量优先级更新能力。
-  - 验收点：Service 可基于 DAO 完成完整交换序列。
-  - 重要度：9/10
-
-- [ ] `Dict.DAO 实现`：补齐 Dict Mapper/DAO 语义
-  - 范围文件：
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/DictDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/dao/DictDaoImpl.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/DictMapper.java](sandwish-infra/src/main/java/com/github/thundax/modules/sys/persistence/mapper/DictMapper.java)
-  - 处理动作：落地 `maxPriorityByType`、`listByTypeOrder` 与排序更新 SQL。
-  - 验收点：排序链路数据库读写覆盖全域。
-  - 重要度：9/10
-
-- [ ] `Dict.Controller 协议`：新增/更新 Dict sort 请求端点
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DictController.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DictController.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictSortRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/request/DictSortRequest.java)
-  - 处理动作：改造排序接口为 `orderedIds + sortDirection`，不接受 priority。
-  - 验收点：Dict API 不再支持 priority 写入。
-  - 重要度：10/10
-
-- [ ] `Dict.数据库约束`：补齐 Dict 排序域唯一索引
-  - 范围文件：
-    - [db/schema/system.sql](db/schema/system.sql)
-  - 处理动作：为 `sys_dict` 增加 `UNIQUE(type, priority)`。
-  - 验收点：同 type 的 priority 冲突可被数据库拒绝。
-  - 重要度：8/10
 
 - [ ] `Role.遗留单点优先级清理`：移除 Role 单点 priority 接口
   - 范围文件：

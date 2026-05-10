@@ -17,7 +17,9 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
+import com.github.thundax.modules.sys.controller.request.DictSortRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -113,6 +115,23 @@ public class DictControllerContractTest {
         DictController controller = new DictController(mock(DictService.class));
 
         controller.delete(Collections.emptyList());
+    }
+
+    @Test
+    public void shouldSortWithOrderedIdsAndDirection() throws Exception {
+        DictService dictService = mock(DictService.class);
+        DictController controller = new DictController(dictService);
+        DictSortRequest request = new DictSortRequest();
+        request.setOrderedIds(Arrays.asList(101L, 102L));
+        request.setSortDirection(SortDirection.DESC);
+
+        controller.sort(request);
+
+        ArgumentCaptor<java.util.List<DictId>> idCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<SortDirection> directionCaptor = ArgumentCaptor.forClass(SortDirection.class);
+        verify(dictService).sort(idCaptor.capture(), directionCaptor.capture());
+        assertEquals(Arrays.asList(DictIdCodec.toDomain(101L), DictIdCodec.toDomain(102L)), idCaptor.getValue());
+        assertEquals(SortDirection.DESC, directionCaptor.getValue());
     }
 
     private DictIdRequest idRequest(Long id) {

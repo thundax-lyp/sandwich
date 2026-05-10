@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import java.util.List;
@@ -14,6 +15,10 @@ public interface DictDao {
     List<Dict> list(String type, String label, String remarks);
 
     Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
+
+    int maxPriorityByType(String type);
+
+    List<Dict> listByType(String type, SortDirection sortDirection);
 
     DictId insert(Dict dict);
 

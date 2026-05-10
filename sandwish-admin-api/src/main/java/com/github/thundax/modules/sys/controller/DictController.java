@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -17,6 +18,7 @@ import com.github.thundax.modules.sys.controller.request.DictIdRequest;
 import com.github.thundax.modules.sys.controller.request.DictPageRequest;
 import com.github.thundax.modules.sys.controller.request.DictQueryRequest;
 import com.github.thundax.modules.sys.controller.request.DictSaveRequest;
+import com.github.thundax.modules.sys.controller.request.DictSortRequest;
 import com.github.thundax.modules.sys.controller.response.DictResponse;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
@@ -161,6 +163,23 @@ public class DictController {
         for (DeleteDictCommand command : commandList) {
             dictService.remove(command);
         }
+        return true;
+    }
+
+    @ApiOperation(value = "排序", notes = "sys:dict:edit")
+    @HasPermission("sys:dict:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @PostMapping(value = "sort")
+    public Boolean sort(@Valid @RequestBody DictSortRequest request) throws ApiException {
+        dictService.sort(
+                RequestListHelper.map(request == null ? null : request.getOrderedIds(), DictIdCodec::toDomain),
+                request == null ? SortDirection.ASC : request.getSortDirection());
         return true;
     }
 

@@ -2,6 +2,8 @@ package com.github.thundax.modules.sys.service;
 
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
@@ -19,6 +21,8 @@ public interface DictService {
     PageResult<Dict> page(DictQuery query, PageQuery page);
 
     DictId create(CreateDictCommand command);
+
+    void sort(List<DictId> orderedIds, SortDirection sortDirection) throws ApiException;
 
     void changeInfo(ChangeDictInfoCommand command);
 

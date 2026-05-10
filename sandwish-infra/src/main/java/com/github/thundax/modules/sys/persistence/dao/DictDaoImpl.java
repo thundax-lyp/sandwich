@@ -3,6 +3,7 @@ package com.github.thundax.modules.sys.persistence.dao;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -81,6 +82,33 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
+    public int maxPriorityByType(String type) {
+        QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(type)) {
+            wrapper.eq("type", type);
+        }
+        Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream()
+                .findFirst()
+                .orElse(null);
+        if (max == null) {
+            return 0;
+        }
+        if (max instanceof Number) {
+            return ((Number) max).intValue();
+        }
+        try {
+            return Integer.parseInt(String.valueOf(max));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
+    }
+
+    @Override
+    public List<Dict> listByType(String type, SortDirection sortDirection) {
+        return DictPersistenceAssembler.toEntityList(mapper.selectList(buildListByTypeWrapper(type, sortDirection)));
+    }
+
+    @Override
     public DictId insert(Dict entity) {
         DictDO dataObject = DictPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
@@ -149,6 +177,20 @@ public class DictDaoImpl implements DictDao {
             wrapper.like("remarks", remarks);
         }
         wrapper.orderByAsc("type", "priority", "id");
+        return wrapper;
+    }
+
+    private QueryWrapper<DictDO> buildListByTypeWrapper(String type, SortDirection sortDirection) {
+        QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(type)) {
+            wrapper.eq("type", type);
+        }
+        if (SortDirection.DESC == sortDirection) {
+            wrapper.orderByDesc("priority");
+        } else {
+            wrapper.orderByAsc("priority");
+        }
+        wrapper.orderByAsc("id");
         return wrapper;
     }
 

@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_dict_type` (`type`, `priority`)
+    UNIQUE KEY `uk_sys_dict_type_priority` (`type`, `priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统字典表';
 
 CREATE TABLE IF NOT EXISTS `sys_log` (

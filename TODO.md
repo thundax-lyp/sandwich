@@ -10,15 +10,6 @@
 ## 当前任务项
 
 
-- [ ] `任务收口与一致性核对`：清理 TODO 与代码覆盖关系
-  - 范围文件：
-    - [TODO.md](TODO.md)
-    - [docs/30-designs/RUNBOOK-SORTABLE-REFACTOR.md](docs/30-designs/RUNBOOK-SORTABLE-REFACTOR.md)
-    - [docs/30-designs/SORT-ORDERING-SPECIAL-DESIGN.md](docs/30-designs/SORT-ORDERING-SPECIAL-DESIGN.md)
-  - 处理动作：核对每个任务的文件范围，完成后删除已关闭项。
-  - 验收点：未完成任务无遗漏且无重复。
-  - 重要度：6/10
-
 ## 待审阅任务项
 
 - 无

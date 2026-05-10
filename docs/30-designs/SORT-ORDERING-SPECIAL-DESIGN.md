@@ -21,7 +21,7 @@
   - `TreeSort`：树结构列表，使用 `lft` 控制顺序与层级。
 - `priority` 仅用于 `FlatSort` 的显示顺序权重，不承载业务状态语义。
 - `TreeSort` 的列表顺序固定由树结构索引产生，`priority` 不参与该链路。
-- 每次 `FlatSort` 重排通过“全量顺序提交”完成，不使用局部增量交换。
+- 每次 `FlatSort` 重排通过“交换式序列”完成，不使用插值重排。
 - `FlatSort` 与 `TreeSort` 接口完全解耦；不共享重排入口、请求结构与返回约定。
 
 ## 4. Sortable 实体映射清单（当前全量）
@@ -60,23 +60,24 @@
 1. `priority` 不允许外部任意输入。
 2. 仅 `FlatSort` 域支持 `priority` 重排；`TreeSort` 不支持 `priority` 重排。
 3. `TreeSort` 列表查询固定按 `lft` 排序；`FlatSort` 列表查询固定按 `priority` 排序。
-4. `FlatSort` 同一次排序域内 `priority` 唯一。
+4. `FlatSort` 同一次交换序列内 `priority` 不重复。
 5. 重排请求必须为 `orderedIds`，不接收优先级数值。
-6. 重排一次覆盖该域内指定集合的全部顺序；不允许仅交换局部片段导致歧义。
+6. 重排默认覆盖该域内完整排序集合，不允许仅交换局部片段导致歧义。
 7. 重排接口必须在一次事务中执行并保证幂等。
 8. 返回结果包含成功与失败语义，不返回排序键重算过程。
 
 ## 7. Functional Requirements
 ### 7.1 前端输入契约
-- 输入仅允许 `orderedIds: list<Long>`（或对应 `*Id` 类型）。
+- 输入仅允许 `orderedIds: list<Long>`（或对应 `*Id` 类型），加 `sortDirection`（`ASC/DESC`，默认 `ASC`）。
 - 不允许 `priority` 随同提交。
 
 ### 7.2 服务端排序规则
-- 在一次重排排序域内按 `orderedIds` 下标顺序重写 `priority`。
+- 在一次重排中按 `orderedIds` 推导出的目标顺序构建交换序列，并仅交换参与实体的 `priority`。
 - 写入策略：
-  - 默认步长：`1, 2, 3 ...`
-  - `FlatSort` 排序域内 `priority` 全局唯一（先验收集后再重写，发现重复整体失败并回滚）。
-  - 每个实体最终 `priority` 与最终顺序一一映射。
+  - 不使用插值，不执行 `1,2,3...` 等重写策略。
+  - 每次交换仅改动交换对两个实体的 `priority`。
+  - `FlatSort` 排序域内 `priority` 唯一性通过交换边界检查与数据库约束兜底保证。
+  - 目标 `orderedIds` 与最终顺序保持一一映射。
 - 支持前端多次拖拽快速重试：同一 `orderedIds` 的重排结果一致。
 
 ### 7.3 排序域一致性
@@ -94,6 +95,21 @@
 ### 7.5 并发与一致性
 - 重排必须加锁或使用可验证的并发控制，确保并发下无交叉覆盖。
 - 重排过程中任何 SQL 执行错误导致整体回滚。
+- 执行时按数据库错误码映射并返回错误码：
+  - MySQL：
+    - `ErrorCode=1205`：`Lock wait timeout exceeded; try restarting transaction` -> `SORT_CONCURRENT_MODIFICATION`
+    - `ErrorCode=1213`：`Deadlock found when trying to get lock` -> `SORT_CONCURRENT_MODIFICATION`
+    - `ErrorCode=1207`（可选）：`Can't execute because table was locked` -> `SORT_CONCURRENT_MODIFICATION`
+    - `ErrorCode=1062`：`Duplicate entry`（唯一约束冲突）-> `SORT_CONCURRENT_MODIFICATION`
+  - PostgreSQL：
+    - `SQLState=55P03`：`lock_not_available` -> `SORT_CONCURRENT_MODIFICATION`
+    - `SQLState=40P01`：`deadlock_detected` -> `SORT_CONCURRENT_MODIFICATION`
+    - `SQLState=40001`：`serialization_failure` -> `SORT_CONCURRENT_MODIFICATION`
+    - `SQLState=23505`：`unique_violation`（唯一约束冲突）-> `SORT_CONCURRENT_MODIFICATION`
+  - SQL Server：
+    - `ErrorCode=1205`：死锁 -> `SORT_CONCURRENT_MODIFICATION`
+    - `ErrorCode=1222`：锁请求超时 -> `SORT_CONCURRENT_MODIFICATION`
+  - 其他数据库或数据库码未命中时映射为 `SORT_DB_FAILURE`，并记录原始错误码。
 
 ### 7.6 错误语义（示例）
 - `SORT_DUPLICATE_ID`：`orderedIds` 存在重复 ID。
@@ -112,10 +128,10 @@
 
 ## 8. Key Flows
 ### 8.1 平铺排序成功流程
-1. API 接收 `orderedIds`。
+1. API 接收 `orderedIds` 与 `sortDirection`（ASC/DESC，默认 ASC）。
 2. Service 校验排序域是否完整且可操作。
 3. 校验输入：空值、空列表、重复、越界、越权。
-4. 在事务内按顺序重写 `priority`。
+4. 在事务内按交换序列执行排序并返回成功。
 5. 返回成功。
 
 ### 8.2 重排失败流程

@@ -33,10 +33,11 @@
    - 允许重复写入请求并发时，使用 DB 唯一冲突重试或行锁规约（由已有唯一约束与 Service 重试策略兜底）。
 
 3. API 层准备（不落地实现，仅形成改造清单）
-   - 定义/更新重排入参为 `orderedIds + sortDirection`。
-   - `sortDirection` 仅支持枚举：`ASC`、`DESC`，默认 `ASC`。
-   - 从入参、响应、文档示例中移除 `priority` 直传与回传。
-   - 不新增任何 `id` 以外的排序权重字段。
+- 定义/更新重排入参为 `orderedIds + sortDirection`。
+- `sortDirection` 仅支持枚举：`ASC`、`DESC`，默认 `ASC`。
+- 从入参、响应、文档示例中移除 `priority` 直传与回传。
+- 不携带列表快照与快照签名。
+- 不新增任何 `id` 以外的排序权重字段。
 
 4. Service 层改造清单（核心）
    - 获取目标排序域当前可见实体 ID 集合。

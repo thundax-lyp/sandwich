@@ -4,7 +4,7 @@
 定义统一、可稳定还原的列表排序机制，并约束不同排序模型的使用边界。
 
 核心目标：
-- 前端在排序操作时，仅提交有序实体 ID；
+- 前端在排序操作时，仅提交有序实体 ID；不携带列表快照，不携带 priority 值；
 - 后端通过顺序写回 `priority` 实现排序；
 - `priority` 在平铺域内唯一且由服务端全权管理；
 - 多用户并发情况下排序结果可预期、可重复、可回放。
@@ -65,6 +65,7 @@
 6. 重排默认覆盖该域内完整排序集合，不允许仅交换局部片段导致歧义。
 7. 重排接口必须在一次事务中执行并保证幂等。
 8. 返回结果包含成功与失败语义，不返回排序键重算过程。
+9. `sortDirection` 仅允许 `ASC` 与 `DESC`，默认 `ASC`。
 
 ## 7. Functional Requirements
 ### 7.1 前端输入契约
@@ -144,7 +145,7 @@
 ## 9. Key Flows（数据库约束）
 - `FlatSort` 对排序域内 `priority` 执行唯一约束与索引优化。
 - 部署时先清理历史重复后再启用唯一约束。
-- `FlatSort` 查询列表固定 `ORDER BY priority ASC`，按约定追加必要过滤条件。
+- `FlatSort` 查询列表按 `ORDER BY priority`，方向由 `sortDirection` 决定，并按约定追加必要过滤条件。
 - `TreeSort` 查询列表固定 `ORDER BY lft ASC`，并保持树形边界约束。
 
 ## 10. Non-Functional Requirements
@@ -162,3 +163,7 @@
 
 ## 12. Open Items
 无
+
+## 13. API 协议说明（服务端约定）
+- API 入参不携带列表快照，不携带 priority；仅支持 `orderedIds` 与 `sortDirection`（`ASC/DESC`，默认 `ASC`）。
+- API 响应仅包含是否成功与标准错误码，不返回排序中间状态。

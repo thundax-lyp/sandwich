@@ -93,7 +93,7 @@ public class MemberServiceImpl implements MemberService {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
-        List<Member> currentMembers = dao.listByScope(null, null, null, effectiveDirection);
+        List<Member> currentMembers = dao.list(null, null, null, effectiveDirection);
         if (currentMembers == null || currentMembers.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
@@ -124,7 +124,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         try {
-            int temporaryPriority = dao.maxPriorityByScope(null, null, null) + PRIORITY_STEP;
+            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
             for (int i = 0; i < currentOrderedIds.size(); i++) {
                 MemberId targetId = orderedIdList.get(i);
                 MemberId currentId = currentOrderedIds.get(i);

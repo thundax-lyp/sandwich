@@ -3,19 +3,23 @@ package com.github.thundax.modules.storage.service.impl;
 import static org.junit.Assert.*;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.*;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartId;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
+import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.command.UploadMultipartPartCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,7 +104,7 @@ public class MultipartUploadServiceImplTest {
         assertEquals("/api/storage/object/s1/content", storage.getAccessEndpoint());
         assertSame(StoredObjectStatus.ACTIVE, storage.getObjectStatus());
         assertSame(StoredObjectReferenceStatus.UNREFERENCED, storage.getReferenceStatus());
-        assertSame(storage, dao.inserted);
+        assertNotNull(dao.inserted);
         assertSame(MultipartUploadStatus.COMPLETED, dao.updatedMultipartSession.getUploadStatus());
         assertEquals(Integer.valueOf(3), dao.updatedMultipartSession.getUploadedPartCount());
         assertNotNull(dao.updatedMultipartSession.getCompletedDate());
@@ -128,7 +132,7 @@ public class MultipartUploadServiceImplTest {
     }
 
     private static MultipartUploadServiceImpl service(RecordingMultipartUploadDao dao) {
-        return new MultipartUploadServiceImpl(dao, dao);
+        return new MultipartUploadServiceImpl(dao, new RecordingStorageService(dao));
     }
 
     private static MultipartUploadSession multipartSession() {
@@ -248,7 +252,8 @@ public class MultipartUploadServiceImplTest {
                 String referenceOwnerId,
                 String referenceOwnerType,
                 String name,
-                String remarks) {
+                String remarks,
+                SortDirection sortDirection) {
             return null;
         }
 
@@ -263,6 +268,7 @@ public class MultipartUploadServiceImplTest {
                 String referenceOwnerType,
                 String name,
                 String remarks,
+                SortDirection sortDirection,
                 int pageNo,
                 int pageSize) {
             return null;
@@ -297,6 +303,123 @@ public class MultipartUploadServiceImplTest {
         @Override
         public int updateReferenceStatus(StoredObject storage) {
             return 1;
+        }
+
+        @Override
+        public int maxPriority() {
+            return 0;
+        }
+
+        @Override
+        public int updatePriority(StoredObjectId id, int priority) {
+            return 1;
+        }
+    }
+
+    private static class RecordingStorageService implements StorageService {
+        private final StoredObjectDao storedObjectDao;
+
+        private RecordingStorageService(StoredObjectDao storedObjectDao) {
+            this.storedObjectDao = storedObjectDao;
+        }
+
+        @Override
+        public StoredObjectId create(com.github.thundax.modules.storage.service.command.CreateStorageCommand command) {
+            return storedObjectDao.insert(toStoredObject(command));
+        }
+
+        @Override
+        public StoredObject get(StoredObjectId id) {
+            return null;
+        }
+
+        @Override
+        public List<StoredObject> list(com.github.thundax.modules.storage.service.query.StorageQuery query) {
+            return null;
+        }
+
+        @Override
+        public com.github.thundax.common.page.PageResult<StoredObject> page(
+                com.github.thundax.modules.storage.service.query.StorageQuery query,
+                com.github.thundax.common.page.PageQuery page) {
+            return null;
+        }
+
+        @Override
+        public void change(com.github.thundax.modules.storage.service.command.ChangeStorageCommand command) {}
+
+        @Override
+        public int remove(com.github.thundax.modules.storage.service.command.DeleteStorageCommand command) {
+            return 0;
+        }
+
+        @Override
+        public List<String> listMimeTypes(com.github.thundax.modules.storage.service.query.StorageQuery query) {
+            return null;
+        }
+
+        @Override
+        public List<String> listReferenceOwnerTypes(
+                com.github.thundax.modules.storage.service.query.StorageQuery query) {
+            return null;
+        }
+
+        @Override
+        public int changeObjectStatus(
+                com.github.thundax.modules.storage.service.command.ChangeStorageObjectStatusCommand command) {
+            return 0;
+        }
+
+        @Override
+        public int changeReferenceStatus(
+                com.github.thundax.modules.storage.service.command.ChangeStorageReferenceStatusCommand command) {
+            return 0;
+        }
+
+        @Override
+        public int removeReferences(
+                com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand command) {
+            return 0;
+        }
+
+        @Override
+        public void addReferences(
+                com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand command) {}
+
+        @Override
+        public List<StoredObjectReference> listReferences(
+                com.github.thundax.modules.storage.service.query.StorageQuery query) {
+            return null;
+        }
+
+        @Override
+        public boolean existsReadableContent(com.github.thundax.modules.storage.service.query.StorageQuery query) {
+            return false;
+        }
+
+        @Override
+        public void sort(StorageSortCommand command) throws com.github.thundax.common.exception.ApiException {}
+
+        private StoredObject toStoredObject(
+                com.github.thundax.modules.storage.service.command.CreateStorageCommand command) {
+            StoredObject storage = new StoredObject();
+            storage.setId(command.getId());
+            storage.setOriginalFilename(command.getOriginalFilename());
+            storage.setContentType(command.getContentType());
+            storage.setName(command.getName());
+            storage.setExtendName(command.getExtendName());
+            storage.setMimeType(command.getMimeType());
+            storage.setOwnerId(command.getOwnerId());
+            storage.setOwnerType(command.getOwnerType());
+            storage.setStorageType(command.getStorageType());
+            storage.setBucketName(command.getBucketName());
+            storage.setObjectKey(command.getObjectKey());
+            storage.setSize(command.getSize());
+            storage.setAccessEndpoint(command.getAccessEndpoint());
+            storage.setObjectStatus(command.getObjectStatus());
+            storage.setReferenceStatus(command.getReferenceStatus());
+            storage.setRemarks(command.getRemarks());
+            return storage;
         }
     }
 }

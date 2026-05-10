@@ -1,12 +1,12 @@
 package com.github.thundax.modules.member.service;
 
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.service.command.MemberCommand;
+import com.github.thundax.modules.member.service.command.MemberSortCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.util.List;
 
@@ -31,5 +31,5 @@ public interface MemberService {
 
     int remove(MemberCommand command);
 
-    void sort(List<MemberId> orderedIds, SortDirection sortDirection) throws ApiException;
+    void sort(MemberSortCommand command) throws ApiException;
 }

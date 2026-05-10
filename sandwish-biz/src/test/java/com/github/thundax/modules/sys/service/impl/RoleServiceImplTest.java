@@ -84,7 +84,7 @@ public class RoleServiceImplTest {
         assertNotNull(id);
         assertNotNull(dao.inserted);
         assertEquals(Long.valueOf(id.value()), dao.deletedRoleMenuId);
-        assertEquals(Integer.valueOf(10), dao.inserted.getPriority());
+        assertEquals(10, dao.inserted.getPriority());
         assertTrue(dao.maxPriorityInvoked);
         assertEquals(Arrays.asList(5001L, 5002L), dao.menuIdList);
     }
@@ -106,7 +106,7 @@ public class RoleServiceImplTest {
                 Collections.emptyList()));
 
         assertNotNull(id);
-        assertEquals(Integer.valueOf(47), dao.inserted.getPriority());
+        assertEquals(47, dao.inserted.getPriority());
         assertTrue(dao.maxPriorityInvoked);
     }
 

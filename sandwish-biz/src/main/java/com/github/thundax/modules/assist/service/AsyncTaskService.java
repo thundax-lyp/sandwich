@@ -1,11 +1,10 @@
 package com.github.thundax.modules.assist.service;
 
-import com.github.thundax.modules.assist.entity.AsyncTask;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
-import java.util.List;
+import com.github.thundax.modules.assist.service.command.AsyncTaskSortCommand;
 
 public interface AsyncTaskService {
 
@@ -17,5 +16,5 @@ public interface AsyncTaskService {
 
     void remove(AsyncTaskId id);
 
-    void sort(List<AsyncTaskId> orderedIds, SortDirection sortDirection) throws ApiException;
+    void sort(AsyncTaskSortCommand command) throws ApiException;
 }

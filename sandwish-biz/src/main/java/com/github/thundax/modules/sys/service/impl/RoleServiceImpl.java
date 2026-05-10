@@ -26,6 +26,7 @@ import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
 import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
+import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -88,9 +89,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<RoleId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<RoleId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(RoleSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<RoleId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }

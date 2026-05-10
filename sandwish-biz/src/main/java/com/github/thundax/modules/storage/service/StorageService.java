@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -15,6 +14,7 @@ import com.github.thundax.modules.storage.service.command.ChangeStorageReference
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
+import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.List;
 
@@ -50,5 +50,5 @@ public interface StorageService {
 
     boolean existsReadableContent(StorageQuery query);
 
-    void sort(List<StoredObjectId> orderedIds, SortDirection sortDirection) throws ApiException;
+    void sort(StorageSortCommand command) throws ApiException;
 }

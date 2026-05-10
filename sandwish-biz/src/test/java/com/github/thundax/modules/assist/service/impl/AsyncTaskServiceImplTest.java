@@ -2,11 +2,11 @@ package com.github.thundax.modules.assist.service.impl;
 
 import static org.junit.Assert.*;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
-import com.github.thundax.common.domain.SortDirection;
 import java.util.List;
 import org.junit.Test;
 

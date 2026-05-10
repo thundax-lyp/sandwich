@@ -16,7 +16,7 @@ public interface DictDao {
 
     Page<Dict> page(String type, String label, String remarks, int pageNo, int pageSize);
 
-    int maxPriorityByType(String type);
+    int maxPriority();
 
     List<Dict> listByType(String type, SortDirection sortDirection);
 

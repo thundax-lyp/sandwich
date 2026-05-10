@@ -22,6 +22,7 @@ import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.sql.SQLException;
@@ -82,9 +83,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<UserId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<UserId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(UserSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<UserId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }

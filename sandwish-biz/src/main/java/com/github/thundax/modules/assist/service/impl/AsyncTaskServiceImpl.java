@@ -8,6 +8,7 @@ import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.service.AsyncTaskService;
 import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
+import com.github.thundax.modules.assist.service.command.AsyncTaskSortCommand;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import java.sql.SQLException;
@@ -72,9 +73,10 @@ public class AsyncTaskServiceImpl implements AsyncTaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<AsyncTaskId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<AsyncTaskId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(AsyncTaskSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<AsyncTaskId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }

@@ -15,6 +15,7 @@ import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
 import com.github.thundax.modules.member.service.command.MemberCommand;
+import com.github.thundax.modules.member.service.command.MemberSortCommand;
 import com.github.thundax.modules.member.service.query.MemberQuery;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -86,9 +87,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<MemberId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<MemberId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(MemberSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<MemberId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }

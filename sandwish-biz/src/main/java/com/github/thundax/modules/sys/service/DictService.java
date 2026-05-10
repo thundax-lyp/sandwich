@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -9,6 +8,7 @@ import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
+import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface DictService {
 
     DictId create(CreateDictCommand command);
 
-    void sort(List<DictId> orderedIds, SortDirection sortDirection) throws ApiException;
+    void sort(DictSortCommand command) throws ApiException;
 
     void changeInfo(ChangeDictInfoCommand command);
 

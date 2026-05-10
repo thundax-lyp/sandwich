@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -11,6 +10,7 @@ import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.List;
 
@@ -30,7 +30,7 @@ public interface UserService {
 
     int changeStatus(ChangeUserStatusCommand command);
 
-    void sort(List<UserId> orderedIds, SortDirection sortDirection) throws ApiException;
+    void sort(UserSortCommand command) throws ApiException;
 
     List<Role> listUserRoles(UserQuery query);
 }

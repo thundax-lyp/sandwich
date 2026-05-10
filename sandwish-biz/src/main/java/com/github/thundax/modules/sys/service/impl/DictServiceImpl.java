@@ -16,6 +16,7 @@ import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
+import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -90,16 +91,17 @@ public class DictServiceImpl implements DictService {
     @Transactional(rollbackFor = Exception.class)
     public DictId create(CreateDictCommand command) {
         Dict dict = toEntity(command);
-        dict.setPriority(dao.maxPriorityByType(dict.getType()) + PRIORITY_STEP);
+        dict.setPriority(dao.maxPriority() + PRIORITY_STEP);
         dict.setId(dao.insert(dict));
         return dict.getId();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<DictId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<DictId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(DictSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<DictId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
@@ -165,7 +167,7 @@ public class DictServiceImpl implements DictService {
         }
 
         try {
-            int temporaryPriority = dao.maxPriorityByType(dictType) + PRIORITY_STEP;
+            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
             for (int i = 0; i < currentOrderedIds.size(); i++) {
                 DictId targetId = orderedIdList.get(i);
                 DictId currentId = currentOrderedIds.get(i);

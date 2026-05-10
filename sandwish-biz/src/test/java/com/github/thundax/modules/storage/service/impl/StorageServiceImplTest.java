@@ -2,6 +2,7 @@ package com.github.thundax.modules.storage.service.impl;
 
 import static org.junit.Assert.*;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
@@ -185,7 +186,6 @@ public class StorageServiceImplTest {
         command.setAccessEndpoint(storage.getAccessEndpoint());
         command.setObjectStatus(storage.getObjectStatus());
         command.setReferenceStatus(storage.getReferenceStatus());
-        command.setPriority(storage.getPriority());
         command.setRemarks(storage.getRemarks());
         return command;
     }
@@ -231,7 +231,8 @@ public class StorageServiceImplTest {
                 String referenceOwnerId,
                 String referenceOwnerType,
                 String name,
-                String remarks) {
+                String remarks,
+                SortDirection sortDirection) {
             return null;
         }
 
@@ -246,6 +247,7 @@ public class StorageServiceImplTest {
                 String referenceOwnerType,
                 String name,
                 String remarks,
+                SortDirection sortDirection,
                 int pageNo,
                 int pageSize) {
             this.mimeType = mimeType;
@@ -296,6 +298,16 @@ public class StorageServiceImplTest {
 
         @Override
         public int updateReferenceStatus(StoredObject storage) {
+            return 1;
+        }
+
+        @Override
+        public int maxPriority() {
+            return 0;
+        }
+
+        @Override
+        public int updatePriority(StoredObjectId id, int priority) {
             return 1;
         }
 

@@ -23,6 +23,7 @@ import com.github.thundax.modules.storage.service.command.ChangeStorageReference
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
+import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -109,9 +110,10 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void sort(List<StoredObjectId> orderedIds, SortDirection sortDirection) throws ApiException {
-        SortDirection effectiveDirection = sortDirection == null ? SortDirection.ASC : sortDirection;
-        List<StoredObjectId> orderedIdList = normalizeOrderedIds(orderedIds);
+    public void sort(StorageSortCommand command) throws ApiException {
+        SortDirection effectiveDirection =
+                command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
+        List<StoredObjectId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }

@@ -11,6 +11,7 @@ import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
+import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,12 +20,12 @@ import org.junit.Test;
 public class DictServiceImplTest {
 
     @Test
-    public void shouldCreatePriorityFromMaxInScopeWithStep() {
+    public void shouldCreatePriorityFromGlobalMaxWithStep() {
         RecordingDictDao dao = new RecordingDictDao();
-        dao.setMaxPriorityByType(30);
+        dao.setMaxPriority(30);
         DictServiceImpl service = new DictServiceImpl(dao);
 
-        DictId id = service.create(new CreateDictCommand(null, "status", null, null, null));
+        DictId id = service.create(new CreateDictCommand("status", null, null, null));
 
         assertEquals(Long.valueOf(8001L), id.value());
         assertEquals("status", dao.inserted.getType());
@@ -32,18 +33,20 @@ public class DictServiceImplTest {
     }
 
     @Test
-    public void shouldSortByAscendingDirectionBySwap() {
+    public void shouldSortByAscendingDirectionBySwap() throws ApiException {
         RecordingDictDao dao = new RecordingDictDao();
         List<Dict> currentList =
                 Arrays.asList(dict(1001L, "status", 10), dict(1002L, "status", 20), dict(1003L, "status", 30));
         dao.setTypeList(currentList);
         dao.setListByIdsResult(currentList);
-        dao.setMaxPriorityByType(30);
+        dao.setMaxPriority(30);
         DictServiceImpl service = new DictServiceImpl(dao);
 
-        service.sort(Arrays.asList(DictIdCodec.toDomain(1003L), DictIdCodec.toDomain(1001L)), SortDirection.ASC);
+        service.sort(new DictSortCommand(
+                Arrays.asList(DictIdCodec.toDomain(1003L), DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1002L)),
+                SortDirection.ASC));
 
-        assertEquals(Arrays.asList(1003L, 1001L, 1002L, 1001L, 1002L, 1003L), dao.getOrderedIdsAfterSort());
+        assertEquals(Arrays.asList(1003L, 1001L, 1003L, 1001L, 1002L, 1001L), dao.getOrderedIdsAfterSort());
         assertEquals(Arrays.asList(40, 30, 10, 41, 30, 20), dao.getUpdatedPriorities());
     }
 
@@ -52,7 +55,7 @@ public class DictServiceImplTest {
         DictServiceImpl service = new DictServiceImpl(new RecordingDictDao());
 
         try {
-            service.sort(new ArrayList<>(), SortDirection.ASC);
+            service.sort(new DictSortCommand(new ArrayList<>(), SortDirection.ASC));
             fail("expect ApiException");
         } catch (ApiException e) {
             assertEquals(ErrorCode.SORT_EMPTY_INPUT.getCode(), e.getCode());
@@ -69,7 +72,8 @@ public class DictServiceImplTest {
         DictServiceImpl service = new DictServiceImpl(dao);
 
         try {
-            service.sort(Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)), SortDirection.ASC);
+            service.sort(new DictSortCommand(
+                    Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)), SortDirection.ASC));
             fail("expect ApiException");
         } catch (ApiException e) {
             assertEquals(ErrorCode.SORT_DUPLICATE_ID.getCode(), e.getCode());
@@ -87,15 +91,15 @@ public class DictServiceImplTest {
 
     private static class RecordingDictDao implements DictDao {
 
-        private int maxPriorityByType;
+        private int maxPriority;
         private List<Dict> typeList = new ArrayList<>();
         private List<Dict> listByIdsResult = new ArrayList<>();
         private final List<Integer> updatedPriorities = new ArrayList<>();
         private final List<Long> orderedIdsAfterSort = new ArrayList<>();
         private Dict inserted;
 
-        void setMaxPriorityByType(int maxPriorityByType) {
-            this.maxPriorityByType = maxPriorityByType;
+        void setMaxPriority(int maxPriority) {
+            this.maxPriority = maxPriority;
         }
 
         void setTypeList(List<Dict> typeList) {
@@ -142,8 +146,8 @@ public class DictServiceImplTest {
         }
 
         @Override
-        public int maxPriorityByType(String type) {
-            return maxPriorityByType;
+        public int maxPriority() {
+            return maxPriority;
         }
 
         @Override

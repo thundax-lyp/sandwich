@@ -82,11 +82,8 @@ public class DictDaoImpl implements DictDao {
     }
 
     @Override
-    public int maxPriorityByType(String type) {
+    public int maxPriority() {
         QueryWrapper<DictDO> wrapper = new QueryWrapper<>();
-        if (StringUtils.isNotBlank(type)) {
-            wrapper.eq("type", type);
-        }
         Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream()
                 .findFirst()
                 .orElse(null);

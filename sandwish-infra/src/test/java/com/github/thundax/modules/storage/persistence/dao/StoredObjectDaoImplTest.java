@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.storage.persistence.cache.StorageCacheSupport;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO;
 import com.github.thundax.modules.storage.persistence.dataobject.StoredObjectReferenceDO;
@@ -39,7 +40,17 @@ public class StoredObjectDaoImplTest {
         when(referenceMapper.selectObjs(any())).thenReturn(Arrays.<Object>asList(5001L, 5002L));
         when(mapper.selectList(any())).thenReturn(Collections.<StoredObjectDO>emptyList());
 
-        dao.list("image/png", "owner-1", "USER", "ACTIVE", "REFERENCED", "biz-1", "ARTICLE", "avatar", "profile");
+        dao.list(
+                "image/png",
+                "owner-1",
+                "USER",
+                "ACTIVE",
+                "REFERENCED",
+                "biz-1",
+                "ARTICLE",
+                "avatar",
+                "profile",
+                SortDirection.ASC);
 
         Wrapper<StoredObjectReferenceDO> referenceWrapper = captureReferenceWrapper(referenceMapper);
         assertSqlContains(referenceWrapper, "reference_owner_id");
@@ -55,7 +66,7 @@ public class StoredObjectDaoImplTest {
         assertSqlContains(storageWrapper, "reference_status");
         assertSqlContains(storageWrapper, "name");
         assertSqlContains(storageWrapper, "remarks");
-        assertSqlContains(storageWrapper, "id desc");
+        assertSqlContains(storageWrapper, "id asc");
         assertSqlContains(storageWrapper, "priority asc");
         assertParamsContain(
                 storageWrapper,
@@ -78,7 +89,7 @@ public class StoredObjectDaoImplTest {
         when(referenceMapper.selectObjs(any())).thenReturn(Collections.emptyList());
         when(mapper.selectList(any())).thenReturn(Collections.<StoredObjectDO>emptyList());
 
-        dao.list(null, null, null, null, null, "biz-1", null, null, null);
+        dao.list(null, null, null, null, null, "biz-1", null, null, null, SortDirection.ASC);
 
         Wrapper<StoredObjectDO> storageWrapper = captureStorageListWrapper(mapper);
         assertSqlContains(storageWrapper, "id");
@@ -95,7 +106,8 @@ public class StoredObjectDaoImplTest {
         dataObjectPage.setTotal(0);
         when(mapper.selectPage(any(), any())).thenReturn(dataObjectPage);
 
-        Page<?> page = dao.page("text/plain", null, null, "ACTIVE", null, null, null, null, null, 3, 25);
+        Page<?> page =
+                dao.page("text/plain", null, null, "ACTIVE", null, null, null, null, null, SortDirection.ASC, 3, 25);
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         ArgumentCaptor<Wrapper> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);

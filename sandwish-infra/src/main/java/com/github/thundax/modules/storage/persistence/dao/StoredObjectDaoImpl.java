@@ -183,7 +183,8 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
 
     @Override
     public int maxPriority() {
-        Object max = mapper.selectObjs(new QueryWrapper<StoredObjectDO>()
+        Object max = mapper
+                .selectObjs(new QueryWrapper<StoredObjectDO>()
                         .select("max(priority)")
                         .ne("object_status", StoredObjectStatus.DELETED.value()))
                 .stream()

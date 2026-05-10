@@ -1,11 +1,11 @@
 package com.github.thundax.modules.member.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.domain.SortDirection;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
@@ -39,21 +39,15 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public List<Member> list(String status, String name, String remarks, SortDirection sortDirection) {
-        return MemberPersistenceAssembler.toEntityList(mapper.selectList(buildListWrapper(status, name, remarks, sortDirection)));
+        return MemberPersistenceAssembler.toEntityList(
+                mapper.selectList(buildListWrapper(status, name, remarks, sortDirection)));
     }
 
     @Override
     public Page<Member> page(
-            String status,
-            String name,
-            String remarks,
-            SortDirection sortDirection,
-            int pageNo,
-            int pageSize) {
+            String status, String name, String remarks, SortDirection sortDirection, int pageNo, int pageSize) {
         Page<MemberDO> dataObjectPage =
-                mapper.selectPage(
-                        new Page<>(pageNo, pageSize),
-                        buildListWrapper(status, name, remarks, sortDirection));
+                mapper.selectPage(new Page<>(pageNo, pageSize), buildListWrapper(status, name, remarks, sortDirection));
         Page<Member> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(MemberPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -100,10 +94,7 @@ public class MemberDaoImpl implements MemberDao {
 
     @Override
     public int updatePriority(MemberId id, int priority) {
-        return mapper.update(
-                null,
-                buildIdUpdateWrapper(id)
-                        .set(MemberDO::getPriority, priority));
+        return mapper.update(null, buildIdUpdateWrapper(id).set(MemberDO::getPriority, priority));
     }
 
     @Override

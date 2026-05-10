@@ -67,9 +67,9 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
             result.add(task);
         }
 
-        Comparator<AsyncTask> comparator = Comparator
-                .comparingInt(AsyncTask::getPriority)
-                .thenComparing(task -> task.getId() == null ? Long.MIN_VALUE : task.getId().value());
+        Comparator<AsyncTask> comparator = Comparator.comparingInt(AsyncTask::getPriority)
+                .thenComparing(task ->
+                        task.getId() == null ? Long.MIN_VALUE : task.getId().value());
         if (SortDirection.DESC == sortDirection) {
             comparator = comparator.reversed();
         }
@@ -182,7 +182,8 @@ public class AsyncTaskDaoImpl implements AsyncTaskDao {
         AsyncTaskCacheDTO cacheDTO = new AsyncTaskCacheDTO();
         cacheDTO.id = AsyncTaskIdCodec.toValue(asyncTask.getId());
         cacheDTO.title = asyncTask.getTitle();
-        cacheDTO.status = asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();
+        cacheDTO.status =
+                asyncTask.getStatus() == null ? null : asyncTask.getStatus().value();
         cacheDTO.message = asyncTask.getMessage();
         cacheDTO.data = asyncTask.getData();
         cacheDTO.isPrivate = asyncTask.getPrivate();

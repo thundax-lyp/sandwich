@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.common.domain.SortDirection;
+import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.valueobject.RoleId;
@@ -89,7 +89,9 @@ public class RoleDaoImpl implements RoleDao {
     @Override
     public int maxPriority() {
         QueryWrapper<RoleDO> wrapper = new QueryWrapper<>();
-        Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream().findFirst().orElse(null);
+        Object max = mapper.selectObjs(wrapper.select("max(priority)")).stream()
+                .findFirst()
+                .orElse(null);
         if (max == null) {
             return 0;
         }

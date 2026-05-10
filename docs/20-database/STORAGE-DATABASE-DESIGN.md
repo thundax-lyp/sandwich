@@ -120,6 +120,7 @@
 
 - 主键：`pk_assist_storage(id)`
 - 唯一索引：`uk_assist_storage_key(storage_type, bucket_name, object_key)`
+- 唯一索引：`uk_assist_storage_priority(priority)`
 - 普通索引：`idx_assist_storage_status(object_status, reference_status`
 - 普通索引：`idx_assist_storage_mime_type(mime_type)`
 

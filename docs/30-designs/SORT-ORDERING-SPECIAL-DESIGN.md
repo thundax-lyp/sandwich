@@ -34,7 +34,7 @@
 | `com.github.thundax.modules.sys.entity.User` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.sys.entity.Department` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`） |
 | `com.github.thundax.modules.sys.entity.Menu` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`），`visibility/maxRank` 仅作过滤 |
-| `com.github.thundax.storage.entity.StoredObject` | `FlatSort` | `id DESC, priority ASC` | `objectStatus` 与列表过滤条件（`mimeType`、`ownerId`、`ownerType`、`referenceStatus`、`referenceOwnerId`、`referenceOwnerType`、`name`、`remarks`） |
+| `com.github.thundax.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.member.entity.Member` | `FlatSort` | `priority, name` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.assist.entity.AsyncTask` | `FlatSort（仅定义）` | `无列表查询排序链路` | `N/A（无列表重排）` |
 

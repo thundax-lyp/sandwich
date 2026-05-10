@@ -808,6 +808,9 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void changeInfo(ChangeUserInfoCommand command) {}
 
+        @Override
+        public void sort(List<UserId> orderedIds, SortDirection sortDirection) throws ApiException {}
+
         public int remove(DeleteUserCommand command) {
             return 1;
         }

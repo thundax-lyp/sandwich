@@ -1,9 +1,9 @@
 package com.github.thundax.modules.storage.service.query;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.util.List;
 import lombok.AllArgsConstructor;

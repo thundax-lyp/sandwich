@@ -10,39 +10,6 @@
 ## 当前任务项
 
 
-- [ ] `AsyncTask.Service 接口`：补齐异步任务排序能力
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/AsyncTaskService.java)
-  - 处理动作：新增 sort(orderedIds, sortDirection) 入参签名。
-  - 验收点：服务层不再支持外部 priority 写入。
-  - 重要度：8/10
-
-- [ ] `AsyncTask.Service 实现`：实现/对齐 AsyncTask 交换式排序
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/impl/AsyncTaskServiceImpl.java)
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/query/AsyncTaskQuery.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/service/query/AsyncTaskQuery.java)
-  - 处理动作：按当前可见集合校验并执行交换更新。
-  - 验收点：无插值重排，重复提交幂等。
-  - 重要度：8/10
-
-- [ ] `AsyncTask.DAO`：补齐 AsyncTask 排序查询与更新方法
-  - 范围文件：
-    - [sandwish-biz/src/main/java/com/github/thundax/modules/assist/dao/AsyncTaskDao.java](sandwish-biz/src/main/java/com/github/thundax/modules/assist/dao/AsyncTaskDao.java)
-    - [sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dao/AsyncTaskDaoImpl.java](sandwish-infra/src/main/java/com/github/thundax/modules/assist/persistence/dao/AsyncTaskDaoImpl.java)
-  - 处理动作：新增 max/list/sort/update API，支持排序交换。
-  - 验收点：Service 可仅通过 DAO 完成排序。
-  - 重要度：9/10
-
-- [ ] `AsyncTask.Controller/API`：新增排序端点并移除 response priority 外露
-  - 范围文件：
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/AsyncTaskController.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/AsyncTaskController.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/AsyncTaskResponse.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/response/AsyncTaskResponse.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/AsyncTaskInterfaceAssembler.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/assembler/AsyncTaskInterfaceAssembler.java)
-    - [sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/AsyncTaskSortRequest.java](sandwish-admin-api/src/main/java/com/github/thundax/modules/assist/controller/request/AsyncTaskSortRequest.java)
-  - 处理动作：新增 sort 端点，移除 priority 字段。
-  - 验收点：API 响应与请求中不出现 priority。
-  - 重要度：9/10
-
 - [ ] `Department.TreeSort 边界`：禁止 Department FlatSort 暴露
   - 范围文件：
     - [sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DepartmentService.java](sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DepartmentService.java)

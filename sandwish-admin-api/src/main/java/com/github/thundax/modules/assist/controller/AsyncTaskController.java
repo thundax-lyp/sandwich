@@ -3,10 +3,13 @@ package com.github.thundax.modules.assist.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.assist.assembler.AsyncTaskInterfaceAssembler;
 import com.github.thundax.modules.assist.controller.request.AsyncTaskIdRequest;
+import com.github.thundax.modules.assist.controller.request.AsyncTaskSortRequest;
 import com.github.thundax.modules.assist.controller.response.AsyncTaskResponse;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskIdCodec;
@@ -56,5 +59,22 @@ public class AsyncTaskController {
         }
 
         return AsyncTaskInterfaceAssembler.toResponse(bean);
+    }
+
+    @ApiOperation(value = "排序", notes = "user")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = Constants.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @HasPermission("user")
+    @PostMapping(value = "sort")
+    public Boolean sort(@Valid @RequestBody AsyncTaskSortRequest request) throws ApiException {
+        asyncTaskService.sort(
+                RequestListHelper.map(request == null ? null : request.getOrderedIds(), AsyncTaskIdCodec::toDomain),
+                request == null ? SortDirection.ASC : request.getSortDirection());
+        return true;
     }
 }

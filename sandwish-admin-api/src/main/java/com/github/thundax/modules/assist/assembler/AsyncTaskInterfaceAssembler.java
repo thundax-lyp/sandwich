@@ -16,7 +16,6 @@ public final class AsyncTaskInterfaceAssembler {
         return AsyncTaskResponse.builder()
                 .id(AsyncTaskIdCodec.toValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .priority(entity.getPriority())
                 .status(entity.getStatus().value())
                 .message(entity.getMessage())
                 .data(entity.getData())

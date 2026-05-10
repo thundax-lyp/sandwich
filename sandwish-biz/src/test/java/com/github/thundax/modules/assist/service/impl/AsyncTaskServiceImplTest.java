@@ -6,6 +6,8 @@ import com.github.thundax.modules.assist.dao.AsyncTaskDao;
 import com.github.thundax.modules.assist.entity.AsyncTask;
 import com.github.thundax.modules.assist.entity.valueobject.AsyncTaskId;
 import com.github.thundax.modules.assist.service.command.AsyncTaskCommand;
+import com.github.thundax.common.domain.SortDirection;
+import java.util.List;
 import org.junit.Test;
 
 public class AsyncTaskServiceImplTest {
@@ -78,11 +80,23 @@ public class AsyncTaskServiceImplTest {
         private AsyncTask getResult;
         private AsyncTask inserted;
         private AsyncTask updated;
+        private List<AsyncTask> listResult;
+        private int maxPriorityResult;
 
         @Override
         public AsyncTask getById(AsyncTaskId id) {
             this.getId = id;
             return getResult;
+        }
+
+        @Override
+        public List<AsyncTask> list(SortDirection sortDirection) {
+            return listResult;
+        }
+
+        @Override
+        public int maxPriority() {
+            return maxPriorityResult;
         }
 
         @Override
@@ -99,6 +113,11 @@ public class AsyncTaskServiceImplTest {
         @Override
         public void deleteById(AsyncTaskId id) {
             this.deletedId = id;
+        }
+
+        @Override
+        public int updatePriority(AsyncTaskId id, int priority) {
+            return 0;
         }
     }
 }

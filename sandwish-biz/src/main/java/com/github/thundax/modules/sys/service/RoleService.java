@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;

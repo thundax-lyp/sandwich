@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_key` (`storage_type`, `bucket_name`, `object_key`),
+    UNIQUE KEY `uk_assist_storage_priority` (`priority`),
     KEY `idx_assist_storage_status` (`object_status`, `reference_status`),
     KEY `idx_assist_storage_mime_type` (`mime_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='统一存储对象主数据表';

@@ -34,8 +34,8 @@ public class DictServiceImplTest {
     @Test
     public void shouldSortByAscendingDirectionBySwap() {
         RecordingDictDao dao = new RecordingDictDao();
-        List<Dict> currentList = Arrays.asList(
-                dict(1001L, "status", 10), dict(1002L, "status", 20), dict(1003L, "status", 30));
+        List<Dict> currentList =
+                Arrays.asList(dict(1001L, "status", 10), dict(1002L, "status", 20), dict(1003L, "status", 30));
         dao.setTypeList(currentList);
         dao.setListByIdsResult(currentList);
         dao.setMaxPriorityByType(30);
@@ -69,9 +69,7 @@ public class DictServiceImplTest {
         DictServiceImpl service = new DictServiceImpl(dao);
 
         try {
-            service.sort(
-                    Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)),
-                    SortDirection.ASC);
+            service.sort(Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)), SortDirection.ASC);
             fail("expect ApiException");
         } catch (ApiException e) {
             assertEquals(ErrorCode.SORT_DUPLICATE_ID.getCode(), e.getCode());

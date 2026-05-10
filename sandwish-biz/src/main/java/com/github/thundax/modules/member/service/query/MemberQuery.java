@@ -1,8 +1,8 @@
 package com.github.thundax.modules.member.service.query;
 
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
-import com.github.thundax.common.domain.SortDirection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
@@ -23,7 +24,6 @@ import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
-import com.github.thundax.common.domain.SortDirection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,8 +116,8 @@ public class StorageServiceImpl implements StorageService {
             throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
-        List<StoredObject> currentStorage = dao.list(
-                null, null, null, null, null, null, null, null, null, effectiveDirection);
+        List<StoredObject> currentStorage =
+                dao.list(null, null, null, null, null, null, null, null, null, effectiveDirection);
         if (currentStorage == null || currentStorage.isEmpty()) {
             throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
         }
@@ -178,9 +178,7 @@ public class StorageServiceImpl implements StorageService {
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
             }
-            throw new ApiException(
-                    ErrorCode.SORT_DB_FAILURE.getCode(),
-                    ErrorCode.SORT_DB_FAILURE.getMessage());
+            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
         }
     }
 
@@ -319,12 +317,13 @@ public class StorageServiceImpl implements StorageService {
         if (errorCode == 1222) {
             return true;
         }
-        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+        return "55P03".equals(sqlState)
+                || "40P01".equals(sqlState)
+                || "40001".equals(sqlState)
                 || "23505".equals(sqlState);
     }
 
-    private void updatePriorityOrThrow(StoredObjectId id, int priority, String message)
-            throws ApiException {
+    private void updatePriorityOrThrow(StoredObjectId id, int priority, String message) throws ApiException {
         int updated = dao.updatePriority(id, priority);
         if (updated != 1) {
             throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);

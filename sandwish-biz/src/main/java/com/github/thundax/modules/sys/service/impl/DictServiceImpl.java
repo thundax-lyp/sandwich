@@ -2,11 +2,11 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
+import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.sys.dao.DictDao;
@@ -17,6 +17,7 @@ import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import java.sql.SQLException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -290,7 +290,9 @@ public class DictServiceImpl implements DictService {
         if (errorCode == 1222) {
             return true;
         }
-        return "55P03".equals(sqlState) || "40P01".equals(sqlState) || "40001".equals(sqlState)
+        return "55P03".equals(sqlState)
+                || "40P01".equals(sqlState)
+                || "40001".equals(sqlState)
                 || "23505".equals(sqlState);
     }
 

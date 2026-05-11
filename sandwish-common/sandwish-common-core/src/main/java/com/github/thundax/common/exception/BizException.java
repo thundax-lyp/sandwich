@@ -1,10 +1,18 @@
 package com.github.thundax.common.exception;
 
+import lombok.Getter;
+
 public class BizException extends RuntimeException {
 
+    @Getter
     private final String code;
+
+    @Getter
     private final String messageKey;
+
+    @Getter
     private final String defaultMessage;
+
     private final Object[] messageArgs;
 
     public BizException(String message) {
@@ -37,18 +45,6 @@ public class BizException extends RuntimeException {
         this.messageKey = messageKey;
         this.defaultMessage = defaultMessage;
         this.messageArgs = messageArgs == null ? new Object[0] : messageArgs.clone();
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessageKey() {
-        return messageKey;
-    }
-
-    public String getDefaultMessage() {
-        return defaultMessage;
     }
 
     public Object[] getMessageArgs() {

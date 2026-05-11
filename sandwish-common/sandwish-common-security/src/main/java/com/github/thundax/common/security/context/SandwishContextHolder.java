@@ -1,7 +1,6 @@
 package com.github.thundax.common.security.context;
 
 import com.github.thundax.common.security.permission.PermissionAuthorities;
-import com.github.thundax.common.security.user.CurrentUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,15 +70,6 @@ public final class SandwishContextHolder {
         Object principal = authentication.getPrincipal();
         if (principal instanceof SandwishSubject) {
             return (SandwishSubject) principal;
-        }
-        if (principal instanceof CurrentUser) {
-            CurrentUser currentUser = (CurrentUser) principal;
-            return new SandwishSubject(
-                    currentUser.getUserId(),
-                    SandwishSubjectType.ADMIN_USER,
-                    currentUser.getDisplayName(),
-                    currentUser.getToken(),
-                    currentUser.getAuthorities());
         }
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;

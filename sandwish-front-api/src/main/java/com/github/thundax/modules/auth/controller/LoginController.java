@@ -2,9 +2,6 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.FrontResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
-import com.github.thundax.common.security.context.SandwishContextHolder;
-import com.github.thundax.common.security.context.SandwishSubject;
-import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
@@ -22,6 +19,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMetho
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.security.CurrentMemberResolver;
 import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
@@ -60,14 +58,17 @@ public class LoginController {
     private final MemberAuthService memberAuthService;
     private final PreAuthSessionService preAuthSessionService;
     private final AuthProperties authProperties;
+    private final CurrentMemberResolver currentMemberResolver;
 
     public LoginController(
             MemberAuthService memberAuthService,
             PreAuthSessionService preAuthSessionService,
-            AuthProperties authProperties) {
+            AuthProperties authProperties,
+            CurrentMemberResolver currentMemberResolver) {
         this.memberAuthService = memberAuthService;
         this.preAuthSessionService = preAuthSessionService;
         this.authProperties = authProperties;
+        this.currentMemberResolver = currentMemberResolver;
     }
 
     @ApiOperation(value = "请求预认证会话")
@@ -171,14 +172,14 @@ public class LoginController {
     @ApiOperation(value = "登录状态")
     @PostMapping("login/status")
     public MemberLoginStatusResponse login() {
-        MemberSpringPrincipal principal = currentMemberPrincipal();
+        MemberSpringPrincipal principal = currentMemberResolver.currentPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
     }
 
     @ApiOperation(value = "检查登录状态")
     @PostMapping("check-login")
     public MemberLoginStatusResponse checkLogin() {
-        MemberSpringPrincipal principal = currentMemberPrincipal();
+        MemberSpringPrincipal principal = currentMemberResolver.currentPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
     }
 
@@ -233,14 +234,6 @@ public class LoginController {
             return PrincipalIdentityType.MEMBER_MOBILE;
         }
         return null;
-    }
-
-    private MemberSpringPrincipal currentMemberPrincipal() {
-        SandwishSubject subject = SandwishContextHolder.currentSubject();
-        if (subject.getSubjectType() != SandwishSubjectType.FRONT_MEMBER) {
-            return null;
-        }
-        return new MemberSpringPrincipal(subject.getSubjectId());
     }
 
     private PreAuthSession createPreAuthSession() {

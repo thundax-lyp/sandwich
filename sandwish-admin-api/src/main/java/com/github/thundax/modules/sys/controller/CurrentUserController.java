@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -27,8 +26,8 @@ import com.github.thundax.modules.sys.controller.response.PersonalMenuResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import com.github.thundax.modules.sys.security.CurrentUserResolver;
 import com.github.thundax.modules.sys.service.CurrentUserService;
-import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
@@ -56,18 +55,18 @@ public class CurrentUserController {
     private static final String PRIVATE_KEY_ITEM = "privateKey";
 
     private final CurrentUserService currentUserService;
-    private final UserService userService;
+    private final CurrentUserResolver currentUserResolver;
     private final PrincipalIdentityService principalIdentityService;
     private final PreAuthSessionService preAuthSessionService;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
-            UserService userService,
+            CurrentUserResolver currentUserResolver,
             PrincipalIdentityService principalIdentityService,
             PreAuthSessionService preAuthSessionService) {
 
         this.currentUserService = currentUserService;
-        this.userService = userService;
+        this.currentUserResolver = currentUserResolver;
         this.principalIdentityService = principalIdentityService;
         this.preAuthSessionService = preAuthSessionService;
     }
@@ -83,10 +82,7 @@ public class CurrentUserController {
     })
     @PostMapping(value = "info")
     public PersonalInfoResponse info() {
-        User currentUser = currentUser();
-        if (currentUser.getId() == null || !currentUser.isEnable()) {
-            throw AdminResponseExceptions.invalidToken();
-        }
+        User currentUser = currentUserResolver.requireCurrentUser();
 
         return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
     }
@@ -103,7 +99,7 @@ public class CurrentUserController {
     @SysLogger("更新")
     @PostMapping(value = "info/update")
     public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) {
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
@@ -141,7 +137,7 @@ public class CurrentUserController {
         request.setPassword(password);
         request.setOldPassword(oldPassword);
 
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         currentUserService.changePassword(
                 new ChangeCurrentUserPasswordCommand(currentUser.getId(), oldPassword, password));
@@ -161,7 +157,7 @@ public class CurrentUserController {
     @SysLogger("上传头像")
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) {
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         try {
             AvatarUtils.saveAvatar(
@@ -186,7 +182,7 @@ public class CurrentUserController {
     @SysLogger("删除头像")
     @PostMapping(value = "avatar/delete")
     public PersonalAvatarResponse deleteAvatar() {
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         AvatarUtils.deleteAvatar(UserIdCodec.toStringValue(currentUser.getId()));
 
@@ -204,7 +200,7 @@ public class CurrentUserController {
     })
     @PostMapping(value = "menus")
     public List<PersonalMenuResponse> menus() {
-        return currentUserService.listVisibleMenus(toQuery(currentUser())).stream()
+        return currentUserService.listVisibleMenus(toQuery(currentUserResolver.currentUser())).stream()
                 .map(PersonalInterfaceAssembler::toMenuResponse)
                 .collect(Collectors.toList());
     }
@@ -220,20 +216,7 @@ public class CurrentUserController {
     })
     @PostMapping(value = "perms")
     public PersonalPermsResponse perms() {
-        return PersonalInterfaceAssembler.toPermsResponse(SandwishContextHolder.currentAuthorities());
-    }
-
-    private User currentUser() {
-        String subjectId = SandwishContextHolder.currentSubjectId();
-        if (StringUtils.isBlank(subjectId)) {
-            return new User();
-        }
-        try {
-            User user = userService.get(UserIdCodec.toDomain(Long.valueOf(subjectId)));
-            return user == null ? new User() : user;
-        } catch (NumberFormatException e) {
-            return new User();
-        }
+        return PersonalInterfaceAssembler.toPermsResponse(currentUserResolver.currentAuthorities());
     }
 
     private String getAccountLoginName(User user) {

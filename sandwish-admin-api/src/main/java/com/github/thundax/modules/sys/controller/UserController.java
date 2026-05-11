@@ -6,7 +6,6 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
@@ -52,6 +51,7 @@ import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import com.github.thundax.modules.sys.security.CurrentUserResolver;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -108,6 +108,7 @@ public class UserController {
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
     private final PreAuthSessionService preAuthSessionService;
+    private final CurrentUserResolver currentUserResolver;
 
     @Autowired
     public UserController(
@@ -116,7 +117,8 @@ public class UserController {
             RoleService roleService,
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
-            PreAuthSessionService preAuthSessionService) {
+            PreAuthSessionService preAuthSessionService,
+            CurrentUserResolver currentUserResolver) {
 
         this.userService = userService;
         this.departmentService = departmentService;
@@ -124,6 +126,7 @@ public class UserController {
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
         this.preAuthSessionService = preAuthSessionService;
+        this.currentUserResolver = currentUserResolver;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
@@ -254,7 +257,7 @@ public class UserController {
         if (bean == null) {
             throw AdminResponseExceptions.objectNotFound();
         }
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
         // 非超管用户无权限开启/关闭管理员
         if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw AdminResponseExceptions.permissionDenied();
@@ -338,7 +341,7 @@ public class UserController {
     @PostMapping(value = "enable")
     @WrappedApiResponse
     public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) {
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         List<ChangeUserStatusCommand> commandList = new ArrayList<>();
         for (UserStatusRequest request : RequestListHelper.present(list)) {
@@ -394,7 +397,7 @@ public class UserController {
     @PostMapping(value = "delete")
     @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) {
-        User currentUser = currentUser();
+        User currentUser = currentUserResolver.currentUser();
 
         List<DeleteUserCommand> commandList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
@@ -656,19 +659,6 @@ public class UserController {
             throw AdminResponseExceptions.invalidToken();
         }
         return privateKey;
-    }
-
-    private User currentUser() {
-        String subjectId = SandwishContextHolder.currentSubjectId();
-        if (StringUtils.isBlank(subjectId)) {
-            return new User();
-        }
-        try {
-            User user = userService.get(UserIdCodec.toDomain(Long.valueOf(subjectId)));
-            return user == null ? new User() : user;
-        } catch (NumberFormatException e) {
-            return new User();
-        }
     }
 
     public static String getAvatarUrl(String userId, String token) {

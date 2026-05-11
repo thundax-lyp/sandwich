@@ -18,6 +18,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import com.github.thundax.modules.sys.security.CurrentUserResolver;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import io.swagger.annotations.Api;
@@ -79,7 +80,7 @@ public class CurrentUserControllerContractTest {
 
         CurrentUserController controller = new CurrentUserController(
                 currentUserService,
-                userService,
+                new CurrentUserResolver(userService),
                 mock(PrincipalIdentityService.class),
                 mock(PreAuthSessionService.class));
 

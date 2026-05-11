@@ -1,12 +1,12 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 public class NotFoundException extends SandwishException {
 
     public NotFoundException() {
-        super(ErrorCode.NOT_FOUND);
+        super(WebErrorCode.NOT_FOUND);
     }
 
     public NotFoundException(String message) {
-        super(ErrorCode.NOT_FOUND, message);
+        super(WebErrorCode.NOT_FOUND, message);
     }
 }

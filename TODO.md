@@ -12,35 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `common-exception-model`：重塑 common-core 业务异常模型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/BizException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/DomainException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ErrorCode.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ApiException.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/exception/ApiExceptionTest.java`
-  - 处理动作：新增 `DomainException`，将 `BizException` 改为携带 String code/messageKey/defaultMessage/args/cause，并删除 checked `ApiException`。
-  - 验收点：`BizException` 不携带 HTTP 语义，`DomainException` 可表达领域不变量失败，`ApiException` 和对应测试已删除。
-  - 重要度：10/10
-
-- [ ] `common-web-response-exception`：迁移 Web 响应异常和响应 code 类型
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/SandwishException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/BadRequestException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/UnauthorizedException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ForbiddenException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/NotFoundException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/ConflictException.java`
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/SystemException.java`
-    - `sandwish-common/sandwish-common-core/src/test/java/com/github/thundax/common/exception/SandwishExceptionTest.java`
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/response/ApiResponse.java`
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/response/ApiResponseTest.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/exception/GlobalExceptionHandlerTest.java`
-  - 处理动作：将 `SandwishException` 和 HTTP 响应异常归属到 `sandwish-common-web`，并将 `ApiResponse.code` 从 `int` 改为 `String`。
-  - 验收点：`sandwish-common-core` 不再承载 Web 响应异常，`ApiResponse` 对外 code 为 String，common-web 测试覆盖成功和失败响应。
-  - 重要度：10/10
-
 - [ ] `common-web-i18n`：将 i18n 文案解析迁移到 common-web
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/i18n/I18nMessages.java`

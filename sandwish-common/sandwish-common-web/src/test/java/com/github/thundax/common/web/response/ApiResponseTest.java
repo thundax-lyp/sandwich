@@ -45,9 +45,9 @@ public class ApiResponseTest {
 
     @Test
     public void shouldCreateFailureResponseWithCustomCodeAndMessage() {
-        ApiResponse<Object> response = ApiResponse.failure(400, "参数错误");
+        ApiResponse<Object> response = ApiResponse.failure("COMMON-00001", "参数错误");
 
-        assertEquals(400, response.getCode());
+        assertEquals("COMMON-00001", response.getCode());
         assertEquals("参数错误", response.getMessage());
         assertNull(response.getData());
     }

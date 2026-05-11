@@ -1,12 +1,12 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 public class BadRequestException extends SandwishException {
 
     public BadRequestException() {
-        super(ErrorCode.BAD_REQUEST);
+        super(WebErrorCode.BAD_REQUEST);
     }
 
     public BadRequestException(String message) {
-        super(ErrorCode.BAD_REQUEST, message);
+        super(WebErrorCode.BAD_REQUEST, message);
     }
 }

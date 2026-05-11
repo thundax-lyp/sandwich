@@ -12,23 +12,23 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApiResponse<T> implements Serializable {
 
-    public static final int SUCCESS_CODE = 0;
-    public static final int ERROR_CODE = 500;
+    public static final String SUCCESS_CODE = "COMMON-00000";
+    public static final String ERROR_CODE = "COMMON-00006";
     public static final String SUCCESS_MESSAGE = "操作成功";
     public static final String ERROR_MESSAGE = "未知异常，请联系管理员";
 
-    private int code;
+    private String code;
     private String message;
     private T data;
 
     public ApiResponse() {}
 
-    public ApiResponse(int code, String message) {
+    public ApiResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    public ApiResponse(int code, String message, T data) {
+    public ApiResponse(String code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -54,17 +54,17 @@ public class ApiResponse<T> implements Serializable {
         return new ApiResponse<>(ERROR_CODE, message);
     }
 
-    public static <T> ApiResponse<T> failure(int code, String message) {
+    public static <T> ApiResponse<T> failure(String code, String message) {
         return new ApiResponse<>(code, message);
     }
 
-    @ApiModelProperty(name = "code", value = "响应码，0 表示成功")
+    @ApiModelProperty(name = "code", value = "响应码，COMMON-00000 表示成功")
     @JsonProperty("code")
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 

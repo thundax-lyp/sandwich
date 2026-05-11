@@ -1,4 +1,4 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -13,9 +13,9 @@ import org.junit.runners.Parameterized;
 public class SandwishExceptionTest {
 
     private final SandwishException exception;
-    private final ErrorCode errorCode;
+    private final WebErrorCode errorCode;
 
-    public SandwishExceptionTest(SandwishException exception, ErrorCode errorCode) {
+    public SandwishExceptionTest(SandwishException exception, WebErrorCode errorCode) {
         this.exception = exception;
         this.errorCode = errorCode;
     }
@@ -23,12 +23,12 @@ public class SandwishExceptionTest {
     @Parameterized.Parameters
     public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][] {
-            {new BadRequestException(), ErrorCode.BAD_REQUEST},
-            {new UnauthorizedException(), ErrorCode.UNAUTHORIZED},
-            {new ForbiddenException(), ErrorCode.FORBIDDEN},
-            {new NotFoundException(), ErrorCode.NOT_FOUND},
-            {new ConflictException(), ErrorCode.CONFLICT},
-            {new SystemException(), ErrorCode.SYSTEM_ERROR}
+            {new BadRequestException(), WebErrorCode.BAD_REQUEST},
+            {new UnauthorizedException(), WebErrorCode.UNAUTHORIZED},
+            {new ForbiddenException(), WebErrorCode.FORBIDDEN},
+            {new NotFoundException(), WebErrorCode.NOT_FOUND},
+            {new ConflictException(), WebErrorCode.CONFLICT},
+            {new SystemException(), WebErrorCode.SYSTEM_ERROR}
         });
     }
 
@@ -36,6 +36,7 @@ public class SandwishExceptionTest {
     public void shouldExposeErrorCodeAndDefaultMessage() {
         assertSame(errorCode, exception.getErrorCode());
         assertEquals(errorCode.getCode(), exception.getCode());
+        assertEquals(errorCode.getHttpStatus(), exception.getHttpStatus());
         assertEquals(errorCode.getMessage(), exception.getMessage());
     }
 
@@ -45,6 +46,7 @@ public class SandwishExceptionTest {
 
         assertSame(errorCode, custom.getErrorCode());
         assertEquals(errorCode.getCode(), custom.getCode());
+        assertEquals(errorCode.getHttpStatus(), custom.getHttpStatus());
         assertEquals("custom", custom.getMessage());
     }
 }

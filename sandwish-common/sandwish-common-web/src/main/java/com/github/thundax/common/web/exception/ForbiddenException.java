@@ -1,12 +1,12 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 public class ForbiddenException extends SandwishException {
 
     public ForbiddenException() {
-        super(ErrorCode.FORBIDDEN);
+        super(WebErrorCode.FORBIDDEN);
     }
 
     public ForbiddenException(String message) {
-        super(ErrorCode.FORBIDDEN, message);
+        super(WebErrorCode.FORBIDDEN, message);
     }
 }

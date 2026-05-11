@@ -1,12 +1,12 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 public class SystemException extends SandwishException {
 
     public SystemException() {
-        super(ErrorCode.SYSTEM_ERROR);
+        super(WebErrorCode.SYSTEM_ERROR);
     }
 
     public SystemException(String message) {
-        super(ErrorCode.SYSTEM_ERROR, message);
+        super(WebErrorCode.SYSTEM_ERROR, message);
     }
 }

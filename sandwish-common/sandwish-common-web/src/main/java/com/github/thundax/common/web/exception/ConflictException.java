@@ -1,12 +1,12 @@
-package com.github.thundax.common.exception;
+package com.github.thundax.common.web.exception;
 
 public class ConflictException extends SandwishException {
 
     public ConflictException() {
-        super(ErrorCode.CONFLICT);
+        super(WebErrorCode.CONFLICT);
     }
 
     public ConflictException(String message) {
-        super(ErrorCode.CONFLICT, message);
+        super(WebErrorCode.CONFLICT, message);
     }
 }

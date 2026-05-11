@@ -6,7 +6,7 @@ import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
-import com.github.thundax.modules.sys.utils.SysLogUtils;
+import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -27,6 +27,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class SysLogMethodInterceptor implements MethodInterceptor {
 
     private static final String TITLE_SEPARATOR = "-";
+
+    private final SysLogMessageService sysLogMessageService;
+
+    public SysLogMethodInterceptor(SysLogMessageService sysLogMessageService) {
+        this.sysLogMessageService = sysLogMessageService;
+    }
 
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
@@ -123,6 +129,6 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
             log.setRequestParams(JsonUtils.toJson(requestBody));
         }
 
-        SysLogUtils.saveLog(log);
+        sysLogMessageService.saveLog(log);
     }
 }

@@ -164,7 +164,7 @@ public final class LayerArchitectureRuleSupport {
 
         assertTrue(
                 "API modules may only declare entry-specific *AuthService, *RegistrationService, "
-                        + "PermissionService or implementation "
+                        + "PermissionService, SysLogMessageService or implementation "
                         + "source files. "
                         + "Other Service types belong in sandwish-biz. Violations: "
                         + violations,
@@ -396,7 +396,8 @@ public final class LayerArchitectureRuleSupport {
                 || className.endsWith("RegistrationService")
                 || className.endsWith("RegistrationServiceImpl")
                 || className.endsWith("PermissionService")
-                || className.endsWith("PermissionServiceImpl");
+                || className.endsWith("PermissionServiceImpl")
+                || className.endsWith("SysLogMessageService");
     }
 
     private static boolean isBusinessForbiddenEntryServiceType(String className) {

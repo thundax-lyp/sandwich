@@ -1,14 +1,12 @@
 package com.github.thundax.modules.auth.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
@@ -26,10 +24,8 @@ import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
-import org.junit.After;
+import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import org.junit.Test;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -37,11 +33,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 public class AuthControllerContractTest {
 
     private final ApiResponseBodyAdvice advice = new ApiResponseBodyAdvice();
-
-    @After
-    public void tearDown() {
-        SpringContextHolder.clearHolder();
-    }
 
     @Test
     public void shouldWrapPreAuthSessionJsonResponseWithApiResponseAdvice() throws Exception {
@@ -66,7 +57,6 @@ public class AuthControllerContractTest {
 
     @Test
     public void shouldWrapLoginJsonResponseWithApiResponseAdvice() throws Exception {
-        mockSysLogTemplate();
         Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
         String encryptedPassword = Sm2Helper.encrypt("plain-password", keyPair.getPublicKey());
         AdminAuthService authService = mock(AdminAuthService.class);
@@ -91,7 +81,8 @@ public class AuthControllerContractTest {
     }
 
     private MockMvc mockMvc(AdminAuthService authService, PreAuthSessionService preAuthSessionService) {
-        return MockMvcBuilders.standaloneSetup(new AuthController(authService, preAuthSessionService, authProperties()))
+        return MockMvcBuilders.standaloneSetup(new AuthController(
+                        authService, preAuthSessionService, authProperties(), mock(SysLogMessageService.class)))
                 .setControllerAdvice(advice)
                 .build();
     }
@@ -120,11 +111,5 @@ public class AuthControllerContractTest {
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
         accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         return new AuthAccessTokenResult(token, "refresh-token-1", accessToken);
-    }
-
-    private void mockSysLogTemplate() {
-        ApplicationContext applicationContext = mock(ApplicationContext.class);
-        when(applicationContext.getBean(eq(AmqpTemplate.class))).thenReturn(mock(AmqpTemplate.class));
-        SpringContextHolder.setApplicationContext(applicationContext);
     }
 }

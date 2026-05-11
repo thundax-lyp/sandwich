@@ -61,7 +61,7 @@
 - `PATH_SERVICE_QUERY_BIZ_OWNERSHIP`：Service 查询对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/query/`，不进入 API、Entity、DAO、infra 或 common 包。
 - `PATH_SERVICE_COMMAND_BIZ_OWNERSHIP`：Service 写入口对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/command/`，不进入 API、Entity、DAO、infra 或 common 包。
 - `PATH_COMMON_PAGE_MODEL`：`PageQuery` 和 `PageResult` 固定归属 `sandwish-common-core` 的 `com.github.thundax.common.page` 包。
-- `PATH_ENTRY_SERVICE_API_ONLY`：入口注册编排 Service 固定归属 API 入口模块；前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；后台权限会话适配 Service 固定归属 `sandwish-admin-api` 的 `auth.service`；可复用认证业务 Service 可以归属 `sandwish-biz` 的 `auth.service`，但不得依赖 API Request / Response、Servlet、安全框架上下文或入口专用 provider；`sandwish-biz` 不得声明 `*RegistrationService`、`PermissionService` 或对应 `*ServiceImpl`。
+- `PATH_ENTRY_SERVICE_API_ONLY`：入口注册编排 Service 固定归属 API 入口模块；前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；后台权限会话适配 Service 固定归属 `sandwish-admin-api` 的 `auth.service`；后台系统日志消息发送和消费服务固定归属 `sandwish-admin-api`，命名为 `SysLogMessageService`；可复用认证业务 Service 可以归属 `sandwish-biz` 的 `auth.service`，但不得依赖 API Request / Response、Servlet、安全框架上下文或入口专用 provider；`sandwish-biz` 不得声明 `*RegistrationService`、`PermissionService` 或对应 `*ServiceImpl`。
 
 ### Layer
 
@@ -88,7 +88,7 @@
 - `NAME_CONTROLLER`：Controller 命名以 `Controller` 结尾
 - `NAME_SERVICE`：Service 命名以 `Service` 结尾
 - `NAME_SERVICE_IMPL`：Service 实现命名以 `ServiceImpl` 结尾
-- `NAME_API_SERVICE_ENTRY_ONLY`：`sandwish-admin-api` 和 `sandwish-front-api` 中只有入口认证适配、注册编排和后台权限会话适配类型允许使用 `Service` / `ServiceImpl` 后缀，且名称必须以 `AuthService`、`RegistrationService`、`PermissionService` 或对应 `ServiceImpl` 结尾；其他业务 Service 固定归属 `sandwish-biz`。
+- `NAME_API_SERVICE_ENTRY_ONLY`：`sandwish-admin-api` 和 `sandwish-front-api` 中只有入口认证适配、注册编排、后台权限会话适配和后台系统日志消息服务类型允许使用 `Service` / `ServiceImpl` 后缀，且名称必须以 `AuthService`、`RegistrationService`、`PermissionService`、`SysLogMessageService` 或对应 `ServiceImpl` 结尾；其他业务 Service 固定归属 `sandwish-biz`。
 - `NAME_DAO`：DAO interface 命名固定以 `Dao` 结尾
 - `NAME_DAO_IMPL`：DAO implementation 命名固定以 `DaoImpl` 结尾
 - `NAME_MAPPER`：Mapper 命名以 `Mapper` 结尾
@@ -122,13 +122,14 @@
 - 后台专用入口不放到 `sandwish-front-api`
 - 前台专用入口不放到 `sandwish-admin-api`
 - 前后台复用业务不复制到两个 API 入口模块
-- 除入口专用认证适配、注册编排和后台权限会话适配 Service 外，其他 Service interface 和 Service implementation 应归属 `sandwish-biz`；可复用认证业务 Service 优先归属 `sandwish-biz`，后台权限会话适配命名为 `PermissionService`，前台会员注册编排命名为 `MemberRegistrationService`
+- 除入口专用认证适配、注册编排、后台权限会话适配 Service 和后台系统日志消息服务外，其他 Service interface 和 Service implementation 应归属 `sandwish-biz`；可复用认证业务 Service 优先归属 `sandwish-biz`，后台权限会话适配命名为 `PermissionService`，前台会员注册编排命名为 `MemberRegistrationService`，后台系统日志消息发送和消费服务命名为 `SysLogMessageService`
 - 无业务语义的通用能力才进入 `sandwish-common`
 - `persistence` 包段固定保留，用于区分业务侧 DAO interface 与 infra 侧持久化实现
 
 ### Layer
 
 - Controller 优先完成参数接收、基础校验和响应组装
+- 分页参数归一化、排序 ID 空值过滤和重复校验属于入口输入整理，固定在 Controller 或 InterfaceAssembler 完成；Service 只接收已规整的 `PageQuery` 和排序 Command，不在 ServiceImpl 中定义 `normalizePage` 或 `normalizeOrderedIds`
 - 事务边界默认放在 Service
 - Service 优先表达业务动作，避免让 Controller 感知过多持久化细节
 - 业务 Entity 不作为公开 HTTP 响应模型直接暴露

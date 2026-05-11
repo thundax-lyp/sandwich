@@ -3,6 +3,7 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.jasypt.JasyptStringEncryptor;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.sys.aop.SysLogPointcutAdvisor;
+import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import com.github.thundax.modules.utils.AvatarUtils;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ public class SandwishConfiguration {
     }
 
     @Bean
-    public SysLogPointcutAdvisor sysLogPointcutAdvisor() {
-        return new SysLogPointcutAdvisor();
+    public SysLogPointcutAdvisor sysLogPointcutAdvisor(SysLogMessageService sysLogMessageService) {
+        return new SysLogPointcutAdvisor(sysLogMessageService);
     }
 
     /**

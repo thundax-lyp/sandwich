@@ -49,7 +49,7 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
-import com.github.thundax.modules.sys.utils.SysLogUtils;
+import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
@@ -82,13 +82,18 @@ public class AuthController {
     private final AdminAuthService authService;
     private final PreAuthSessionService preAuthSessionService;
     private final AuthProperties properties;
+    private final SysLogMessageService sysLogMessageService;
 
     @Autowired
     public AuthController(
-            AdminAuthService authService, PreAuthSessionService preAuthSessionService, AuthProperties properties) {
+            AdminAuthService authService,
+            PreAuthSessionService preAuthSessionService,
+            AuthProperties properties,
+            SysLogMessageService sysLogMessageService) {
         this.authService = authService;
         this.preAuthSessionService = preAuthSessionService;
         this.properties = properties;
+        this.sysLogMessageService = sysLogMessageService;
     }
 
     @ApiOperation(value = "请求预认证会话")
@@ -384,7 +389,7 @@ public class AuthController {
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
         log.setRequestParams(AuthInterfaceAssembler.toLogJson(request));
-        SysLogUtils.saveLog(log);
+        sysLogMessageService.saveLog(log);
     }
 
     private void writeLog(HttpServletRequest currentRequest, String title, User user, String loginName) {
@@ -398,7 +403,7 @@ public class AuthController {
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
         log.setRequestParams(AuthInterfaceAssembler.toLogJson(loginName));
-        SysLogUtils.saveLog(log);
+        sysLogMessageService.saveLog(log);
     }
 
     private AuthAccessTokenResponse loginSuccess(

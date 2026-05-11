@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.aop;
 
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
+import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -13,8 +14,8 @@ public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
 
     private static final Class<? extends Annotation>[] ANNOTATION_CLASSES = new Class[] {SysLogger.class};
 
-    public SysLogPointcutAdvisor() {
-        setAdvice(new SysLogMethodInterceptor());
+    public SysLogPointcutAdvisor(SysLogMessageService sysLogMessageService) {
+        setAdvice(new SysLogMethodInterceptor(sysLogMessageService));
     }
 
     @Override

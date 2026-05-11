@@ -47,6 +47,7 @@ db/
 - `Storage`: `schema/storage.sql`, `data/storage.sql`
 - `Member`: `schema/member.sql`, `data/member.sql`
 - `Audit`: `schema/audit.sql`, `data/audit.sql`
+- `Assist`: 当前无 schema/data 脚本，异步任务只使用 Redis / JetCache 运行态缓存
 
 ## 4. Execution Order
 
@@ -69,6 +70,7 @@ db/
 - `auth` 初始化依赖 `system` 的用户与登录标识主数据。
 - `storage` 当前不依赖其他业务域初始化数据。
 - `member` 当前不依赖其他业务域初始化数据。
+- `assist` 当前只使用 Redis / JetCache 运行态缓存，不提供 schema 或 data 脚本；数据库边界见 `../docs/20-database/ASSIST-DATABASE-DESIGN.md`。
 
 ## 5. Change Policy
 

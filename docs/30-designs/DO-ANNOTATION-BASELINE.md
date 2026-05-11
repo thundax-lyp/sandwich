@@ -10,9 +10,9 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 
 当前扫描结果：
 
-- DO 类总数：20
-- 数据库表映射 DO：17
-- Redis-only DO：3
+- DO 类总数：18
+- 数据库表映射 DO：18
+- Redis-only DO：0
 - DataObject 类：0
 
 数据库表映射 DO 当前为：
@@ -36,11 +36,9 @@ DO 注解规约适用于同时满足以下条件的 Java 类：
 - `com.github.thundax.modules.sys.persistence.dataobject.UserDO`
 - `com.github.thundax.modules.sys.persistence.dataobject.UserRoleDO`
 
-Redis-only DO 当前为：
+Redis-only DO 当前为：无。
 
-- `com.github.thundax.modules.assist.persistence.dataobject.AsyncTaskDO`
-
-Redis-only DO 不纳入数据库表 DO 注解门禁，因为它们没有数据库表名，不补 `@TableName`。Redis-only DO 的命名规则归属运行态持久化设计，不混入数据库表注解门禁。
+缓存运行态对象使用 DAO implementation 内部 `CacheDTO`，不使用 `DO/DataObject` 命名，避免和数据库持久化对象混淆。
 
 ## 必需类级注解
 

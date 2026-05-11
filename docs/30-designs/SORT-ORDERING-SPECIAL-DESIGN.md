@@ -6,7 +6,7 @@
 核心目标：
 - 前端在排序操作时，仅提交有序实体 ID；不携带列表快照，不携带 priority 值；
 - 后端通过顺序写回 `priority` 实现排序；
-- `priority` 在全局范围内唯一且由服务端全权管理；
+- 数据库持久化 `FlatSort` 的 `priority` 在对应排序集合内唯一且由服务端全权管理；
 - 多用户并发情况下排序结果可预期、可重复、可回放。
 
 ## 2. Scope
@@ -34,9 +34,9 @@
 | `com.github.thundax.modules.sys.entity.User` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.sys.entity.Department` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`） |
 | `com.github.thundax.modules.sys.entity.Menu` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`），`visibility/maxRank` 仅作过滤 |
-| `com.github.thundax.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
+| `com.github.thundax.modules.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.member.entity.Member` | `FlatSort` | `priority, name` | 无固定 scope（全局平铺排序集合） |
-| `com.github.thundax.assist.entity.AsyncTask` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
+| `com.github.thundax.modules.assist.entity.AsyncTask` | `FlatSort` | `priority, id` | 当前 JetCache key 索引内的未过期任务集合 |
 
 ### 4.1 模块边界
 - `sandwish-admin-api` / `sandwish-front-api`：
@@ -45,7 +45,7 @@
 - `sandwish-biz`：
   - 实现 `FlatSort` 与 `TreeSort` 分域校验：排序域完整性、越权检测。
 - `sandwish-infra`：
-  - 提供重排写库能力：`FlatSort` 仅更新 `priority`；`TreeSort` 仅更新树结构索引或树移动字段。
+  - 提供重排持久化能力：数据库 `FlatSort` 仅更新 `priority`；`AsyncTask` 这类缓存运行态 `FlatSort` 仅更新缓存对象 `priority`；`TreeSort` 仅更新树结构索引或树移动字段。
 - 两类排序链路不能互相调用彼此入口，也不共享幂等键/并发键。
 
 ## 5. Core Business Objects
@@ -60,7 +60,7 @@
 1. `priority` 不允许外部任意输入。
 2. 仅 `FlatSort` 域支持 `priority` 重排；`TreeSort` 不支持 `priority` 重排。
 3. `TreeSort` 列表查询固定按 `lft` 排序；`FlatSort` 列表查询固定按 `priority` 排序。
-4. `FlatSort` 全局 `priority` 不重复（以数据库约束为主保护）。
+4. 数据库持久化 `FlatSort` 的 `priority` 不重复（以数据库约束为主保护）；缓存运行态 `FlatSort` 以当前缓存集合校验为准。
 5. 重排请求必须为 `orderedIds`，不接收优先级数值。
 6. 重排默认覆盖该域内完整排序集合，不允许仅交换局部片段导致歧义。
 7. 重排接口必须在一次事务中执行并保证幂等。
@@ -77,7 +77,8 @@
 - 写入策略：
   - 不使用插值，不执行 `1,2,3...` 等重写策略。
   - 每次交换仅改动交换对两个实体的 `priority`。
-  - `FlatSort` 的 `priority` 唯一性通过全局唯一约束与交换边界检查兜底保证。
+  - 数据库持久化 `FlatSort` 的 `priority` 唯一性通过全局唯一约束与交换边界检查兜底保证。
+  - 缓存运行态 `FlatSort` 不依赖数据库唯一约束，排序域按当前缓存索引内仍可读取的对象集合判定。
   - 目标 `orderedIds` 与最终顺序保持一一映射。
 - 支持前端多次拖拽快速重试：同一 `orderedIds` 的重排结果一致。
 
@@ -143,7 +144,8 @@
 5. 不写入任何 `priority`，保持原状。
 
 ## 9. Key Flows（数据库约束）
-- `FlatSort` 对 `priority` 执行全局唯一约束与索引优化。
+- 数据库持久化 `FlatSort` 对 `priority` 执行全局唯一约束与索引优化。
+- 缓存运行态 `FlatSort` 不建立数据库唯一约束，按缓存 key 索引读取当前排序集合。
 - 部署时先清理历史重复后再启用唯一约束。
 - `FlatSort` 查询列表按 `ORDER BY priority`，方向由 `sortDirection` 决定，并按约定追加必要过滤条件。
 - `TreeSort` 查询列表固定 `ORDER BY lft ASC`，并保持树形边界约束。
@@ -158,7 +160,7 @@
 - 重复提交同一 `orderedIds` 不产生差异值。
 - 重排排序域外 ID 提交被拒绝且无半成功。
 - 跨端调用（admin/front）共享同一排序语义。
-- 平铺重排 `priority` 全局不重复（数据约束可验证）。
+- 数据库持久化平铺重排 `priority` 全局不重复（数据约束可验证）。
 - 树形实体顺序仅受 `lft` 约束，`priority` 改动不影响树序结果。
 
 ## 12. Open Items

@@ -151,6 +151,7 @@ Sandwich 固定采用三层 API 架构。
 边界：
 
 - 可以依赖 `sandwish-common-core`。
+- 可以依赖 `sandwish-common-security` 读取或写入入口无关的 `SandwishContextHolder`。
 - 不承载 Controller、Interceptor、入口专用 Filter 或具体入口配置；允许承载入口无关的通用 Web Filter。
 - 不承载业务请求 / 响应对象。
 - Helper 只返回数据，不抛入口层业务异常。
@@ -378,7 +379,11 @@ Sandwich 固定采用三层 API 架构。
 
 `sandwish-admin-api -> sandwish-common-web -> sandwish-common-core`
 
+`sandwish-admin-api -> sandwish-common-web -> sandwish-common-security`
+
 `sandwish-front-api -> sandwish-common-web -> sandwish-common-core`
+
+`sandwish-front-api -> sandwish-common-web -> sandwish-common-security`
 
 Spring Security 接入链路允许入口模块依赖：
 

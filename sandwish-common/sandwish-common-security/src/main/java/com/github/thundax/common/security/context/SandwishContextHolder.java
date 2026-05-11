@@ -14,7 +14,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public final class SandwishContextHolder {
 
+    private static final ThreadLocal<String> REQUEST_ID_HOLDER = new ThreadLocal<>();
+
     private SandwishContextHolder() {}
+
+    public static String requestId() {
+        return REQUEST_ID_HOLDER.get();
+    }
+
+    public static void setRequestId(String requestId) {
+        REQUEST_ID_HOLDER.set(requestId);
+    }
 
     public static SandwishSubject currentSubject() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -54,7 +64,7 @@ public final class SandwishContextHolder {
 
     public static void setSubject(SandwishSubject subject) {
         if (subject == null || !subject.isAuthenticated()) {
-            clear();
+            clearSubject();
             return;
         }
         SecurityContextHolder.getContext()
@@ -62,8 +72,17 @@ public final class SandwishContextHolder {
                         subject, subject.getToken(), toAuthorities(subject.getAuthorities())));
     }
 
-    public static void clear() {
+    public static void clearSubject() {
         SecurityContextHolder.clearContext();
+    }
+
+    public static void clearRequestContext() {
+        REQUEST_ID_HOLDER.remove();
+    }
+
+    public static void clear() {
+        clearSubject();
+        clearRequestContext();
     }
 
     private static SandwishSubject resolvePrincipal(Authentication authentication) {

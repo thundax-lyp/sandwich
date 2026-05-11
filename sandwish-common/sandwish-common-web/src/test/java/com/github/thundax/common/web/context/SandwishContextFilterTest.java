@@ -3,7 +3,7 @@ package com.github.thundax.common.web.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import com.github.thundax.common.context.SandwishRequestContextHolder;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import org.junit.After;
@@ -15,7 +15,7 @@ public class SandwishContextFilterTest {
 
     @After
     public void tearDown() {
-        SandwishRequestContextHolder.clear();
+        SandwishContextHolder.clear();
     }
 
     @Test
@@ -23,16 +23,15 @@ public class SandwishContextFilterTest {
         SandwishContextFilter filter = new SandwishContextFilter(new DefaultSandwishContextResolver());
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader(DefaultSandwishContextResolver.HEADER_REQUEST_ID, "request-1");
-        request.addHeader(DefaultSandwishContextResolver.HEADER_TOKEN, "token-1");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {
-            assertEquals("request-1", SandwishRequestContextHolder.getContext().getRequestId());
-            assertEquals("token-1", SandwishRequestContextHolder.getContext().getToken());
+            assertEquals("request-1", SandwishContextHolder.requestId());
+            assertNull(SandwishContextHolder.currentToken());
         });
 
         assertEquals("request-1", response.getHeader(DefaultSandwishContextResolver.HEADER_REQUEST_ID));
-        assertNull(SandwishRequestContextHolder.getContext().getRequestId());
+        assertNull(SandwishContextHolder.requestId());
     }
 
     @Test
@@ -42,9 +41,8 @@ public class SandwishContextFilterTest {
         filter.doFilter(
                 new MockHttpServletRequest(),
                 new MockHttpServletResponse(),
-                (servletRequest, servletResponse) ->
-                        assertNull(SandwishRequestContextHolder.getContext().getRequestId()));
+                (servletRequest, servletResponse) -> assertNull(SandwishContextHolder.requestId()));
 
-        assertNull(SandwishRequestContextHolder.getContext().getRequestId());
+        assertNull(SandwishContextHolder.requestId());
     }
 }

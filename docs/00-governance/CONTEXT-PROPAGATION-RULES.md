@@ -70,7 +70,7 @@ Sandwich 当前通过统一 `SandwishContextHolder` 表达运行时身份上下�
   - 审计字段填充、私有数据过滤和持久化约束可以消费已建立的后台用户上下文
   - DAO / Mapper 不得自行解析 token、session 或 HTTP request
 - `sandwish-common-web`
-  - `SandwishContextFilter` 负责建立和清理 `SandwishRequestContextHolder` 中的通用请求元数据
+  - `SandwishContextFilter` 负责通过 `SandwishContextHolder` 建立和清理通用请求元数据
 
 ## 6. Global Constraints
 
@@ -148,13 +148,12 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 固定规则：
 
-- 通用请求元数据透传使用 `sandwish-common-core` 中已有的 `ContextSnapshot`、`ContextAwareRunnable` 和 `ContextAwareCallable`
-- `ContextAwareRunnable` / `ContextAwareCallable` 只负责 `SandwishRequestContextHolder` 中通用请求元数据，不自动搬运认证主体
+- 通用请求元数据固定通过 `SandwishContextHolder` 表达，标准 HTTP 入口由 `SandwishContextFilter` 建立并清理
+- 跨线程任务不得默认透传 `SandwishContextHolder`；确需 requestId 等请求元数据时，调用方必须显式读取并作为普通参数传入
 - 需要当前用户或会员身份的异步任务，必须显式传入稳定业务参数，或在进入业务前手工建立对应上下文
-- 不得假定 `SandwishContextHolder` 或 `SandwishRequestContextHolder` 会自动跨线程存在
+- 不得假定 `SandwishContextHolder` 会自动跨线程存在
 - 异步任务完成后必须通过 `SandwishContextHolder.clear()` 清理手工建立的身份上下文
-- 线程池、MQ、定时任务等非 HTTP 入口手工建立 `SandwishContextHolder` 或 `SandwishRequestContextHolder` 时，
-  必须在任务结束的 `finally` 中清理对应上下文
+- 线程池、MQ、定时任务等非 HTTP 入口手工建立 `SandwishContextHolder` 时，必须在任务结束的 `finally` 中清理对应上下文
 - 无法建立完整上下文的非标准入口，不得进入依赖当前身份的业务逻辑
 
 ### 6.7 Cache Rule

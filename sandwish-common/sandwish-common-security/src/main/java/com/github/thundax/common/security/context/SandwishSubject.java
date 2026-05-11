@@ -5,13 +5,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 public class SandwishSubject implements Serializable {
 
+    @Setter
     private String subjectId;
+
     private SandwishSubjectType subjectType = SandwishSubjectType.ANONYMOUS;
+
+    @Setter
     private String displayName;
+
+    @Setter
     private String token;
+
     private final Set<String> authorities = new LinkedHashSet<>();
 
     public SandwishSubject() {}
@@ -41,36 +51,8 @@ public class SandwishSubject implements Serializable {
         return authorities.contains(authority);
     }
 
-    public String getSubjectId() {
-        return subjectId;
-    }
-
-    public void setSubjectId(String subjectId) {
-        this.subjectId = subjectId;
-    }
-
-    public SandwishSubjectType getSubjectType() {
-        return subjectType;
-    }
-
     public void setSubjectType(SandwishSubjectType subjectType) {
         this.subjectType = subjectType == null ? SandwishSubjectType.UNKNOWN : subjectType;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public Set<String> getAuthorities() {

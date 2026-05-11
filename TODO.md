@@ -12,15 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `api-error-code-doc`：建立前后台 API error code 文档
-  - 范围文件：
-    - `docs/30-designs/ADMIN-API-ERROR-CODE-DESIGN.md`
-    - `docs/30-designs/FRONT-API-ERROR-CODE-DESIGN.md`
-    - `docs/30-designs/RUNBOOK-EXCEPTION-LAYERING.md`
-  - 处理动作：按 RUNBOOK 固定 `<DOMAIN>-<NUMBER>` 格式，建立前后台独立 error code 表。
-  - 验收点：两份 error code 文档存在，条目包含 code、HTTP status、messageKey、defaultMessage、触发场景和入口归属，同一入口内 code 无重复。
-  - 重要度：9/10
-
 - [ ] `common-exception-model`：重塑 common-core 业务异常模型
   - 范围文件：
     - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/exception/BizException.java`

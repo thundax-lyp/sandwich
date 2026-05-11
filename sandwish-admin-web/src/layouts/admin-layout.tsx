@@ -111,8 +111,8 @@ const getOpenKeys = (pathname: string) => {
     return openKeys;
 };
 
-const normalizeMenuKey = (menu: { id: string; url?: string | null }) => {
-    return menu.url || menu.id;
+const normalizeMenuKey = (menu: { id: number; url?: string | null }) => {
+    return menu.url || String(menu.id);
 };
 
 const buildAuthorizedMenuItems = (
@@ -122,7 +122,7 @@ const buildAuthorizedMenuItems = (
         return fallbackMenuItems;
     }
 
-    const childrenByParentId = new Map<string | null, typeof menus>();
+    const childrenByParentId = new Map<number | null, typeof menus>();
     menus.forEach((menu) => {
         const parentId = menu.parentId || null;
         const siblings = childrenByParentId.get(parentId) || [];
@@ -136,7 +136,7 @@ const buildAuthorizedMenuItems = (
 
         return {
             key,
-            icon: menuIconMap[key] || menuIconMap[menu.id],
+            icon: menuIconMap[key] || menuIconMap[String(menu.id)],
             label: menu.name,
             children: children.length ? children.map(toMenuItem) : undefined
         };

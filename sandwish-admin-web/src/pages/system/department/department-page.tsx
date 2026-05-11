@@ -32,7 +32,7 @@ const readDepartmentQuery = (values: DepartmentListRequest): DepartmentListReque
 };
 
 const buildDepartmentTree = (departments: DepartmentResponse[]) => {
-    const nodeMap = new Map<string, DepartmentTableNode>();
+    const nodeMap = new Map<number, DepartmentTableNode>();
     const roots: DepartmentTableNode[] = [];
 
     departments.forEach((department) => {
@@ -52,16 +52,6 @@ const buildDepartmentTree = (departments: DepartmentResponse[]) => {
         roots.push(department);
     });
 
-    const sortNodes = (nodes: DepartmentTableNode[]) => {
-        nodes.sort((first, second) => (first.priority ?? 0) - (second.priority ?? 0));
-        nodes.forEach((node) => {
-            if (node.children) {
-                sortNodes(node.children);
-            }
-        });
-    };
-
-    sortNodes(roots);
     return roots;
 };
 
@@ -75,7 +65,7 @@ const countLeafDepartments = (departments: DepartmentTableNode[]): number => {
     }, 0);
 };
 
-const collectDepartmentIds = (departments: DepartmentTableNode[]): string[] => {
+const collectDepartmentIds = (departments: DepartmentTableNode[]): number[] => {
     return departments.flatMap((department) => [
         department.id,
         ...(department.children ? collectDepartmentIds(department.children) : [])
@@ -103,26 +93,11 @@ const columns: TableProps<DepartmentTableNode>["columns"] = [
         render: (namePath?: string | null) => namePath || <Text type="secondary">根部门</Text>
     },
     {
-        title: "排序",
-        dataIndex: "priority",
-        key: "priority",
-        width: 96,
-        align: "right",
-        render: (priority?: number | null) => priority ?? "-"
-    },
-    {
         title: "备注",
         dataIndex: "remarks",
         key: "remarks",
         ellipsis: true,
         render: (remarks?: string | null) => remarks || <Text type="secondary">未填写</Text>
-    },
-    {
-        title: "更新时间",
-        dataIndex: "updateDate",
-        key: "updateDate",
-        width: 180,
-        render: (updateDate?: string | null) => updateDate || <Text type="secondary">-</Text>
     }
 ];
 

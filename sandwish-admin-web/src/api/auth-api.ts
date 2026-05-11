@@ -3,7 +3,7 @@ import { ADMIN_API_BASE_URL, postJson } from "./http";
 export interface LoginFormResponse {
     loginToken: string;
     refreshToken: string;
-    expireSeconds: number;
+    expiredAt: number;
     publicKey: string;
 }
 

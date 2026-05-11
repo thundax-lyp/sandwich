@@ -4,7 +4,7 @@ export const ADMIN_API_BASE_URL = "/admin-api/api";
 const ACCESS_TOKEN_HEADER = "Access-Token";
 
 interface ApiResponse<T> {
-    code: number;
+    code: string;
     message: string;
     data: T;
 }
@@ -14,14 +14,18 @@ interface RequestOptions<TBody> {
 }
 
 export class ApiError extends Error {
-    readonly code: number;
+    readonly code: string | number;
 
-    constructor(code: number, message: string) {
+    constructor(code: string | number, message: string) {
         super(message);
         this.name = "ApiError";
         this.code = code;
     }
 }
+
+const isSuccessCode = (code: string | undefined) => {
+    return code === "COMMON-00000";
+};
 
 export const postJson = async <TResponse, TBody = unknown>(
     path: string,
@@ -42,9 +46,9 @@ export const postJson = async <TResponse, TBody = unknown>(
     });
 
     const payload = (await response.json()) as ApiResponse<TResponse>;
-    if (!response.ok || payload.code !== 0) {
+    if (!response.ok || !isSuccessCode(payload.code)) {
         const code = payload.code ?? response.status;
-        if (code === 401) {
+        if (response.status === 401 || code === "COMMON-00002") {
             clearAccessToken();
         }
         throw new ApiError(code, payload.message || "请求失败");

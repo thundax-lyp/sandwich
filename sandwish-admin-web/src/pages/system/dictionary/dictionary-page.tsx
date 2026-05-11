@@ -13,7 +13,6 @@ import {
     Card,
     Form,
     Input,
-    InputNumber,
     Modal,
     Space,
     Table,
@@ -40,11 +39,10 @@ const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
 
 interface DictFormValues {
-    id?: string | null;
+    id?: number | null;
     type: string;
     label: string;
     value: string;
-    priority?: number | null;
     remarks?: string | null;
 }
 
@@ -67,7 +65,6 @@ const readFormRequest = (values: DictFormValues): DictSaveRequest => {
         type: values.type.trim(),
         label: values.label.trim(),
         value: values.value.trim(),
-        priority: values.priority ?? 0,
         remarks: normalizeSearch(values.remarks)
     };
 };
@@ -98,10 +95,6 @@ export const DictionaryPage = () => {
     const currentPageSize = query.pageSize || DEFAULT_PAGE_SIZE;
     const typeCount = useMemo(
         () => new Set(dictionaries.map((item) => item.type)).size,
-        [dictionaries]
-    );
-    const editedCount = useMemo(
-        () => dictionaries.filter((item) => Boolean(item.updateDate)).length,
         [dictionaries]
     );
     const topTypes = useMemo(() => {
@@ -161,9 +154,7 @@ export const DictionaryPage = () => {
 
     const openCreateEditor = () => {
         setEditingDictionary(null);
-        editForm.setFieldsValue({
-            priority: 0
-        } as DictFormValues);
+        editForm.resetFields();
         setEditorOpen(true);
     };
 
@@ -174,7 +165,6 @@ export const DictionaryPage = () => {
             type: dictionary.type,
             label: dictionary.label,
             value: dictionary.value,
-            priority: dictionary.priority ?? 0,
             remarks: dictionary.remarks
         });
         setEditorOpen(true);
@@ -194,7 +184,7 @@ export const DictionaryPage = () => {
         saveMutation.mutate(readFormRequest(values));
     };
 
-    const confirmDelete = (ids: string[]) => {
+    const confirmDelete = (ids: number[]) => {
         Modal.confirm({
             title: "删除字典项",
             content: `确认删除 ${ids.length} 个字典项？删除后需要重新新增。`,
@@ -231,26 +221,11 @@ export const DictionaryPage = () => {
             render: (value: string) => <Text code>{value}</Text>
         },
         {
-            title: "排序",
-            dataIndex: "priority",
-            key: "priority",
-            width: 96,
-            align: "right",
-            render: (priority?: number | null) => priority ?? 0
-        },
-        {
             title: "备注",
             dataIndex: "remarks",
             key: "remarks",
             ellipsis: true,
             render: (remarks?: string | null) => remarks || <Text type="secondary">未填写</Text>
-        },
-        {
-            title: "更新时间",
-            dataIndex: "updateDate",
-            key: "updateDate",
-            width: 180,
-            render: (updateDate?: string | null) => updateDate || <Text type="secondary">-</Text>
         },
         {
             title: "操作",
@@ -313,8 +288,8 @@ export const DictionaryPage = () => {
                     <strong>{typeCount}</strong>
                 </Card>
                 <Card className="dictionary-summary-card">
-                    <Text type="secondary">已维护</Text>
-                    <strong>{editedCount}</strong>
+                    <Text type="secondary">当前页</Text>
+                    <strong>{dictionaries.length}</strong>
                 </Card>
             </section>
 
@@ -380,7 +355,7 @@ export const DictionaryPage = () => {
                         icon={<DeleteOutlined />}
                         disabled={!canEditDictionary || selectedRowKeys.length === 0}
                         loading={deleteMutation.isPending}
-                        onClick={() => confirmDelete(selectedRowKeys.map(String))}
+                        onClick={() => confirmDelete(selectedRowKeys.map(Number))}
                     >
                         批量删除
                     </Button>
@@ -462,9 +437,6 @@ export const DictionaryPage = () => {
                         rules={[{ required: true, message: "请输入值" }]}
                     >
                         <Input placeholder="例如：ENABLED" />
-                    </Form.Item>
-                    <Form.Item name="priority" label="排序">
-                        <InputNumber min={0} precision={0} style={{ width: "100%" }} />
                     </Form.Item>
                     <Form.Item name="remarks" label="备注">
                         <TextArea rows={3} maxLength={200} showCount placeholder="补充使用说明" />

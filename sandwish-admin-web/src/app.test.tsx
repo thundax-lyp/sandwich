@@ -39,10 +39,10 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: "user-1",
+                                id: 1,
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -59,13 +59,13 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: [
-                                { id: "menu-system", name: "系统管理" },
+                                { id: 10, name: "系统管理" },
                                 {
-                                    id: "menu-user",
-                                    parentId: "menu-system",
+                                    id: 11,
+                                    parentId: 10,
                                     name: "用户管理",
                                     url: "/system/users"
                                 }
@@ -83,7 +83,7 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 perms: ["sys:user:view", "sys:user:edit"]
@@ -100,7 +100,7 @@ describe("App", () => {
             return Promise.resolve(
                 new Response(
                     JSON.stringify({
-                        code: 404,
+                        code: "COMMON-00004",
                         message: "not found"
                     }),
                     {
@@ -156,12 +156,12 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 loginToken: "login-form-token",
                                 refreshToken: "refresh-token",
-                                expireSeconds: 300,
+                                expiredAt: 1778513052155,
                                 publicKey: "public-key"
                             }
                         }),
@@ -188,7 +188,7 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 token: "login-access-token",
@@ -207,7 +207,7 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 perms: ["sys:user:view", "sys:user:edit"]
@@ -225,10 +225,10 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: "user-1",
+                                id: 1,
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -243,7 +243,7 @@ describe("App", () => {
 
             if (url.endsWith("/sys/current-user/menus")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: 0, message: "success", data: [] }), {
+                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
                         headers: { "Content-Type": "application/json" },
                         status: 200
                     })
@@ -251,7 +251,7 @@ describe("App", () => {
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
                     headers: { "Content-Type": "application/json" },
                     status: 404
                 })
@@ -290,10 +290,10 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: "user-1",
+                                id: 1,
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -308,7 +308,7 @@ describe("App", () => {
 
             if (url.endsWith("/sys/current-user/menus")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: 0, message: "success", data: [] }), {
+                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
                         headers: { "Content-Type": "application/json" },
                         status: 200
                     })
@@ -319,7 +319,7 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 perms: ["sys:user:view"]
@@ -334,7 +334,7 @@ describe("App", () => {
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: 0, message: "success", data: true }), {
+                new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: true }), {
                     headers: { "Content-Type": "application/json" },
                     status: 200
                 })
@@ -371,24 +371,22 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: [
                                 {
-                                    id: "dept-root",
+                                    id: 1,
                                     name: "总部",
                                     shortName: "HQ",
                                     namePath: "总部",
-                                    priority: 1,
                                     remarks: "核心组织"
                                 },
                                 {
-                                    id: "dept-tech",
-                                    parentId: "dept-root",
+                                    id: 2,
+                                    parentId: 1,
                                     name: "技术部",
                                     shortName: "Tech",
-                                    namePath: "总部/技术部",
-                                    priority: 2
+                                    namePath: "总部/技术部"
                                 }
                             ]
                         }),
@@ -401,7 +399,7 @@ describe("App", () => {
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
                     headers: { "Content-Type": "application/json" },
                     status: 404
                 })
@@ -442,7 +440,7 @@ describe("App", () => {
                 return Promise.resolve(
                     new Response(
                         JSON.stringify({
-                            code: 0,
+                            code: "COMMON-00000",
                             message: "success",
                             data: {
                                 pageNo: 1,
@@ -451,20 +449,17 @@ describe("App", () => {
                                 totalCount: 2,
                                 records: [
                                     {
-                                        id: "dict-enabled",
+                                        id: 1,
                                         type: "user_status",
                                         label: "启用",
                                         value: "ENABLED",
-                                        priority: 1,
-                                        remarks: "允许登录",
-                                        updateDate: "2026-05-07 09:00:00"
+                                        remarks: "允许登录"
                                     },
                                     {
-                                        id: "dict-disabled",
+                                        id: 2,
                                         type: "user_status",
                                         label: "停用",
-                                        value: "DISABLED",
-                                        priority: 2
+                                        value: "DISABLED"
                                     }
                                 ]
                             }
@@ -478,7 +473,7 @@ describe("App", () => {
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: 404, message: "not found" }), {
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
                     headers: { "Content-Type": "application/json" },
                     status: 404
                 })
@@ -519,7 +514,7 @@ describe("App", () => {
     it("clears stale tokens when protected menu loading is unauthorized", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "stale-token");
         vi.spyOn(globalThis, "fetch").mockResolvedValue(
-            new Response(JSON.stringify({ code: 401, message: "未授权用户" }), {
+            new Response(JSON.stringify({ code: "COMMON-00002", message: "未授权用户" }), {
                 headers: { "Content-Type": "application/json" },
                 status: 200
             })

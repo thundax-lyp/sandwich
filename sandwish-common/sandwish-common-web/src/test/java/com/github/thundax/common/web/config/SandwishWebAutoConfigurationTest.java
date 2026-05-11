@@ -7,6 +7,7 @@ import com.github.thundax.common.web.context.DefaultSandwishContextResolver;
 import com.github.thundax.common.web.context.SandwishContextFilter;
 import com.github.thundax.common.web.context.SandwishContextResolver;
 import com.github.thundax.common.web.exception.GlobalExceptionHandler;
+import com.github.thundax.common.web.i18n.I18nMessageResolver;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
@@ -23,6 +24,7 @@ public class SandwishWebAutoConfigurationTest {
     @Test
     public void shouldRegisterCommonWebBeans() {
         contextRunner.run(context -> {
+            context.getBean(I18nMessageResolver.class);
             context.getBean(GlobalExceptionHandler.class);
             context.getBean(ApiResponseBodyAdvice.class);
             context.getBean(SandwishContextResolver.class);

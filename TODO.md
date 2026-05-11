@@ -12,16 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `common-web-i18n`：将 i18n 文案解析迁移到 common-web
-  - 范围文件：
-    - `sandwish-common/sandwish-common-core/src/main/java/com/github/thundax/common/i18n/I18nMessages.java`
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/i18n/I18nMessageResolver.java`
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/exception/GlobalExceptionHandlerTest.java`
-  - 处理动作：删除 core 静态 `I18nMessages`，在 common-web 使用构造器注入的 resolver 完成 response message 解析。
-  - 验收点：生产代码中只有 common-web/API 边界解析 i18n，biz/infra/common-core 不引用 `MessageSource`、`LocaleContextHolder` 或 `I18nMessages`。
-  - 重要度：8/10
-
 - [ ] `biz-exception-boundary`：增加 Service 异常边界注解和 AOP
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalAuthService.java`

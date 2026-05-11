@@ -37,7 +37,9 @@ public class SandwishExceptionTest {
         assertSame(errorCode, exception.getErrorCode());
         assertEquals(errorCode.getCode(), exception.getCode());
         assertEquals(errorCode.getHttpStatus(), exception.getHttpStatus());
+        assertEquals(errorCode.getMessageKey(), exception.getMessageKey());
         assertEquals(errorCode.getMessage(), exception.getMessage());
+        assertEquals(errorCode.getMessage(), exception.getDefaultMessage());
     }
 
     @Test
@@ -48,5 +50,7 @@ public class SandwishExceptionTest {
         assertEquals(errorCode.getCode(), custom.getCode());
         assertEquals(errorCode.getHttpStatus(), custom.getHttpStatus());
         assertEquals("custom", custom.getMessage());
+        assertEquals(errorCode.getMessageKey(), custom.getMessageKey());
+        assertEquals("custom", custom.getDefaultMessage());
     }
 }

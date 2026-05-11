@@ -1,6 +1,5 @@
-package com.github.thundax.modules.auth.exception;
+package com.github.thundax.common.exception;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.web.exception.ExceptionTranslator;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.common.web.exception.WebErrorCode;
@@ -24,6 +23,9 @@ public class FrontExceptionTranslator implements ExceptionTranslator, Ordered {
         register(WebErrorCode.BAD_REQUEST, "AUTH-00007", "auth.exception.login-request-too-many", "登录请求过多");
         register(WebErrorCode.BAD_REQUEST, "AUTH-00008", "auth.exception.login-form-key-expired", "登录表单密钥已失效");
         register(WebErrorCode.BAD_REQUEST, "AUTH-00009", "auth.exception.login-form-expired", "登录表单已失效");
+        register(WebErrorCode.BAD_REQUEST, "AUTH-00010", "auth.exception.member-unavailable", "会员状态不可用");
+        register(WebErrorCode.CONFLICT, "AUTH-00011", "auth.exception.identity-exists", "会员标识已存在");
+        register(WebErrorCode.BAD_REQUEST, "SYS-00001", "sys.exception.invalid-parameter", "参数无效");
     }
 
     @Override

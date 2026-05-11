@@ -33,6 +33,10 @@
         </dependency>
         <dependency>
             <groupId>com.github.thundax</groupId>
+            <artifactId>sandwish-common-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.thundax</groupId>
             <artifactId>sandwish-common-security</artifactId>
         </dependency>
         <dependency>

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.FrontBizExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -73,13 +74,12 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginAccount(MemberAuthCommand command) throws ApiException {
+    public MemberTokenResult loginAccount(MemberAuthCommand command) {
         return loginAccount(command.getAccount(), command.getPlainPassword(), command.getIp(), command.getUserAgent());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    private MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent)
-            throws ApiException {
+    private MemberTokenResult loginAccount(String account, String plainPassword, String ip, String userAgent) {
         PrincipalIdentity principalIdentity;
         try {
             principalIdentity = principalAuthService.authenticatePassword(new AuthenticatePasswordCommand(
@@ -97,7 +97,7 @@ public class MemberAuthServiceImpl implements MemberAuthService {
                     ip,
                     userAgent,
                     PrincipalLoginEvent.REASON_INVALID_CREDENTIAL);
-            throw new ApiException("用户名或密码错误");
+            throw FrontBizExceptions.invalidUsernamePassword();
         }
         Member member = requireActiveMember(principalIdentity.getPrincipalKey().getPrincipalId());
         MemberTokenResult result = createTokenResult(member);
@@ -114,16 +114,16 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult loginSms(MemberAuthCommand command) throws ApiException {
+    public MemberTokenResult loginSms(MemberAuthCommand command) {
         return loginSms(command.getMobile(), command.getIp(), command.getUserAgent());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    private MemberTokenResult loginSms(String mobile, String ip, String userAgent) throws ApiException {
+    private MemberTokenResult loginSms(String mobile, String ip, String userAgent) {
         PrincipalIdentity identity;
         try {
             identity = requireIdentity(PrincipalIdentityType.MEMBER_MOBILE, mobile);
-        } catch (ApiException e) {
+        } catch (BizException e) {
             writeLoginEvent(
                     null,
                     PrincipalLoginEventType.LOGIN_FAILED,
@@ -149,23 +149,23 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public MemberTokenResult refreshAccessToken(MemberAuthCommand command) throws ApiException {
+    public MemberTokenResult refreshAccessToken(MemberAuthCommand command) {
         return refreshAccessToken(command.getRefreshToken(), command.getIp(), command.getUserAgent());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    private MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) throws ApiException {
+    private MemberTokenResult refreshAccessToken(String refreshToken, String ip, String userAgent) {
         PrincipalRefreshToken oldRefreshToken = principalRefreshTokenDao.getByToken(refreshToken);
         Date now = new Date();
         if (oldRefreshToken == null || !oldRefreshToken.canRefresh(now)) {
-            throw new ApiException("refreshToken已失效");
+            throw FrontBizExceptions.refreshTokenExpired();
         }
         oldRefreshToken.markUsed();
         principalRefreshTokenDao.updateStatus(oldRefreshToken);
         Member member = requireActiveMember(oldRefreshToken.getPrincipalKey().getPrincipalId());
         PrincipalAuthSession session = principalAuthSessionDao.getById(oldRefreshToken.getSessionId());
         if (session == null || session.isExpired(now)) {
-            throw new ApiException("refreshToken已失效");
+            throw FrontBizExceptions.refreshTokenExpired();
         }
         MemberTokenResult result = createTokenResult(member, session);
         writeLoginEvent(
@@ -181,15 +181,15 @@ public class MemberAuthServiceImpl implements MemberAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void logout(MemberAuthCommand command) throws ApiException {
+    public void logout(MemberAuthCommand command) {
         logout(command.getAccessToken(), command.getIp(), command.getUserAgent());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    private void logout(String accessToken, String ip, String userAgent) throws ApiException {
+    private void logout(String accessToken, String ip, String userAgent) {
         PrincipalAccessToken token = principalAccessTokenDao.getByToken(accessToken);
         if (token == null) {
-            throw new ApiException("accessToken已失效");
+            throw FrontBizExceptions.accessTokenExpired();
         }
         Date now = new Date();
         token.revoke();
@@ -283,20 +283,20 @@ public class MemberAuthServiceImpl implements MemberAuthService {
         return result;
     }
 
-    private Member requireActiveMember(Long memberId) throws ApiException {
+    private Member requireActiveMember(Long memberId) {
         Member member = memberService.get(MemberIdCodec.toDomain(memberId));
         if (member == null || !member.isActive()) {
-            throw new ApiException("会员状态不可用");
+            throw FrontBizExceptions.memberUnavailable();
         }
         return member;
     }
 
-    private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) throws ApiException {
+    private PrincipalIdentity requireIdentity(PrincipalIdentityType type, String value) {
         PrincipalIdentity identity;
         try {
             identity = principalAuthService.authenticateIdentity(new AuthenticateIdentityCommand(type, value));
         } catch (InvalidPasswordException e) {
-            throw new ApiException("用户名或密码错误");
+            throw FrontBizExceptions.invalidUsernamePassword();
         }
         return identity;
     }

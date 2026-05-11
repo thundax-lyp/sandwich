@@ -1,25 +1,25 @@
 package com.github.thundax.common.web;
 
+import com.github.thundax.common.web.response.ApiResponse;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.http.HttpStatus;
 
 public class ReturnObject extends HashMap<String, Object> {
 
     public ReturnObject() {
-        put("code", 0);
-        put("message", "操作成功");
+        put("code", ApiResponse.SUCCESS_CODE);
+        put("message", ApiResponse.SUCCESS_MESSAGE);
     }
 
     public static ReturnObject error() {
-        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "未知异常，请联系管理员");
+        return error(ApiResponse.ERROR_CODE, ApiResponse.ERROR_MESSAGE);
     }
 
     public static ReturnObject error(String msg) {
-        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, msg);
+        return error(ApiResponse.ERROR_CODE, msg);
     }
 
-    public static ReturnObject error(int code, String msg) {
+    public static ReturnObject error(String code, String msg) {
         ReturnObject returnObject = new ReturnObject();
         returnObject.put("code", code);
         returnObject.put("message", msg);

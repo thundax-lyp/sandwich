@@ -12,19 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `front-api-exception-migration`：迁移前台 API 异常响应
-  - 范围文件：
-    - `sandwish-front-api/src/main/java/com/github/thundax/common/web/ReturnObject.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/LoginController.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/controller/RegisterController.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberAuthService.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberAuthServiceImpl.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/MemberRegistrationService.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/service/impl/MemberRegistrationServiceImpl.java`
-  - 处理动作：删除前台 API 的 checked `ApiException` 和 int code 返回，统一通过前台 translator 输出 String code。
-  - 验收点：前台 API tests 覆盖 String code，前台生产代码无 `ApiException` 使用点。
-  - 重要度：10/10
-
 - [ ] `infra-exception-boundary`：盘点并清理 Infra 业务异常依赖
   - 范围文件：
     - 搜索模式：`sandwish-infra/src/main/java/com/github/thundax/modules/**/persistence/**/*.java`

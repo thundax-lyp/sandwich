@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.controller;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.FrontResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
@@ -70,21 +70,20 @@ public class LoginController {
 
     @ApiOperation(value = "请求预认证会话")
     @PostMapping("pre-auth-session")
-    public MemberLoginFormResponse preAuthSession() throws ApiException {
+    public MemberLoginFormResponse preAuthSession() {
         return MemberLoginInterfaceAssembler.toLoginFormResponse(createPreAuthSession());
     }
 
     @ApiOperation(value = "刷新预认证会话")
     @PostMapping("pre-auth-session/refresh")
-    public MemberLoginFormResponse refreshPreAuthSession(@Valid @RequestBody MemberRefreshTokenRequest request)
-            throws ApiException {
+    public MemberLoginFormResponse refreshPreAuthSession(@Valid @RequestBody MemberRefreshTokenRequest request) {
         return MemberLoginInterfaceAssembler.toLoginFormResponse(refreshPreAuthSession(request.getRefreshToken()));
     }
 
     @ApiOperation(value = "账号密码登录")
     @PostMapping("login")
     public MemberTokenResponse loginAccount(
-            @Valid @RequestBody MemberAccountLoginRequest request, HttpServletRequest httpRequest) throws ApiException {
+            @Valid @RequestBody MemberAccountLoginRequest request, HttpServletRequest httpRequest) {
         PreAuthSessionToken token = PreAuthSessionToken.of(request.getLoginToken());
         if (!validateCaptcha(token, request.getCaptcha())) {
             memberAuthService.recordLoginFailed(memberAuthCommand(
@@ -98,7 +97,7 @@ public class LoginController {
                     ip(httpRequest),
                     userAgent(httpRequest),
                     PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
-            throw new ApiException("图形验证码错误");
+            throw FrontResponseExceptions.invalidCaptcha();
         }
         String password = decryptRsaValue(token, request.getPassword());
         preAuthSessionService.release(
@@ -119,7 +118,7 @@ public class LoginController {
     @ApiOperation(value = "短信登录")
     @PostMapping("login/sms")
     public MemberTokenResponse loginSms(
-            @Valid @RequestBody MemberSmsLoginRequest request, HttpServletRequest httpRequest) throws ApiException {
+            @Valid @RequestBody MemberSmsLoginRequest request, HttpServletRequest httpRequest) {
         PreAuthSessionToken token = PreAuthSessionToken.of(request.getLoginToken());
         if (!validateSmsValidateCode(token, request.getMobile(), request.getValidateCode())) {
             memberAuthService.recordLoginFailed(memberAuthCommand(
@@ -133,7 +132,7 @@ public class LoginController {
                     ip(httpRequest),
                     userAgent(httpRequest),
                     PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
-            throw new ApiException("短信验证码错误");
+            throw FrontResponseExceptions.invalidSmsCode();
         }
         preAuthSessionService.release(
                 new ReleasePreAuthSessionCommand(requireSessionIdByToken(request.getLoginToken())));
@@ -153,7 +152,7 @@ public class LoginController {
     @ApiOperation(value = "刷新 access token")
     @PostMapping("token/refresh")
     public MemberTokenResponse refreshAccessToken(
-            @Valid @RequestBody MemberRefreshTokenRequest request, HttpServletRequest httpRequest) throws ApiException {
+            @Valid @RequestBody MemberRefreshTokenRequest request, HttpServletRequest httpRequest) {
         return MemberLoginInterfaceAssembler.toTokenResponse(memberAuthService.refreshAccessToken(memberAuthCommand(
                 null,
                 null,
@@ -184,7 +183,7 @@ public class LoginController {
     @ApiOperation(value = "登出")
     @PostMapping("logout")
     public MemberLoginStatusResponse logout(
-            @Valid @RequestBody MemberLogoutRequest request, HttpServletRequest httpRequest) throws ApiException {
+            @Valid @RequestBody MemberLogoutRequest request, HttpServletRequest httpRequest) {
         memberAuthService.logout(memberAuthCommand(
                 null,
                 null,
@@ -234,9 +233,9 @@ public class LoginController {
         return null;
     }
 
-    private PreAuthSession createPreAuthSession() throws ApiException {
+    private PreAuthSession createPreAuthSession() {
         if (preAuthSessionService.count(new PreAuthSessionQuery()) > authProperties.getMaxLoginCount()) {
-            throw new ApiException("登录请求过多");
+            throw FrontResponseExceptions.loginRequestTooMany();
         }
         PreAuthSession session =
                 preAuthSessionService.create(new CreatePreAuthSessionCommand(authProperties.getLoginExpiredSeconds()));
@@ -249,7 +248,7 @@ public class LoginController {
         return preAuthSessionService.get(new PreAuthSessionQuery(session.getId(), null, null, null));
     }
 
-    private PreAuthSession refreshPreAuthSession(String refreshToken) throws ApiException {
+    private PreAuthSession refreshPreAuthSession(String refreshToken) {
         PreAuthSession session = preAuthSessionService.refresh(new RefreshPreAuthSessionCommand(
                 requireSessionIdByRefreshToken(refreshToken),
                 authProperties.getLoginExpiredSeconds(),
@@ -258,7 +257,7 @@ public class LoginController {
         return session;
     }
 
-    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) throws ApiException {
+    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) {
         if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
             return true;
@@ -269,8 +268,7 @@ public class LoginController {
                         new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
     }
 
-    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
-            throws ApiException {
+    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode) {
         if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
             return true;
@@ -285,22 +283,22 @@ public class LoginController {
                         validateCode);
     }
 
-    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
+    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) {
         String privateKey = preAuthSessionService.getValue(
                 new PreAuthSessionQuery(requireSessionId(token), null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
-            throw new ApiException("登录表单密钥已失效");
+            throw FrontResponseExceptions.loginFormKeyExpired();
         }
         String[] privateKeyParts = StringUtils.split(privateKey, MEMBER_PRIVATE_KEY_SEPARATOR);
         if (privateKeyParts == null || privateKeyParts.length != 2) {
-            throw new ApiException("登录表单密钥已失效");
+            throw FrontResponseExceptions.loginFormKeyExpired();
         }
         RSAUtils.ReadableKeyPair keyPair =
                 new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
         return RSAUtils.decryptBase64(encryptedValue, keyPair);
     }
 
-    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) throws ApiException {
+    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) {
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
     }
@@ -317,24 +315,24 @@ public class LoginController {
         return request.getHeader("user-agent");
     }
 
-    private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
+    private PreAuthSessionId requireSessionIdByToken(String token) {
         return requireSessionId(PreAuthSessionToken.of(token));
     }
 
-    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
+    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) {
         PreAuthSessionId sessionId =
                 preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
         if (sessionId == null) {
-            throw new ApiException("登录表单已失效");
+            throw FrontResponseExceptions.loginFormExpired();
         }
         return sessionId;
     }
 
-    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) throws ApiException {
+    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByRefreshToken(
                 new PreAuthSessionQuery(null, null, PreAuthSessionToken.of(refreshToken), null));
         if (sessionId == null) {
-            throw new ApiException("登录表单已失效");
+            throw FrontResponseExceptions.loginFormExpired();
         }
         return sessionId;
     }

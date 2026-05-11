@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.FrontBizExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -71,7 +71,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerAccount(MemberRegistrationCommand command) throws ApiException {
+    public EntityId registerAccount(MemberRegistrationCommand command) {
         String loginToken = command.getLoginToken();
         String name = command.getName();
         String account = command.getAccount();
@@ -82,7 +82,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(encryptedPassword, "password");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateCaptcha(token, captcha)) {
-            throw new ApiException("图形验证码错误");
+            throw FrontBizExceptions.invalidCaptcha();
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_ACCOUNT, account);
 
@@ -97,14 +97,14 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     @Override
-    public void sendRegisterSmsCode(MemberRegistrationCommand command) throws ApiException {
+    public void sendRegisterSmsCode(MemberRegistrationCommand command) {
         String loginToken = command.getLoginToken();
         String mobile = command.getMobile();
         String captcha = command.getCaptcha();
         requireText(mobile, "mobile");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateCaptcha(token, captcha)) {
-            throw new ApiException("图形验证码错误");
+            throw FrontBizExceptions.invalidCaptcha();
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
         String validateCode = PreAuthCodeHelper.generateSmsCode();
@@ -121,7 +121,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerMobile(MemberRegistrationCommand command) throws ApiException {
+    public EntityId registerMobile(MemberRegistrationCommand command) {
         String loginToken = command.getLoginToken();
         String name = command.getName();
         String mobile = command.getMobile();
@@ -130,7 +130,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(mobile, "mobile");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateSmsValidateCode(token, mobile, validateCode)) {
-            throw new ApiException("短信验证码错误");
+            throw FrontBizExceptions.invalidSmsCode();
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_MOBILE, mobile);
 
@@ -141,14 +141,14 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     @Override
-    public void sendRegisterEmailCode(MemberRegistrationCommand command) throws ApiException {
+    public void sendRegisterEmailCode(MemberRegistrationCommand command) {
         String loginToken = command.getLoginToken();
         String email = command.getEmail();
         String captcha = command.getCaptcha();
         requireText(email, "email");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateCaptcha(token, captcha)) {
-            throw new ApiException("图形验证码错误");
+            throw FrontBizExceptions.invalidCaptcha();
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
         String validateCode = PreAuthCodeHelper.generateEmailCode();
@@ -165,7 +165,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public EntityId registerEmail(MemberRegistrationCommand command) throws ApiException {
+    public EntityId registerEmail(MemberRegistrationCommand command) {
         String loginToken = command.getLoginToken();
         String name = command.getName();
         String email = command.getEmail();
@@ -174,7 +174,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         requireText(email, "email");
         PreAuthSessionToken token = PreAuthSessionToken.of(loginToken);
         if (!validateEmailValidateCode(token, email, validateCode)) {
-            throw new ApiException("邮箱验证码错误");
+            throw FrontBizExceptions.invalidEmailCode();
         }
         ensureIdentityAvailable(PrincipalIdentityType.MEMBER_EMAIL, email);
 
@@ -192,9 +192,9 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         return member;
     }
 
-    private void ensureIdentityAvailable(PrincipalIdentityType identityType, String identityValue) throws ApiException {
+    private void ensureIdentityAvailable(PrincipalIdentityType identityType, String identityValue) {
         if (principalIdentityService.get(identityQuery(identityType, identityValue)) != null) {
-            throw new ApiException("会员标识已存在");
+            throw FrontBizExceptions.identityExists();
         }
     }
 
@@ -267,13 +267,13 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         return query;
     }
 
-    private void requireText(String value, String field) throws ApiException {
+    private void requireText(String value, String field) {
         if (StringUtils.isBlank(value)) {
-            throw new ApiException(field + "不能为空");
+            throw FrontBizExceptions.invalidParameter(field);
         }
     }
 
-    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) throws ApiException {
+    private boolean validateCaptcha(PreAuthSessionToken token, String captcha) {
         if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
             return true;
@@ -284,8 +284,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
                         new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
     }
 
-    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode)
-            throws ApiException {
+    private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode) {
         if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
             return true;
@@ -300,8 +299,7 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
                         validateCode);
     }
 
-    private boolean validateEmailValidateCode(PreAuthSessionToken token, String email, String validateCode)
-            throws ApiException {
+    private boolean validateEmailValidateCode(PreAuthSessionToken token, String email, String validateCode) {
         if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
                 && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
             return true;
@@ -316,26 +314,26 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
                         validateCode);
     }
 
-    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) throws ApiException {
+    private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) {
         String privateKey = preAuthSessionService.getValue(
                 new PreAuthSessionQuery(requireSessionId(token), null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
-            throw new ApiException("登录表单密钥已失效");
+            throw FrontBizExceptions.loginFormKeyExpired();
         }
         String[] privateKeyParts = StringUtils.split(privateKey, MEMBER_PRIVATE_KEY_SEPARATOR);
         if (privateKeyParts == null || privateKeyParts.length != 2) {
-            throw new ApiException("登录表单密钥已失效");
+            throw FrontBizExceptions.loginFormKeyExpired();
         }
         RSAUtils.ReadableKeyPair keyPair =
                 new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
         return RSAUtils.decryptBase64(encryptedValue, keyPair);
     }
 
-    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) throws ApiException {
+    private PreAuthSessionId requireSessionId(PreAuthSessionToken token) {
         PreAuthSessionId sessionId =
                 preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
         if (sessionId == null) {
-            throw new ApiException("登录表单已失效");
+            throw FrontBizExceptions.loginFormExpired();
         }
         return sessionId;
     }

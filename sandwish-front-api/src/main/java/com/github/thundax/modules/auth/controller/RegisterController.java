@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.controller;
 
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.modules.auth.assembler.MemberRegisterInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.MemberAccountRegisterRequest;
@@ -33,40 +32,35 @@ public class RegisterController {
 
     @ApiOperation(value = "账号密码注册")
     @PostMapping(value = "account")
-    public MemberRegisterResponse registerAccount(@Valid @RequestBody MemberAccountRegisterRequest request)
-            throws ApiException {
+    public MemberRegisterResponse registerAccount(@Valid @RequestBody MemberAccountRegisterRequest request) {
         return MemberRegisterInterfaceAssembler.toRegisterResponse(
                 memberRegistrationService.registerAccount(accountCommand(request)));
     }
 
     @ApiOperation(value = "发送注册短信验证码")
     @PostMapping(value = "mobile/code")
-    public MemberRegisterResponse sendSmsCode(@Valid @RequestBody MemberRegisterSmsCodeRequest request)
-            throws ApiException {
+    public MemberRegisterResponse sendSmsCode(@Valid @RequestBody MemberRegisterSmsCodeRequest request) {
         memberRegistrationService.sendRegisterSmsCode(smsCodeCommand(request));
         return MemberRegisterInterfaceAssembler.toCodeResponse();
     }
 
     @ApiOperation(value = "手机号注册")
     @PostMapping(value = "mobile")
-    public MemberRegisterResponse registerMobile(@Valid @RequestBody MemberMobileRegisterRequest request)
-            throws ApiException {
+    public MemberRegisterResponse registerMobile(@Valid @RequestBody MemberMobileRegisterRequest request) {
         return MemberRegisterInterfaceAssembler.toRegisterResponse(
                 memberRegistrationService.registerMobile(mobileCommand(request)));
     }
 
     @ApiOperation(value = "发送注册邮箱验证码")
     @PostMapping(value = "email/code")
-    public MemberRegisterResponse sendEmailCode(@Valid @RequestBody MemberRegisterEmailCodeRequest request)
-            throws ApiException {
+    public MemberRegisterResponse sendEmailCode(@Valid @RequestBody MemberRegisterEmailCodeRequest request) {
         memberRegistrationService.sendRegisterEmailCode(emailCodeCommand(request));
         return MemberRegisterInterfaceAssembler.toCodeResponse();
     }
 
     @ApiOperation(value = "邮箱注册")
     @PostMapping(value = "email")
-    public MemberRegisterResponse registerEmail(@Valid @RequestBody MemberEmailRegisterRequest request)
-            throws ApiException {
+    public MemberRegisterResponse registerEmail(@Valid @RequestBody MemberEmailRegisterRequest request) {
         return MemberRegisterInterfaceAssembler.toRegisterResponse(
                 memberRegistrationService.registerEmail(emailCommand(request)));
     }

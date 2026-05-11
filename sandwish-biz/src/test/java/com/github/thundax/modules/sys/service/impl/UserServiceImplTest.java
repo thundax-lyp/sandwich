@@ -15,8 +15,10 @@ import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.springframework.beans.factory.ObjectProvider;
 
 public class UserServiceImplTest {
 
@@ -109,7 +111,9 @@ public class UserServiceImplTest {
         verify(userDao).deleteById(UserId.of(1001L));
     }
 
-    private static java.util.List<UserDeleteCascadeHandler> deleteHandlers(UserDeleteCascadeHandler... handlers) {
-        return Arrays.asList(handlers);
+    private static ObjectProvider<List<UserDeleteCascadeHandler>> deleteHandlers(UserDeleteCascadeHandler... handlers) {
+        ObjectProvider<List<UserDeleteCascadeHandler>> deleteHandlers = mock(ObjectProvider.class);
+        when(deleteHandlers.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(Arrays.asList(handlers));
+        return deleteHandlers;
     }
 }

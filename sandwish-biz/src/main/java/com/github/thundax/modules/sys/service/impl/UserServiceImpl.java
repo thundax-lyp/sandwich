@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +45,11 @@ public class UserServiceImpl implements UserService {
     private final UserDao dao;
     private final List<UserDeleteCascadeHandler> deleteCascadeHandlers;
 
-    public UserServiceImpl(UserDao dao, List<UserDeleteCascadeHandler> deleteCascadeHandlers) {
+    public UserServiceImpl(UserDao dao, ObjectProvider<List<UserDeleteCascadeHandler>> deleteCascadeHandlers) {
         this.dao = dao;
-        this.deleteCascadeHandlers = deleteCascadeHandlers == null ? Collections.emptyList() : deleteCascadeHandlers;
+        this.deleteCascadeHandlers = deleteCascadeHandlers == null
+                ? Collections.emptyList()
+                : deleteCascadeHandlers.getIfAvailable(Collections::emptyList);
     }
 
     public User get(UserId id) {

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,13 +48,16 @@ public class RoleServiceImpl implements RoleService {
     private final List<CacheChangedListener> cacheChangedListeners;
 
     public RoleServiceImpl(RoleDao dao) {
-        this(dao, Collections.emptyList());
+        this.dao = dao;
+        this.cacheChangedListeners = Collections.emptyList();
     }
 
     @Autowired
-    public RoleServiceImpl(RoleDao dao, List<CacheChangedListener> cacheChangedListeners) {
+    public RoleServiceImpl(RoleDao dao, ObjectProvider<List<CacheChangedListener>> cacheChangedListeners) {
         this.dao = dao;
-        this.cacheChangedListeners = cacheChangedListeners == null ? Collections.emptyList() : cacheChangedListeners;
+        this.cacheChangedListeners = cacheChangedListeners == null
+                ? Collections.emptyList()
+                : cacheChangedListeners.getIfAvailable(Collections::emptyList);
     }
 
     public Role get(RoleId id) {

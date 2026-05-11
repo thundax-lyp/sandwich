@@ -22,6 +22,7 @@ import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +36,16 @@ public class MenuServiceImpl implements MenuService {
     private final List<CacheChangedListener> cacheChangedListeners;
 
     public MenuServiceImpl(MenuDao dao) {
-        this(dao, Collections.emptyList());
+        this.dao = dao;
+        this.cacheChangedListeners = Collections.emptyList();
     }
 
     @Autowired
-    public MenuServiceImpl(MenuDao dao, List<CacheChangedListener> cacheChangedListeners) {
+    public MenuServiceImpl(MenuDao dao, ObjectProvider<List<CacheChangedListener>> cacheChangedListeners) {
         this.dao = dao;
-        this.cacheChangedListeners = cacheChangedListeners == null ? Collections.emptyList() : cacheChangedListeners;
+        this.cacheChangedListeners = cacheChangedListeners == null
+                ? Collections.emptyList()
+                : cacheChangedListeners.getIfAvailable(Collections::emptyList);
     }
 
     public Menu get(MenuId id) {

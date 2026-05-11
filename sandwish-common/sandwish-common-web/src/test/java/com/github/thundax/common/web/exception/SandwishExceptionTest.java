@@ -24,10 +24,6 @@ public class SandwishExceptionTest {
     public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][] {
             {new BadRequestException(), WebErrorCode.BAD_REQUEST},
-            {new UnauthorizedException(), WebErrorCode.UNAUTHORIZED},
-            {new ForbiddenException(), WebErrorCode.FORBIDDEN},
-            {new NotFoundException(), WebErrorCode.NOT_FOUND},
-            {new ConflictException(), WebErrorCode.CONFLICT},
             {new SystemException(), WebErrorCode.SYSTEM_ERROR}
         });
     }

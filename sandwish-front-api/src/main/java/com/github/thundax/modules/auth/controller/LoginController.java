@@ -20,7 +20,6 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.security.CurrentMemberResolver;
-import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
@@ -172,15 +171,13 @@ public class LoginController {
     @ApiOperation(value = "登录状态")
     @PostMapping("login/status")
     public MemberLoginStatusResponse login() {
-        MemberSpringPrincipal principal = currentMemberResolver.currentPrincipal();
-        return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
+        return MemberLoginInterfaceAssembler.toLoginStatusResponse(currentMemberResolver.currentMemberId());
     }
 
     @ApiOperation(value = "检查登录状态")
     @PostMapping("check-login")
     public MemberLoginStatusResponse checkLogin() {
-        MemberSpringPrincipal principal = currentMemberResolver.currentPrincipal();
-        return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
+        return MemberLoginInterfaceAssembler.toLoginStatusResponse(currentMemberResolver.currentMemberId());
     }
 
     @ApiOperation(value = "登出")

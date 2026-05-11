@@ -4,7 +4,6 @@ import com.github.thundax.modules.auth.controller.response.MemberLoginFormRespon
 import com.github.thundax.modules.auth.controller.response.MemberLoginStatusResponse;
 import com.github.thundax.modules.auth.controller.response.MemberTokenResponse;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
-import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.result.MemberTokenResult;
 import org.springframework.lang.NonNull;
 
@@ -14,10 +13,10 @@ public final class MemberLoginInterfaceAssembler {
     private MemberLoginInterfaceAssembler() {}
 
     @NonNull
-    public static MemberLoginStatusResponse toLoginStatusResponse(MemberSpringPrincipal principal) {
+    public static MemberLoginStatusResponse toLoginStatusResponse(String memberId) {
         return MemberLoginStatusResponse.builder()
-                .loggedIn(principal != null)
-                .memberId(principal == null ? null : principal.getId())
+                .loggedIn(memberId != null)
+                .memberId(memberId)
                 .build();
     }
 

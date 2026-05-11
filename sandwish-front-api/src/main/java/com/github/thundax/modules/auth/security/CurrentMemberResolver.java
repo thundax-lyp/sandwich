@@ -8,11 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CurrentMemberResolver {
 
-    public MemberSpringPrincipal currentPrincipal() {
-        String memberId = currentMemberId();
-        return memberId == null ? null : new MemberSpringPrincipal(memberId);
-    }
-
     public String currentMemberId() {
         SandwishSubject subject = SandwishContextHolder.currentSubject();
         return subject.getSubjectType() == SandwishSubjectType.FRONT_MEMBER ? subject.getSubjectId() : null;

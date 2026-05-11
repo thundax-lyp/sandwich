@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.security;
+package com.github.thundax.modules.auth.security;
 
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.context.SandwishContextHolder;

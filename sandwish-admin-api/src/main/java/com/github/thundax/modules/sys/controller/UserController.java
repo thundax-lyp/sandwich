@@ -1,12 +1,12 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -201,7 +201,7 @@ public class UserController {
     @WrappedApiResponse
     public UserResponse add(@Valid @RequestBody UserSaveRequest request) {
         // 解密密码（数据需要加密传输）
-        String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
+        String password = Sm2Crypto.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
         request.setLoginPass(password);
         validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
@@ -244,7 +244,7 @@ public class UserController {
     public UserResponse update(@Valid @RequestBody UserSaveRequest request) {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
+            String password = Sm2Crypto.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
         }

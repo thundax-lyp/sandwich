@@ -1,4 +1,4 @@
-package com.github.thundax.common.utils;
+package com.github.thundax.common.crypto;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -17,7 +17,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class RSAUtils {
+public class RsaCrypto {
 
     private static final String ALGOR = "RSA";
     private static final String PROVIDER = "BC";
@@ -34,8 +34,8 @@ public class RSAUtils {
     }
 
     /**
-     * 生成钥对，生成的数据存储在map<String, String>中 RSAUtils.PUBKEY：base64编码的public key,用于发送给浏览器的jsencrypt.js
-     * RSAUtils.PUBKEY_MODULUS与RSAUtils.PRIKEY_EXPONENT用于存储在Session中，以解码时使用
+     * 生成钥对，生成的数据存储在map<String, String>中 RsaCrypto.PUBKEY：base64编码的public key,用于发送给浏览器的jsencrypt.js
+     * RsaCrypto.PUBKEY_MODULUS与RsaCrypto.PRIKEY_EXPONENT用于存储在Session中，以解码时使用
      */
     public static ReadableKeyPair generateKeyPair() {
         try {

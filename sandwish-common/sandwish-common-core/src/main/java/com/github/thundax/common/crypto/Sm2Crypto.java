@@ -1,8 +1,7 @@
-package com.github.thundax.common.utils.encrypt;
+package com.github.thundax.common.crypto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.thundax.common.utils.JsonUtils;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -32,7 +31,7 @@ import org.bouncycastle.util.BigIntegers;
  * 仅适配前端 sm-crypto
  */
 @Slf4j
-public final class Sm2Helper {
+public final class Sm2Crypto {
 
     private static final String SM2_CURVE_NAME = "sm2p256v1";
 
@@ -44,7 +43,7 @@ public final class Sm2Helper {
     private static final ECDomainParameters DOMAIN_PARAMETERS = new ECDomainParameters(
             X9EC_PARAMETERS.getCurve(), X9EC_PARAMETERS.getG(), X9EC_PARAMETERS.getN(), X9EC_PARAMETERS.getH());
 
-    private Sm2Helper() {}
+    private Sm2Crypto() {}
 
     public static StringKeyPair generateKeyPair() {
         try {
@@ -145,7 +144,14 @@ public final class Sm2Helper {
 
         @Override
         public String toString() {
-            return JsonUtils.toJson(this);
+            return "{\"publicKey\":\"" + escape(publicKey) + "\",\"privateKey\":\"" + escape(privateKey) + "\"}";
+        }
+
+        private static String escape(String value) {
+            if (value == null) {
+                return "";
+            }
+            return value.replace("\\", "\\\\").replace("\"", "\\\"");
         }
     }
 

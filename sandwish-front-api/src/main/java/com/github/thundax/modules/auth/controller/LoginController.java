@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.controller;
 
+import com.github.thundax.common.crypto.RsaCrypto;
 import com.github.thundax.common.exception.FrontResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
-import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -243,7 +243,7 @@ public class LoginController {
         PreAuthSession session =
                 preAuthSessionService.create(new CreatePreAuthSessionCommand(authProperties.getLoginExpiredSeconds()));
         writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
-        RSAUtils.ReadableKeyPair keyPair = RSAUtils.generateKeyPair();
+        RsaCrypto.ReadableKeyPair keyPair = RsaCrypto.generateKeyPair();
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt()));
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
@@ -296,9 +296,9 @@ public class LoginController {
         if (privateKeyParts == null || privateKeyParts.length != 2) {
             throw FrontResponseExceptions.loginFormKeyExpired();
         }
-        RSAUtils.ReadableKeyPair keyPair =
-                new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
-        return RSAUtils.decryptBase64(encryptedValue, keyPair);
+        RsaCrypto.ReadableKeyPair keyPair =
+                new RsaCrypto.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
+        return RsaCrypto.decryptBase64(encryptedValue, keyPair);
     }
 
     private void writeCaptcha(PreAuthSessionId sessionId, String captcha) {
@@ -306,7 +306,7 @@ public class LoginController {
                 sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
     }
 
-    private String memberPrivateKeyValue(RSAUtils.ReadableKeyPair keyPair) {
+    private String memberPrivateKeyValue(RsaCrypto.ReadableKeyPair keyPair) {
         return keyPair.getModulus() + MEMBER_PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent();
     }
 

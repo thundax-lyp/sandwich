@@ -3,13 +3,13 @@ package com.github.thundax.modules.auth.security;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
-import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -212,7 +212,7 @@ public class AuthPermissionLifecycleTest {
         Assert.assertTrue(view.getScopes().contains("openid"));
 
         String codeVerifier = "plain-verifier";
-        String codeChallenge = Sha256Helper.hashBase64Url(codeVerifier);
+        String codeChallenge = Sha256Digest.hashBase64Url(codeVerifier);
         OAuth2AuthorizationDecisionResult decision = authService.decideOAuth2(decisionCommand(
                 "admin-web",
                 "http://127.0.0.1/callback",
@@ -579,7 +579,7 @@ public class AuthPermissionLifecycleTest {
             client.setId(EntityIdCodec.toDomain(3001L));
             client.setClientId("admin-web");
             client.setClientName("Admin Web");
-            client.setClientSecretHash(Sha256Helper.hashBase64Url("secret"));
+            client.setClientSecretHash(Sha256Digest.hashBase64Url("secret"));
             client.setStatus(OAuthClientStatus.ENABLED);
             client.setGrantTypes(new LinkedHashSet<>(Arrays.asList("authorization_code", "refresh_token")));
             client.setRedirectUris(new LinkedHashSet<>(Collections.singletonList("http://127.0.0.1/callback")));

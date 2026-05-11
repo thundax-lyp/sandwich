@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service.impl;
 
+import com.github.thundax.common.crypto.RsaCrypto;
 import com.github.thundax.common.exception.FrontBizExceptions;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.utils.RSAUtils;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -324,9 +324,9 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         if (privateKeyParts == null || privateKeyParts.length != 2) {
             throw FrontBizExceptions.loginFormKeyExpired();
         }
-        RSAUtils.ReadableKeyPair keyPair =
-                new RSAUtils.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
-        return RSAUtils.decryptBase64(encryptedValue, keyPair);
+        RsaCrypto.ReadableKeyPair keyPair =
+                new RsaCrypto.ReadableKeyPair(null, privateKeyParts[0], null, privateKeyParts[1]);
+        return RsaCrypto.decryptBase64(encryptedValue, keyPair);
     }
 
     private PreAuthSessionId requireSessionId(PreAuthSessionToken token) {

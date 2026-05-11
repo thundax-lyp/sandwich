@@ -1,4 +1,4 @@
-package com.github.thundax.common.utils.encrypt;
+package com.github.thundax.common.crypto;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -9,11 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
-public final class Md5Helper {
+public final class Md5Digest {
 
     private static final String ALGORITHM_MD5 = "MD5";
 
-    private Md5Helper() {}
+    private Md5Digest() {}
 
     public static String encrypt(InputStream inputStream) {
         try {

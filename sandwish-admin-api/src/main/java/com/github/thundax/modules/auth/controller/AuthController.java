@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.controller;
 
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
-import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.common.web.util.RequestIpUtils;
@@ -134,7 +134,7 @@ public class AuthController {
         createCaptcha(request.getLoginToken());
 
         String privateKey = getPrivateKey(request.getLoginToken());
-        String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
+        String password = Sm2Crypto.decrypt(request.getPassword(), privateKey);
 
         User user;
         try {
@@ -281,7 +281,7 @@ public class AuthController {
         PreAuthSession session =
                 preAuthSessionService.create(new CreatePreAuthSessionCommand(properties.getLoginExpiredSeconds()));
         writeCaptcha(session.getId(), PreAuthCodeHelper.generateCaptcha());
-        Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
+        Sm2Crypto.StringKeyPair keyPair = Sm2Crypto.generateKeyPair();
         if (keyPair != null) {
             preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                     session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt()));

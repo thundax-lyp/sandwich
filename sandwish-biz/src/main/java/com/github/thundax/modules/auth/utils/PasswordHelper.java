@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.utils;
 
-import com.github.thundax.common.codec.Sm3Utils;
+import com.github.thundax.common.crypto.Sm3Digest;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
@@ -33,12 +33,12 @@ public final class PasswordHelper {
             return StringUtils.equals(encrypt(plainPassword, args[ARG_SALT]), encryptedPassword);
         }
 
-        return StringUtils.equals(Sm3Utils.sm3Hex(plainPassword), encryptedPassword);
+        return StringUtils.equals(Sm3Digest.sm3Hex(plainPassword), encryptedPassword);
     }
 
     private static String encrypt(String plainPassword, String salt) {
         String encryptedPassword =
-                Sm3Utils.sm3Hex((salt + ARG_SEPARATOR + plainPassword).getBytes(StandardCharsets.UTF_8));
+                Sm3Digest.sm3Hex((salt + ARG_SEPARATOR + plainPassword).getBytes(StandardCharsets.UTF_8));
         return PREFIX + salt + ARG_SEPARATOR + encryptedPassword + SUFFIX;
     }
 

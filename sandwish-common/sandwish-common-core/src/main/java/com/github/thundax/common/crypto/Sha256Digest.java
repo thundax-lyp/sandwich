@@ -1,4 +1,4 @@
-package com.github.thundax.common.utils.encrypt;
+package com.github.thundax.common.crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -6,11 +6,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import org.apache.commons.lang3.StringUtils;
 
-public final class Sha256Helper {
+public final class Sha256Digest {
 
     private static final String ALGORITHM_SHA_256 = "SHA-256";
 
-    private Sha256Helper() {}
+    private Sha256Digest() {}
 
     public static String hashBase64Url(String input) {
         if (input == null) {

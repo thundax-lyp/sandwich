@@ -5,8 +5,8 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
-import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
@@ -163,7 +163,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
     }
 
     private String tokenHash(String token) {
-        return StringUtils.isBlank(token) ? null : Sha256Helper.hashBase64Url(token);
+        return StringUtils.isBlank(token) ? null : Sha256Digest.hashBase64Url(token);
     }
 
     private void removeExpired(String indexKey) {

@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.thundax.common.utils.encrypt.Sm2Helper;
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.config.AuthProperties;
@@ -57,8 +57,8 @@ public class AuthControllerContractTest {
 
     @Test
     public void shouldWrapLoginJsonResponseWithApiResponseAdvice() throws Exception {
-        Sm2Helper.StringKeyPair keyPair = Sm2Helper.generateKeyPair();
-        String encryptedPassword = Sm2Helper.encrypt("plain-password", keyPair.getPublicKey());
+        Sm2Crypto.StringKeyPair keyPair = Sm2Crypto.generateKeyPair();
+        String encryptedPassword = Sm2Crypto.encrypt("plain-password", keyPair.getPublicKey());
         AdminAuthService authService = mock(AdminAuthService.class);
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSessionId sessionId = PreAuthSessionId.of("session-1");

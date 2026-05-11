@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -132,8 +132,8 @@ public class CurrentUserController {
 
         // 解密密码（数据需要加密传输）
         String privateKey = getPrivateKey(request.getToken());
-        String password = Sm2Helper.decrypt(request.getPassword(), privateKey);
-        String oldPassword = Sm2Helper.decrypt(request.getOldPassword(), privateKey);
+        String password = Sm2Crypto.decrypt(request.getPassword(), privateKey);
+        String oldPassword = Sm2Crypto.decrypt(request.getOldPassword(), privateKey);
         request.setPassword(password);
         request.setOldPassword(oldPassword);
 

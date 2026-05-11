@@ -1,4 +1,4 @@
-package com.github.thundax.common.utils.encrypt;
+package com.github.thundax.common.crypto;
 
 import java.security.Key;
 import java.security.Security;
@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 
-public final class Sm4Helper {
+public final class Sm4Crypto {
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -21,7 +21,7 @@ public final class Sm4Helper {
     // 定义分组加密模式使用：PKCS5Padding
     private static final String ALGORITHM_NAME_ECB_PADDING = "SM4/ECB/PKCS5Padding";
 
-    private Sm4Helper() {}
+    private Sm4Crypto() {}
 
     /**
      * sm4加密

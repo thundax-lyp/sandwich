@@ -1,4 +1,4 @@
-package com.github.thundax.common.utils.encrypt;
+package com.github.thundax.common.crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -15,11 +15,11 @@ import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-public final class DesHelper {
+public final class DesCrypto {
 
     private static final String ALGORITHM_DES = "DES";
 
-    private DesHelper() {}
+    private DesCrypto() {}
 
     public static byte[] encrypt(byte[] plainBytes, byte[] password) {
         try {

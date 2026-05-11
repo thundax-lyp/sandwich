@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.autoconfigure.LoginProperties;
+import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
@@ -1050,7 +1050,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         }
         OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
         if (client == null
-                || !StringUtils.equals(Sha256Helper.hashBase64Url(clientSecret), client.getClientSecretHash())) {
+                || !StringUtils.equals(Sha256Digest.hashBase64Url(clientSecret), client.getClientSecretHash())) {
             throw AdminResponseExceptions.oauth2ClientSecretInvalid();
         }
         return client;
@@ -1080,7 +1080,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return false;
         }
         if ("S256".equalsIgnoreCase(authorization.getCodeChallengeMethod())) {
-            return StringUtils.equals(authorization.getCodeChallenge(), Sha256Helper.hashBase64Url(codeVerifier));
+            return StringUtils.equals(authorization.getCodeChallenge(), Sha256Digest.hashBase64Url(codeVerifier));
         }
         return StringUtils.equals(authorization.getCodeChallenge(), codeVerifier);
     }

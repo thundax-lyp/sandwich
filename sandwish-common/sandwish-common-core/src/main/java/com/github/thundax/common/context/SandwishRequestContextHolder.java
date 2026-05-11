@@ -1,10 +1,10 @@
 package com.github.thundax.common.context;
 
-public final class SandwishContextHolder {
+public final class SandwishRequestContextHolder {
 
     private static final ThreadLocal<SandwishContext> CONTEXT_HOLDER = new ThreadLocal<>();
 
-    private SandwishContextHolder() {}
+    private SandwishRequestContextHolder() {}
 
     public static SandwishContext getContext() {
         SandwishContext context = CONTEXT_HOLDER.get();

@@ -22,7 +22,7 @@ public class ContextAwareCallable<V> implements Callable<V> {
             snapshot.restore();
             return delegate.call();
         } finally {
-            SandwishContextHolder.clear();
+            SandwishRequestContextHolder.clear();
         }
     }
 }

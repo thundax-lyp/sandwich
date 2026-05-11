@@ -3,7 +3,7 @@ package com.github.thundax.common.web.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import com.github.thundax.common.context.SandwishContextHolder;
+import com.github.thundax.common.context.SandwishRequestContextHolder;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import org.junit.After;
@@ -15,7 +15,7 @@ public class SandwishContextFilterTest {
 
     @After
     public void tearDown() {
-        SandwishContextHolder.clear();
+        SandwishRequestContextHolder.clear();
     }
 
     @Test
@@ -27,12 +27,12 @@ public class SandwishContextFilterTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {
-            assertEquals("request-1", SandwishContextHolder.getContext().getRequestId());
-            assertEquals("token-1", SandwishContextHolder.getContext().getToken());
+            assertEquals("request-1", SandwishRequestContextHolder.getContext().getRequestId());
+            assertEquals("token-1", SandwishRequestContextHolder.getContext().getToken());
         });
 
         assertEquals("request-1", response.getHeader(DefaultSandwishContextResolver.HEADER_REQUEST_ID));
-        assertNull(SandwishContextHolder.getContext().getRequestId());
+        assertNull(SandwishRequestContextHolder.getContext().getRequestId());
     }
 
     @Test
@@ -43,8 +43,8 @@ public class SandwishContextFilterTest {
                 new MockHttpServletRequest(),
                 new MockHttpServletResponse(),
                 (servletRequest, servletResponse) ->
-                        assertNull(SandwishContextHolder.getContext().getRequestId()));
+                        assertNull(SandwishRequestContextHolder.getContext().getRequestId()));
 
-        assertNull(SandwishContextHolder.getContext().getRequestId());
+        assertNull(SandwishRequestContextHolder.getContext().getRequestId());
     }
 }

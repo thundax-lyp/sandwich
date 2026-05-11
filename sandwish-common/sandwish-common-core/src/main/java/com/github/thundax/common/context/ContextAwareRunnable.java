@@ -20,7 +20,7 @@ public class ContextAwareRunnable implements Runnable {
             snapshot.restore();
             delegate.run();
         } finally {
-            SandwishContextHolder.clear();
+            SandwishRequestContextHolder.clear();
         }
     }
 }

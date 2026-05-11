@@ -9,10 +9,10 @@ public class ContextSnapshot {
     }
 
     public static ContextSnapshot capture() {
-        return new ContextSnapshot(new SandwishContext(SandwishContextHolder.getContext()));
+        return new ContextSnapshot(new SandwishContext(SandwishRequestContextHolder.getContext()));
     }
 
     public void restore() {
-        SandwishContextHolder.setContext(new SandwishContext(context));
+        SandwishRequestContextHolder.setContext(new SandwishContext(context));
     }
 }

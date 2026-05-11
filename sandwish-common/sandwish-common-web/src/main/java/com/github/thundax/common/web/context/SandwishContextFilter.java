@@ -1,7 +1,7 @@
 package com.github.thundax.common.web.context;
 
 import com.github.thundax.common.context.SandwishContext;
-import com.github.thundax.common.context.SandwishContextHolder;
+import com.github.thundax.common.context.SandwishRequestContextHolder;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,14 +24,14 @@ public class SandwishContextFilter extends OncePerRequestFilter {
         if (context == null) {
             context = new SandwishContext();
         }
-        SandwishContextHolder.setContext(context);
+        SandwishRequestContextHolder.setContext(context);
         if (context.getRequestId() != null) {
             response.setHeader(DefaultSandwishContextResolver.HEADER_REQUEST_ID, context.getRequestId());
         }
         try {
             filterChain.doFilter(request, response);
         } finally {
-            SandwishContextHolder.clear();
+            SandwishRequestContextHolder.clear();
         }
     }
 }

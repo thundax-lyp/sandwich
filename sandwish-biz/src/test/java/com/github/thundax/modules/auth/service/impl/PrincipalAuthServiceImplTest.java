@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.service.impl;
 import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.i18n.I18nMessages;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
@@ -21,19 +20,9 @@ import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import java.util.List;
-import java.util.Locale;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.support.StaticMessageSource;
 
 public class PrincipalAuthServiceImplTest {
-
-    @BeforeClass
-    public static void setUpMessages() {
-        StaticMessageSource messageSource = new StaticMessageSource();
-        messageSource.addMessage("auth.exception.invalid-password", Locale.getDefault(), "bad password");
-        new I18nMessages(messageSource);
-    }
 
     @Test
     public void shouldAuthenticatePasswordAndResetVerifyState() throws ApiException {

@@ -1,11 +1,10 @@
 package com.github.thundax.modules.auth.exception;
 
 import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.i18n.I18nMessages;
 
 public class BannedAccountException extends ApiException {
 
     public BannedAccountException() {
-        super(I18nMessages.getMessage("auth.exception.banned-account"));
+        super("auth.exception.banned-account", "用户已禁用");
     }
 }

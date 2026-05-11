@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.service.impl;
 import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.i18n.I18nMessages;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession.RefreshTokenValue;
@@ -15,25 +14,15 @@ import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionComm
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.support.StaticMessageSource;
 
 public class PreAuthSessionServiceImplTest {
     private static final String CAPTCHA_ITEM = "CAPTCHA";
 
     private RecordingPreAuthSessionDao preAuthSessionDao;
     private PreAuthSessionServiceImpl service;
-
-    @BeforeClass
-    public static void setUpMessages() {
-        StaticMessageSource messageSource = new StaticMessageSource();
-        messageSource.addMessage("common.exception.invalid-token", Locale.getDefault(), "invalid token");
-        new I18nMessages(messageSource);
-    }
 
     @Before
     public void setUp() {

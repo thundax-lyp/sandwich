@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.common.exception.MoveTreeNodeException;
-import com.github.thundax.common.i18n.I18nMessages;
 import com.github.thundax.modules.sys.controller.request.DepartmentIdRequest;
 import com.github.thundax.modules.sys.controller.request.DepartmentMoveRequest;
 import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
@@ -22,19 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.context.support.StaticMessageSource;
 
 public class DepartmentControllerContractTest {
-
-    @BeforeClass
-    public static void setUpMessages() {
-        StaticMessageSource messageSource = new StaticMessageSource();
-        messageSource.addMessage("common.exception.move-tree-node", Locale.getDefault(), "{0}:{1}->{2}");
-        new I18nMessages(messageSource);
-    }
 
     @Test
     public void shouldExcludeSelectedDepartmentAndDescendantsFromTree() {

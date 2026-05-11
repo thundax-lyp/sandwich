@@ -11,13 +11,11 @@ Response 注解规约适用于同时满足以下条件的 Java 类：
 
 当前扫描结果：
 
-- Response 类总数：29
-- Admin API Response 类：28
-- Front API Response 类：1
+- Response 类总数：45
+- Admin API Response 类：41
+- Front API Response 类：4
 - Shared、infra Response 类：0
-- Biz Response 类：1
-
-`sandwish-biz/src/main/java/com/github/thundax/modules/assist/plugins/koal/sign/BaseResponse.java` 是签名插件协议对象，不位于 API 响应包内，当前不纳入 API Response 注解门禁。
+- Biz Response 类：0
 
 如果后续在 API 响应包中新增响应模型，默认纳入同一规约；除非单独 TODO 明确收窄扫描范围。
 

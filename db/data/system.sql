@@ -124,18 +124,6 @@ INSERT INTO `sys_menu` (
     (
         1000000000000001019, 1000000000000001017, 35, 36, '存储对象编辑', 'storage:storage:edit', 0,
         'HIDDEN', NULL, NULL, NULL, 2, '存储对象编辑权限'
-    ),
-    (
-        1000000000000001020, NULL, 39, 44, '辅助工具', NULL, 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '辅助工具权限根节点'
-    ),
-    (
-        1000000000000001021, 1000000000000001020, 40, 41, '签名查看', 'assist:signature:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '签名查看权限'
-    ),
-    (
-        1000000000000001022, 1000000000000001020, 42, 43, '签名编辑', 'assist:signature:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '签名编辑权限'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -376,21 +364,6 @@ INSERT INTO `sys_dict` (
     ),
     (
         1000000000000002053, 'multipart_upload_status', '已中止', 'ABORTED', 3, '分片上传中止状态'
-    ),
-    (
-        1000000000000002054, 'async_task_status', '空闲', 'IDLE', 0, '异步任务空闲状态'
-    ),
-    (
-        1000000000000002055, 'async_task_status', '执行中', 'ACTIVE', 1, '异步任务执行中状态'
-    ),
-    (
-        1000000000000002056, 'async_task_status', '已暂停', 'SUSPENDED', 2, '异步任务暂停状态'
-    ),
-    (
-        1000000000000002057, 'async_task_status', '成功', 'SUCCESS', 3, '异步任务成功状态'
-    ),
-    (
-        1000000000000002058, 'async_task_status', '失败', 'ERROR', 4, '异步任务失败状态'
     )
 ON DUPLICATE KEY UPDATE
     `type` = VALUES(`type`),

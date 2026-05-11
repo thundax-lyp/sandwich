@@ -46,7 +46,6 @@ public final class AuditInterfaceAssembler {
         OBJECT_TYPE_LABELS.put("Department", "部门");
         OBJECT_TYPE_LABELS.put("Dict", "字典");
         OBJECT_TYPE_LABELS.put("Member", "会员");
-        OBJECT_TYPE_LABELS.put("AsyncTask", "异步任务");
 
         OBJECT_FIELDS.put("User", fields(field("name", "名称"), field("status", "状态"), field("privilege", "权限")));
         OBJECT_FIELDS.put("Role", fields(field("name", "名称"), field("status", "状态"), field("privilege", "权限")));
@@ -54,7 +53,6 @@ public final class AuditInterfaceAssembler {
         OBJECT_FIELDS.put("Department", fields(field("name", "名称"), field("shortName", "简称"), field("parentId", "父级")));
         OBJECT_FIELDS.put("Dict", fields(field("type", "类型"), field("label", "标签"), field("value", "值")));
         OBJECT_FIELDS.put("Member", fields(field("name", "名称"), field("status", "状态"), field("gender", "性别")));
-        OBJECT_FIELDS.put("AsyncTask", fields(field("title", "标题"), field("status", "状态"), field("message", "消息")));
     }
 
     private AuditInterfaceAssembler() {}

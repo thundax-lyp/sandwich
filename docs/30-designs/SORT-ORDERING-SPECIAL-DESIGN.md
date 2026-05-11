@@ -36,7 +36,6 @@
 | `com.github.thundax.modules.sys.entity.Menu` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`），`visibility/maxRank` 仅作过滤 |
 | `com.github.thundax.modules.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.member.entity.Member` | `FlatSort` | `priority, name` | 无固定 scope（全局平铺排序集合） |
-| `com.github.thundax.modules.assist.entity.AsyncTask` | `FlatSort` | `priority, id` | 当前 JetCache key 索引内的未过期任务集合 |
 
 ### 4.1 模块边界
 - `sandwish-admin-api` / `sandwish-front-api`：
@@ -45,7 +44,7 @@
 - `sandwish-biz`：
   - 实现 `FlatSort` 与 `TreeSort` 分域校验：排序域完整性、越权检测。
 - `sandwish-infra`：
-  - 提供重排持久化能力：数据库 `FlatSort` 仅更新 `priority`；`AsyncTask` 这类缓存运行态 `FlatSort` 仅更新缓存对象 `priority`；`TreeSort` 仅更新树结构索引或树移动字段。
+  - 提供重排持久化能力：数据库 `FlatSort` 仅更新 `priority`；缓存运行态 `FlatSort` 仅更新缓存对象 `priority`；`TreeSort` 仅更新树结构索引或树移动字段。
 - 两类排序链路不能互相调用彼此入口，也不共享幂等键/并发键。
 
 ## 5. Core Business Objects

@@ -8,18 +8,15 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 执行时间过滤器
  */
+@Slf4j
 public class ProcessTimeFilter implements Filter {
 
     public static final String START_TIME = "_start_time";
-
-    protected static final Logger log = LoggerFactory.getLogger(ProcessTimeFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -42,8 +39,6 @@ public class ProcessTimeFilter implements Filter {
         long time = System.currentTimeMillis();
         request.setAttribute(START_TIME, time);
 
-        System.out.println("=== " + request.getRequestURI());
-
         chain.doFilter(request, response);
 
         time = System.currentTimeMillis() - time;
@@ -52,25 +47,29 @@ public class ProcessTimeFilter implements Filter {
 
     private String getRemoteAddr(HttpServletRequest request) {
         String remoteAddr = request.getHeader("X-Real-IP");
-        if (StringUtils.isNotBlank(remoteAddr)) {
+        if (isNotBlank(remoteAddr)) {
             return remoteAddr;
         }
 
         remoteAddr = request.getHeader("X-Forwarded-For");
-        if (StringUtils.isNotBlank(remoteAddr)) {
+        if (isNotBlank(remoteAddr)) {
             return remoteAddr;
         }
 
         remoteAddr = request.getHeader("Proxy-Client-IP");
-        if (StringUtils.isNotBlank(remoteAddr)) {
+        if (isNotBlank(remoteAddr)) {
             return remoteAddr;
         }
 
         remoteAddr = request.getHeader("WL-Proxy-Client-IP");
-        if (StringUtils.isNotBlank(remoteAddr)) {
+        if (isNotBlank(remoteAddr)) {
             return remoteAddr;
         }
 
         return request.getRemoteAddr();
+    }
+
+    private boolean isNotBlank(String text) {
+        return text != null && !text.trim().isEmpty();
     }
 }

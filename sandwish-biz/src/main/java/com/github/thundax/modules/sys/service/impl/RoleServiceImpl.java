@@ -7,7 +7,6 @@ import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
@@ -48,10 +47,6 @@ public class RoleServiceImpl implements RoleService {
     private static final int PRIORITY_STEP = 10;
 
     private final RoleDao dao;
-
-    private final PooledThreadLocal<Map<Long, List<Long>>> idUserIdsMapHandler = new PooledThreadLocal<>();
-
-    private final PooledThreadLocal<Map<Long, List<Long>>> idMenuIdsMapHandler = new PooledThreadLocal<>();
 
     public RoleServiceImpl(RoleDao dao) {
         this.dao = dao;
@@ -278,23 +273,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<User> listRoleUsers(RoleQuery query) {
-        List<Long> userIdList = idUserIdsMapHandler
-                .computeIfAbsent(HashMap::new)
-                .computeIfAbsent(
-                        RoleIdCodec.toValue(query.getId()),
-                        roleId -> dao.listRoleUsers(RoleIdCodec.toValue(query.getId())));
-
+        List<Long> userIdList = dao.listRoleUsers(RoleIdCodec.toValue(query.getId()));
         return userIdList.stream().map(this::newUser).collect(Collectors.toList());
     }
 
     @Override
     public List<Menu> listRoleMenus(RoleQuery query) {
-        List<Long> menuIdList = idMenuIdsMapHandler
-                .computeIfAbsent(HashMap::new)
-                .computeIfAbsent(
-                        RoleIdCodec.toValue(query.getId()),
-                        roleId -> dao.listRoleMenus(RoleIdCodec.toValue(query.getId())));
-
+        List<Long> menuIdList = dao.listRoleMenus(RoleIdCodec.toValue(query.getId()));
         return menuIdList.stream().map(this::newMenu).collect(Collectors.toList());
     }
 

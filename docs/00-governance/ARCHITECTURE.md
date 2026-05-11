@@ -151,7 +151,7 @@ Sandwich 固定采用三层 API 架构。
 边界：
 
 - 可以依赖 `sandwish-common-core`。
-- 不承载 Controller、Filter、Interceptor 或具体入口配置。
+- 不承载 Controller、Interceptor、入口专用 Filter 或具体入口配置；允许承载入口无关的通用 Web Filter。
 - 不承载业务请求 / 响应对象。
 - Helper 只返回数据，不抛入口层业务异常。
 - `SandwishException`、Web error code 和 message resolve 能力固定归属本模块。

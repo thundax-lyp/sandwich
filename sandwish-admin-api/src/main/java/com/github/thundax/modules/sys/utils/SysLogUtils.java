@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.utils;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.sys.entity.Log;
@@ -87,9 +86,6 @@ public class SysLogUtils {
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
-
-        } finally {
-            PooledThreadLocal.reset();
         }
     }
 

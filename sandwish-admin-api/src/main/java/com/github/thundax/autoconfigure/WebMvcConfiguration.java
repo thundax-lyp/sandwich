@@ -3,7 +3,6 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.config.SandwishOssProperties;
 import com.github.thundax.common.oss.support.LocalFileObjectStorageClient;
-import com.github.thundax.common.thread.PooledThreadLocalFilter;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.store.ObjectStorageStoredObjectStore;
@@ -38,14 +37,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private StorageType storageType(SandwishOssProperties ossProperties) {
         return "s3".equalsIgnoreCase(ossProperties.getType()) ? StorageType.OSS : StorageType.LOCAL_FILE;
-    }
-
-    @Bean
-    public FilterRegistrationBean<PooledThreadLocalFilter> polledThreadFilterRegistrationBean() {
-        FilterRegistrationBean<PooledThreadLocalFilter> bean = new FilterRegistrationBean<>();
-        bean.setFilter(new PooledThreadLocalFilter());
-        bean.addUrlPatterns("/*");
-        return bean;
     }
 
     @Bean

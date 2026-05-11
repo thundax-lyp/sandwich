@@ -33,6 +33,8 @@ import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.result.*;
+import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
@@ -92,7 +94,9 @@ public class AuthPermissionLifecycleTest {
                         new TestRoleService(),
                         new TestMenuService(),
                         principalIdentityService,
-                        principalCredentialService));
+                        principalCredentialService,
+                        org.mockito.Mockito.mock(StorageService.class),
+                        org.mockito.Mockito.mock(StoredObjectStore.class)));
         authService = new AdminAuthServiceImpl(
                 authProperties,
                 new LoginProperties(),

@@ -17,6 +17,16 @@ import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
+import com.github.thundax.modules.storage.entity.StoredObject;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
+import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
+import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
+import com.github.thundax.modules.storage.service.query.StorageQuery;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -27,17 +37,26 @@ import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,24 +67,38 @@ import org.springframework.transaction.annotation.Transactional;
 public class CurrentUserServiceImpl implements CurrentUserService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
+    private static final String AVATAR_REMARKS = "avatar";
+    private static final String AVATAR_NAME = "avatar";
+    private static final String AVATAR_FILENAME = "avatar.jpg";
+    private static final String JPG = "jpg";
+    private static final String IMAGE_JPEG = "image/jpeg";
+    private static final int MAX_AVATAR_WIDTH = 400;
+    private static final int MAX_AVATAR_HEIGHT = 400;
+    private static final float IMAGE_QUALITY = 0.8f;
 
     private final UserService userService;
     private final RoleService roleService;
     private final MenuService menuService;
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
+    private final StorageService storageService;
+    private final StoredObjectStore storedObjectStore;
 
     public CurrentUserServiceImpl(
             UserService userService,
             RoleService roleService,
             MenuService menuService,
             PrincipalIdentityService principalIdentityService,
-            PrincipalCredentialService principalCredentialService) {
+            PrincipalCredentialService principalCredentialService,
+            StorageService storageService,
+            StoredObjectStore storedObjectStore) {
         this.userService = userService;
         this.roleService = roleService;
         this.menuService = menuService;
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
+        this.storageService = storageService;
+        this.storedObjectStore = storedObjectStore;
     }
 
     @Override
@@ -108,6 +141,61 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         }
 
         upsertPassword(command.getUserId(), accountIdentity, PasswordHelper.encrypt(password));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StoredObject changeAvatar(ChangeCurrentUserAvatarCommand command) {
+        if (command == null || command.getUserId() == null || command.getInputStream() == null) {
+            throw invalidParameter("avatar");
+        }
+
+        removeAvatar(command.getUserId());
+
+        byte[] avatarBytes = readAvatarBytes(command.getInputStream());
+        StoredObject storage = toAvatarStorage(command.getUserId(), command.getOriginalFilename());
+        storage.setId(storageService.create(toCreateStorageCommand(storage)));
+        try {
+            applyStoredObject(storage, storedObjectStore.save(storage, new ByteArrayInputStream(avatarBytes)));
+        } catch (IOException e) {
+            throw storageFailure(e.getMessage());
+        }
+        storageService.change(toChangeStorageCommand(storage));
+        return storage;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeAvatar(RemoveCurrentUserAvatarCommand command) {
+        if (command == null || command.getUserId() == null) {
+            throw invalidParameter("userId");
+        }
+        removeAvatar(command.getUserId());
+    }
+
+    @Override
+    public StoredObject getAvatar(UserId userId) {
+        List<StoredObject> avatars = listAvatars(userId);
+        return avatars.isEmpty() ? null : avatars.get(avatars.size() - 1);
+    }
+
+    @Override
+    public InputStream getAvatarInputStream(UserId userId) {
+        StoredObject avatar = getAvatar(userId);
+        if (avatar == null || !storedObjectStore.exists(avatar)) {
+            return null;
+        }
+        try {
+            return storedObjectStore.open(avatar);
+        } catch (IOException e) {
+            throw storageFailure(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean existsAvatar(UserId userId) {
+        StoredObject avatar = getAvatar(userId);
+        return avatar != null && storedObjectStore.exists(avatar);
     }
 
     @Override
@@ -154,6 +242,21 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         UserQuery query = new UserQuery();
         query.setId(userId);
         return query;
+    }
+
+    private List<StoredObject> listAvatars(UserId userId) {
+        StorageQuery query = new StorageQuery();
+        query.setOwnerType(StorageOwnerType.USER);
+        query.setOwnerId(userId == null ? null : String.valueOf(userId.value()));
+        query.setObjectStatus(StoredObjectStatus.ACTIVE);
+        query.setRemarks(AVATAR_REMARKS);
+        return storageService.list(query);
+    }
+
+    private void removeAvatar(UserId userId) {
+        for (StoredObject storage : listAvatars(userId)) {
+            storageService.remove(new DeleteStorageCommand(storage.getId()));
+        }
     }
 
     @Override
@@ -213,6 +316,112 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
         principalCredentialService.change(new PrincipalCredentialCommand(credential));
+    }
+
+    private byte[] readAvatarBytes(InputStream inputStream) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Thumbnails.Builder<?> builder = Thumbnails.of(inputStream);
+            BufferedImage image = builder.scale(1.0f).asBufferedImage();
+
+            int originWidth = image.getWidth();
+            int originHeight = image.getHeight();
+            if (originWidth <= 0 || originHeight <= 0) {
+                throw invalidParameter("avatar");
+            }
+
+            if (originWidth > MAX_AVATAR_WIDTH || originHeight > MAX_AVATAR_HEIGHT) {
+                double scale = Math.min(
+                        (double) MAX_AVATAR_WIDTH / (double) originWidth,
+                        (double) MAX_AVATAR_HEIGHT / (double) originHeight);
+                builder = Thumbnails.of(image).scale(scale);
+            } else {
+                builder = Thumbnails.of(image).size(originWidth, originHeight);
+            }
+
+            builder.outputFormat(JPG);
+            builder.outputQuality(IMAGE_QUALITY);
+            builder.toOutputStream(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw storageFailure(e.getMessage());
+        } catch (RuntimeException e) {
+            throw invalidParameter("avatar");
+        }
+    }
+
+    private StoredObject toAvatarStorage(UserId userId, String originalFilename) {
+        StoredObject storage = new StoredObject();
+        storage.setOriginalFilename(originalFilename(originalFilename));
+        storage.setContentType(IMAGE_JPEG);
+        storage.setName(AVATAR_NAME);
+        storage.setExtendName(JPG);
+        storage.setMimeType(IMAGE_JPEG);
+        storage.setOwnerId(String.valueOf(userId.value()));
+        storage.setOwnerType(StorageOwnerType.USER);
+        storage.setObjectStatus(StoredObjectStatus.ACTIVE);
+        storage.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
+        storage.setRemarks(AVATAR_REMARKS);
+        return storage;
+    }
+
+    private String originalFilename(String originalFilename) {
+        if (StringUtils.isBlank(FilenameUtils.getExtension(originalFilename))) {
+            return AVATAR_FILENAME;
+        }
+        return originalFilename;
+    }
+
+    private void applyStoredObject(StoredObject storage, StoredObject storedObject) {
+        storage.setStorageType(storedObject.getStorageType());
+        storage.setBucketName(storedObject.getBucketName());
+        storage.setObjectKey(storedObject.getObjectKey());
+        storage.setSize(storedObject.getSize());
+        storage.setAccessEndpoint(storedObject.getAccessEndpoint());
+    }
+
+    private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {
+        CreateStorageCommand command = new CreateStorageCommand();
+        command.setOriginalFilename(storage.getOriginalFilename());
+        command.setContentType(storage.getContentType());
+        command.setName(storage.getName());
+        command.setExtendName(storage.getExtendName());
+        command.setMimeType(storage.getMimeType());
+        command.setOwnerId(storage.getOwnerId());
+        command.setOwnerType(storage.getOwnerType());
+        command.setObjectStatus(storage.getObjectStatus());
+        command.setReferenceStatus(storage.getReferenceStatus());
+        command.setRemarks(storage.getRemarks());
+        return command;
+    }
+
+    private ChangeStorageCommand toChangeStorageCommand(StoredObject storage) {
+        ChangeStorageCommand command = new ChangeStorageCommand();
+        command.setId(storage.getId());
+        command.setOriginalFilename(storage.getOriginalFilename());
+        command.setContentType(storage.getContentType());
+        command.setName(storage.getName());
+        command.setExtendName(storage.getExtendName());
+        command.setMimeType(storage.getMimeType());
+        command.setOwnerId(storage.getOwnerId());
+        command.setOwnerType(storage.getOwnerType());
+        command.setStorageType(storage.getStorageType());
+        command.setBucketName(storage.getBucketName());
+        command.setObjectKey(storage.getObjectKey());
+        command.setSize(storage.getSize());
+        command.setAccessEndpoint(storage.getAccessEndpoint());
+        command.setObjectStatus(storage.getObjectStatus());
+        command.setReferenceStatus(storage.getReferenceStatus());
+        command.setRemarks(storage.getRemarks());
+        return command;
+    }
+
+    private BizException invalidParameter(String name) {
+        return new BizException("SYS-00001", "sys.exception.invalid-parameter", "无效的参数: " + name);
+    }
+
+    private BizException storageFailure(String message) {
+        return new BizException(
+                "SYS-00005", "sys.exception.storage-failure", StringUtils.defaultIfBlank(message, "存储处理失败"));
     }
 
     private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {

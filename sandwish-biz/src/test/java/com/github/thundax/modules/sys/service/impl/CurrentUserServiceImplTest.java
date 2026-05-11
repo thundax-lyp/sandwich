@@ -14,6 +14,8 @@ import com.github.thundax.modules.auth.service.command.PrincipalCredentialComman
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
+import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
@@ -44,7 +46,9 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 menuService,
                 mock(PrincipalIdentityService.class),
-                mock(PrincipalCredentialService.class));
+                mock(PrincipalCredentialService.class),
+                mock(StorageService.class),
+                mock(StoredObjectStore.class));
         List<Menu> menus = Arrays.asList(menu(5001L, null, "系统管理"), menu(5002L, 5001L, "用户管理"));
 
         when(menuService.list(any(MenuQuery.class))).thenReturn(menus);
@@ -66,7 +70,9 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 menuService,
                 mock(PrincipalIdentityService.class),
-                mock(PrincipalCredentialService.class));
+                mock(PrincipalCredentialService.class),
+                mock(StorageService.class),
+                mock(StoredObjectStore.class));
         List<Menu> menus = Arrays.asList(
                 menu(5001L, null, "系统管理"),
                 menu(5002L, 5001L, "用户管理"),
@@ -92,7 +98,9 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 menuService,
                 mock(PrincipalIdentityService.class),
-                mock(PrincipalCredentialService.class));
+                mock(PrincipalCredentialService.class),
+                mock(StorageService.class),
+                mock(StoredObjectStore.class));
         List<Menu> menus = Arrays.asList(
                 menu(5010L, null, "A-root"), menu(5011L, 5010L, "B-child"), menu(5012L, 5011L, "C-grandchild"));
 
@@ -115,7 +123,9 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 mock(MenuService.class),
                 principalIdentityService,
-                mock(PrincipalCredentialService.class));
+                mock(PrincipalCredentialService.class),
+                mock(StorageService.class),
+                mock(StoredObjectStore.class));
         User currentUser = superUser();
         PrincipalIdentity identity = accountIdentity(currentUser.getId(), "tester");
 
@@ -150,7 +160,9 @@ public class CurrentUserServiceImplTest {
                 mock(RoleService.class),
                 mock(MenuService.class),
                 principalIdentityService,
-                principalCredentialService);
+                principalCredentialService,
+                mock(StorageService.class),
+                mock(StoredObjectStore.class));
         User currentUser = superUser();
         PrincipalIdentity identity = accountIdentity(currentUser.getId(), "tester");
         PrincipalCredential credential = new PrincipalCredential();

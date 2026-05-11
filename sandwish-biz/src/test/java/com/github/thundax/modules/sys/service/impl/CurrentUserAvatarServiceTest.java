@@ -1,4 +1,4 @@
-package com.github.thundax.modules.sys.support;
+package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.github.thundax.modules.auth.service.PrincipalCredentialService;
+import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
@@ -18,6 +20,10 @@ import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import com.github.thundax.modules.sys.service.MenuService;
+import com.github.thundax.modules.sys.service.RoleService;
+import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -28,7 +34,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-public class AvatarStorageSupportTest {
+public class CurrentUserAvatarServiceTest {
 
     @Test
     public void shouldStoreAvatarAsUserOwnedStorageObject() throws Exception {
@@ -49,9 +55,18 @@ public class AvatarStorageSupportTest {
             return storedObject;
         });
 
-        AvatarStorageSupport support = new AvatarStorageSupport(storageService, storedObjectStore);
+        CurrentUserServiceImpl service = new CurrentUserServiceImpl(
+                mock(UserService.class),
+                mock(RoleService.class),
+                mock(MenuService.class),
+                mock(PrincipalIdentityService.class),
+                mock(PrincipalCredentialService.class),
+                storageService,
+                storedObjectStore);
+        MultipartFile avatar = avatarFile();
 
-        support.saveAvatar(UserIdCodec.toDomain(7L), avatarFile());
+        service.changeAvatar(new ChangeCurrentUserAvatarCommand(
+                UserIdCodec.toDomain(7L), avatar.getInputStream(), avatar.getOriginalFilename()));
 
         ArgumentCaptor<DeleteStorageCommand> deleteCaptor = ArgumentCaptor.forClass(DeleteStorageCommand.class);
         verify(storageService).remove(deleteCaptor.capture());

@@ -29,14 +29,16 @@ import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
+import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
-import com.github.thundax.modules.sys.support.AvatarStorageSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -58,20 +60,17 @@ public class CurrentUserController {
     private final CurrentUserResolver currentUserResolver;
     private final PrincipalIdentityService principalIdentityService;
     private final PreAuthSessionService preAuthSessionService;
-    private final AvatarStorageSupport avatarStorageSupport;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
             CurrentUserResolver currentUserResolver,
             PrincipalIdentityService principalIdentityService,
-            PreAuthSessionService preAuthSessionService,
-            AvatarStorageSupport avatarStorageSupport) {
+            PreAuthSessionService preAuthSessionService) {
 
         this.currentUserService = currentUserService;
         this.currentUserResolver = currentUserResolver;
         this.principalIdentityService = principalIdentityService;
         this.preAuthSessionService = preAuthSessionService;
-        this.avatarStorageSupport = avatarStorageSupport;
     }
 
     @ApiOperation(value = "当前用户信息", notes = "读取当前登录后台用户的基础资料和登录名")
@@ -164,7 +163,14 @@ public class CurrentUserController {
     public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) {
         User currentUser = currentUserResolver.currentUser();
 
-        avatarStorageSupport.saveAvatar(currentUser.getId(), request.getAvatar());
+        try {
+            currentUserService.changeAvatar(new ChangeCurrentUserAvatarCommand(
+                    currentUser.getId(),
+                    request.getAvatar().getInputStream(),
+                    request.getAvatar().getOriginalFilename()));
+        } catch (IOException e) {
+            throw AdminResponseExceptions.system(e.getMessage());
+        }
 
         return PersonalInterfaceAssembler.toAvatarResponse(readAvatarUrl(currentUser));
     }
@@ -183,7 +189,7 @@ public class CurrentUserController {
     public PersonalAvatarResponse deleteAvatar() {
         User currentUser = currentUserResolver.currentUser();
 
-        avatarStorageSupport.removeAvatar(currentUser.getId());
+        currentUserService.removeAvatar(new RemoveCurrentUserAvatarCommand(currentUser.getId()));
 
         return PersonalInterfaceAssembler.toAvatarResponse(null);
     }
@@ -229,7 +235,7 @@ public class CurrentUserController {
     }
 
     private String readAvatarUrl(User user) {
-        if (user == null || !avatarStorageSupport.existsAvatar(user.getId())) {
+        if (user == null || !currentUserService.existsAvatar(user.getId())) {
             return null;
         }
         return UserController.getAvatarUrl(

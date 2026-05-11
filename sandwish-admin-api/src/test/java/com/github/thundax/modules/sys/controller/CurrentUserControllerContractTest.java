@@ -21,7 +21,6 @@ import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
-import com.github.thundax.modules.sys.support.AvatarStorageSupport;
 import io.swagger.annotations.Api;
 import java.util.Arrays;
 import java.util.List;
@@ -83,8 +82,7 @@ public class CurrentUserControllerContractTest {
                 currentUserService,
                 new CurrentUserResolver(userService),
                 mock(PrincipalIdentityService.class),
-                mock(PreAuthSessionService.class),
-                mock(AvatarStorageSupport.class));
+                mock(PreAuthSessionService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 

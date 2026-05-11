@@ -30,6 +30,7 @@ import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
+import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.UserAvatarRequest;
@@ -53,21 +54,25 @@ import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
+import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
+import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
-import com.github.thundax.modules.sys.support.AvatarStorageSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -109,7 +114,7 @@ public class UserController {
     private final PrincipalCredentialService principalCredentialService;
     private final PreAuthSessionService preAuthSessionService;
     private final CurrentUserResolver currentUserResolver;
-    private final AvatarStorageSupport avatarStorageSupport;
+    private final CurrentUserService currentUserService;
 
     @Autowired
     public UserController(
@@ -120,7 +125,7 @@ public class UserController {
             PrincipalCredentialService principalCredentialService,
             PreAuthSessionService preAuthSessionService,
             CurrentUserResolver currentUserResolver,
-            AvatarStorageSupport avatarStorageSupport) {
+            CurrentUserService currentUserService) {
 
         this.userService = userService;
         this.departmentService = departmentService;
@@ -129,7 +134,7 @@ public class UserController {
         this.principalCredentialService = principalCredentialService;
         this.preAuthSessionService = preAuthSessionService;
         this.currentUserResolver = currentUserResolver;
-        this.avatarStorageSupport = avatarStorageSupport;
+        this.currentUserService = currentUserService;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
@@ -298,7 +303,12 @@ public class UserController {
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @WrappedApiResponse
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) {
-        avatarStorageSupport.saveAvatar(UserIdCodec.toDomain(Long.valueOf(id)), avatar);
+        try {
+            currentUserService.changeAvatar(new ChangeCurrentUserAvatarCommand(
+                    UserIdCodec.toDomain(Long.valueOf(id)), avatar.getInputStream(), avatar.getOriginalFilename()));
+        } catch (IOException e) {
+            throw AdminResponseExceptions.system(e.getMessage());
+        }
         return true;
     }
 
@@ -315,7 +325,7 @@ public class UserController {
     @PostMapping(value = "avatar/delete")
     @WrappedApiResponse
     public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) {
-        avatarStorageSupport.removeAvatar(UserIdCodec.toDomain(request.getId()));
+        currentUserService.removeAvatar(new RemoveCurrentUserAvatarCommand(UserIdCodec.toDomain(request.getId())));
         return true;
     }
 
@@ -499,7 +509,26 @@ public class UserController {
             return;
         }
 
-        avatarStorageSupport.writeAvatar(UserIdCodec.toDomain(Long.valueOf(userId)), response);
+        StoredObject avatar = currentUserService.getAvatar(UserIdCodec.toDomain(Long.valueOf(userId)));
+        InputStream inputStream = currentUserService.getAvatarInputStream(UserIdCodec.toDomain(Long.valueOf(userId)));
+        if (avatar == null || inputStream == null) {
+            response.sendError(HttpStatus.NOT_FOUND.value());
+            return;
+        }
+
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+        response.setContentType(avatar.getMimeType());
+
+        try (InputStream avatarInputStream = inputStream;
+                OutputStream outputStream = response.getOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int readBytes;
+            while ((readBytes = avatarInputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, readBytes);
+            }
+        }
     }
 
     private UserQuery readQuery(UserQueryRequest request) {
@@ -678,7 +707,7 @@ public class UserController {
     }
 
     private String readAvatarUrl(UserId userId) {
-        if (!avatarStorageSupport.existsAvatar(userId)) {
+        if (!currentUserService.existsAvatar(userId)) {
             return null;
         }
         return getAvatarUrl(UserIdCodec.toStringValue(userId), SandwishContextHolder.currentToken());

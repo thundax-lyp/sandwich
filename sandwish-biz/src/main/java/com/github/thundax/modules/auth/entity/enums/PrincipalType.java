@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalType {
@@ -15,6 +15,7 @@ public enum PrincipalType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90011", "auth.domain.principal-type.invalid", "Unknown principal type: " + value));
     }
 }

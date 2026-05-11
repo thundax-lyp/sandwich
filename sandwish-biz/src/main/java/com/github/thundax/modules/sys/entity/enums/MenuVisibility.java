@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum MenuVisibility {
@@ -15,6 +15,7 @@ public enum MenuVisibility {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown menu visibility: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "SYS-90002", "sys.domain.menu-visibility.invalid", "Unknown menu visibility: " + value));
     }
 }

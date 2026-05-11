@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum UserPrivilege {
@@ -16,6 +16,7 @@ public enum UserPrivilege {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown user privilege: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "SYS-90005", "sys.domain.user-privilege.invalid", "Unknown user privilege: " + value));
     }
 }

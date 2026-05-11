@@ -1,6 +1,6 @@
 package com.github.thundax.modules.audit.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum AuditOperatorType {
@@ -20,6 +20,7 @@ public enum AuditOperatorType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown audit operator type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUDIT-90002", "audit.domain.operator-type.invalid", "Unknown audit operator type: " + value));
     }
 }

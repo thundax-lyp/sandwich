@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum RoleStatus {
@@ -15,6 +15,7 @@ public enum RoleStatus {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown role status: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "SYS-90004", "sys.domain.role-status.invalid", "Unknown role status: " + value));
     }
 }

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalAuthenticationMethod {
@@ -20,6 +20,9 @@ public enum PrincipalAuthenticationMethod {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal authentication method: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90002",
+                        "auth.domain.principal-authentication-method.invalid",
+                        "Unknown principal authentication method: " + value));
     }
 }

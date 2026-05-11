@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalTokenStatus {
@@ -17,6 +17,9 @@ public enum PrincipalTokenStatus {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal token status: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90010",
+                        "auth.domain.principal-token-status.invalid",
+                        "Unknown principal token status: " + value));
     }
 }

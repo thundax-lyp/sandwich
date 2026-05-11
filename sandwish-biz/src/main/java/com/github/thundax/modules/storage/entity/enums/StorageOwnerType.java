@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum StorageOwnerType {
@@ -15,6 +15,7 @@ public enum StorageOwnerType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown storage owner type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "STORAGE-90002", "storage.domain.owner-type.invalid", "Unknown storage owner type: " + value));
     }
 }

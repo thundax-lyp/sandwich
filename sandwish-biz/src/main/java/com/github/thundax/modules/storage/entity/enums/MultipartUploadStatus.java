@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum MultipartUploadStatus {
@@ -17,6 +17,9 @@ public enum MultipartUploadStatus {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown multipart upload status: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "STORAGE-90001",
+                        "storage.domain.multipart-upload-status.invalid",
+                        "Unknown multipart upload status: " + value));
     }
 }

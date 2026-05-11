@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalCredentialStatus {
@@ -17,6 +17,9 @@ public enum PrincipalCredentialStatus {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal credential status: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90003",
+                        "auth.domain.principal-credential-status.invalid",
+                        "Unknown principal credential status: " + value));
     }
 }

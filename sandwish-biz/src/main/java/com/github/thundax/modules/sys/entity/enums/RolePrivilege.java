@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum RolePrivilege {
@@ -15,6 +15,7 @@ public enum RolePrivilege {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown role privilege: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "SYS-90003", "sys.domain.role-privilege.invalid", "Unknown role privilege: " + value));
     }
 }

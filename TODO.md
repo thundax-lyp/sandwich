@@ -12,36 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `biz-domain-exception-migration`：迁移领域枚举和值对象异常
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/OAuthClientStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalAuthenticationMethod.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalCredentialStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalCredentialType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalIdentityStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalIdentityType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalLoginEventType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalTokenStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/enums/AuditAction.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/enums/AuditOperatorType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberGender.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/entity/enums/MemberStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/MultipartUploadStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageOwnerType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StorageType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StoredObjectReferenceStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/entity/enums/StoredObjectStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/LogType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/MenuVisibility.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/RolePrivilege.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/RoleStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserPrivilege.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/entity/enums/UserStatus.java`
-  - 处理动作：将领域枚举和值对象的不变量失败从 `BizException` 迁移为 `DomainException`。
-  - 验收点：领域对象、值对象和领域枚举不再抛泛业务异常，领域失败携带 String code/messageKey/defaultMessage。
-  - 重要度：8/10
-
 - [ ] `biz-service-api-exception-migration`：迁移 Biz Service 的 ApiException 调用点
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalAuthService.java`

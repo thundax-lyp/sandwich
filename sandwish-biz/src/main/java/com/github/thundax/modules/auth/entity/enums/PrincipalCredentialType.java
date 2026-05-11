@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalCredentialType {
@@ -43,7 +43,10 @@ public enum PrincipalCredentialType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal credential type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90004",
+                        "auth.domain.principal-credential-type.invalid",
+                        "Unknown principal credential type: " + value));
     }
 
     public static PrincipalCredentialType from(PrincipalType principalType, String credentialName) {
@@ -51,7 +54,9 @@ public enum PrincipalCredentialType {
                 .filter(item ->
                         item.principalType == principalType && item.credentialName.equalsIgnoreCase(credentialName))
                 .findFirst()
-                .orElseThrow(() ->
-                        new BizException("Unknown principal credential type: " + principalType + ":" + credentialName));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90005",
+                        "auth.domain.principal-credential-type.invalid-combination",
+                        "Unknown principal credential type: " + principalType + ":" + credentialName));
     }
 }

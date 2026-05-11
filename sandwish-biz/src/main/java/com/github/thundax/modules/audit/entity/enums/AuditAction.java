@@ -1,6 +1,6 @@
 package com.github.thundax.modules.audit.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum AuditAction {
@@ -27,6 +27,7 @@ public enum AuditAction {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown audit action: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUDIT-90001", "audit.domain.action.invalid", "Unknown audit action: " + value));
     }
 }

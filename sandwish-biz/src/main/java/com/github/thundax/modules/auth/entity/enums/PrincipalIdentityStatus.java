@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalIdentityStatus {
@@ -15,6 +15,9 @@ public enum PrincipalIdentityStatus {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal identity status: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90006",
+                        "auth.domain.principal-identity-status.invalid",
+                        "Unknown principal identity status: " + value));
     }
 }

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalIdentityType {
@@ -57,14 +57,19 @@ public enum PrincipalIdentityType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal identity type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90007",
+                        "auth.domain.principal-identity-type.invalid",
+                        "Unknown principal identity type: " + value));
     }
 
     public static PrincipalIdentityType from(PrincipalType principalType, String identityName) {
         return Arrays.stream(values())
                 .filter(item -> item.principalType == principalType && item.identityName.equalsIgnoreCase(identityName))
                 .findFirst()
-                .orElseThrow(() ->
-                        new BizException("Unknown principal identity type: " + principalType + ":" + identityName));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90008",
+                        "auth.domain.principal-identity-type.invalid-combination",
+                        "Unknown principal identity type: " + principalType + ":" + identityName));
     }
 }

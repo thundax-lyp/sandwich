@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum PrincipalLoginEventType {
@@ -18,6 +18,9 @@ public enum PrincipalLoginEventType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown principal login event type: " + value));
+                .orElseThrow(() -> new DomainException(
+                        "AUTH-90009",
+                        "auth.domain.principal-login-event-type.invalid",
+                        "Unknown principal login event type: " + value));
     }
 }

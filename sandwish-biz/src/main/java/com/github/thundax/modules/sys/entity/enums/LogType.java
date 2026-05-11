@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.entity.enums;
 
-import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.DomainException;
 import java.util.Arrays;
 
 public enum LogType {
@@ -15,6 +15,7 @@ public enum LogType {
         return Arrays.stream(values())
                 .filter(item -> item.name().equalsIgnoreCase(value))
                 .findFirst()
-                .orElseThrow(() -> new BizException("Unknown log type: " + value));
+                .orElseThrow(() ->
+                        new DomainException("SYS-90001", "sys.domain.log-type.invalid", "Unknown log type: " + value));
     }
 }

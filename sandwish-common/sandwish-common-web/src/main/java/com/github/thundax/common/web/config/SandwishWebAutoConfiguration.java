@@ -4,8 +4,11 @@ import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.context.DefaultSandwishContextResolver;
 import com.github.thundax.common.web.context.SandwishContextFilter;
 import com.github.thundax.common.web.context.SandwishContextResolver;
+import com.github.thundax.common.web.exception.DefaultExceptionTranslator;
+import com.github.thundax.common.web.exception.ExceptionTranslator;
 import com.github.thundax.common.web.exception.GlobalExceptionHandler;
 import com.github.thundax.common.web.i18n.I18nMessageResolver;
+import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -26,8 +29,15 @@ public class SandwishWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public GlobalExceptionHandler globalExceptionHandler(I18nMessageResolver i18nMessageResolver) {
-        return new GlobalExceptionHandler(i18nMessageResolver);
+    public GlobalExceptionHandler globalExceptionHandler(
+            I18nMessageResolver i18nMessageResolver, List<ExceptionTranslator> exceptionTranslators) {
+        return new GlobalExceptionHandler(i18nMessageResolver, exceptionTranslators);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DefaultExceptionTranslator.class)
+    public DefaultExceptionTranslator defaultExceptionTranslator() {
+        return new DefaultExceptionTranslator();
     }
 
     @Bean

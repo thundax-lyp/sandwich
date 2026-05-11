@@ -12,17 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `api-error-translator`：建立前后台异常转换层
-  - 范围文件：
-    - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/exception/BannedAccountException.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/exception/InvalidUsernamePasswordException.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/exception/AdminExceptionTranslator.java`
-    - `sandwish-front-api/src/main/java/com/github/thundax/modules/auth/exception/FrontExceptionTranslator.java`
-  - 处理动作：按入口建立 `AdminExceptionTranslator` 和 `FrontExceptionTranslator`，将 Biz/Domain/framework 异常转换为 `SandwishException`。
-  - 验收点：translator 输出 code 均存在于对应 error code 文档，`GlobalExceptionHandler` 只负责响应组装。
-  - 重要度：10/10
-
 - [ ] `admin-api-exception-migration`：迁移后台 API 异常响应
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java`

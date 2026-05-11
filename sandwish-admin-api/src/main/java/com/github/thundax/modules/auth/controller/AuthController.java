@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
@@ -53,7 +54,9 @@ import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -83,17 +86,20 @@ public class AuthController {
     private final PreAuthSessionService preAuthSessionService;
     private final AuthProperties properties;
     private final SysLogMessageService sysLogMessageService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public AuthController(
             AdminAuthService authService,
             PreAuthSessionService preAuthSessionService,
             AuthProperties properties,
-            SysLogMessageService sysLogMessageService) {
+            SysLogMessageService sysLogMessageService,
+            ObjectMapper objectMapper) {
         this.authService = authService;
         this.preAuthSessionService = preAuthSessionService;
         this.properties = properties;
         this.sysLogMessageService = sysLogMessageService;
+        this.objectMapper = objectMapper;
     }
 
     @ApiOperation(value = "请求预认证会话")
@@ -388,7 +394,7 @@ public class AuthController {
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
-        log.setRequestParams(AuthInterfaceAssembler.toLogJson(request));
+        log.setRequestParams(toLogJson(request));
         sysLogMessageService.saveLog(log);
     }
 
@@ -402,8 +408,34 @@ public class AuthController {
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
         log.setType(LogType.ACCESS);
-        log.setRequestParams(AuthInterfaceAssembler.toLogJson(loginName));
+        log.setRequestParams(toLogJson(loginName));
         sysLogMessageService.saveLog(log);
+    }
+
+    private String toLogJson(AuthLoginRequest request) {
+        if (request == null) {
+            return null;
+        }
+        AuthLoginRequest maskedRequest = new AuthLoginRequest();
+        maskedRequest.setLoginToken(request.getLoginToken());
+        maskedRequest.setUsername(request.getUsername());
+        maskedRequest.setPassword("******");
+        maskedRequest.setCaptcha(request.getCaptcha());
+        return toJson(maskedRequest);
+    }
+
+    private String toLogJson(String loginName) {
+        Map<String, Object> request = new LinkedHashMap<>();
+        request.put("loginName", loginName);
+        return toJson(request);
+    }
+
+    private String toJson(Object value) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private AuthAccessTokenResponse loginSuccess(

@@ -1,7 +1,7 @@
 package com.github.thundax.modules.sys.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.security.context.SandwishContextHolder;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
@@ -29,9 +29,11 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
     private static final String TITLE_SEPARATOR = "-";
 
     private final SysLogMessageService sysLogMessageService;
+    private final ObjectMapper objectMapper;
 
-    public SysLogMethodInterceptor(SysLogMessageService sysLogMessageService) {
+    public SysLogMethodInterceptor(SysLogMessageService sysLogMessageService, ObjectMapper objectMapper) {
         this.sysLogMessageService = sysLogMessageService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -126,9 +128,17 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
         }
 
         if (requestBody != null) {
-            log.setRequestParams(JsonUtils.toJson(requestBody));
+            log.setRequestParams(toJson(requestBody));
         }
 
         sysLogMessageService.saveLog(log);
+    }
+
+    private String toJson(Object requestBody) {
+        try {
+            return objectMapper.writeValueAsString(requestBody);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

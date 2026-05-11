@@ -1,7 +1,5 @@
 package com.github.thundax.modules.auth.assembler;
 
-import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.response.AuthAccessTokenResponse;
 import com.github.thundax.modules.auth.controller.response.AuthLoginFormResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2AuthorizationDecisionResponse;
@@ -18,8 +16,6 @@ import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationDecisio
 import com.github.thundax.modules.auth.service.result.OAuth2AuthorizationViewResult;
 import com.github.thundax.modules.sys.entity.User;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import org.springframework.lang.NonNull;
@@ -65,24 +61,6 @@ public final class AuthInterfaceAssembler {
                                 : result.getOauthAccessToken())
                 .refreshToken(result.getRefreshToken())
                 .build();
-    }
-
-    public static String toLogJson(AuthLoginRequest request) {
-        if (request == null) {
-            return null;
-        }
-        AuthLoginRequest maskedRequest = new AuthLoginRequest();
-        maskedRequest.setLoginToken(request.getLoginToken());
-        maskedRequest.setUsername(request.getUsername());
-        maskedRequest.setPassword("******");
-        maskedRequest.setCaptcha(request.getCaptcha());
-        return JsonUtils.toJson(maskedRequest);
-    }
-
-    public static String toLogJson(String loginName) {
-        Map<String, Object> request = new LinkedHashMap<>();
-        request.put("loginName", loginName);
-        return JsonUtils.toJson(request);
     }
 
     @NonNull

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
-import com.github.thundax.common.utils.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import java.io.IOException;
@@ -17,9 +17,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final MemberAuthService memberAuthService;
+    private final ObjectMapper objectMapper;
 
-    public FrontSpringSecurityConfiguration(MemberAuthService memberAuthService) {
+    public FrontSpringSecurityConfiguration(MemberAuthService memberAuthService, ObjectMapper objectMapper) {
         this.memberAuthService = memberAuthService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class FrontSpringSecurityConfiguration extends WebSecurityConfigurerAdapt
     }
 
     private void writeLogoutResponse(HttpServletResponse response) throws IOException {
-        String jsonString = JsonUtils.toJson(MemberLoginInterfaceAssembler.toLogoutResponse());
+        String jsonString = objectMapper.writeValueAsString(MemberLoginInterfaceAssembler.toLogoutResponse());
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

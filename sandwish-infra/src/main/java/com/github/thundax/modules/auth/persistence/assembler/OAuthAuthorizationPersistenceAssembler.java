@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.id.EntityIdCodec;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.modules.auth.entity.OAuthAuthorization;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class OAuthAuthorizationPersistenceAssembler {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final TypeReference<LinkedHashSet<String>> STRING_SET_TYPE =
             new TypeReference<LinkedHashSet<String>>() {};
 
@@ -74,14 +75,25 @@ public final class OAuthAuthorizationPersistenceAssembler {
     }
 
     private static String writeStringSet(Set<String> values) {
-        return values == null ? "[]" : JsonUtils.toJson(values);
+        if (values == null) {
+            return "[]";
+        }
+        try {
+            return OBJECT_MAPPER.writeValueAsString(values);
+        } catch (Exception e) {
+            throw new IllegalStateException("failed to write oauth authorization string set", e);
+        }
     }
 
     private static LinkedHashSet<String> readStringSet(String value) {
         if (StringUtils.isBlank(value)) {
             return new LinkedHashSet<>();
         }
-        LinkedHashSet<String> values = JsonUtils.fromJson(value, STRING_SET_TYPE);
-        return values == null ? new LinkedHashSet<>() : values;
+        try {
+            LinkedHashSet<String> values = OBJECT_MAPPER.readValue(value, STRING_SET_TYPE);
+            return values == null ? new LinkedHashSet<>() : values;
+        } catch (Exception e) {
+            throw new IllegalStateException("failed to read oauth authorization string set", e);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.modules.auth.security.filter.AccessTokenAuthenticationFilter;
@@ -30,18 +31,21 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final PermissionService permissionService;
     private final UserService userService;
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    private final ObjectMapper objectMapper;
 
     public SpringSecurityConfiguration(
             SandwishProperties properties,
             AdminAuthService authService,
             PermissionService permissionService,
             UserService userService,
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
+            RequestMappingHandlerMapping requestMappingHandlerMapping,
+            ObjectMapper objectMapper) {
         this.properties = properties;
         this.authService = authService;
         this.permissionService = permissionService;
         this.userService = userService;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(
                         new AccessTokenAuthenticationFilter(
-                                accessTokenExcludePaths(), authService, permissionService, userService),
+                                accessTokenExcludePaths(), authService, permissionService, userService, objectMapper),
                         UsernamePasswordAuthenticationFilter.class);
     }
 

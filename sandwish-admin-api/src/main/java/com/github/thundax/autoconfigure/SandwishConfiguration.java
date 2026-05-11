@@ -1,5 +1,6 @@
 package com.github.thundax.autoconfigure;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.jasypt.JasyptStringEncryptor;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.sys.aop.SysLogPointcutAdvisor;
@@ -27,8 +28,9 @@ public class SandwishConfiguration {
     }
 
     @Bean
-    public SysLogPointcutAdvisor sysLogPointcutAdvisor(SysLogMessageService sysLogMessageService) {
-        return new SysLogPointcutAdvisor(sysLogMessageService);
+    public SysLogPointcutAdvisor sysLogPointcutAdvisor(
+            SysLogMessageService sysLogMessageService, ObjectMapper objectMapper) {
+        return new SysLogPointcutAdvisor(sysLogMessageService, objectMapper);
     }
 
     /**

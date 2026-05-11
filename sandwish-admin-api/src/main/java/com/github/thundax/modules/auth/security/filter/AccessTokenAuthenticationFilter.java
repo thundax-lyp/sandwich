@@ -1,11 +1,11 @@
 package com.github.thundax.modules.auth.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.security.context.SandwishSubjectType;
-import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.web.exception.WebErrorCode;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
@@ -42,24 +42,28 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final AdminAuthService authService;
     private final PermissionService permissionService;
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     public AccessTokenAuthenticationFilter(
             SandwishProperties.AccessTokenFilterProperties properties,
             AdminAuthService authService,
             PermissionService permissionService,
-            UserService userService) {
-        this(properties.getExcludePath(), authService, permissionService, userService);
+            UserService userService,
+            ObjectMapper objectMapper) {
+        this(properties.getExcludePath(), authService, permissionService, userService, objectMapper);
     }
 
     public AccessTokenAuthenticationFilter(
             List<String> excludePaths,
             AdminAuthService authService,
             PermissionService permissionService,
-            UserService userService) {
+            UserService userService,
+            ObjectMapper objectMapper) {
         this.excludePatternList.addAll(excludePaths);
         this.authService = authService;
         this.permissionService = permissionService;
         this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -135,7 +139,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void writeError(HttpServletResponse response) throws IOException {
-        String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(WebErrorCode.UNAUTHORIZED.getCode(), "未授权用户"));
+        String jsonString =
+                objectMapper.writeValueAsString(new ResponseBodyWrapper(WebErrorCode.UNAUTHORIZED.getCode(), "未授权用户"));
 
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

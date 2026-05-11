@@ -1,5 +1,6 @@
 package com.github.thundax.modules.sys.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.utils.SysLogMessageService;
 import java.lang.annotation.Annotation;
@@ -14,8 +15,8 @@ public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
 
     private static final Class<? extends Annotation>[] ANNOTATION_CLASSES = new Class[] {SysLogger.class};
 
-    public SysLogPointcutAdvisor(SysLogMessageService sysLogMessageService) {
-        setAdvice(new SysLogMethodInterceptor(sysLogMessageService));
+    public SysLogPointcutAdvisor(SysLogMessageService sysLogMessageService, ObjectMapper objectMapper) {
+        setAdvice(new SysLogMethodInterceptor(sysLogMessageService, objectMapper));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
@@ -69,6 +70,7 @@ public class AuthPermissionLifecycleTest {
     private TestPrincipalAuthSessionDao principalAuthSessionDao;
     private AdminAuthService authService;
     private PermissionService permissionService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {
@@ -334,7 +336,8 @@ public class AuthPermissionLifecycleTest {
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
-                new TestUserService());
+                new TestUserService(),
+                objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
@@ -361,7 +364,8 @@ public class AuthPermissionLifecycleTest {
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
-                new TestUserService());
+                new TestUserService(),
+                objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
@@ -382,7 +386,8 @@ public class AuthPermissionLifecycleTest {
                 new SandwishProperties.AccessTokenFilterProperties(),
                 authService,
                 permissionService,
-                new TestUserService());
+                new TestUserService(),
+                objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -401,8 +406,8 @@ public class AuthPermissionLifecycleTest {
         SandwishProperties.AccessTokenFilterProperties properties =
                 new SandwishProperties.AccessTokenFilterProperties();
         properties.setExcludePath(Collections.singletonList("/api/auth/**"));
-        AccessTokenAuthenticationFilter filter =
-                new AccessTokenAuthenticationFilter(properties, authService, permissionService, new TestUserService());
+        AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
+                properties, authService, permissionService, new TestUserService(), objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/auth/captcha");
         MockHttpServletResponse response = new MockHttpServletResponse();

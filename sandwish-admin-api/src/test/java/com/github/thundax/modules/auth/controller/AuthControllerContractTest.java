@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
@@ -82,7 +83,11 @@ public class AuthControllerContractTest {
 
     private MockMvc mockMvc(AdminAuthService authService, PreAuthSessionService preAuthSessionService) {
         return MockMvcBuilders.standaloneSetup(new AuthController(
-                        authService, preAuthSessionService, authProperties(), mock(SysLogMessageService.class)))
+                        authService,
+                        preAuthSessionService,
+                        authProperties(),
+                        mock(SysLogMessageService.class),
+                        new ObjectMapper()))
                 .setControllerAdvice(advice)
                 .build();
     }

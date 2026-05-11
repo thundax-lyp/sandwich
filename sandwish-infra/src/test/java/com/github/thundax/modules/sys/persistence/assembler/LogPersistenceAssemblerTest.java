@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.persistence.dataobject.LogDO;
@@ -28,7 +27,7 @@ public class LogPersistenceAssemblerTest {
         try {
             LogPersistenceAssembler.toEntity(dataObject);
             fail("Legacy log type value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown log type: 1", expected.getMessage());
         }
     }

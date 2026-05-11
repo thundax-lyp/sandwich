@@ -2,7 +2,6 @@ package com.github.thundax.modules.storage.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -72,7 +71,7 @@ public class StoragePersistenceAssemblerTest {
         try {
             StoragePersistenceAssembler.toEntity(dataObject);
             fail("Legacy object status value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown storage status: 1", expected.getMessage());
         }
 
@@ -81,7 +80,7 @@ public class StoragePersistenceAssemblerTest {
         try {
             StoragePersistenceAssembler.toEntity(dataObject);
             fail("Legacy reference status value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown storage reference status: 1", expected.getMessage());
         }
     }

@@ -89,6 +89,11 @@ public class PrincipalAuthSessionDaoImplTest {
                             }
                             return null;
                         }
+                        if ("PUT".equals(method.getName())) {
+                            values.put((String) args[0], args[1]);
+                            ttlSeconds.put((String) args[0], (Long) args[2]);
+                            return null;
+                        }
                         if ("remove".equals(method.getName())) {
                             values.remove(args[0]);
                             ttlSeconds.remove(args[0]);

@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RolePrivilege;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -31,7 +30,7 @@ public class RolePersistenceAssemblerTest {
         try {
             RolePersistenceAssembler.toEntity(dataObject);
             fail("Legacy status value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown role status: 1", expected.getMessage());
         }
     }

@@ -2,7 +2,6 @@ package com.github.thundax.modules.member.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberGender;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -30,7 +29,7 @@ public class MemberPersistenceAssemblerTest {
         try {
             MemberPersistenceAssembler.toEntity(dataObject);
             fail("Legacy status value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown member status: 1", expected.getMessage());
         }
     }

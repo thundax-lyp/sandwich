@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
@@ -29,7 +28,7 @@ public class MenuPersistenceAssemblerTest {
         try {
             MenuPersistenceAssembler.toEntity(dataObject);
             fail("Legacy visibility value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown menu visibility: 1", expected.getMessage());
         }
     }

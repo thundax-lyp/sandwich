@@ -12,18 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `infra-exception-boundary`：盘点并清理 Infra 业务异常依赖
-  - 范围文件：
-    - 搜索模式：`sandwish-infra/src/main/java/com/github/thundax/modules/**/persistence/**/*.java`
-    - 搜索模式：`sandwish-infra/src/main/java/com/github/thundax/modules/**/store/**/*.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/UserPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/RolePersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/MenuPersistenceAssemblerTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/sys/persistence/assembler/LogPersistenceAssemblerTest.java`
-  - 处理动作：移除 Infra 生产和测试对 `BizException`、`DomainException`、`SandwishException` 的依赖，只保留技术异常。
-  - 验收点：`sandwish-infra` 无业务异常和 API 响应异常依赖，无 `InfraException`。
-  - 重要度：8/10
-
 - [ ] `exception-architecture-gates`：增加异常分层架构门禁
   - 范围文件：
     - `sandwish-biz/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`

@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.persistence.assembler;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -32,7 +31,7 @@ public class UserPersistenceAssemblerTest {
         try {
             UserPersistenceAssembler.toEntity(dataObject);
             fail("Legacy status value must be rejected");
-        } catch (BizException expected) {
+        } catch (RuntimeException expected) {
             assertEquals("Unknown user status: 1", expected.getMessage());
         }
     }

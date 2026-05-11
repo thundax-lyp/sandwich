@@ -1,10 +1,10 @@
-package com.github.thundax.modules.sys.utils;
+package com.github.thundax.modules.sys.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
-import com.github.thundax.common.Constants;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
+import com.github.thundax.modules.sys.service.SysLogMessageService;
 import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.io.File;
@@ -27,18 +27,17 @@ import org.springframework.stereotype.Service;
 @Lazy(value = false)
 @Slf4j
 @RequiredArgsConstructor
-public class SysLogMessageService {
+public class SysLogMessageServiceImpl implements SysLogMessageService {
 
-    public static final String QUEUE_SAVE_LOG = Constants.QUEUE_PREFIX + "save-log";
-
-    public static final DateFormat LOG_FILENAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static final String LOG_EXTEND_NAME = ".log";
+    private static final DateFormat LOG_FILENAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final String LOG_EXTEND_NAME = ".log";
 
     private final AmqpTemplate template;
     private final SandwishProperties sandwishProperties;
     private final LogService logService;
     private final ObjectMapper objectMapper;
 
+    @Override
     public void saveLog(Log sysLog) {
         try {
             template.convertAndSend(QUEUE_SAVE_LOG, objectMapper.writeValueAsString(sysLog));
@@ -66,8 +65,7 @@ public class SysLogMessageService {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
+            log.error("can not consume sys-log message", e);
         }
     }
 

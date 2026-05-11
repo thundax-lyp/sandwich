@@ -50,7 +50,7 @@ import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
-import com.github.thundax.modules.sys.utils.SysLogMessageService;
+import com.github.thundax.modules.sys.service.SysLogMessageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;

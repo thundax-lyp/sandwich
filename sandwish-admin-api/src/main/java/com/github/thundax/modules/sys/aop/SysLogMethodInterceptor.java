@@ -6,7 +6,7 @@ import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
-import com.github.thundax.modules.sys.utils.SysLogMessageService;
+import com.github.thundax.modules.sys.service.SysLogMessageService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

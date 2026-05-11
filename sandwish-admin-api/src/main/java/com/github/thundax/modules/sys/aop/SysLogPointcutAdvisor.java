@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.aop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
-import com.github.thundax.modules.sys.utils.SysLogMessageService;
+import com.github.thundax.modules.sys.service.SysLogMessageService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -33,8 +33,6 @@ public class SysLogPointcutAdvisor extends StaticMethodMatcherPointcutAdvisor {
                 return isAnnotationPresent(m);
 
             } catch (NoSuchMethodException ignored) {
-                // default return value is false.  If we can't find the method, then obviously
-                // there is no annotation, so just use the default return value.
             }
         }
 

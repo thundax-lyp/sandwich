@@ -1,6 +1,6 @@
 package com.github.thundax.autoconfigure;
 
-import com.github.thundax.modules.sys.utils.SysLogMessageService;
+import com.github.thundax.modules.sys.service.SysLogMessageService;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

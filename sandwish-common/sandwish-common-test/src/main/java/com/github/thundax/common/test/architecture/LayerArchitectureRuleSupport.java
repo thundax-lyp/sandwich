@@ -397,7 +397,8 @@ public final class LayerArchitectureRuleSupport {
                 || className.endsWith("RegistrationServiceImpl")
                 || className.endsWith("PermissionService")
                 || className.endsWith("PermissionServiceImpl")
-                || className.endsWith("SysLogMessageService");
+                || className.endsWith("SysLogMessageService")
+                || className.endsWith("SysLogMessageServiceImpl");
     }
 
     private static boolean isBusinessForbiddenEntryServiceType(String className) {

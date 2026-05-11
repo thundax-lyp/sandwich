@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
@@ -51,7 +51,7 @@ public final class UserInterfaceAssembler {
                 .email(entity.getEmail())
                 .mobile(entity.getMobile())
                 .avatar(UserController.getAvatarUrl(
-                        UserIdCodec.toStringValue(entity.getId()), UserAccessHolder.currentToken()))
+                        UserIdCodec.toStringValue(entity.getId()), SandwishContextHolder.currentToken()))
                 .superAdmin(entity.isSuper())
                 .admin(entity.isAdmin())
                 .enable(entity.isEnable())

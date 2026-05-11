@@ -1,4 +1,4 @@
-package com.github.thundax.common.security.user;
+package com.github.thundax.common.security.context;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -6,49 +6,55 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class CurrentUser implements Serializable {
+public class SandwishSubject implements Serializable {
 
-    private String userId;
-    private String loginName;
+    private String subjectId;
+    private SandwishSubjectType subjectType = SandwishSubjectType.ANONYMOUS;
     private String displayName;
     private String token;
     private final Set<String> authorities = new LinkedHashSet<>();
 
-    public CurrentUser() {}
+    public SandwishSubject() {}
 
-    public CurrentUser(String userId, String loginName, String displayName, Collection<String> authorities) {
-        this.userId = userId;
-        this.loginName = loginName;
+    public SandwishSubject(
+            String subjectId,
+            SandwishSubjectType subjectType,
+            String displayName,
+            String token,
+            Collection<String> authorities) {
+        this.subjectId = subjectId;
+        this.subjectType = subjectType == null ? SandwishSubjectType.UNKNOWN : subjectType;
         this.displayName = displayName;
+        this.token = token;
         setAuthorities(authorities);
     }
 
-    public static CurrentUser anonymous() {
-        return new CurrentUser();
+    public static SandwishSubject anonymous() {
+        return new SandwishSubject();
     }
 
     public boolean isAuthenticated() {
-        return userId != null && !userId.trim().isEmpty();
+        return subjectId != null && !subjectId.trim().isEmpty() && subjectType != SandwishSubjectType.ANONYMOUS;
     }
 
     public boolean hasAuthority(String authority) {
         return authorities.contains(authority);
     }
 
-    public String getUserId() {
-        return userId;
+    public String getSubjectId() {
+        return subjectId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setSubjectId(String subjectId) {
+        this.subjectId = subjectId;
     }
 
-    public String getLoginName() {
-        return loginName;
+    public SandwishSubjectType getSubjectType() {
+        return subjectType;
     }
 
-    public void setLoginName(String loginName) {
-        this.loginName = loginName;
+    public void setSubjectType(SandwishSubjectType subjectType) {
+        this.subjectType = subjectType == null ? SandwishSubjectType.UNKNOWN : subjectType;
     }
 
     public String getDisplayName() {

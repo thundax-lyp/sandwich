@@ -5,6 +5,7 @@ import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.exception.SandwishException;
+import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
@@ -49,7 +50,6 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
-import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
@@ -378,7 +378,7 @@ public class AuthController {
         Log log = new Log();
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
-        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
+        log.setRemoteAddr(RequestIpUtils.getIpAddr(currentRequest));
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
@@ -392,7 +392,7 @@ public class AuthController {
         log.setUserId(UserIdCodec.toStringValue(user.getId()));
         log.setTitle("系统-登录-" + title);
         log.setLogDate(new Date());
-        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
+        log.setRemoteAddr(RequestIpUtils.getIpAddr(currentRequest));
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());
@@ -543,7 +543,7 @@ public class AuthController {
     }
 
     private String ip(HttpServletRequest request) {
-        return IPUtils.getIpAddr(request);
+        return RequestIpUtils.getIpAddr(request);
     }
 
     private String userAgent(HttpServletRequest request) {

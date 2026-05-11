@@ -7,6 +7,8 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
@@ -30,7 +32,6 @@ import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.service.result.*;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
@@ -104,7 +105,7 @@ public class AuthPermissionLifecycleTest {
 
     @After
     public void tearDown() {
-        UserAccessHolder.clear();
+        SandwishContextHolder.clear();
         SecurityContextHolder.clearContext();
     }
 
@@ -342,8 +343,10 @@ public class AuthPermissionLifecycleTest {
 
         filter.doFilter(request, response, chain);
 
-        Assert.assertEquals(
-                "1", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        SandwishSubject principal = (SandwishSubject)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Assert.assertEquals("1", principal.getSubjectId());
+        Assert.assertEquals(accessToken.getToken(), principal.getToken());
         Assert.assertTrue(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
         Assert.assertEquals(
                 PrincipalTokenStatus.ACTIVE,
@@ -352,7 +355,7 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
-    public void shouldClearUserAccessHolderAfterAuthenticatedRequest() throws Exception {
+    public void shouldExposeUserAccessThroughSecurityContextDuringAuthenticatedRequest() throws Exception {
         AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
         AccessTokenAuthenticationFilter filter = new AccessTokenAuthenticationFilter(
                 new SandwishProperties.AccessTokenFilterProperties(),
@@ -365,12 +368,12 @@ public class AuthPermissionLifecycleTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {
-            Assert.assertEquals(Long.valueOf(1L), UserAccessHolder.currentUserId());
-            Assert.assertEquals(accessToken.getToken(), UserAccessHolder.currentToken());
+            Assert.assertEquals("1", SandwishContextHolder.currentSubjectId());
+            Assert.assertEquals(accessToken.getToken(), SandwishContextHolder.currentToken());
         });
 
-        Assert.assertNull(UserAccessHolder.currentUserId());
-        Assert.assertNull(UserAccessHolder.currentToken());
+        Assert.assertEquals("1", SandwishContextHolder.currentSubjectId());
+        Assert.assertEquals(accessToken.getToken(), SandwishContextHolder.currentToken());
     }
 
     @Test

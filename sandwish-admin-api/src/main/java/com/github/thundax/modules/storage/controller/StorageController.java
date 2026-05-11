@@ -6,11 +6,11 @@ import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.request.StorageIdRequest;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
@@ -115,7 +115,7 @@ public class StorageController {
 
             StoredObject storage = new StoredObject();
             storage.setOwnerType(StorageOwnerType.USER);
-            storage.setOwnerId(String.valueOf(UserAccessHolder.currentUserId()));
+            storage.setOwnerId(SandwishContextHolder.currentSubjectId());
             StorageUtils.applyFileMetadata(file, storage);
             try {
                 applyStoredObject(storage, storedObjectStore.save(storage, file.getInputStream()));
@@ -139,7 +139,7 @@ public class StorageController {
         }
         StorageQuery accessQuery = storageQuery(id);
         accessQuery.setOwnerType(StorageOwnerType.USER);
-        accessQuery.setOwnerId(String.valueOf(UserAccessHolder.currentUserId()));
+        accessQuery.setOwnerId(SandwishContextHolder.currentSubjectId());
         if (!storageService.existsReadableContent(accessQuery)) {
             response.sendError(HttpStatus.SC_FORBIDDEN);
             return;

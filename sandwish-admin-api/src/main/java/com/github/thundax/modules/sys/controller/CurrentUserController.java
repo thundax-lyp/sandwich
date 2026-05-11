@@ -3,7 +3,7 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.security.permission.PermissionAuthorities;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -16,7 +16,6 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
@@ -29,6 +28,7 @@ import com.github.thundax.modules.sys.controller.response.PersonalPermsResponse;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
+import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
@@ -38,14 +38,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,15 +56,18 @@ public class CurrentUserController {
     private static final String PRIVATE_KEY_ITEM = "privateKey";
 
     private final CurrentUserService currentUserService;
+    private final UserService userService;
     private final PrincipalIdentityService principalIdentityService;
     private final PreAuthSessionService preAuthSessionService;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
+            UserService userService,
             PrincipalIdentityService principalIdentityService,
             PreAuthSessionService preAuthSessionService) {
 
         this.currentUserService = currentUserService;
+        this.userService = userService;
         this.principalIdentityService = principalIdentityService;
         this.preAuthSessionService = preAuthSessionService;
     }
@@ -83,7 +83,7 @@ public class CurrentUserController {
     })
     @PostMapping(value = "info")
     public PersonalInfoResponse info() {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
         if (currentUser.getId() == null || !currentUser.isEnable()) {
             throw AdminResponseExceptions.invalidToken();
         }
@@ -103,7 +103,7 @@ public class CurrentUserController {
     @SysLogger("更新")
     @PostMapping(value = "info/update")
     public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
                 currentUser.getId(),
@@ -141,7 +141,7 @@ public class CurrentUserController {
         request.setPassword(password);
         request.setOldPassword(oldPassword);
 
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         currentUserService.changePassword(
                 new ChangeCurrentUserPasswordCommand(currentUser.getId(), oldPassword, password));
@@ -161,7 +161,7 @@ public class CurrentUserController {
     @SysLogger("上传头像")
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         try {
             AvatarUtils.saveAvatar(
@@ -186,7 +186,7 @@ public class CurrentUserController {
     @SysLogger("删除头像")
     @PostMapping(value = "avatar/delete")
     public PersonalAvatarResponse deleteAvatar() {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         AvatarUtils.deleteAvatar(UserIdCodec.toStringValue(currentUser.getId()));
 
@@ -204,7 +204,7 @@ public class CurrentUserController {
     })
     @PostMapping(value = "menus")
     public List<PersonalMenuResponse> menus() {
-        return currentUserService.listVisibleMenus(toQuery(UserAccessHolder.currentUser())).stream()
+        return currentUserService.listVisibleMenus(toQuery(currentUser())).stream()
                 .map(PersonalInterfaceAssembler::toMenuResponse)
                 .collect(Collectors.toList());
     }
@@ -220,14 +220,20 @@ public class CurrentUserController {
     })
     @PostMapping(value = "perms")
     public PersonalPermsResponse perms() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return PersonalInterfaceAssembler.toPermsResponse(SandwishContextHolder.currentAuthorities());
+    }
 
-        if (authentication == null) {
-            return PersonalInterfaceAssembler.toPermsResponse(new HashSet<>());
+    private User currentUser() {
+        String subjectId = SandwishContextHolder.currentSubjectId();
+        if (StringUtils.isBlank(subjectId)) {
+            return new User();
         }
-
-        return PersonalInterfaceAssembler.toPermsResponse(
-                PermissionAuthorities.toPermissions(authentication.getAuthorities()));
+        try {
+            User user = userService.get(UserIdCodec.toDomain(Long.valueOf(subjectId)));
+            return user == null ? new User() : user;
+        } catch (NumberFormatException e) {
+            return new User();
+        }
     }
 
     private String getAccountLoginName(User user) {

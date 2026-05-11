@@ -6,6 +6,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
@@ -28,7 +29,6 @@ import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.UserInterfaceAssembler;
 import com.github.thundax.modules.sys.controller.request.UserAvatarRequest;
@@ -254,7 +254,7 @@ public class UserController {
         if (bean == null) {
             throw AdminResponseExceptions.objectNotFound();
         }
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
         // 非超管用户无权限开启/关闭管理员
         if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw AdminResponseExceptions.permissionDenied();
@@ -338,7 +338,7 @@ public class UserController {
     @PostMapping(value = "enable")
     @WrappedApiResponse
     public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         List<ChangeUserStatusCommand> commandList = new ArrayList<>();
         for (UserStatusRequest request : RequestListHelper.present(list)) {
@@ -394,7 +394,7 @@ public class UserController {
     @PostMapping(value = "delete")
     @WrappedApiResponse
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) {
-        User currentUser = UserAccessHolder.currentUser();
+        User currentUser = currentUser();
 
         List<DeleteUserCommand> commandList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
@@ -656,6 +656,19 @@ public class UserController {
             throw AdminResponseExceptions.invalidToken();
         }
         return privateKey;
+    }
+
+    private User currentUser() {
+        String subjectId = SandwishContextHolder.currentSubjectId();
+        if (StringUtils.isBlank(subjectId)) {
+            return new User();
+        }
+        try {
+            User user = userService.get(UserIdCodec.toDomain(Long.valueOf(subjectId)));
+            return user == null ? new User() : user;
+        } catch (NumberFormatException e) {
+            return new User();
+        }
     }
 
     public static String getAvatarUrl(String userId, String token) {

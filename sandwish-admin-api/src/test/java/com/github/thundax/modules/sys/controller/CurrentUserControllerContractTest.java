@@ -4,10 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.utils.SpringContextHolder;
+import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.context.SandwishSubject;
+import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.controller.request.PersonalAvatarUploadRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.request.PersonalPasswordUpdateRequest;
@@ -25,7 +26,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,8 +33,7 @@ public class CurrentUserControllerContractTest {
 
     @After
     public void tearDown() {
-        UserAccessHolder.clear();
-        SpringContextHolder.clearHolder();
+        SandwishContextHolder.clear();
     }
 
     @Test
@@ -75,11 +74,14 @@ public class CurrentUserControllerContractTest {
         when(userService.get(org.mockito.ArgumentMatchers.any())).thenReturn(currentUser);
         when(currentUserService.listVisibleMenus(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(menus);
-        mockApplicationContext(userService);
-        UserAccessHolder.currentUserId(1L, "token-1");
+        SandwishContextHolder.setSubject(new SandwishSubject(
+                "1", SandwishSubjectType.ADMIN_USER, "tester", "token-1", java.util.Collections.emptyList()));
 
         CurrentUserController controller = new CurrentUserController(
-                currentUserService, mock(PrincipalIdentityService.class), mock(PreAuthSessionService.class));
+                currentUserService,
+                userService,
+                mock(PrincipalIdentityService.class),
+                mock(PreAuthSessionService.class));
 
         List<PersonalMenuResponse> responses = controller.menus();
 
@@ -99,12 +101,6 @@ public class CurrentUserControllerContractTest {
         Assert.assertNotNull(mapping);
         assertEquals(1, mapping.value().length);
         assertEquals(value, mapping.value()[0]);
-    }
-
-    private void mockApplicationContext(UserService userService) {
-        ApplicationContext applicationContext = mock(ApplicationContext.class);
-        when(applicationContext.getBean(UserService.class)).thenReturn(userService);
-        SpringContextHolder.setApplicationContext(applicationContext);
     }
 
     private User superUser() {

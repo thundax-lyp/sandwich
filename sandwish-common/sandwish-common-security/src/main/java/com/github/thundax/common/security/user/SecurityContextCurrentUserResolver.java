@@ -1,5 +1,6 @@
 package com.github.thundax.common.security.user;
 
+import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,13 @@ public class SecurityContextCurrentUserResolver implements CurrentUserResolver {
 
         CurrentUser currentUser = new CurrentUser();
         Object principal = authentication.getPrincipal();
-        if (principal instanceof CurrentUser) {
+        if (principal instanceof SandwishSubject) {
+            SandwishSubject subject = (SandwishSubject) principal;
+            currentUser.setUserId(subject.getSubjectId());
+            currentUser.setLoginName(subject.getDisplayName());
+            currentUser.setDisplayName(subject.getDisplayName());
+            currentUser.setToken(subject.getToken());
+        } else if (principal instanceof CurrentUser) {
             currentUser = (CurrentUser) principal;
         } else if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;

@@ -1,5 +1,8 @@
 package com.github.thundax.modules.auth.security;
 
+import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.context.SandwishSubject;
+import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.query.MemberAuthQuery;
@@ -10,9 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter {
@@ -33,12 +33,12 @@ public class MemberAccessTokenAuthenticationFilter extends OncePerRequestFilter 
         if (StringUtils.isNotBlank(accessToken)) {
             PrincipalAccessToken token = memberAuthService.getValidAccessToken(memberAuthQuery(accessToken));
             if (token != null) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        new MemberSpringPrincipal(
-                                String.valueOf(token.getPrincipalKey().getPrincipalId())),
+                SandwishContextHolder.setSubject(new SandwishSubject(
+                        String.valueOf(token.getPrincipalKey().getPrincipalId()),
+                        SandwishSubjectType.FRONT_MEMBER,
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority(MEMBER_PERMISSION)));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        accessToken,
+                        Collections.singletonList(MEMBER_PERMISSION)));
             }
         }
         filterChain.doFilter(request, response);

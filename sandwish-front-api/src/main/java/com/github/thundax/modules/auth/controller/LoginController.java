@@ -2,7 +2,11 @@ package com.github.thundax.modules.auth.controller;
 
 import com.github.thundax.common.exception.FrontResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
+import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.context.SandwishSubject;
+import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.common.utils.RSAUtils;
+import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.request.MemberAccountLoginRequest;
@@ -18,7 +22,6 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMetho
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
-import com.github.thundax.modules.auth.security.MemberSecurityContext;
 import com.github.thundax.modules.auth.security.MemberSpringPrincipal;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
@@ -29,7 +32,6 @@ import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionComm
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
-import com.github.thundax.modules.utils.IPUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.servlet.http.HttpServletRequest;
@@ -169,14 +171,14 @@ public class LoginController {
     @ApiOperation(value = "登录状态")
     @PostMapping("login/status")
     public MemberLoginStatusResponse login() {
-        MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
+        MemberSpringPrincipal principal = currentMemberPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
     }
 
     @ApiOperation(value = "检查登录状态")
     @PostMapping("check-login")
     public MemberLoginStatusResponse checkLogin() {
-        MemberSpringPrincipal principal = MemberSecurityContext.getPrincipal();
+        MemberSpringPrincipal principal = currentMemberPrincipal();
         return MemberLoginInterfaceAssembler.toLoginStatusResponse(principal);
     }
 
@@ -231,6 +233,14 @@ public class LoginController {
             return PrincipalIdentityType.MEMBER_MOBILE;
         }
         return null;
+    }
+
+    private MemberSpringPrincipal currentMemberPrincipal() {
+        SandwishSubject subject = SandwishContextHolder.currentSubject();
+        if (subject.getSubjectType() != SandwishSubjectType.FRONT_MEMBER) {
+            return null;
+        }
+        return new MemberSpringPrincipal(subject.getSubjectId());
     }
 
     private PreAuthSession createPreAuthSession() {
@@ -308,7 +318,7 @@ public class LoginController {
     }
 
     private String ip(HttpServletRequest request) {
-        return IPUtils.getIpAddr(request);
+        return RequestIpUtils.getIpAddr(request);
     }
 
     private String userAgent(HttpServletRequest request) {

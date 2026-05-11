@@ -2,6 +2,9 @@ package com.github.thundax.modules.auth.security.filter;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
+import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.context.SandwishSubject;
+import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.common.utils.JsonUtils;
 import com.github.thundax.common.web.exception.WebErrorCode;
 import com.github.thundax.modules.auth.service.AdminAuthService;
@@ -9,14 +12,12 @@ import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.UserService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.FilterChain;
@@ -26,9 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -97,28 +95,22 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             writeError(response);
             return;
         }
-        UserAccessHolder.currentUserId(Long.valueOf(accessToken.getUserId()), token);
-        try {
-            User currentUser = userService.get(UserIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
-            if (currentUser.getId() == null || !currentUser.isEnable()) {
-                writeError(response);
-                return;
-            }
-
-            Set<String> permissions = permissionService.getPermissions(token);
-            if (permissions == null) {
-                permissions = permissionService.createPermissions(token, accessToken.getUserId());
-            }
-
-            authService.activeAccessToken(accessTokenCommand(accessToken));
-            SecurityContextHolder.getContext()
-                    .setAuthentication(new UsernamePasswordAuthenticationToken(
-                            accessToken.getUserId(), token, toAuthorities(permissions)));
-
-            filterChain.doFilter(request, response);
-        } finally {
-            UserAccessHolder.clear();
+        User currentUser = userService.get(UserIdCodec.toDomain(Long.valueOf(accessToken.getUserId())));
+        if (currentUser.getId() == null || !currentUser.isEnable()) {
+            writeError(response);
+            return;
         }
+
+        Set<String> permissions = permissionService.getPermissions(token);
+        if (permissions == null) {
+            permissions = permissionService.createPermissions(token, accessToken.getUserId());
+        }
+
+        authService.activeAccessToken(accessTokenCommand(accessToken));
+        SandwishContextHolder.setSubject(new SandwishSubject(
+                accessToken.getUserId(), SandwishSubjectType.ADMIN_USER, currentUser.getName(), token, permissions));
+
+        filterChain.doFilter(request, response);
     }
 
     private String findToken(HttpServletRequest request) {
@@ -140,18 +132,6 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setAccessToken(accessToken);
         return command;
-    }
-
-    private Collection<SimpleGrantedAuthority> toAuthorities(Collection<String> permissions) {
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if (permissions == null || permissions.isEmpty()) {
-            return authorities;
-        }
-
-        for (String permission : permissions) {
-            authorities.add(new SimpleGrantedAuthority(permission));
-        }
-        return authorities;
     }
 
     private void writeError(HttpServletResponse response) throws IOException {

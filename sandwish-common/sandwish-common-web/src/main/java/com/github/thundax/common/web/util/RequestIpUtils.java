@@ -1,19 +1,16 @@
-package com.github.thundax.modules.utils;
+package com.github.thundax.common.web.util;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IPUtils {
-    private static Logger logger = LoggerFactory.getLogger(IPUtils.class);
+public final class RequestIpUtils {
 
-    /**
-     * 获取IP地址
-     *
-     * <p>使用Nginx等反向代理软件， 则不能通过request.getRemoteAddr()获取IP地址
-     * 如果使用了多级反向代理的话，X-Forwarded-For的值并不止一个，而是一串IP地址，X-Forwarded-For中第一个非unknown的有效IP字符串，则为真实IP地址
-     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestIpUtils.class);
+
+    private RequestIpUtils() {}
+
     public static String getIpAddr(HttpServletRequest request) {
         String ip = "";
         try {
@@ -34,7 +31,7 @@ public class IPUtils {
                 ip = request.getRemoteAddr();
             }
         } catch (Exception e) {
-            logger.error("IPUtils ERROR ", e);
+            LOGGER.error("RequestIpUtils ERROR ", e);
         }
 
         return ip;

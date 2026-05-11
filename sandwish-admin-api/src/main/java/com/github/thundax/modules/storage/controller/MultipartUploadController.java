@@ -2,8 +2,8 @@ package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.request.MultipartUploadCompleteRequest;
 import com.github.thundax.modules.storage.controller.request.MultipartUploadInitRequest;
@@ -148,7 +148,7 @@ public class MultipartUploadController {
     private InitMultipartUploadCommand toInitMultipartUploadCommand(MultipartUploadInitRequest request) {
         InitMultipartUploadCommand command = new InitMultipartUploadCommand();
         command.setOwnerType(StorageOwnerType.USER);
-        command.setOwnerId(String.valueOf(UserAccessHolder.currentUserId()));
+        command.setOwnerId(SandwishContextHolder.currentSubjectId());
         command.setBusinessType(request.getBusinessType());
         command.setOriginalFilename(request.getOriginalFilename());
         command.setMimeType(request.getMimeType());

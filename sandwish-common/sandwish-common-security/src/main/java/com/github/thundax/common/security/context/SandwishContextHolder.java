@@ -1,0 +1,106 @@
+package com.github.thundax.common.security.context;
+
+import com.github.thundax.common.security.permission.PermissionAuthorities;
+import com.github.thundax.common.security.user.CurrentUser;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+public final class SandwishContextHolder {
+
+    private SandwishContextHolder() {}
+
+    public static SandwishSubject currentSubject() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return SandwishSubject.anonymous();
+        }
+
+        SandwishSubject subject = resolvePrincipal(authentication);
+        subject.setAuthorities(PermissionAuthorities.toPermissions(authentication.getAuthorities()));
+        if (subject.getToken() == null && authentication.getCredentials() instanceof String) {
+            subject.setToken((String) authentication.getCredentials());
+        }
+        return subject;
+    }
+
+    public static String currentSubjectId() {
+        return currentSubject().getSubjectId();
+    }
+
+    public static SandwishSubjectType currentSubjectType() {
+        return currentSubject().getSubjectType();
+    }
+
+    public static String currentToken() {
+        return currentSubject().getToken();
+    }
+
+    public static Set<String> currentAuthorities() {
+        return currentSubject().getAuthorities();
+    }
+
+    public static boolean isAuthenticated() {
+        return currentSubject().isAuthenticated();
+    }
+
+    public static void setSubject(SandwishSubject subject) {
+        if (subject == null || !subject.isAuthenticated()) {
+            clear();
+            return;
+        }
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(
+                        subject, subject.getToken(), toAuthorities(subject.getAuthorities())));
+    }
+
+    public static void clear() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private static SandwishSubject resolvePrincipal(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof SandwishSubject) {
+            return (SandwishSubject) principal;
+        }
+        if (principal instanceof CurrentUser) {
+            CurrentUser currentUser = (CurrentUser) principal;
+            return new SandwishSubject(
+                    currentUser.getUserId(),
+                    SandwishSubjectType.ADMIN_USER,
+                    currentUser.getDisplayName(),
+                    currentUser.getToken(),
+                    currentUser.getAuthorities());
+        }
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            return new SandwishSubject(
+                    userDetails.getUsername(), SandwishSubjectType.UNKNOWN, userDetails.getUsername(), null, null);
+        }
+        if (principal instanceof String) {
+            return new SandwishSubject((String) principal, SandwishSubjectType.UNKNOWN, (String) principal, null, null);
+        }
+        return new SandwishSubject(
+                authentication.getName(), SandwishSubjectType.UNKNOWN, authentication.getName(), null, null);
+    }
+
+    private static Collection<SimpleGrantedAuthority> toAuthorities(Collection<String> authorities) {
+        if (authorities == null || authorities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Collection<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for (String authority : authorities) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(authority));
+        }
+        return grantedAuthorities;
+    }
+}

@@ -1,6 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
@@ -75,6 +75,6 @@ public final class PersonalInterfaceAssembler {
         if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
             return null;
         }
-        return UserController.getAvatarUrl(id, UserAccessHolder.currentToken());
+        return UserController.getAvatarUrl(id, SandwishContextHolder.currentToken());
     }
 }

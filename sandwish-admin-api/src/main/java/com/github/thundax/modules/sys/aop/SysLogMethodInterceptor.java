@@ -1,12 +1,12 @@
 package com.github.thundax.modules.sys.aop;
 
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.utils.JsonUtils;
-import com.github.thundax.modules.auth.utils.UserAccessHolder;
+import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
 import com.github.thundax.modules.sys.utils.SysLogUtils;
-import com.github.thundax.modules.utils.IPUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -103,13 +103,12 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
         titleParts.add(value);
 
         Log log = new Log();
-        log.setUserId(
-                UserAccessHolder.currentUserId() == null ? null : String.valueOf(UserAccessHolder.currentUserId()));
+        log.setUserId(SandwishContextHolder.currentSubjectId());
         log.setTitle(StringUtils.join(titleParts, TITLE_SEPARATOR));
 
         log.setLogDate(new Date());
 
-        log.setRemoteAddr(IPUtils.getIpAddr(currentRequest));
+        log.setRemoteAddr(RequestIpUtils.getIpAddr(currentRequest));
         log.setUserAgent(currentRequest.getHeader("user-agent"));
         log.setRequestUri(currentRequest.getRequestURI());
         log.setMethod(currentRequest.getMethod());

@@ -6,6 +6,7 @@ import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -51,6 +52,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public StoredObject get(StoredObjectId id) {
         if (id == null) {
             return null;
@@ -59,6 +61,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<StoredObject> list(StorageQuery query) {
         if (query != null && query.getIds() != null) {
             return dao.listByIds(StoredObjectIdCodec.toValues(query.getIds()));
@@ -77,6 +80,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PageResult<StoredObject> page(StorageQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<StoredObject> dataPage = dao.page(
@@ -97,6 +101,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public StoredObjectId create(CreateStorageCommand command) {
         if (command == null) {
@@ -109,6 +114,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void sort(StorageSortCommand command) throws ApiException {
         SortDirection effectiveDirection =
@@ -185,11 +191,13 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public void change(ChangeStorageCommand command) {
         dao.update(toStoredObject(command));
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteStorageCommand command) {
         if (command == null || command.getId() == null) {
@@ -199,16 +207,19 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<String> listMimeTypes(StorageQuery query) {
         return dao.listMimeTypes();
     }
 
     @Override
+    @BizExceptionBoundary
     public List<String> listReferenceOwnerTypes(StorageQuery query) {
         return businessDao.listReferenceOwnerTypes();
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int changeObjectStatus(ChangeStorageObjectStatusCommand command) {
         StoredObject storage = new StoredObject();
@@ -218,6 +229,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int changeReferenceStatus(ChangeStorageReferenceStatusCommand command) {
         StoredObject storage = new StoredObject();
@@ -227,6 +239,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int removeReferences(RemoveStorageReferencesCommand command) {
         if (command == null) {
@@ -236,12 +249,14 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void addReferences(AddStorageReferencesCommand command) {
         businessDao.insertReferences(command.getReferences());
     }
 
     @Override
+    @BizExceptionBoundary
     public List<StoredObjectReference> listReferences(StorageQuery query) {
         StoredObject entity = new StoredObject();
         entity.setId(query.getId());
@@ -249,6 +264,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    @BizExceptionBoundary
     public boolean existsReadableContent(StorageQuery query) {
         StoredObject storage = query == null ? null : get(query.getId());
         if (storage == null) {

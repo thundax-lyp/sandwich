@@ -18,6 +18,7 @@ import com.github.thundax.modules.audit.service.AuditService;
 import com.github.thundax.modules.audit.service.command.CreateAuditLogCommand;
 import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import com.github.thundax.modules.audit.service.query.AuditMetaQuery;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public AuditLogId record(CreateAuditLogCommand command) {
         if (command == null
@@ -115,6 +117,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @BizExceptionBoundary
     public AuditLog getLog(AuditLogId id) {
         if (id == null) {
             return null;
@@ -123,6 +126,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @BizExceptionBoundary
     public AuditMeta getMeta(AuditMetaQuery query) {
         if (query == null) {
             return null;
@@ -131,11 +135,13 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<AuditLog> list(AuditMetaQuery query) {
         return auditLogDao.listByObject(query.getObjectType(), query.getObjectId());
     }
 
     @Override
+    @BizExceptionBoundary
     public PageResult<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
         IPage<AuditLog> dataPage = auditLogDao.page(
                 query == null ? null : query.getObjectType(),

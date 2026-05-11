@@ -17,6 +17,7 @@ import com.github.thundax.modules.auth.service.command.PrincipalCredentialComman
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -68,6 +69,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public User changeInfo(ChangeCurrentUserInfoCommand command) {
         userService.changeInfo(new ChangeUserInfoCommand(
@@ -87,6 +89,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void changePassword(ChangeCurrentUserPasswordCommand command) throws ApiException {
         String oldPassword = command.getOldPassword();
@@ -110,6 +113,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Menu> listAccessibleMenus(CurrentUserQuery query) {
         if (isSuper(query)) {
             List<Menu> menuList = menuService.list(new MenuQuery());
@@ -156,6 +160,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Menu> listVisibleMenus(CurrentUserQuery query) {
         List<Menu> visibleMenus =
                 listAccessibleMenus(query).stream().filter(Menu::isDisplay).collect(Collectors.toList());

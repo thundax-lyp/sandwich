@@ -10,6 +10,7 @@ import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionComm
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,11 +23,13 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
+    @BizExceptionBoundary
     public int count(PreAuthSessionQuery query) {
         return preAuthSessionDao.count();
     }
 
     @Override
+    @BizExceptionBoundary
     public PreAuthSession create(CreatePreAuthSessionCommand command) {
         PreAuthSession session = PreAuthSession.create(command.getExpiredSeconds());
         preAuthSessionDao.insert(session);
@@ -34,16 +37,19 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PreAuthSessionId getIdByToken(PreAuthSessionQuery query) {
         return preAuthSessionDao.getByToken(query.getToken());
     }
 
     @Override
+    @BizExceptionBoundary
     public PreAuthSessionId getIdByRefreshToken(PreAuthSessionQuery query) {
         return preAuthSessionDao.getByRefreshToken(query.getRefreshToken());
     }
 
     @Override
+    @BizExceptionBoundary
     public PreAuthSession get(PreAuthSessionQuery query) throws InvalidTokenException {
         PreAuthSession session = preAuthSessionDao.getById(query.getId());
         if (session == null || session.isExpired()) {
@@ -53,6 +59,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PreAuthSession refresh(RefreshPreAuthSessionCommand command) throws InvalidTokenException {
         PreAuthSessionQuery query = new PreAuthSessionQuery();
         query.setId(command.getId());
@@ -63,11 +70,13 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
+    @BizExceptionBoundary
     public void release(ReleasePreAuthSessionCommand command) {
         preAuthSessionDao.deleteById(command.getId());
     }
 
     @Override
+    @BizExceptionBoundary
     public void upsertValue(UpsertPreAuthSessionValueCommand command) throws InvalidTokenException {
         PreAuthSessionQuery query = new PreAuthSessionQuery();
         query.setId(command.getId());
@@ -77,6 +86,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
+    @BizExceptionBoundary
     public String getValue(PreAuthSessionQuery query) throws InvalidTokenException {
         return get(query).findValue(query.getName());
     }

@@ -6,6 +6,7 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
@@ -57,6 +58,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Department", id = "", action = AuditAction.CREATE, summary = "创建部门", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public DepartmentId create(CreateDepartmentCommand command) {
@@ -66,6 +68,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Department", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新部门")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeDepartmentInfoCommand command) {
@@ -92,6 +95,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void move(MoveDepartmentCommand command) {
         dao.moveTreeNode(
@@ -101,6 +105,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @BizExceptionBoundary
     public boolean existsChildRelation(DepartmentQuery query) {
         return query != null
                 && query.getChildId() != null

@@ -9,6 +9,7 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
@@ -50,6 +51,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<String> listTypes(DictQuery query) {
         return dao.listTypes();
     }
@@ -87,6 +89,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Dict", id = "", action = AuditAction.CREATE, summary = "创建字典", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public DictId create(CreateDictCommand command) {
@@ -97,6 +100,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void sort(DictSortCommand command) throws ApiException {
         SortDirection effectiveDirection =
@@ -202,6 +206,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Dict", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新字典")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeDictInfoCommand command) {
@@ -209,6 +214,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(
             type = "Dict",
             id = "#command.id.value()",

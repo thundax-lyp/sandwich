@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
@@ -26,6 +27,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @BizExceptionBoundary
     public Log get(LogId id) {
         if (id == null) {
             return null;
@@ -34,6 +36,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Log> list(LogQuery query) {
         return dao.list(
                 query == null ? null : typeValue(query.getType()),
@@ -47,6 +50,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PageResult<Log> page(LogQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Log> dataPage = dao.page(
@@ -65,6 +69,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public LogId create(CreateLogCommand command) {
         Log log = toLog(command);
@@ -73,6 +78,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int deleteByCondition(LogQuery query) {
         return dao.batchDelete(

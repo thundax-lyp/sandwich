@@ -6,6 +6,7 @@ import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class PrincipalIdentityServiceImpl implements PrincipalIdentityService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PrincipalIdentity get(PrincipalIdentityQuery query) {
         if (query == null) {
             return null;
@@ -37,11 +39,13 @@ public class PrincipalIdentityServiceImpl implements PrincipalIdentityService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<PrincipalIdentity> list(PrincipalIdentityQuery query) {
         return principalIdentityDao.listByPrincipalKeyAndStatus(query.getPrincipalKey(), query.getStatus());
     }
 
     @Override
+    @BizExceptionBoundary
     public EntityId create(PrincipalIdentityCommand command) {
         PrincipalIdentity principalIdentity = command.getPrincipalIdentity();
         EntityId id = principalIdentityDao.insert(principalIdentity);
@@ -50,11 +54,13 @@ public class PrincipalIdentityServiceImpl implements PrincipalIdentityService {
     }
 
     @Override
+    @BizExceptionBoundary
     public void change(PrincipalIdentityCommand command) {
         principalIdentityDao.update(command.getPrincipalIdentity());
     }
 
     @Override
+    @BizExceptionBoundary
     public void changeStatus(PrincipalIdentityCommand command) {
         principalIdentityDao.updateStatus(command.getPrincipalIdentity());
     }

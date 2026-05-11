@@ -9,6 +9,7 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void sort(UserSortCommand command) throws ApiException {
         SortDirection effectiveDirection =
@@ -160,6 +162,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "User", id = "", action = AuditAction.CREATE, summary = "创建后台用户", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public UserId create(CreateUserCommand command) {
@@ -170,6 +173,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeUserInfoCommand command) {
@@ -188,6 +192,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(ChangeUserStatusCommand command) {
@@ -219,6 +224,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Role> listUserRoles(UserQuery query) {
         return dao.listUserRoles(UserIdCodec.toValue(query.getId())).stream()
                 .map(this::newRole)

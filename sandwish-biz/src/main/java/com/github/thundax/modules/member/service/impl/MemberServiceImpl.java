@@ -8,6 +8,7 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
 import com.github.thundax.modules.member.entity.enums.MemberStatus;
@@ -42,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     public Member get(MemberId id) {
         if (id == null) {
             return null;
@@ -50,6 +52,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Member> list(MemberQuery query) {
         if (query != null && query.getIds() != null) {
             return dao.listByIds(MemberIdCodec.toValues(query.getIds()));
@@ -62,6 +65,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PageResult<Member> page(MemberQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Member> dataPage = dao.page(
@@ -76,6 +80,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "", action = AuditAction.CREATE, summary = "创建会员", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public MemberId create(MemberCommand command) {
@@ -86,6 +91,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void sort(MemberSortCommand command) throws ApiException {
         SortDirection effectiveDirection =
@@ -161,6 +167,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员")
     @Transactional(rollbackFor = Exception.class)
     public void change(MemberCommand command) {
@@ -168,6 +175,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员信息")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(MemberCommand command) {
@@ -175,6 +183,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(MemberCommand command) {
@@ -182,6 +191,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(
             type = "Member",
             id = "#command.id.value()",

@@ -11,6 +11,7 @@ import com.github.thundax.common.thread.PooledThreadLocal;
 import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -77,6 +78,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Role", id = "", action = AuditAction.CREATE, summary = "创建角色", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public RoleId create(CreateRoleCommand command) {
@@ -88,6 +90,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void sort(RoleSortCommand command) throws ApiException {
         SortDirection effectiveDirection =
@@ -178,6 +181,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Role", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新角色")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeRoleInfoCommand command) {
@@ -196,6 +200,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void assignUsers(AssignRoleUsersCommand command) {
         dao.deleteRoleUser(RoleIdCodec.toValue(command.getRoleId()));
@@ -210,6 +215,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     @AuditLog(type = "Role", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新角色状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(ChangeRoleStatusCommand command) {
@@ -247,6 +253,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<User> listRoleUsers(RoleQuery query) {
         List<Long> userIdList = idUserIdsMapHandler
                 .computeIfAbsent(HashMap::new)
@@ -258,6 +265,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @BizExceptionBoundary
     public List<Menu> listRoleMenus(RoleQuery query) {
         List<Long> menuIdList = idMenuIdsMapHandler
                 .computeIfAbsent(HashMap::new)

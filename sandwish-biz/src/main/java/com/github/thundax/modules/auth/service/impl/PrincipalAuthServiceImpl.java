@@ -16,6 +16,7 @@ import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
+import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.Date;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) throws ApiException {
         PrincipalIdentity identity = principalIdentityService.get(identityQuery(command));
         if (identity == null || !identity.isEnabled()) {
@@ -41,6 +43,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
+    @BizExceptionBoundary
     public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) throws ApiException {
         PrincipalIdentity identity = authenticateIdentity(
                 new AuthenticateIdentityCommand(command.getIdentityType(), command.getIdentityValue()));

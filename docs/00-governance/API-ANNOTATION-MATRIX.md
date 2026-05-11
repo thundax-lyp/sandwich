@@ -42,7 +42,20 @@
 
 需要新增长期例外时，先更新本文档，再补对应 ArchUnit 或人工审阅规则。不得再使用 `@ApiOperation(notes = "ignore")` 表达权限例外。
 
-## 5. Rule Format
+## 5. Error Response Contract
+
+API 业务失败通过统一响应 `code` 表达可识别失败原因。
+
+- `ApiResponse.code` 固定为 `String`。
+- error code 格式固定为 `<DOMAIN>-<NUMBER>`，例如 `AUTH-00001`。
+- `DOMAIN` 固定使用大写业务域标识，`NUMBER` 固定使用 5 位数字。
+- 后台和前台不共享业务 code 编号空间。
+- 后台 code 以 [`ADMIN-API-ERROR-CODE-DESIGN.md`](../30-designs/ADMIN-API-ERROR-CODE-DESIGN.md) 为准。
+- 前台 code 以 [`FRONT-API-ERROR-CODE-DESIGN.md`](../30-designs/FRONT-API-ERROR-CODE-DESIGN.md) 为准。
+- `ExceptionTranslator` 输出的 code 必须存在于对应 error code 文档。
+- 新增或修改业务失败时，必须同步 response exception 工厂、translator、error code 文档和契约测试。
+
+## 6. Rule Format
 
 每条规则固定字段：
 
@@ -56,7 +69,7 @@
 
 `[RuleID] <scope> violates <constraint>: <found>`
 
-## 6. Hard Rules
+## 7. Hard Rules
 
 当前 Swagger 基线是 Springfox 2.x / Swagger 2 注解体系，Controller 分组继续使用 `@Api(tags = "...")`。`@Tag` 属于 OpenAPI 3 注解体系，只有完成 Swagger 技术栈升级后才能统一切换。新增或修改 Controller 时，`@Api.tags` 应使用稳定业务分组名，例如 `系统/当前用户`，不得使用数字排序前缀。
 
@@ -76,7 +89,7 @@
 | `ANNO_CONTROLLER_RESPONSE_ASSEMBLER_REQUIRED` | `ADMIN_REST_CONTROLLER_SELECTOR` + `FRONT_REST_CONTROLLER_SELECTOR` | Controller 固定通过对应 `*InterfaceAssembler` 或 `PageResponseHelper` 获取完整 `*Response` / `PageResponse`；Controller 不直接创建业务 `*Response` | ArchUnit / review | `[ANNO_CONTROLLER_RESPONSE_ASSEMBLER_REQUIRED] <class> violates response assembler required: <responseType>` |
 | `ANNO_MODEL_FIELD_DESCRIPTION_REVIEW` | API Request / Response 字段 | 对外字段应声明 `@ApiModelProperty` 和稳定 JSON 字段名；当前作为人工审阅规则，不作为硬门禁 | review | `[ANNO_MODEL_FIELD_DESCRIPTION_REVIEW] <field> violates field description review: <foundAnnotations>` |
 
-## 7. Minimal Matrix
+## 8. Minimal Matrix
 
 | Interface Type | Required | Forbidden |
 | --- | --- | --- |
@@ -89,14 +102,16 @@
 
 `@ApiOperation.notes` 是可选业务补充说明，不承载访问控制规则。API 访问口径固定以 `@HasPermission` 或 `@PublicApi` 为准。
 
-## 8. CI Gate
+## 9. CI Gate
 
 - 已有 ArchUnit 门禁继续覆盖 Request / Response 类级注解。
 - REST Controller 直接创建业务 `*Response` 的行为纳入门禁；业务响应创建固定收敛到对应 `*InterfaceAssembler`，分页响应创建固定使用 `PageResponseHelper`。
 - 已有 RestController 架构测试继续约束 REST Controller 不回流手写 `Validator`。
 - 前后台 REST Controller 已纳入类级 `/api/{domain}/{resource}`、`@Api`、`@ApiOperation`、HTTP mapping 唯一性、JSON POST、GET 非 JSON、访问口径标记和 `@RequestBody *Request` 参数 `@Valid` 门禁。
+- 异常分层门禁固定覆盖 infra 不依赖业务异常、biz 不依赖 Web 异常、API translator 和 response exception 工厂归属。
+- API error code 门禁固定覆盖 `ApiResponse.code` 字符串类型、code 格式和前后台 code 文档同步。
 - 新增或修改 Controller、Request、Response 时，必须按本文档人工审阅。
 
-## 9. Open Items
+## 10. Open Items
 
 无

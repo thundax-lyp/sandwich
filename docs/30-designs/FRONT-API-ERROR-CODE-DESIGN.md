@@ -53,14 +53,9 @@
 | AUTH-00007 | 400 | auth.exception.login-request-too-many | 登录请求过多 | 前台登录请求触发频率限制 | front |
 | AUTH-00008 | 400 | auth.exception.login-form-key-expired | 登录表单密钥已失效 | 前台登录表单 RSA 密钥不存在或过期 | front |
 | AUTH-00009 | 400 | auth.exception.login-form-expired | 登录表单已失效 | 前台登录表单会话不存在或过期 | front |
-| MEMBER-00001 | 409 | member.exception.identity-exists | 会员标识已存在 | 前台注册身份标识已存在 | front |
-| MEMBER-00002 | 403 | member.exception.disabled | 会员状态不可用 | 前台会员状态不可登录或不可操作 | front |
-| MEMBER-00003 | 400 | member.exception.required-field-empty | 必填字段不能为空 | 前台会员注册必填字段为空 | front |
-| MEMBER-00004 | 400 | member.exception.sort-empty-input | 排序输入不能为空 | 前台会员排序输入为空 | front |
-| MEMBER-00005 | 400 | member.exception.sort-missing-id | 排序实体集合与查询范围不一致 | 前台会员排序目标缺失 | front |
-| MEMBER-00006 | 400 | member.exception.sort-duplicate-id | 排序实体存在重复 ID | 前台会员排序输入存在重复 ID | front |
-| MEMBER-00007 | 409 | member.exception.sort-concurrent-modification | 排序存在并发修改，请重试 | 前台会员排序发生并发修改 | front |
-| MEMBER-00008 | 500 | member.exception.sort-db-failure | 排序数据库异常 | 前台会员排序持久化失败 | front |
+| AUTH-00010 | 400 | auth.exception.member-unavailable | 会员状态不可用 | 前台会员状态不可登录或不可操作 | front |
+| AUTH-00011 | 409 | auth.exception.identity-exists | 会员标识已存在 | 前台注册身份标识已存在 | front |
+| SYS-00001 | 400 | sys.exception.invalid-parameter | 参数无效 | 前台请求参数或业务前置参数无效 | front |
 
 ## 5. Maintenance Rules
 

@@ -9,6 +9,8 @@
 - 数据库、实体、DAO、Mapper 和持久化查询见 [`DATABASE-RULES.md`](./DATABASE-RULES.md)
 - 领域标识、数据库主键和业务编号边界见 [`UNIFIED-ID-DESIGN.md`](./UNIFIED-ID-DESIGN.md)
 - HTTP API 注解矩阵见 [`API-ANNOTATION-MATRIX.md`](./API-ANNOTATION-MATRIX.md)
+- 后台 API error code 见 [`ADMIN-API-ERROR-CODE-DESIGN.md`](../30-designs/ADMIN-API-ERROR-CODE-DESIGN.md)
+- 前台 API error code 见 [`FRONT-API-ERROR-CODE-DESIGN.md`](../30-designs/FRONT-API-ERROR-CODE-DESIGN.md)
 - 当前用户、会员和线程上下文透传见 [`CONTEXT-PROPAGATION-RULES.md`](./CONTEXT-PROPAGATION-RULES.md)
 - 文档写作与维护见 [`DOCUMENT-RULES.md`](./DOCUMENT-RULES.md)
 - 上线准备、运维和 jar 打包见 [`DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`](./DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md)
@@ -85,6 +87,28 @@ Sandwich 固定采用三层 API 架构。
 
 `sandwish-infra` 固定只作为持久化实现模块，不引入额外业务分层语义。
 
+## Exception And Error Response Boundaries
+
+异常固定按层表达：
+
+- Infra 层不定义 `InfraException`，不抛 `BizException`、`DomainException` 或 `SandwishException`，直接抛 Java、Spring、MyBatis 或第三方技术异常。
+- Biz 层 Domain 使用 `DomainException` 表达领域规则失败；Service 使用 `BizException` 表达业务流程失败。
+- Service implementation 类级固定声明 `@BizExceptionBoundary`，放行 `BizException` 和 `DomainException`，捕获其他技术异常并转换为 `BizException`。
+- `@BizExceptionBoundaryIgnore` 只允许用于无参数 getter；其他 Service 公开方法不得绕过业务异常边界。
+- API 层使用 `SandwishException` 表达对外 HTTP 错误；`SandwishException` 固定归属 `sandwish-common-web`。
+- API 入口模块的响应异常工厂和 `ExceptionTranslator` 固定归属本入口模块的 `com.github.thundax.common.exception` 包。
+- Controller 不向外暴露 `BizException`、`DomainException` 或 infra 技术异常；入口层通过 `ExceptionTranslator` 转换为 `SandwishException`。
+- 全局异常处理只负责 HTTP status 和统一响应组装，不承载业务判断。
+
+对外错误响应固定规则：
+
+- 业务失败默认使用 HTTP `400`；认证失败使用 `401`；权限失败使用 `403`；资源不存在使用 `404`；资源状态冲突使用 `409`；未知系统错误使用 `500`。
+- API 响应 `code` 固定为 `String`，格式固定为 `<DOMAIN>-<NUMBER>`，例如 `AUTH-00001`。
+- `DOMAIN` 使用大写业务域标识，`NUMBER` 使用 5 位数字。
+- 后台和前台不共享业务 code 编号空间。
+- error code 不表达 reason、不携带 HTTP status、不跟随文案变化；reason 由 `messageKey`、`defaultMessage` 和响应 `message` 表达。
+- 新增或修改业务失败时，必须同步对应 error code 文档、translator 和契约测试。
+
 ## Module Boundaries
 
 ### `sandwish-common`
@@ -106,7 +130,6 @@ Sandwich 固定采用三层 API 架构。
 - 通用工具类
 - 通用分页数据模型
 - 通用编码、加密、集合、日期、文件工具
-- i18n 支撑
 - 存储、线程等通用技术能力
 
 边界：
@@ -123,6 +146,7 @@ Sandwich 固定采用三层 API 架构。
 - 通用 Web 响应模型
 - 通用请求列表辅助
 - 入口无关的 Web 支撑能力
+- 入口无关的 Web 异常和 i18n message 支撑
 
 边界：
 
@@ -130,6 +154,7 @@ Sandwich 固定采用三层 API 架构。
 - 不承载 Controller、Filter、Interceptor 或具体入口配置。
 - 不承载业务请求 / 响应对象。
 - Helper 只返回数据，不抛入口层业务异常。
+- `SandwishException`、Web error code 和 message resolve 能力固定归属本模块。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-test`

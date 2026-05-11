@@ -180,6 +180,7 @@
 - DAO / Mapper 是否改变了查询、分页、SQL、实体映射或持久化约束。
 - static 是否改变了 API 文档、上传访问或其他运行支撑资源。
 - 是否改动了架构规则、命名规则或其他可能影响静态检查的内容。
+- 是否改变了异常分层、异常转换、统一响应或 API error code 契约。
 
 判断结果：
 
@@ -196,6 +197,7 @@
 - 治理规则或固定做法变化：检查 `docs/00-governance/*.md`。
 - 数据库结构、字段、查询语义变化：检查 `20-database/*-DATABASE-DESIGN.md`。
 - AI 默认读取入口或任务路由变化：检查 `docs/AGENT.md`。
+- 异常分层、统一响应或 API error code 变化：检查 `ARCHITECTURE.md`、`API-ANNOTATION-MATRIX.md` 和对应 `30-designs/*-API-ERROR-CODE-DESIGN.md`。
 
 判断原则：
 

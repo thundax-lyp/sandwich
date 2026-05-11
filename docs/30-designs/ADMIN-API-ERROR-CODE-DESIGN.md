@@ -75,7 +75,7 @@
 ## 5. Maintenance Rules
 
 - 新增后台业务失败时，必须先在本文档登记 error code。
-- 后台 `AdminExceptionTranslator` 输出的 code 必须存在于本文档。
+- 后台 `com.github.thundax.common.exception.AdminExceptionTranslator` 输出的 code 必须存在于本文档。
 - 修改 `defaultMessage` 或 i18n 文案时，不得修改既有 code。
 - 删除 code 前必须确认后台接口、测试和前端不再引用该 code。
 

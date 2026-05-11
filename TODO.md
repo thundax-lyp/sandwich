@@ -12,16 +12,4 @@
 
 ## 待审阅任务项
 
-- [ ] `exception-governance-cleanup`：沉淀治理规则并清理 RUNBOOK
-  - 范围文件：
-    - `docs/00-governance/ARCHITECTURE.md`
-    - `docs/00-governance/API-ANNOTATION-MATRIX.md`
-    - `docs/00-governance/TODO-RULES.md`
-    - `docs/AGENT.md`
-    - `docs/30-designs/RUNBOOK-EXCEPTION-LAYERING.md`
-    - `TODO.md`
-  - 处理动作：将稳定异常分层和 API error code 规则沉淀到治理文档，更新 AI 路由，删除 RUNBOOK 并删除或收窄已完成 TODO。
-  - 验收点：长期规则不依赖 RUNBOOK，`RUNBOOK-EXCEPTION-LAYERING.md` 已清理，`TODO.md` 只保留未完成任务。
-  - 重要度：9/10
-
 ## 待讨论项

@@ -68,6 +68,11 @@
 - 统一 API 响应包装、`@WrappedApiController` 或 `ApiResponseBodyAdvice`：
   先读 `ARCHITECTURE.md`
   再读 `00-governance/API-ANNOTATION-MATRIX.md`
+- 异常分层、`BizException`、`DomainException`、`SandwishException`、`ExceptionTranslator` 或 API error code：
+  先读 `ARCHITECTURE.md`
+  再读 `00-governance/API-ANNOTATION-MATRIX.md`
+  再按入口读 `30-designs/ADMIN-API-ERROR-CODE-DESIGN.md` 或 `30-designs/FRONT-API-ERROR-CODE-DESIGN.md`
+  只有处理一次性迁移任务时才读取对应 `RUNBOOK-*`
 - 登录态、当前用户、当前会员、线程上下文、异步身份透传：
   先读 `ARCHITECTURE.md`
   再读 `00-governance/CONTEXT-PROPAGATION-RULES.md`
@@ -97,9 +102,9 @@
 - `sandwish-common`:
   Common 聚合模块。
 - `sandwish-common-core`:
-  通用工具、分页数据模型、加密、i18n、存储和线程等非持久化公共技术能力。
+  通用工具、分页数据模型、加密、存储和线程等非持久化公共技术能力。
 - `sandwish-common-web`:
-  通用 Web 响应模型、请求列表辅助和入口无关的 Web 支撑能力。
+  通用 Web 响应模型、请求列表辅助、Web 异常和入口无关的 i18n message 支撑能力。
 - `sandwish-common-test`:
   通用测试支撑、架构规则 helper 和测试资源。
 - `sandwish-common-cache`:

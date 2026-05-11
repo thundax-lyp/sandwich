@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class MenuServiceImpl implements MenuService {
 
     private final MenuDao dao;
@@ -68,7 +69,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Menu", id = "", action = AuditAction.CREATE, summary = "创建菜单", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public MenuId create(CreateMenuCommand command) {
@@ -79,7 +79,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Menu", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新菜单")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeMenuInfoCommand command) {
@@ -93,7 +92,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Menu", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新菜单可见性")
     @Transactional(rollbackFor = Exception.class)
     public int changeVisibility(ChangeMenuVisibilityCommand command) {
@@ -127,7 +125,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void move(MoveMenuCommand command) {
         dao.moveTreeNode(
@@ -138,7 +135,6 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @BizExceptionBoundary
     public boolean existsChildRelation(MenuQuery query) {
         return query != null
                 && query.getChildId() != null

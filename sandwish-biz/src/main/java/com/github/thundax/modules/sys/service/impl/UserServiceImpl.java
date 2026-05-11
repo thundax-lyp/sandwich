@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class UserServiceImpl implements UserService {
 
     private static final int PRIORITY_STEP = 10;
@@ -83,28 +84,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
-    public void sort(UserSortCommand command) throws ApiException {
+    public void sort(UserSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
         List<UserId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_EMPTY_INPUT.getCode(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessageKey(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
         List<User> selectedUsers = dao.listByIds(toValues(orderedIdList));
         if (selectedUsers == null || selectedUsers.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         List<User> currentUsers = dao.list(null, null, null, null, null, effectiveDirection);
         if (currentUsers == null || currentUsers.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         if (currentUsers.size() != orderedIdList.size()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         Map<Long, Integer> indexById = new HashMap<>(currentUsers.size());
@@ -113,7 +125,10 @@ public class UserServiceImpl implements UserService {
         for (int i = 0; i < currentUsers.size(); i++) {
             User currentUser = currentUsers.get(i);
             if (currentUser == null || currentUser.getId() == null) {
-                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DB_FAILURE.getCode(),
+                        ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                        ErrorCode.SORT_DB_FAILURE.getMessage());
             }
             long userId = currentUser.getId().value();
             indexById.put(userId, i);
@@ -123,7 +138,10 @@ public class UserServiceImpl implements UserService {
 
         for (UserId orderedId : orderedIdList) {
             if (!indexById.containsKey(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
         }
 
@@ -153,16 +171,19 @@ public class UserServiceImpl implements UserService {
             }
         } catch (RuntimeException exception) {
             if (isConcurrentModification(exception)) {
-                throw new ApiException(
+                throw new BizException(
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
             }
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(),
+                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                    ErrorCode.SORT_DB_FAILURE.getMessage());
         }
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "User", id = "", action = AuditAction.CREATE, summary = "创建后台用户", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public UserId create(CreateUserCommand command) {
@@ -173,7 +194,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeUserInfoCommand command) {
@@ -192,7 +212,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "User", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新后台用户状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(ChangeUserStatusCommand command) {
@@ -224,7 +243,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<Role> listUserRoles(UserQuery query) {
         return dao.listUserRoles(UserIdCodec.toValue(query.getId())).stream()
                 .map(this::newRole)
@@ -278,7 +296,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    private List<UserId> normalizeOrderedIds(List<UserId> orderedIds) throws ApiException {
+    private List<UserId> normalizeOrderedIds(List<UserId> orderedIds) {
         if (orderedIds == null) {
             return new ArrayList<>();
         }
@@ -287,10 +305,16 @@ public class UserServiceImpl implements UserService {
         List<UserId> normalized = new ArrayList<>(orderedIds.size());
         for (UserId orderedId : orderedIds) {
             if (orderedId == null || orderedId.value() == null) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             if (!uniqueIdValues.add(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
             }
             normalized.add(orderedId);
         }
@@ -331,14 +355,15 @@ public class UserServiceImpl implements UserService {
                 || "23505".equals(sqlState);
     }
 
-    private void updatePriorityOrThrow(UserId id, int priority, String message) throws ApiException {
+    private void updatePriorityOrThrow(UserId id, int priority, String message) {
         User user = new User();
         user.setId(id);
         user.setPriority(priority);
 
         int updated = dao.updatePriority(user);
         if (updated != 1) {
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessageKey(), message);
         }
     }
 }

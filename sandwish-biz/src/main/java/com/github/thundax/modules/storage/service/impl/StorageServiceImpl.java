@@ -2,7 +2,7 @@ package com.github.thundax.modules.storage.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class StorageServiceImpl implements StorageService {
 
     private static final int PRIORITY_STEP = 10;
@@ -52,7 +53,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     public StoredObject get(StoredObjectId id) {
         if (id == null) {
             return null;
@@ -61,7 +61,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<StoredObject> list(StorageQuery query) {
         if (query != null && query.getIds() != null) {
             return dao.listByIds(StoredObjectIdCodec.toValues(query.getIds()));
@@ -80,7 +79,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     public PageResult<StoredObject> page(StorageQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<StoredObject> dataPage = dao.page(
@@ -101,7 +99,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public StoredObjectId create(CreateStorageCommand command) {
         if (command == null) {
@@ -114,24 +111,32 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
-    public void sort(StorageSortCommand command) throws ApiException {
+    public void sort(StorageSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
         List<StoredObjectId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_EMPTY_INPUT.getCode(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessageKey(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
         List<StoredObject> currentStorage =
                 dao.list(null, null, null, null, null, null, null, null, null, effectiveDirection);
         if (currentStorage == null || currentStorage.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         if (currentStorage.size() != orderedIdList.size()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         Map<Long, Integer> indexById = new HashMap<>(currentStorage.size());
@@ -141,7 +146,10 @@ public class StorageServiceImpl implements StorageService {
         for (int i = 0; i < currentStorage.size(); i++) {
             StoredObject storage = currentStorage.get(i);
             if (storage == null || storage.getId() == null) {
-                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DB_FAILURE.getCode(),
+                        ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                        ErrorCode.SORT_DB_FAILURE.getMessage());
             }
             long storageId = storage.getId().value();
             indexById.put(storageId, i);
@@ -151,7 +159,10 @@ public class StorageServiceImpl implements StorageService {
 
         for (StoredObjectId orderedId : orderedIdList) {
             if (orderedId == null || !indexById.containsKey(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
         }
 
@@ -182,22 +193,24 @@ public class StorageServiceImpl implements StorageService {
             }
         } catch (RuntimeException exception) {
             if (isConcurrentModification(exception)) {
-                throw new ApiException(
+                throw new BizException(
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
             }
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(),
+                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                    ErrorCode.SORT_DB_FAILURE.getMessage());
         }
     }
 
     @Override
-    @BizExceptionBoundary
     public void change(ChangeStorageCommand command) {
         dao.update(toStoredObject(command));
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int remove(DeleteStorageCommand command) {
         if (command == null || command.getId() == null) {
@@ -207,19 +220,16 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<String> listMimeTypes(StorageQuery query) {
         return dao.listMimeTypes();
     }
 
     @Override
-    @BizExceptionBoundary
     public List<String> listReferenceOwnerTypes(StorageQuery query) {
         return businessDao.listReferenceOwnerTypes();
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int changeObjectStatus(ChangeStorageObjectStatusCommand command) {
         StoredObject storage = new StoredObject();
@@ -229,7 +239,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int changeReferenceStatus(ChangeStorageReferenceStatusCommand command) {
         StoredObject storage = new StoredObject();
@@ -239,7 +248,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int removeReferences(RemoveStorageReferencesCommand command) {
         if (command == null) {
@@ -249,14 +257,12 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void addReferences(AddStorageReferencesCommand command) {
         businessDao.insertReferences(command.getReferences());
     }
 
     @Override
-    @BizExceptionBoundary
     public List<StoredObjectReference> listReferences(StorageQuery query) {
         StoredObject entity = new StoredObject();
         entity.setId(query.getId());
@@ -264,7 +270,6 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    @BizExceptionBoundary
     public boolean existsReadableContent(StorageQuery query) {
         StoredObject storage = query == null ? null : get(query.getId());
         if (storage == null) {
@@ -297,7 +302,7 @@ public class StorageServiceImpl implements StorageService {
         return referenceStatus == null ? null : referenceStatus.value();
     }
 
-    private List<StoredObjectId> normalizeOrderedIds(List<StoredObjectId> orderedIds) throws ApiException {
+    private List<StoredObjectId> normalizeOrderedIds(List<StoredObjectId> orderedIds) {
         if (orderedIds == null) {
             return new ArrayList<>();
         }
@@ -305,10 +310,16 @@ public class StorageServiceImpl implements StorageService {
         List<StoredObjectId> normalized = new ArrayList<>(orderedIds.size());
         for (StoredObjectId orderedId : orderedIds) {
             if (orderedId == null || orderedId.value() == null) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             if (!uniqueIdValues.add(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
             }
             normalized.add(orderedId);
         }
@@ -341,10 +352,11 @@ public class StorageServiceImpl implements StorageService {
                 || "23505".equals(sqlState);
     }
 
-    private void updatePriorityOrThrow(StoredObjectId id, int priority, String message) throws ApiException {
+    private void updatePriorityOrThrow(StoredObjectId id, int priority, String message) {
         int updated = dao.updatePriority(id, priority);
         if (updated != 1) {
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessageKey(), message);
         }
     }
 

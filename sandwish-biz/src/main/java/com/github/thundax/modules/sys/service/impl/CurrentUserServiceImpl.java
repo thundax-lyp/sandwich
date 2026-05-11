@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.service.impl;
 
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -45,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class CurrentUserServiceImpl implements CurrentUserService {
 
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
@@ -69,7 +69,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public User changeInfo(ChangeCurrentUserInfoCommand command) {
         userService.changeInfo(new ChangeUserInfoCommand(
@@ -89,15 +88,14 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
-    public void changePassword(ChangeCurrentUserPasswordCommand command) throws ApiException {
+    public void changePassword(ChangeCurrentUserPasswordCommand command) {
         String oldPassword = command.getOldPassword();
         String password = command.getPassword();
         if (StringUtils.isBlank(password)) {
-            throw new InvalidParameterException("password");
+            throw new BizException("SYS-00001", "sys.exception.invalid-parameter", "password");
         } else if (!password.matches(SysApiUtils.PASSWORD_VALIDATE_PATTERN)) {
-            throw new ApiException(SysApiUtils.PASSWORD_VALIDATE_MESSAGE);
+            throw new BizException(SysApiUtils.PASSWORD_VALIDATE_MESSAGE);
         }
 
         PrincipalIdentity accountIdentity = getAccountIdentity(command.getUserId());
@@ -113,7 +111,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<Menu> listAccessibleMenus(CurrentUserQuery query) {
         if (isSuper(query)) {
             List<Menu> menuList = menuService.list(new MenuQuery());
@@ -160,7 +157,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<Menu> listVisibleMenus(CurrentUserQuery query) {
         List<Menu> visibleMenus =
                 listAccessibleMenus(query).stream().filter(Menu::isDisplay).collect(Collectors.toList());

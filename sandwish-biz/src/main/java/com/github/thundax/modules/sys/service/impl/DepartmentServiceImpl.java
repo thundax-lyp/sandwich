@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentDao dao;
@@ -58,7 +59,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Department", id = "", action = AuditAction.CREATE, summary = "创建部门", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public DepartmentId create(CreateDepartmentCommand command) {
@@ -68,7 +68,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Department", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新部门")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeDepartmentInfoCommand command) {
@@ -95,7 +94,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public void move(MoveDepartmentCommand command) {
         dao.moveTreeNode(
@@ -105,7 +103,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    @BizExceptionBoundary
     public boolean existsChildRelation(DepartmentQuery query) {
         return query != null
                 && query.getChildId() != null

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class MultipartUploadServiceImpl implements MultipartUploadService {
 
     private final MultipartUploadDao multipartUploadDao;
@@ -38,7 +39,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public MultipartUploadSession init(InitMultipartUploadCommand command) {
         MultipartUploadSession session = toMultipartSession(command);
@@ -56,7 +56,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public MultipartUploadPart uploadPart(UploadMultipartPartCommand command) {
         MultipartUploadPart part = toMultipartPart(command);
@@ -79,7 +78,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public StoredObject complete(CompleteMultipartUploadCommand command) {
         String uploadId = command == null ? null : command.getUploadId();
@@ -99,7 +97,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int abort(AbortMultipartUploadCommand command) {
         MultipartUploadSession session = requireActiveMultipartSession(command == null ? null : command.getUploadId());

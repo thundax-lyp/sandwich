@@ -1,6 +1,6 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -21,6 +21,7 @@ import java.util.Date;
 import org.springframework.stereotype.Service;
 
 @Service
+@BizExceptionBoundary
 public class PrincipalAuthServiceImpl implements PrincipalAuthService {
 
     private final PrincipalIdentityService principalIdentityService;
@@ -33,8 +34,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
-    @BizExceptionBoundary
-    public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) throws ApiException {
+    public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) {
         PrincipalIdentity identity = principalIdentityService.get(identityQuery(command));
         if (identity == null || !identity.isEnabled()) {
             throw invalidPrincipalCredential();
@@ -43,8 +43,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     @Override
-    @BizExceptionBoundary
-    public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) throws ApiException {
+    public PrincipalIdentity authenticatePassword(AuthenticatePasswordCommand command) {
         PrincipalIdentity identity = authenticateIdentity(
                 new AuthenticateIdentityCommand(command.getIdentityType(), command.getIdentityValue()));
         PrincipalCredential credential =
@@ -57,17 +56,16 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     }
 
     private void validateCredential(
-            PrincipalCredential credential, String plainPassword, PrincipalPasswordPolicyDTO passwordPolicy)
-            throws ApiException {
+            PrincipalCredential credential, String plainPassword, PrincipalPasswordPolicyDTO passwordPolicy) {
         Date now = new Date();
         if (credential.isLocked(now)) {
-            throw new ApiException("帐号已被锁定，请等待（" + lockedExpireSeconds(credential, passwordPolicy, now) + "）秒后自动解锁!");
+            throw new BizException("帐号已被锁定，请等待（" + lockedExpireSeconds(credential, passwordPolicy, now) + "）秒后自动解锁!");
         }
         if (credential.isExpired(now)) {
-            throw new ApiException("认证凭据已过期");
+            throw new BizException("认证凭据已过期");
         }
         if (!credential.isActive()) {
-            throw new ApiException("认证凭据不可用");
+            throw new BizException("认证凭据不可用");
         }
 
         if (PasswordHelper.validate(plainPassword, credential.getCredentialValue())) {
@@ -87,9 +85,9 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         credential.markFailed(lockedUntil);
         principalCredentialService.changeVerifyState(new PrincipalCredentialCommand(credential));
         if (credential.isLocked(now)) {
-            throw new ApiException("帐号已被锁定，请等待（" + passwordPolicy.getLockSeconds() + "）秒后自动解锁!");
+            throw new BizException("帐号已被锁定，请等待（" + passwordPolicy.getLockSeconds() + "）秒后自动解锁!");
         }
-        throw new ApiException("密码输入错误"
+        throw new BizException("密码输入错误"
                 + credential.getFailedLimit()
                 + "次后将被锁定，剩余"
                 + (credential.getFailedLimit() - credential.getFailedCount())
@@ -123,7 +121,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         return Math.max(remaining, 0L);
     }
 
-    private ApiException invalidPrincipalCredential() {
+    private BizException invalidPrincipalCredential() {
         return new InvalidPasswordException();
     }
 }

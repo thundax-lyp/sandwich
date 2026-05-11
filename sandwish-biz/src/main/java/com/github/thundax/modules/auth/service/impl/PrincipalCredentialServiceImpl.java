@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
+@BizExceptionBoundary
 public class PrincipalCredentialServiceImpl implements PrincipalCredentialService {
 
     private final PrincipalCredentialDao principalCredentialDao;
@@ -20,7 +21,6 @@ public class PrincipalCredentialServiceImpl implements PrincipalCredentialServic
     }
 
     @Override
-    @BizExceptionBoundary
     public PrincipalCredential get(PrincipalCredentialQuery query) {
         if (query == null) {
             return null;
@@ -38,13 +38,11 @@ public class PrincipalCredentialServiceImpl implements PrincipalCredentialServic
     }
 
     @Override
-    @BizExceptionBoundary
     public List<PrincipalCredential> list(PrincipalCredentialQuery query) {
         return principalCredentialDao.listByPrincipalKeyAndStatus(query.getPrincipalKey(), query.getStatus());
     }
 
     @Override
-    @BizExceptionBoundary
     public EntityId create(PrincipalCredentialCommand command) {
         PrincipalCredential principalCredential = command.getPrincipalCredential();
         EntityId id = principalCredentialDao.insert(principalCredential);
@@ -53,19 +51,16 @@ public class PrincipalCredentialServiceImpl implements PrincipalCredentialServic
     }
 
     @Override
-    @BizExceptionBoundary
     public void change(PrincipalCredentialCommand command) {
         principalCredentialDao.update(command.getPrincipalCredential());
     }
 
     @Override
-    @BizExceptionBoundary
     public void changeStatus(PrincipalCredentialCommand command) {
         principalCredentialDao.updateStatus(command.getPrincipalCredential());
     }
 
     @Override
-    @BizExceptionBoundary
     public void changeVerifyState(PrincipalCredentialCommand command) {
         principalCredentialDao.updateVerifyState(command.getPrincipalCredential());
     }

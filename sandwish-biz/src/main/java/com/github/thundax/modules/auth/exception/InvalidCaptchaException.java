@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.exception;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 
-public class InvalidCaptchaException extends ApiException {
+public class InvalidCaptchaException extends BizException {
 
     public InvalidCaptchaException() {
-        super("auth.exception.invalid-captcha", "验证码错误");
+        super("AUTH-00001", "auth.exception.invalid-captcha", "验证码错误");
     }
 }

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.auth.service;
 
-import com.github.thundax.common.exception.InvalidTokenException;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
@@ -19,13 +18,13 @@ public interface PreAuthSessionService {
 
     PreAuthSessionId getIdByRefreshToken(PreAuthSessionQuery query);
 
-    PreAuthSession get(PreAuthSessionQuery query) throws InvalidTokenException;
+    PreAuthSession get(PreAuthSessionQuery query);
 
-    PreAuthSession refresh(RefreshPreAuthSessionCommand command) throws InvalidTokenException;
+    PreAuthSession refresh(RefreshPreAuthSessionCommand command);
 
     void release(ReleasePreAuthSessionCommand command);
 
-    void upsertValue(UpsertPreAuthSessionValueCommand command) throws InvalidTokenException;
+    void upsertValue(UpsertPreAuthSessionValueCommand command);
 
-    String getValue(PreAuthSessionQuery query) throws InvalidTokenException;
+    String getValue(PreAuthSessionQuery query);
 }

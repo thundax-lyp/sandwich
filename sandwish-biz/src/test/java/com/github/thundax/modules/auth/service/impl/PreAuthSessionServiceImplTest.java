@@ -2,7 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession.RefreshTokenValue;
@@ -76,7 +76,7 @@ public class PreAuthSessionServiceImplTest {
         assertNull(service.getValue(queryByName(session.getId(), CAPTCHA_ITEM)));
     }
 
-    @Test(expected = InvalidTokenException.class)
+    @Test(expected = BizException.class)
     public void shouldRejectExpiredPreAuthSessionById() throws Exception {
         PreAuthSessionToken refreshToken = PreAuthSessionToken.of("refresh-token-1");
         PreAuthSession session = PreAuthSession.restore(

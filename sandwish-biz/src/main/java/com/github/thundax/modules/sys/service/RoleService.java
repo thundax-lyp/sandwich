@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.service;
 
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -30,7 +29,7 @@ public interface RoleService {
 
     int remove(DeleteRoleCommand command);
 
-    void sort(RoleSortCommand command) throws ApiException;
+    void sort(RoleSortCommand command);
 
     int changeStatus(ChangeRoleStatusCommand command);
 

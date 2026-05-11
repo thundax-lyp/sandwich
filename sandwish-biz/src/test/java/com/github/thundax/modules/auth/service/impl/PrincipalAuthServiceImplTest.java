@@ -2,7 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import static org.junit.Assert.*;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
@@ -25,7 +25,7 @@ import org.junit.Test;
 public class PrincipalAuthServiceImplTest {
 
     @Test
-    public void shouldAuthenticatePasswordAndResetVerifyState() throws ApiException {
+    public void shouldAuthenticatePasswordAndResetVerifyState() {
         RecordingPrincipalIdentityService identityService = new RecordingPrincipalIdentityService();
         RecordingPrincipalCredentialService credentialService = new RecordingPrincipalCredentialService();
         PrincipalIdentity identity = identity(1001L, "developer", PrincipalIdentityStatus.ENABLED);
@@ -51,7 +51,7 @@ public class PrincipalAuthServiceImplTest {
     }
 
     @Test(expected = InvalidPasswordException.class)
-    public void shouldRejectWrongPasswordWithoutLockPolicy() throws ApiException {
+    public void shouldRejectWrongPasswordWithoutLockPolicy() {
         RecordingPrincipalIdentityService identityService = new RecordingPrincipalIdentityService();
         RecordingPrincipalCredentialService credentialService = new RecordingPrincipalCredentialService();
         PrincipalIdentity identity = identity(1001L, "developer", PrincipalIdentityStatus.ENABLED);
@@ -86,7 +86,7 @@ public class PrincipalAuthServiceImplTest {
                     PrincipalCredentialType.USER_PASSWORD,
                     "wrong",
                     new PrincipalPasswordPolicyDTO(true, 2, 60)));
-        } catch (ApiException e) {
+        } catch (BizException e) {
             assertEquals("帐号已被锁定，请等待（60）秒后自动解锁!", e.getMessage());
         }
 

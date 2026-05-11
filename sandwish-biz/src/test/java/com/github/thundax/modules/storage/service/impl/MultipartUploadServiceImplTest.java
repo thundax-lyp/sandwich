@@ -398,7 +398,7 @@ public class MultipartUploadServiceImplTest {
         }
 
         @Override
-        public void sort(StorageSortCommand command) throws com.github.thundax.common.exception.ApiException {}
+        public void sort(StorageSortCommand command) throws com.github.thundax.common.exception.BizException {}
 
         private StoredObject toStoredObject(
                 com.github.thundax.modules.storage.service.command.CreateStorageCommand command) {

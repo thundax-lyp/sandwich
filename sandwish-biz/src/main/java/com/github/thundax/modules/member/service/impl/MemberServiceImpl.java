@@ -2,7 +2,7 @@ package com.github.thundax.modules.member.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class MemberServiceImpl implements MemberService {
 
     private static final int PRIORITY_STEP = 10;
@@ -43,7 +44,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     public Member get(MemberId id) {
         if (id == null) {
             return null;
@@ -52,7 +52,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<Member> list(MemberQuery query) {
         if (query != null && query.getIds() != null) {
             return dao.listByIds(MemberIdCodec.toValues(query.getIds()));
@@ -65,7 +64,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     public PageResult<Member> page(MemberQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Member> dataPage = dao.page(
@@ -80,7 +78,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "", action = AuditAction.CREATE, summary = "创建会员", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public MemberId create(MemberCommand command) {
@@ -91,23 +88,31 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
-    public void sort(MemberSortCommand command) throws ApiException {
+    public void sort(MemberSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
         List<MemberId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_EMPTY_INPUT.getCode(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessageKey(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
         List<Member> currentMembers = dao.list(null, null, null, effectiveDirection);
         if (currentMembers == null || currentMembers.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         if (currentMembers.size() != orderedIdList.size()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         Map<Long, Integer> indexById = new HashMap<>(currentMembers.size());
@@ -117,7 +122,10 @@ public class MemberServiceImpl implements MemberService {
         for (int i = 0; i < currentMembers.size(); i++) {
             Member member = currentMembers.get(i);
             if (member == null || member.getId() == null) {
-                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DB_FAILURE.getCode(),
+                        ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                        ErrorCode.SORT_DB_FAILURE.getMessage());
             }
             long memberId = member.getId().value();
             indexById.put(memberId, i);
@@ -127,7 +135,10 @@ public class MemberServiceImpl implements MemberService {
 
         for (MemberId orderedId : orderedIdList) {
             if (orderedId == null || !indexById.containsKey(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
         }
 
@@ -158,16 +169,19 @@ public class MemberServiceImpl implements MemberService {
             }
         } catch (RuntimeException exception) {
             if (isConcurrentModification(exception)) {
-                throw new ApiException(
+                throw new BizException(
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
             }
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(),
+                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                    ErrorCode.SORT_DB_FAILURE.getMessage());
         }
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员")
     @Transactional(rollbackFor = Exception.class)
     public void change(MemberCommand command) {
@@ -175,7 +189,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员信息")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(MemberCommand command) {
@@ -183,7 +196,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Member", id = "#command.member.id.value()", action = AuditAction.UPDATE, summary = "更新会员状态")
     @Transactional(rollbackFor = Exception.class)
     public int changeStatus(MemberCommand command) {
@@ -191,7 +203,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(
             type = "Member",
             id = "#command.id.value()",
@@ -214,7 +225,7 @@ public class MemberServiceImpl implements MemberService {
         return status == null ? null : status.value();
     }
 
-    private List<MemberId> normalizeOrderedIds(List<MemberId> orderedIds) throws ApiException {
+    private List<MemberId> normalizeOrderedIds(List<MemberId> orderedIds) {
         if (orderedIds == null) {
             return new ArrayList<>();
         }
@@ -222,10 +233,16 @@ public class MemberServiceImpl implements MemberService {
         List<MemberId> normalized = new ArrayList<>(orderedIds.size());
         for (MemberId orderedId : orderedIds) {
             if (orderedId == null || orderedId.value() == null) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             if (!uniqueIdValues.add(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
             }
             normalized.add(orderedId);
         }
@@ -258,10 +275,11 @@ public class MemberServiceImpl implements MemberService {
                 || "23505".equals(sqlState);
     }
 
-    private void updatePriorityOrThrow(MemberId id, int priority, String message) throws ApiException {
+    private void updatePriorityOrThrow(MemberId id, int priority, String message) {
         int updated = dao.updatePriority(id, priority);
         if (updated != 1) {
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessageKey(), message);
         }
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class LogServiceImpl implements LogService {
 
     private final LogDao dao;
@@ -27,7 +28,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @BizExceptionBoundary
     public Log get(LogId id) {
         if (id == null) {
             return null;
@@ -36,7 +36,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<Log> list(LogQuery query) {
         return dao.list(
                 query == null ? null : typeValue(query.getType()),
@@ -50,7 +49,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @BizExceptionBoundary
     public PageResult<Log> page(LogQuery query, PageQuery page) {
         PageQuery normalizedPage = normalizePage(page);
         IPage<Log> dataPage = dao.page(
@@ -69,7 +67,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public LogId create(CreateLogCommand command) {
         Log log = toLog(command);
@@ -78,7 +75,6 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public int deleteByCondition(LogQuery query) {
         return dao.batchDelete(

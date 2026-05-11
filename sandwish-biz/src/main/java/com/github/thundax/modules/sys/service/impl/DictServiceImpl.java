@@ -2,7 +2,7 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
+@BizExceptionBoundary
 public class DictServiceImpl implements DictService {
 
     private static final int PRIORITY_STEP = 10;
@@ -51,7 +52,6 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<String> listTypes(DictQuery query) {
         return dao.listTypes();
     }
@@ -89,7 +89,6 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Dict", id = "", action = AuditAction.CREATE, summary = "创建字典", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public DictId create(CreateDictCommand command) {
@@ -100,21 +99,26 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
-    public void sort(DictSortCommand command) throws ApiException {
+    public void sort(DictSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
         List<DictId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
         if (orderedIdList.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_EMPTY_INPUT.getCode(), ErrorCode.SORT_EMPTY_INPUT.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_EMPTY_INPUT.getCode(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessageKey(),
+                    ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
         List<Dict> selectedDicts = dao.listByIds(toValues(orderedIdList));
         Map<Long, String> typeById = new HashMap<>();
         String dictType = null;
         if (selectedDicts == null || selectedDicts.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
         for (Dict dict : selectedDicts) {
             if (dict == null || dict.getId() == null) {
@@ -129,24 +133,39 @@ public class DictServiceImpl implements DictService {
 
         for (DictId orderedId : orderedIdList) {
             if (orderedId == null || orderedId.value() == null) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             String currentType = typeById.get(orderedId.value());
             if (StringUtils.isEmpty(dictType)) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             if (!Objects.equals(dictType, currentType)) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
         }
 
         List<Dict> currentDicts = dao.listByType(dictType, effectiveDirection);
         if (currentDicts == null || currentDicts.isEmpty()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         if (currentDicts.size() != orderedIdList.size()) {
-            throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_MISSING_ID.getCode(),
+                    ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                    ErrorCode.SORT_MISSING_ID.getMessage());
         }
 
         Map<Long, Integer> indexById = new HashMap<>(currentDicts.size());
@@ -156,7 +175,10 @@ public class DictServiceImpl implements DictService {
         for (int i = 0; i < currentDicts.size(); i++) {
             Dict dict = currentDicts.get(i);
             if (dict == null || dict.getId() == null) {
-                throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DB_FAILURE.getCode(),
+                        ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                        ErrorCode.SORT_DB_FAILURE.getMessage());
             }
             long dictId = dict.getId().value();
             indexById.put(dictId, i);
@@ -166,7 +188,10 @@ public class DictServiceImpl implements DictService {
 
         for (DictId orderedId : orderedIdList) {
             if (!indexById.containsKey(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
         }
 
@@ -197,16 +222,19 @@ public class DictServiceImpl implements DictService {
             }
         } catch (RuntimeException exception) {
             if (isConcurrentModification(exception)) {
-                throw new ApiException(
+                throw new BizException(
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
+                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
                         ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
             }
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessage());
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(),
+                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
+                    ErrorCode.SORT_DB_FAILURE.getMessage());
         }
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(type = "Dict", id = "#command.id.value()", action = AuditAction.UPDATE, summary = "更新字典")
     @Transactional(rollbackFor = Exception.class)
     public void changeInfo(ChangeDictInfoCommand command) {
@@ -214,7 +242,6 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    @BizExceptionBoundary
     @AuditLog(
             type = "Dict",
             id = "#command.id.value()",
@@ -259,7 +286,7 @@ public class DictServiceImpl implements DictService {
         return values;
     }
 
-    private List<DictId> normalizeOrderedIds(List<DictId> orderedIds) throws ApiException {
+    private List<DictId> normalizeOrderedIds(List<DictId> orderedIds) {
         if (orderedIds == null) {
             return new ArrayList<>();
         }
@@ -268,10 +295,16 @@ public class DictServiceImpl implements DictService {
         List<DictId> normalized = new ArrayList<>(orderedIds.size());
         for (DictId orderedId : orderedIds) {
             if (orderedId == null || orderedId.value() == null) {
-                throw new ApiException(ErrorCode.SORT_MISSING_ID.getCode(), ErrorCode.SORT_MISSING_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_MISSING_ID.getCode(),
+                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
+                        ErrorCode.SORT_MISSING_ID.getMessage());
             }
             if (!uniqueIdValues.add(orderedId.value())) {
-                throw new ApiException(ErrorCode.SORT_DUPLICATE_ID.getCode(), ErrorCode.SORT_DUPLICATE_ID.getMessage());
+                throw new BizException(
+                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
+                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
             }
             normalized.add(orderedId);
         }
@@ -304,14 +337,15 @@ public class DictServiceImpl implements DictService {
                 || "23505".equals(sqlState);
     }
 
-    private void updatePriorityOrThrow(DictId id, int priority, String message) throws ApiException {
+    private void updatePriorityOrThrow(DictId id, int priority, String message) {
         Dict dict = new Dict();
         dict.setId(id);
         dict.setPriority(priority);
 
         int updated = dao.updatePriority(dict);
         if (updated != 1) {
-            throw new ApiException(ErrorCode.SORT_DB_FAILURE.getCode(), message);
+            throw new BizException(
+                    ErrorCode.SORT_DB_FAILURE.getCode(), ErrorCode.SORT_DB_FAILURE.getMessageKey(), message);
         }
     }
 

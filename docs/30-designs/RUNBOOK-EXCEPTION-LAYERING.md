@@ -65,17 +65,19 @@ Biz 层规则：
 
 ### 3.3 Service Exception Boundary Annotation
 
-Service 方法固定使用 `@BizExceptionBoundary` 声明技术异常转换边界。
+Service implementation 类固定使用 `@BizExceptionBoundary` 声明技术异常转换边界。
 
 注解规则：
 
-- `@BizExceptionBoundary` 只允许标注在 Service implementation 的 public 方法上。
-- 对外 Service 方法必须标注 `@BizExceptionBoundary`，只有 getter 方法允许由架构测试明确排除。
+- `@BizExceptionBoundary` 固定标注在 Service implementation 类上。
+- 方法级 `@BizExceptionBoundary` 只用于局部显式声明边界，不作为 Service implementation 默认写法。
+- `@BizExceptionBoundaryIgnore` 固定作为对等排除注解，只允许标注在无参 getter 方法上。
+- 对外 Service implementation 类必须标注 `@BizExceptionBoundary`。
 - `@BizExceptionBoundary` 固定携带 fallback 业务 code、messageKey 和 defaultMessage。
 - `@BizExceptionBoundary` 对 `DomainException` 和 `BizException` 固定放行。
 - `@BizExceptionBoundary` 捕获其他异常后固定转换为 `BizException`，并保留原始 cause。
 - `@BizExceptionBoundary` 不负责识别具体业务语义；唯一键冲突、并发修改、对象不存在等明确业务失败仍由 Service 显式转换为具体 `BizException`。
-- Controller、DAO、Mapper、领域对象和值对象禁止标注 `@BizExceptionBoundary`。
+- Controller、DAO、Mapper、领域对象和值对象禁止标注 `@BizExceptionBoundary` 或 `@BizExceptionBoundaryIgnore`。
 
 ### 3.4 API Exception Boundary
 
@@ -229,8 +231,8 @@ Handler 规则：
 1. 将 Service 方法签名中的 `throws ApiException` 改为不声明 checked 业务异常。
 2. 将业务失败改为抛 `BizException` 或 `DomainException`。
 3. 将领域枚举解析失败统一抛 `DomainException`。
-4. 增加 `@BizExceptionBoundary` 注解和对应 AOP。
-5. 为对外 Service implementation public 方法补充 `@BizExceptionBoundary`。
+4. 增加 `@BizExceptionBoundary`、`@BizExceptionBoundaryIgnore` 注解和对应 AOP。
+5. 为对外 Service implementation 类补充 `@BizExceptionBoundary`。
 6. AOP 固定放行 `DomainException` 和 `BizException`。
 7. AOP 固定捕获其他技术异常并转换为 `BizException`，保留原始 cause。
 8. 删除 Biz 层对 API 响应异常的依赖。
@@ -239,8 +241,8 @@ Handler 规则：
 
 - `sandwish-biz` 不依赖 `SandwishException`。
 - `sandwish-biz` 不声明 `throws ApiException`。
-- 对外 Service implementation public 方法具备 `@BizExceptionBoundary` 门禁覆盖。
-- getter 方法以外的 Service implementation public 方法缺少 `@BizExceptionBoundary` 时门禁失败。
+- 对外 Service implementation 类具备 `@BizExceptionBoundary` 门禁覆盖。
+- `@BizExceptionBoundaryIgnore` 标注在非无参 getter 方法时门禁失败。
 - DAO / Infra 技术异常在 Service 边界被转换为 `BizException`。
 - 业务异常测试覆盖主要错误码。
 
@@ -280,17 +282,19 @@ Handler 规则：
 2. 增加 Infra 不依赖 Biz/API 异常的 ArchUnit 测试。
 3. 增加 Controller 不直接抛 Biz / Domain 异常的 ArchUnit 测试。
 4. 增加 `ApiException` 禁用或限定使用范围的 ArchUnit 测试。
-5. 增加 `@BizExceptionBoundary` 只能标注 Service implementation public 方法的 ArchUnit 测试。
-6. 增加对外 Service implementation public 方法必须标注 `@BizExceptionBoundary` 的 ArchUnit 测试，getter 方法除外。
-7. 增加 DAO / Mapper / Controller / 领域对象禁止标注 `@BizExceptionBoundary` 的 ArchUnit 测试。
-8. 增加 API response code 字段必须为 `String` 的架构或契约测试。
-9. 增加 API response code 格式必须符合 `<DOMAIN>-<NUMBER>` 的契约测试。
+5. 增加 `@BizExceptionBoundary` 只能标注 Service implementation 类或方法的 ArchUnit 测试。
+6. 增加对外 Service implementation 类必须标注 `@BizExceptionBoundary` 的 ArchUnit 测试。
+7. 增加 `@BizExceptionBoundaryIgnore` 只能标注无参 getter 方法的 ArchUnit 测试。
+8. 增加 DAO / Mapper / Controller / 领域对象禁止标注 `@BizExceptionBoundary` 和 `@BizExceptionBoundaryIgnore` 的 ArchUnit 测试。
+9. 增加 API response code 字段必须为 `String` 的架构或契约测试。
+10. 增加 API response code 格式必须符合 `<DOMAIN>-<NUMBER>` 的契约测试。
 
 验收点：
 
 - 异常分层规则可由测试稳定验证。
 - 新增异常类违反归属时测试失败。
-- 非 getter Service 方法缺少 `@BizExceptionBoundary` 时测试失败。
+- 对外 Service implementation 类缺少 `@BizExceptionBoundary` 时测试失败。
+- `@BizExceptionBoundaryIgnore` 标注在非无参 getter 方法时测试失败。
 - `ApiException` 残留时测试失败。
 - API response code 格式错误时测试失败。
 

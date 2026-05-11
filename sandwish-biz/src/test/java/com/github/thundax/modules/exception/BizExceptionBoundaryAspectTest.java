@@ -2,10 +2,12 @@ package com.github.thundax.modules.exception;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.DomainException;
+import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.Test;
 
@@ -68,6 +70,21 @@ public class BizExceptionBoundaryAspectTest {
             fail("Error should be thrown");
         } catch (AssertionError actual) {
             assertSame(expected, actual);
+        }
+    }
+
+    @Test
+    public void shouldDeclareIgnoreAnnotationOnGetterMethods() throws Exception {
+        Method method = IgnoredGetterService.class.getMethod("getStatus");
+
+        assertTrue(method.isAnnotationPresent(BizExceptionBoundaryIgnore.class));
+    }
+
+    private static class IgnoredGetterService {
+
+        @BizExceptionBoundaryIgnore
+        public String getStatus() {
+            return "ok";
         }
     }
 
@@ -137,7 +154,7 @@ public class BizExceptionBoundaryAspectTest {
         }
 
         @Override
-        public org.aspectj.lang.SourceLocation getSourceLocation() {
+        public org.aspectj.lang.reflect.SourceLocation getSourceLocation() {
             throw new UnsupportedOperationException();
         }
 
@@ -148,6 +165,11 @@ public class BizExceptionBoundaryAspectTest {
 
         @Override
         public org.aspectj.lang.JoinPoint.StaticPart getStaticPart() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set$AroundClosure(org.aspectj.runtime.internal.AroundClosure aroundClosure) {
             throw new UnsupportedOperationException();
         }
     }

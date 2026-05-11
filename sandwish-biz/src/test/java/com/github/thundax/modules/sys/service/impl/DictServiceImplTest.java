@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
@@ -33,7 +33,7 @@ public class DictServiceImplTest {
     }
 
     @Test
-    public void shouldSortByAscendingDirectionBySwap() throws ApiException {
+    public void shouldSortByAscendingDirectionBySwap() {
         RecordingDictDao dao = new RecordingDictDao();
         List<Dict> currentList =
                 Arrays.asList(dict(1001L, "status", 10), dict(1002L, "status", 20), dict(1003L, "status", 30));
@@ -56,8 +56,8 @@ public class DictServiceImplTest {
 
         try {
             service.sort(new DictSortCommand(new ArrayList<>(), SortDirection.ASC));
-            fail("expect ApiException");
-        } catch (ApiException e) {
+            fail("expect BizException");
+        } catch (BizException e) {
             assertEquals(ErrorCode.SORT_EMPTY_INPUT.getCode(), e.getCode());
             assertEquals(ErrorCode.SORT_EMPTY_INPUT.getMessage(), e.getMessage());
         }
@@ -74,8 +74,8 @@ public class DictServiceImplTest {
         try {
             service.sort(new DictSortCommand(
                     Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)), SortDirection.ASC));
-            fail("expect ApiException");
-        } catch (ApiException e) {
+            fail("expect BizException");
+        } catch (BizException e) {
             assertEquals(ErrorCode.SORT_DUPLICATE_ID.getCode(), e.getCode());
             assertEquals(ErrorCode.SORT_DUPLICATE_ID.getMessage(), e.getMessage());
         }

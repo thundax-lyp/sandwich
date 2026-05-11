@@ -12,26 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `biz-service-api-exception-migration`：迁移 Biz Service 的 ApiException 调用点
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/PrincipalAuthService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PrincipalAuthServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/CurrentUserService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/CurrentUserServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/UserService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/UserServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/RoleService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/RoleServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/DictService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/sys/service/impl/DictServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/MemberService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/member/service/impl/MemberServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/StorageService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/storage/service/impl/StorageServiceImpl.java`
-  - 处理动作：删除 Service 接口和实现中的 `throws ApiException`，将业务失败改为 `BizException` 或 `DomainException`。
-  - 验收点：`sandwish-biz` 生产代码无 `throws ApiException`、`new ApiException`、`extends ApiException` 残留。
-  - 重要度：10/10
-
 - [ ] `api-error-translator`：建立前后台异常转换层
   - 范围文件：
     - `sandwish-common/sandwish-common-web/src/main/java/com/github/thundax/common/web/exception/GlobalExceptionHandler.java`
@@ -95,8 +75,8 @@
     - `sandwish-infra/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
     - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/response/ApiResponseTest.java`
     - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/exception/GlobalExceptionHandlerTest.java`
-  - 处理动作：增加 ArchUnit 或契约测试，约束异常归属、`@BizExceptionBoundary` 标注范围、ApiException 禁用和 API code 格式。
-  - 验收点：违反异常分层、非 getter Service 缺少边界注解、ApiException 残留或 code 格式错误时测试失败。
+  - 处理动作：增加 ArchUnit 或契约测试，约束异常归属、`@BizExceptionBoundary` / `@BizExceptionBoundaryIgnore` 标注范围、ApiException 禁用和 API code 格式。
+  - 验收点：违反异常分层、ServiceImpl 缺少边界注解、`@BizExceptionBoundaryIgnore` 标注在非无参 getter、ApiException 残留或 code 格式错误时测试失败。
   - 重要度：10/10
 
 - [ ] `exception-governance-cleanup`：沉淀治理规则并清理 RUNBOOK

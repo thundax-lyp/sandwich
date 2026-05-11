@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.exception;
 
-import com.github.thundax.common.exception.ApiException;
+import com.github.thundax.common.exception.BizException;
 
-public class InvalidPasswordException extends ApiException {
+public class InvalidPasswordException extends BizException {
 
     public InvalidPasswordException() {
-        super("auth.exception.invalid-password", "密码错误");
+        super("AUTH-00003", "auth.exception.invalid-password", "密码错误");
     }
 }

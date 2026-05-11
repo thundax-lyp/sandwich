@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@BizExceptionBoundary
 public class AuditServiceImpl implements AuditService {
 
     private final AuditMetaDao auditMetaDao;
@@ -39,7 +40,6 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    @BizExceptionBoundary
     @Transactional(rollbackFor = Exception.class)
     public AuditLogId record(CreateAuditLogCommand command) {
         if (command == null
@@ -117,7 +117,6 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    @BizExceptionBoundary
     public AuditLog getLog(AuditLogId id) {
         if (id == null) {
             return null;
@@ -126,7 +125,6 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    @BizExceptionBoundary
     public AuditMeta getMeta(AuditMetaQuery query) {
         if (query == null) {
             return null;
@@ -135,13 +133,11 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
-    @BizExceptionBoundary
     public List<AuditLog> list(AuditMetaQuery query) {
         return auditLogDao.listByObject(query.getObjectType(), query.getObjectId());
     }
 
     @Override
-    @BizExceptionBoundary
     public PageResult<AuditLog> page(AuditLogQuery query, PageQuery pageQuery) {
         IPage<AuditLog> dataPage = auditLogDao.page(
                 query == null ? null : query.getObjectType(),

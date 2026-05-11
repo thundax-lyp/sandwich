@@ -1,6 +1,5 @@
 package com.github.thundax.modules.member.service;
 
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.member.entity.Member;
@@ -31,5 +30,5 @@ public interface MemberService {
 
     int remove(MemberCommand command);
 
-    void sort(MemberSortCommand command) throws ApiException;
+    void sort(MemberSortCommand command);
 }

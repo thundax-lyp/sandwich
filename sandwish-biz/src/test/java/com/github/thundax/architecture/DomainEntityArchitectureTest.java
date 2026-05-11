@@ -27,7 +27,7 @@ public class DomainEntityArchitectureTest {
     private static final Pattern ENUM_DECLARATION_PATTERN = Pattern.compile("\\benum\\s+[A-Za-z0-9_]+\\b");
     private static final Pattern ENUM_FROM_STRING_PATTERN =
             Pattern.compile("\\bfrom\\s*\\(\\s*String\\s+[A-Za-z0-9_]+\\s*\\)");
-    private static final Pattern BIZ_EXCEPTION_PATTERN = Pattern.compile("\\bBizException\\b");
+    private static final Pattern DOMAIN_EXCEPTION_PATTERN = Pattern.compile("\\bDomainException\\b");
 
     private static final Set<String> LEGACY_OLD_ENTITY_BASE_SOURCES = new LinkedHashSet<>();
 
@@ -52,7 +52,7 @@ public class DomainEntityArchitectureTest {
     }
 
     @Test
-    public void shouldUseBizExceptionForDomainEnumParsingFailures() throws IOException {
+    public void shouldUseDomainExceptionForDomainEnumParsingFailures() throws IOException {
         Path root = repositoryRoot();
         Path sourceRoot = root.resolve("sandwish-biz").resolve("src/main/java/com/github/thundax/modules");
         List<String> violations = new ArrayList<>();
@@ -64,7 +64,7 @@ public class DomainEntityArchitectureTest {
                     .forEach(path -> collectEnumParsingViolation(root, path, violations));
         }
 
-        assertTrue("Domain enum parsing failures must use BizException: " + violations, violations.isEmpty());
+        assertTrue("Domain enum parsing failures must use DomainException: " + violations, violations.isEmpty());
     }
 
     private List<String> findViolations(Pattern pattern, Set<String> legacySources) throws IOException {
@@ -98,9 +98,9 @@ public class DomainEntityArchitectureTest {
         boolean hasFromString = ENUM_FROM_STRING_PATTERN.matcher(content).find();
         boolean hasIllegalArgumentException =
                 ENUM_ILLEGAL_ARGUMENT_EXCEPTION_PATTERN.matcher(content).find();
-        boolean missesBizException =
-                hasFromString && !BIZ_EXCEPTION_PATTERN.matcher(content).find();
-        if (hasIllegalArgumentException || missesBizException) {
+        boolean missesDomainException =
+                hasFromString && !DOMAIN_EXCEPTION_PATTERN.matcher(content).find();
+        if (hasIllegalArgumentException || missesDomainException) {
             violations.add(toRepositoryPath(root, path));
         }
     }

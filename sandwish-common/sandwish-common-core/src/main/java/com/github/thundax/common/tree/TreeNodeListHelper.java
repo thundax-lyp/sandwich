@@ -1,4 +1,4 @@
-package com.github.thundax.common.collection;
+package com.github.thundax.common.tree;
 
 import java.util.HashSet;
 import java.util.Iterator;

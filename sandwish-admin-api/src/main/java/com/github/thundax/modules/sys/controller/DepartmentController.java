@@ -1,9 +1,9 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.collection.TreeNodeListHelper;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.tree.TreeNodeListHelper;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;

@@ -23,6 +23,15 @@ public final class AdminResponseExceptions {
                 WebErrorCode.BAD_REQUEST, "AUTH-00005", "auth.exception.login-request-too-many", "登录请求过多");
     }
 
+    public static SandwishException invalidUsernamePassword() {
+        return new SandwishException(
+                WebErrorCode.BAD_REQUEST, "AUTH-00002", "auth.exception.invalid-username-password", "用户名或密码错误");
+    }
+
+    public static SandwishException bannedAccount() {
+        return new SandwishException(WebErrorCode.FORBIDDEN, "AUTH-00004", "auth.exception.banned-account", "用户已禁用");
+    }
+
     public static SandwishException objectNotFound() {
         return new SandwishException(WebErrorCode.NOT_FOUND, "SYS-00002", "sys.exception.object-not-found", "资源不存在");
     }

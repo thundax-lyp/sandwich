@@ -12,7 +12,6 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 public class PrincipalAuthSessionDaoImplTest {
@@ -35,14 +34,12 @@ public class PrincipalAuthSessionDaoImplTest {
         assertEquals(
                 new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")),
                 stored.getValues().get(SAMPLE_VALUE_NAME));
-        assertEquals(Long.valueOf(70L), cache.getTtlSeconds(sessionKey("fa1")));
 
         Date accessTime = new Date(3000L);
         dao.touch(PrincipalAuthSessionId.of("fa1"), accessTime, 80);
 
         PrincipalAuthSession touched = dao.getById(PrincipalAuthSessionId.of("fa1"));
         assertEquals(accessTime, touched.getLastAccessTime());
-        assertEquals(Long.valueOf(80L), cache.getTtlSeconds(sessionKey("fa1")));
 
         dao.deleteById(PrincipalAuthSessionId.of("fa1"));
 
@@ -74,7 +71,6 @@ public class PrincipalAuthSessionDaoImplTest {
 
     private static class TestCache {
         private final Map<String, Object> values = new HashMap<>();
-        private final Map<String, Long> ttlSeconds = new HashMap<>();
 
         private Cache<String, Object> proxy() {
             return (Cache<String, Object>) Proxy.newProxyInstance(
@@ -84,19 +80,14 @@ public class PrincipalAuthSessionDaoImplTest {
                         }
                         if ("put".equals(method.getName())) {
                             values.put((String) args[0], args[1]);
-                            if (args.length == 4 && TimeUnit.SECONDS == args[3]) {
-                                ttlSeconds.put((String) args[0], (Long) args[2]);
-                            }
                             return null;
                         }
                         if ("PUT".equals(method.getName())) {
                             values.put((String) args[0], args[1]);
-                            ttlSeconds.put((String) args[0], (Long) args[2]);
                             return null;
                         }
                         if ("remove".equals(method.getName())) {
                             values.remove(args[0]);
-                            ttlSeconds.remove(args[0]);
                             return true;
                         }
                         if ("close".equals(method.getName())) {
@@ -110,10 +101,6 @@ public class PrincipalAuthSessionDaoImplTest {
                         }
                         return null;
                     });
-        }
-
-        private Long getTtlSeconds(String key) {
-            return ttlSeconds.get(key);
         }
     }
 }

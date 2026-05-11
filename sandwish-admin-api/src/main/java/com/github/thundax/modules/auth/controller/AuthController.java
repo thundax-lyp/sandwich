@@ -32,7 +32,6 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
-import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
@@ -140,7 +139,7 @@ public class AuthController {
                 writeLog(currentRequest, "用户锁定", request);
             } else if (e.getMessage() != null && e.getMessage().contains("密码输入错误")) {
                 writeLog(currentRequest, "密码输入错误", request);
-            } else if (!(e instanceof InvalidUsernamePasswordException)) {
+            } else if (!"AUTH-00002".equals(e.getCode())) {
                 writeLog(currentRequest, "认证失败", request);
             } else {
                 writeLog(currentRequest, "用户失败", request);

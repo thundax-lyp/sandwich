@@ -12,19 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `exception-architecture-gates`：增加异常分层架构门禁
-  - 范围文件：
-    - `sandwish-biz/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
-    - `sandwish-biz/src/test/java/com/github/thundax/architecture/BizExceptionBoundaryArchitectureTest.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
-    - `sandwish-front-api/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
-    - `sandwish-infra/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/response/ApiResponseTest.java`
-    - `sandwish-common/sandwish-common-web/src/test/java/com/github/thundax/common/web/exception/GlobalExceptionHandlerTest.java`
-  - 处理动作：增加 ArchUnit 或契约测试，约束异常归属、`@BizExceptionBoundary` / `@BizExceptionBoundaryIgnore` 标注范围、ApiException 禁用和 API code 格式。
-  - 验收点：违反异常分层、ServiceImpl 缺少边界注解、`@BizExceptionBoundaryIgnore` 标注在非无参 getter、ApiException 残留或 code 格式错误时测试失败。
-  - 重要度：10/10
-
 - [ ] `exception-governance-cleanup`：沉淀治理规则并清理 RUNBOOK
   - 范围文件：
     - `docs/00-governance/ARCHITECTURE.md`

@@ -2,6 +2,7 @@ package com.github.thundax.common.web.response;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -50,5 +51,20 @@ public class ApiResponseTest {
         assertEquals("COMMON-00001", response.getCode());
         assertEquals("参数错误", response.getMessage());
         assertNull(response.getData());
+    }
+
+    @Test
+    public void shouldUseStringErrorCodeFormat() {
+        assertEquals(String.class, responseCodeType());
+        assertTrue(ApiResponse.SUCCESS_CODE.matches("[A-Z]+-\\d{5}"));
+        assertTrue(ApiResponse.ERROR_CODE.matches("[A-Z]+-\\d{5}"));
+    }
+
+    private Class<?> responseCodeType() {
+        try {
+            return ApiResponse.class.getDeclaredField("code").getType();
+        } catch (NoSuchFieldException e) {
+            throw new AssertionError(e);
+        }
     }
 }

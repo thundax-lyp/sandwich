@@ -1,6 +1,5 @@
-package com.github.thundax.modules.auth.exception;
+package com.github.thundax.common.exception;
 
-import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.web.exception.ExceptionTranslator;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.common.web.exception.WebErrorCode;

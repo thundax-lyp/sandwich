@@ -29,9 +29,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAccessTokenCode;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalRefreshTokenCode;
-import com.github.thundax.modules.auth.exception.BannedAccountException;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
-import com.github.thundax.modules.auth.exception.InvalidUsernamePasswordException;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
@@ -734,7 +732,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     ip,
                     userAgent,
                     PrincipalLoginEvent.REASON_INVALID_CREDENTIAL);
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
 
         User user = getUser(UserIdCodec.toDomain(identity.getPrincipalKey().getPrincipalId()));
@@ -745,7 +743,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     ip,
                     userAgent,
                     PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
         if (!user.isEnable()) {
             writeLoginEvent(
@@ -757,7 +755,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     ip,
                     userAgent,
                     PrincipalLoginEvent.REASON_ACCOUNT_DISABLED);
-            throw new BannedAccountException();
+            throw AdminResponseExceptions.bannedAccount();
         }
         return user;
     }
@@ -805,11 +803,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     private void validatePassword(User user, String plainPassword) {
         if (user == null) {
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
         String loginName = getAccountLoginName(user.getId());
         if (StringUtils.isBlank(loginName)) {
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
         authenticatePassword(loginName, plainPassword);
     }
@@ -844,13 +842,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         } catch (InvalidPasswordException e) {
             recordLoginFailed(
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_IDENTITY_NOT_FOUND);
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
         User user = getUser(UserIdCodec.toDomain(identity.getPrincipalKey().getPrincipalId()));
         if (user == null) {
             recordLoginFailed(
                     authenticationMethod, identityType, ip, userAgent, PrincipalLoginEvent.REASON_PRINCIPAL_NOT_FOUND);
-            throw new InvalidUsernamePasswordException();
+            throw AdminResponseExceptions.invalidUsernamePassword();
         }
         if (!user.isEnable()) {
             writeLoginEvent(
@@ -862,7 +860,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                     ip,
                     userAgent,
                     PrincipalLoginEvent.REASON_ACCOUNT_DISABLED);
-            throw new BannedAccountException();
+            throw AdminResponseExceptions.bannedAccount();
         }
         return user;
     }

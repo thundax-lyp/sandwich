@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
+import com.github.thundax.modules.auth.security.filter.MemberAccessTokenAuthenticationFilter;
 import com.github.thundax.modules.auth.service.MemberAuthService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

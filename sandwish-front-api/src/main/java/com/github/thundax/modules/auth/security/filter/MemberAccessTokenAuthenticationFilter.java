@@ -1,4 +1,4 @@
-package com.github.thundax.modules.auth.security;
+package com.github.thundax.modules.auth.security.filter;
 
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;

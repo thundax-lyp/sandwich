@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
-import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.response.PersonalAvatarResponse;
 import com.github.thundax.modules.sys.controller.response.PersonalInfoResponse;
@@ -12,16 +10,14 @@ import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
-import com.github.thundax.modules.utils.AvatarUtils;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public final class PersonalInterfaceAssembler {
     private PersonalInterfaceAssembler() {}
 
     @NonNull
-    public static PersonalInfoResponse toInfoResponse(User entity, String loginName) {
+    public static PersonalInfoResponse toInfoResponse(User entity, String loginName, String avatarUrl) {
         if (entity == null) {
             return PersonalInfoResponse.builder().build();
         }
@@ -32,15 +28,15 @@ public final class PersonalInterfaceAssembler {
                 .name(entity.getName())
                 .mobile(entity.getMobile())
                 .email(entity.getEmail())
-                .avatar(readAvatarUrl(entity))
+                .avatar(avatarUrl)
                 .admin(entity.isAdmin())
                 .superAdmin(entity.isSuper())
                 .build();
     }
 
     @NonNull
-    public static PersonalAvatarResponse toAvatarResponse(User entity) {
-        return PersonalAvatarResponse.builder().avatar(readAvatarUrl(entity)).build();
+    public static PersonalAvatarResponse toAvatarResponse(String avatarUrl) {
+        return PersonalAvatarResponse.builder().avatar(avatarUrl).build();
     }
 
     @NonNull
@@ -68,13 +64,5 @@ public final class PersonalInterfaceAssembler {
         entity.setEmail(request.getEmail());
         entity.setMobile(request.getMobile());
         return entity;
-    }
-
-    private static String readAvatarUrl(User entity) {
-        String id = entity == null ? null : UserIdCodec.toStringValue(entity.getId());
-        if (StringUtils.isBlank(id) || !AvatarUtils.existAvatar(id)) {
-            return null;
-        }
-        return UserController.getAvatarUrl(id, SandwishContextHolder.currentToken());
     }
 }

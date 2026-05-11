@@ -1,8 +1,6 @@
 package com.github.thundax.modules.sys.assembler;
 
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
-import com.github.thundax.modules.sys.controller.UserController;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
@@ -37,6 +35,7 @@ public final class UserInterfaceAssembler {
             String loginName,
             Department department,
             List<Role> roleList,
+            String avatarUrl,
             Function<DepartmentId, Department> departmentLoader) {
         if (entity == null) {
             return UserResponse.builder().build();
@@ -50,8 +49,7 @@ public final class UserInterfaceAssembler {
                 .name(entity.getName())
                 .email(entity.getEmail())
                 .mobile(entity.getMobile())
-                .avatar(UserController.getAvatarUrl(
-                        UserIdCodec.toStringValue(entity.getId()), SandwishContextHolder.currentToken()))
+                .avatar(avatarUrl)
                 .superAdmin(entity.isSuper())
                 .admin(entity.isAdmin())
                 .enable(entity.isEnable())

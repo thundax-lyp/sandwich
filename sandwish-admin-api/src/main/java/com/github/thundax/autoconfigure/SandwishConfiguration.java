@@ -5,9 +5,7 @@ import com.github.thundax.common.jasypt.JasyptStringEncryptor;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.sys.aop.SysLogPointcutAdvisor;
 import com.github.thundax.modules.sys.service.SysLogMessageService;
-import com.github.thundax.modules.utils.AvatarUtils;
 import org.jasypt.encryption.StringEncryptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +14,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 @EnableConfigurationProperties({SandwishProperties.class, AuthProperties.class})
 public class SandwishConfiguration {
-
-    @Autowired
-    public SandwishConfiguration(SandwishProperties properties) {
-        AvatarUtils.setStoragePath(properties.getUpload().getStoragePath());
-    }
 
     @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {

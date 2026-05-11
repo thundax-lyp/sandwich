@@ -4,6 +4,7 @@ import com.github.thundax.common.Constants;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -31,12 +32,11 @@ import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserPasswordCommand;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
-import com.github.thundax.modules.utils.AvatarUtils;
+import com.github.thundax.modules.sys.support.AvatarStorageSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -58,17 +58,20 @@ public class CurrentUserController {
     private final CurrentUserResolver currentUserResolver;
     private final PrincipalIdentityService principalIdentityService;
     private final PreAuthSessionService preAuthSessionService;
+    private final AvatarStorageSupport avatarStorageSupport;
 
     public CurrentUserController(
             CurrentUserService currentUserService,
             CurrentUserResolver currentUserResolver,
             PrincipalIdentityService principalIdentityService,
-            PreAuthSessionService preAuthSessionService) {
+            PreAuthSessionService preAuthSessionService,
+            AvatarStorageSupport avatarStorageSupport) {
 
         this.currentUserService = currentUserService;
         this.currentUserResolver = currentUserResolver;
         this.principalIdentityService = principalIdentityService;
         this.preAuthSessionService = preAuthSessionService;
+        this.avatarStorageSupport = avatarStorageSupport;
     }
 
     @ApiOperation(value = "当前用户信息", notes = "读取当前登录后台用户的基础资料和登录名")
@@ -84,7 +87,8 @@ public class CurrentUserController {
     public PersonalInfoResponse info() {
         User currentUser = currentUserResolver.requireCurrentUser();
 
-        return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
+        return PersonalInterfaceAssembler.toInfoResponse(
+                currentUser, getAccountLoginName(currentUser), readAvatarUrl(currentUser));
     }
 
     @ApiOperation(value = "更新当前用户信息", notes = "更新当前登录后台用户的姓名、邮箱和手机号")
@@ -114,7 +118,8 @@ public class CurrentUserController {
                 currentUser.getPriority(),
                 currentUser.getRemarks()));
 
-        return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
+        return PersonalInterfaceAssembler.toInfoResponse(
+                currentUser, getAccountLoginName(currentUser), readAvatarUrl(currentUser));
     }
 
     @ApiOperation(value = "更新当前用户密码", notes = "校验当前登录后台用户旧密码后更新密码凭据")
@@ -159,15 +164,9 @@ public class CurrentUserController {
     public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) {
         User currentUser = currentUserResolver.currentUser();
 
-        try {
-            AvatarUtils.saveAvatar(
-                    UserIdCodec.toStringValue(currentUser.getId()),
-                    request.getAvatar().getInputStream());
-        } catch (IOException e) {
-            throw AdminResponseExceptions.system(e.getMessage());
-        }
+        avatarStorageSupport.saveAvatar(currentUser.getId(), request.getAvatar());
 
-        return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
+        return PersonalInterfaceAssembler.toAvatarResponse(readAvatarUrl(currentUser));
     }
 
     @ApiOperation(value = "删除当前用户头像", notes = "删除当前登录后台用户头像文件并返回头像访问信息")
@@ -184,9 +183,9 @@ public class CurrentUserController {
     public PersonalAvatarResponse deleteAvatar() {
         User currentUser = currentUserResolver.currentUser();
 
-        AvatarUtils.deleteAvatar(UserIdCodec.toStringValue(currentUser.getId()));
+        avatarStorageSupport.removeAvatar(currentUser.getId());
 
-        return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
+        return PersonalInterfaceAssembler.toAvatarResponse(null);
     }
 
     @ApiOperation(value = "当前用户菜单列表", notes = "按当前登录后台用户角色和访问等级返回可见菜单树列表")
@@ -227,6 +226,14 @@ public class CurrentUserController {
                 PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId())),
                 PrincipalIdentityType.USER_ACCOUNT));
         return identity == null ? null : identity.getIdentityValue();
+    }
+
+    private String readAvatarUrl(User user) {
+        if (user == null || !avatarStorageSupport.existsAvatar(user.getId())) {
+            return null;
+        }
+        return UserController.getAvatarUrl(
+                UserIdCodec.toStringValue(user.getId()), SandwishContextHolder.currentToken());
     }
 
     private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {

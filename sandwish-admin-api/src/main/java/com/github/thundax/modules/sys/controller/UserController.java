@@ -7,6 +7,7 @@ import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -61,12 +62,11 @@ import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
-import com.github.thundax.modules.utils.AvatarUtils;
+import com.github.thundax.modules.sys.support.AvatarStorageSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -77,8 +77,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -111,6 +109,7 @@ public class UserController {
     private final PrincipalCredentialService principalCredentialService;
     private final PreAuthSessionService preAuthSessionService;
     private final CurrentUserResolver currentUserResolver;
+    private final AvatarStorageSupport avatarStorageSupport;
 
     @Autowired
     public UserController(
@@ -120,7 +119,8 @@ public class UserController {
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
             PreAuthSessionService preAuthSessionService,
-            CurrentUserResolver currentUserResolver) {
+            CurrentUserResolver currentUserResolver,
+            AvatarStorageSupport avatarStorageSupport) {
 
         this.userService = userService;
         this.departmentService = departmentService;
@@ -129,6 +129,7 @@ public class UserController {
         this.principalCredentialService = principalCredentialService;
         this.preAuthSessionService = preAuthSessionService;
         this.currentUserResolver = currentUserResolver;
+        this.avatarStorageSupport = avatarStorageSupport;
     }
 
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
@@ -297,6 +298,7 @@ public class UserController {
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @WrappedApiResponse
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) {
+        avatarStorageSupport.saveAvatar(UserIdCodec.toDomain(Long.valueOf(id)), avatar);
         return true;
     }
 
@@ -313,6 +315,7 @@ public class UserController {
     @PostMapping(value = "avatar/delete")
     @WrappedApiResponse
     public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) {
+        avatarStorageSupport.removeAvatar(UserIdCodec.toDomain(request.getId()));
         return true;
     }
 
@@ -327,7 +330,7 @@ public class UserController {
     @HasPermission("sys:user:view")
     @PostMapping(value = "avatar")
     public String avatar(@Valid @RequestBody UserAvatarRequest request) {
-        return "";
+        return readAvatarUrl(UserIdCodec.toDomain(request.getId()));
     }
 
     @ApiOperation(value = "启用/禁用", notes = "sys:user:edit")
@@ -496,18 +499,7 @@ public class UserController {
             return;
         }
 
-        File avatarFile = AvatarUtils.getAvatarFile(userId);
-        if (!avatarFile.exists()) {
-            response.sendError(HttpStatus.NOT_FOUND.value());
-            return;
-        }
-
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-
-        IOUtils.write(FileUtils.readFileToByteArray(avatarFile), response.getOutputStream());
+        avatarStorageSupport.writeAvatar(UserIdCodec.toDomain(Long.valueOf(userId)), response);
     }
 
     private UserQuery readQuery(UserQueryRequest request) {
@@ -590,7 +582,12 @@ public class UserController {
         Department department = departmentService.get(user.getDepartmentId());
         List<Role> roleList = userService.listUserRoles(userQuery(user.getId()));
         return UserInterfaceAssembler.toResponse(
-                user, getAccountLoginName(user.getId()), department, roleList, departmentService::get);
+                user,
+                getAccountLoginName(user.getId()),
+                department,
+                roleList,
+                readAvatarUrl(user.getId()),
+                departmentService::get);
     }
 
     private UserQuery userQuery(UserId userId) {
@@ -678,5 +675,12 @@ public class UserController {
 
     public static String getAvatarUrl(String userId, String token) {
         return String.format(AVATAR_URL_FORMAT, userId, token);
+    }
+
+    private String readAvatarUrl(UserId userId) {
+        if (!avatarStorageSupport.existsAvatar(userId)) {
+            return null;
+        }
+        return getAvatarUrl(UserIdCodec.toStringValue(userId), SandwishContextHolder.currentToken());
     }
 }

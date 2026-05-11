@@ -1,20 +1,21 @@
 package com.github.thundax.common.web.util;
 
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public final class RequestIpUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestIpUtils.class);
 
     private RequestIpUtils() {}
 
     public static String getIpAddr(HttpServletRequest request) {
         String ip = "";
         try {
-            ip = request.getHeader("x-forwarded-for");
+            ip = request.getHeader("X-Real-IP");
+            if (isUnknown(ip)) {
+                ip = request.getHeader("x-forwarded-for");
+            }
             if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
                 ip = request.getHeader("Proxy-Client-IP");
             }
@@ -31,9 +32,13 @@ public final class RequestIpUtils {
                 ip = request.getRemoteAddr();
             }
         } catch (Exception e) {
-            LOGGER.error("RequestIpUtils ERROR ", e);
+            log.error("RequestIpUtils ERROR ", e);
         }
 
         return ip;
+    }
+
+    private static boolean isUnknown(String ip) {
+        return StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip);
     }
 }

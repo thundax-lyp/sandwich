@@ -29,7 +29,6 @@
   - `sandwish-common-mybatis`: jar
   - `sandwish-common-security`: jar
   - `sandwish-common-swagger`: jar
-  - `sandwish-common-log`: jar
   - `sandwish-common-mq`: jar
   - `sandwish-common-oss`: jar
   - `sandwish-biz`: jar
@@ -116,7 +115,7 @@ Sandwich 固定采用三层 API 架构。
 职责：
 
 - Common 聚合模块
-- 管理 `sandwish-common-core`、`sandwish-common-web`、`sandwish-common-test`、`sandwish-common-cache`、`sandwish-common-mybatis`、`sandwish-common-security`、`sandwish-common-swagger`、`sandwish-common-log`、`sandwish-common-mq` 和 `sandwish-common-oss`
+- 管理 `sandwish-common-core`、`sandwish-common-web`、`sandwish-common-test`、`sandwish-common-cache`、`sandwish-common-mybatis`、`sandwish-common-security`、`sandwish-common-swagger`、`sandwish-common-mq` 和 `sandwish-common-oss`
 
 边界：
 
@@ -203,23 +202,6 @@ Sandwich 固定采用三层 API 架构。
 - 适配 Spring Boot 2.0.x 与 Springfox 2.x。
 - 不承载业务 Controller、Request 或 Response。
 - 不承载具体业务 API 注解。
-- 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
-
-### `sandwish-common-log`
-
-职责：
-
-- 通用系统日志注解
-- 通用系统日志切面
-- 系统日志事件模型
-- 日志投递适配
-
-边界：
-
-- 可以依赖 `sandwish-common-core` 和 `sandwish-common-mq`。
-- 不承载具体业务日志落库实现。
-- 不承载业务日志查询、展示或管理流程。
-- 不访问业务 DAO、数据库或 Redis。
 - 不依赖 `sandwish-biz`、`sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api`。
 
 ### `sandwish-common-mq`
@@ -401,9 +383,9 @@ OSS 存储链路允许 infra 和入口装配依赖：
 
 `sandwish-infra -> sandwish-common-oss`
 
-日志与消息链路允许入口模块依赖：
+消息链路允许入口模块依赖：
 
-`sandwish-admin-api -> sandwish-common-log -> sandwish-common-mq -> sandwish-common-core`
+`sandwish-admin-api -> sandwish-common-mq -> sandwish-common-core`
 
 测试支撑链路允许测试代码依赖：
 

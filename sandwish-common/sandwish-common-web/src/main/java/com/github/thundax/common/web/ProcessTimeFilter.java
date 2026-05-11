@@ -1,5 +1,6 @@
 package com.github.thundax.common.web;
 
+import com.github.thundax.common.web.util.RequestIpUtils;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,7 +35,7 @@ public class ProcessTimeFilter implements Filter {
 
         HttpServletRequest request = (HttpServletRequest) req;
 
-        String remoteAddr = getRemoteAddr(request);
+        String remoteAddr = RequestIpUtils.getIpAddr(request);
 
         long time = System.currentTimeMillis();
         request.setAttribute(START_TIME, time);
@@ -43,33 +44,5 @@ public class ProcessTimeFilter implements Filter {
 
         time = System.currentTimeMillis() - time;
         log.debug("process {} ms[{}] from[{}]", request.getRequestURI(), time, remoteAddr);
-    }
-
-    private String getRemoteAddr(HttpServletRequest request) {
-        String remoteAddr = request.getHeader("X-Real-IP");
-        if (isNotBlank(remoteAddr)) {
-            return remoteAddr;
-        }
-
-        remoteAddr = request.getHeader("X-Forwarded-For");
-        if (isNotBlank(remoteAddr)) {
-            return remoteAddr;
-        }
-
-        remoteAddr = request.getHeader("Proxy-Client-IP");
-        if (isNotBlank(remoteAddr)) {
-            return remoteAddr;
-        }
-
-        remoteAddr = request.getHeader("WL-Proxy-Client-IP");
-        if (isNotBlank(remoteAddr)) {
-            return remoteAddr;
-        }
-
-        return request.getRemoteAddr();
-    }
-
-    private boolean isNotBlank(String text) {
-        return text != null && !text.trim().isEmpty();
     }
 }

@@ -99,11 +99,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.thundax</groupId>
-                <artifactId>sandwish-common-log</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.thundax</groupId>
                 <artifactId>sandwish-common-mq</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -111,8 +111,6 @@
   通用 JetCache 基线配置和缓存基础设施，不承载业务 key、TTL、版本和失效语义。
 - `sandwish-common-swagger`:
   通用 Swagger / Springfox 自动配置、文档属性和静态资源映射，不承载业务 API 注解和入口专用配置。
-- `sandwish-common-log`:
-  通用系统日志注解、切面、日志事件模型和日志投递适配。
 - `sandwish-common-mq`:
   通用消息模型、消息发送契约、消息配置和无消息中间件环境的 no-op sender。
 - `sandwish-common-oss`:

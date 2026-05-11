@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInt
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.mybatis.typehandler.EntityIdTypeHandler;
-import com.github.thundax.common.security.config.SandwishSecurityAutoConfiguration;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -20,8 +19,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 public class MybatisPlusConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(
-                    AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+            .withConfiguration(AutoConfigurations.of(MybatisPlusConfiguration.class))
             .withPropertyValues("spring.datasource.url=jdbc:mysql://127.0.0.1:3306/sandwish");
 
     @Test
@@ -59,8 +57,7 @@ public class MybatisPlusConfigurationTest {
     @Test
     public void shouldInferPaginationDbTypeFromDatasourceDriverWhenUrlMissing() {
         ApplicationContextRunner runner = new ApplicationContextRunner()
-                .withConfiguration(
-                        AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(MybatisPlusConfiguration.class))
                 .withPropertyValues("spring.datasource.driver-class-name=dm.jdbc.driver.DmDriver");
 
         runner.run(context -> {
@@ -75,8 +72,7 @@ public class MybatisPlusConfigurationTest {
     @Test
     public void shouldRejectUnsupportedDatasourceType() {
         ApplicationContextRunner runner = new ApplicationContextRunner()
-                .withConfiguration(
-                        AutoConfigurations.of(SandwishSecurityAutoConfiguration.class, MybatisPlusConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(MybatisPlusConfiguration.class))
                 .withPropertyValues("spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/sandwish");
 
         runner.run(context -> assertTrue(hasCause(context.getStartupFailure(), IllegalStateException.class)));

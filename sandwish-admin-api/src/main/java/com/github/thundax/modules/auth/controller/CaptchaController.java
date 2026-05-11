@@ -1,9 +1,9 @@
 package com.github.thundax.modules.auth.controller;
 
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
+import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.CaptchaInterfaceAssembler;
 import com.github.thundax.modules.auth.controller.request.CaptchaRefreshRequest;
 import com.github.thundax.modules.auth.controller.response.CaptchaRefreshResponse;
@@ -71,7 +71,7 @@ public class CaptchaController {
     public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String loginToken = request.getParameter("loginToken");
         if (StringUtils.isBlank(loginToken)) {
-            writeResponse(response, -1, "invalidate login token");
+            writeResponse(response, "AUTH-00006", "invalidate login token");
             return;
         }
 
@@ -79,18 +79,17 @@ public class CaptchaController {
             String captcha = getCaptcha(loginToken);
             writeImage(request, response, captcha);
 
-        } catch (ApiException e) {
-            writeResponse(response, -1, e.getMessage());
+        } catch (SandwishException e) {
+            writeResponse(response, e.getCode(), e.getMessage());
         }
     }
 
     @ApiOperation(value = "刷新图形验证码")
     @PostMapping(value = "refresh")
     @WrappedApiResponse
-    public CaptchaRefreshResponse refreshCaptcha(@Valid @RequestBody CaptchaRefreshRequest request)
-            throws ApiException {
+    public CaptchaRefreshResponse refreshCaptcha(@Valid @RequestBody CaptchaRefreshRequest request) {
         if (StringUtils.isBlank(request.getLoginToken())) {
-            throw new InvalidParameterException("loginToken");
+            throw AdminResponseExceptions.invalidParameter("loginToken");
         }
 
         createCaptcha(request.getLoginToken());
@@ -98,13 +97,13 @@ public class CaptchaController {
         return CaptchaInterfaceAssembler.toRefreshResponse(true);
     }
 
-    private void writeResponse(HttpServletResponse response, int code, String message) throws IOException {
+    private void writeResponse(HttpServletResponse response, String code, String message) throws IOException {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(APPLICATION_JSON_UTF8_VALUE);
-        response.getWriter().print("{\"code\":" + code + ",\"message\":\"" + message + "\"}");
+        response.getWriter().print("{\"code\":\"" + code + "\",\"message\":\"" + message + "\"}");
     }
 
-    private String createCaptcha(String loginToken) throws ApiException {
+    private String createCaptcha(String loginToken) {
         String captcha = PreAuthCodeHelper.generateCaptcha();
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 requireSessionIdByToken(loginToken),
@@ -114,7 +113,7 @@ public class CaptchaController {
         return captcha;
     }
 
-    private String getCaptcha(String loginToken) throws ApiException {
+    private String getCaptcha(String loginToken) {
         String captcha = preAuthSessionService.getValue(
                 new PreAuthSessionQuery(requireSessionIdByToken(loginToken), null, null, CAPTCHA_ITEM));
         if (StringUtils.isEmpty(captcha)) {
@@ -123,11 +122,11 @@ public class CaptchaController {
         return captcha;
     }
 
-    private PreAuthSessionId requireSessionIdByToken(String token) throws ApiException {
+    private PreAuthSessionId requireSessionIdByToken(String token) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
                 new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
-            throw new InvalidParameterException("loginToken");
+            throw AdminResponseExceptions.invalidParameter("loginToken");
         }
         return sessionId;
     }

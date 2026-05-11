@@ -7,7 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.common.exception.MoveTreeNodeException;
+import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.sys.controller.request.DepartmentIdRequest;
 import com.github.thundax.modules.sys.controller.request.DepartmentMoveRequest;
 import com.github.thundax.modules.sys.controller.response.DepartmentResponse;
@@ -53,7 +53,7 @@ public class DepartmentControllerContractTest {
         verify(departmentService).move(any(MoveDepartmentCommand.class));
     }
 
-    @Test(expected = MoveTreeNodeException.class)
+    @Test(expected = SandwishException.class)
     public void shouldRejectMovingNodeIntoItsDescendant() throws Exception {
         DepartmentService departmentService = mock(DepartmentService.class);
         DepartmentController controller = new DepartmentController(departmentService);

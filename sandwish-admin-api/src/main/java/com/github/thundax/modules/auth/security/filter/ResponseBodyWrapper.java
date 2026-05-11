@@ -15,11 +15,11 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseBodyWrapper {
 
-    private int code;
+    private String code;
     private String message;
     private Object data;
 
-    public ResponseBodyWrapper(int code, String message) {
+    public ResponseBodyWrapper(String code, String message) {
         this.code = code;
         this.message = message;
     }

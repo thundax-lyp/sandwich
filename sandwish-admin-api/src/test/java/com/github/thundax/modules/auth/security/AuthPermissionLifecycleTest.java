@@ -3,12 +3,12 @@ package com.github.thundax.modules.auth.security;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
+import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
@@ -299,7 +299,7 @@ public class AuthPermissionLifecycleTest {
             authService.authorizeOAuth2(oauthCommand(
                     "admin-web", "http://127.0.0.1/callback", Collections.singletonList("admin.write"), "state-1"));
             Assert.fail("invalid scope must be rejected");
-        } catch (ApiException expected) {
+        } catch (SandwishException expected) {
             Assert.assertNotNull(expected);
         }
     }
@@ -808,7 +808,7 @@ public class AuthPermissionLifecycleTest {
         public void changeInfo(ChangeUserInfoCommand command) {}
 
         @Override
-        public void sort(com.github.thundax.modules.sys.service.command.UserSortCommand command) throws ApiException {}
+        public void sort(com.github.thundax.modules.sys.service.command.UserSortCommand command) {}
 
         public int remove(DeleteUserCommand command) {
             return 1;

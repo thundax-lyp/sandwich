@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.controller;
 
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.modules.auth.utils.UserAccessHolder;
@@ -76,18 +75,18 @@ public class MultipartUploadController {
     })
     @PostMapping(value = "{uploadId}/parts")
     @WrappedApiResponse
-    public MultipartUploadPartResponse uploadPart(@PathVariable("uploadId") String uploadId, HttpServletRequest request)
-            throws ApiException {
+    public MultipartUploadPartResponse uploadPart(
+            @PathVariable("uploadId") String uploadId, HttpServletRequest request) {
         if (!(request instanceof MultipartHttpServletRequest)) {
-            throw new InvalidParameterException("file");
+            throw AdminResponseExceptions.invalidParameter("file");
         }
 
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         MultipartFile file = multipartRequest.getFileMap().values().stream()
                 .findFirst()
-                .orElseThrow(() -> new InvalidParameterException("file"));
+                .orElseThrow(() -> AdminResponseExceptions.invalidParameter("file"));
         if (file.isEmpty()) {
-            throw new InvalidParameterException("file");
+            throw AdminResponseExceptions.invalidParameter("file");
         }
 
         Integer partNumber = readPartNumber(request);
@@ -123,15 +122,15 @@ public class MultipartUploadController {
         return multipartUploadService.abort(new AbortMultipartUploadCommand(uploadId)) > 0;
     }
 
-    private Integer readPartNumber(HttpServletRequest request) throws ApiException {
+    private Integer readPartNumber(HttpServletRequest request) {
         String partNumber = request.getParameter("partNumber");
         if (StringUtils.isBlank(partNumber)) {
-            throw new InvalidParameterException("partNumber");
+            throw AdminResponseExceptions.invalidParameter("partNumber");
         }
         try {
             return Integer.valueOf(partNumber);
         } catch (NumberFormatException e) {
-            throw new InvalidParameterException("partNumber");
+            throw AdminResponseExceptions.invalidParameter("partNumber");
         }
     }
 

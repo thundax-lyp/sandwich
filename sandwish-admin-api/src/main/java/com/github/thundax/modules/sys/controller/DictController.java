@@ -1,9 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -61,7 +59,7 @@ public class DictController {
     })
     @SysLogger("读取")
     @PostMapping(value = "get")
-    public DictResponse get(@Valid @RequestBody DictIdRequest request) throws ApiException {
+    public DictResponse get(@Valid @RequestBody DictIdRequest request) {
         return DictInterfaceAssembler.toResponse(dictService.get(DictInterfaceAssembler.toId(request)));
     }
 
@@ -76,7 +74,7 @@ public class DictController {
     })
     @SysLogger("列表")
     @PostMapping(value = "list")
-    public List<DictResponse> list(@Valid @RequestBody DictQueryRequest request) throws ApiException {
+    public List<DictResponse> list(@Valid @RequestBody DictQueryRequest request) {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         return dictService.list(query).stream()
                 .map(dict -> DictInterfaceAssembler.toResponse(dict))
@@ -94,7 +92,7 @@ public class DictController {
     })
     @SysLogger("分页")
     @PostMapping(value = "page")
-    public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) throws ApiException {
+    public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
         PageQuery page = readDictPage(request);
         return PageResponseHelper.fromPageResult(dictService.page(query, page), DictInterfaceAssembler::toResponse);
@@ -111,7 +109,7 @@ public class DictController {
     })
     @SysLogger("添加")
     @PostMapping(value = "create")
-    public DictResponse add(@Valid @RequestBody DictSaveRequest request) throws ApiException {
+    public DictResponse add(@Valid @RequestBody DictSaveRequest request) {
         DictId id = dictService.create(DictInterfaceAssembler.toCreateCommand(request));
         return DictInterfaceAssembler.toResponse(dictService.get(id));
     }
@@ -127,11 +125,11 @@ public class DictController {
     })
     @SysLogger("更新")
     @PostMapping(value = "update")
-    public DictResponse update(@Valid @RequestBody DictSaveRequest request) throws ApiException {
+    public DictResponse update(@Valid @RequestBody DictSaveRequest request) {
         DictId id = DictIdCodec.toDomain(request.getId());
         Dict dict = dictService.get(id);
         if (dict == null) {
-            throw new ApiException("id not exist");
+            throw AdminResponseExceptions.objectNotFound();
         }
         dictService.changeInfo(DictInterfaceAssembler.toChangeInfoCommand(request));
         return DictInterfaceAssembler.toResponse(dictService.get(id));
@@ -148,17 +146,17 @@ public class DictController {
     })
     @SysLogger("删除")
     @PostMapping(value = "delete")
-    public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) {
         List<DeleteDictCommand> commandList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {
             Dict bean = dictService.get(DictInterfaceAssembler.toId(request));
             if (bean == null) {
-                throw new NullBeanException("Dict", DictInterfaceAssembler.toId(request));
+                throw AdminResponseExceptions.objectNotFound();
             }
             commandList.add(DictInterfaceAssembler.toDeleteCommand(request));
         }
         if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
         for (DeleteDictCommand command : commandList) {
             dictService.remove(command);
@@ -176,7 +174,7 @@ public class DictController {
                 dataTypeClass = String.class),
     })
     @PostMapping(value = "sort")
-    public Boolean sort(@Valid @RequestBody DictSortRequest request) throws ApiException {
+    public Boolean sort(@Valid @RequestBody DictSortRequest request) {
         dictService.sort(new DictSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), DictIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));

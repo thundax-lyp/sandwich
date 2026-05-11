@@ -1,10 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InsertBeanExistException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
@@ -106,10 +103,10 @@ public class RoleController {
     @HasPermission("sys:role:view")
     @SysLogger("读取")
     @PostMapping(value = "get")
-    public RoleResponse get(@Valid @RequestBody RoleIdRequest request) throws ApiException {
+    public RoleResponse get(@Valid @RequestBody RoleIdRequest request) {
         Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
         return toResponse(bean);
     }
@@ -125,7 +122,7 @@ public class RoleController {
     @HasPermission("sys:role:view")
     @SysLogger("列表")
     @PostMapping(value = "list")
-    public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) throws ApiException {
+    public List<RoleResponse> list(@Valid @RequestBody RoleQueryRequest request) {
         RoleQuery query = RoleInterfaceAssembler.toQuery(request);
 
         return roleService.list(query).stream().map(role -> toResponse(role)).collect(Collectors.toList());
@@ -142,13 +139,13 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("添加")
     @PostMapping(value = "create")
-    public RoleResponse add(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
+    public RoleResponse add(@Valid @RequestBody RoleSaveRequest request) {
         validateMenus(request.getMenuList());
 
         if (request.getId() != null) {
             Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
             if (bean != null) {
-                throw new InsertBeanExistException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectExists();
             }
         }
 
@@ -169,12 +166,12 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("更新")
     @PostMapping(value = "update")
-    public RoleResponse update(@Valid @RequestBody RoleSaveRequest request) throws ApiException {
+    public RoleResponse update(@Valid @RequestBody RoleSaveRequest request) {
         validateMenus(request.getMenuList());
 
         Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
 
         Role entity = RoleInterfaceAssembler.toEntity(bean, request);
@@ -195,18 +192,18 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("启用")
     @PostMapping(value = "enable")
-    public Boolean updateStatus(@Valid @RequestBody List<RoleStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@Valid @RequestBody List<RoleStatusRequest> list) {
         List<ChangeRoleStatusCommand> commandList = new ArrayList<>();
         for (RoleStatusRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
             commandList.add(new ChangeRoleStatusCommand(
                     bean.getId(), Boolean.TRUE.equals(request.getEnable()) ? RoleStatus.ENABLED : RoleStatus.DISABLED));
         }
         if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
 
         commandList.forEach(roleService::changeStatus);
@@ -225,7 +222,7 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("排序")
     @PostMapping(value = "sort")
-    public Boolean updatePriority(@Valid @RequestBody RoleSortRequest request) throws ApiException {
+    public Boolean updatePriority(@Valid @RequestBody RoleSortRequest request) {
         roleService.sort(new RoleSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), RoleIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
@@ -243,17 +240,17 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("删除")
     @PostMapping(value = "delete")
-    public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) {
         List<DeleteRoleCommand> commandList = new ArrayList<>();
         for (RoleIdRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
             commandList.add(new DeleteRoleCommand(bean.getId()));
         }
         if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
 
         commandList.forEach(roleService::remove);
@@ -317,10 +314,10 @@ public class RoleController {
     })
     @HasPermission({"sys:role:view", "sys:role:edit"})
     @PostMapping(value = "user/list")
-    public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) throws ApiException {
+    public List<RoleUserResponse> userList(@Valid @RequestBody RoleIdRequest request) {
         Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
 
         return roleService.listRoleUsers(roleQuery(request.getId())).stream()
@@ -339,7 +336,7 @@ public class RoleController {
     @HasPermission("sys:role:edit")
     @SysLogger("授权")
     @PostMapping(value = "user/assign")
-    public Boolean assignUser(@Valid @RequestBody RoleAssignUserRequest request) throws ApiException {
+    public Boolean assignUser(@Valid @RequestBody RoleAssignUserRequest request) {
         validateAssignUser(request);
 
         roleService.assignUsers(new AssignRoleUsersCommand(
@@ -377,20 +374,20 @@ public class RoleController {
         return query;
     }
 
-    private void validateAssignUser(RoleAssignUserRequest request) throws ApiException {
+    private void validateAssignUser(RoleAssignUserRequest request) {
         Role roleBean = roleService.get(RoleIdCodec.toDomain(request.getRoleId()));
         if (roleBean == null) {
-            throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getRoleId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
 
         if (request.getUsers() == null || request.getUsers().isEmpty()) {
-            throw new InvalidParameterException("users");
+            throw AdminResponseExceptions.invalidParameter("users");
         }
 
         for (RoleUserRequest userRequest : request.getUsers()) {
             User userBean = userService.get(UserIdCodec.toDomain(userRequest.getId()));
             if (userBean == null) {
-                throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(userRequest.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
         }
     }
@@ -415,18 +412,18 @@ public class RoleController {
         return query;
     }
 
-    private void validateMenus(List<RoleMenuRequest> requestList) throws ApiException {
+    private void validateMenus(List<RoleMenuRequest> requestList) {
         if (requestList == null || requestList.isEmpty()) {
             return;
         }
         for (RoleMenuRequest request : requestList) {
             if (request == null || request.getId() == null) {
-                throw new InvalidParameterException("menus.id");
+                throw AdminResponseExceptions.invalidParameter("menus.id");
 
             } else {
                 Menu bean = menuService.get(MenuIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(MENU_NAME, MenuIdCodec.toDomain(request.getId()));
+                    throw AdminResponseExceptions.objectNotFound();
                 }
             }
         }

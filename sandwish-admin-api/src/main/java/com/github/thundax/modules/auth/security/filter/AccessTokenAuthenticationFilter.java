@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.security.filter;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
 import com.github.thundax.common.utils.JsonUtils;
+import com.github.thundax.common.web.exception.WebErrorCode;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
@@ -154,7 +155,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void writeError(HttpServletResponse response) throws IOException {
-        String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(HttpStatus.UNAUTHORIZED.value(), "未授权用户"));
+        String jsonString = JsonUtils.toJson(new ResponseBodyWrapper(WebErrorCode.UNAUTHORIZED.getCode(), "未授权用户"));
 
         response.setStatus(HttpStatus.OK.value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

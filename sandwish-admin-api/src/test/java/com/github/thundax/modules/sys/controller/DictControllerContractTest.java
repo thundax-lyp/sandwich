@@ -11,11 +11,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.thundax.common.domain.SortDirection;
-import com.github.thundax.common.exception.InvalidParameterException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
+import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.modules.sys.controller.request.DictIdRequest;
@@ -111,7 +111,7 @@ public class DictControllerContractTest {
                         .collect(Collectors.toList()));
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test(expected = SandwishException.class)
     public void shouldRejectEmptyDeleteList() throws Exception {
         DictController controller = new DictController(mock(DictService.class));
 

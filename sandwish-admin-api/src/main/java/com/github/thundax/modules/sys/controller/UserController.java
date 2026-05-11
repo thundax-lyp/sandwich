@@ -1,12 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InsertBeanExistException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.InvalidTokenException;
-import com.github.thundax.common.exception.NullBeanException;
-import com.github.thundax.common.exception.PermissionDeniedException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
@@ -143,10 +138,10 @@ public class UserController {
     @SysLogger("读取")
     @PostMapping(value = "get")
     @WrappedApiResponse
-    public UserResponse get(@Valid @RequestBody UserIdRequest request) throws ApiException {
+    public UserResponse get(@Valid @RequestBody UserIdRequest request) {
         User bean = userService.get(UserIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
         return toResponse(bean);
     }
@@ -163,7 +158,7 @@ public class UserController {
     @SysLogger("列表")
     @PostMapping(value = "list")
     @WrappedApiResponse
-    public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) throws ApiException {
+    public List<UserResponse> list(@Valid @RequestBody UserQueryRequest request) {
         UserQuery query = readQuery(request);
 
         return userService.list(query).stream().map(user -> toResponse(user)).collect(Collectors.toList());
@@ -180,7 +175,7 @@ public class UserController {
     @HasPermission("sys:user:view")
     @SysLogger("分页")
     @PostMapping(value = "page")
-    public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) throws ApiException {
+    public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) {
         UserQuery query = readQuery(request);
         PageQuery page = readUserPage(request);
 
@@ -199,7 +194,7 @@ public class UserController {
     @SysLogger("添加")
     @PostMapping(value = "create")
     @WrappedApiResponse
-    public UserResponse add(@Valid @RequestBody UserSaveRequest request) throws ApiException {
+    public UserResponse add(@Valid @RequestBody UserSaveRequest request) {
         // 解密密码（数据需要加密传输）
         String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
         request.setLoginPass(password);
@@ -207,11 +202,11 @@ public class UserController {
         validateRoles(request.getRoleList());
 
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
-            throw new InvalidParameterException("loginName");
+            throw AdminResponseExceptions.invalidParameter("loginName");
         }
 
         if (StringUtils.isBlank(request.getLoginPass())) {
-            throw new InvalidParameterException("password");
+            throw AdminResponseExceptions.invalidParameter("password");
         }
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
@@ -220,7 +215,7 @@ public class UserController {
         if (entity.getId() != null) {
             User bean = userService.get(entity.getId());
             if (bean != null) {
-                throw new InsertBeanExistException(USER_NAME, entity.getId());
+                throw AdminResponseExceptions.objectExists();
             }
         }
 
@@ -241,7 +236,7 @@ public class UserController {
     @SysLogger("更新")
     @PostMapping(value = "update")
     @WrappedApiResponse
-    public UserResponse update(@Valid @RequestBody UserSaveRequest request) throws ApiException {
+    public UserResponse update(@Valid @RequestBody UserSaveRequest request) {
         // 解密密码（数据需要加密传输）
         if (StringUtils.isNotBlank(request.getLoginPass())) {
             String password = Sm2Helper.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
@@ -252,23 +247,23 @@ public class UserController {
         validateRoles(request.getRoleList());
 
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
-            throw new InvalidParameterException("loginName");
+            throw AdminResponseExceptions.invalidParameter("loginName");
         }
 
         User bean = userService.get(UserIdCodec.toDomain(request.getId()));
         if (bean == null) {
-            throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
+            throw AdminResponseExceptions.objectNotFound();
         }
         User currentUser = UserAccessHolder.currentUser();
         // 非超管用户无权限开启/关闭管理员
         if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
-            throw new PermissionDeniedException();
+            throw AdminResponseExceptions.permissionDenied();
         }
         // 无权限修改超管/等级高于自身的用户信息
         if (!currentUser.isSuper()) {
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw new PermissionDeniedException();
+                throw AdminResponseExceptions.permissionDenied();
             }
         }
 
@@ -296,7 +291,7 @@ public class UserController {
     @SysLogger("上传头像")
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @WrappedApiResponse
-    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) throws ApiException {
+    public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) {
         return true;
     }
 
@@ -312,7 +307,7 @@ public class UserController {
     @SysLogger("删除头像")
     @PostMapping(value = "avatar/delete")
     @WrappedApiResponse
-    public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
+    public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) {
         return true;
     }
 
@@ -326,7 +321,7 @@ public class UserController {
     })
     @HasPermission("sys:user:view")
     @PostMapping(value = "avatar")
-    public String avatar(@Valid @RequestBody UserAvatarRequest request) throws ApiException {
+    public String avatar(@Valid @RequestBody UserAvatarRequest request) {
         return "";
     }
 
@@ -342,24 +337,24 @@ public class UserController {
     @SysLogger("启用")
     @PostMapping(value = "enable")
     @WrappedApiResponse
-    public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) throws ApiException {
+    public Boolean updateStatus(@Valid @RequestBody List<UserStatusRequest> list) {
         User currentUser = UserAccessHolder.currentUser();
 
         List<ChangeUserStatusCommand> commandList = new ArrayList<>();
         for (UserStatusRequest request : RequestListHelper.present(list)) {
             User bean = userService.get(UserIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw new PermissionDeniedException();
+                throw AdminResponseExceptions.permissionDenied();
             }
             commandList.add(new ChangeUserStatusCommand(
                     bean.getId(), Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
         }
         if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
 
         commandList.forEach(userService::changeStatus);
@@ -379,7 +374,7 @@ public class UserController {
     @SysLogger("排序")
     @PostMapping(value = "sort")
     @WrappedApiResponse
-    public Boolean sort(@Valid @RequestBody UserSortRequest request) throws ApiException {
+    public Boolean sort(@Valid @RequestBody UserSortRequest request) {
         userService.sort(new UserSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), UserIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
@@ -398,23 +393,23 @@ public class UserController {
     @SysLogger("删除")
     @PostMapping(value = "delete")
     @WrappedApiResponse
-    public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) {
         User currentUser = UserAccessHolder.currentUser();
 
         List<DeleteUserCommand> commandList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
             User bean = userService.get(UserIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(USER_NAME, UserIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
             if (bean.isSuper()
                     || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw new PermissionDeniedException();
+                throw AdminResponseExceptions.permissionDenied();
             }
             commandList.add(new DeleteUserCommand(bean.getId()));
         }
         if (commandList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
 
         commandList.forEach(userService::remove);
@@ -497,13 +492,13 @@ public class UserController {
         IOUtils.write(FileUtils.readFileToByteArray(avatarFile), response.getOutputStream());
     }
 
-    private UserQuery readQuery(UserQueryRequest request) throws ApiException {
+    private UserQuery readQuery(UserQueryRequest request) {
         UserQuery query = UserInterfaceAssembler.toQuery(request);
 
         if (request.getDepartmentId() != null) {
             Department department = departmentService.get(DepartmentIdCodec.toDomain(request.getDepartmentId()));
             if (department == null) {
-                throw new NullBeanException(DEPARTMENT_NAME, DepartmentIdCodec.toDomain(request.getDepartmentId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
 
             query.setDepartmentId(department.getId());
@@ -512,30 +507,30 @@ public class UserController {
         return query;
     }
 
-    private void validateDepartment(UserDepartmentRequest request) throws ApiException {
+    private void validateDepartment(UserDepartmentRequest request) {
         if (request == null || request.getId() == null) {
-            throw new InvalidParameterException("department.id");
+            throw AdminResponseExceptions.invalidParameter("department.id");
 
         } else {
             Department bean = departmentService.get(DepartmentIdCodec.toDomain(request.getId()));
             if (bean == null) {
-                throw new NullBeanException(DEPARTMENT_NAME, DepartmentIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
         }
     }
 
-    private void validateRoles(List<UserRoleRequest> requestList) throws ApiException {
+    private void validateRoles(List<UserRoleRequest> requestList) {
         if (requestList == null || requestList.isEmpty()) {
             return;
         }
         for (UserRoleRequest request : requestList) {
             if (request == null || request.getId() == null) {
-                throw new InvalidParameterException("roles.id");
+                throw AdminResponseExceptions.invalidParameter("roles.id");
 
             } else {
                 Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
                 if (bean == null) {
-                    throw new NullBeanException(ROLE_NAME, RoleIdCodec.toDomain(request.getId()));
+                    throw AdminResponseExceptions.objectNotFound();
                 }
             }
         }
@@ -649,16 +644,16 @@ public class UserController {
         return query;
     }
 
-    private String getPrivateKey(String token) throws InvalidTokenException {
+    private String getPrivateKey(String token) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
                 new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         String privateKey =
                 preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         return privateKey;
     }

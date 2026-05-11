@@ -1,7 +1,6 @@
 package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
@@ -29,32 +28,33 @@ public interface AdminAuthService {
 
     AuthTokenQueryResult getTokenInfo(AdminAuthQuery query);
 
-    AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command) throws ApiException;
+    AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command);
 
-    OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) throws ApiException;
+    OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command);
 
-    OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command) throws ApiException;
+    OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command);
 
-    AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command) throws ApiException;
+    AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command);
 
-    boolean revokeAuthorizationCode(AdminAuthCommand command) throws ApiException;
+    @LayerPublicApi(reason = "OAuth2 授权码吊销的后台认证业务入口")
+    boolean revokeAuthorizationCode(AdminAuthCommand command);
 
-    boolean revokeOAuth2Token(AdminAuthCommand command) throws ApiException;
+    boolean revokeOAuth2Token(AdminAuthCommand command);
 
     void invalidateSessionByToken(AdminAuthCommand command);
 
     @LayerPublicApi(reason = "账号状态变化时按用户维度失效在线会话的业务入口")
     int invalidateSessionsByUserId(AdminAuthCommand command);
 
-    User authenticatePassword(AdminAuthCommand command) throws ApiException;
+    User authenticatePassword(AdminAuthCommand command);
 
-    User authenticateSms(AdminAuthCommand command) throws ApiException;
+    User authenticateSms(AdminAuthCommand command);
 
-    User authenticateWecom(AdminAuthCommand command) throws ApiException;
+    User authenticateWecom(AdminAuthCommand command);
 
-    User authenticateGithub(AdminAuthCommand command) throws ApiException;
+    User authenticateGithub(AdminAuthCommand command);
 
     void recordLoginFailed(AdminAuthCommand command);
 
-    void validatePassword(AdminAuthCommand command) throws ApiException;
+    void validatePassword(AdminAuthCommand command);
 }

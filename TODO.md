@@ -12,24 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `admin-api-exception-migration`：迁移后台 API 异常响应
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/AuthController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/controller/CaptchaController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/AdminAuthService.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/service/impl/AdminAuthServiceImpl.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/auth/security/filter/ResponseBodyWrapper.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/UserController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/RoleController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/MenuController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DictController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/sys/controller/DepartmentController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/MultipartUploadController.java`
-  - 处理动作：删除后台 Controller 和后台认证 Service 中的 checked `ApiException`，统一通过 translator/SandwishException 输出 String code。
-  - 验收点：后台 API contract tests 覆盖 String code，后台生产代码无 `ApiException` 使用点。
-  - 重要度：10/10
-
 - [ ] `front-api-exception-migration`：迁移前台 API 异常响应
   - 范围文件：
     - `sandwish-front-api/src/main/java/com/github/thundax/common/web/ReturnObject.java`

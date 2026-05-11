@@ -95,7 +95,7 @@ public class MultipartUploadControllerContractTest {
         assertEquals(Long.valueOf(3L), captor.getValue().getSize());
     }
 
-    @Test(expected = com.github.thundax.common.exception.InvalidParameterException.class)
+    @Test(expected = com.github.thundax.common.web.exception.SandwishException.class)
     public void shouldRejectNonMultipartPartUpload() throws Exception {
         MultipartUploadController controller =
                 controller(mock(MultipartUploadService.class), mock(StoredObjectStore.class));

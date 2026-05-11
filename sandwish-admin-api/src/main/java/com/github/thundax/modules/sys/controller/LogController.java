@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -67,7 +66,7 @@ public class LogController {
                 dataTypeClass = String.class),
     })
     @PostMapping(value = "page")
-    public PageResponse<LogResponse> page(@Valid @RequestBody LogPageRequest request) throws ApiException {
+    public PageResponse<LogResponse> page(@Valid @RequestBody LogPageRequest request) {
         LogQuery query = LogInterfaceAssembler.toQuery(request);
 
         return PageResponseHelper.fromPageResult(logService.page(query, readLogPage(request)), this::toResponse);

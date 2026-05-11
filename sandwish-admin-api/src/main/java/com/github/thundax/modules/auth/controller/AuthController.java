@@ -1,11 +1,10 @@
 package com.github.thundax.modules.auth.controller;
 
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
@@ -96,17 +95,16 @@ public class AuthController {
     @ApiOperation(value = "请求预认证会话")
     @PostMapping(value = "pre-auth-session")
     @SysLogger("请求预认证会话")
-    public AuthLoginFormResponse preAuthSession() throws ApiException {
+    public AuthLoginFormResponse preAuthSession() {
         return AuthInterfaceAssembler.toLoginFormResponse(createPreAuthSession());
     }
 
     @ApiOperation(value = "刷新预认证会话")
     @PostMapping(value = "pre-auth-session/refresh")
     @SysLogger("刷新预认证会话")
-    public AuthLoginFormResponse refreshPreAuthSession(@Valid @RequestBody AuthLoginFormRefreshRequest request)
-            throws ApiException {
+    public AuthLoginFormResponse refreshPreAuthSession(@Valid @RequestBody AuthLoginFormRefreshRequest request) {
         if (StringUtils.isBlank(request.getRefreshToken())) {
-            throw new InvalidParameterException("refreshToken");
+            throw AdminResponseExceptions.invalidParameter("refreshToken");
         }
 
         return AuthInterfaceAssembler.toLoginFormResponse(refreshPreAuthSession(request.getRefreshToken()));
@@ -115,7 +113,7 @@ public class AuthController {
     @ApiOperation(value = "用户/密码登录")
     @PostMapping(value = "login")
     @SysLogger("用户/密码登录")
-    public AuthAccessTokenResponse login(@Valid @RequestBody AuthLoginRequest request) throws ApiException {
+    public AuthAccessTokenResponse login(@Valid @RequestBody AuthLoginRequest request) {
         HttpServletRequest currentRequest =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         if (!validateCaptcha(request.getLoginToken(), request.getCaptcha())) {
@@ -137,7 +135,7 @@ public class AuthController {
         User user;
         try {
             user = authService.authenticatePassword(passwordCommand(request.getUsername(), password, currentRequest));
-        } catch (ApiException e) {
+        } catch (SandwishException e) {
             if (e.getMessage() != null && e.getMessage().contains("锁定")) {
                 writeLog(currentRequest, "用户锁定", request);
             } else if (e.getMessage() != null && e.getMessage().contains("密码输入错误")) {
@@ -164,7 +162,7 @@ public class AuthController {
 
     @ApiOperation(value = "短信登录")
     @PostMapping(value = "login/sms")
-    public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) throws ApiException {
+    public AuthAccessTokenResponse loginBySms(@Valid @RequestBody SmsLoginRequest request) {
         HttpServletRequest currentRequest = currentRequest();
         if (!validateSmsValidateCode(request.getLoginToken(), request.getMobile(), request.getValidateCode())) {
             authService.recordLoginFailed(loginFailedCommand(
@@ -186,7 +184,7 @@ public class AuthController {
 
     @ApiOperation(value = "企业微信登录")
     @PostMapping(value = "login/wecom")
-    public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) throws ApiException {
+    public AuthAccessTokenResponse loginByWecom(@Valid @RequestBody WecomLoginRequest request) {
         HttpServletRequest currentRequest = currentRequest();
         User user = authService.authenticateWecom(codeCommand(request.getCode(), currentRequest));
         return loginSuccess(
@@ -195,7 +193,7 @@ public class AuthController {
 
     @ApiOperation(value = "GitHub 登录")
     @PostMapping(value = "login/github")
-    public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) throws ApiException {
+    public AuthAccessTokenResponse loginByGithub(@Valid @RequestBody GithubLoginRequest request) {
         HttpServletRequest currentRequest = currentRequest();
         User user = authService.authenticateGithub(codeCommand(request.getCode(), currentRequest));
         return loginSuccess(
@@ -205,14 +203,14 @@ public class AuthController {
     @ApiOperation(value = "登出")
     @PostMapping(value = "logout")
     @SysLogger("登出")
-    public Boolean logout(@Valid @RequestBody AuthLogoutRequest request) throws ApiException {
+    public Boolean logout(@Valid @RequestBody AuthLogoutRequest request) {
         if (StringUtils.isEmpty(request.getToken())) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
 
         AuthAccessTokenResult accessToken = authService.getAccessToken(tokenQuery(request.getToken()));
         if (accessToken == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
 
         HttpServletRequest currentRequest = currentRequest();
@@ -241,42 +239,40 @@ public class AuthController {
 
     @ApiOperation(value = "刷新 token")
     @PostMapping(value = "token/refresh")
-    public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) throws ApiException {
+    public AuthAccessTokenResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.refreshAccessToken(
                 refreshTokenCommand(request.getClientId(), request.getRefreshToken(), currentRequest())));
     }
 
     @ApiOperation(value = "OAuth2 授权视图")
     @PostMapping(value = "oauth2/authorize")
-    public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request)
-            throws ApiException {
+    public OAuth2AuthorizationViewResponse authorize(@Valid @RequestBody OAuth2AuthorizeRequest request) {
         return AuthInterfaceAssembler.toAuthorizationViewResponse(authService.authorizeOAuth2(oauthCommand(
                 request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState())));
     }
 
     @ApiOperation(value = "OAuth2 授权决策")
     @PostMapping(value = "oauth2/decision")
-    public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request)
-            throws ApiException {
+    public OAuth2AuthorizationDecisionResponse decision(@Valid @RequestBody OAuth2DecisionRequest request) {
         return AuthInterfaceAssembler.toAuthorizationDecisionResponse(
                 authService.decideOAuth2(decisionCommand(request)));
     }
 
     @ApiOperation(value = "OAuth2 授权码换 token")
     @PostMapping(value = "oauth2/token")
-    public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
+    public AuthAccessTokenResponse token(@Valid @RequestBody OAuth2TokenRequest request) {
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.exchangeOAuth2Token(exchangeCommand(request)));
     }
 
     @ApiOperation(value = "OAuth2 撤销令牌")
     @PostMapping(value = "oauth2/revoke")
-    public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) throws ApiException {
+    public Boolean revoke(@Valid @RequestBody OAuth2TokenRequest request) {
         return authService.revokeOAuth2Token(revokeTokenCommand(request));
     }
 
-    private PreAuthSession createPreAuthSession() throws ApiException {
+    private PreAuthSession createPreAuthSession() {
         if (preAuthSessionService.count(new PreAuthSessionQuery()) > properties.getMaxLoginCount()) {
-            throw new ApiException("登录请求过多");
+            throw AdminResponseExceptions.loginRequestTooMany();
         }
         PreAuthSession session =
                 preAuthSessionService.create(new CreatePreAuthSessionCommand(properties.getLoginExpiredSeconds()));
@@ -291,7 +287,7 @@ public class AuthController {
         return preAuthSessionService.get(new PreAuthSessionQuery(session.getId(), null, null, null));
     }
 
-    private PreAuthSession refreshPreAuthSession(String refreshToken) throws ApiException {
+    private PreAuthSession refreshPreAuthSession(String refreshToken) {
         PreAuthSession session = preAuthSessionService.refresh(new RefreshPreAuthSessionCommand(
                 requireSessionIdByRefreshToken(refreshToken),
                 properties.getLoginExpiredSeconds(),
@@ -308,13 +304,13 @@ public class AuthController {
         }
     }
 
-    private String createCaptcha(String loginToken) throws InvalidTokenException {
+    private String createCaptcha(String loginToken) {
         String captcha = PreAuthCodeHelper.generateCaptcha();
         writeCaptcha(requireSessionIdByToken(loginToken), captcha);
         return captcha;
     }
 
-    private boolean validateCaptcha(String loginToken, String captcha) throws ApiException {
+    private boolean validateCaptcha(String loginToken, String captcha) {
         if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
                 && StringUtils.equals(properties.getWhiteCaptcha(), captcha)) {
             return true;
@@ -322,7 +318,7 @@ public class AuthController {
         return StringUtils.equals(captcha, getCaptcha(loginToken));
     }
 
-    private String getCaptcha(String loginToken) throws ApiException {
+    private String getCaptcha(String loginToken) {
         String captcha = preAuthSessionService.getValue(
                 new PreAuthSessionQuery(requireSessionIdByToken(loginToken), null, null, CAPTCHA_ITEM));
         if (StringUtils.isEmpty(captcha)) {
@@ -331,7 +327,7 @@ public class AuthController {
         return captcha;
     }
 
-    private boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode) throws ApiException {
+    private boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode) {
         if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
                 && StringUtils.equals(properties.getWhiteCaptcha(), validateCode)) {
             return true;
@@ -347,34 +343,34 @@ public class AuthController {
         return StringUtils.equals(savedMobile, mobile) && StringUtils.equals(savedValidateCode, validateCode);
     }
 
-    private String getPrivateKey(String loginToken) throws InvalidTokenException {
+    private String getPrivateKey(String loginToken) {
         String privateKey = preAuthSessionService.getValue(
                 new PreAuthSessionQuery(requireSessionIdByToken(loginToken), null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         return privateKey;
     }
 
-    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) throws InvalidTokenException {
+    private void writeCaptcha(PreAuthSessionId sessionId, String captcha) {
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
     }
 
-    private PreAuthSessionId requireSessionIdByToken(String token) throws InvalidTokenException {
+    private PreAuthSessionId requireSessionIdByToken(String token) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
                 new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         return sessionId;
     }
 
-    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) throws InvalidTokenException {
+    private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByRefreshToken(
                 new PreAuthSessionQuery(null, null, PreAuthSessionToken.of(refreshToken), null));
         if (sessionId == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         return sessionId;
     }

@@ -1,8 +1,7 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.permission.PermissionAuthorities;
 import com.github.thundax.common.utils.encrypt.Sm2Helper;
@@ -83,10 +82,10 @@ public class CurrentUserController {
                 dataTypeClass = String.class),
     })
     @PostMapping(value = "info")
-    public PersonalInfoResponse info() throws ApiException {
+    public PersonalInfoResponse info() {
         User currentUser = UserAccessHolder.currentUser();
         if (currentUser.getId() == null || !currentUser.isEnable()) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
 
         return PersonalInterfaceAssembler.toInfoResponse(currentUser, getAccountLoginName(currentUser));
@@ -103,7 +102,7 @@ public class CurrentUserController {
     })
     @SysLogger("更新")
     @PostMapping(value = "info/update")
-    public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) throws ApiException {
+    public PersonalInfoResponse updateInfo(@Valid @RequestBody PersonalInfoUpdateRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
         currentUser = currentUserService.changeInfo(new ChangeCurrentUserInfoCommand(
@@ -133,7 +132,7 @@ public class CurrentUserController {
     })
     @SysLogger("更新密码")
     @PostMapping(value = "password/update")
-    public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) throws ApiException {
+    public Boolean updatePassword(@Valid @RequestBody PersonalPasswordUpdateRequest request) {
 
         // 解密密码（数据需要加密传输）
         String privateKey = getPrivateKey(request.getToken());
@@ -161,7 +160,7 @@ public class CurrentUserController {
     })
     @SysLogger("上传头像")
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) throws ApiException {
+    public PersonalAvatarResponse uploadAvatar(@Valid PersonalAvatarUploadRequest request) {
         User currentUser = UserAccessHolder.currentUser();
 
         try {
@@ -169,7 +168,7 @@ public class CurrentUserController {
                     UserIdCodec.toStringValue(currentUser.getId()),
                     request.getAvatar().getInputStream());
         } catch (IOException e) {
-            throw new ApiException(e.getMessage());
+            throw AdminResponseExceptions.system(e.getMessage());
         }
 
         return PersonalInterfaceAssembler.toAvatarResponse(currentUser);
@@ -253,16 +252,16 @@ public class CurrentUserController {
                 currentUser.getId(), currentUser.getPrivilege(), currentUser.getStatus(), currentUser.getRank());
     }
 
-    private String getPrivateKey(String token) throws InvalidTokenException {
+    private String getPrivateKey(String token) {
         PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
                 new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
         if (sessionId == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         String privateKey =
                 preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         return privateKey;
     }

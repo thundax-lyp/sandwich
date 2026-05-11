@@ -1,8 +1,7 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.autoconfigure.LoginProperties;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidTokenException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.common.utils.encrypt.Sha256Helper;
@@ -165,19 +164,19 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command) throws ApiException {
+    public AuthTokenRefreshResult refreshAccessToken(AdminAuthCommand command) {
         return refreshAccessToken(
                 command.getClientId(), command.getRefreshToken(), command.getIp(), command.getUserAgent());
     }
 
     @Override
-    public OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) throws ApiException {
+    public OAuth2AuthorizationViewResult authorizeOAuth2(AdminAuthCommand command) {
         return authorizeOAuth2(
                 command.getClientId(), command.getRedirectUri(), command.getScopes(), command.getState());
     }
 
     @Override
-    public OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command) throws ApiException {
+    public OAuth2AuthorizationDecisionResult decideOAuth2(AdminAuthCommand command) {
         return decideOAuth2(
                 command.getClientId(),
                 command.getRedirectUri(),
@@ -192,7 +191,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command) throws ApiException {
+    public AuthTokenRefreshResult exchangeOAuth2Token(AdminAuthCommand command) {
         return exchangeOAuth2Token(
                 command.getClientId(),
                 command.getClientSecret(),
@@ -206,12 +205,12 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public boolean revokeAuthorizationCode(AdminAuthCommand command) throws ApiException {
+    public boolean revokeAuthorizationCode(AdminAuthCommand command) {
         return revokeAuthorizationCode(command.getAuthorizationCode());
     }
 
     @Override
-    public boolean revokeOAuth2Token(AdminAuthCommand command) throws ApiException {
+    public boolean revokeOAuth2Token(AdminAuthCommand command) {
         return revokeOAuth2Token(command.getClientId(), command.getClientSecret(), command.getToken());
     }
 
@@ -226,23 +225,23 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public User authenticatePassword(AdminAuthCommand command) throws ApiException {
+    public User authenticatePassword(AdminAuthCommand command) {
         return authenticatePassword(
                 command.getLoginName(), command.getPlainPassword(), command.getIp(), command.getUserAgent());
     }
 
     @Override
-    public User authenticateSms(AdminAuthCommand command) throws ApiException {
+    public User authenticateSms(AdminAuthCommand command) {
         return authenticateSms(command.getMobile(), command.getIp(), command.getUserAgent());
     }
 
     @Override
-    public User authenticateWecom(AdminAuthCommand command) throws ApiException {
+    public User authenticateWecom(AdminAuthCommand command) {
         return authenticateWecom(command.getCode(), command.getIp(), command.getUserAgent());
     }
 
     @Override
-    public User authenticateGithub(AdminAuthCommand command) throws ApiException {
+    public User authenticateGithub(AdminAuthCommand command) {
         return authenticateGithub(command.getCode(), command.getIp(), command.getUserAgent());
     }
 
@@ -257,7 +256,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @Override
-    public void validatePassword(AdminAuthCommand command) throws ApiException {
+    public void validatePassword(AdminAuthCommand command) {
         validatePassword(command.getUser(), command.getPlainPassword());
     }
 
@@ -437,14 +436,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return AuthTokenQueryResult.active(token, accessToken, session, user, getAccountLoginName(user.getId()));
     }
 
-    private AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) throws ApiException {
+    private AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken) {
         return refreshAccessToken(clientId, refreshToken, null, null);
     }
 
-    private AuthTokenRefreshResult refreshAccessToken(String clientId, String refreshToken, String ip, String userAgent)
-            throws ApiException {
+    private AuthTokenRefreshResult refreshAccessToken(
+            String clientId, String refreshToken, String ip, String userAgent) {
         if (principalRefreshTokenDao == null) {
-            throw new ApiException("refresh token 未配置");
+            throw AdminResponseExceptions.invalidToken();
         }
         String requestedClientId = StringUtils.defaultIfBlank(clientId, ADMIN_CLIENT_ID);
         PrincipalRefreshToken current = principalRefreshTokenDao.getByToken(refreshToken);
@@ -452,7 +451,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if (current == null
                 || !current.canRefresh(now)
                 || !StringUtils.equals(requestedClientId, current.getClientId())) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         current.markUsed();
         principalRefreshTokenDao.updateStatus(current);
@@ -472,7 +471,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     private OAuth2AuthorizationViewResult authorizeOAuth2(
-            String clientId, String redirectUri, List<String> scopes, String state) throws ApiException {
+            String clientId, String redirectUri, List<String> scopes, String state) {
         OAuthClient client = validateOAuthClient(clientId, redirectUri, scopes);
         OAuth2AuthorizationViewResult result = new OAuth2AuthorizationViewResult();
         result.setClientId(client.getClientId());
@@ -491,8 +490,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String codeChallenge,
             String codeChallengeMethod,
             String userId,
-            boolean approved)
-            throws ApiException {
+            boolean approved) {
         return decideOAuth2(
                 clientId, redirectUri, scopes, state, codeChallenge, codeChallengeMethod, userId, approved, null, null);
     }
@@ -507,8 +505,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String userId,
             boolean approved,
             String ip,
-            String userAgent)
-            throws ApiException {
+            String userAgent) {
         validateOAuthClient(clientId, redirectUri, scopes);
         OAuth2AuthorizationDecisionResult result = new OAuth2AuthorizationDecisionResult();
         result.setApproved(approved);
@@ -526,7 +523,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             return result;
         }
         if (oauthAuthorizationDao == null) {
-            throw new ApiException("OAuth2 authorization 未配置");
+            throw AdminResponseExceptions.oauth2AuthorizationNotConfigured();
         }
         Date now = new Date();
         OAuthAuthorization authorization = new OAuthAuthorization();
@@ -561,8 +558,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String redirectUri,
             String authorizationCode,
             String codeVerifier,
-            String refreshToken)
-            throws ApiException {
+            String refreshToken) {
         return exchangeOAuth2Token(
                 clientId,
                 clientSecret,
@@ -584,11 +580,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String codeVerifier,
             String refreshToken,
             String ip,
-            String userAgent)
-            throws ApiException {
+            String userAgent) {
         OAuthClient client = validateOAuthClientSecret(clientId, clientSecret);
         if (!client.supportsGrantType(grantType)) {
-            throw new ApiException("OAuth2 grant type unsupported");
+            throw AdminResponseExceptions.oauth2GrantTypeUnsupported();
         }
         if ("authorization_code".equals(grantType)) {
             return exchangeAuthorizationCode(client, redirectUri, authorizationCode, codeVerifier, ip, userAgent);
@@ -596,7 +591,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         if ("refresh_token".equals(grantType)) {
             return refreshOAuth2Token(client, refreshToken, ip, userAgent);
         }
-        throw new ApiException("OAuth2 grant type unsupported");
+        throw AdminResponseExceptions.oauth2GrantTypeUnsupported();
     }
 
     private AuthTokenRefreshResult exchangeAuthorizationCode(
@@ -605,10 +600,9 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String authorizationCode,
             String codeVerifier,
             String ip,
-            String userAgent)
-            throws ApiException {
+            String userAgent) {
         if (oauthAuthorizationDao == null) {
-            throw new ApiException("OAuth2 authorization 未配置");
+            throw AdminResponseExceptions.oauth2AuthorizationNotConfigured();
         }
         OAuthAuthorization authorization = oauthAuthorizationDao.getByAuthorizationCode(authorizationCode);
         Date now = new Date();
@@ -617,7 +611,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 || !StringUtils.equals(client.getClientId(), authorization.getClientId())
                 || !StringUtils.equals(redirectUri, authorization.getRedirectUri())
                 || !verifyPkce(authorization, codeVerifier)) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         authorization.markUsed(now);
         oauthAuthorizationDao.updateUsed(authorization);
@@ -633,23 +627,23 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     private AuthTokenRefreshResult refreshOAuth2Token(
-            OAuthClient client, String refreshToken, String ip, String userAgent) throws ApiException {
+            OAuthClient client, String refreshToken, String ip, String userAgent) {
         if (principalRefreshTokenDao == null) {
-            throw new ApiException("refresh token 未配置");
+            throw AdminResponseExceptions.invalidToken();
         }
         PrincipalRefreshToken current = principalRefreshTokenDao.getByToken(refreshToken);
         Date now = new Date();
         if (current == null
                 || !current.canRefresh(now)
                 || !StringUtils.equals(client.getClientId(), current.getClientId())) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         current.markUsed();
         principalRefreshTokenDao.updateStatus(current);
 
         PrincipalAuthSession session = getActivePrincipalAuthSession(current, now);
         if (session == null) {
-            throw new InvalidTokenException();
+            throw AdminResponseExceptions.invalidToken();
         }
         AuthAccessTokenResult oauthAccessToken = createOAuthAccessToken(client, current, session, now);
         String nextRefreshToken =
@@ -666,14 +660,14 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthTokenRefreshResult(oauthAccessToken, nextRefreshToken, oauthAccessToken.getToken());
     }
 
-    private boolean revokeAuthorizationCode(String authorizationCode) throws ApiException {
+    private boolean revokeAuthorizationCode(String authorizationCode) {
         if (oauthAuthorizationDao == null) {
-            throw new ApiException("OAuth2 authorization 未配置");
+            throw AdminResponseExceptions.oauth2AuthorizationNotConfigured();
         }
         return oauthAuthorizationDao.deleteByAuthorizationCode(authorizationCode) > 0;
     }
 
-    private boolean revokeOAuth2Token(String clientId, String clientSecret, String token) throws ApiException {
+    private boolean revokeOAuth2Token(String clientId, String clientSecret, String token) {
         validateOAuthClientSecret(clientId, clientSecret);
         Date now = new Date();
         boolean revoked = false;
@@ -720,12 +714,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return count;
     }
 
-    private User authenticatePassword(String loginName, String plainPassword) throws ApiException {
+    private User authenticatePassword(String loginName, String plainPassword) {
         return authenticatePassword(loginName, plainPassword, null, null);
     }
 
-    private User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent)
-            throws ApiException {
+    private User authenticatePassword(String loginName, String plainPassword, String ip, String userAgent) {
         PrincipalIdentity identity;
         try {
             identity = principalAuthService.authenticatePassword(new AuthenticatePasswordCommand(
@@ -769,22 +762,22 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return user;
     }
 
-    private User authenticateSms(String mobile) throws ApiException {
+    private User authenticateSms(String mobile) {
         return authenticateSms(mobile, null, null);
     }
 
-    private User authenticateSms(String mobile, String ip, String userAgent) throws ApiException {
+    private User authenticateSms(String mobile, String ip, String userAgent) {
         return authenticateIdentity(
                 PrincipalIdentityType.USER_MOBILE, mobile, PrincipalAuthenticationMethod.SMS_CODE, ip, userAgent);
     }
 
-    private User authenticateWecom(String code) throws ApiException {
+    private User authenticateWecom(String code) {
         return authenticateWecom(code, null, null);
     }
 
-    private User authenticateWecom(String code, String ip, String userAgent) throws ApiException {
+    private User authenticateWecom(String code, String ip, String userAgent) {
         if (wecomLoginProvider == null) {
-            throw new ApiException("企业微信登录未配置");
+            throw AdminResponseExceptions.wecomLoginNotConfigured();
         }
         return authenticateIdentity(
                 PrincipalIdentityType.USER_WECOM,
@@ -794,13 +787,13 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 userAgent);
     }
 
-    private User authenticateGithub(String code) throws ApiException {
+    private User authenticateGithub(String code) {
         return authenticateGithub(code, null, null);
     }
 
-    private User authenticateGithub(String code, String ip, String userAgent) throws ApiException {
+    private User authenticateGithub(String code, String ip, String userAgent) {
         if (githubLoginProvider == null) {
-            throw new ApiException("GitHub登录未配置");
+            throw AdminResponseExceptions.githubLoginNotConfigured();
         }
         return authenticateIdentity(
                 PrincipalIdentityType.USER_GITHUB,
@@ -810,7 +803,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
                 userAgent);
     }
 
-    private void validatePassword(User user, String plainPassword) throws ApiException {
+    private void validatePassword(User user, String plainPassword) {
         if (user == null) {
             throw new InvalidUsernamePasswordException();
         }
@@ -843,8 +836,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String identityValue,
             PrincipalAuthenticationMethod authenticationMethod,
             String ip,
-            String userAgent)
-            throws ApiException {
+            String userAgent) {
         PrincipalIdentity identity;
         try {
             identity = principalAuthService.authenticateIdentity(
@@ -1054,27 +1046,26 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return client.getAccessTokenTtlSeconds();
     }
 
-    private OAuthClient validateOAuthClientSecret(String clientId, String clientSecret) throws ApiException {
+    private OAuthClient validateOAuthClientSecret(String clientId, String clientSecret) {
         if (oauthClientDao == null) {
-            throw new ApiException("OAuth2 client 未配置");
+            throw AdminResponseExceptions.oauth2ClientNotConfigured();
         }
         OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
         if (client == null
                 || !StringUtils.equals(Sha256Helper.hashBase64Url(clientSecret), client.getClientSecretHash())) {
-            throw new ApiException("OAuth2 client secret invalid");
+            throw AdminResponseExceptions.oauth2ClientSecretInvalid();
         }
         return client;
     }
 
-    private OAuthClient validateOAuthClient(String clientId, String redirectUri, List<String> scopes)
-            throws ApiException {
+    private OAuthClient validateOAuthClient(String clientId, String redirectUri, List<String> scopes) {
         if (oauthClientDao == null) {
-            throw new ApiException("OAuth2 client 未配置");
+            throw AdminResponseExceptions.oauth2ClientNotConfigured();
         }
         OAuthClient client = oauthClientDao.getByClientIdAndStatus(clientId, OAuthClientStatus.ENABLED);
         Set<String> requestedScopes = toScopeSet(scopes);
         if (client == null || !client.supportsRedirectUri(redirectUri) || !client.supportsScopes(requestedScopes)) {
-            throw new ApiException("OAuth2 client request invalid");
+            throw AdminResponseExceptions.oauth2ClientRequestInvalid();
         }
         return client;
     }

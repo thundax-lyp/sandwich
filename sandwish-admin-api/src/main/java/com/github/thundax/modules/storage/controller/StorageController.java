@@ -2,9 +2,7 @@ package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.Constants;
-import com.github.thundax.common.exception.ApiException;
-import com.github.thundax.common.exception.InvalidParameterException;
-import com.github.thundax.common.exception.NullBeanException;
+import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
@@ -87,7 +85,7 @@ public class StorageController {
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @PostMapping(value = "page")
-    public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) throws ApiException {
+    public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         PageQuery page = readStoragePage(request);
         return PageResponseHelper.fromPageResult(
@@ -170,17 +168,17 @@ public class StorageController {
     })
     @PostMapping(value = "delete")
     @WrappedApiResponse
-    public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) throws ApiException {
+    public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) {
         List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
             StoredObject storage = storageService.get(storedObjectId(request.getId()));
             if (storage == null) {
-                throw new NullBeanException("StoredObject", StoredObjectIdCodec.toDomain(request.getId()));
+                throw AdminResponseExceptions.objectNotFound();
             }
             storageList.add(storage);
         }
         if (storageList.isEmpty()) {
-            throw new InvalidParameterException("list");
+            throw AdminResponseExceptions.invalidParameter("list");
         }
 
         for (StoredObject storage : storageList) {
@@ -200,7 +198,7 @@ public class StorageController {
     @HasPermission("storage:storage:edit")
     @PostMapping(value = "sort")
     @WrappedApiResponse
-    public Boolean sort(@Valid @RequestBody StorageSortRequest request) throws ApiException {
+    public Boolean sort(@Valid @RequestBody StorageSortRequest request) {
         storageService.sort(new StorageSortCommand(
                 RequestListHelper.map(request == null ? null : request.getOrderedIds(), StoredObjectIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));

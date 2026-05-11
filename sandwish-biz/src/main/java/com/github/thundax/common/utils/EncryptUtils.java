@@ -1,16 +1,12 @@
 package com.github.thundax.common.utils;
 
 import com.github.thundax.common.crypto.Sm4Crypto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+@Slf4j
 public class EncryptUtils {
 
-    /**
-     * sm4加密
-     *
-     * @param value
-     * @return
-     */
     public static String sm4Encrypt(String value) {
         if (StringUtils.isEmpty(value)) {
             return value;
@@ -19,17 +15,11 @@ public class EncryptUtils {
             String encryptedValue = Sm4Crypto.encryptEcb(NativePropertyPlaceConfigurer.SALT, value);
             return encryptedValue == null ? value : NativePropertyPlaceConfigurer.PREFIX + encryptedValue;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("can not encrypt sm4 value", e);
         }
         return value;
     }
 
-    /**
-     * sm4解密
-     *
-     * @param value
-     * @return
-     */
     public static String sm4Decrypt(String value) {
         if (!StringUtils.startsWith(value, NativePropertyPlaceConfigurer.PREFIX)) {
             return value;
@@ -40,7 +30,7 @@ public class EncryptUtils {
                     StringUtils.substring(value, NativePropertyPlaceConfigurer.PREFIX.length()));
             return decryptValue == null ? value : decryptValue;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("can not decrypt sm4 value", e);
         }
         return value;
     }

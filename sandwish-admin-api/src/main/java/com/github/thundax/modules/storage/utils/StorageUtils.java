@@ -67,14 +67,14 @@ public final class StorageUtils {
                     outputStream.close();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("can not close storage output stream", e);
             }
             try {
                 if (inputStream != null) {
                     inputStream.close();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("can not close storage input stream", e);
             }
         }
     }

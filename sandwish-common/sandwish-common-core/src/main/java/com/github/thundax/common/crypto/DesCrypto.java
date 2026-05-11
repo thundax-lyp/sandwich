@@ -14,10 +14,13 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class DesCrypto {
 
     private static final String ALGORITHM_DES = "DES";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DesCrypto.class);
 
     private DesCrypto() {}
 
@@ -37,7 +40,7 @@ public final class DesCrypto {
                 | NoSuchPaddingException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
-            e.printStackTrace();
+            LOGGER.warn("can not encrypt des value", e);
         }
         return null;
     }
@@ -58,7 +61,7 @@ public final class DesCrypto {
                 | NoSuchPaddingException
                 | IllegalBlockSizeException
                 | BadPaddingException e) {
-            e.printStackTrace();
+            LOGGER.warn("can not decrypt des value", e);
         }
         return null;
     }
@@ -78,7 +81,7 @@ public final class DesCrypto {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
         } catch (DecoderException e) {
-            e.printStackTrace();
+            LOGGER.warn("can not decode des hex text", e);
         }
         return null;
     }

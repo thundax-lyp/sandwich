@@ -13,12 +13,11 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * XSS过滤处理
- */
+@Slf4j
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private static final String JSON_CONTENT_TYPE = "application/json";
@@ -31,12 +30,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private HTMLFilter htmlFilter;
 
-    /**
-     * @param request HttpServletRequest
-     * @param encoding 编码
-     * @param excludeTags 例外的特定标签
-     * @param includeTags 需要过滤的标签
-     */
     public XssHttpServletRequestWrapper(
             HttpServletRequest request, String encoding, List<String> excludeTags, List<String> includeTags) {
         super(request);
@@ -45,10 +38,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         this.htmlFilter = new HTMLFilter();
     }
 
-    /**
-     * @param request HttpServletRequest
-     * @param encoding 编码
-     */
     public XssHttpServletRequestWrapper(HttpServletRequest request, String encoding) {
         this(request, encoding, null, null);
     }
@@ -59,7 +48,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        // 非json处理
         if (!JSON_CONTENT_TYPE.equalsIgnoreCase(super.getHeader(CONTENT_TYPE))) {
             return super.getInputStream();
         }
@@ -67,12 +55,10 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         String body = IOUtils.toString(in, encoding);
         IOUtils.closeQuietly(in);
 
-        // 空串处理直接返回
         if (StringUtils.isBlank(body)) {
             return super.getInputStream();
         }
 
-        // xss过滤
         body = XssShieldUtil.stripXss(body);
         body = xssFilter(URLDecoder.decode(body, encoding));
         return new RequestCachingInputStream(body.getBytes(encoding));
@@ -88,7 +74,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             }
             return value;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("can not filter request parameter {}", name, e);
         }
         return "";
     }
@@ -104,7 +90,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                 parameters[i] = XssShieldUtil.stripXss(parameters[i]);
                 parameters[i] = xssFilter(URLDecoder.decode(parameters[i], encoding));
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("can not filter request parameter value {}", name, e);
             }
         }
         return parameters;
@@ -121,7 +107,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                     values[i] = XssShieldUtil.stripXss(values[i]);
                     values[i] = xssFilter(URLDecoder.decode(values[i], encoding));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.warn("can not filter request parameter map value {}", key, e);
                 }
             }
             map.put(key, values);
@@ -139,7 +125,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             }
             return value;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("can not filter request header {}", name, e);
         }
         return "";
     }
@@ -177,6 +163,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
                 }
             }
         } catch (Exception e) {
+            log.warn("can not filter query string", e);
         }
         return paramStr;
     }
@@ -185,11 +172,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         return orgRequest;
     }
 
-    /**
-     * <b> #获取最原始的request </b>
-     *
-     * @param request HttpServletRequest
-     */
     public static HttpServletRequest getOrgRequest(HttpServletRequest request) {
         if (request instanceof XssHttpServletRequestWrapper) {
             return ((XssHttpServletRequestWrapper) request).getOrgRequest();
@@ -225,14 +207,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
         return result;
     }
 
-    /**
-     *
-     *
-     * <pre>
-     * servlet中inputStream只能一次读取，后续不能再次读取inputStream
-     * xss过滤body后，重新把流放入ServletInputStream中
-     * </pre>
-     */
     private static class RequestCachingInputStream extends ServletInputStream {
         private final ByteArrayInputStream inputStream;
 

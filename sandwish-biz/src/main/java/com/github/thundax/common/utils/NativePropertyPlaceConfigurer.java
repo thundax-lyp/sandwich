@@ -1,28 +1,23 @@
 package com.github.thundax.common.utils;
 
 import com.github.thundax.common.crypto.Sm4Crypto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
-/**
- * 本地化配置文件取值转换器，用于处理配置文件中加密属性
- *
- * <p>加密方式使用Sm4.encrypt(data, EncryptUtil.KEY)
- */
+@Slf4j
 public class NativePropertyPlaceConfigurer extends PropertyPlaceholderConfigurer {
 
-    /* 加密盐值() */
     public static final String SALT = "PJ-1712PJ-1712";
     public static final String PREFIX = "ENC(WDIT:";
 
     @Override
     protected String convertProperty(String propertyName, String propertyValue) {
 
-        // 加密属性处理
         if (propertyValue.startsWith(PREFIX)) {
             try {
                 return Sm4Crypto.decryptEcb(SALT, propertyValue.substring(PREFIX.length(), propertyValue.length() - 1));
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("can not decrypt local property {}", propertyName, e);
                 return propertyValue;
             }
         }

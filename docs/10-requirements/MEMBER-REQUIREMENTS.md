@@ -49,7 +49,7 @@
 
 - 会员主表固定为 `member_member`。
 - 会员数据库表使用 `member_` 业务域前缀。
-- 会员身份上下文不得与后台 `UserAccessHolder` 混用。
+- 会员身份上下文必须通过 `SandwishContextHolder` 读取，并校验主体类型为 `FRONT_MEMBER`。
 - `Member` 不承载登录标识、认证凭据、联系方式登录依据、地址、邮编或登录行为字段。
 - 前台会员认证运行态固定归属 auth 域，保留 `Member*` 类型名前缀以区分后台用户认证模型。
 

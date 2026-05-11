@@ -10,10 +10,9 @@
 
 当前范围：
 
-- 后台请求基于 access token 建立 `UserAccessHolder`
-- 前台请求基于 member access token 建立 `MemberSecurityContext`
+- 后台请求基于 access token 建立 `SandwishContextHolder` 中的 `ADMIN_USER` 主体
+- 前台请求基于 member access token 建立 `SandwishContextHolder` 中的 `FRONT_MEMBER` 主体
 - Controller、Service、DAO、Mapper 对当前用户或会员上下文的读取边界
-- `PooledThreadLocal` 在请求结束后的清理边界
 - 异步任务、线程池、定时任务等非标准入口的上下文要求
 - 判断“上下文透传是否完成”时的统一验收口径
 
@@ -26,14 +25,14 @@
 
 ## 3. Bounded Context
 
-Sandwich 当前存在两类运行时身份上下文：
+Sandwich 当前通过统一 `SandwishContextHolder` 表达运行时身份上下文：
 
-- 后台管理端上下文：`UserAccessHolder`
-- 前台会员端上下文：`MemberSecurityContext`
+- 后台管理端主体：`SandwishSubjectType.ADMIN_USER`
+- 前台会员端主体：`SandwishSubjectType.FRONT_MEMBER`
 
 两类上下文不得混用。
 
-后台 API 不从 `MemberSecurityContext` 读取当前用户。前台 API 不从 `UserAccessHolder` 读取当前会员。
+业务代码不得直接访问 Spring Security `SecurityContextHolder`，统一通过 `SandwishContextHolder` 读取当前主体。
 
 ## 4. Core Model
 
@@ -43,37 +42,35 @@ Sandwich 当前存在两类运行时身份上下文：
 
 1. 客户端提交 access token。
 2. 后台认证过滤器校验 token。
-3. 校验通过后，把 `userId` 和 token 写入 `UserAccessHolder`。
-4. 后续后台链路通过 `UserAccessHolder.currentUserId()` 和 `UserAccessHolder.currentToken()` 读取。
-5. 后台认证过滤器完成请求后必须调用 `UserAccessHolder.clear()` 清理后台身份上下文。
-6. 请求完成后，通过 `PooledThreadLocalFilter` 兜底清理线程上下文。
+3. 校验通过后，把后台主体写入 `SandwishContextHolder`，主体类型固定为 `ADMIN_USER`。
+4. 后续后台链路通过 `SandwishContextHolder` 读取当前主体。
+5. Spring Security 负责标准 HTTP 请求结束后的后台身份上下文清理。
 
 ### 4.2 Front Member Context
 
 前台会员上下文建立流程固定如下：
 
 1. 前台认证过滤器完成会员认证。
-2. Spring Security `Authentication` 保存 `MemberSpringPrincipal`。
-3. 后续前台链路通过 `MemberSecurityContext.getPrincipal()` 或 `MemberSecurityContext.getCurrentMemberId()` 读取。
+2. 校验通过后，把会员主体写入 `SandwishContextHolder`，主体类型固定为 `FRONT_MEMBER`。
+3. 后续前台链路通过 `SandwishContextHolder` 读取当前主体。
 4. 登出时按 access token 撤销认证态。
 
 ## 5. Module Mapping
 
 - `sandwish-admin-api`
-  - 后台认证过滤器负责建立 `UserAccessHolder`
-  - 后台 Controller、日志、审计和文件访问可以读取 `UserAccessHolder`
+  - 后台认证过滤器负责建立 `SandwishContextHolder` 中的后台主体
+  - 后台 Controller、日志、审计和文件访问通过 `SandwishContextHolder` 读取后台身份
 - `sandwish-front-api`
-  - 前台 Spring Security 过滤器负责建立 `MemberSecurityContext`
-  - 前台 Controller 和会员访问服务读取 `MemberSecurityContext`
+  - 前台认证过滤器负责建立 `SandwishContextHolder` 中的会员主体
+  - 前台 Controller 和会员访问服务读取 `SandwishContextHolder`
 - `sandwish-biz`
-  - Service 可以读取当前后台用户上下文，但不得直接感知 HTTP request
+  - Service 可以读取已建立的 Sandwich 主体上下文，但不得直接感知 HTTP request
   - 共享业务能力不得把前台会员上下文和后台用户上下文混为同一模型
 - `sandwish-infra`
   - 审计字段填充、私有数据过滤和持久化约束可以消费已建立的后台用户上下文
   - DAO / Mapper 不得自行解析 token、session 或 HTTP request
-- `sandwish-common-core`
-  - `PooledThreadLocal` 提供线程上下文容器
-  - `PooledThreadLocalFilter` 负责请求结束后的线程上下文清理
+- `sandwish-common-web`
+  - `SandwishContextFilter` 负责建立和清理 `SandwishRequestContextHolder` 中的通用请求元数据
 
 ## 6. Global Constraints
 
@@ -81,9 +78,9 @@ Sandwich 当前存在两类运行时身份上下文：
 
 运行时身份上下文的可信来源固定如下：
 
-- 后台当前用户：`UserAccessHolder`
-- 后台当前 token：`UserAccessHolder`
-- 前台当前会员：`MemberSecurityContext`
+- 后台当前用户：`SandwishContextHolder` 中的 `ADMIN_USER`
+- 后台当前 token：`SandwishContextHolder`
+- 前台当前会员：`SandwishContextHolder` 中的 `FRONT_MEMBER`
 不得在 Controller、Service、DAO 或 Mapper 中重新解析 token、session、cookie 来绕过上述上下文入口。
 
 ### 6.2 Entry Rule
@@ -92,15 +89,15 @@ Sandwich 当前存在两类运行时身份上下文：
 
 后台入口固定规则：
 
-- access token 校验通过后才能写入 `UserAccessHolder`
+- access token 校验通过后才能写入 `SandwishContextHolder`
 - token 校验失败不得进入业务 Controller
-- 请求完成后必须显式清理 `UserAccessHolder`
-- 请求完成后必须通过 `PooledThreadLocalFilter` 兜底清理 `PooledThreadLocal`
+- 请求完成后由 Spring Security 清理后台身份上下文；手工测试或非标准入口必须显式清理
+  `SandwishContextHolder`
 
 前台入口固定规则：
 
-- 会员认证通过后才能写入 Spring Security `Authentication`
-- 受保护前台路径不得绕过 Spring Security 读取会员身份
+- 会员认证通过后才能写入 `SandwishContextHolder`
+- 受保护前台路径不得绕过 `SandwishContextHolder` 读取会员身份
 - 登出必须撤销 access token，不依赖 HTTP session
 
 ### 6.3 Controller Rule
@@ -121,8 +118,8 @@ Service 可以消费已建立的当前身份上下文，但不得依赖 HTTP API
 
 - Service 不直接接收 `HttpServletRequest`、`HttpServletResponse` 或 `HttpSession`
 - Service 不直接解析 token、cookie、header
-- Service 需要当前后台用户时，读取 `UserAccessHolder`
-- Service 需要当前前台会员时，由前台专用 Service 读取 `MemberSecurityContext`
+- Service 需要当前后台用户时，读取 `SandwishContextHolder` 并校验主体类型为 `ADMIN_USER`
+- Service 需要当前前台会员时，读取 `SandwishContextHolder` 并校验主体类型为 `FRONT_MEMBER`
 - 前后台共享 Service 若同时服务两端，必须让调用方显式传入稳定业务参数，不隐式猜测身份来源
 
 ### 6.5 DAO And Mapper Rule
@@ -133,7 +130,7 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 - DAO / Mapper 不直接接收 `HttpServletRequest`、`HttpServletResponse` 或 `HttpSession`
 - DAO / Mapper 不解析 token、cookie、header
-- DAO implementation 可以在持久化审计、私有数据过滤等固定场景消费 `UserAccessHolder.currentUserId()`
+- DAO implementation 可以在持久化审计、私有数据过滤等固定场景消费 `SandwishContextHolder` 中已建立的主体
 - Mapper interface 和 Mapper XML / 注解 SQL 不直接引用上下文工具
 
 ### 6.6 Async And Non-Standard Entry Rule
@@ -152,10 +149,12 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 固定规则：
 
 - 通用请求元数据透传使用 `sandwish-common-core` 中已有的 `ContextSnapshot`、`ContextAwareRunnable` 和 `ContextAwareCallable`
-- `ContextAwareRunnable` / `ContextAwareCallable` 只负责 `SandwishContextHolder` 中的通用请求元数据，不自动搬运后台 `UserAccessHolder` 或前台 Spring Security `Authentication`
+- `ContextAwareRunnable` / `ContextAwareCallable` 只负责 `SandwishRequestContextHolder` 中通用请求元数据，不自动搬运认证主体
 - 需要当前用户或会员身份的异步任务，必须显式传入稳定业务参数，或在进入业务前手工建立对应上下文
-- 不得假定 `PooledThreadLocal` 或 Spring Security 上下文会自动跨线程存在
-- 异步任务完成后必须清理手工建立的线程上下文；后台身份上下文使用 `UserAccessHolder.clear()` 清理
+- 不得假定 `SandwishContextHolder` 或 `SandwishRequestContextHolder` 会自动跨线程存在
+- 异步任务完成后必须通过 `SandwishContextHolder.clear()` 清理手工建立的身份上下文
+- 线程池、MQ、定时任务等非 HTTP 入口手工建立 `SandwishContextHolder` 或 `SandwishRequestContextHolder` 时，
+  必须在任务结束的 `finally` 中清理对应上下文
 - 无法建立完整上下文的非标准入口，不得进入依赖当前身份的业务逻辑
 
 ### 6.7 Cache Rule
@@ -176,13 +175,14 @@ DAO / Mapper 不感知 HTTP、Session 和权限适配。
 
 ## 8. Common Mistakes
 
-- 在前台代码中读取 `UserAccessHolder`
-- 在后台代码中读取 `MemberSecurityContext`
+- 在业务代码中直接读取 Spring Security `SecurityContextHolder`
+- 在前台代码中把 `ADMIN_USER` 当作会员
+- 在后台代码中把 `FRONT_MEMBER` 当作后台用户
 - 在 Service 中直接接收 `HttpServletRequest`
 - 在 DAO / Mapper 中解析 token 或 session
 - 异步任务中直接读取当前线程上下文
 - 前台登出只清理 Spring Security，不撤销 access token
-- 手工设置 `PooledThreadLocal` 后没有清理
+- 手工设置 `SandwishContextHolder` 后没有清理
 
 ## 9. Open Items
 

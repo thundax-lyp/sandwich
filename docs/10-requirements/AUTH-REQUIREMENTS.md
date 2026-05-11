@@ -74,7 +74,7 @@
 
 - `Principal*` 是 auth 域内部统一结构描述，不作为公开 HTTP Request / Response。
 - `PrincipalKey.principalType + principalId` 必须唯一定位业务主体；后台固定为 `USER + User.id`，前台固定为 `MEMBER + Member.id`。
-- 后台上下文仍由 `UserAccessHolder` 建立和读取，前台上下文仍由 `MemberSecurityContext` 建立和读取。
+- 后台和前台认证上下文统一由 `SandwishContextHolder` 建立和读取，并通过 `SandwishSubjectType` 区分后台用户和前台会员主体。
 - API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话、验证码图片输出和响应装配适配；可复用的认证业务流程固定收敛到 `sandwish-biz` 的 auth Service。
 - `sandwish-biz` 的 auth Service 不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
 - `sandwish-biz` 的 auth Service 写入口固定使用业务动作名并接收 `*Command`。

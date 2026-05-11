@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -51,7 +50,7 @@ public class RoleServiceImplTest {
     }
 
     @Test
-    public void shouldNormalizeInvalidPageBeforeQuery() {
+    public void shouldPassPageQueryAsIs() {
         RecordingRoleDao dao = new RecordingRoleDao();
         PageQuery page = new PageQuery();
         page.setPageNo(0);
@@ -60,8 +59,8 @@ public class RoleServiceImplTest {
 
         PageResult<Role> result = service.page(new RoleQuery(), page);
 
-        assertEquals(PageRules.firstPageIndex(), dao.pageNo);
-        assertEquals(PageRules.defaultPageSize(), dao.pageSize);
+        assertEquals(0, dao.pageNo);
+        assertEquals(0, dao.pageSize);
         assertEquals(1L, result.getTotalCount());
     }
 

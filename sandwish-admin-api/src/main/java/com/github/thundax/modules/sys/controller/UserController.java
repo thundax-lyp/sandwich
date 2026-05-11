@@ -69,8 +69,10 @@ import io.swagger.annotations.ApiOperation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -379,9 +381,22 @@ public class UserController {
     @WrappedApiResponse
     public Boolean sort(@Valid @RequestBody UserSortRequest request) {
         userService.sort(new UserSortCommand(
-                RequestListHelper.map(request == null ? null : request.getOrderedIds(), UserIdCodec::toDomain),
+                RequestListHelper.map(
+                        readOrderedIds(request == null ? null : request.getOrderedIds()), UserIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
         return true;
+    }
+
+    private List<Long> readOrderedIds(List<Long> sourceList) {
+        List<Long> orderedIds = RequestListHelper.present(sourceList);
+        if (sourceList == null || orderedIds.size() != sourceList.size() || orderedIds.isEmpty()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        Set<Long> uniqueIds = new HashSet<>(orderedIds);
+        if (uniqueIds.size() != orderedIds.size()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        return orderedIds;
     }
 
     @ApiOperation(value = "删除", notes = "sys:user:edit")

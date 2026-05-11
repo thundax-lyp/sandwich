@@ -6,7 +6,6 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
@@ -26,14 +25,11 @@ import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import com.github.thundax.modules.sys.service.query.UserQuery;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,15 +66,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public PageResult<User> page(UserQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<User> dataPage = dao.page(
                 query == null ? null : DepartmentIdCodec.toValue(query.getDepartmentId()),
                 query == null ? null : query.getLoginName(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getStatus(),
                 query == null ? null : query.getPrivilege(),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -88,7 +83,8 @@ public class UserServiceImpl implements UserService {
     public void sort(UserSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
-        List<UserId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
+        List<UserId> orderedIdList =
+                command == null || command.getOrderedIds() == null ? Collections.emptyList() : command.getOrderedIds();
         if (orderedIdList.isEmpty()) {
             throw new BizException(
                     ErrorCode.SORT_EMPTY_INPUT.getCode(),
@@ -145,41 +141,28 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        try {
-            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
-            for (int i = 0; i < currentOrderedIds.size(); i++) {
-                UserId targetId = orderedIdList.get(i);
-                UserId currentId = currentOrderedIds.get(i);
-                if (targetId.equals(currentId)) {
-                    continue;
-                }
-
-                int targetIndex = indexById.get(targetId.value());
-                int currentPriority = priorityById.get(currentId.value());
-                int targetPriority = priorityById.get(targetId.value());
-
-                updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
-                updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
-                updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
-
-                priorityById.put(targetId.value(), currentPriority);
-                priorityById.put(currentId.value(), targetPriority);
-                currentOrderedIds.set(i, targetId);
-                currentOrderedIds.set(targetIndex, currentId);
-                indexById.put(targetId.value(), i);
-                indexById.put(currentId.value(), targetIndex);
+        int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
+        for (int i = 0; i < currentOrderedIds.size(); i++) {
+            UserId targetId = orderedIdList.get(i);
+            UserId currentId = currentOrderedIds.get(i);
+            if (targetId.equals(currentId)) {
+                continue;
             }
-        } catch (RuntimeException exception) {
-            if (isConcurrentModification(exception)) {
-                throw new BizException(
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
-            }
-            throw new BizException(
-                    ErrorCode.SORT_DB_FAILURE.getCode(),
-                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
-                    ErrorCode.SORT_DB_FAILURE.getMessage());
+
+            int targetIndex = indexById.get(targetId.value());
+            int currentPriority = priorityById.get(currentId.value());
+            int targetPriority = priorityById.get(targetId.value());
+
+            updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
+            updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
+            updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
+
+            priorityById.put(targetId.value(), currentPriority);
+            priorityById.put(currentId.value(), targetPriority);
+            currentOrderedIds.set(i, targetId);
+            currentOrderedIds.set(targetIndex, currentId);
+            indexById.put(targetId.value(), i);
+            indexById.put(currentId.value(), targetIndex);
         }
     }
 
@@ -255,17 +238,6 @@ public class UserServiceImpl implements UserService {
         return role;
     }
 
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
-    }
-
     private User toUser(CreateUserCommand command) {
         User user = new User();
         user.setId(command.getId());
@@ -296,63 +268,12 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    private List<UserId> normalizeOrderedIds(List<UserId> orderedIds) {
-        if (orderedIds == null) {
-            return new ArrayList<>();
-        }
-
-        Set<Long> uniqueIdValues = new HashSet<>(orderedIds.size());
-        List<UserId> normalized = new ArrayList<>(orderedIds.size());
-        for (UserId orderedId : orderedIds) {
-            if (orderedId == null || orderedId.value() == null) {
-                throw new BizException(
-                        ErrorCode.SORT_MISSING_ID.getCode(),
-                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
-                        ErrorCode.SORT_MISSING_ID.getMessage());
-            }
-            if (!uniqueIdValues.add(orderedId.value())) {
-                throw new BizException(
-                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
-            }
-            normalized.add(orderedId);
-        }
-        return normalized;
-    }
-
     private List<Long> toValues(List<UserId> ids) {
         List<Long> values = new ArrayList<>(ids.size());
         for (UserId id : ids) {
             values.add(id.value());
         }
         return values;
-    }
-
-    private boolean isConcurrentModification(RuntimeException exception) {
-        Throwable cursor = exception;
-        while (cursor != null) {
-            if (cursor instanceof SQLException) {
-                return isConcurrentSqlFailure((SQLException) cursor);
-            }
-            cursor = cursor.getCause();
-        }
-        return false;
-    }
-
-    private boolean isConcurrentSqlFailure(SQLException sqlException) {
-        int errorCode = sqlException.getErrorCode();
-        String sqlState = sqlException.getSQLState();
-        if (errorCode == 1205 || errorCode == 1213 || errorCode == 1207) {
-            return true;
-        }
-        if (errorCode == 1222) {
-            return true;
-        }
-        return "55P03".equals(sqlState)
-                || "40P01".equals(sqlState)
-                || "40001".equals(sqlState)
-                || "23505".equals(sqlState);
     }
 
     private void updatePriorityOrThrow(UserId id, int priority, String message) {

@@ -6,7 +6,6 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
@@ -19,14 +18,12 @@ import com.github.thundax.modules.sys.service.command.CreateDictCommand;
 import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,13 +74,12 @@ public class DictServiceImpl implements DictService {
     }
 
     public PageResult<Dict> page(DictQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<Dict> dataPage = dao.page(
                 query == null ? null : query.getType(),
                 query == null ? null : query.getLabel(),
                 query == null ? null : query.getRemarks(),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -103,7 +99,8 @@ public class DictServiceImpl implements DictService {
     public void sort(DictSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
-        List<DictId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
+        List<DictId> orderedIdList =
+                command == null || command.getOrderedIds() == null ? Collections.emptyList() : command.getOrderedIds();
         if (orderedIdList.isEmpty()) {
             throw new BizException(
                     ErrorCode.SORT_EMPTY_INPUT.getCode(),
@@ -195,42 +192,29 @@ public class DictServiceImpl implements DictService {
             }
         }
 
-        try {
-            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
-            for (int i = 0; i < currentOrderedIds.size(); i++) {
-                DictId targetId = orderedIdList.get(i);
-                DictId currentId = currentOrderedIds.get(i);
-                if (targetId.equals(currentId)) {
-                    continue;
-                }
-
-                int targetIndex = indexById.get(targetId.value());
-                int currentPriority = priorityById.get(currentId.value());
-                int targetPriority = priorityById.get(targetId.value());
-
-                updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
-                updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
-                updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
-
-                priorityById.put(targetId.value(), currentPriority);
-                priorityById.put(currentId.value(), targetPriority);
-
-                currentOrderedIds.set(i, targetId);
-                currentOrderedIds.set(targetIndex, currentId);
-                indexById.put(targetId.value(), i);
-                indexById.put(currentId.value(), targetIndex);
+        int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
+        for (int i = 0; i < currentOrderedIds.size(); i++) {
+            DictId targetId = orderedIdList.get(i);
+            DictId currentId = currentOrderedIds.get(i);
+            if (targetId.equals(currentId)) {
+                continue;
             }
-        } catch (RuntimeException exception) {
-            if (isConcurrentModification(exception)) {
-                throw new BizException(
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
-            }
-            throw new BizException(
-                    ErrorCode.SORT_DB_FAILURE.getCode(),
-                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
-                    ErrorCode.SORT_DB_FAILURE.getMessage());
+
+            int targetIndex = indexById.get(targetId.value());
+            int currentPriority = priorityById.get(currentId.value());
+            int targetPriority = priorityById.get(targetId.value());
+
+            updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
+            updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
+            updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
+
+            priorityById.put(targetId.value(), currentPriority);
+            priorityById.put(currentId.value(), targetPriority);
+
+            currentOrderedIds.set(i, targetId);
+            currentOrderedIds.set(targetIndex, currentId);
+            indexById.put(targetId.value(), i);
+            indexById.put(currentId.value(), targetIndex);
         }
     }
 
@@ -255,17 +239,6 @@ public class DictServiceImpl implements DictService {
         }
     }
 
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
-    }
-
     private Dict toEntity(CreateDictCommand command) {
         Dict dict = new Dict();
         if (command == null) {
@@ -284,57 +257,6 @@ public class DictServiceImpl implements DictService {
             values.add(id.value());
         }
         return values;
-    }
-
-    private List<DictId> normalizeOrderedIds(List<DictId> orderedIds) {
-        if (orderedIds == null) {
-            return new ArrayList<>();
-        }
-
-        Set<Long> uniqueIdValues = new HashSet<>(orderedIds.size());
-        List<DictId> normalized = new ArrayList<>(orderedIds.size());
-        for (DictId orderedId : orderedIds) {
-            if (orderedId == null || orderedId.value() == null) {
-                throw new BizException(
-                        ErrorCode.SORT_MISSING_ID.getCode(),
-                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
-                        ErrorCode.SORT_MISSING_ID.getMessage());
-            }
-            if (!uniqueIdValues.add(orderedId.value())) {
-                throw new BizException(
-                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
-            }
-            normalized.add(orderedId);
-        }
-        return normalized;
-    }
-
-    private boolean isConcurrentModification(RuntimeException exception) {
-        Throwable cursor = exception;
-        while (cursor != null) {
-            if (cursor instanceof SQLException) {
-                return isConcurrentSqlFailure((SQLException) cursor);
-            }
-            cursor = cursor.getCause();
-        }
-        return false;
-    }
-
-    private boolean isConcurrentSqlFailure(SQLException sqlException) {
-        int errorCode = sqlException.getErrorCode();
-        String sqlState = sqlException.getSQLState();
-        if (errorCode == 1205 || errorCode == 1213 || errorCode == 1207) {
-            return true;
-        }
-        if (errorCode == 1222) {
-            return true;
-        }
-        return "55P03".equals(sqlState)
-                || "40P01".equals(sqlState)
-                || "40001".equals(sqlState)
-                || "23505".equals(sqlState);
     }
 
     private void updatePriorityOrThrow(DictId id, int priority, String message) {

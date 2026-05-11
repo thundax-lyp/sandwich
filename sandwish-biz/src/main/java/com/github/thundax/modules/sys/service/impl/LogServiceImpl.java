@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
@@ -50,7 +49,6 @@ public class LogServiceImpl implements LogService {
 
     @Override
     public PageResult<Log> page(LogQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<Log> dataPage = dao.page(
                 query == null ? null : typeValue(query.getType()),
                 query == null ? null : query.getRemoteAddr(),
@@ -60,8 +58,8 @@ public class LogServiceImpl implements LogService {
                 query == null ? null : query.getRequestUri(),
                 query == null ? null : query.getBeginDate(),
                 query == null ? null : query.getEndDate(),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -84,17 +82,6 @@ public class LogServiceImpl implements LogService {
                 query == null ? null : query.getRequestUri(),
                 query == null ? null : query.getBeginDate(),
                 query == null ? null : query.getEndDate());
-    }
-
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
     }
 
     private String typeValue(LogType type) {

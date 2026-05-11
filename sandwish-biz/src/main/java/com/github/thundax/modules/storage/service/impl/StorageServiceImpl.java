@@ -26,13 +26,11 @@ import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +78,6 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public PageResult<StoredObject> page(StorageQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<StoredObject> dataPage = dao.page(
                 query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
@@ -92,8 +89,8 @@ public class StorageServiceImpl implements StorageService {
                 query == null ? null : query.getOriginalFilename(),
                 query == null ? null : query.getRemarks(),
                 query == null ? null : query.getSortDirection(),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -115,7 +112,8 @@ public class StorageServiceImpl implements StorageService {
     public void sort(StorageSortCommand command) {
         SortDirection effectiveDirection =
                 command == null || command.getSortDirection() == null ? SortDirection.ASC : command.getSortDirection();
-        List<StoredObjectId> orderedIdList = normalizeOrderedIds(command == null ? null : command.getOrderedIds());
+        List<StoredObjectId> orderedIdList =
+                command == null || command.getOrderedIds() == null ? Collections.emptyList() : command.getOrderedIds();
         if (orderedIdList.isEmpty()) {
             throw new BizException(
                     ErrorCode.SORT_EMPTY_INPUT.getCode(),
@@ -166,42 +164,29 @@ public class StorageServiceImpl implements StorageService {
             }
         }
 
-        try {
-            int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
-            for (int i = 0; i < currentOrderedIds.size(); i++) {
-                StoredObjectId targetId = orderedIdList.get(i);
-                StoredObjectId currentId = currentOrderedIds.get(i);
-                if (targetId.equals(currentId)) {
-                    continue;
-                }
-
-                int targetIndex = indexById.get(targetId.value());
-                int currentPriority = priorityById.get(currentId.value());
-                int targetPriority = priorityById.get(targetId.value());
-
-                updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
-                updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
-                updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
-
-                priorityById.put(targetId.value(), currentPriority);
-                priorityById.put(currentId.value(), targetPriority);
-
-                currentOrderedIds.set(i, targetId);
-                currentOrderedIds.set(targetIndex, currentId);
-                indexById.put(targetId.value(), i);
-                indexById.put(currentId.value(), targetIndex);
+        int temporaryPriority = dao.maxPriority() + PRIORITY_STEP;
+        for (int i = 0; i < currentOrderedIds.size(); i++) {
+            StoredObjectId targetId = orderedIdList.get(i);
+            StoredObjectId currentId = currentOrderedIds.get(i);
+            if (targetId.equals(currentId)) {
+                continue;
             }
-        } catch (RuntimeException exception) {
-            if (isConcurrentModification(exception)) {
-                throw new BizException(
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getCode(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessageKey(),
-                        ErrorCode.SORT_CONCURRENT_MODIFICATION.getMessage());
-            }
-            throw new BizException(
-                    ErrorCode.SORT_DB_FAILURE.getCode(),
-                    ErrorCode.SORT_DB_FAILURE.getMessageKey(),
-                    ErrorCode.SORT_DB_FAILURE.getMessage());
+
+            int targetIndex = indexById.get(targetId.value());
+            int currentPriority = priorityById.get(currentId.value());
+            int targetPriority = priorityById.get(targetId.value());
+
+            updatePriorityOrThrow(targetId, temporaryPriority++, "暂态更新失败");
+            updatePriorityOrThrow(currentId, targetPriority, "交换更新失败");
+            updatePriorityOrThrow(targetId, currentPriority, "交换更新失败");
+
+            priorityById.put(targetId.value(), currentPriority);
+            priorityById.put(currentId.value(), targetPriority);
+
+            currentOrderedIds.set(i, targetId);
+            currentOrderedIds.set(targetIndex, currentId);
+            indexById.put(targetId.value(), i);
+            indexById.put(currentId.value(), targetIndex);
         }
     }
 
@@ -284,12 +269,6 @@ public class StorageServiceImpl implements StorageService {
                 && StringUtils.equals(storage.getOwnerId(), query.getOwnerId());
     }
 
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        normalizedPage.normalize();
-        return normalizedPage;
-    }
-
     private String ownerTypeValue(StorageOwnerType ownerType) {
         return ownerType == null ? null : ownerType.value();
     }
@@ -300,56 +279,6 @@ public class StorageServiceImpl implements StorageService {
 
     private String referenceStatusValue(StoredObjectReferenceStatus referenceStatus) {
         return referenceStatus == null ? null : referenceStatus.value();
-    }
-
-    private List<StoredObjectId> normalizeOrderedIds(List<StoredObjectId> orderedIds) {
-        if (orderedIds == null) {
-            return new ArrayList<>();
-        }
-        Set<Long> uniqueIdValues = new HashSet<>(orderedIds.size());
-        List<StoredObjectId> normalized = new ArrayList<>(orderedIds.size());
-        for (StoredObjectId orderedId : orderedIds) {
-            if (orderedId == null || orderedId.value() == null) {
-                throw new BizException(
-                        ErrorCode.SORT_MISSING_ID.getCode(),
-                        ErrorCode.SORT_MISSING_ID.getMessageKey(),
-                        ErrorCode.SORT_MISSING_ID.getMessage());
-            }
-            if (!uniqueIdValues.add(orderedId.value())) {
-                throw new BizException(
-                        ErrorCode.SORT_DUPLICATE_ID.getCode(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessageKey(),
-                        ErrorCode.SORT_DUPLICATE_ID.getMessage());
-            }
-            normalized.add(orderedId);
-        }
-        return normalized;
-    }
-
-    private boolean isConcurrentModification(RuntimeException exception) {
-        Throwable cursor = exception;
-        while (cursor != null) {
-            if (cursor instanceof SQLException) {
-                return isConcurrentSqlFailure((SQLException) cursor);
-            }
-            cursor = cursor.getCause();
-        }
-        return false;
-    }
-
-    private boolean isConcurrentSqlFailure(SQLException sqlException) {
-        int errorCode = sqlException.getErrorCode();
-        String sqlState = sqlException.getSQLState();
-        if (errorCode == 1205 || errorCode == 1213 || errorCode == 1207) {
-            return true;
-        }
-        if (errorCode == 1222) {
-            return true;
-        }
-        return "55P03".equals(sqlState)
-                || "40P01".equals(sqlState)
-                || "40001".equals(sqlState)
-                || "23505".equals(sqlState);
     }
 
     private void updatePriorityOrThrow(StoredObjectId id, int priority, String message) {

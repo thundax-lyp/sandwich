@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
@@ -47,13 +46,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     public PageResult<Department> page(DepartmentQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<Department> dataPage = dao.page(
                 query == null ? null : DepartmentIdCodec.toValue(query.getParentId()),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -110,17 +108,6 @@ public class DepartmentServiceImpl implements DepartmentService {
                 && dao.isChildOf(
                         DepartmentIdCodec.toValue(query.getChildId()),
                         DepartmentIdCodec.toValue(query.getAncestorId()));
-    }
-
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
     }
 
     private Department toDepartment(CreateDepartmentCommand command) {

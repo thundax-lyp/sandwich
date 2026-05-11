@@ -63,24 +63,6 @@ public class DictServiceImplTest {
         }
     }
 
-    @Test
-    public void shouldRejectSortDuplicateIdsBySortCode() {
-        RecordingDictDao dao = new RecordingDictDao();
-        List<Dict> currentList = Arrays.asList(dict(1001L, "status", 10), dict(1002L, "status", 20));
-        dao.setTypeList(currentList);
-        dao.setListByIdsResult(currentList);
-        DictServiceImpl service = new DictServiceImpl(dao);
-
-        try {
-            service.sort(new DictSortCommand(
-                    Arrays.asList(DictIdCodec.toDomain(1001L), DictIdCodec.toDomain(1001L)), SortDirection.ASC));
-            fail("expect BizException");
-        } catch (BizException e) {
-            assertEquals(ErrorCode.SORT_DUPLICATE_ID.getCode(), e.getCode());
-            assertEquals(ErrorCode.SORT_DUPLICATE_ID.getMessage(), e.getMessage());
-        }
-    }
-
     private Dict dict(Long id, String type, int priority) {
         Dict dict = new Dict();
         dict.setId(DictIdCodec.toDomain(id));

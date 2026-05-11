@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -63,7 +62,7 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldNormalizeInvalidPageBeforeQuery() {
+    public void shouldPassPageQueryAsIs() {
         RecordingMenuDao dao = new RecordingMenuDao();
         PageQuery page = new PageQuery();
         page.setPageNo(0);
@@ -72,8 +71,8 @@ public class MenuServiceImplTest {
 
         PageResult<Menu> result = service.page(new MenuQuery(), page);
 
-        assertEquals(PageRules.firstPageIndex(), dao.pageNo);
-        assertEquals(PageRules.defaultPageSize(), dao.pageSize);
+        assertEquals(0, dao.pageNo);
+        assertEquals(0, dao.pageSize);
         assertEquals(1L, result.getTotalCount());
     }
 

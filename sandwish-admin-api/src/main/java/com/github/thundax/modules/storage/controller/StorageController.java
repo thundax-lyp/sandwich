@@ -38,8 +38,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -200,9 +202,23 @@ public class StorageController {
     @WrappedApiResponse
     public Boolean sort(@Valid @RequestBody StorageSortRequest request) {
         storageService.sort(new StorageSortCommand(
-                RequestListHelper.map(request == null ? null : request.getOrderedIds(), StoredObjectIdCodec::toDomain),
+                RequestListHelper.map(
+                        readOrderedIds(request == null ? null : request.getOrderedIds()),
+                        StoredObjectIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
         return true;
+    }
+
+    private List<Long> readOrderedIds(List<Long> sourceList) {
+        List<Long> orderedIds = RequestListHelper.present(sourceList);
+        if (sourceList == null || orderedIds.size() != sourceList.size() || orderedIds.isEmpty()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        Set<Long> uniqueIds = new HashSet<>(orderedIds);
+        if (uniqueIds.size() != orderedIds.size()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        return orderedIds;
     }
 
     @ApiOperation(value = "获取业务类型树", notes = "storage:storage:view")

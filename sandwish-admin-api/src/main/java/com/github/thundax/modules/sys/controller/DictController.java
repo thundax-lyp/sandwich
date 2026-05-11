@@ -29,7 +29,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -176,9 +178,22 @@ public class DictController {
     @PostMapping(value = "sort")
     public Boolean sort(@Valid @RequestBody DictSortRequest request) {
         dictService.sort(new DictSortCommand(
-                RequestListHelper.map(request == null ? null : request.getOrderedIds(), DictIdCodec::toDomain),
+                RequestListHelper.map(
+                        readOrderedIds(request == null ? null : request.getOrderedIds()), DictIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
         return true;
+    }
+
+    private List<Long> readOrderedIds(List<Long> sourceList) {
+        List<Long> orderedIds = RequestListHelper.present(sourceList);
+        if (sourceList == null || orderedIds.size() != sourceList.size() || orderedIds.isEmpty()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        Set<Long> uniqueIds = new HashSet<>(orderedIds);
+        if (uniqueIds.size() != orderedIds.size()) {
+            throw AdminResponseExceptions.invalidParameter("orderedIds");
+        }
+        return orderedIds;
     }
 
     private PageQuery readDictPage(DictPageRequest request) {

@@ -136,6 +136,15 @@ public class DictControllerContractTest {
         assertEquals(SortDirection.DESC, sortCommand.getSortDirection());
     }
 
+    @Test(expected = SandwishException.class)
+    public void shouldRejectDuplicateSortIds() throws Exception {
+        DictController controller = new DictController(mock(DictService.class));
+        DictSortRequest request = new DictSortRequest();
+        request.setOrderedIds(Arrays.asList(101L, 101L));
+
+        controller.sort(request);
+    }
+
     private DictIdRequest idRequest(Long id) {
         DictIdRequest request = new DictIdRequest();
         request.setId(id);

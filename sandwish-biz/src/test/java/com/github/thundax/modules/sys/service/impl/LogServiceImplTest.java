@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.modules.sys.dao.LogDao;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.enums.LogType;
@@ -72,7 +71,7 @@ public class LogServiceImplTest {
     }
 
     @Test
-    public void shouldNormalizeInvalidPageBeforeQuery() {
+    public void shouldPassPageQueryAsIs() {
         RecordingLogDao dao = new RecordingLogDao();
         PageQuery page = new PageQuery();
         page.setPageNo(0);
@@ -81,8 +80,8 @@ public class LogServiceImplTest {
 
         service.page((LogQuery) null, page);
 
-        assertEquals(PageRules.firstPageIndex(), dao.pageNo);
-        assertEquals(PageRules.defaultPageSize(), dao.pageSize);
+        assertEquals(0, dao.pageNo);
+        assertEquals(0, dao.pageSize);
     }
 
     @Test

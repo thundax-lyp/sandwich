@@ -3,8 +3,6 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.common.page.PageRules;
-import com.github.thundax.common.utils.SpringContextHolder;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
@@ -22,6 +20,7 @@ import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
 import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,10 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuDao dao;
+    private final List<CacheChangedListener> cacheChangedListeners;
+
+    public MenuServiceImpl(MenuDao dao) {
+        this(dao, Collections.emptyList());
+    }
 
     @Autowired
-    public MenuServiceImpl(MenuDao dao) {
+    public MenuServiceImpl(MenuDao dao, List<CacheChangedListener> cacheChangedListeners) {
         this.dao = dao;
+        this.cacheChangedListeners = cacheChangedListeners == null ? Collections.emptyList() : cacheChangedListeners;
     }
 
     public Menu get(MenuId id) {
@@ -57,13 +62,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     public PageResult<Menu> page(MenuQuery query, PageQuery page) {
-        PageQuery normalizedPage = normalizePage(page);
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : MenuIdCodec.toValue(query.getParentId()),
                 query == null ? null : visibilityValue(query.getVisibility()),
                 query == null ? null : rankValue(query.getMaxRank()),
-                normalizedPage.getPageNo(),
-                normalizedPage.getPageSize());
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -143,28 +147,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     private void notifyCacheChanged() {
-        try {
-            SpringContextHolder.getBeansOfType(CacheChangedListener.class)
-                    .forEach((name, listener) -> listener.onMenuCacheChanged());
-        } catch (IllegalStateException | NullPointerException ignored) {
-            // Unit tests may instantiate the service without a Spring application context.
-        }
+        cacheChangedListeners.forEach(CacheChangedListener::onMenuCacheChanged);
     }
 
     public interface CacheChangedListener {
 
         void onMenuCacheChanged();
-    }
-
-    private PageQuery normalizePage(PageQuery page) {
-        PageQuery normalizedPage = page == null ? new PageQuery() : page;
-        if (normalizedPage.getPageNo() < PageRules.firstPageIndex()) {
-            normalizedPage.setPageNo(PageRules.firstPageIndex());
-        }
-        if (normalizedPage.getPageSize() <= 0) {
-            normalizedPage.setPageSize(PageRules.defaultPageSize());
-        }
-        return normalizedPage;
     }
 
     private String visibilityValue(MenuVisibility visibility) {

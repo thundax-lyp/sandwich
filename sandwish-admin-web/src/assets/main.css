@@ -1572,9 +1572,9 @@ p {
     }
 
     .workspace {
-        --workspace-padding-inline: 16px;
-        --workspace-padding-top: 16px;
-        --workspace-padding-bottom: 28px;
+        --workspace-padding-inline: 0px;
+        --workspace-padding-top: 0px;
+        --workspace-padding-bottom: 0px;
     }
 
     .topbar {
@@ -1633,10 +1633,28 @@ p {
         align-items: stretch;
     }
 
-    .user-page-actions,
-    .user-search,
-    .user-page-actions .ant-btn {
+    .user-page-actions {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) max-content max-content;
         width: 100%;
+        align-items: center;
+    }
+
+    .user-page-actions .ant-space-item {
+        min-width: 0;
+    }
+
+    .user-page-actions .ant-space-item:has(.user-search-hidden) {
+        display: none;
+    }
+
+    .user-search {
+        width: 100%;
+    }
+
+    .user-page-actions .ant-btn {
+        width: auto;
+        white-space: nowrap;
     }
 
     .user-search-hidden {

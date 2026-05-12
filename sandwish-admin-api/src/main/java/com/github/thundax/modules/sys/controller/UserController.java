@@ -102,10 +102,7 @@ public class UserController {
 
     private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
-    private static final String DEPARTMENT_NAME = "department";
     private static final String PRIVATE_KEY_ITEM = "privateKey";
-    private static final String ROLE_NAME = "Role";
-    private static final String USER_NAME = "User";
 
     private final UserService userService;
     private final DepartmentService departmentService;

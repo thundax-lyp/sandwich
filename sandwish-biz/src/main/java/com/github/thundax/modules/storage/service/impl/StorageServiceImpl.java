@@ -11,9 +11,7 @@ import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
-import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
-import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
@@ -66,9 +64,15 @@ public class StorageServiceImpl implements StorageService {
         return dao.list(
                 query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
-                query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : statusValue(query.getObjectStatus()),
-                query == null ? null : referenceStatusValue(query.getReferenceStatus()),
+                query == null || query.getOwnerType() == null
+                        ? null
+                        : query.getOwnerType().value(),
+                query == null || query.getObjectStatus() == null
+                        ? null
+                        : query.getObjectStatus().value(),
+                query == null || query.getReferenceStatus() == null
+                        ? null
+                        : query.getReferenceStatus().value(),
                 query == null ? null : query.getReferenceOwnerId(),
                 query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getOriginalFilename(),
@@ -81,9 +85,15 @@ public class StorageServiceImpl implements StorageService {
         IPage<StoredObject> dataPage = dao.page(
                 query == null ? null : query.getContentType(),
                 query == null ? null : query.getOwnerId(),
-                query == null ? null : ownerTypeValue(query.getOwnerType()),
-                query == null ? null : statusValue(query.getObjectStatus()),
-                query == null ? null : referenceStatusValue(query.getReferenceStatus()),
+                query == null || query.getOwnerType() == null
+                        ? null
+                        : query.getOwnerType().value(),
+                query == null || query.getObjectStatus() == null
+                        ? null
+                        : query.getObjectStatus().value(),
+                query == null || query.getReferenceStatus() == null
+                        ? null
+                        : query.getReferenceStatus().value(),
                 query == null ? null : query.getReferenceOwnerId(),
                 query == null ? null : query.getReferenceOwnerType(),
                 query == null ? null : query.getOriginalFilename(),
@@ -238,7 +248,8 @@ public class StorageServiceImpl implements StorageService {
         if (command == null) {
             return 0;
         }
-        return businessDao.deleteByOwner(ownerTypeValue(command.getOwnerType()), command.getOwnerId());
+        return businessDao.deleteByOwner(
+                command.getOwnerType() == null ? null : command.getOwnerType().value(), command.getOwnerId());
     }
 
     @Override
@@ -267,18 +278,6 @@ public class StorageServiceImpl implements StorageService {
                 && storage.getOwnerType() == query.getOwnerType()
                 && StringUtils.isNotBlank(query.getOwnerId())
                 && StringUtils.equals(storage.getOwnerId(), query.getOwnerId());
-    }
-
-    private String ownerTypeValue(StorageOwnerType ownerType) {
-        return ownerType == null ? null : ownerType.value();
-    }
-
-    private String statusValue(StoredObjectStatus status) {
-        return status == null ? null : status.value();
-    }
-
-    private String referenceStatusValue(StoredObjectReferenceStatus referenceStatus) {
-        return referenceStatus == null ? null : referenceStatus.value();
     }
 
     private void updatePriorityOrThrow(StoredObjectId id, int priority, String message) {

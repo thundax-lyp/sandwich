@@ -11,7 +11,6 @@ import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.member.dao.MemberDao;
 import com.github.thundax.modules.member.entity.Member;
-import com.github.thundax.modules.member.entity.enums.MemberStatus;
 import com.github.thundax.modules.member.entity.valueobject.MemberId;
 import com.github.thundax.modules.member.entity.valueobject.MemberIdCodec;
 import com.github.thundax.modules.member.service.MemberService;
@@ -55,7 +54,9 @@ public class MemberServiceImpl implements MemberService {
             return dao.listByIds(MemberIdCodec.toValues(query.getIds()));
         }
         return dao.list(
-                query == null ? null : statusValue(query.getStatus()),
+                query == null || query.getStatus() == null
+                        ? null
+                        : query.getStatus().value(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 query == null ? null : query.getSortDirection());
@@ -64,7 +65,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public PageResult<Member> page(MemberQuery query, PageQuery page) {
         IPage<Member> dataPage = dao.page(
-                query == null ? null : statusValue(query.getStatus()),
+                query == null || query.getStatus() == null
+                        ? null
+                        : query.getStatus().value(),
                 query == null ? null : query.getName(),
                 query == null ? null : query.getRemarks(),
                 query == null ? null : query.getSortDirection(),
@@ -198,10 +201,6 @@ public class MemberServiceImpl implements MemberService {
     public int remove(MemberCommand command) {
         MemberId id = command.getId();
         return id == null ? 0 : dao.deleteById(id);
-    }
-
-    private String statusValue(MemberStatus status) {
-        return status == null ? null : status.value();
     }
 
     private void updatePriorityOrThrow(MemberId id, int priority, String message) {

@@ -8,7 +8,6 @@ import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
-import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.List;
@@ -25,7 +24,7 @@ public interface UserService {
 
     void changeInfo(ChangeUserInfoCommand command);
 
-    int remove(DeleteUserCommand command);
+    int remove(UserId id);
 
     int changeStatus(ChangeUserStatusCommand command);
 

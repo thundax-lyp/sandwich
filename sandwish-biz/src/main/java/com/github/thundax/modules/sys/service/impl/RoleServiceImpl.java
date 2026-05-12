@@ -3,12 +3,12 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
@@ -22,7 +22,6 @@ import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
-import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.ArrayList;
@@ -249,13 +248,12 @@ public class RoleServiceImpl implements RoleService {
 
     @AuditLog(
             type = "Role",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除角色",
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public int remove(DeleteRoleCommand command) {
-        RoleId id = command.getId();
+    public int remove(RoleId id) {
         Role role = get(id);
         if (role == null) {
             return 0;

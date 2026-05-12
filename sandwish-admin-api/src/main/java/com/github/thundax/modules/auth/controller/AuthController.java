@@ -49,6 +49,7 @@ import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.LogType;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.SysLogMessageService;
 import io.swagger.annotations.Api;
@@ -159,7 +160,7 @@ public class AuthController {
 
         releasePreAuthSession(request.getLoginToken());
 
-        authService.deleteAccessTokensByUserId(userIdCommand(UserIdCodec.toStringValue(user.getId())));
+        authService.deleteAccessTokensByUserId(userIdCommand(user.getId()));
 
         return loginSuccess(
                 user,
@@ -440,11 +441,10 @@ public class AuthController {
             String logTitle,
             PrincipalAuthenticationMethod authenticationMethod,
             PrincipalIdentityType identityType) {
-        authService.deleteAccessTokensByUserId(userIdCommand(UserIdCodec.toStringValue(user.getId())));
+        authService.deleteAccessTokensByUserId(userIdCommand(user.getId()));
         HttpServletRequest currentRequest = currentRequest();
         writeLog(currentRequest, logTitle, user, loginName);
-        AdminAuthCommand command =
-                accessTokenCommand(UserIdCodec.toStringValue(user.getId()), loginName, currentRequest);
+        AdminAuthCommand command = accessTokenCommand(user.getId(), loginName, currentRequest);
         command.setAuthenticationMethod(authenticationMethod);
         command.setIdentityType(identityType);
         return AuthInterfaceAssembler.toAccessTokenResponse(authService.createAccessToken(command));
@@ -467,14 +467,14 @@ public class AuthController {
         return withRequestContext(command, request);
     }
 
-    private AdminAuthCommand accessTokenCommand(String userId, String loginName, HttpServletRequest request) {
+    private AdminAuthCommand accessTokenCommand(UserId userId, String loginName, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setUserId(userId);
         command.setLoginName(loginName);
         return withRequestContext(command, request);
     }
 
-    private AdminAuthCommand userIdCommand(String userId) {
+    private AdminAuthCommand userIdCommand(UserId userId) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setUserId(userId);
         return command;
@@ -519,7 +519,7 @@ public class AuthController {
                 oauthCommand(request.getClientId(), request.getRedirectUri(), request.getScopes(), request.getState());
         command.setCodeChallenge(request.getCodeChallenge());
         command.setCodeChallengeMethod(request.getCodeChallengeMethod());
-        command.setUserId(request.getUserId());
+        command.setUserId(UserIdCodec.toDomain(request.getUserId()));
         command.setApproved(request.isApproved());
         return withRequestContext(command, currentRequest());
     }

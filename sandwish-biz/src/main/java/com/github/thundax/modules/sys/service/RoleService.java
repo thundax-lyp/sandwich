@@ -10,7 +10,6 @@ import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
-import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.List;
@@ -27,7 +26,7 @@ public interface RoleService {
 
     void changeInfo(ChangeRoleInfoCommand command);
 
-    int remove(DeleteRoleCommand command);
+    int remove(RoleId id);
 
     void sort(RoleSortCommand command);
 

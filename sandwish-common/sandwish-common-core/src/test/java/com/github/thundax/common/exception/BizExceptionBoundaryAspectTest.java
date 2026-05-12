@@ -1,12 +1,10 @@
-package com.github.thundax.modules.exception;
+package com.github.thundax.common.exception;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.exception.DomainException;
 import java.lang.reflect.Method;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.Test;

@@ -3,11 +3,11 @@ package com.github.thundax.modules.auth.service.impl;
 import static org.junit.Assert.*;
 
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.*;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
@@ -111,7 +111,7 @@ public class PrincipalAuthServiceImplTest {
 
     private static PrincipalCredential credential(long id, PrincipalIdentityId identityId, String password) {
         PrincipalCredential credential = new PrincipalCredential();
-        credential.setId(EntityIdCodec.toDomain(id));
+        credential.setId(PrincipalCredentialIdCodec.toDomain(id));
         credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         credential.setIdentityId(identityId);
         credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
@@ -182,7 +182,7 @@ public class PrincipalAuthServiceImplTest {
         }
 
         @Override
-        public EntityId create(PrincipalCredentialCommand command) {
+        public PrincipalCredentialId create(PrincipalCredentialCommand command) {
             return command.getPrincipalCredential().getId();
         }
 

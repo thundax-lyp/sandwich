@@ -1,6 +1,5 @@
-package com.github.thundax.modules.exception;
+package com.github.thundax.common.exception;
 
-import com.github.thundax.common.exception.BizException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,9 +15,9 @@ public class BizExceptionBoundaryAspect {
     public static final String TECHNICAL_FAILURE_MESSAGE_KEY = "biz.exception.technical-failure";
     public static final String TECHNICAL_FAILURE_MESSAGE = "业务处理失败";
 
-    @Around("(@within(com.github.thundax.modules.exception.BizExceptionBoundary)"
-            + " && !@annotation(com.github.thundax.modules.exception.BizExceptionBoundaryIgnore))"
-            + " || @annotation(com.github.thundax.modules.exception.BizExceptionBoundary)")
+    @Around("(@within(com.github.thundax.common.exception.BizExceptionBoundary)"
+            + " && !@annotation(com.github.thundax.common.exception.BizExceptionBoundaryIgnore))"
+            + " || @annotation(com.github.thundax.common.exception.BizExceptionBoundary)")
     public Object convertTechnicalException(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return joinPoint.proceed();

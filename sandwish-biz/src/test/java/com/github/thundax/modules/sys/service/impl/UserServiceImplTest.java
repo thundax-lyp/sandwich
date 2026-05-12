@@ -11,7 +11,6 @@ import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
-import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,7 +85,7 @@ public class UserServiceImplTest {
         when(userDao.getById(UserId.of(1001L))).thenReturn(user);
         when(userDao.deleteById(UserId.of(1001L))).thenReturn(1);
 
-        int count = service.remove(new DeleteUserCommand(UserId.of(1001L)));
+        int count = service.remove(UserId.of(1001L));
 
         assertEquals(1, count);
         InOrder inOrder = org.mockito.Mockito.inOrder(deleteCascadeHandler, userDao);
@@ -104,7 +103,7 @@ public class UserServiceImplTest {
         when(userDao.getById(UserId.of(1001L))).thenReturn(user);
         when(userDao.deleteById(UserId.of(1001L))).thenReturn(1);
 
-        int count = service.remove(new DeleteUserCommand(UserId.of(1001L)));
+        int count = service.remove(UserId.of(1001L));
 
         assertEquals(1, count);
         verify(userDao).deleteUserRole(1001L);

@@ -465,7 +465,7 @@ public class AuthPermissionLifecycleTest {
 
     private AuthAccessTokenResult createAccessToken(String userId, String loginName) {
         AdminAuthCommand command = new AdminAuthCommand();
-        command.setUserId(userId);
+        command.setUserId(UserIdCodec.toDomain(userId));
         command.setLoginName(loginName);
         return authService.createAccessToken(command);
     }
@@ -478,7 +478,7 @@ public class AuthPermissionLifecycleTest {
 
     private AdminAuthCommand userSessionCommand(Long userId, String reason) {
         AdminAuthCommand command = new AdminAuthCommand();
-        command.setEntityUserId(EntityId.of(userId));
+        command.setUserId(UserIdCodec.toDomain(userId));
         command.setReason(reason);
         return command;
     }
@@ -517,7 +517,7 @@ public class AuthPermissionLifecycleTest {
         AdminAuthCommand command = oauthCommand(clientId, redirectUri, scopes, state);
         command.setCodeChallenge(codeChallenge);
         command.setCodeChallengeMethod(codeChallengeMethod);
-        command.setUserId(userId);
+        command.setUserId(UserIdCodec.toDomain(userId));
         command.setApproved(approved);
         return command;
     }
@@ -833,7 +833,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void sort(com.github.thundax.modules.sys.service.command.UserSortCommand command) {}
 
-        public int remove(DeleteUserCommand command) {
+        public int remove(UserId id) {
             return 1;
         }
 
@@ -899,9 +899,9 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId create(PrincipalCredentialCommand command) {
+        public PrincipalCredentialId create(PrincipalCredentialCommand command) {
             PrincipalCredential principalCredential = command.getPrincipalCredential();
-            principalCredential.setId(EntityId.of(9001L));
+            principalCredential.setId(PrincipalCredentialId.of(9001L));
             return principalCredential.getId();
         }
 
@@ -916,7 +916,7 @@ public class AuthPermissionLifecycleTest {
 
         private PrincipalCredential credential() {
             PrincipalCredential credential = new PrincipalCredential();
-            credential.setId(EntityId.of(9001L));
+            credential.setId(PrincipalCredentialId.of(9001L));
             credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             credential.setIdentityId(PrincipalIdentityId.of(8001L));
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
@@ -965,7 +965,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void changeInfo(ChangeMenuInfoCommand command) {}
 
-        public int remove(DeleteMenuCommand command) {
+        public int remove(MenuId id) {
             return 1;
         }
 
@@ -1037,7 +1037,7 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void changeInfo(ChangeRoleInfoCommand command) {}
 
-        public int remove(DeleteRoleCommand command) {
+        public int remove(RoleId id) {
             return 1;
         }
 

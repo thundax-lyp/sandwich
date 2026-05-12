@@ -15,7 +15,6 @@ import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import java.util.Arrays;
@@ -84,8 +83,7 @@ public class StorageServiceImplTest {
         RecordingStoredObjectDao dao = new RecordingStoredObjectDao();
         StorageServiceImpl service = storageService(dao);
 
-        int count = service.remove(new DeleteStorageCommand(StoredObjectId.of(8101L)))
-                + service.remove(new DeleteStorageCommand(StoredObjectId.of(8102L)));
+        int count = service.remove(StoredObjectId.of(8101L)) + service.remove(StoredObjectId.of(8102L));
 
         assertEquals(2, count);
         assertEquals(Arrays.asList(8101L, 8102L), dao.deletedIds);

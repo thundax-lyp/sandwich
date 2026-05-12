@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
@@ -16,7 +17,6 @@ import com.github.thundax.modules.auth.service.dto.PrincipalPasswordPolicyDTO;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.Date;
 import org.springframework.stereotype.Service;
 

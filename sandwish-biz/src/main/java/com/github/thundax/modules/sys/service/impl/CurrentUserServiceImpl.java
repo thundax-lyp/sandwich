@@ -1,6 +1,7 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
@@ -16,7 +17,6 @@ import com.github.thundax.modules.auth.service.command.PrincipalCredentialComman
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
@@ -24,7 +24,6 @@ import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -256,7 +255,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
     private void removeAvatar(UserId userId) {
         for (StoredObject storage : listAvatars(userId)) {
-            storageService.remove(new DeleteStorageCommand(storage.getId()));
+            storageService.remove(storage.getId());
         }
     }
 

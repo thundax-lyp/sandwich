@@ -11,7 +11,6 @@ import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageObjectStatusCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageReferenceStatusCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
@@ -29,7 +28,7 @@ public interface StorageService {
 
     void change(ChangeStorageCommand command);
 
-    int remove(DeleteStorageCommand command);
+    int remove(StoredObjectId id);
 
     List<String> listMimeTypes(StorageQuery query);
 

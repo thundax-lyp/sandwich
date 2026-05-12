@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
@@ -11,7 +12,6 @@ import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionComm
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import org.springframework.stereotype.Service;
 
 @Service

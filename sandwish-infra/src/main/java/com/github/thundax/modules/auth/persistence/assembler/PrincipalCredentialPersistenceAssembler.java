@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO;
@@ -20,7 +20,7 @@ public final class PrincipalCredentialPersistenceAssembler {
             return null;
         }
         PrincipalCredentialDO dataObject = new PrincipalCredentialDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(PrincipalCredentialIdCodec.toValue(entity.getId()));
         dataObject.setPrincipalType(principalTypeValue(entity.getPrincipalKey()));
         dataObject.setPrincipalId(principalIdValue(entity.getPrincipalKey()));
         dataObject.setIdentityId(PrincipalIdentityIdCodec.toValue(entity.getIdentityId()));
@@ -41,7 +41,7 @@ public final class PrincipalCredentialPersistenceAssembler {
             return null;
         }
         PrincipalCredential entity = new PrincipalCredential();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(PrincipalCredentialIdCodec.toDomain(dataObject.getId()));
         entity.setPrincipalKey(
                 PrincipalKey.of(principalTypeFrom(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
         entity.setIdentityId(PrincipalIdentityIdCodec.toDomain(dataObject.getIdentityId()));

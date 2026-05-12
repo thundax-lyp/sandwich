@@ -26,7 +26,6 @@ import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
-import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.Arrays;
@@ -100,15 +99,12 @@ public class DictControllerContractTest {
 
         Boolean deleted = controller.delete(Arrays.asList(idRequest(1L), idRequest(2L)));
 
-        ArgumentCaptor<DeleteDictCommand> commandCaptor = ArgumentCaptor.forClass(DeleteDictCommand.class);
-        verify(dictService, times(2)).remove(commandCaptor.capture());
+        ArgumentCaptor<DictId> idCaptor = ArgumentCaptor.forClass(DictId.class);
+        verify(dictService, times(2)).remove(idCaptor.capture());
         assertEquals(Boolean.TRUE, deleted);
         assertEquals(
                 Arrays.asList(1L, 2L),
-                commandCaptor.getAllValues().stream()
-                        .map(DeleteDictCommand::getId)
-                        .map(DictIdCodec::toValue)
-                        .collect(Collectors.toList()));
+                idCaptor.getAllValues().stream().map(DictIdCodec::toValue).collect(Collectors.toList()));
     }
 
     @Test(expected = SandwishException.class)

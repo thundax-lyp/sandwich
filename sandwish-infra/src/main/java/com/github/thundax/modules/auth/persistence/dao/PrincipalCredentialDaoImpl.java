@@ -2,13 +2,13 @@ package com.github.thundax.modules.auth.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.PrincipalCredentialDao;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
@@ -29,8 +29,9 @@ public class PrincipalCredentialDaoImpl implements PrincipalCredentialDao {
     }
 
     @Override
-    public PrincipalCredential getById(EntityId id) {
-        return PrincipalCredentialPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    public PrincipalCredential getById(PrincipalCredentialId id) {
+        return PrincipalCredentialPersistenceAssembler.toEntity(
+                mapper.selectById(PrincipalCredentialIdCodec.toValue(id)));
     }
 
     @Override
@@ -62,11 +63,11 @@ public class PrincipalCredentialDaoImpl implements PrincipalCredentialDao {
     }
 
     @Override
-    public EntityId insert(PrincipalCredential principalCredential) {
+    public PrincipalCredentialId insert(PrincipalCredential principalCredential) {
         PrincipalCredentialDO dataObject = PrincipalCredentialPersistenceAssembler.toDataObject(principalCredential);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return PrincipalCredentialIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

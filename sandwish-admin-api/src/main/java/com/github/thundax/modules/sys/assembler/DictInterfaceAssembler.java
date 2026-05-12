@@ -10,7 +10,6 @@ import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -73,13 +72,6 @@ public final class DictInterfaceAssembler {
         command.setLabel(request.getLabel());
         command.setType(request.getType());
         command.setValue(request.getValue());
-        return command;
-    }
-
-    @NonNull
-    public static DeleteDictCommand toDeleteCommand(@NonNull DictIdRequest request) {
-        DeleteDictCommand command = new DeleteDictCommand();
-        command.setId(DictIdCodec.toDomain(request.getId()));
         return command;
     }
 

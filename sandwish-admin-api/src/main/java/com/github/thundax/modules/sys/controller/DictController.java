@@ -20,7 +20,6 @@ import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import com.github.thundax.modules.sys.service.DictService;
-import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import io.swagger.annotations.Api;
@@ -149,20 +148,18 @@ public class DictController {
     @SysLogger("删除")
     @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<DictIdRequest> list) {
-        List<DeleteDictCommand> commandList = new ArrayList<>();
+        List<DictId> idList = new ArrayList<>();
         for (DictIdRequest request : RequestListHelper.present(list)) {
             Dict bean = dictService.get(DictInterfaceAssembler.toId(request));
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            commandList.add(DictInterfaceAssembler.toDeleteCommand(request));
+            idList.add(bean.getId());
         }
-        if (commandList.isEmpty()) {
+        if (idList.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("list");
         }
-        for (DeleteDictCommand command : commandList) {
-            dictService.remove(command);
-        }
+        idList.forEach(dictService::remove);
         return true;
     }
 

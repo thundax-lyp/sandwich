@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
 import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.List;
@@ -23,7 +22,7 @@ public interface DepartmentService {
 
     void changeInfo(ChangeDepartmentInfoCommand command);
 
-    int remove(DeleteDepartmentCommand command);
+    int remove(DepartmentId id);
 
     void move(MoveDepartmentCommand command);
 

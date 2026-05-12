@@ -3,10 +3,10 @@ package com.github.thundax.modules.storage.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.storage.dao.StoredObjectDao;
 import com.github.thundax.modules.storage.dao.StoredObjectReferenceDao;
 import com.github.thundax.modules.storage.entity.StoredObject;
@@ -20,7 +20,6 @@ import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageObjectStatusCommand;
 import com.github.thundax.modules.storage.service.command.ChangeStorageReferenceStatusCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
@@ -207,11 +206,11 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int remove(DeleteStorageCommand command) {
-        if (command == null || command.getId() == null) {
+    public int remove(StoredObjectId id) {
+        if (id == null) {
             return 0;
         }
-        return dao.deleteById(command.getId());
+        return dao.deleteById(id);
     }
 
     @Override

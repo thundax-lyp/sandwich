@@ -1,10 +1,10 @@
-package com.github.thundax.modules.exception;
+package com.github.thundax.common.exception;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BizExceptionBoundaryIgnore {}
+public @interface BizExceptionBoundary {}

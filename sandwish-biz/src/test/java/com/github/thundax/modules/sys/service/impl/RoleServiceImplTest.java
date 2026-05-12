@@ -16,7 +16,6 @@ import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.CreateRoleCommand;
-import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,7 +128,7 @@ public class RoleServiceImplTest {
         dao.getResult = role(4001L);
         RoleServiceImpl service = new RoleServiceImpl(dao);
 
-        int count = service.remove(new DeleteRoleCommand(RoleId.of(4001L)));
+        int count = service.remove(RoleId.of(4001L));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(4001L), dao.deletedRoleMenuId);

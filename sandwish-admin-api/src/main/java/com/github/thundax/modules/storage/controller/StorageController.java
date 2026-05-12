@@ -23,7 +23,6 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
@@ -181,7 +180,7 @@ public class StorageController {
         }
 
         for (StoredObject storage : storageList) {
-            storageService.remove(new DeleteStorageCommand(storage.getId()));
+            storageService.remove(storage.getId());
         }
         return true;
     }

@@ -3,19 +3,18 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.DictDao;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.ArrayList;
@@ -228,14 +227,14 @@ public class DictServiceImpl implements DictService {
     @Override
     @AuditLog(
             type = "Dict",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除字典",
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public void remove(DeleteDictCommand command) {
-        if (command != null && command.getId() != null) {
-            dao.deleteById(command.getId());
+    public void remove(DictId id) {
+        if (id != null) {
+            dao.deleteById(id);
         }
     }
 

@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.exception.AdminResponseExceptions;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
 import com.github.thundax.modules.auth.config.AuthProperties;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
@@ -219,7 +218,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @Override
     public int invalidateSessionsByUserId(AdminAuthCommand command) {
-        return invalidateSessionsByUserId(command.getEntityUserId(), command.getReason());
+        return invalidateSessionsByUserId(command.getUserId(), command.getReason());
     }
 
     @Override
@@ -259,17 +258,17 @@ public class AdminAuthServiceImpl implements AdminAuthService {
     }
 
     @NonNull
-    private AuthAccessTokenResult createAccessToken(String userId) {
+    private AuthAccessTokenResult createAccessToken(UserId userId) {
         return createAccessToken(userId, null);
     }
 
     @NonNull
-    private AuthAccessTokenResult createAccessToken(String userId, String loginName) {
+    private AuthAccessTokenResult createAccessToken(UserId userId, String loginName) {
         return createAccessToken(userId, loginName, null, null);
     }
 
     @NonNull
-    private AuthAccessTokenResult createAccessToken(String userId, String loginName, String ip, String userAgent) {
+    private AuthAccessTokenResult createAccessToken(UserId userId, String loginName, String ip, String userAgent) {
         return createAccessToken(
                 userId,
                 loginName,
@@ -281,7 +280,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
 
     @NonNull
     private AuthAccessTokenResult createAccessToken(
-            String userId,
+            UserId userId,
             String loginName,
             String ip,
             String userAgent,
@@ -292,7 +291,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         PrincipalAccessToken accessToken = buildPrincipalAccessToken(
                 token,
                 ADMIN_CLIENT_ID,
-                PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
+                PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)),
                 new LinkedHashSet<>(),
                 now,
                 properties.getLoginExpiredSeconds());
@@ -301,7 +300,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         principalAuthSessionDao.insert(session, runtimeExpiredSeconds(properties.getLoginExpiredSeconds()));
         accessToken.setSessionId(session.getId());
         accessToken.setId(requirePrincipalAccessTokenDao().insert(accessToken, token));
-        permissionService.createPermissions(token, userId);
+        permissionService.createPermissions(token, UserIdCodec.toStringValue(userId));
         String refreshToken = createPrincipalRefreshToken(accessToken, ADMIN_CLIENT_ID, now);
         if (StringUtils.isNotBlank(loginName)) {
             writeLoginEvent(
@@ -334,11 +333,11 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         return new AuthAccessTokenResult(token, null, accessToken);
     }
 
-    private int deleteAccessTokensByUserId(String userId) {
+    private int deleteAccessTokensByUserId(UserId userId) {
         int count = 0;
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
-                        PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
+                        PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)),
                         ADMIN_CLIENT_ID,
                         PrincipalTokenStatus.ACTIVE);
         for (PrincipalAccessToken token : tokens) {
@@ -454,8 +453,8 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         current.markUsed();
         principalRefreshTokenDao.updateStatus(current);
 
-        AuthAccessTokenResult accessToken =
-                createAccessToken(String.valueOf(current.getPrincipalKey().getPrincipalId()), null, ip, userAgent);
+        AuthAccessTokenResult accessToken = createAccessToken(
+                UserIdCodec.toDomain(current.getPrincipalKey().getPrincipalId()), null, ip, userAgent);
         writeLoginEvent(
                 current.getPrincipalKey(),
                 requestedClientId,
@@ -487,7 +486,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String state,
             String codeChallenge,
             String codeChallengeMethod,
-            String userId,
+            UserId userId,
             boolean approved) {
         return decideOAuth2(
                 clientId, redirectUri, scopes, state, codeChallenge, codeChallengeMethod, userId, approved, null, null);
@@ -500,7 +499,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
             String state,
             String codeChallenge,
             String codeChallengeMethod,
-            String userId,
+            UserId userId,
             boolean approved,
             String ip,
             String userAgent) {
@@ -510,7 +509,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         result.setState(state);
         if (!approved) {
             writeLoginEvent(
-                    PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)),
+                    PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)),
                     clientId,
                     PrincipalLoginEventType.OAUTH_AUTHORIZED,
                     PrincipalAuthenticationMethod.OAUTH_CODE,
@@ -527,7 +526,7 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         OAuthAuthorization authorization = new OAuthAuthorization();
         authorization.setAuthorizationCode(UuidHelper.compact());
         authorization.setClientId(clientId);
-        authorization.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, Long.valueOf(userId)));
+        authorization.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)));
         authorization.setRedirectUri(redirectUri);
         authorization.setScopes(toScopeSet(scopes));
         authorization.setState(state);
@@ -694,10 +693,10 @@ public class AdminAuthServiceImpl implements AdminAuthService {
         invalidatePrincipalAuthSession(token);
     }
 
-    private int invalidateSessionsByUserId(EntityId userId, String reason) {
+    private int invalidateSessionsByUserId(UserId userId, String reason) {
         List<PrincipalAccessToken> tokens = requirePrincipalAccessTokenDao()
                 .listByPrincipalKeyAndClientIdAndStatus(
-                        PrincipalKey.of(PrincipalType.USER, userId.value()),
+                        PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)),
                         ADMIN_CLIENT_ID,
                         PrincipalTokenStatus.ACTIVE);
         int count = 0;

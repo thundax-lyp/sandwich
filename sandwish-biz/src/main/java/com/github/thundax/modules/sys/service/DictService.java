@@ -6,7 +6,6 @@ import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictId;
 import com.github.thundax.modules.sys.service.command.ChangeDictInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDictCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDictCommand;
 import com.github.thundax.modules.sys.service.command.DictSortCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import java.util.List;
@@ -25,7 +24,7 @@ public interface DictService {
 
     void changeInfo(ChangeDictInfoCommand command);
 
-    void remove(DeleteDictCommand command);
+    void remove(DictId id);
 
     List<String> listTypes(DictQuery query);
 

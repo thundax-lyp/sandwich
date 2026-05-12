@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface PrincipalCredentialService {
     List<PrincipalCredential> list(PrincipalCredentialQuery query);
 
     @LayerPublicApi(reason = "统一认证主体资料维护时新增凭据的业务入口")
-    EntityId create(PrincipalCredentialCommand command);
+    PrincipalCredentialId create(PrincipalCredentialCommand command);
 
     @LayerPublicApi(reason = "统一认证主体资料维护时更新凭据的业务入口")
     void change(PrincipalCredentialCommand command);

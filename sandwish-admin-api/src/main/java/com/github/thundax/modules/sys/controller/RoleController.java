@@ -31,6 +31,7 @@ import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
+import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -40,7 +41,6 @@ import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
-import com.github.thundax.modules.sys.service.command.DeleteRoleCommand;
 import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
@@ -255,19 +255,19 @@ public class RoleController {
     @SysLogger("删除")
     @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<RoleIdRequest> list) {
-        List<DeleteRoleCommand> commandList = new ArrayList<>();
+        List<RoleId> idList = new ArrayList<>();
         for (RoleIdRequest request : RequestListHelper.present(list)) {
             Role bean = roleService.get(RoleIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            commandList.add(new DeleteRoleCommand(bean.getId()));
+            idList.add(bean.getId());
         }
-        if (commandList.isEmpty()) {
+        if (idList.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("list");
         }
 
-        commandList.forEach(roleService::remove);
+        idList.forEach(roleService::remove);
 
         return true;
     }

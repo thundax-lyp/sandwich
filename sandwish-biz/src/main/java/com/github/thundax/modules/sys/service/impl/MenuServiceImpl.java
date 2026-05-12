@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
@@ -15,7 +15,6 @@ import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
 import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
-import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.Collections;
@@ -115,14 +114,14 @@ public class MenuServiceImpl implements MenuService {
 
     @AuditLog(
             type = "Menu",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除菜单",
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public int remove(DeleteMenuCommand command) {
-        dao.deleteMenuRole(MenuIdCodec.toValue(command.getId()));
-        Menu bean = this.get(command.getId());
+    public int remove(MenuId id) {
+        dao.deleteMenuRole(MenuIdCodec.toValue(id));
+        Menu bean = this.get(id);
         if (bean == null) {
             return 0;
         }

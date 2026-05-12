@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.service.command;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalAuthenticationMethod;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
+import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AdminAuthCommand {
-    private String userId;
-    private EntityId entityUserId;
+    private UserId userId;
     private String loginName;
     private String plainPassword;
     private String mobile;

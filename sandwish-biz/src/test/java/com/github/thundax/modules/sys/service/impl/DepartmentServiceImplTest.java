@@ -12,7 +12,6 @@ import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.List;
 import org.junit.Test;
@@ -88,7 +87,7 @@ public class DepartmentServiceImplTest {
         dao.getResult = department(6001L);
         DepartmentServiceImpl service = new DepartmentServiceImpl(dao);
 
-        int count = service.remove(new DeleteDepartmentCommand(DepartmentIdCodec.toDomain(6001L)));
+        int count = service.remove(DepartmentIdCodec.toDomain(6001L));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(6001L), dao.deletedId);

@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.DepartmentDao;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
@@ -13,7 +13,6 @@ import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.command.ChangeDepartmentInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateDepartmentCommand;
-import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
 import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import java.util.List;
@@ -75,13 +74,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @AuditLog(
             type = "Department",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除部门",
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public int remove(DeleteDepartmentCommand command) {
-        Department bean = this.get(command.getId());
+    public int remove(DepartmentId id) {
+        Department bean = this.get(id);
         if (bean == null) {
             return 0;
         }

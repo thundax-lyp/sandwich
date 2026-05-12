@@ -21,7 +21,6 @@ import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
-import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.command.MoveMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import io.swagger.annotations.Api;
@@ -196,19 +195,19 @@ public class MenuController {
     @SysLogger("删除")
     @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<MenuIdRequest> list) {
-        List<DeleteMenuCommand> commandList = new ArrayList<>();
+        List<MenuId> idList = new ArrayList<>();
         for (MenuIdRequest request : RequestListHelper.present(list)) {
             Menu bean = menuService.get(MenuIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            commandList.add(new DeleteMenuCommand(bean.getId()));
+            idList.add(bean.getId());
         }
-        if (commandList.isEmpty()) {
+        if (idList.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("list");
         }
 
-        commandList.forEach(menuService::remove);
+        idList.forEach(menuService::remove);
 
         return true;
     }

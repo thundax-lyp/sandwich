@@ -3,12 +3,12 @@ package com.github.thundax.modules.sys.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.exception.ErrorCode;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -21,7 +21,6 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
-import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.handler.UserDeleteCascadeHandler;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -209,13 +208,13 @@ public class UserServiceImpl implements UserService {
 
     @AuditLog(
             type = "User",
-            id = "#command.id.value()",
+            id = "#id.value()",
             action = AuditAction.DELETE,
             summary = "删除后台用户",
             recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
-    public int remove(DeleteUserCommand command) {
-        User user = get(command.getId());
+    public int remove(UserId id) {
+        User user = get(id);
         if (user == null) {
             return 0;
         }
@@ -223,9 +222,9 @@ public class UserServiceImpl implements UserService {
         for (UserDeleteCascadeHandler deleteCascadeHandler : deleteCascadeHandlers) {
             deleteCascadeHandler.beforeDelete(user);
         }
-        dao.deleteUserRole(UserIdCodec.toValue(command.getId()));
+        dao.deleteUserRole(UserIdCodec.toValue(id));
 
-        return dao.deleteById(command.getId());
+        return dao.deleteById(id);
     }
 
     @Override

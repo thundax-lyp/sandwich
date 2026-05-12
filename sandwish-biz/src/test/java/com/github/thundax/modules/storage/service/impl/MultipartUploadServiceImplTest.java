@@ -349,7 +349,7 @@ public class MultipartUploadServiceImplTest {
         public void change(com.github.thundax.modules.storage.service.command.ChangeStorageCommand command) {}
 
         @Override
-        public int remove(com.github.thundax.modules.storage.service.command.DeleteStorageCommand command) {
+        public int remove(com.github.thundax.modules.storage.entity.valueobject.StoredObjectId id) {
             return 0;
         }
 

@@ -1,12 +1,12 @@
 package com.github.thundax.modules.auth.service.impl;
 
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.modules.auth.dao.PrincipalIdentityDao;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

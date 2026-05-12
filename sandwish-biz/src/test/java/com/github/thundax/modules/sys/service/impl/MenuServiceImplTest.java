@@ -15,7 +15,6 @@ import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.command.ChangeMenuInfoCommand;
 import com.github.thundax.modules.sys.service.command.ChangeMenuVisibilityCommand;
 import com.github.thundax.modules.sys.service.command.CreateMenuCommand;
-import com.github.thundax.modules.sys.service.command.DeleteMenuCommand;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import java.util.List;
 import org.junit.Test;
@@ -106,7 +105,7 @@ public class MenuServiceImplTest {
         dao.getResult = stored;
         MenuServiceImpl service = new MenuServiceImpl(dao);
 
-        int count = service.remove(new DeleteMenuCommand(MenuId.of(5001L)));
+        int count = service.remove(MenuId.of(5001L));
 
         assertEquals(1, count);
         assertEquals(Long.valueOf(5001L), dao.deletedMenuRoleId);

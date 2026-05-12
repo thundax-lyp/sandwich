@@ -1,6 +1,7 @@
 package com.github.thundax.modules.audit.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.dao.AuditLogDao;
@@ -18,7 +19,6 @@ import com.github.thundax.modules.audit.service.AuditService;
 import com.github.thundax.modules.audit.service.command.CreateAuditLogCommand;
 import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import com.github.thundax.modules.audit.service.query.AuditMetaQuery;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;

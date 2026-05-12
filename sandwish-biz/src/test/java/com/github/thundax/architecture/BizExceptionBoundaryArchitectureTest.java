@@ -2,9 +2,9 @@ package com.github.thundax.architecture;
 
 import static org.junit.Assert.assertTrue;
 
+import com.github.thundax.common.exception.BizExceptionBoundary;
+import com.github.thundax.common.exception.BizExceptionBoundaryIgnore;
 import com.github.thundax.common.test.architecture.AbstractArchitectureTest;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
-import com.github.thundax.modules.exception.BizExceptionBoundaryIgnore;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaMethod;

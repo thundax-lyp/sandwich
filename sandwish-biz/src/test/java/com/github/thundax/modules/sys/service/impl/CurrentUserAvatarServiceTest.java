@@ -13,11 +13,11 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
+import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
-import com.github.thundax.modules.storage.service.command.DeleteStorageCommand;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.MenuService;
@@ -68,10 +68,9 @@ public class CurrentUserAvatarServiceTest {
         service.changeAvatar(new ChangeCurrentUserAvatarCommand(
                 UserIdCodec.toDomain(7L), avatar.getInputStream(), avatar.getOriginalFilename()));
 
-        ArgumentCaptor<DeleteStorageCommand> deleteCaptor = ArgumentCaptor.forClass(DeleteStorageCommand.class);
+        ArgumentCaptor<StoredObjectId> deleteCaptor = ArgumentCaptor.forClass(StoredObjectId.class);
         verify(storageService).remove(deleteCaptor.capture());
-        assertEquals(
-                StoredObjectIdCodec.toDomain(7001L), deleteCaptor.getValue().getId());
+        assertEquals(StoredObjectIdCodec.toDomain(7001L), deleteCaptor.getValue());
 
         ArgumentCaptor<CreateStorageCommand> createCaptor = ArgumentCaptor.forClass(CreateStorageCommand.class);
         verify(storageService).create(createCaptor.capture());

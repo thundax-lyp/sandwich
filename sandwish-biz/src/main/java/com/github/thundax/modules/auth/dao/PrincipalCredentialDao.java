@@ -1,16 +1,16 @@
 package com.github.thundax.modules.auth.dao;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.List;
 
 public interface PrincipalCredentialDao {
 
-    PrincipalCredential getById(EntityId id);
+    PrincipalCredential getById(PrincipalCredentialId id);
 
     PrincipalCredential getByIdentityIdAndType(PrincipalIdentityId identityId, PrincipalCredentialType credentialType);
 
@@ -18,7 +18,7 @@ public interface PrincipalCredentialDao {
 
     List<PrincipalCredential> listByPrincipalKeyAndStatus(PrincipalKey principalKey, PrincipalCredentialStatus status);
 
-    EntityId insert(PrincipalCredential principalCredential);
+    PrincipalCredentialId insert(PrincipalCredential principalCredential);
 
     int update(PrincipalCredential principalCredential);
 

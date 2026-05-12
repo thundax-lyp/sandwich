@@ -28,7 +28,7 @@ public interface MemberService {
 
     int changeStatus(MemberCommand command);
 
-    int remove(MemberCommand command);
+    int remove(MemberId id);
 
     void sort(MemberSortCommand command);
 }

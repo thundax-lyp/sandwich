@@ -59,7 +59,6 @@ import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
-import com.github.thundax.modules.sys.service.command.DeleteUserCommand;
 import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
@@ -426,7 +425,7 @@ public class UserController {
     public Boolean delete(@Valid @RequestBody List<UserIdRequest> list) {
         User currentUser = currentUserResolver.currentUser();
 
-        List<DeleteUserCommand> commandList = new ArrayList<>();
+        List<UserId> idList = new ArrayList<>();
         for (UserIdRequest request : RequestListHelper.present(list)) {
             User bean = userService.get(UserIdCodec.toDomain(request.getId()));
             if (bean == null) {
@@ -436,13 +435,13 @@ public class UserController {
                     || bean.getRank().value() >= currentUser.getRank().value()) {
                 throw AdminResponseExceptions.permissionDenied();
             }
-            commandList.add(new DeleteUserCommand(bean.getId()));
+            idList.add(bean.getId());
         }
-        if (commandList.isEmpty()) {
+        if (idList.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("list");
         }
 
-        commandList.forEach(userService::remove);
+        idList.forEach(userService::remove);
 
         return true;
     }

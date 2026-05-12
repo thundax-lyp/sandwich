@@ -1,8 +1,8 @@
 package com.github.thundax.modules.storage.service.impl;
 
 import com.github.thundax.common.exception.BizException;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.storage.dao.MultipartUploadDao;
 import com.github.thundax.modules.storage.entity.MultipartUploadPart;
 import com.github.thundax.modules.storage.entity.MultipartUploadSession;

@@ -1,12 +1,12 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.id.EntityId;
+import com.github.thundax.common.exception.BizExceptionBoundary;
 import com.github.thundax.modules.auth.dao.PrincipalCredentialDao;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
-import com.github.thundax.modules.exception.BizExceptionBoundary;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +43,9 @@ public class PrincipalCredentialServiceImpl implements PrincipalCredentialServic
     }
 
     @Override
-    public EntityId create(PrincipalCredentialCommand command) {
+    public PrincipalCredentialId create(PrincipalCredentialCommand command) {
         PrincipalCredential principalCredential = command.getPrincipalCredential();
-        EntityId id = principalCredentialDao.insert(principalCredential);
+        PrincipalCredentialId id = principalCredentialDao.insert(principalCredential);
         principalCredential.setId(id);
         return id;
     }

@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service.query;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalCredentialId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrincipalCredentialQuery {
-    private EntityId id;
+    private PrincipalCredentialId id;
     private PrincipalIdentityId identityId;
     private PrincipalCredentialType credentialType;
     private PrincipalKey principalKey;

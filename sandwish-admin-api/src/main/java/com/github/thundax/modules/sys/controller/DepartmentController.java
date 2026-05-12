@@ -18,7 +18,6 @@ import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
-import com.github.thundax.modules.sys.service.command.DeleteDepartmentCommand;
 import com.github.thundax.modules.sys.service.command.MoveDepartmentCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import io.swagger.annotations.Api;
@@ -164,19 +163,19 @@ public class DepartmentController {
     @SysLogger("删除")
     @PostMapping(value = "delete")
     public Boolean delete(@Valid @RequestBody List<DepartmentIdRequest> list) {
-        List<DeleteDepartmentCommand> commandList = new ArrayList<>();
+        List<DepartmentId> idList = new ArrayList<>();
         for (DepartmentIdRequest request : RequestListHelper.present(list)) {
             Department bean = departmentService.get(DepartmentIdCodec.toDomain(request.getId()));
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            commandList.add(new DeleteDepartmentCommand(bean.getId()));
+            idList.add(bean.getId());
         }
-        if (commandList.isEmpty()) {
+        if (idList.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("list");
         }
 
-        commandList.forEach(departmentService::remove);
+        idList.forEach(departmentService::remove);
 
         return true;
     }

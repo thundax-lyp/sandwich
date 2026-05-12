@@ -315,7 +315,7 @@ export const UserPage = () => {
                     <Space className="user-page-actions">
                         <Input
                             allowClear
-                            className="user-search"
+                            className={`user-search${filtersOpen ? " user-search-hidden" : ""}`}
                             placeholder="搜索用户..."
                             prefix={<SearchOutlined />}
                             suffix={<span className="user-search-shortcut">⌘K</span>}

@@ -1052,6 +1052,19 @@ p {
 
 .user-search {
     width: 250px;
+    transition:
+        width 0.18s ease,
+        opacity 0.14s ease,
+        margin 0.18s ease;
+}
+
+.user-search-hidden {
+    width: 0;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .user-search-shortcut {
@@ -1551,6 +1564,10 @@ p {
     .user-search,
     .user-page-actions .ant-btn {
         width: 100%;
+    }
+
+    .user-search-hidden {
+        display: none;
     }
 
     .user-filter-panel-open {

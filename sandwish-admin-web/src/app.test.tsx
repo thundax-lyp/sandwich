@@ -6,6 +6,7 @@ import { postJson } from "./api/http";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
+import { UserPage } from "./pages/system/user/user-page";
 import { queryClient } from "./query/query-client";
 
 vi.mock("sm-crypto", () => ({
@@ -63,7 +64,7 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: [
-                                { id: "10", name: "系统管理", displayParams: "{\"icon\":\"system\"}" },
+                                { id: "10", name: "系统管理", displayParams: '{"icon":"system"}' },
                                 {
                                     id: "11",
                                     parentId: "10",
@@ -115,9 +116,7 @@ describe("App", () => {
 
         render(<App />);
 
-        expect(
-            await screen.findByRole("heading", { name: "仪表盘已就绪" })
-        ).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
         expect(await screen.findByText("Developer")).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/sys/current-user/info",
@@ -248,10 +247,13 @@ describe("App", () => {
 
             if (url.endsWith("/sys/current-user/menus")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
-                        headers: { "Content-Type": "application/json" },
-                        status: 200
-                    })
+                    new Response(
+                        JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
                 );
             }
 
@@ -270,12 +272,12 @@ describe("App", () => {
         await userEvent.type(screen.getByPlaceholderText("验证码"), "1234");
         await userEvent.click(screen.getByRole("button", { name: /登\s*录/ }));
 
-        expect(
-            await screen.findByRole("heading", { name: "仪表盘已就绪" })
-        ).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("login-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("login-refresh-token");
-        expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe(String(loginExpireAt));
+        expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe(
+            String(loginExpireAt)
+        );
         await waitFor(() => expect(hasPermission("sys:user:view")).toBe(true));
         expect(hasPermission("sys:role:view")).toBe(false);
         expect(globalThis.fetch).toHaveBeenCalledWith(
@@ -315,10 +317,13 @@ describe("App", () => {
 
             if (url.endsWith("/sys/current-user/menus")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
-                        headers: { "Content-Type": "application/json" },
-                        status: 200
-                    })
+                    new Response(
+                        JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
                 );
             }
 
@@ -341,10 +346,13 @@ describe("App", () => {
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: true }), {
-                    headers: { "Content-Type": "application/json" },
-                    status: 200
-                })
+                new Response(
+                    JSON.stringify({ code: "COMMON-00000", message: "success", data: true }),
+                    {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    }
+                )
             );
         });
 
@@ -519,6 +527,28 @@ describe("App", () => {
         );
     });
 
+    it("renders the silver user management layout interactions", async () => {
+        render(<UserPage />);
+
+        expect(screen.getByRole("heading", { name: "Users" })).toBeInTheDocument();
+        expect(screen.getByText("Ethan Chen")).toBeInTheDocument();
+
+        await userEvent.type(screen.getByPlaceholderText("Search users..."), "olivia");
+
+        expect(screen.getByText("Olivia Martinez")).toBeInTheDocument();
+        expect(screen.queryByText("Ethan Chen")).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole("button", { name: "编辑 Olivia Martinez" }));
+
+        expect(await screen.findByText("Edit User")).toBeInTheDocument();
+        expect(screen.getByDisplayValue("Olivia Martinez")).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));
+
+        expect((await screen.findAllByText("Delete User")).length).toBeGreaterThan(0);
+        expect(screen.getByText("Are you sure you want to delete this user?")).toBeInTheDocument();
+    });
+
     it("clears stale tokens when protected menu loading is unauthorized", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "stale-token");
         vi.spyOn(globalThis, "fetch").mockResolvedValue(
@@ -600,19 +630,29 @@ describe("App", () => {
 
             if (url.endsWith("/sys/current-user/menus")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
-                        headers: { "Content-Type": "application/json" },
-                        status: 200
-                    })
+                    new Response(
+                        JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
                 );
             }
 
             if (url.endsWith("/sys/current-user/perms")) {
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: { perms: [] } }), {
-                        headers: { "Content-Type": "application/json" },
-                        status: 200
-                    })
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: { perms: [] }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
                 );
             }
 
@@ -626,9 +666,7 @@ describe("App", () => {
 
         render(<App />);
 
-        expect(
-            await screen.findByRole("heading", { name: "仪表盘已就绪" })
-        ).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("refreshed-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("rotated-refresh-token");
         expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe("1778514052155");
@@ -648,7 +686,10 @@ describe("App", () => {
     it("waits for an in-flight token refresh before sending another request", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "old-token");
         localStorage.setItem("sandwish.admin.refreshToken", "refresh-token");
-        localStorage.setItem("sandwish.admin.accessTokenExpireAt", String(Date.now() + 5 * 60 * 1000));
+        localStorage.setItem(
+            "sandwish.admin.accessTokenExpireAt",
+            String(Date.now() + 5 * 60 * 1000)
+        );
         let resolveRefresh: (response: Response) => void = () => undefined;
         const refreshResponse = new Promise<Response>((resolve) => {
             resolveRefresh = resolve;
@@ -677,18 +718,24 @@ describe("App", () => {
                     })
                 );
                 return Promise.resolve(
-                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
-                        headers: { "Content-Type": "application/json" },
-                        status: 200
-                    })
+                    new Response(
+                        JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
                 );
             }
 
             return Promise.resolve(
-                new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: {} }), {
-                    headers: { "Content-Type": "application/json" },
-                    status: 200
-                })
+                new Response(
+                    JSON.stringify({ code: "COMMON-00000", message: "success", data: {} }),
+                    {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    }
+                )
             );
         });
 

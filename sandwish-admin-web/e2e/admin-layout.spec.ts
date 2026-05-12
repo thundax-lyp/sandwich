@@ -3,15 +3,19 @@ import type { Page } from "@playwright/test";
 
 const expectNoPageHorizontalOverflow = async (page: Page) => {
     await expect
-        .poll(async () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+        .poll(async () =>
+            page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+        )
         .toBe(true);
 
     const metrics = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
         viewportWidth: window.innerWidth
     }));
-    expect(metrics.scrollWidth, `scrollWidth=${metrics.scrollWidth}, viewport=${metrics.viewportWidth}`)
-        .toBeLessThanOrEqual(metrics.viewportWidth);
+    expect(
+        metrics.scrollWidth,
+        `scrollWidth=${metrics.scrollWidth}, viewport=${metrics.viewportWidth}`
+    ).toBeLessThanOrEqual(metrics.viewportWidth);
 };
 
 test.describe("admin layout", () => {
@@ -41,19 +45,19 @@ test.describe("admin layout", () => {
                             id: "10",
                             name: "仪表盘",
                             url: "/dashboard",
-                            displayParams: "{\"icon\":\"dashboard\"}"
+                            displayParams: '{"icon":"dashboard"}'
                         },
                         {
                             id: "11",
                             name: "系统管理",
-                            displayParams: "{\"icon\":\"system\"}"
+                            displayParams: '{"icon":"system"}'
                         },
                         {
                             id: "12",
                             parentId: "11",
                             name: "用户管理",
                             url: "/system/users",
-                            displayParams: "{\"icon\":\"users\"}"
+                            displayParams: '{"icon":"users"}'
                         }
                     ]
                 })
@@ -112,7 +116,10 @@ test.describe("admin layout", () => {
         await page.addInitScript(() => {
             window.localStorage.setItem("sandwish.admin.accessToken", "test-token");
             window.localStorage.setItem("sandwish.admin.refreshToken", "refresh-token");
-            window.localStorage.setItem("sandwish.admin.accessTokenExpireAt", String(Date.now() + 3600 * 1000));
+            window.localStorage.setItem(
+                "sandwish.admin.accessTokenExpireAt",
+                String(Date.now() + 3600 * 1000)
+            );
         });
     });
 
@@ -145,7 +152,9 @@ test.describe("admin layout", () => {
         await expect(sidebar).not.toHaveClass(/sidebar-mobile-open/);
     });
 
-    test("keeps the workspace content within the expanded and collapsed desktop widths", async ({ page }) => {
+    test("keeps the workspace content within the expanded and collapsed desktop widths", async ({
+        page
+    }) => {
         await page.setViewportSize({ width: 1280, height: 800 });
         await page.goto("/system/dictionaries");
 
@@ -153,24 +162,26 @@ test.describe("admin layout", () => {
         const workspaceContent = page.locator(".dictionary-page");
         await expect(page.getByRole("heading", { name: "字典管理" })).toBeVisible();
         await expect(main).toHaveAttribute("data-sidebar-state", "expanded");
-        await expect(main).toHaveCSS("width", "1032px");
-        await expect(workspaceContent).toHaveCSS("width", "944px");
+        await expect(main).toHaveCSS("width", "996px");
+        await expect(workspaceContent).toHaveCSS("width", "940px");
         await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("收起菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "collapsed");
-        await expect(main).toHaveCSS("width", "1192px");
-        await expect(workspaceContent).toHaveCSS("width", "1104px");
+        await expect(main).toHaveCSS("width", "1156px");
+        await expect(workspaceContent).toHaveCSS("width", "1100px");
         await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("展开菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "expanded");
-        await expect(main).toHaveCSS("width", "1032px");
-        await expect(workspaceContent).toHaveCSS("width", "944px");
+        await expect(main).toHaveCSS("width", "996px");
+        await expect(workspaceContent).toHaveCSS("width", "940px");
         await expectNoPageHorizontalOverflow(page);
     });
 
-    test("uses the padded viewport width when the mobile menu is closed or open", async ({ page }) => {
+    test("uses the padded viewport width when the mobile menu is closed or open", async ({
+        page
+    }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         await page.goto("/system/dictionaries");
 
@@ -178,14 +189,14 @@ test.describe("admin layout", () => {
         const workspaceContent = page.locator(".dictionary-page");
         await expect(page.getByRole("heading", { name: "字典管理" })).toBeVisible();
         await expect(main).toHaveAttribute("data-sidebar-state", "closed");
-        await expect(main).toHaveCSS("width", "390px");
-        await expect(workspaceContent).toHaveCSS("width", "358px");
+        await expect(main).toHaveCSS("width", "370px");
+        await expect(workspaceContent).toHaveCSS("width", "338px");
         await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("展开菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "open");
-        await expect(main).toHaveCSS("width", "390px");
-        await expect(workspaceContent).toHaveCSS("width", "358px");
+        await expect(main).toHaveCSS("width", "370px");
+        await expect(workspaceContent).toHaveCSS("width", "338px");
         await expectNoPageHorizontalOverflow(page);
     });
 });

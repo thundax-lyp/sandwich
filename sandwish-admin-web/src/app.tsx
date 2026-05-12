@@ -22,13 +22,17 @@ const App = () => {
         <ConfigProvider
             locale={zhCN}
             theme={{
-                algorithm: themeName === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+                algorithm:
+                    themeName === "dark" ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
                 token: {
-                    colorPrimary: themeName === "dark" ? "#d7f171" : "#171717",
-                    colorBgContainer: themeName === "dark" ? "#171717" : "#ffffff",
-                    colorBorder: themeName === "dark" ? "#31312d" : "#deded8",
-                    colorText: themeName === "dark" ? "#f5f0e8" : "#171717",
-                    colorTextSecondary: themeName === "dark" ? "#a8a59d" : "#66635e",
+                    colorPrimary: themeName === "dark" ? "#3b82f6" : "#2563eb",
+                    colorBgContainer: themeName === "dark" ? "#111c2e" : "#ffffff",
+                    colorBorder:
+                        themeName === "dark"
+                            ? "rgba(171, 191, 222, 0.18)"
+                            : "rgba(116, 132, 160, 0.24)",
+                    colorText: themeName === "dark" ? "#f8fbff" : "#101827",
+                    colorTextSecondary: themeName === "dark" ? "#b8c4d8" : "#526079",
                     borderRadius: 8,
                     fontFamily: '"Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif'
                 }

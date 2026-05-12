@@ -1,28 +1,30 @@
 :root {
-    --surface-page: #fbfbfa;
-    --surface-panel: #ffffff;
-    --surface-soft: #f3f3f1;
-    --surface-hover: #eeeeeb;
-    --text-primary: #171717;
-    --text-secondary: #66635e;
-    --text-muted: #aaa7a0;
-    --line-subtle: #deded8;
-    --line-strong: #c9c8c0;
-    --accent-yellow: #fff000;
-    --accent-lime: #94f06f;
-    --accent-violet: #9e58f5;
-    --accent-orange: #ff8a00;
-    --accent-blue: #2c78ff;
-    --logo-tile: #17242f;
-    --logo-middle: #f5f0e8;
-    --logo-middle-line: #17242f;
-    --logo-top-line: #17242f;
-    --shadow-soft: 0 18px 50px rgba(23, 23, 23, 0.07);
+    --surface-page: #eef3fb;
+    --surface-panel: rgba(255, 255, 255, 0.82);
+    --surface-soft: rgba(229, 236, 248, 0.86);
+    --surface-hover: rgba(214, 226, 246, 0.88);
+    --text-primary: #101827;
+    --text-secondary: #526079;
+    --text-muted: #8792aa;
+    --line-subtle: rgba(116, 132, 160, 0.22);
+    --line-strong: rgba(80, 98, 130, 0.34);
+    --accent-yellow: #d9e7ff;
+    --accent-lime: #6ee7b7;
+    --accent-violet: #7c6df2;
+    --accent-orange: #f59e0b;
+    --accent-blue: #2563eb;
+    --accent-blue-soft: rgba(37, 99, 235, 0.12);
+    --logo-tile: #eff6ff;
+    --logo-middle: #2563eb;
+    --logo-middle-line: #dbeafe;
+    --logo-top-line: #102542;
+    --shadow-soft: 0 22px 70px rgba(31, 45, 71, 0.12);
+    --shadow-blue: 0 16px 36px rgba(37, 99, 235, 0.28);
     --sidebar-width: 248px;
     --sidebar-collapsed-width: 88px;
-    --workspace-padding-inline: 44px;
-    --workspace-padding-top: 44px;
-    --workspace-padding-bottom: 64px;
+    --workspace-padding-inline: 28px;
+    --workspace-padding-top: 28px;
+    --workspace-padding-bottom: 40px;
     color: var(--text-primary);
     background: var(--surface-page);
     font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -33,25 +35,27 @@
 }
 
 html[data-theme="dark"] {
-    --surface-page: #0f0f0e;
-    --surface-panel: #171717;
-    --surface-soft: #22221f;
-    --surface-hover: #2a2a26;
-    --text-primary: #f5f0e8;
-    --text-secondary: #b4b0a8;
-    --text-muted: #77736b;
-    --line-subtle: #31312d;
-    --line-strong: #45453f;
-    --accent-yellow: #d7f171;
-    --accent-lime: #75df63;
-    --accent-violet: #bf7cff;
-    --accent-orange: #ff9f2f;
-    --accent-blue: #75a7ff;
-    --logo-tile: #f5f0e8;
-    --logo-middle: #171717;
-    --logo-middle-line: #f5f0e8;
-    --logo-top-line: #171717;
-    --shadow-soft: 0 20px 70px rgba(0, 0, 0, 0.42);
+    --surface-page: #07111f;
+    --surface-panel: rgba(17, 28, 46, 0.82);
+    --surface-soft: rgba(31, 45, 68, 0.86);
+    --surface-hover: rgba(42, 62, 95, 0.88);
+    --text-primary: #f8fbff;
+    --text-secondary: #b8c4d8;
+    --text-muted: #748299;
+    --line-subtle: rgba(171, 191, 222, 0.16);
+    --line-strong: rgba(191, 207, 232, 0.28);
+    --accent-yellow: #dbeafe;
+    --accent-lime: #34d399;
+    --accent-violet: #a78bfa;
+    --accent-orange: #f59e0b;
+    --accent-blue: #3b82f6;
+    --accent-blue-soft: rgba(59, 130, 246, 0.18);
+    --logo-tile: #dbeafe;
+    --logo-middle: #1d4ed8;
+    --logo-middle-line: #eff6ff;
+    --logo-top-line: #0f172a;
+    --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.46);
+    --shadow-blue: 0 18px 42px rgba(37, 99, 235, 0.35);
 }
 
 * {
@@ -62,7 +66,18 @@ body {
     min-width: 320px;
     min-height: 100vh;
     margin: 0;
-    background: var(--surface-page);
+    background:
+        radial-gradient(
+            circle at 16% 4%,
+            color-mix(in srgb, var(--accent-blue) 20%, transparent),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 88% 10%,
+            color-mix(in srgb, var(--accent-violet) 14%, transparent),
+            transparent 26%
+        ),
+        var(--surface-page);
 }
 
 #root {
@@ -74,9 +89,17 @@ button {
 }
 
 .admin-shell {
+    gap: 12px;
     min-height: 100vh;
+    padding: 12px;
     color: var(--text-primary);
-    background: var(--surface-page);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-soft) 48%, transparent),
+            transparent 420px
+        ),
+        var(--surface-page);
 }
 
 .admin-shell .ant-layout {
@@ -84,6 +107,9 @@ button {
 }
 
 .admin-main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     flex: 1 1 0;
     width: auto;
     max-width: 100%;
@@ -96,12 +122,15 @@ button {
 
 .sidebar {
     position: sticky;
-    top: 0;
-    height: 100vh;
-    padding: 32px 20px;
+    top: 12px;
+    height: calc(100vh - 24px);
+    padding: 20px 16px;
     color: var(--text-primary);
-    background: var(--surface-page) !important;
-    border-right: 1px solid var(--line-subtle);
+    background: color-mix(in srgb, var(--surface-panel) 86%, transparent) !important;
+    border: 1px solid var(--line-subtle);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
 }
 
 .sidebar .ant-layout-sider-children {
@@ -116,7 +145,8 @@ button {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    padding: 0 4px 12px;
 }
 
 .sidebar.ant-layout-sider-collapsed {
@@ -131,8 +161,9 @@ button {
     display: grid;
     width: 44px;
     height: 44px;
+    border: 1px solid var(--line-strong);
     border-radius: 14px;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 14px 34px rgba(37, 99, 235, 0.22);
 }
 
 .logo-tile {
@@ -201,10 +232,10 @@ button {
 
 .nav-menu .ant-menu-submenu-title,
 .nav-menu .ant-menu-item {
-    height: 48px !important;
-    margin: 6px 0 !important;
+    height: 42px !important;
+    margin: 4px 0 !important;
     color: var(--text-primary) !important;
-    font-size: 15px;
+    font-size: 14px;
     border-radius: 8px !important;
 }
 
@@ -224,7 +255,9 @@ button {
 }
 
 .nav-menu .ant-menu-item-selected {
-    box-shadow: inset 4px 0 0 var(--accent-yellow);
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    box-shadow: var(--shadow-blue);
 }
 
 .menu-icon-config-error {
@@ -245,12 +278,13 @@ button {
 .workspace {
     display: grid;
     align-content: start;
-    gap: 28px;
+    gap: 18px;
     grid-template-columns: minmax(0, 1fr);
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    padding: var(--workspace-padding-top) var(--workspace-padding-inline) var(--workspace-padding-bottom);
+    padding: var(--workspace-padding-top) var(--workspace-padding-inline)
+        var(--workspace-padding-bottom);
 }
 
 .admin-content-grid {
@@ -267,17 +301,20 @@ button {
 
 .topbar {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 20;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     height: auto;
-    padding: 20px 32px 18px 44px;
+    padding: 12px 22px;
     color: var(--text-primary);
-    background: var(--surface-page);
-    border-bottom: 1px solid var(--line-subtle);
+    background: color-mix(in srgb, var(--surface-panel) 82%, transparent);
+    border: 1px solid var(--line-subtle);
+    border-radius: 18px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
     line-height: normal;
 }
 
@@ -285,7 +322,7 @@ button {
     display: flex;
     align-items: center;
     gap: 16px;
-    min-height: 44px;
+    min-height: 38px;
     min-width: 0;
 }
 
@@ -296,7 +333,7 @@ button {
 .topbar-path {
     display: inline-flex;
     align-items: center;
-    min-height: 44px;
+    min-height: 38px;
     color: var(--text-muted);
     font-size: 15px;
     line-height: 1.2;
@@ -312,7 +349,7 @@ button {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    height: 44px;
+    height: 38px;
     padding: 0 12px;
 }
 
@@ -709,7 +746,7 @@ p {
 
 .dictionary-page {
     display: grid;
-    gap: 20px;
+    gap: 14px;
     min-width: 0;
 }
 
@@ -738,7 +775,7 @@ p {
 .dictionary-summary {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 12px;
     max-width: 100%;
 }
 
@@ -750,12 +787,13 @@ p {
 
 .dictionary-summary-card .ant-card-body {
     display: grid;
-    gap: 10px;
+    gap: 6px;
+    padding: 16px 18px;
 }
 
 .dictionary-summary-card strong {
     color: var(--text-primary);
-    font-size: 32px;
+    font-size: 28px;
     line-height: 1;
 }
 
@@ -764,22 +802,31 @@ p {
     min-width: 0;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 14px;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.dictionary-list-toolbar h3.ant-typography {
+    font-size: 22px;
+    line-height: 1.18;
 }
 
 .dictionary-search-form {
     min-width: 0;
     justify-content: flex-end;
-    row-gap: 10px;
+    row-gap: 8px;
+}
+
+.dictionary-search-form .ant-form-item {
+    margin-bottom: 0;
 }
 
 .dictionary-type-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    min-height: 30px;
-    margin-bottom: 14px;
+    gap: 6px;
+    min-height: 26px;
+    margin-bottom: 10px;
 }
 
 .dictionary-bulk-bar {
@@ -787,8 +834,12 @@ p {
     min-width: 0;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.dictionary-list-panel .ant-card-body {
+    padding: 18px 20px;
 }
 
 .dictionary-list-panel .ant-table-wrapper,
@@ -803,6 +854,56 @@ p {
 .dictionary-list-panel .ant-table-content {
     max-width: 100%;
     overflow-x: auto;
+}
+
+.dictionary-list-panel .ant-table {
+    color: var(--text-primary);
+    font-size: 14px;
+    background: transparent;
+}
+
+.dictionary-list-panel .ant-table-container {
+    overflow: hidden;
+    background: color-mix(in srgb, var(--surface-panel) 70%, transparent);
+    border: 1px solid var(--line-subtle);
+    border-radius: 10px;
+}
+
+.dictionary-list-panel .ant-table-thead > tr > th {
+    padding: 12px 14px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--surface-soft) 64%, transparent);
+    border-bottom-color: var(--line-subtle);
+}
+
+.dictionary-list-panel .ant-table-tbody > tr > td {
+    padding: 11px 14px;
+    border-bottom-color: var(--line-subtle);
+}
+
+.dictionary-list-panel .ant-table-tbody > tr:hover > td {
+    background: var(--surface-hover) !important;
+}
+
+.dictionary-list-panel .ant-table-tbody strong {
+    font-size: 14px;
+}
+
+.dictionary-list-panel .ant-tag {
+    margin-inline-end: 0;
+    border-radius: 7px;
+}
+
+.dictionary-list-panel .ant-typography code {
+    padding: 1px 6px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.dictionary-list-panel .ant-pagination {
+    margin: 12px 0 0;
 }
 
 .dictionary-empty-icon {
@@ -821,7 +922,12 @@ p {
     align-items: center;
     min-height: 100vh;
     padding: 56px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--accent-yellow) 18%, transparent), transparent 36%),
+    background:
+        linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--accent-yellow) 18%, transparent),
+            transparent 36%
+        ),
         var(--surface-page);
 }
 
@@ -891,20 +997,272 @@ p {
     object-fit: contain;
 }
 
+.user-page {
+    display: grid;
+    min-width: 0;
+}
+
+.user-command-panel {
+    min-width: 0;
+    padding: 20px 22px 18px;
+    overflow: hidden;
+    background: var(--surface-panel);
+    border: 1px solid var(--line-subtle);
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
+}
+
+.user-page-header {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 10px;
+}
+
+.user-page-header h2.ant-typography {
+    margin: 0 0 4px;
+    color: var(--text-primary);
+    font-size: 24px;
+    line-height: 1.15;
+}
+
+.user-page-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.user-search {
+    width: 250px;
+}
+
+.user-search-shortcut {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.user-status-tabs .ant-tabs-nav {
+    margin-bottom: 10px;
+}
+
+.user-status-tabs .ant-tabs-tab {
+    padding: 6px 0;
+}
+
+.user-status-tabs .ant-tabs-tab-btn {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.user-status-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: var(--accent-blue) !important;
+}
+
+.user-table {
+    min-width: 0;
+}
+
+.user-table .ant-table {
+    color: var(--text-primary);
+    background: transparent;
+}
+
+.user-table .ant-table-container {
+    overflow: hidden;
+    background: color-mix(in srgb, var(--surface-panel) 70%, transparent);
+    border: 1px solid var(--line-subtle);
+    border-radius: 10px;
+}
+
+.user-table .ant-table-thead > tr > th {
+    padding: 12px 14px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--surface-soft) 64%, transparent);
+    border-bottom-color: var(--line-subtle);
+}
+
+.user-table .ant-table-tbody > tr > td {
+    padding: 11px 14px;
+    border-bottom-color: var(--line-subtle);
+}
+
+.user-table .ant-table-tbody > tr:hover > td {
+    background: var(--surface-hover) !important;
+}
+
+.user-table .ant-pagination {
+    margin: 12px 0 0;
+}
+
+.user-role-admin,
+.user-role-editor,
+.user-role-viewer,
+.user-status-active,
+.user-status-inactive,
+.user-status-invited {
+    border: 1px solid transparent;
+    border-radius: 7px;
+}
+
+.user-role-admin {
+    color: #1d4ed8;
+    background: rgba(37, 99, 235, 0.12);
+    border-color: rgba(37, 99, 235, 0.22);
+}
+
+.user-role-editor {
+    color: #6d28d9;
+    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(124, 58, 237, 0.22);
+}
+
+.user-role-viewer {
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
+    border-color: var(--line-subtle);
+}
+
+.user-status-active {
+    color: #047857;
+    background: rgba(16, 185, 129, 0.13);
+    border-color: rgba(16, 185, 129, 0.24);
+}
+
+.user-status-inactive {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.24);
+}
+
+.user-status-invited {
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.14);
+    border-color: rgba(245, 158, 11, 0.26);
+}
+
+.user-edit-drawer .ant-drawer-content,
+.user-delete-modal .ant-modal-content {
+    color: var(--text-primary);
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--surface-soft) 42%, transparent),
+            transparent
+        ),
+        var(--surface-panel);
+    border: 1px solid var(--line-subtle);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(18px);
+}
+
+.user-edit-drawer .ant-drawer-header,
+.user-edit-drawer .ant-drawer-footer,
+.user-delete-modal .ant-modal-header {
+    background: transparent;
+    border-color: var(--line-subtle);
+}
+
+.user-edit-form {
+    display: grid;
+    gap: 14px;
+}
+
+.user-edit-avatar {
+    position: relative;
+    width: fit-content;
+    margin-bottom: 2px;
+}
+
+.user-edit-avatar .ant-btn {
+    position: absolute;
+    right: -4px;
+    bottom: -3px;
+}
+
+.user-edit-form label,
+.user-delete-content label {
+    display: grid;
+    gap: 5px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.user-edit-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.user-edit-footer .ant-btn-primary,
+.user-page-actions .ant-btn-primary {
+    box-shadow: var(--shadow-blue);
+}
+
+.user-delete-content {
+    display: grid;
+    gap: 14px;
+    padding-top: 8px;
+    text-align: center;
+}
+
+.user-delete-warning {
+    color: #ef4444;
+    font-size: 46px;
+}
+
+.user-delete-content > strong {
+    color: var(--text-primary);
+}
+
+.user-delete-content > .ant-typography {
+    max-width: 280px;
+    margin: 0 auto;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.user-delete-person {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 12px;
+    text-align: left;
+    background: color-mix(in srgb, var(--surface-soft) 60%, transparent);
+    border: 1px solid var(--line-subtle);
+    border-radius: 8px;
+}
+
+.user-delete-person > div {
+    display: grid;
+    gap: 2px;
+}
+
+.user-delete-content label {
+    text-align: left;
+}
+
 @media (max-width: 760px) {
     .admin-shell {
+        gap: 10px;
         min-height: 100vh;
+        padding: 10px;
     }
 
     .sidebar {
         position: fixed !important;
-        inset: 0 auto 0 0;
+        inset: 10px auto 10px 10px;
         z-index: 40;
         width: min(84vw, 320px) !important;
         max-width: 320px !important;
         min-width: 0 !important;
-        height: 100dvh;
+        height: calc(100dvh - 20px);
         padding: 22px 16px;
+        border-radius: 18px;
         box-shadow: 18px 0 42px rgba(0, 0, 0, 0.16);
         transform: translateX(-104%);
         transition: transform 180ms ease;
@@ -917,7 +1275,7 @@ p {
 
     .sidebar-backdrop {
         position: fixed;
-        inset: 0 0 0 min(84vw, 320px);
+        inset: 0 0 0 calc(min(84vw, 320px) + 10px);
         z-index: 35;
         display: block;
         padding: 0;
@@ -938,13 +1296,14 @@ p {
 
     .workspace {
         --workspace-padding-inline: 16px;
-        --workspace-padding-top: 22px;
-        --workspace-padding-bottom: 42px;
+        --workspace-padding-top: 16px;
+        --workspace-padding-bottom: 28px;
     }
 
     .topbar {
         gap: 10px;
         padding: 14px 16px;
+        border-radius: 18px;
     }
 
     .topbar-heading {
@@ -985,6 +1344,26 @@ p {
 
     .dictionary-summary {
         grid-template-columns: 1fr;
+    }
+
+    .user-command-panel {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .user-page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-page-actions,
+    .user-search,
+    .user-page-actions .ant-btn {
+        width: 100%;
+    }
+
+    .user-status-tabs .ant-tabs-nav-wrap {
+        overflow: auto;
     }
 
     .user-menu-trigger {

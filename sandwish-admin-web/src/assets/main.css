@@ -1306,8 +1306,42 @@ p {
     background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
 }
 
+.user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .user-column-title {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+
+.user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .user-column-resize-handle {
+    display: none;
+}
+
 .user-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
     background: var(--surface-hover) !important;
+}
+
+.user-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+.user-row-actions-inline {
+    flex-wrap: nowrap;
+}
+
+.user-row-action {
+    display: inline-grid;
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+    place-items: center;
+}
+
+.user-row-action-more {
+    display: none;
 }
 
 .user-table .ant-pagination {
@@ -1601,6 +1635,14 @@ p {
     .user-table-toolbar .ant-space,
     .user-table-toolbar .ant-btn {
         width: 100%;
+    }
+
+    .user-row-actions-inline {
+        display: none;
+    }
+
+    .user-row-action-more {
+        display: inline-grid;
     }
 
     .user-menu-trigger {

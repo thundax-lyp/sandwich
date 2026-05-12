@@ -13,6 +13,7 @@ import {
     Avatar,
     Button,
     Drawer,
+    Dropdown,
     Input,
     Modal,
     Select,
@@ -22,20 +23,23 @@ import {
     Typography
 } from "antd";
 import type { TableProps } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 
 const { Text, Title } = Typography;
 
 const MIN_COLUMN_WIDTH = 96;
+const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
+const DESKTOP_ACTION_COLUMN_WIDTH = 84;
+const MOBILE_ACTION_COLUMN_WIDTH = 54;
 const DEFAULT_COLUMN_WIDTHS = {
     name: 220,
     email: 220,
     role: 120,
     status: 130,
     lastLogin: 160,
-    actions: 140
+    actions: DESKTOP_ACTION_COLUMN_WIDTH
 };
 
 type UserColumnKey = keyof typeof DEFAULT_COLUMN_WIDTHS;
@@ -171,6 +175,7 @@ export const UserPage = () => {
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
     const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+    const [isMobileTable, setIsMobileTable] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters =
@@ -210,6 +215,24 @@ export const UserPage = () => {
             />
         </span>
     );
+
+    useEffect(() => {
+        if (typeof window.matchMedia !== "function") {
+            return undefined;
+        }
+
+        const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
+        const updateMobileTable = () => setIsMobileTable(mediaQueryList.matches);
+
+        updateMobileTable();
+        mediaQueryList.addEventListener("change", updateMobileTable);
+        return () => mediaQueryList.removeEventListener("change", updateMobileTable);
+    }, []);
+
+    const actionColumnWidth = isMobileTable ? MOBILE_ACTION_COLUMN_WIDTH : DESKTOP_ACTION_COLUMN_WIDTH;
+    const tableScrollX =
+        columnWidths.name + columnWidths.email + columnWidths.role + columnWidths.status + columnWidths.lastLogin
+        + actionColumnWidth;
 
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
@@ -278,28 +301,65 @@ export const UserPage = () => {
         {
             title: renderResizableTitle("actions", "操作"),
             key: "actions",
-            width: columnWidths.actions,
+            width: actionColumnWidth,
             fixed: "right",
             render: (_, user) => (
-                <Space size={6}>
-                    <Button
-                        aria-label={`编辑 ${user.name}`}
-                        icon={<EditOutlined />}
-                        type="text"
-                        onClick={() => setEditingUser(user)}
-                    />
-                    <Button
-                        aria-label={`删除 ${user.name}`}
-                        icon={<DeleteOutlined />}
-                        type="text"
-                        danger
-                        onClick={() => {
-                            setDeletingUser(user);
-                            setDeleteConfirmText("delete");
+                <div className="user-row-actions">
+                    <Space className="user-row-actions-inline" size={4}>
+                        <Button
+                            aria-label={`编辑 ${user.name}`}
+                            className="user-row-action"
+                            icon={<EditOutlined />}
+                            type="text"
+                            onClick={() => setEditingUser(user)}
+                        />
+                        <Button
+                            aria-label={`删除 ${user.name}`}
+                            className="user-row-action"
+                            icon={<DeleteOutlined />}
+                            type="text"
+                            danger
+                            onClick={() => {
+                                setDeletingUser(user);
+                                setDeleteConfirmText("delete");
+                            }}
+                        />
+                    </Space>
+                    <Dropdown
+                        menu={{
+                            items: [
+                                {
+                                    key: "edit",
+                                    icon: <EditOutlined />,
+                                    label: "编辑"
+                                },
+                                {
+                                    key: "delete",
+                                    danger: true,
+                                    icon: <DeleteOutlined />,
+                                    label: "删除"
+                                }
+                            ],
+                            onClick: ({ key }) => {
+                                if (key === "edit") {
+                                    setEditingUser(user);
+                                }
+                                if (key === "delete") {
+                                    setDeletingUser(user);
+                                    setDeleteConfirmText("delete");
+                                }
+                            }
                         }}
-                    />
-                    <Button aria-label={`更多 ${user.name}`} icon={<MoreOutlined />} type="text" />
-                </Space>
+                        trigger={["click"]}
+                    >
+                        <Button
+                            aria-label={`展开 ${user.name} 操作`}
+                            className="user-row-action user-row-action-more"
+                            icon={<MoreOutlined />}
+                            type="text"
+                        />
+                    </Dropdown>
+                </div>
             )
         }
     ];
@@ -442,7 +502,7 @@ export const UserPage = () => {
                         selectedRowKeys,
                         onChange: setSelectedRowKeys
                     }}
-                    scroll={{ x: Object.values(columnWidths).reduce((sum, width) => sum + width, 0) }}
+                    scroll={{ x: tableScrollX }}
                 />
             </section>
 

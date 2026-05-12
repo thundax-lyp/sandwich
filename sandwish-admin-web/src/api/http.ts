@@ -84,6 +84,11 @@ const requestTokenRefresh = async () => {
 };
 
 export const refreshAccessTokenIfNeeded = async () => {
+    if (refreshPromise) {
+        const refreshedToken = await refreshPromise;
+        return refreshedToken?.token || getAccessToken();
+    }
+
     if (!shouldRefreshBeforeRequest()) {
         return getAccessToken();
     }

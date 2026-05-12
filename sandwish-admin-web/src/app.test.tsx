@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
+import { postJson } from "./api/http";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
@@ -639,5 +640,87 @@ describe("App", () => {
                 })
             )
         );
+    });
+
+    it("waits for an in-flight token refresh before sending another request", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "old-token");
+        localStorage.setItem("sandwish.admin.refreshToken", "refresh-token");
+        localStorage.setItem("sandwish.admin.accessTokenExpireAt", String(Date.now() + 5 * 60 * 1000));
+        let resolveRefresh: (response: Response) => void = () => undefined;
+        const refreshResponse = new Promise<Response>((resolve) => {
+            resolveRefresh = resolve;
+        });
+        vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+            const url = String(input);
+            if (url.endsWith("/sys/current-user/info")) {
+                return Promise.resolve(
+                    new Response(JSON.stringify({ code: "COMMON-00002", message: "未授权用户" }), {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    })
+                );
+            }
+
+            if (url.endsWith("/auth/session/token/refresh")) {
+                return refreshResponse;
+            }
+
+            if (url.endsWith("/sys/current-user/menus")) {
+                expect(init).toEqual(
+                    expect.objectContaining({
+                        headers: expect.objectContaining({
+                            "Access-Token": "new-token"
+                        })
+                    })
+                );
+                return Promise.resolve(
+                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    })
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: {} }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 200
+                })
+            );
+        });
+
+        const infoRequest = postJson("/sys/current-user/info").catch(() => null);
+        await waitFor(() =>
+            expect(globalThis.fetch).toHaveBeenCalledWith(
+                "/admin-api/api/auth/session/token/refresh",
+                expect.any(Object)
+            )
+        );
+        const menuRequest = postJson("/sys/current-user/menus");
+
+        expect(globalThis.fetch).not.toHaveBeenCalledWith(
+            "/admin-api/api/sys/current-user/menus",
+            expect.any(Object)
+        );
+        resolveRefresh(
+            new Response(
+                JSON.stringify({
+                    code: "COMMON-00000",
+                    message: "success",
+                    data: {
+                        token: "new-token",
+                        refreshToken: "new-refresh-token",
+                        expireAt: Date.now() + 5 * 60 * 1000
+                    }
+                }),
+                {
+                    headers: { "Content-Type": "application/json" },
+                    status: 200
+                }
+            )
+        );
+
+        await expect(menuRequest).resolves.toEqual([]);
+        await infoRequest;
     });
 });

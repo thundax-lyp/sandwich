@@ -4,6 +4,7 @@ import {
     EditOutlined,
     ExclamationCircleOutlined,
     FilterOutlined,
+    HolderOutlined,
     MoreOutlined,
     PlusOutlined,
     PoweroffOutlined,
@@ -31,7 +32,7 @@ const { Text, Title } = Typography;
 
 const MIN_COLUMN_WIDTH = 96;
 const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
-const DESKTOP_ACTION_COLUMN_WIDTH = 84;
+const DESKTOP_ACTION_COLUMN_WIDTH = 116;
 const MOBILE_ACTION_COLUMN_WIDTH = 54;
 const DEFAULT_COLUMN_WIDTHS = {
     name: 220,
@@ -323,6 +324,12 @@ export const UserPage = () => {
                                 setDeletingUser(user);
                                 setDeleteConfirmText("delete");
                             }}
+                        />
+                        <Button
+                            aria-label={`拖动排序 ${user.name}`}
+                            className="user-row-action user-row-drag-handle"
+                            icon={<HolderOutlined />}
+                            type="text"
                         />
                     </Space.Compact>
                     <Dropdown

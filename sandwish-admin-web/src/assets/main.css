@@ -1349,6 +1349,15 @@ p {
     place-items: center;
 }
 
+.user-row-drag-handle {
+    color: var(--text-muted);
+    cursor: grab;
+}
+
+.user-row-drag-handle:active {
+    cursor: grabbing;
+}
+
 .user-row-actions-inline .user-row-action + .user-row-action {
     margin-left: -1px;
 }

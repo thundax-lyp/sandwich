@@ -22,9 +22,9 @@
     --shadow-blue: 0 16px 36px rgba(37, 99, 235, 0.28);
     --sidebar-width: 248px;
     --sidebar-collapsed-width: 88px;
-    --workspace-padding-inline: 28px;
-    --workspace-padding-top: 28px;
-    --workspace-padding-bottom: 40px;
+    --workspace-padding-inline: 0px;
+    --workspace-padding-top: 0px;
+    --workspace-padding-bottom: 0px;
     color: var(--text-primary);
     background: var(--surface-page);
     font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;

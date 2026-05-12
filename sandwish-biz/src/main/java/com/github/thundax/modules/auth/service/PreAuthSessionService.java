@@ -10,7 +10,7 @@ import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValue
 
 public interface PreAuthSessionService {
 
-    int count();
+    int countActiveSessions();
 
     PreAuthSession create(CreatePreAuthSessionCommand command);
 

@@ -24,7 +24,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
-    public int count() {
+    public int countActiveSessions() {
         return preAuthSessionDao.count();
     }
 

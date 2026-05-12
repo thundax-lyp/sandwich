@@ -278,7 +278,7 @@ public class AuthController {
     }
 
     private PreAuthSession createPreAuthSession() {
-        if (preAuthSessionService.count() > properties.getMaxLoginCount()) {
+        if (preAuthSessionService.countActiveSessions() > properties.getMaxLoginCount()) {
             throw AdminResponseExceptions.loginRequestTooMany();
         }
         PreAuthSession session =

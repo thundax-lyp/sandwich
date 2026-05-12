@@ -9,8 +9,6 @@ import com.github.thundax.modules.exception.BizExceptionBoundary;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.dao.MenuDao;
 import com.github.thundax.modules.sys.entity.Menu;
-import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
-import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.entity.valueobject.MenuId;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.service.MenuService;
@@ -61,15 +59,19 @@ public class MenuServiceImpl implements MenuService {
         }
         return dao.list(
                 query == null ? null : MenuIdCodec.toValue(query.getParentId()),
-                query == null ? null : visibilityValue(query.getVisibility()),
-                query == null ? null : rankValue(query.getMaxRank()));
+                query == null || query.getVisibility() == null
+                        ? null
+                        : query.getVisibility().value(),
+                query == null ? null : AccessRankCodec.toValue(query.getMaxRank()));
     }
 
     public PageResult<Menu> page(MenuQuery query, PageQuery page) {
         IPage<Menu> dataPage = dao.page(
                 query == null ? null : MenuIdCodec.toValue(query.getParentId()),
-                query == null ? null : visibilityValue(query.getVisibility()),
-                query == null ? null : rankValue(query.getMaxRank()),
+                query == null || query.getVisibility() == null
+                        ? null
+                        : query.getVisibility().value(),
+                query == null ? null : AccessRankCodec.toValue(query.getMaxRank()),
                 page.getPageNo(),
                 page.getPageSize());
         return PageResult.of(
@@ -157,14 +159,6 @@ public class MenuServiceImpl implements MenuService {
     public interface CacheChangedListener {
 
         void onMenuCacheChanged();
-    }
-
-    private String visibilityValue(MenuVisibility visibility) {
-        return visibility == null ? null : visibility.value();
-    }
-
-    private Integer rankValue(AccessRank rank) {
-        return rank == null ? null : AccessRankCodec.toValue(rank);
     }
 
     private Menu toMenu(CreateMenuCommand command) {

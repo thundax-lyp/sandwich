@@ -72,7 +72,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "ethan@acme.com",
         role: "Admin",
         status: "Active",
-        lastLogin: "2 minutes ago",
+        lastLogin: "2 分钟前",
         avatarColor: "#0f766e"
     },
     {
@@ -81,7 +81,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "sophia@acme.com",
         role: "Editor",
         status: "Active",
-        lastLogin: "1 hour ago",
+        lastLogin: "1 小时前",
         avatarColor: "#c2410c"
     },
     {
@@ -90,7 +90,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "liam@acme.com",
         role: "Viewer",
         status: "Active",
-        lastLogin: "3 hours ago",
+        lastLogin: "3 小时前",
         avatarColor: "#1d4ed8"
     },
     {
@@ -99,7 +99,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "olivia@acme.com",
         role: "Editor",
         status: "Inactive",
-        lastLogin: "2 days ago",
+        lastLogin: "2 天前",
         avatarColor: "#be185d"
     },
     {
@@ -108,7 +108,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "noah@acme.com",
         role: "Viewer",
         status: "Invited",
-        lastLogin: "Never",
+        lastLogin: "从未登录",
         avatarColor: "#0369a1"
     },
     {
@@ -117,7 +117,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "ava@acme.com",
         role: "Admin",
         status: "Active",
-        lastLogin: "5 minutes ago",
+        lastLogin: "5 分钟前",
         avatarColor: "#7c3aed"
     },
     {
@@ -126,7 +126,7 @@ const USER_RECORDS: UserRecord[] = [
         email: "james@acme.com",
         role: "Editor",
         status: "Active",
-        lastLogin: "1 day ago",
+        lastLogin: "1 天前",
         avatarColor: "#b45309"
     }
 ];
@@ -137,10 +137,22 @@ const roleClassName: Record<UserRecord["role"], string> = {
     Viewer: "user-role-viewer"
 };
 
+const roleLabel: Record<UserRecord["role"], string> = {
+    Admin: "管理员",
+    Editor: "编辑者",
+    Viewer: "只读用户"
+};
+
 const statusClassName: Record<UserRecord["status"], string> = {
     Active: "user-status-active",
     Inactive: "user-status-inactive",
     Invited: "user-status-invited"
+};
+
+const statusLabel: Record<UserRecord["status"], string> = {
+    Active: "启用",
+    Inactive: "禁用",
+    Invited: "已邀请"
 };
 
 const getInitials = (name: string) => {
@@ -222,7 +234,7 @@ export const UserPage = () => {
 
     const columns: TableProps<UserRecord>["columns"] = [
         {
-            title: renderResizableTitle("name", "User"),
+            title: renderResizableTitle("name", "用户"),
             dataIndex: "name",
             key: "name",
             width: columnWidths.name,
@@ -236,35 +248,35 @@ export const UserPage = () => {
             )
         },
         {
-            title: renderResizableTitle("email", "Email"),
+            title: renderResizableTitle("email", "邮箱"),
             dataIndex: "email",
             key: "email",
             width: columnWidths.email
         },
         {
-            title: renderResizableTitle("role", "Role"),
+            title: renderResizableTitle("role", "角色"),
             dataIndex: "role",
             key: "role",
             width: columnWidths.role,
-            render: (role: UserRecord["role"]) => <Tag className={roleClassName[role]}>{role}</Tag>
+            render: (role: UserRecord["role"]) => <Tag className={roleClassName[role]}>{roleLabel[role]}</Tag>
         },
         {
-            title: renderResizableTitle("status", "Status"),
+            title: renderResizableTitle("status", "状态"),
             dataIndex: "status",
             key: "status",
             width: columnWidths.status,
             render: (status: UserRecord["status"]) => (
-                <Tag className={statusClassName[status]}>{status}</Tag>
+                <Tag className={statusClassName[status]}>{statusLabel[status]}</Tag>
             )
         },
         {
-            title: renderResizableTitle("lastLogin", "Last Login"),
+            title: renderResizableTitle("lastLogin", "最近登录"),
             dataIndex: "lastLogin",
             key: "lastLogin",
             width: columnWidths.lastLogin
         },
         {
-            title: renderResizableTitle("actions", "Actions"),
+            title: renderResizableTitle("actions", "操作"),
             key: "actions",
             width: columnWidths.actions,
             fixed: "right",
@@ -297,29 +309,29 @@ export const UserPage = () => {
             <section className="user-command-panel">
                 <div className="user-page-header">
                     <div>
-                        <Title level={2}>Users</Title>
-                        <Text type="secondary">Manage your users and their permissions.</Text>
+                        <Title level={2}>用户管理</Title>
+                        <Text type="secondary">管理后台用户、角色与权限状态。</Text>
                     </div>
                     <Space className="user-page-actions">
                         <Input
                             allowClear
                             className="user-search"
-                            placeholder="Search users..."
+                            placeholder="搜索用户..."
                             prefix={<SearchOutlined />}
                             suffix={<span className="user-search-shortcut">⌘K</span>}
                             value={searchText}
                             onChange={(event) => setSearchText(event.target.value)}
                         />
                         <Button
+                            className={filtersOpen || hasActiveFilters ? "user-filter-toggle-active" : undefined}
                             icon={<FilterOutlined />}
-                            type={filtersOpen || hasActiveFilters ? "primary" : "default"}
                             aria-expanded={filtersOpen}
                             onClick={() => setFiltersOpen((open) => !open)}
                         >
-                            Filters
+                            筛选
                         </Button>
                         <Button type="primary" icon={<PlusOutlined />}>
-                            Create User
+                            新增用户
                         </Button>
                     </Space>
                 </div>
@@ -327,7 +339,7 @@ export const UserPage = () => {
                 <div className={`user-filter-panel${filtersOpen ? " user-filter-panel-open" : ""}`}>
                     <div className="user-filter-form">
                         <label>
-                            <span>Email</span>
+                            <span>邮箱</span>
                             <Input
                                 allowClear
                                 placeholder="name@company.com"
@@ -341,12 +353,12 @@ export const UserPage = () => {
                             />
                         </label>
                         <label>
-                            <span>Role</span>
+                            <span>角色</span>
                             <Select<UserFilterRole>
                                 value={filters.role}
                                 options={["All", "Admin", "Editor", "Viewer"].map((value) => ({
                                     value: value as UserFilterRole,
-                                    label: value
+                                    label: value === "All" ? "全部" : roleLabel[value as UserRecord["role"]]
                                 }))}
                                 onChange={(role) =>
                                     setFilters((currentFilters) => ({
@@ -357,12 +369,12 @@ export const UserPage = () => {
                             />
                         </label>
                         <label>
-                            <span>Status</span>
+                            <span>状态</span>
                             <Select<UserFilterStatus>
                                 value={filters.status}
                                 options={["All", "Active", "Inactive", "Invited"].map((value) => ({
                                     value: value as UserFilterStatus,
-                                    label: value
+                                    label: value === "All" ? "全部" : statusLabel[value as UserRecord["status"]]
                                 }))}
                                 onChange={(status) =>
                                     setFilters((currentFilters) => ({
@@ -373,7 +385,7 @@ export const UserPage = () => {
                             />
                         </label>
                         <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            Reset
+                            重置
                         </Button>
                     </div>
                 </div>
@@ -398,7 +410,7 @@ export const UserPage = () => {
                             禁用
                         </Button>
                         <Button
-                            type="primary"
+                            className="user-batch-enable"
                             icon={<PoweroffOutlined />}
                             disabled={!hasSelectedUsers}
                         >
@@ -417,7 +429,7 @@ export const UserPage = () => {
                         pageSize: 50,
                         total: 1248,
                         showSizeChanger: false,
-                        showTotal: () => "1,248 users"
+                        showTotal: () => "1,248 个用户"
                     }}
                     rowSelection={{
                         selectedRowKeys,
@@ -429,16 +441,16 @@ export const UserPage = () => {
 
             <Drawer
                 className="user-edit-drawer"
-                title="Edit User"
+                title="编辑用户"
                 open={Boolean(editingUser)}
                 size="default"
                 onClose={() => setEditingUser(null)}
                 extra={<Button size="small">−</Button>}
                 footer={
                     <div className="user-edit-footer">
-                        <Button onClick={() => setEditingUser(null)}>Cancel</Button>
+                        <Button onClick={() => setEditingUser(null)}>取消</Button>
                         <Button type="primary" onClick={() => setEditingUser(null)}>
-                            Update User
+                            更新用户
                         </Button>
                     </div>
                 }
@@ -452,38 +464,42 @@ export const UserPage = () => {
                             <Button size="small" shape="circle" icon={<CameraOutlined />} />
                         </div>
                         <label>
-                            <span>Full Name</span>
+                            <span>姓名</span>
                             <Input value={editingUser.name} readOnly />
                         </label>
                         <label>
-                            <span>Email</span>
+                            <span>邮箱</span>
                             <Input value={editingUser.email} readOnly />
                         </label>
                         <label>
-                            <span>Role</span>
+                            <span>角色</span>
                             <Select
                                 value={editingUser.role}
-                                options={["Admin", "Editor", "Viewer"].map((value) => ({ value }))}
-                            />
-                        </label>
-                        <label>
-                            <span>Status</span>
-                            <Select
-                                value={editingUser.status}
-                                options={["Active", "Inactive", "Invited"].map((value) => ({
-                                    value
+                                options={["Admin", "Editor", "Viewer"].map((value) => ({
+                                    value,
+                                    label: roleLabel[value as UserRecord["role"]]
                                 }))}
                             />
                         </label>
                         <label>
-                            <span>Organization</span>
+                            <span>状态</span>
+                            <Select
+                                value={editingUser.status}
+                                options={["Active", "Inactive", "Invited"].map((value) => ({
+                                    value,
+                                    label: statusLabel[value as UserRecord["status"]]
+                                }))}
+                            />
+                        </label>
+                        <label>
+                            <span>组织</span>
                             <Select
                                 value="Acme Corporation"
                                 options={[{ value: "Acme Corporation" }]}
                             />
                         </label>
                         <label>
-                            <span>Projects</span>
+                            <span>项目</span>
                             <Select
                                 mode="multiple"
                                 value={["AI Platform", "Data Infrastructure"]}
@@ -498,12 +514,12 @@ export const UserPage = () => {
 
             <Modal
                 className="user-delete-modal"
-                title="Delete User"
+                title="删除用户"
                 open={Boolean(deletingUser)}
                 centered
                 width={360}
-                okText="Delete User"
-                cancelText="Cancel"
+                okText="删除用户"
+                cancelText="取消"
                 okButtonProps={{ danger: true, disabled: deleteConfirmText !== "delete" }}
                 onCancel={() => setDeletingUser(null)}
                 onOk={() => setDeletingUser(null)}
@@ -511,9 +527,9 @@ export const UserPage = () => {
                 {deletingUser ? (
                     <div className="user-delete-content">
                         <ExclamationCircleOutlined className="user-delete-warning" />
-                        <strong>Are you sure you want to delete this user?</strong>
+                        <strong>确认删除这个用户？</strong>
                         <Text type="secondary">
-                            This action cannot be undone. All user data will be permanently removed.
+                            此操作不可撤销，相关用户数据将被永久移除。
                         </Text>
                         <div className="user-delete-person">
                             <Avatar style={{ backgroundColor: deletingUser.avatarColor }}>
@@ -525,7 +541,7 @@ export const UserPage = () => {
                             </div>
                         </div>
                         <label>
-                            <span>Type "delete" to confirm</span>
+                            <span>输入 delete 确认删除</span>
                             <Input
                                 value={deleteConfirmText}
                                 onChange={(event) => setDeleteConfirmText(event.target.value)}

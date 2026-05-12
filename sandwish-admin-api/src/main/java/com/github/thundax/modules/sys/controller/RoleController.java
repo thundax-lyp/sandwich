@@ -68,10 +68,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RoleController {
 
     private static final String DEPARTMENT_ID_PREFIX = "DEPARTMENT_";
-    private static final String DEPARTMENT_NAME = "department";
-    private static final String MENU_NAME = "Menu";
-    private static final String ROLE_NAME = "Role";
-    private static final String USER_NAME = "User";
 
     private final RoleService roleService;
     private final MenuService menuService;

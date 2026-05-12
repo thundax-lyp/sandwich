@@ -18,6 +18,7 @@ import com.github.thundax.modules.sys.service.UserService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.FilterChain;
@@ -109,10 +110,15 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         if (permissions == null) {
             permissions = permissionService.createPermissions(token, accessToken.getUserId());
         }
+        Set<String> permissionSnapshot = new LinkedHashSet<>(permissions);
 
         authService.activeAccessToken(accessTokenCommand(accessToken));
         SandwishContextHolder.setSubject(new SandwishSubject(
-                accessToken.getUserId(), SandwishSubjectType.ADMIN_USER, currentUser.getName(), token, permissions));
+                accessToken.getUserId(),
+                SandwishSubjectType.ADMIN_USER,
+                currentUser.getName(),
+                token,
+                permissionSnapshot));
 
         filterChain.doFilter(request, response);
     }

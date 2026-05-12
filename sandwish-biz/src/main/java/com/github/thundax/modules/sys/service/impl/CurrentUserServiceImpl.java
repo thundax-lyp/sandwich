@@ -52,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -201,9 +202,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     @Override
     public List<Menu> listAccessibleMenus(CurrentUserQuery query) {
         if (isSuper(query)) {
-            List<Menu> menuList = menuService.list(new MenuQuery());
-            menuList.sort(Menu::compareTo);
-            return menuList;
+            return sortedMenus(menuService.list(new MenuQuery()));
         }
 
         List<Role> roleList = userService.listUserRoles(userQuery(query.getUserId()));
@@ -211,9 +210,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         if (isAdmin) {
             MenuQuery menuQuery = new MenuQuery();
             menuQuery.setMaxRank(query.getRank());
-            List<Menu> menuList = menuService.list(menuQuery);
-            menuList.sort(Menu::compareTo);
-            return menuList;
+            return sortedMenus(menuService.list(menuQuery));
         }
 
         List<MenuId> menuIds = roleList.stream()
@@ -227,15 +224,19 @@ public class CurrentUserServiceImpl implements CurrentUserService {
                 .collect(Collectors.toList());
         MenuQuery menuQuery = new MenuQuery();
         menuQuery.setIds(menuIds);
-        List<Menu> menuList = menuService.list(menuQuery);
-        menuList.sort(Menu::compareTo);
-        return menuList;
+        return sortedMenus(menuService.list(menuQuery));
     }
 
     private RoleQuery roleQuery(Role role) {
         RoleQuery query = new RoleQuery();
         query.setId(role.getId());
         return query;
+    }
+
+    private List<Menu> sortedMenus(List<Menu> menus) {
+        List<Menu> menuList = menus == null ? new ArrayList<>() : new ArrayList<>(menus);
+        menuList.sort(Menu::compareTo);
+        return menuList;
     }
 
     private UserQuery userQuery(UserId userId) {

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.auth.persistence.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 
 import com.alicp.jetcache.Cache;
@@ -44,6 +45,26 @@ public class PrincipalAuthSessionDaoImplTest {
         dao.deleteById(PrincipalAuthSessionId.of("fa1"));
 
         assertNull(dao.getById(PrincipalAuthSessionId.of("fa1")));
+    }
+
+    @Test
+    public void shouldReturnIndependentSessionValueCollections() throws Exception {
+        PrincipalAuthSessionDaoImpl dao = new PrincipalAuthSessionDaoImpl();
+        TestCache cache = new TestCache();
+        injectCache(dao, cache);
+
+        PrincipalAuthSession session = session();
+        dao.insert(session, 70);
+
+        PrincipalAuthSession first = dao.getById(PrincipalAuthSessionId.of("fa1"));
+        ((Set<String>) first.getValues().get(SAMPLE_VALUE_NAME)).clear();
+        PrincipalAuthSession second = dao.getById(PrincipalAuthSessionId.of("fa1"));
+
+        assertNotSame(
+                first.getValues().get(SAMPLE_VALUE_NAME), second.getValues().get(SAMPLE_VALUE_NAME));
+        assertEquals(
+                new LinkedHashSet<>(Arrays.asList("sys:user:query", "sys:user:update")),
+                second.getValues().get(SAMPLE_VALUE_NAME));
     }
 
     private PrincipalAuthSession session() {

@@ -11,9 +11,13 @@ import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -97,7 +101,7 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         if (cacheValues == null) {
             return values;
         }
-        values.putAll(cacheValues);
+        cacheValues.forEach((key, value) -> values.put(key, copyValue(value)));
         return values;
     }
 
@@ -106,8 +110,21 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
         if (entityValues == null) {
             return values;
         }
-        values.putAll(entityValues);
+        entityValues.forEach((key, value) -> values.put(key, copyValue(value)));
         return values;
+    }
+
+    private static Object copyValue(Object value) {
+        if (value instanceof Set) {
+            return new LinkedHashSet<>((Set<?>) value);
+        }
+        if (value instanceof Collection) {
+            return new ArrayList<>((Collection<?>) value);
+        }
+        if (value instanceof Map) {
+            return new LinkedHashMap<>((Map<?, ?>) value);
+        }
+        return value;
     }
 
     private static class PrincipalAuthSessionCacheDTO implements CacheDTO {

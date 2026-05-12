@@ -61,10 +61,10 @@ public class PermissionServiceImpl implements PermissionService {
         if (session == null) {
             return Collections.emptySet();
         }
-        Set<String> permissions = loadPermissions(userId);
-        session.getValues().put(SESSION_VALUE_PERMISSIONS, permissions);
+        Set<String> permissions = new HashSet<>(loadPermissions(userId));
+        session.getValues().put(SESSION_VALUE_PERMISSIONS, new HashSet<>(permissions));
         principalAuthSessionDao.insert(session, expiredSeconds(session));
-        return permissions;
+        return new HashSet<>(permissions);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class PermissionServiceImpl implements PermissionService {
             return null;
         }
         Set<String> permissions = new HashSet<>();
-        for (Object item : (Collection<?>) value) {
+        for (Object item : new HashSet<>((Collection<?>) value)) {
             if (item != null) {
                 permissions.add(String.valueOf(item));
             }

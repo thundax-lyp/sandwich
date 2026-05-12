@@ -145,6 +145,17 @@ public class AuthPermissionLifecycleTest {
     }
 
     @Test
+    public void shouldReturnIndependentPermissionSnapshots() {
+        AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
+
+        Set<String> permissions = permissionService.getPermissions(accessToken.getToken());
+        permissions.clear();
+
+        Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "sys:role:view"));
+        Assert.assertTrue(permissionService.isPermitted(accessToken.getToken(), "user"));
+    }
+
+    @Test
     public void shouldInvalidateSessionByUserId() {
         AuthAccessTokenResult accessToken = createAccessToken("1", "tester");
 

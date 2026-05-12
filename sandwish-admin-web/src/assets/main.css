@@ -1336,6 +1336,7 @@ p {
 }
 
 .user-row-actions-inline {
+    display: inline-flex;
     flex-wrap: nowrap;
 }
 
@@ -1346,6 +1347,10 @@ p {
     height: 30px;
     padding: 0;
     place-items: center;
+}
+
+.user-row-actions-inline .user-row-action + .user-row-action {
+    margin-left: -1px;
 }
 
 .user-row-action-more {

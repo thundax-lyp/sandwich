@@ -305,7 +305,7 @@ export const UserPage = () => {
             fixed: "right",
             render: (_, user) => (
                 <div className="user-row-actions">
-                    <Space className="user-row-actions-inline" size={4}>
+                    <Space.Compact className="user-row-actions-inline">
                         <Button
                             aria-label={`编辑 ${user.name}`}
                             className="user-row-action"
@@ -324,7 +324,7 @@ export const UserPage = () => {
                                 setDeleteConfirmText("delete");
                             }}
                         />
-                    </Space>
+                    </Space.Compact>
                     <Dropdown
                         menu={{
                             items: [

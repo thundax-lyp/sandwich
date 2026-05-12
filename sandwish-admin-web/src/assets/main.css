@@ -710,13 +710,24 @@ p {
 .dictionary-page {
     display: grid;
     gap: 20px;
+    min-width: 0;
 }
 
 .dictionary-page-header {
     display: flex;
+    min-width: 0;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
+}
+
+.dictionary-page > *,
+.dictionary-page-header > *,
+.dictionary-list-toolbar > *,
+.dictionary-summary > *,
+.dictionary-list-panel,
+.dictionary-list-panel .ant-card-body {
+    min-width: 0;
 }
 
 .dictionary-page-header h2.ant-typography,
@@ -728,10 +739,12 @@ p {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
+    max-width: 100%;
 }
 
 .dictionary-summary-card,
 .dictionary-list-panel {
+    max-width: 100%;
     border-color: var(--line-subtle);
 }
 
@@ -748,6 +761,7 @@ p {
 
 .dictionary-list-toolbar {
     display: flex;
+    min-width: 0;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
@@ -755,6 +769,7 @@ p {
 }
 
 .dictionary-search-form {
+    min-width: 0;
     justify-content: flex-end;
     row-gap: 10px;
 }
@@ -769,10 +784,25 @@ p {
 
 .dictionary-bulk-bar {
     display: flex;
+    min-width: 0;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 12px;
+}
+
+.dictionary-list-panel .ant-table-wrapper,
+.dictionary-list-panel .ant-spin-nested-loading,
+.dictionary-list-panel .ant-spin-container,
+.dictionary-list-panel .ant-table,
+.dictionary-list-panel .ant-table-container {
+    max-width: 100%;
+    min-width: 0;
+}
+
+.dictionary-list-panel .ant-table-content {
+    max-width: 100%;
+    overflow-x: auto;
 }
 
 .dictionary-empty-icon {
@@ -933,6 +963,28 @@ p {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .dictionary-page-header,
+    .dictionary-list-toolbar,
+    .dictionary-bulk-bar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dictionary-page-header .ant-space,
+    .dictionary-list-toolbar .ant-space,
+    .dictionary-search-form,
+    .dictionary-bulk-bar .ant-btn {
+        width: 100%;
+    }
+
+    .dictionary-page-header .ant-space {
+        justify-content: flex-start;
+    }
+
+    .dictionary-summary {
+        grid-template-columns: 1fr;
     }
 
     .user-menu-trigger {

@@ -1,4 +1,18 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+const expectNoPageHorizontalOverflow = async (page: Page) => {
+    await expect
+        .poll(async () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+        .toBe(true);
+
+    const metrics = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth
+    }));
+    expect(metrics.scrollWidth, `scrollWidth=${metrics.scrollWidth}, viewport=${metrics.viewportWidth}`)
+        .toBeLessThanOrEqual(metrics.viewportWidth);
+};
 
 test.describe("admin layout", () => {
     test.beforeEach(async ({ page }) => {
@@ -141,16 +155,19 @@ test.describe("admin layout", () => {
         await expect(main).toHaveAttribute("data-sidebar-state", "expanded");
         await expect(main).toHaveCSS("width", "1032px");
         await expect(workspaceContent).toHaveCSS("width", "944px");
+        await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("收起菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "collapsed");
         await expect(main).toHaveCSS("width", "1192px");
         await expect(workspaceContent).toHaveCSS("width", "1104px");
+        await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("展开菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "expanded");
         await expect(main).toHaveCSS("width", "1032px");
         await expect(workspaceContent).toHaveCSS("width", "944px");
+        await expectNoPageHorizontalOverflow(page);
     });
 
     test("uses the padded viewport width when the mobile menu is closed or open", async ({ page }) => {
@@ -163,10 +180,12 @@ test.describe("admin layout", () => {
         await expect(main).toHaveAttribute("data-sidebar-state", "closed");
         await expect(main).toHaveCSS("width", "390px");
         await expect(workspaceContent).toHaveCSS("width", "358px");
+        await expectNoPageHorizontalOverflow(page);
 
         await page.getByLabel("展开菜单").click();
         await expect(main).toHaveAttribute("data-sidebar-state", "open");
         await expect(main).toHaveCSS("width", "390px");
         await expect(workspaceContent).toHaveCSS("width", "358px");
+        await expectNoPageHorizontalOverflow(page);
     });
 });

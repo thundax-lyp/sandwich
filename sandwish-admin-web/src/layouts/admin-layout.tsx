@@ -1,18 +1,24 @@
 import {
     AppstoreOutlined,
     AuditOutlined,
+    BellOutlined,
     BookOutlined,
+    CalendarOutlined,
     CloudServerOutlined,
+    FilterOutlined,
     LogoutOutlined,
     MenuOutlined,
+    MoonOutlined,
     SafetyCertificateOutlined,
+    SearchOutlined,
+    SunOutlined,
     TeamOutlined,
     UserOutlined
 } from "@ant-design/icons";
 import { Alert, Avatar, Button, Layout, Menu, Space, Typography, message } from "antd";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { MenuProps } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../api/auth-api";
@@ -23,6 +29,7 @@ import {
     listCurrentUserMenus,
     listCurrentUserPerms
 } from "../service/current-user-service";
+import { getStoredTheme, setAdminTheme, subscribeAdminThemeChange } from "../theme/theme-storage";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -169,6 +176,7 @@ const buildAuthorizedMenuItems = (
 export const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
     const currentUserInfoQuery = useQuery({
         queryKey: ["current-user", "info"],
         queryFn: getCurrentUserInfo,
@@ -213,6 +221,17 @@ export const AdminLayout = () => {
         }
     }, [currentUserPermsQuery.data]);
 
+    useEffect(() => {
+        const syncTheme = () => setThemeName(getStoredTheme());
+        return subscribeAdminThemeChange(syncTheme);
+    }, []);
+
+    const toggleTheme = () => {
+        const nextTheme = themeName === "dark" ? "light" : "dark";
+        setThemeName(nextTheme);
+        setAdminTheme(nextTheme);
+    };
+
     return (
         <Layout className="admin-shell">
             <Sider className="sidebar" width={248}>
@@ -237,10 +256,23 @@ export const AdminLayout = () => {
             <Layout>
                 <Header className="topbar">
                     <div>
-                        <Text className="eyebrow">admin-api workspace</Text>
+                        <Text className="topbar-path">Sandwich / Admin Console</Text>
                         <Title level={1}>后台管理台</Title>
                     </div>
                     <Space className="topbar-actions">
+                        <div className="topbar-search">
+                            <SearchOutlined />
+                            <span>Search</span>
+                            <kbd>⌘ /</kbd>
+                        </div>
+                        <Button icon={<CalendarOutlined />}>今日</Button>
+                        <Button icon={<FilterOutlined />}>筛选</Button>
+                        <Button className="notification-button" shape="circle" icon={<BellOutlined />} />
+                        <Button
+                            shape="circle"
+                            icon={themeName === "dark" ? <SunOutlined /> : <MoonOutlined />}
+                            onClick={toggleTheme}
+                        />
                         <Space size={10}>
                             <Avatar size={36} src={currentUser?.avatar} icon={<UserOutlined />} />
                             <div>
@@ -260,36 +292,73 @@ export const AdminLayout = () => {
                     </Space>
                 </Header>
 
-                <Content className="workspace">
-                    {currentUserInfoQuery.isError ? (
-                        <Alert
-                            type="warning"
-                            showIcon
-                            message="当前用户信息加载失败"
-                            description="请确认当前登录态有效，并检查 admin-api 当前用户接口。"
-                            style={{ marginBottom: 16 }}
-                        />
-                    ) : null}
-                    {currentUserMenusQuery.isError ? (
-                        <Alert
-                            type="warning"
-                            showIcon
-                            message="权限菜单加载失败"
-                            description="请确认当前登录态有效，并检查 admin-api 权限菜单接口。"
-                            style={{ marginBottom: 16 }}
-                        />
-                    ) : null}
-                    {currentUserPermsQuery.isError ? (
-                        <Alert
-                            type="warning"
-                            showIcon
-                            message="权限字符串加载失败"
-                            description="请确认当前登录态有效，并检查 admin-api 当前用户权限接口。"
-                            style={{ marginBottom: 16 }}
-                        />
-                    ) : null}
-                    <Outlet />
-                </Content>
+                <div className="admin-content-grid">
+                    <Content className="workspace">
+                        {currentUserInfoQuery.isError ? (
+                            <Alert
+                                type="warning"
+                                showIcon
+                                message="当前用户信息加载失败"
+                                description="请确认当前登录态有效，并检查 admin-api 当前用户接口。"
+                                style={{ marginBottom: 16 }}
+                            />
+                        ) : null}
+                        {currentUserMenusQuery.isError ? (
+                            <Alert
+                                type="warning"
+                                showIcon
+                                message="权限菜单加载失败"
+                                description="请确认当前登录态有效，并检查 admin-api 权限菜单接口。"
+                                style={{ marginBottom: 16 }}
+                            />
+                        ) : null}
+                        {currentUserPermsQuery.isError ? (
+                            <Alert
+                                type="warning"
+                                showIcon
+                                message="权限字符串加载失败"
+                                description="请确认当前登录态有效，并检查 admin-api 当前用户权限接口。"
+                                style={{ marginBottom: 16 }}
+                            />
+                        ) : null}
+                        <Outlet />
+                    </Content>
+                    <aside className="context-rail" aria-label="最近动态">
+                        <section>
+                            <Text className="rail-title">Recent Documents</Text>
+                            {[
+                                ["系统日志巡检", "Updated 2 minutes ago"],
+                                ["菜单权限映射", "Updated 3 hours ago"],
+                                ["对象存储策略", "Updated 5 hours ago"],
+                                ["RocketMQ 消费组", "Updated 8 hours ago"]
+                            ].map(([title, time]) => (
+                                <div className="rail-document" key={title}>
+                                    <span className="rail-file" />
+                                    <div>
+                                        <strong>{title}</strong>
+                                        <span>{time}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+                        <section>
+                            <Text className="rail-title">Team Mates</Text>
+                            {[
+                                ["Developer", "Administrator", "#7ff06a"],
+                                ["Ops Bot", "Runtime watcher", "#f6c343"],
+                                ["Audit", "Security reviewer", "#9e58f5"]
+                            ].map(([name, role, color]) => (
+                                <div className="rail-mate" key={name}>
+                                    <Avatar style={{ background: color, color: "#171717" }}>{name.slice(0, 1)}</Avatar>
+                                    <div>
+                                        <strong>{name}</strong>
+                                        <span>{role}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+                    </aside>
+                </div>
             </Layout>
         </Layout>
     );

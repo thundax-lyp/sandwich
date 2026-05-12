@@ -3,6 +3,8 @@ import {
     AuditOutlined,
     BookOutlined,
     CloudServerOutlined,
+    DownOutlined,
+    IdcardOutlined,
     LogoutOutlined,
     MenuFoldOutlined,
     MenuOutlined,
@@ -13,7 +15,7 @@ import {
     TeamOutlined,
     UserOutlined
 } from "@ant-design/icons";
-import { Alert, Avatar, Button, Layout, Menu, Space, Typography, message } from "antd";
+import { Alert, Avatar, Button, Dropdown, Layout, Menu, Space, Typography, message } from "antd";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { MenuProps } from "antd";
 import { useEffect, useState } from "react";
@@ -32,14 +34,14 @@ import {
 import { getStoredTheme, setAdminTheme, subscribeAdminThemeChange } from "../theme/theme-storage";
 
 const { Header, Sider, Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const TOKEN_KEEP_ALIVE_INTERVAL_MS = 30 * 1000;
 
 const fallbackMenuItems: MenuProps["items"] = [
     {
         key: "/dashboard",
         icon: <AppstoreOutlined />,
-        label: "Dashboard"
+        label: "仪表盘"
     },
     {
         key: "system",
@@ -93,6 +95,17 @@ const fallbackMenuItems: MenuProps["items"] = [
 ];
 
 const menuIconMap: Record<string, ReactNode> = {
+    dashboard: <AppstoreOutlined />,
+    system: <SafetyCertificateOutlined />,
+    users: <TeamOutlined />,
+    roles: <SafetyCertificateOutlined />,
+    menus: <MenuOutlined />,
+    departments: <AppstoreOutlined />,
+    dictionaries: <BookOutlined />,
+    logs: <AuditOutlined />,
+    storage: <CloudServerOutlined />,
+    "storage-objects": <CloudServerOutlined />,
+    permission: <SafetyCertificateOutlined />,
     "/dashboard": <AppstoreOutlined />,
     "/system/users": <TeamOutlined />,
     "/system/departments": <AppstoreOutlined />,
@@ -100,9 +113,7 @@ const menuIconMap: Record<string, ReactNode> = {
     "/system/menus": <MenuOutlined />,
     "/system/dictionaries": <BookOutlined />,
     "/system/logs": <AuditOutlined />,
-    "/storage/objects": <CloudServerOutlined />,
-    system: <SafetyCertificateOutlined />,
-    storage: <CloudServerOutlined />
+    "/storage/objects": <CloudServerOutlined />
 };
 
 const getOpenKeys = (pathname: string) => {
@@ -121,6 +132,19 @@ const getOpenKeys = (pathname: string) => {
 
 const normalizeMenuKey = (menu: { id: number; url?: string | null }) => {
     return menu.url || String(menu.id);
+};
+
+const getDisplayIcon = (displayParams?: string | null) => {
+    if (!displayParams) {
+        return undefined;
+    }
+
+    try {
+        const parsedDisplayParams = JSON.parse(displayParams) as { icon?: unknown };
+        return typeof parsedDisplayParams.icon === "string" ? parsedDisplayParams.icon : undefined;
+    } catch {
+        return undefined;
+    }
 };
 
 const buildAuthorizedMenuItems = (
@@ -152,7 +176,7 @@ const buildAuthorizedMenuItems = (
 
         return {
             key,
-            icon: menuIconMap[key] || menuIconMap[String(menu.id)],
+            icon: menuIconMap[getDisplayIcon(menu.displayParams) || ""] || menuIconMap[key] || menuIconMap[String(menu.id)],
             label: menu.name,
             children: children.length ? children.map((child) => toMenuItem(child, nextAncestors)) : undefined
         };
@@ -167,7 +191,7 @@ const buildAuthorizedMenuItems = (
         {
             key: "/dashboard",
             icon: <AppstoreOutlined />,
-            label: "Dashboard"
+            label: "仪表盘"
         },
         ...(rootMenuItems as NonNullable<MenuProps["items"]>),
         ...(orphanMenuItems as NonNullable<MenuProps["items"]>)
@@ -242,6 +266,21 @@ export const AdminLayout = () => {
         setThemeName(nextTheme);
         setAdminTheme(nextTheme);
     };
+    const userMenuItems: MenuProps["items"] = [
+        {
+            key: "profile",
+            icon: <IdcardOutlined />,
+            label: "个人资料"
+        },
+        {
+            type: "divider"
+        },
+        {
+            key: "logout",
+            icon: <LogoutOutlined />,
+            label: "退出登录"
+        }
+    ];
 
     return (
         <Layout className="admin-shell">
@@ -256,7 +295,7 @@ export const AdminLayout = () => {
                     <SandwichLogo className="brand-logo" />
                     <div className="brand-copy">
                         <strong>Sandwich</strong>
-                        <span>Admin Console</span>
+                        <span>管理台</span>
                     </div>
                 </div>
 
@@ -282,8 +321,7 @@ export const AdminLayout = () => {
                             onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
                         />
                         <div>
-                            <Text className="topbar-path">Sandwich / Admin Console</Text>
-                            <Title level={1}>后台管理台</Title>
+                            <Text className="topbar-path">Sandwich / 管理台</Text>
                         </div>
                     </div>
                     <Space className="topbar-actions">
@@ -292,22 +330,29 @@ export const AdminLayout = () => {
                             icon={themeName === "dark" ? <SunOutlined /> : <MoonOutlined />}
                             onClick={toggleTheme}
                         />
-                        <Space size={10}>
-                            <Avatar size={36} src={currentUser?.avatar} icon={<UserOutlined />} />
-                            <div>
-                                <Text strong>{currentUserName}</Text>
-                                <br />
-                                <Text type="secondary">{currentUser?.loginName || "未连接"}</Text>
-                            </div>
-                        </Space>
-                        <Button type="default">连接检查</Button>
-                        <Button
-                            icon={<LogoutOutlined />}
-                            loading={logoutMutation.isPending}
-                            onClick={() => logoutMutation.mutate()}
+                        <Dropdown
+                            menu={{
+                                items: userMenuItems,
+                                onClick: ({ key }) => {
+                                    if (key === "logout") {
+                                        logoutMutation.mutate();
+                                    }
+                                    if (key === "profile") {
+                                        message.info("个人资料功能待接入");
+                                    }
+                                }
+                            }}
+                            trigger={["click"]}
                         >
-                            退出登录
-                        </Button>
+                            <Button className="user-menu-trigger" loading={logoutMutation.isPending}>
+                                <Avatar size={32} src={currentUser?.avatar} icon={<UserOutlined />} />
+                                <span className="user-menu-copy">
+                                    <Text strong>{currentUserName}</Text>
+                                    <Text type="secondary">{currentUser?.loginName || "未连接"}</Text>
+                                </span>
+                                <DownOutlined />
+                            </Button>
+                        </Dropdown>
                     </Space>
                 </Header>
 
@@ -342,41 +387,6 @@ export const AdminLayout = () => {
                         ) : null}
                         <Outlet />
                     </Content>
-                    <aside className="context-rail" aria-label="最近动态">
-                        <section>
-                            <Text className="rail-title">Recent Documents</Text>
-                            {[
-                                ["系统日志巡检", "Updated 2 minutes ago"],
-                                ["菜单权限映射", "Updated 3 hours ago"],
-                                ["对象存储策略", "Updated 5 hours ago"],
-                                ["RocketMQ 消费组", "Updated 8 hours ago"]
-                            ].map(([title, time]) => (
-                                <div className="rail-document" key={title}>
-                                    <span className="rail-file" />
-                                    <div>
-                                        <strong>{title}</strong>
-                                        <span>{time}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </section>
-                        <section>
-                            <Text className="rail-title">Team Mates</Text>
-                            {[
-                                ["Developer", "Administrator", "#7ff06a"],
-                                ["Ops Bot", "Runtime watcher", "#f6c343"],
-                                ["Audit", "Security reviewer", "#9e58f5"]
-                            ].map(([name, role, color]) => (
-                                <div className="rail-mate" key={name}>
-                                    <Avatar style={{ background: color, color: "#171717" }}>{name.slice(0, 1)}</Avatar>
-                                    <div>
-                                        <strong>{name}</strong>
-                                        <span>{role}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </section>
-                    </aside>
                 </div>
             </Layout>
         </Layout>

@@ -19,7 +19,6 @@
     --logo-top-line: #17242f;
     --shadow-soft: 0 18px 50px rgba(23, 23, 23, 0.07);
     --sidebar-width: 248px;
-    --rail-width: 288px;
     color: var(--text-primary);
     background: var(--surface-page);
     font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -90,7 +89,15 @@ button {
     border-right: 1px solid var(--line-subtle);
 }
 
+.sidebar .ant-layout-sider-children {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    overflow: hidden;
+}
+
 .brand {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -154,7 +161,6 @@ button {
 
 .sidebar-toggle {
     flex: 0 0 auto;
-    margin-top: 6px;
     color: var(--text-secondary);
     background: var(--surface-soft);
 }
@@ -169,6 +175,11 @@ button {
 }
 
 .nav-menu {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 16px;
     background: transparent;
     border-inline-end: 0 !important;
 }
@@ -210,27 +221,30 @@ button {
 }
 
 .admin-content-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--rail-width);
     min-height: calc(100vh - 120px);
 }
 
 .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     height: auto;
-    padding: 34px 32px 0 44px;
+    padding: 20px 32px 18px 44px;
     color: var(--text-primary);
     background: var(--surface-page);
+    border-bottom: 1px solid var(--line-subtle);
     line-height: normal;
 }
 
 .topbar-heading {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
+    min-height: 44px;
     min-width: 0;
 }
 
@@ -239,18 +253,40 @@ button {
 }
 
 .topbar-path {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     color: var(--text-muted);
     font-size: 15px;
-}
-
-.topbar-path::after {
-    color: var(--text-primary);
-    content: " / Overview";
+    line-height: 1.2;
 }
 
 .topbar-actions {
+    align-items: center;
     flex-wrap: wrap;
     justify-content: flex-end;
+}
+
+.user-menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 12px;
+}
+
+.user-menu-copy {
+    display: grid;
+    min-width: 0;
+    text-align: left;
+}
+
+.user-menu-copy .ant-typography {
+    max-width: 120px;
+    overflow: hidden;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .eyebrow {
@@ -566,61 +602,6 @@ p {
     text-decoration: none;
 }
 
-.context-rail {
-    display: grid;
-    align-content: start;
-    gap: 50px;
-    padding: 34px 32px 48px;
-    background: var(--surface-page);
-    border-left: 1px solid var(--line-subtle);
-}
-
-.rail-title {
-    display: block;
-    margin-bottom: 22px;
-    color: var(--text-secondary);
-    font-size: 16px;
-}
-
-.rail-document,
-.rail-mate {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.rail-file {
-    display: block;
-    width: 52px;
-    height: 62px;
-    background:
-        linear-gradient(135deg, rgba(255, 240, 0, 0.18), transparent 42%),
-        var(--surface-panel);
-    border: 1px solid var(--line-subtle);
-    border-radius: 8px;
-    box-shadow: var(--shadow-soft);
-}
-
-.rail-document strong,
-.rail-document span,
-.rail-mate strong,
-.rail-mate span {
-    display: block;
-}
-
-.rail-document strong,
-.rail-mate strong {
-    color: var(--text-primary);
-    font-size: 16px;
-}
-
-.rail-document span,
-.rail-mate span {
-    margin-top: 6px;
-    color: var(--text-secondary);
-}
-
 .department-page {
     display: grid;
     gap: 20px;
@@ -862,18 +843,10 @@ p {
         padding: 24px 18px;
     }
 
-    .admin-content-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .context-rail {
-        display: none;
-    }
-
     .topbar {
-        align-items: flex-start;
+        align-items: stretch;
         flex-direction: column;
-        padding: 24px 18px 0;
+        padding: 16px 18px;
     }
 
     .topbar-heading {
@@ -882,6 +855,7 @@ p {
 
     .topbar-actions {
         width: 100%;
+        justify-content: flex-start;
     }
 
     .metrics {

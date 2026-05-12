@@ -32,7 +32,7 @@ const metricItems = [
 
 const workColumns = [
     {
-        title: "Draft",
+        title: "草稿",
         count: 2,
         items: [
             ["登录态治理", "预认证会话、验证码与访问令牌链路"],
@@ -40,7 +40,7 @@ const workColumns = [
         ]
     },
     {
-        title: "In Progress",
+        title: "进行中",
         count: 2,
         items: [
             ["MQ 兼容层", "RabbitMQ / RocketMQ 发送消费闭环"],
@@ -48,7 +48,7 @@ const workColumns = [
         ]
     },
     {
-        title: "Archived",
+        title: "已归档",
         count: 1,
         items: [["权限字典", "用户、角色、菜单权限基础模型"]]
     }
@@ -58,9 +58,9 @@ export const DashboardPage = () => {
     return (
         <div className="dashboard-page">
             <section className="dashboard-hero">
-                <Text className="eyebrow">dashboard</Text>
-                <Title level={2}>Dashboard 已就绪</Title>
-                <strong>Sandwich Admin</strong>
+                <Text className="eyebrow">仪表盘</Text>
+                <Title level={2}>仪表盘已就绪</Title>
+                <strong>Sandwich 管理台</strong>
                 <Paragraph>系统运行态、权限治理和基础资源管理都在这里聚合。</Paragraph>
             </section>
 
@@ -75,7 +75,7 @@ export const DashboardPage = () => {
                             <div>
                                 <strong>{metric.value}</strong>
                                 <span className="metric-delta">{metric.delta}</span>
-                                <p>compared to last week</p>
+                                <p>较上周</p>
                             </div>
                             <svg viewBox="0 0 120 72" role="img" aria-label={`${metric.label}趋势`}>
                                 <path className="metric-chart-fill" d={`${metric.line} L112 72 L8 72 Z`} />
@@ -88,8 +88,8 @@ export const DashboardPage = () => {
 
             <section className="campaign-board">
                 <div className="section-title-row">
-                    <Title level={3}>Recent operations</Title>
-                    <button type="button">View All</button>
+                    <Title level={3}>最近操作</Title>
+                    <button type="button">查看全部</button>
                 </div>
                 <div className="operation-columns">
                     {workColumns.map((column) => (
@@ -110,7 +110,7 @@ export const DashboardPage = () => {
                                 </article>
                             ))}
                             <button className="add-operation" type="button">
-                                + Add operation
+                                + 新增操作
                             </button>
                         </div>
                     ))}

@@ -115,7 +115,7 @@ describe("App", () => {
         render(<App />);
 
         expect(
-            await screen.findByRole("heading", { name: "Dashboard 已就绪" })
+            await screen.findByRole("heading", { name: "仪表盘已就绪" })
         ).toBeInTheDocument();
         expect(await screen.findByText("Developer")).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
@@ -269,7 +269,7 @@ describe("App", () => {
         await userEvent.click(screen.getByRole("button", { name: /登\s*录/ }));
 
         expect(
-            await screen.findByRole("heading", { name: "Dashboard 已就绪" })
+            await screen.findByRole("heading", { name: "仪表盘已就绪" })
         ).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("login-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("login-refresh-token");
@@ -348,7 +348,8 @@ describe("App", () => {
 
         render(<App />);
 
-        await userEvent.click(await screen.findByRole("button", { name: /退出登录/ }));
+        await userEvent.click(await screen.findByRole("button", { name: /Developer/ }));
+        await userEvent.click(await screen.findByRole("menuitem", { name: /退出登录/ }));
 
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/auth/session/logout",
@@ -624,7 +625,7 @@ describe("App", () => {
         render(<App />);
 
         expect(
-            await screen.findByRole("heading", { name: "Dashboard 已就绪" })
+            await screen.findByRole("heading", { name: "仪表盘已就绪" })
         ).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("refreshed-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("rotated-refresh-token");

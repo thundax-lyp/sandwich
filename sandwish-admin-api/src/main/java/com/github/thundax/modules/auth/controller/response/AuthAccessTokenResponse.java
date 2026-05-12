@@ -23,4 +23,8 @@ public class AuthAccessTokenResponse implements Serializable {
     @ApiModelProperty(name = "refreshToken", value = "刷新令牌")
     @JsonProperty("refreshToken")
     private String refreshToken;
+
+    @ApiModelProperty(name = "expireAt", value = "访问令牌过期时间")
+    @JsonProperty("expireAt")
+    private Long expireAt;
 }

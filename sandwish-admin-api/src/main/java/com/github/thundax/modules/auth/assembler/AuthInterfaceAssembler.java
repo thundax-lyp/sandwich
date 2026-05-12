@@ -46,6 +46,7 @@ public final class AuthInterfaceAssembler {
         return AuthAccessTokenResponse.builder()
                 .token(entity.getToken())
                 .refreshToken(entity.getRefreshToken())
+                .expireAt(accessTokenExpireAt(entity))
                 .build();
     }
 
@@ -60,7 +61,16 @@ public final class AuthInterfaceAssembler {
                                 ? result.getAccessToken().getToken()
                                 : result.getOauthAccessToken())
                 .refreshToken(result.getRefreshToken())
+                .expireAt(accessTokenExpireAt(result.getAccessToken()))
                 .build();
+    }
+
+    private static Long accessTokenExpireAt(AuthAccessTokenResult result) {
+        return result == null
+                        || result.getPrincipalAccessToken() == null
+                        || result.getPrincipalAccessToken().getExpireAt() == null
+                ? null
+                : result.getPrincipalAccessToken().getExpireAt().getTime();
     }
 
     @NonNull

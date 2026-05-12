@@ -26,6 +26,7 @@ import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.SysLogMessageService;
+import java.util.Date;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -78,7 +79,9 @@ public class AuthControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
-                .andExpect(jsonPath("$.data.token").value("access-token-1"));
+                .andExpect(jsonPath("$.data.token").value("access-token-1"))
+                .andExpect(jsonPath("$.data.refreshToken").value("refresh-token-1"))
+                .andExpect(jsonPath("$.data.expireAt").value(1778513052155L));
     }
 
     private MockMvc mockMvc(AdminAuthService authService, PreAuthSessionService preAuthSessionService) {
@@ -115,6 +118,7 @@ public class AuthControllerContractTest {
     private AuthAccessTokenResult accessToken(String token) {
         PrincipalAccessToken accessToken = new PrincipalAccessToken();
         accessToken.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
+        accessToken.setExpireAt(new Date(1778513052155L));
         return new AuthAccessTokenResult(token, "refresh-token-1", accessToken);
     }
 }

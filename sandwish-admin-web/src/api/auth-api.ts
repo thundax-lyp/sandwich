@@ -17,10 +17,16 @@ export interface LoginRequest {
 export interface AccessTokenResponse {
     token: string;
     refreshToken?: string;
+    expireAt?: number;
 }
 
 export interface LogoutRequest {
     token: string;
+}
+
+export interface TokenRefreshRequest {
+    clientId?: string;
+    refreshToken: string;
 }
 
 export const createLoginForm = () => {
@@ -35,6 +41,12 @@ export const refreshCaptcha = (loginToken: string) => {
 
 export const login = (request: LoginRequest) => {
     return postJson<AccessTokenResponse, LoginRequest>("/auth/session/login", {
+        body: request
+    });
+};
+
+export const refreshAccessToken = (request: TokenRefreshRequest) => {
+    return postJson<AccessTokenResponse, TokenRefreshRequest>("/auth/session/token/refresh", {
         body: request
     });
 };

@@ -150,6 +150,7 @@ describe("App", () => {
     });
 
     it("loads permissions as part of successful login", async () => {
+        const loginExpireAt = Date.now() + 5 * 60 * 1000;
         vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
             const url = String(input);
             if (url.endsWith("/auth/session/pre-auth-session")) {
@@ -192,7 +193,8 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 token: "login-access-token",
-                                refreshToken: "login-refresh-token"
+                                refreshToken: "login-refresh-token",
+                                expireAt: loginExpireAt
                             }
                         }),
                         {
@@ -269,6 +271,8 @@ describe("App", () => {
             await screen.findByRole("heading", { name: "Dashboard 已就绪" })
         ).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("login-access-token");
+        expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("login-refresh-token");
+        expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe(String(loginExpireAt));
         await waitFor(() => expect(hasPermission("sys:user:view")).toBe(true));
         expect(hasPermission("sys:role:view")).toBe(false);
         expect(globalThis.fetch).toHaveBeenCalledWith(
@@ -532,6 +536,108 @@ describe("App", () => {
                 }),
                 method: "POST"
             })
+        );
+    });
+
+    it("refreshes the access token before expireAt is within 60 seconds", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "expiring-token");
+        localStorage.setItem("sandwish.admin.refreshToken", "refresh-token");
+        localStorage.setItem("sandwish.admin.accessTokenExpireAt", String(Date.now() + 30 * 1000));
+        vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+            const url = String(input);
+            if (url.endsWith("/auth/session/token/refresh")) {
+                expect(init).toEqual(
+                    expect.objectContaining({
+                        body: JSON.stringify({
+                            clientId: "admin-api",
+                            refreshToken: "refresh-token"
+                        })
+                    })
+                );
+
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                token: "refreshed-access-token",
+                                refreshToken: "rotated-refresh-token",
+                                expireAt: 1778514052155
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/info")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                id: 1,
+                                loginName: "developer",
+                                name: "Developer"
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/menus")) {
+                return Promise.resolve(
+                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: [] }), {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    })
+                );
+            }
+
+            if (url.endsWith("/sys/current-user/perms")) {
+                return Promise.resolve(
+                    new Response(JSON.stringify({ code: "COMMON-00000", message: "success", data: { perms: [] } }), {
+                        headers: { "Content-Type": "application/json" },
+                        status: 200
+                    })
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(<App />);
+
+        expect(
+            await screen.findByRole("heading", { name: "Dashboard 已就绪" })
+        ).toBeInTheDocument();
+        expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("refreshed-access-token");
+        expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("rotated-refresh-token");
+        expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe("1778514052155");
+        await waitFor(() =>
+            expect(globalThis.fetch).toHaveBeenCalledWith(
+                "/admin-api/api/sys/current-user/info",
+                expect.objectContaining({
+                    headers: expect.objectContaining({
+                        "Access-Token": "refreshed-access-token"
+                    }),
+                    method: "POST"
+                })
+            )
         );
     });
 });

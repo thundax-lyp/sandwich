@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../api/auth-api";
+import { refreshAccessTokenIfNeeded } from "../api/http";
 import { replacePermissions } from "../auth/permission-storage";
 import { clearAccessToken, getAccessToken } from "../auth/token-storage";
 import {
@@ -33,6 +34,7 @@ import { getStoredTheme, setAdminTheme, subscribeAdminThemeChange } from "../the
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
+const TOKEN_KEEP_ALIVE_INTERVAL_MS = 30 * 1000;
 
 const fallbackMenuItems: MenuProps["items"] = [
     {
@@ -224,6 +226,15 @@ export const AdminLayout = () => {
     useEffect(() => {
         const syncTheme = () => setThemeName(getStoredTheme());
         return subscribeAdminThemeChange(syncTheme);
+    }, []);
+
+    useEffect(() => {
+        void refreshAccessTokenIfNeeded();
+        const timer = window.setInterval(() => {
+            void refreshAccessTokenIfNeeded();
+        }, TOKEN_KEEP_ALIVE_INTERVAL_MS);
+
+        return () => window.clearInterval(timer);
     }, []);
 
     const toggleTheme = () => {

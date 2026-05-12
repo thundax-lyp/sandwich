@@ -6,6 +6,7 @@ import {
     FilterOutlined,
     MoreOutlined,
     PlusOutlined,
+    PoweroffOutlined,
     SearchOutlined
 } from "@ant-design/icons";
 import {
@@ -14,7 +15,6 @@ import {
     Drawer,
     Input,
     Modal,
-    Popover,
     Select,
     Space,
     Table,
@@ -23,6 +23,7 @@ import {
 } from "antd";
 import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
+import type { Key } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 
 const { Text, Title } = Typography;
@@ -158,6 +159,10 @@ export const UserPage = () => {
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
     const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const hasSelectedUsers = selectedRowKeys.length > 0;
+    const hasActiveFilters =
+        Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
 
     const startResizeColumn = (columnKey: UserColumnKey) => (event: ReactMouseEvent) => {
         event.preventDefault();
@@ -214,66 +219,6 @@ export const UserPage = () => {
     const resetFilters = () => {
         setFilters(DEFAULT_USER_FILTERS);
     };
-
-    const filterForm = (
-        <div className="user-filter-form">
-            <div className="user-filter-form-header">
-                <Text strong>Filters</Text>
-                <Button size="small" type="text" onClick={resetFilters}>
-                    Reset
-                </Button>
-            </div>
-            <label>
-                <span>Email</span>
-                <Input
-                    allowClear
-                    placeholder="name@company.com"
-                    value={filters.email}
-                    onChange={(event) =>
-                        setFilters((currentFilters) => ({
-                            ...currentFilters,
-                            email: event.target.value
-                        }))
-                    }
-                />
-            </label>
-            <label>
-                <span>Role</span>
-                <Select<UserFilterRole>
-                    value={filters.role}
-                    options={["All", "Admin", "Editor", "Viewer"].map((value) => ({
-                        value: value as UserFilterRole,
-                        label: value
-                    }))}
-                    onChange={(role) =>
-                        setFilters((currentFilters) => ({
-                            ...currentFilters,
-                            role
-                        }))
-                    }
-                />
-            </label>
-            <label>
-                <span>Status</span>
-                <Select<UserFilterStatus>
-                    value={filters.status}
-                    options={["All", "Active", "Inactive", "Invited"].map((value) => ({
-                        value: value as UserFilterStatus,
-                        label: value
-                    }))}
-                    onChange={(status) =>
-                        setFilters((currentFilters) => ({
-                            ...currentFilters,
-                            status
-                        }))
-                    }
-                />
-            </label>
-            <Button type="primary" onClick={() => setFiltersOpen(false)}>
-                Apply Filters
-            </Button>
-        </div>
-    );
 
     const columns: TableProps<UserRecord>["columns"] = [
         {
@@ -365,18 +310,99 @@ export const UserPage = () => {
                             value={searchText}
                             onChange={(event) => setSearchText(event.target.value)}
                         />
-                        <Popover
-                            arrow={false}
-                            content={filterForm}
-                            open={filtersOpen}
-                            placement="bottomRight"
-                            trigger="click"
-                            onOpenChange={setFiltersOpen}
+                        <Button
+                            icon={<FilterOutlined />}
+                            type={filtersOpen || hasActiveFilters ? "primary" : "default"}
+                            aria-expanded={filtersOpen}
+                            onClick={() => setFiltersOpen((open) => !open)}
                         >
-                            <Button icon={<FilterOutlined />}>Filters</Button>
-                        </Popover>
+                            Filters
+                        </Button>
                         <Button type="primary" icon={<PlusOutlined />}>
                             Create User
+                        </Button>
+                    </Space>
+                </div>
+
+                <div className={`user-filter-panel${filtersOpen ? " user-filter-panel-open" : ""}`}>
+                    <div className="user-filter-form">
+                        <label>
+                            <span>Email</span>
+                            <Input
+                                allowClear
+                                placeholder="name@company.com"
+                                value={filters.email}
+                                onChange={(event) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        email: event.target.value
+                                    }))
+                                }
+                            />
+                        </label>
+                        <label>
+                            <span>Role</span>
+                            <Select<UserFilterRole>
+                                value={filters.role}
+                                options={["All", "Admin", "Editor", "Viewer"].map((value) => ({
+                                    value: value as UserFilterRole,
+                                    label: value
+                                }))}
+                                onChange={(role) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        role
+                                    }))
+                                }
+                            />
+                        </label>
+                        <label>
+                            <span>Status</span>
+                            <Select<UserFilterStatus>
+                                value={filters.status}
+                                options={["All", "Active", "Inactive", "Invited"].map((value) => ({
+                                    value: value as UserFilterStatus,
+                                    label: value
+                                }))}
+                                onChange={(status) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        status
+                                    }))
+                                }
+                            />
+                        </label>
+                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
+                            Reset
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="user-table-toolbar">
+                    <Text type={hasSelectedUsers ? undefined : "secondary"}>
+                        已选择 {selectedRowKeys.length} 项
+                    </Text>
+                    <Space wrap>
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            批量删除
+                        </Button>
+                        <Button
+                            className="user-batch-neutral"
+                            icon={<PoweroffOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            禁用
+                        </Button>
+                        <Button
+                            type="primary"
+                            icon={<PoweroffOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            启用
                         </Button>
                     </Space>
                 </div>
@@ -393,7 +419,10 @@ export const UserPage = () => {
                         showSizeChanger: false,
                         showTotal: () => "1,248 users"
                     }}
-                    rowSelection={{}}
+                    rowSelection={{
+                        selectedRowKeys,
+                        onChange: setSelectedRowKeys
+                    }}
                     scroll={{ x: Object.values(columnWidths).reduce((sum, width) => sum + width, 0) }}
                 />
             </section>

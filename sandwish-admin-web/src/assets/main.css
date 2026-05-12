@@ -91,8 +91,13 @@ button {
     min-width: 0;
 }
 
-.sidebar.ant-layout-sider-collapsed + .admin-main {
+.admin-main[data-sidebar-state="collapsed"] {
     --workspace-outer-width: calc(100vw - var(--sidebar-collapsed-width));
+}
+
+.admin-main[data-sidebar-state="closed"],
+.admin-main[data-sidebar-state="open"] {
+    --workspace-outer-width: 100vw;
 }
 
 .sidebar-backdrop {
@@ -918,11 +923,6 @@ p {
         --workspace-padding-inline: 16px;
         --workspace-padding-top: 22px;
         --workspace-padding-bottom: 42px;
-    }
-
-    .admin-main,
-    .sidebar.ant-layout-sider-collapsed + .admin-main {
-        --workspace-outer-width: 100vw;
     }
 
     .topbar {

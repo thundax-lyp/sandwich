@@ -191,6 +191,13 @@ export const AdminLayout = () => {
         : [];
     const currentUser = currentUserInfoQuery.data;
     const currentUserName = currentUser?.name || currentUser?.loginName || "当前用户";
+    const sidebarState = isMobileLayout
+        ? sidebarCollapsed
+            ? "closed"
+            : "open"
+        : sidebarCollapsed
+            ? "collapsed"
+            : "expanded";
 
     useEffect(() => {
         if (currentUserPermsQuery.data) {
@@ -288,7 +295,7 @@ export const AdminLayout = () => {
                 />
             </Sider>
 
-            <Layout className="admin-main">
+            <Layout className="admin-main" data-sidebar-state={sidebarState}>
                 <Header className="topbar">
                     <div className="topbar-heading">
                         <Button

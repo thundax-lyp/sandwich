@@ -10,6 +10,9 @@ public final class RequestIpUtils {
     private RequestIpUtils() {}
 
     public static String getIpAddr(HttpServletRequest request) {
+        if (request == null) {
+            return "";
+        }
         String ip = "";
         try {
             ip = request.getHeader("X-Real-IP");

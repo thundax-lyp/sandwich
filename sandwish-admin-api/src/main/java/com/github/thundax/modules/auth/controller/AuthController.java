@@ -132,8 +132,7 @@ public class AuthController {
             authService.recordLoginFailed(loginFailedCommand(
                     PrincipalAuthenticationMethod.PASSWORD,
                     PrincipalIdentityType.USER_ACCOUNT,
-                    ip(currentRequest),
-                    userAgent(currentRequest),
+                    currentRequest,
                     PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
             throw new InvalidCaptchaException();
         }
@@ -178,8 +177,7 @@ public class AuthController {
             authService.recordLoginFailed(loginFailedCommand(
                     PrincipalAuthenticationMethod.SMS_CODE,
                     PrincipalIdentityType.USER_MOBILE,
-                    ip(currentRequest),
-                    userAgent(currentRequest),
+                    currentRequest,
                     PrincipalLoginEvent.REASON_CAPTCHA_INVALID));
             throw new InvalidCaptchaException();
         }
@@ -468,18 +466,14 @@ public class AuthController {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setLoginName(loginName);
         command.setPlainPassword(plainPassword);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand accessTokenCommand(String userId, String loginName, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setUserId(userId);
         command.setLoginName(loginName);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand userIdCommand(String userId) {
@@ -491,34 +485,26 @@ public class AuthController {
     private AdminAuthCommand mobileCommand(String mobile, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setMobile(mobile);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand codeCommand(String code, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setCode(code);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand accessTokenCommand(AuthAccessTokenResult accessToken, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setAccessToken(accessToken);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand refreshTokenCommand(String clientId, String refreshToken, HttpServletRequest request) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setClientId(clientId);
         command.setRefreshToken(refreshToken);
-        command.setIp(ip(request));
-        command.setUserAgent(userAgent(request));
-        return command;
+        return withRequestContext(command, request);
     }
 
     private AdminAuthCommand oauthCommand(String clientId, String redirectUri, List<String> scopes, String state) {
@@ -537,9 +523,7 @@ public class AuthController {
         command.setCodeChallengeMethod(request.getCodeChallengeMethod());
         command.setUserId(request.getUserId());
         command.setApproved(request.isApproved());
-        command.setIp(ip(currentRequest()));
-        command.setUserAgent(userAgent(currentRequest()));
-        return command;
+        return withRequestContext(command, currentRequest());
     }
 
     private AdminAuthCommand exchangeCommand(OAuth2TokenRequest request) {
@@ -551,9 +535,7 @@ public class AuthController {
         command.setAuthorizationCode(request.getAuthorizationCode());
         command.setCodeVerifier(request.getCodeVerifier());
         command.setRefreshToken(request.getRefreshToken());
-        command.setIp(ip(currentRequest()));
-        command.setUserAgent(userAgent(currentRequest()));
-        return command;
+        return withRequestContext(command, currentRequest());
     }
 
     private AdminAuthCommand revokeTokenCommand(OAuth2TokenRequest request) {
@@ -567,23 +549,20 @@ public class AuthController {
     private AdminAuthCommand loginFailedCommand(
             PrincipalAuthenticationMethod authenticationMethod,
             PrincipalIdentityType identityType,
-            String ip,
-            String userAgent,
+            HttpServletRequest request,
             String reason) {
         AdminAuthCommand command = new AdminAuthCommand();
         command.setAuthenticationMethod(authenticationMethod);
         command.setIdentityType(identityType);
-        command.setIp(ip);
-        command.setUserAgent(userAgent);
         command.setReason(reason);
+        return withRequestContext(command, request);
+    }
+
+    private AdminAuthCommand withRequestContext(AdminAuthCommand command, HttpServletRequest request) {
+        command.setIp(RequestIpUtils.getIpAddr(request));
+        if (request != null) {
+            command.setUserAgent(request.getHeader("user-agent"));
+        }
         return command;
-    }
-
-    private String ip(HttpServletRequest request) {
-        return RequestIpUtils.getIpAddr(request);
-    }
-
-    private String userAgent(HttpServletRequest request) {
-        return request.getHeader("user-agent");
     }
 }

@@ -32,4 +32,9 @@ public class RequestIpUtilsTest {
 
         assertEquals("127.0.0.1", RequestIpUtils.getIpAddr(request));
     }
+
+    @Test
+    public void shouldReturnEmptyIpWhenRequestIsNull() {
+        assertEquals("", RequestIpUtils.getIpAddr(null));
+    }
 }

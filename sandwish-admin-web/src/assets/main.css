@@ -1102,7 +1102,7 @@ p {
 
 .user-filter-form {
     display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(150px, 180px) auto;
+    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(150px, 180px) auto auto;
     min-width: 0;
     align-items: flex-end;
     gap: 12px;
@@ -1129,6 +1129,18 @@ p {
 
 .user-filter-form .ant-btn {
     min-width: 86px;
+}
+
+.user-filter-form .user-filter-search {
+    color: var(--accent-blue);
+    background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
+    border-color: color-mix(in srgb, var(--accent-blue) 24%, var(--line-subtle));
+}
+
+.user-filter-form .user-filter-search:hover {
+    color: var(--accent-blue) !important;
+    background: color-mix(in srgb, var(--accent-blue) 12%, transparent) !important;
+    border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--line-subtle)) !important;
 }
 
 .user-table-toolbar {

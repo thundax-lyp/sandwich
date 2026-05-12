@@ -387,6 +387,13 @@ export const UserPage = () => {
                         <Button onClick={resetFilters} disabled={!hasActiveFilters}>
                             重置
                         </Button>
+                        <Button
+                            className="user-filter-search"
+                            icon={<SearchOutlined />}
+                            onClick={() => setFiltersOpen(false)}
+                        >
+                            查询
+                        </Button>
                     </div>
                 </div>
 

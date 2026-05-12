@@ -57,6 +57,7 @@ interface UserRecord {
 
 type UserFilterRole = "All" | UserRecord["role"];
 type UserFilterStatus = "All" | UserRecord["status"];
+type DropPosition = "before" | "after";
 
 interface UserFilters {
     email: string;
@@ -180,7 +181,7 @@ export const UserPage = () => {
     const [isMobileTable, setIsMobileTable] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [draggingUserId, setDraggingUserId] = useState<string | null>(null);
-    const [dragOverUserId, setDragOverUserId] = useState<string | null>(null);
+    const [dropTarget, setDropTarget] = useState<{ userId: string; position: DropPosition } | null>(null);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters =
         Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
@@ -261,7 +262,12 @@ export const UserPage = () => {
         event.dataTransfer.setData("text/plain", userId);
     };
 
-    const moveUserBefore = (sourceUserId: string, targetUserId: string) => {
+    const readDropPosition = (event: ReactDragEvent<HTMLElement>): DropPosition => {
+        const rowRect = event.currentTarget.getBoundingClientRect();
+        return event.clientY < rowRect.top + rowRect.height / 2 ? "before" : "after";
+    };
+
+    const moveUser = (sourceUserId: string, targetUserId: string, position: DropPosition) => {
         if (sourceUserId === targetUserId) {
             return;
         }
@@ -276,14 +282,14 @@ export const UserPage = () => {
             const nextUsers = [...currentUsers];
             const [sourceUser] = nextUsers.splice(sourceIndex, 1);
             const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUserId);
-            nextUsers.splice(nextTargetIndex, 0, sourceUser);
+            nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, sourceUser);
             return nextUsers;
         });
     };
 
     const clearUserDrag = () => {
         setDraggingUserId(null);
-        setDragOverUserId(null);
+        setDropTarget(null);
     };
 
     const resetFilters = () => {
@@ -537,28 +543,32 @@ export const UserPage = () => {
                     columns={columns}
                     dataSource={filteredUsers}
                     onRow={(user) => ({
-                        className: dragOverUserId === user.id ? "user-row-drag-over" : undefined,
+                        className:
+                            dropTarget?.userId === user.id
+                                ? `user-row-drop-${dropTarget.position}`
+                                : undefined,
                         onDragEnter: () => {
                             if (draggingUserId && draggingUserId !== user.id) {
-                                setDragOverUserId(user.id);
+                                setDropTarget({ userId: user.id, position: "before" });
                             }
                         },
                         onDragOver: (event) => {
                             if (draggingUserId && draggingUserId !== user.id) {
                                 event.preventDefault();
                                 event.dataTransfer.dropEffect = "move";
+                                setDropTarget({ userId: user.id, position: readDropPosition(event) });
                             }
                         },
                         onDragLeave: () => {
-                            if (dragOverUserId === user.id) {
-                                setDragOverUserId(null);
+                            if (dropTarget?.userId === user.id) {
+                                setDropTarget(null);
                             }
                         },
                         onDrop: (event) => {
                             event.preventDefault();
                             const sourceUserId = event.dataTransfer.getData("text/plain") || draggingUserId;
                             if (sourceUserId) {
-                                moveUserBefore(sourceUserId, user.id);
+                                moveUser(sourceUserId, user.id, readDropPosition(event));
                             }
                             clearUserDrag();
                         }

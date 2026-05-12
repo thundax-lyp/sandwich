@@ -1379,8 +1379,17 @@ p {
     display: none;
 }
 
-.user-row-drag-over > td {
-    background: color-mix(in srgb, var(--accent-blue) 8%, transparent) !important;
+.user-row-drop-before > td,
+.user-row-drop-after > td {
+    background: color-mix(in srgb, var(--accent-blue) 4%, transparent) !important;
+}
+
+.user-row-drop-before > td {
+    box-shadow: inset 0 2px 0 var(--accent-blue);
+}
+
+.user-row-drop-after > td {
+    box-shadow: inset 0 -2px 0 var(--accent-blue);
 }
 
 .user-table .ant-pagination {

@@ -15,6 +15,7 @@ import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,7 +31,7 @@ public class CaptchaControllerContractTest {
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSessionId sessionId = PreAuthSessionId.of("1");
         when(preAuthSessionService.getIdByToken(any(PreAuthSessionToken.class))).thenReturn(sessionId);
-        when(preAuthSessionService.getValue(any(PreAuthSessionId.class), any(String.class)))
+        when(preAuthSessionService.getValue(any(PreAuthSessionValueQuery.class)))
                 .thenReturn("1234");
 
         MvcResult result = mockMvc(preAuthSessionService)

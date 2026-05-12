@@ -10,6 +10,7 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
 import org.springframework.stereotype.Service;
 
@@ -75,7 +76,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
-    public String getValue(PreAuthSessionId id, String name) {
-        return get(id).findValue(name);
+    public String getValue(PreAuthSessionValueQuery query) {
+        return get(query.getId()).findValue(query.getName());
     }
 }

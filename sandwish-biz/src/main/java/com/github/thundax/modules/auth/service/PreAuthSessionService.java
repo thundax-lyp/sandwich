@@ -7,6 +7,7 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 
 public interface PreAuthSessionService {
 
@@ -26,5 +27,5 @@ public interface PreAuthSessionService {
 
     void upsertValue(UpsertPreAuthSessionValueCommand command);
 
-    String getValue(PreAuthSessionId id, String name);
+    String getValue(PreAuthSessionValueQuery query);
 }

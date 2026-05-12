@@ -12,6 +12,7 @@ import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -113,7 +114,8 @@ public class CaptchaController {
     }
 
     private String getCaptcha(String loginToken) {
-        String captcha = preAuthSessionService.getValue(requireSessionIdByToken(loginToken), CAPTCHA_ITEM);
+        String captcha = preAuthSessionService.getValue(
+                new PreAuthSessionValueQuery(requireSessionIdByToken(loginToken), CAPTCHA_ITEM));
         if (StringUtils.isEmpty(captcha)) {
             throw new InvalidCaptchaException();
         }

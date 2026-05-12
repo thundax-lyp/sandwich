@@ -27,7 +27,7 @@ import com.github.thundax.modules.auth.service.command.MemberAuthCommand;
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -234,7 +234,7 @@ public class LoginController {
     }
 
     private PreAuthSession createPreAuthSession() {
-        if (preAuthSessionService.count(new PreAuthSessionQuery()) > authProperties.getMaxLoginCount()) {
+        if (preAuthSessionService.countActiveSessions() > authProperties.getMaxLoginCount()) {
             throw FrontResponseExceptions.loginRequestTooMany();
         }
         PreAuthSession session =
@@ -245,7 +245,7 @@ public class LoginController {
                 session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt()));
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 session.getId(), PRIVATE_KEY_ITEM, memberPrivateKeyValue(keyPair), session.getExpiredAt()));
-        return preAuthSessionService.get(new PreAuthSessionQuery(session.getId(), null, null, null));
+        return preAuthSessionService.get(session.getId());
     }
 
     private PreAuthSession refreshPreAuthSession(String refreshToken) {
@@ -264,8 +264,7 @@ public class LoginController {
         }
         return StringUtils.equals(
                 captcha,
-                preAuthSessionService.getValue(
-                        new PreAuthSessionQuery(requireSessionId(token), null, null, CAPTCHA_ITEM)));
+                preAuthSessionService.getValue(new PreAuthSessionValueQuery(requireSessionId(token), CAPTCHA_ITEM)));
     }
 
     private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode) {
@@ -275,17 +274,16 @@ public class LoginController {
         }
         PreAuthSessionId sessionId = requireSessionId(token);
         return StringUtils.equals(
-                        preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, SMS_MOBILE_ITEM)),
+                        preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, SMS_MOBILE_ITEM)),
                         mobile)
                 && StringUtils.equals(
-                        preAuthSessionService.getValue(
-                                new PreAuthSessionQuery(sessionId, null, null, SMS_VALIDATE_CODE_ITEM)),
+                        preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, SMS_VALIDATE_CODE_ITEM)),
                         validateCode);
     }
 
     private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) {
-        String privateKey = preAuthSessionService.getValue(
-                new PreAuthSessionQuery(requireSessionId(token), null, null, PRIVATE_KEY_ITEM));
+        String privateKey =
+                preAuthSessionService.getValue(new PreAuthSessionValueQuery(requireSessionId(token), PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw FrontResponseExceptions.loginFormKeyExpired();
         }
@@ -320,8 +318,7 @@ public class LoginController {
     }
 
     private PreAuthSessionId requireSessionId(PreAuthSessionToken token) {
-        PreAuthSessionId sessionId =
-                preAuthSessionService.getIdByToken(new PreAuthSessionQuery(null, token, null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(token);
         if (sessionId == null) {
             throw FrontResponseExceptions.loginFormExpired();
         }
@@ -329,8 +326,7 @@ public class LoginController {
     }
 
     private PreAuthSessionId requireSessionIdByRefreshToken(String refreshToken) {
-        PreAuthSessionId sessionId = preAuthSessionService.getIdByRefreshToken(
-                new PreAuthSessionQuery(null, null, PreAuthSessionToken.of(refreshToken), null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByRefreshToken(PreAuthSessionToken.of(refreshToken));
         if (sessionId == null) {
             throw FrontResponseExceptions.loginFormExpired();
         }

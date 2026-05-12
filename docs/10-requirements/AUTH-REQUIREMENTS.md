@@ -78,7 +78,7 @@
 - API 入口模块只做 HTTP、安全框架、第三方 provider、权限会话、验证码图片输出和响应装配适配；可复用的认证业务流程固定收敛到 `sandwish-biz` 的 auth Service。
 - `sandwish-biz` 的 auth Service 不得直接依赖 Servlet、Spring Security `Authentication`、API Request / Response、`PermissionService` 或入口模块 provider。
 - `sandwish-biz` 的 auth Service 写入口固定使用业务动作名并接收 `*Command`。
-- `sandwish-biz` 的 auth Service 查询入口固定使用 `*Query`，分页查询固定使用 `*Query + PageQuery` 并返回 `PageResult<T>`。
+- `sandwish-biz` 的 auth Service 复合查询入口固定使用 `*Query`，单一对象标识读取允许使用 `*Id` 或 `*Token`，分页查询固定使用 `*Query + PageQuery` 并返回 `PageResult<T>`。
 
 ## 4. Module Mapping
 

@@ -421,9 +421,9 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 可以依赖 `sandwish-common` 的通用工具和基础服务。
 - 对外提供稳定业务方法，避免让 Controller 感知过多持久化细节。
 - 跨模块业务复用优先放在 `sandwish-biz` 的 Service。
-- 方法入参固定为 `*Query`、`*Query + PageQuery` 或 `*Command` 三种形态。
+- 方法入参固定为 `*Id`、`*Token`、`*Query`、`*Query + PageQuery` 或 `*Command` 五种形态。
 - 方法参数最多 2 个。
-- 查询入口固定接收一个 `*Query`。
+- 复合查询入口固定接收一个 `*Query`。
 - 分页查询入口固定接收一个 `*Query` 和一个 `PageQuery`。
 - 写入口固定接收一个 `*Command`，并使用明确业务动作命名。
 - 方法返回结果固定使用 `*DTO`、业务 `Entity` 或 Java-Type。
@@ -469,12 +469,12 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 不在 DTO 中写复杂业务流程。
 - 不强制引入值对象、聚合根等非当前架构必需概念。
 - `*Id` 固定作为 Service 单对象标识入参模型，归属对应业务对象的 `entity/valueobject` 包；Service 对外方法不直接使用通用 `EntityId` 表达业务对象标识。
-- `*Query` 固定作为 Service 多条件读取模型；只有一个业务对象标识时，优先使用对应 `*Id`，不额外定义只有 `id` 的 `*Query`。
+- `*Query` 固定作为 Service 多条件读取模型；只有一个业务对象标识时，优先使用对应 `*Id` 或 `*Token`，不额外定义只有 `id` / `token` 的 `*Query`。
 - `PageQuery` 固定作为 Service 分页输入窗口，只承载 `pageNo` 和 `pageSize`。
 - `PageResult` 固定作为 Service 分页返回结果，不作为 Service 入参。
 - `*Command` 固定作为 Service 写入口入参模型，承载一次业务写操作的目标对象标识、业务动作上下文和并发控制参数。
 - Service 创建方法必须返回新建主实体的 `EntityId`，不得依赖入参回填副作用表达创建结果。
-- Service `get`、`exists`、`deleteById` 和无附加业务上下文的 `remove` 可以接收单个 `*Id`；带筛选条件的 `list`、`count`、`deleteByCondition` 和分页读取继续使用 `*Query`。
+- Service `get`、`exists`、`deleteById`、按 token 定位和无附加业务上下文的 `remove` 可以接收单个 `*Id` 或 `*Token`；带筛选条件的 `list`、`count`、`deleteByCondition` 和分页读取继续使用 `*Query`。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
 - `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - `DO` / `DataObject` 不承载业务 `query` 对象，不定义 `Query` 内部类，不作为 Service 查询模型传递。

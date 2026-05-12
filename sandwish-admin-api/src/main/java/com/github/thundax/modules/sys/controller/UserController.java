@@ -25,6 +25,7 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
@@ -673,7 +674,7 @@ public class UserController {
         if (sessionId == null) {
             throw AdminResponseExceptions.invalidToken();
         }
-        String privateKey = preAuthSessionService.getValue(sessionId, PRIVATE_KEY_ITEM);
+        String privateKey = preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw AdminResponseExceptions.invalidToken();
         }

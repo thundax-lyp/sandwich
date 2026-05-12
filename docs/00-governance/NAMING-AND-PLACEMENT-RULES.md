@@ -67,7 +67,7 @@
 
 - `LAYER_CONTROLLER_TO_SERVICE`：Controller 可以调用 Service，不直接访问 DAO / Mapper
 - `LAYER_CONTROLLER_REQUEST_RESPONSE`：Controller 固定接收 `Request` 并输出 `Response` / API 响应包装；入口模型放在同业务模块的 `controller/request` 与 `controller/response` 包，不下沉到 Service
-- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定为 `*Id`、`*Query`、`*Query + PageQuery` 或 `*Command` 四种形态；方法参数最多 2 个；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper`、通用 `EntityId` 参数或其他持久化实现类型。
+- `LAYER_SERVICE_BOUNDARY_TYPES`：Service 方法入参固定为 `*Id`、`*Token`、`*Query`、`*Query + PageQuery` 或 `*Command` 五种形态；方法参数最多 2 个；不得接收或返回 API `Request` / `Response`、`DO/DataObject`、MyBatis-Plus `Page/IPage/Wrapper`、通用 `EntityId` 参数或其他持久化实现类型。
 - `LAYER_SERVICE_PAGE_RESULT`：Service 分页返回结果固定使用 `PageResult<T>`，`T` 只能是 `*DTO`、业务 `Entity` 或 Java 标准类型；`PageResult` 不作为 Service 方法入参。
 - `LAYER_SERVICE_WRITE_COMMAND`：Service 写入口固定接收一个 `*Command`，不接收业务 `Entity`、散落业务字段或 API `Request`。
 - `LAYER_SERVICE_NO_EMPTY_BASE`：不得新增空 `BaseService`、空 marker Service 或通用 `BaseServiceImpl`；Service 共性能力必须有明确方法契约或具体业务价值。
@@ -107,6 +107,7 @@
 - `NAME_DTO`：Service 边界传输对象必须以 `DTO` 结尾。
 - `NAME_SERVICE_QUERY`：Service 查询对象命名固定为 `{业务对象名}Query`，例如 `UserQuery`、`StorageQuery`；不得使用 API `Request`、`Param`、`Condition` 或泛化 `Query` 类替代。
 - `NAME_SERVICE_ID`：Service 单对象标识命名固定为 `{业务对象名}Id`，例如 `UserId`、`RoleId`、`StoredObjectId`；不得用裸 `EntityId` 替代业务对象标识。
+- `NAME_SERVICE_TOKEN`：Service 单一 token 标识命名固定为 `{业务对象名}Token`，例如 `PreAuthSessionToken`；不得用裸 `String` 替代业务 token 标识。
 - `NAME_SERVICE_COMMAND`：Service 写入口对象命名固定为 `{业务动作}{业务对象}Command` 或 `{业务动作}Command`，例如 `CreateDictCommand`、`RenameRoleCommand`、`BindRoleMenusCommand`；不得使用 API `Request`、`Param`、`DTO` 或业务 `Entity` 替代。
 - `NAME_SERVICE_METHOD_BUSINESS_ACTION`：Service 写方法固定使用业务动作名，不使用 `update*`、`save*`、`insert*`、`batch*` 等泛化或过时命名；条件清理动作允许使用 `deleteByXxx(*Query)` 窄口径。
 

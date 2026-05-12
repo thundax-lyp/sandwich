@@ -202,7 +202,7 @@
 - 暂未接入生产调用但确属稳定业务入口的方法，必须声明 `@LayerPublicApi(reason = "...")`，且 reason 不得以测试作为理由。
 - Service 创建方法必须返回新建主实体的 `EntityId`。
 - Service 写入口固定使用业务动作名并接收 `*Command`。
-- Service 查询入口固定使用 `*Query`，分页查询固定使用 `*Query + PageQuery` 并返回 `PageResult<T>`。
+- Service 复合查询入口固定使用 `*Query`，单一对象标识读取允许使用 `*Id` 或 `*Token`，分页查询固定使用 `*Query + PageQuery` 并返回 `PageResult<T>`。
 - Service 接口公开方法不得重载；批量、按条件、按 ID、级联等行为差异必须体现在方法名中。
 - `UserService` 固定承载后台用户主体、用户角色关系和用户主事务入口。
 - `UserService` 提供用户删除级联处理接口；接口只表达删除前清理扩展点，不在 System 文档中定义接入方和清理细节。

@@ -12,6 +12,7 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -67,12 +68,12 @@ public class PreAuthSessionServiceImplTest {
 
         service.upsertValue(new UpsertPreAuthSessionValueCommand(
                 session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() + 60000L));
-        assertEquals("2345", service.getValue(session.getId(), CAPTCHA_ITEM));
+        assertEquals("2345", service.getValue(new PreAuthSessionValueQuery(session.getId(), CAPTCHA_ITEM)));
 
         service.upsertValue(new UpsertPreAuthSessionValueCommand(
                 session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L));
 
-        assertNull(service.getValue(session.getId(), CAPTCHA_ITEM));
+        assertNull(service.getValue(new PreAuthSessionValueQuery(session.getId(), CAPTCHA_ITEM)));
     }
 
     @Test(expected = BizException.class)

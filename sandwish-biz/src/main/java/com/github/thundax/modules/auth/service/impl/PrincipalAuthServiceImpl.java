@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.BizException;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalAuthService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
@@ -105,7 +105,8 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         return query;
     }
 
-    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+    private PrincipalCredentialQuery credentialQuery(
+            PrincipalIdentityId identityId, PrincipalCredentialType credentialType) {
         PrincipalCredentialQuery query = new PrincipalCredentialQuery();
         query.setIdentityId(identityId);
         query.setCredentialType(credentialType);

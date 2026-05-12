@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.common.arch.LayerPublicApi;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface PrincipalIdentityService {
     List<PrincipalIdentity> list(PrincipalIdentityQuery query);
 
     @LayerPublicApi(reason = "统一认证主体资料维护时新增登录标识的业务入口")
-    EntityId create(PrincipalIdentityCommand command);
+    PrincipalIdentityId create(PrincipalIdentityCommand command);
 
     @LayerPublicApi(reason = "统一认证主体资料维护时更新登录标识的业务入口")
     void change(PrincipalIdentityCommand command);

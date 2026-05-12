@@ -8,6 +8,8 @@ import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.*;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.exception.InvalidPasswordException;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
@@ -99,7 +101,7 @@ public class PrincipalAuthServiceImplTest {
 
     private static PrincipalIdentity identity(long id, String identityValue, PrincipalIdentityStatus status) {
         PrincipalIdentity identity = new PrincipalIdentity();
-        identity.setId(EntityIdCodec.toDomain(id));
+        identity.setId(PrincipalIdentityIdCodec.toDomain(id));
         identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
         identity.setType(PrincipalIdentityType.USER_ACCOUNT);
         identity.setIdentityValue(identityValue);
@@ -107,7 +109,7 @@ public class PrincipalAuthServiceImplTest {
         return identity;
     }
 
-    private static PrincipalCredential credential(long id, EntityId identityId, String password) {
+    private static PrincipalCredential credential(long id, PrincipalIdentityId identityId, String password) {
         PrincipalCredential credential = new PrincipalCredential();
         credential.setId(EntityIdCodec.toDomain(id));
         credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
@@ -143,7 +145,7 @@ public class PrincipalAuthServiceImplTest {
         }
 
         @Override
-        public EntityId create(PrincipalIdentityCommand command) {
+        public PrincipalIdentityId create(PrincipalIdentityCommand command) {
             return command.getPrincipalIdentity().getId();
         }
 

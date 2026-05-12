@@ -2,13 +2,13 @@ package com.github.thundax.modules.auth.persistence.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.dao.PrincipalIdentityDao;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.assembler.PrincipalIdentityPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO;
@@ -27,8 +27,8 @@ public class PrincipalIdentityDaoImpl implements PrincipalIdentityDao {
     }
 
     @Override
-    public PrincipalIdentity getById(EntityId id) {
-        return PrincipalIdentityPersistenceAssembler.toEntity(mapper.selectById(EntityIdCodec.toValue(id)));
+    public PrincipalIdentity getById(PrincipalIdentityId id) {
+        return PrincipalIdentityPersistenceAssembler.toEntity(mapper.selectById(PrincipalIdentityIdCodec.toValue(id)));
     }
 
     @Override
@@ -58,11 +58,11 @@ public class PrincipalIdentityDaoImpl implements PrincipalIdentityDao {
     }
 
     @Override
-    public EntityId insert(PrincipalIdentity principalIdentity) {
+    public PrincipalIdentityId insert(PrincipalIdentity principalIdentity) {
         PrincipalIdentityDO dataObject = PrincipalIdentityPersistenceAssembler.toDataObject(principalIdentity);
         dataObject.setId(idGenerator.nextId().value());
         mapper.insert(dataObject);
-        return EntityIdCodec.toDomain(dataObject.getId());
+        return PrincipalIdentityIdCodec.toDomain(dataObject.getId());
     }
 
     @Override

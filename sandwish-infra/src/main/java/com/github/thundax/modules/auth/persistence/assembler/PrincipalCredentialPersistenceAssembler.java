@@ -5,6 +5,7 @@ import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public final class PrincipalCredentialPersistenceAssembler {
         dataObject.setId(EntityIdCodec.toValue(entity.getId()));
         dataObject.setPrincipalType(principalTypeValue(entity.getPrincipalKey()));
         dataObject.setPrincipalId(principalIdValue(entity.getPrincipalKey()));
-        dataObject.setIdentityId(EntityIdCodec.toValue(entity.getIdentityId()));
+        dataObject.setIdentityId(PrincipalIdentityIdCodec.toValue(entity.getIdentityId()));
         dataObject.setCredentialType(credentialTypeValue(entity.getCredentialType()));
         dataObject.setCredentialValue(entity.getCredentialValue());
         dataObject.setStatus(statusValue(entity.getStatus()));
@@ -43,7 +44,7 @@ public final class PrincipalCredentialPersistenceAssembler {
         entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
         entity.setPrincipalKey(
                 PrincipalKey.of(principalTypeFrom(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
-        entity.setIdentityId(EntityIdCodec.toDomain(dataObject.getIdentityId()));
+        entity.setIdentityId(PrincipalIdentityIdCodec.toDomain(dataObject.getIdentityId()));
         entity.setCredentialType(credentialTypeFrom(dataObject.getCredentialType()));
         entity.setCredentialValue(dataObject.getCredentialValue());
         entity.setStatus(statusFrom(dataObject.getStatus()));

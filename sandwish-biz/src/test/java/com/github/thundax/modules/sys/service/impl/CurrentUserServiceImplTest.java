@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
@@ -187,7 +187,7 @@ public class CurrentUserServiceImplTest {
 
     private PrincipalIdentity accountIdentity(UserId userId, String loginName) {
         PrincipalIdentity identity = new PrincipalIdentity();
-        identity.setId(EntityId.of(2001L));
+        identity.setId(PrincipalIdentityId.of(2001L));
         identity.setType(PrincipalIdentityType.USER_ACCOUNT);
         identity.setIdentityValue(loginName);
         return identity;

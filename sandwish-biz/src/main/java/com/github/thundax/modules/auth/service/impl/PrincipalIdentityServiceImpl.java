@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.dao.PrincipalIdentityDao;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
@@ -44,9 +44,9 @@ public class PrincipalIdentityServiceImpl implements PrincipalIdentityService {
     }
 
     @Override
-    public EntityId create(PrincipalIdentityCommand command) {
+    public PrincipalIdentityId create(PrincipalIdentityCommand command) {
         PrincipalIdentity principalIdentity = command.getPrincipalIdentity();
-        EntityId id = principalIdentityDao.insert(principalIdentity);
+        PrincipalIdentityId id = principalIdentityDao.insert(principalIdentity);
         principalIdentity.setId(id);
         return id;
     }

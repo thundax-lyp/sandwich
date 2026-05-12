@@ -1,15 +1,15 @@
 package com.github.thundax.modules.auth.dao;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.List;
 
 public interface PrincipalIdentityDao {
 
-    PrincipalIdentity getById(EntityId id);
+    PrincipalIdentity getById(PrincipalIdentityId id);
 
     PrincipalIdentity getByIdentity(PrincipalIdentityType identityType, String identityValue);
 
@@ -17,7 +17,7 @@ public interface PrincipalIdentityDao {
 
     List<PrincipalIdentity> listByPrincipalKeyAndStatus(PrincipalKey principalKey, PrincipalIdentityStatus status);
 
-    EntityId insert(PrincipalIdentity principalIdentity);
+    PrincipalIdentityId insert(PrincipalIdentity principalIdentity);
 
     int update(PrincipalIdentity principalIdentity);
 

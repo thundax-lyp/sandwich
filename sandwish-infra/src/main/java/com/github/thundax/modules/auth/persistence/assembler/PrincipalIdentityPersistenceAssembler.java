@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.persistence.assembler;
 
-import com.github.thundax.common.id.EntityIdCodec;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public final class PrincipalIdentityPersistenceAssembler {
             return null;
         }
         PrincipalIdentityDO dataObject = new PrincipalIdentityDO();
-        dataObject.setId(EntityIdCodec.toValue(entity.getId()));
+        dataObject.setId(PrincipalIdentityIdCodec.toValue(entity.getId()));
         dataObject.setPrincipalType(principalTypeValue(entity.getPrincipalKey()));
         dataObject.setPrincipalId(principalIdValue(entity.getPrincipalKey()));
         dataObject.setIdentityType(identityTypeValue(entity.getType()));
@@ -33,7 +33,7 @@ public final class PrincipalIdentityPersistenceAssembler {
             return null;
         }
         PrincipalIdentity entity = new PrincipalIdentity();
-        entity.setId(EntityIdCodec.toDomain(dataObject.getId()));
+        entity.setId(PrincipalIdentityIdCodec.toDomain(dataObject.getId()));
         entity.setPrincipalKey(
                 PrincipalKey.of(principalTypeFrom(dataObject.getPrincipalType()), dataObject.getPrincipalId()));
         entity.setType(identityTypeFrom(dataObject.getIdentityType()));

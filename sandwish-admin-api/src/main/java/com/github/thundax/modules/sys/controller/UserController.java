@@ -2,7 +2,6 @@ package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.token.AccessTokenNames;
@@ -19,6 +18,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.security.CurrentUserResolver;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
@@ -662,7 +662,8 @@ public class UserController {
         return query;
     }
 
-    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+    private PrincipalCredentialQuery credentialQuery(
+            PrincipalIdentityId identityId, PrincipalCredentialType credentialType) {
         PrincipalCredentialQuery query = new PrincipalCredentialQuery();
         query.setIdentityId(identityId);
         query.setCredentialType(credentialType);

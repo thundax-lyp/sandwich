@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.MemberRegistrationService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
@@ -256,7 +257,8 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
         return query;
     }
 
-    private PrincipalCredentialQuery credentialQuery(EntityId identityId, PrincipalCredentialType credentialType) {
+    private PrincipalCredentialQuery credentialQuery(
+            PrincipalIdentityId identityId, PrincipalCredentialType credentialType) {
         PrincipalCredentialQuery query = new PrincipalCredentialQuery();
         query.setIdentityId(identityId);
         query.setCredentialType(credentialType);

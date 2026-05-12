@@ -1,8 +1,8 @@
 package com.github.thundax.modules.auth.entity;
 
-import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrincipalIdentity {
-    private EntityId id;
+    private PrincipalIdentityId id;
     private PrincipalKey principalKey;
     private PrincipalIdentityType type;
     private String identityValue;

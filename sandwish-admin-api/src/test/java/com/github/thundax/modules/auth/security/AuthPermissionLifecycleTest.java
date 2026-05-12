@@ -449,7 +449,7 @@ public class AuthPermissionLifecycleTest {
 
         private PrincipalIdentity identity(PrincipalIdentityType identityType, String identityValue) {
             PrincipalIdentity identity = new PrincipalIdentity();
-            identity.setId(EntityIdCodec.toDomain(1001L));
+            identity.setId(PrincipalIdentityIdCodec.toDomain(1001L));
             identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             identity.setType(identityType);
             identity.setIdentityValue(identityValue);
@@ -863,9 +863,9 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
-        public EntityId create(PrincipalIdentityCommand command) {
+        public PrincipalIdentityId create(PrincipalIdentityCommand command) {
             PrincipalIdentity principalIdentity = command.getPrincipalIdentity();
-            principalIdentity.setId(EntityId.of(8001L));
+            principalIdentity.setId(PrincipalIdentityId.of(8001L));
             return principalIdentity.getId();
         }
 
@@ -877,7 +877,7 @@ public class AuthPermissionLifecycleTest {
 
         private PrincipalIdentity identity(String loginName) {
             PrincipalIdentity identity = new PrincipalIdentity();
-            identity.setId(EntityId.of(8001L));
+            identity.setId(PrincipalIdentityId.of(8001L));
             identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
             identity.setType(PrincipalIdentityType.USER_ACCOUNT);
             identity.setIdentityValue(loginName);
@@ -918,7 +918,7 @@ public class AuthPermissionLifecycleTest {
             PrincipalCredential credential = new PrincipalCredential();
             credential.setId(EntityId.of(9001L));
             credential.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1L));
-            credential.setIdentityId(EntityId.of(8001L));
+            credential.setIdentityId(PrincipalIdentityId.of(8001L));
             credential.setCredentialType(PrincipalCredentialType.USER_PASSWORD);
             credential.setCredentialValue("secret");
             credential.setStatus(PrincipalCredentialStatus.ACTIVE);

@@ -9,6 +9,8 @@ import com.github.thundax.modules.auth.dao.PrincipalCredentialDao;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityIdCodec;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.persistence.assembler.PrincipalCredentialPersistenceAssembler;
 import com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO;
@@ -32,9 +34,10 @@ public class PrincipalCredentialDaoImpl implements PrincipalCredentialDao {
     }
 
     @Override
-    public PrincipalCredential getByIdentityIdAndType(EntityId identityId, PrincipalCredentialType credentialType) {
+    public PrincipalCredential getByIdentityIdAndType(
+            PrincipalIdentityId identityId, PrincipalCredentialType credentialType) {
         LambdaQueryWrapper<PrincipalCredentialDO> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(PrincipalCredentialDO::getIdentityId, EntityIdCodec.toValue(identityId));
+        wrapper.eq(PrincipalCredentialDO::getIdentityId, PrincipalIdentityIdCodec.toValue(identityId));
         wrapper.eq(PrincipalCredentialDO::getCredentialType, credentialType.value());
         return PrincipalCredentialPersistenceAssembler.toEntity(mapper.selectOne(wrapper));
     }

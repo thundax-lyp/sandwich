@@ -3,6 +3,7 @@ package com.github.thundax.modules.auth.entity;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalIdentityId;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import lombok.Setter;
 public class PrincipalCredential {
     private EntityId id;
     private PrincipalKey principalKey;
-    private EntityId identityId;
+    private PrincipalIdentityId identityId;
     private PrincipalCredentialType credentialType;
     private String credentialValue;
     private PrincipalCredentialStatus status = PrincipalCredentialStatus.ACTIVE;

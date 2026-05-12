@@ -14,10 +14,10 @@ import {
     Drawer,
     Input,
     Modal,
+    Popover,
     Select,
     Space,
     Table,
-    Tabs,
     Tag,
     Typography
 } from "antd";
@@ -48,6 +48,21 @@ interface UserRecord {
     lastLogin: string;
     avatarColor: string;
 }
+
+type UserFilterRole = "All" | UserRecord["role"];
+type UserFilterStatus = "All" | UserRecord["status"];
+
+interface UserFilters {
+    email: string;
+    role: UserFilterRole;
+    status: UserFilterStatus;
+}
+
+const DEFAULT_USER_FILTERS: UserFilters = {
+    email: "",
+    role: "All",
+    status: "All"
+};
 
 const USER_RECORDS: UserRecord[] = [
     {
@@ -136,8 +151,9 @@ const getInitials = (name: string) => {
 };
 
 export const UserPage = () => {
-    const [activeStatus, setActiveStatus] = useState("All");
     const [searchText, setSearchText] = useState("");
+    const [filtersOpen, setFiltersOpen] = useState(false);
+    const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
     const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
@@ -180,26 +196,83 @@ export const UserPage = () => {
 
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
+        const emailKeyword = filters.email.trim().toLowerCase();
         return USER_RECORDS.filter((user) => {
-            const isStatusMatched = activeStatus === "All" || user.status === activeStatus;
+            const isEmailMatched = !emailKeyword || user.email.toLowerCase().includes(emailKeyword);
+            const isRoleMatched = filters.role === "All" || user.role === filters.role;
+            const isStatusMatched = filters.status === "All" || user.status === filters.status;
             const isKeywordMatched =
                 !keyword ||
                 user.name.toLowerCase().includes(keyword) ||
                 user.email.toLowerCase().includes(keyword) ||
                 user.role.toLowerCase().includes(keyword);
 
-            return isStatusMatched && isKeywordMatched;
+            return isEmailMatched && isRoleMatched && isStatusMatched && isKeywordMatched;
         });
-    }, [activeStatus, searchText]);
+    }, [filters, searchText]);
 
-    const statusCounts = useMemo(
-        () => ({
-            All: USER_RECORDS.length,
-            Active: USER_RECORDS.filter((user) => user.status === "Active").length,
-            Inactive: USER_RECORDS.filter((user) => user.status === "Inactive").length,
-            Invited: USER_RECORDS.filter((user) => user.status === "Invited").length
-        }),
-        []
+    const resetFilters = () => {
+        setFilters(DEFAULT_USER_FILTERS);
+    };
+
+    const filterForm = (
+        <div className="user-filter-form">
+            <div className="user-filter-form-header">
+                <Text strong>Filters</Text>
+                <Button size="small" type="text" onClick={resetFilters}>
+                    Reset
+                </Button>
+            </div>
+            <label>
+                <span>Email</span>
+                <Input
+                    allowClear
+                    placeholder="name@company.com"
+                    value={filters.email}
+                    onChange={(event) =>
+                        setFilters((currentFilters) => ({
+                            ...currentFilters,
+                            email: event.target.value
+                        }))
+                    }
+                />
+            </label>
+            <label>
+                <span>Role</span>
+                <Select<UserFilterRole>
+                    value={filters.role}
+                    options={["All", "Admin", "Editor", "Viewer"].map((value) => ({
+                        value: value as UserFilterRole,
+                        label: value
+                    }))}
+                    onChange={(role) =>
+                        setFilters((currentFilters) => ({
+                            ...currentFilters,
+                            role
+                        }))
+                    }
+                />
+            </label>
+            <label>
+                <span>Status</span>
+                <Select<UserFilterStatus>
+                    value={filters.status}
+                    options={["All", "Active", "Inactive", "Invited"].map((value) => ({
+                        value: value as UserFilterStatus,
+                        label: value
+                    }))}
+                    onChange={(status) =>
+                        setFilters((currentFilters) => ({
+                            ...currentFilters,
+                            status
+                        }))
+                    }
+                />
+            </label>
+            <Button type="primary" onClick={() => setFiltersOpen(false)}>
+                Apply Filters
+            </Button>
+        </div>
     );
 
     const columns: TableProps<UserRecord>["columns"] = [
@@ -292,24 +365,21 @@ export const UserPage = () => {
                             value={searchText}
                             onChange={(event) => setSearchText(event.target.value)}
                         />
-                        <Button icon={<FilterOutlined />}>Filters</Button>
+                        <Popover
+                            arrow={false}
+                            content={filterForm}
+                            open={filtersOpen}
+                            placement="bottomRight"
+                            trigger="click"
+                            onOpenChange={setFiltersOpen}
+                        >
+                            <Button icon={<FilterOutlined />}>Filters</Button>
+                        </Popover>
                         <Button type="primary" icon={<PlusOutlined />}>
                             Create User
                         </Button>
                     </Space>
                 </div>
-
-                <Tabs
-                    activeKey={activeStatus}
-                    className="user-status-tabs"
-                    items={[
-                        { key: "All", label: `All Users ${statusCounts.All}` },
-                        { key: "Active", label: `Active ${statusCounts.Active}` },
-                        { key: "Inactive", label: `Inactive ${statusCounts.Inactive}` },
-                        { key: "Invited", label: `Invited ${statusCounts.Invited}` }
-                    ]}
-                    onChange={setActiveStatus}
-                />
 
                 <Table<UserRecord>
                     rowKey="id"

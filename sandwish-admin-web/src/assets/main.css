@@ -1043,21 +1043,24 @@ p {
     font-size: 11px;
 }
 
-.user-status-tabs .ant-tabs-nav {
-    margin-bottom: 10px;
+.user-filter-form {
+    display: grid;
+    width: 280px;
+    gap: 12px;
 }
 
-.user-status-tabs .ant-tabs-tab {
-    padding: 6px 0;
+.user-filter-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
-.user-status-tabs .ant-tabs-tab-btn {
+.user-filter-form label {
+    display: grid;
+    gap: 5px;
     color: var(--text-secondary);
-    font-size: 13px;
-}
-
-.user-status-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: var(--accent-blue) !important;
+    font-size: 12px;
 }
 
 .user-table {

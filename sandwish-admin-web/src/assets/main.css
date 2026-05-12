@@ -20,6 +20,9 @@
     --shadow-soft: 0 18px 50px rgba(23, 23, 23, 0.07);
     --sidebar-width: 248px;
     --sidebar-collapsed-width: 88px;
+    --workspace-padding-inline: 44px;
+    --workspace-padding-top: 44px;
+    --workspace-padding-bottom: 64px;
     color: var(--text-primary);
     background: var(--surface-page);
     font-family: "Avenir Next", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -81,12 +84,15 @@ button {
 }
 
 .admin-main {
-    width: calc(100vw - var(--sidebar-width));
+    --workspace-outer-width: calc(100vw - var(--sidebar-width));
+    flex: 0 0 var(--workspace-outer-width);
+    width: var(--workspace-outer-width);
+    max-width: var(--workspace-outer-width);
     min-width: 0;
 }
 
 .sidebar.ant-layout-sider-collapsed + .admin-main {
-    width: calc(100vw - var(--sidebar-collapsed-width));
+    --workspace-outer-width: calc(100vw - var(--sidebar-collapsed-width));
 }
 
 .sidebar-backdrop {
@@ -242,13 +248,17 @@ button {
 }
 
 .workspace {
+    --workspace-content-width: calc(
+        var(--workspace-outer-width) - var(--workspace-padding-inline) - var(--workspace-padding-inline)
+    );
     display: grid;
     align-content: start;
     gap: 28px;
+    grid-template-columns: minmax(0, var(--workspace-content-width));
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    padding: 44px 44px 64px;
+    padding: var(--workspace-padding-top) var(--workspace-padding-inline) var(--workspace-padding-bottom);
 }
 
 .admin-content-grid {
@@ -258,6 +268,8 @@ button {
 }
 
 .workspace > * {
+    width: 100%;
+    max-width: var(--workspace-content-width);
     min-width: 0;
 }
 
@@ -903,12 +915,14 @@ p {
     }
 
     .workspace {
-        padding: 22px 16px 42px;
+        --workspace-padding-inline: 16px;
+        --workspace-padding-top: 22px;
+        --workspace-padding-bottom: 42px;
     }
 
     .admin-main,
     .sidebar.ant-layout-sider-collapsed + .admin-main {
-        width: 100vw;
+        --workspace-outer-width: 100vw;
     }
 
     .topbar {

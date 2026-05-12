@@ -131,27 +131,33 @@ test.describe("admin layout", () => {
         await expect(sidebar).not.toHaveClass(/sidebar-mobile-open/);
     });
 
-    test("keeps the workspace within the remaining desktop width", async ({ page }) => {
+    test("keeps the workspace content within the remaining desktop width", async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 800 });
         await page.goto("/system/dictionaries");
 
         const main = page.locator(".admin-main");
+        const workspaceContent = page.locator(".dictionary-page");
         await expect(page.getByRole("heading", { name: "字典管理" })).toBeVisible();
         await expect(main).toHaveCSS("width", "1032px");
+        await expect(workspaceContent).toHaveCSS("width", "944px");
 
         await page.getByLabel("收起菜单").click();
         await expect(main).toHaveCSS("width", "1192px");
+        await expect(workspaceContent).toHaveCSS("width", "1104px");
     });
 
-    test("uses the full viewport width while the mobile menu is an overlay", async ({ page }) => {
+    test("uses the padded viewport width while the mobile menu is an overlay", async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         await page.goto("/system/dictionaries");
 
         const main = page.locator(".admin-main");
+        const workspaceContent = page.locator(".dictionary-page");
         await expect(page.getByRole("heading", { name: "字典管理" })).toBeVisible();
         await expect(main).toHaveCSS("width", "390px");
+        await expect(workspaceContent).toHaveCSS("width", "358px");
 
         await page.getByLabel("展开菜单").click();
         await expect(main).toHaveCSS("width", "390px");
+        await expect(workspaceContent).toHaveCSS("width", "358px");
     });
 });

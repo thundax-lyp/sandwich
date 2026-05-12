@@ -84,20 +84,10 @@ button {
 }
 
 .admin-main {
-    --workspace-outer-width: calc(100vw - var(--sidebar-width));
-    flex: 0 0 var(--workspace-outer-width);
-    width: var(--workspace-outer-width);
-    max-width: var(--workspace-outer-width);
+    flex: 1 1 0;
+    width: auto;
+    max-width: 100%;
     min-width: 0;
-}
-
-.admin-main[data-sidebar-state="collapsed"] {
-    --workspace-outer-width: calc(100vw - var(--sidebar-collapsed-width));
-}
-
-.admin-main[data-sidebar-state="closed"],
-.admin-main[data-sidebar-state="open"] {
-    --workspace-outer-width: 100vw;
 }
 
 .sidebar-backdrop {
@@ -253,13 +243,10 @@ button {
 }
 
 .workspace {
-    --workspace-content-width: calc(
-        var(--workspace-outer-width) - var(--workspace-padding-inline) - var(--workspace-padding-inline)
-    );
     display: grid;
     align-content: start;
     gap: 28px;
-    grid-template-columns: minmax(0, var(--workspace-content-width));
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -274,7 +261,7 @@ button {
 
 .workspace > * {
     width: 100%;
-    max-width: var(--workspace-content-width);
+    max-width: 100%;
     min-width: 0;
 }
 

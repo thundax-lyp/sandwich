@@ -44,86 +44,90 @@ INSERT INTO `sys_role` (
     `remarks` = VALUES(`remarks`);
 
 -- Default navigation menus are permission-backed resources and must be seeded here.
--- Dashboard is the login landing page, not a menu resource, so it is intentionally not inserted.
+-- display_params keeps frontend presentation metadata as JSON.
 INSERT INTO `sys_menu` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `perms`, `ranks`,
     `visibility`, `display_params`, `url`, `target`, `priority`, `remarks`
 ) VALUES
     (
-        1000000000000001001, NULL, 1, 30, '系统管理', NULL, 0,
-        'VISIBLE', NULL, '/system', NULL, 0, '系统管理根菜单'
+        1000000000000001020, NULL, 1, 2, '仪表盘', NULL, 0,
+        'VISIBLE', '{"icon":"dashboard"}', '/dashboard', NULL, 0, '后台仪表盘'
     ),
     (
-        1000000000000001002, 1000000000000001001, 2, 7, '用户管理', NULL, 0,
-        'VISIBLE', NULL, '/system/users', NULL, 1, '用户管理'
+        1000000000000001001, NULL, 3, 32, '系统管理', NULL, 0,
+        'VISIBLE', '{"icon":"system"}', '/system', NULL, 1, '系统管理根菜单'
     ),
     (
-        1000000000000001003, 1000000000000001002, 3, 4, '用户查看', 'sys:user:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '用户查看权限'
+        1000000000000001002, 1000000000000001001, 4, 9, '用户管理', NULL, 0,
+        'VISIBLE', '{"icon":"users"}', '/system/users', NULL, 1, '用户管理'
     ),
     (
-        1000000000000001004, 1000000000000001002, 5, 6, '用户编辑', 'sys:user:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '用户编辑权限'
+        1000000000000001003, 1000000000000001002, 5, 6, '用户查看', 'sys:user:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '用户查看权限'
     ),
     (
-        1000000000000001005, 1000000000000001001, 8, 13, '角色管理', NULL, 0,
-        'VISIBLE', NULL, '/system/roles', NULL, 2, '角色管理'
+        1000000000000001004, 1000000000000001002, 7, 8, '用户编辑', 'sys:user:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '用户编辑权限'
     ),
     (
-        1000000000000001006, 1000000000000001005, 9, 10, '角色查看', 'sys:role:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '角色查看权限'
+        1000000000000001005, 1000000000000001001, 10, 15, '角色管理', NULL, 0,
+        'VISIBLE', '{"icon":"roles"}', '/system/roles', NULL, 2, '角色管理'
     ),
     (
-        1000000000000001007, 1000000000000001005, 11, 12, '角色编辑', 'sys:role:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '角色编辑权限'
+        1000000000000001006, 1000000000000001005, 11, 12, '角色查看', 'sys:role:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '角色查看权限'
     ),
     (
-        1000000000000001008, 1000000000000001001, 14, 15, '菜单管理', 'super', 0,
-        'VISIBLE', NULL, '/system/menus', NULL, 3, '菜单管理'
+        1000000000000001007, 1000000000000001005, 13, 14, '角色编辑', 'sys:role:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '角色编辑权限'
     ),
     (
-        1000000000000001009, 1000000000000001001, 16, 21, '部门管理', NULL, 0,
-        'VISIBLE', NULL, '/system/departments', NULL, 4, '部门管理'
+        1000000000000001008, 1000000000000001001, 16, 17, '菜单管理', 'super', 0,
+        'VISIBLE', '{"icon":"menus"}', '/system/menus', NULL, 3, '菜单管理'
     ),
     (
-        1000000000000001010, 1000000000000001009, 17, 18, '部门查看', 'sys:department:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '部门查看权限'
+        1000000000000001009, 1000000000000001001, 18, 23, '部门管理', NULL, 0,
+        'VISIBLE', '{"icon":"departments"}', '/system/departments', NULL, 4, '部门管理'
     ),
     (
-        1000000000000001011, 1000000000000001009, 19, 20, '部门编辑', 'sys:department:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '部门编辑权限'
+        1000000000000001010, 1000000000000001009, 19, 20, '部门查看', 'sys:department:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '部门查看权限'
     ),
     (
-        1000000000000001012, 1000000000000001001, 22, 27, '字典管理', NULL, 0,
-        'VISIBLE', NULL, '/system/dictionaries', NULL, 5, '字典管理'
+        1000000000000001011, 1000000000000001009, 21, 22, '部门编辑', 'sys:department:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '部门编辑权限'
     ),
     (
-        1000000000000001013, 1000000000000001012, 23, 24, '字典查看', 'sys:dict:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '字典查看权限'
+        1000000000000001012, 1000000000000001001, 24, 29, '字典管理', NULL, 0,
+        'VISIBLE', '{"icon":"dictionaries"}', '/system/dictionaries', NULL, 5, '字典管理'
     ),
     (
-        1000000000000001014, 1000000000000001012, 25, 26, '字典编辑', 'sys:dict:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '字典编辑权限'
+        1000000000000001013, 1000000000000001012, 25, 26, '字典查看', 'sys:dict:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '字典查看权限'
     ),
     (
-        1000000000000001015, 1000000000000001001, 28, 29, '系统日志', 'super', 0,
-        'VISIBLE', NULL, '/system/logs', NULL, 6, '系统日志'
+        1000000000000001014, 1000000000000001012, 27, 28, '字典编辑', 'sys:dict:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '字典编辑权限'
     ),
     (
-        1000000000000001016, NULL, 31, 38, '存储管理', NULL, 0,
-        'VISIBLE', NULL, '/storage', NULL, 1, '存储管理根菜单'
+        1000000000000001015, 1000000000000001001, 30, 31, '系统日志', 'super', 0,
+        'VISIBLE', '{"icon":"logs"}', '/system/logs', NULL, 6, '系统日志'
     ),
     (
-        1000000000000001017, 1000000000000001016, 32, 37, '存储对象', NULL, 0,
-        'VISIBLE', NULL, '/storage/objects', NULL, 1, '存储对象'
+        1000000000000001016, NULL, 33, 40, '存储管理', NULL, 0,
+        'VISIBLE', '{"icon":"storage"}', '/storage', NULL, 2, '存储管理根菜单'
     ),
     (
-        1000000000000001018, 1000000000000001017, 33, 34, '存储对象查看', 'storage:storage:view', 0,
-        'HIDDEN', NULL, NULL, NULL, 1, '存储对象查看权限'
+        1000000000000001017, 1000000000000001016, 34, 39, '存储对象', NULL, 0,
+        'VISIBLE', '{"icon":"storage-objects"}', '/storage/objects', NULL, 1, '存储对象'
     ),
     (
-        1000000000000001019, 1000000000000001017, 35, 36, '存储对象编辑', 'storage:storage:edit', 0,
-        'HIDDEN', NULL, NULL, NULL, 2, '存储对象编辑权限'
+        1000000000000001018, 1000000000000001017, 35, 36, '存储对象查看', 'storage:storage:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '存储对象查看权限'
+    ),
+    (
+        1000000000000001019, 1000000000000001017, 37, 38, '存储对象编辑', 'storage:storage:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '存储对象编辑权限'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -164,9 +168,7 @@ INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
     (1000000000000000401, 1000000000000001017),
     (1000000000000000401, 1000000000000001018),
     (1000000000000000401, 1000000000000001019),
-    (1000000000000000401, 1000000000000001020),
-    (1000000000000000401, 1000000000000001021),
-    (1000000000000000401, 1000000000000001022)
+    (1000000000000000401, 1000000000000001020)
 ON DUPLICATE KEY UPDATE
     `menu_id` = VALUES(`menu_id`);
 

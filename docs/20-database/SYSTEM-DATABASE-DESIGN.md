@@ -151,7 +151,7 @@
 | `perms` | `perms` | `perms` | 否 | 权限编码 |
 | `ranks` | `ranks` | `rank` | 是 | 访问等级 |
 | `visibility` | `visibility` | `visibility` | 是 | 显示状态，取值固定为 `VISIBLE` / `HIDDEN` |
-| `display_params` | `displayParams` | `displayParams` | 否 | 显示参数 |
+| `display_params` | `displayParams` | `displayParams` | 否 | 显示参数，JSON 格式，菜单图标使用 `icon` 字段 |
 | `url` | `url` | `url` | 否 | 访问路径 |
 | `target` | `target` | `target` | 否 | 打开目标 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
@@ -161,6 +161,7 @@
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `parent_id` 复用 `sys_menu.id`。
+- 固定初始化菜单的 `display_params` 必须包含 `icon`，用于后台管理台导航展示。
 
 索引：
 

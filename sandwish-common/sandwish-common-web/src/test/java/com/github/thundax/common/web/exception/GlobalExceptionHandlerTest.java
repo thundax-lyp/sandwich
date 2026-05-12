@@ -24,7 +24,8 @@ public class GlobalExceptionHandlerTest {
     public void shouldConvertSandwishExceptionToFailureResponse() {
         messageSource.addMessage(WebErrorCode.BAD_REQUEST.getMessageKey(), Locale.getDefault(), "Bad request");
 
-        ResponseEntity<ApiResponse<Object>> response = handler.handleSandwishException(new BadRequestException("参数缺失"));
+        ResponseEntity<ApiResponse<Object>> response =
+                handler.handleSandwishException(new BadRequestException("参数缺失"), null);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(WebErrorCode.BAD_REQUEST.getCode(), response.getBody().getCode());
@@ -37,7 +38,7 @@ public class GlobalExceptionHandlerTest {
         BindException exception = new BindException(new Object(), "request");
         exception.addError(new FieldError("request", "name", "名称不能为空"));
 
-        ResponseEntity<ApiResponse<Object>> response = handler.handleException(exception);
+        ResponseEntity<ApiResponse<Object>> response = handler.handleException(exception, null);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(WebErrorCode.BAD_REQUEST.getCode(), response.getBody().getCode());
@@ -47,7 +48,7 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     public void shouldConvertUnknownExceptionToSystemFailureResponse() {
-        ResponseEntity<ApiResponse<Object>> response = handler.handleException(new RuntimeException("boom"));
+        ResponseEntity<ApiResponse<Object>> response = handler.handleException(new RuntimeException("boom"), null);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals(WebErrorCode.SYSTEM_ERROR.getCode(), response.getBody().getCode());

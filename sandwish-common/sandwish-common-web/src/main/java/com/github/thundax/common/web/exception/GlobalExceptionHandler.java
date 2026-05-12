@@ -5,6 +5,9 @@ import com.github.thundax.common.web.response.ApiResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private final I18nMessageResolver i18nMessageResolver;
     private final List<ExceptionTranslator> exceptionTranslators;
@@ -23,17 +28,42 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SandwishException.class)
-    public ResponseEntity<ApiResponse<Object>> handleSandwishException(SandwishException exception) {
+    public ResponseEntity<ApiResponse<Object>> handleSandwishException(
+            SandwishException exception, HttpServletRequest request) {
+        if (isSystemError(exception)) {
+            logException(request, exception);
+        }
         return toResponseEntity(exception);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Object>> handleException(Exception exception) {
+    public ResponseEntity<ApiResponse<Object>> handleException(Exception exception, HttpServletRequest request) {
         SandwishException translatedException = translate(exception);
         if (translatedException != null) {
+            if (isSystemError(translatedException)) {
+                logException(request, exception);
+            }
             return toResponseEntity(translatedException);
         }
+        logException(request, exception);
         return toResponseEntity(new SystemException());
+    }
+
+    private boolean isSystemError(SandwishException exception) {
+        return exception != null && exception.getHttpStatus() >= 500;
+    }
+
+    private void logException(HttpServletRequest request, Exception exception) {
+        if (request == null) {
+            LOGGER.error("Unhandled API exception", exception);
+            return;
+        }
+        LOGGER.error(
+                "Unhandled API exception: method={}, uri={}, requestId={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                request.getHeader("X-Request-Id"),
+                exception);
     }
 
     private SandwishException translate(Exception exception) {

@@ -203,6 +203,7 @@ export const AdminLayout = () => {
     const navigate = useNavigate();
     const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isMobileLayout, setIsMobileLayout] = useState(false);
     const currentUserInfoQuery = useQuery({
         queryKey: ["current-user", "info"],
         queryFn: getCurrentUserInfo,
@@ -261,6 +262,21 @@ export const AdminLayout = () => {
         return () => window.clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+        const mediaQueryList = window.matchMedia("(max-width: 760px)");
+        const syncMobileLayout = (matches: boolean) => {
+            setIsMobileLayout(matches);
+            if (matches) {
+                setSidebarCollapsed(true);
+            }
+        };
+        const handleChange = (event: MediaQueryListEvent) => syncMobileLayout(event.matches);
+
+        syncMobileLayout(mediaQueryList.matches);
+        mediaQueryList.addEventListener("change", handleChange);
+        return () => mediaQueryList.removeEventListener("change", handleChange);
+    }, []);
+
     const toggleTheme = () => {
         const nextTheme = themeName === "dark" ? "light" : "dark";
         setThemeName(nextTheme);
@@ -284,11 +300,19 @@ export const AdminLayout = () => {
 
     return (
         <Layout className="admin-shell">
+            {isMobileLayout && !sidebarCollapsed ? (
+                <button
+                    className="sidebar-backdrop"
+                    type="button"
+                    aria-label="关闭菜单"
+                    onClick={() => setSidebarCollapsed(true)}
+                />
+            ) : null}
             <Sider
-                className="sidebar"
+                className={`sidebar${isMobileLayout && !sidebarCollapsed ? " sidebar-mobile-open" : ""}`}
                 width={248}
                 collapsedWidth={88}
-                collapsed={sidebarCollapsed}
+                collapsed={isMobileLayout ? false : sidebarCollapsed}
                 trigger={null}
             >
                 <div className="brand">
@@ -305,7 +329,12 @@ export const AdminLayout = () => {
                     defaultOpenKeys={getOpenKeys(location.pathname)}
                     selectedKeys={[location.pathname]}
                     items={menuItems}
-                    onClick={({ key }) => navigate(key)}
+                    onClick={({ key }) => {
+                        navigate(key);
+                        if (isMobileLayout) {
+                            setSidebarCollapsed(true);
+                        }
+                    }}
                 />
             </Sider>
 

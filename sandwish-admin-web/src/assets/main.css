@@ -1106,11 +1106,17 @@ p {
 
 .user-table-toolbar .ant-btn {
     border-color: var(--line-subtle);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.user-table-toolbar .ant-btn > span:not(.anticon) {
+    font-weight: 400;
 }
 
 .user-table-toolbar .ant-btn:disabled,
 .user-table-toolbar .ant-btn:disabled:hover {
-    color: var(--text-muted);
+    color: color-mix(in srgb, var(--text-muted) 78%, transparent);
     background: transparent;
     border-color: var(--line-subtle);
 }

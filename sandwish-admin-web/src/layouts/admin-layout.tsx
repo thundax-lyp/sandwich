@@ -122,25 +122,38 @@ const buildAuthorizedMenuItems = (
         return fallbackMenuItems;
     }
 
+    const menuIds = new Set(menus.map((menu) => menu.id));
     const childrenByParentId = new Map<number | null, typeof menus>();
     menus.forEach((menu) => {
-        const parentId = menu.parentId || null;
+        const parentId = menu.parentId && menu.parentId !== menu.id && menuIds.has(menu.parentId) ? menu.parentId : null;
         const siblings = childrenByParentId.get(parentId) || [];
         siblings.push(menu);
         childrenByParentId.set(parentId, siblings);
     });
 
-    const toMenuItem = (menu: (typeof menus)[number]): NonNullable<MenuProps["items"]>[number] => {
+    const visited = new Set<number>();
+    const toMenuItem = (
+        menu: (typeof menus)[number],
+        ancestors: Set<number> = new Set()
+    ): NonNullable<MenuProps["items"]>[number] => {
         const key = normalizeMenuKey(menu);
-        const children = childrenByParentId.get(menu.id) || [];
+        const nextAncestors = new Set(ancestors);
+        nextAncestors.add(menu.id);
+        visited.add(menu.id);
+        const children = (childrenByParentId.get(menu.id) || []).filter((child) => !nextAncestors.has(child.id));
 
         return {
             key,
             icon: menuIconMap[key] || menuIconMap[String(menu.id)],
             label: menu.name,
-            children: children.length ? children.map(toMenuItem) : undefined
+            children: children.length ? children.map((child) => toMenuItem(child, nextAncestors)) : undefined
         };
     };
+    const rootMenus = childrenByParentId.get(null) || [];
+    const rootMenuItems = rootMenus.map((menu) => toMenuItem(menu));
+    const orphanMenuItems = menus
+        .filter((menu) => !visited.has(menu.id))
+        .map((menu) => toMenuItem(menu));
 
     return [
         {
@@ -148,7 +161,8 @@ const buildAuthorizedMenuItems = (
             icon: <AppstoreOutlined />,
             label: "Dashboard"
         },
-        ...((childrenByParentId.get(null) || []).map(toMenuItem) as NonNullable<MenuProps["items"]>)
+        ...(rootMenuItems as NonNullable<MenuProps["items"]>),
+        ...(orphanMenuItems as NonNullable<MenuProps["items"]>)
     ];
 };
 

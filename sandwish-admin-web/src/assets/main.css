@@ -1337,6 +1337,7 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 3px;
     min-width: 0;
 }
 
@@ -1356,7 +1357,14 @@ p {
 
 .user-row-drag-handle {
     color: var(--text-muted);
+    background: transparent;
+    border: 0;
     cursor: grab;
+}
+
+.user-row-drag-handle:hover {
+    color: var(--text-primary);
+    background: var(--surface-hover);
 }
 
 .user-row-drag-handle:active {
@@ -1369,6 +1377,10 @@ p {
 
 .user-row-action-more {
     display: none;
+}
+
+.user-row-drag-over > td {
+    background: color-mix(in srgb, var(--accent-blue) 8%, transparent) !important;
 }
 
 .user-table .ant-pagination {
@@ -1683,6 +1695,10 @@ p {
     }
 
     .user-row-actions-inline {
+        display: none;
+    }
+
+    .user-row-drag-handle {
         display: none;
     }
 

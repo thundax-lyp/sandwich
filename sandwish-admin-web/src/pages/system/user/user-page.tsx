@@ -26,7 +26,7 @@ import {
 import type { TableProps } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
-import type { MouseEvent as ReactMouseEvent } from "react";
+import type { DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent } from "react";
 
 const { Text, Title } = Typography;
 
@@ -169,6 +169,7 @@ const getInitials = (name: string) => {
 };
 
 export const UserPage = () => {
+    const [users, setUsers] = useState<UserRecord[]>(USER_RECORDS);
     const [searchText, setSearchText] = useState("");
     const [filtersOpen, setFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
@@ -178,6 +179,8 @@ export const UserPage = () => {
     const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
     const [isMobileTable, setIsMobileTable] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const [draggingUserId, setDraggingUserId] = useState<string | null>(null);
+    const [dragOverUserId, setDragOverUserId] = useState<string | null>(null);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters =
         Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
@@ -238,7 +241,7 @@ export const UserPage = () => {
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
         const emailKeyword = filters.email.trim().toLowerCase();
-        return USER_RECORDS.filter((user) => {
+        return users.filter((user) => {
             const isEmailMatched = !emailKeyword || user.email.toLowerCase().includes(emailKeyword);
             const isRoleMatched = filters.role === "All" || user.role === filters.role;
             const isStatusMatched = filters.status === "All" || user.status === filters.status;
@@ -250,7 +253,38 @@ export const UserPage = () => {
 
             return isEmailMatched && isRoleMatched && isStatusMatched && isKeywordMatched;
         });
-    }, [filters, searchText]);
+    }, [filters, searchText, users]);
+
+    const startUserDrag = (userId: string) => (event: ReactDragEvent<HTMLButtonElement>) => {
+        setDraggingUserId(userId);
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", userId);
+    };
+
+    const moveUserBefore = (sourceUserId: string, targetUserId: string) => {
+        if (sourceUserId === targetUserId) {
+            return;
+        }
+
+        setUsers((currentUsers) => {
+            const sourceIndex = currentUsers.findIndex((user) => user.id === sourceUserId);
+            const targetIndex = currentUsers.findIndex((user) => user.id === targetUserId);
+            if (sourceIndex < 0 || targetIndex < 0) {
+                return currentUsers;
+            }
+
+            const nextUsers = [...currentUsers];
+            const [sourceUser] = nextUsers.splice(sourceIndex, 1);
+            const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUserId);
+            nextUsers.splice(nextTargetIndex, 0, sourceUser);
+            return nextUsers;
+        });
+    };
+
+    const clearUserDrag = () => {
+        setDraggingUserId(null);
+        setDragOverUserId(null);
+    };
 
     const resetFilters = () => {
         setFilters(DEFAULT_USER_FILTERS);
@@ -325,13 +359,17 @@ export const UserPage = () => {
                                 setDeleteConfirmText("delete");
                             }}
                         />
-                        <Button
-                            aria-label={`拖动排序 ${user.name}`}
-                            className="user-row-action user-row-drag-handle"
-                            icon={<HolderOutlined />}
-                            type="text"
-                        />
                     </Space.Compact>
+                    <button
+                        aria-label={`拖动排序 ${user.name}`}
+                        className="user-row-action user-row-drag-handle"
+                        draggable
+                        type="button"
+                        onDragEnd={clearUserDrag}
+                        onDragStart={startUserDrag(user.id)}
+                    >
+                        <HolderOutlined />
+                    </button>
                     <Dropdown
                         menu={{
                             items: [
@@ -498,6 +536,33 @@ export const UserPage = () => {
                     className="user-table"
                     columns={columns}
                     dataSource={filteredUsers}
+                    onRow={(user) => ({
+                        className: dragOverUserId === user.id ? "user-row-drag-over" : undefined,
+                        onDragEnter: () => {
+                            if (draggingUserId && draggingUserId !== user.id) {
+                                setDragOverUserId(user.id);
+                            }
+                        },
+                        onDragOver: (event) => {
+                            if (draggingUserId && draggingUserId !== user.id) {
+                                event.preventDefault();
+                                event.dataTransfer.dropEffect = "move";
+                            }
+                        },
+                        onDragLeave: () => {
+                            if (dragOverUserId === user.id) {
+                                setDragOverUserId(null);
+                            }
+                        },
+                        onDrop: (event) => {
+                            event.preventDefault();
+                            const sourceUserId = event.dataTransfer.getData("text/plain") || draggingUserId;
+                            if (sourceUserId) {
+                                moveUserBefore(sourceUserId, user.id);
+                            }
+                            clearUserDrag();
+                        }
+                    })}
                     pagination={{
                         current: 1,
                         pageSize: 50,

@@ -13,7 +13,6 @@ import com.github.thundax.modules.sys.dao.RoleDao;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
-import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.valueobject.MenuIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.RoleId;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
@@ -68,12 +67,19 @@ public class RoleServiceImpl implements RoleService {
     }
 
     public List<Role> list(RoleQuery query) {
-        return dao.list(query == null ? null : statusValue(query.getStatus()));
+        return dao.list(
+                query == null || query.getStatus() == null
+                        ? null
+                        : query.getStatus().value());
     }
 
     public PageResult<Role> page(RoleQuery query, PageQuery page) {
-        IPage<Role> dataPage =
-                dao.page(query == null ? null : statusValue(query.getStatus()), page.getPageNo(), page.getPageSize());
+        IPage<Role> dataPage = dao.page(
+                query == null || query.getStatus() == null
+                        ? null
+                        : query.getStatus().value(),
+                page.getPageNo(),
+                page.getPageSize());
         return PageResult.of(
                 (int) dataPage.getCurrent(), (int) dataPage.getSize(), dataPage.getTotal(), dataPage.getRecords());
     }
@@ -295,10 +301,6 @@ public class RoleServiceImpl implements RoleService {
     public interface CacheChangedListener {
 
         void onRoleCacheChanged();
-    }
-
-    private String statusValue(RoleStatus status) {
-        return status == null ? null : status.value();
     }
 
     private List<Long> toValues(List<RoleId> ids) {

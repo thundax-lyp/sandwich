@@ -37,7 +37,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
     public PrincipalIdentity authenticateIdentity(AuthenticateIdentityCommand command) {
         PrincipalIdentity identity = principalIdentityService.get(identityQuery(command));
         if (identity == null || !identity.isEnabled()) {
-            throw invalidPrincipalCredential();
+            throw new InvalidPasswordException();
         }
         return identity;
     }
@@ -49,7 +49,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         PrincipalCredential credential =
                 principalCredentialService.get(credentialQuery(identity.getId(), command.getCredentialType()));
         if (credential == null) {
-            throw invalidPrincipalCredential();
+            throw new InvalidPasswordException();
         }
         validateCredential(credential, command.getPlainPassword(), effectivePolicy(command.getPasswordPolicy()));
         return identity;
@@ -75,7 +75,7 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         }
 
         if (!passwordPolicy.isLockEnabled()) {
-            throw invalidPrincipalCredential();
+            throw new InvalidPasswordException();
         }
 
         if (credential.getFailedLimit() <= 0) {
@@ -119,9 +119,5 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         }
         long remaining = (credential.getLockedUntil().getTime() - now.getTime()) / 1000L;
         return Math.max(remaining, 0L);
-    }
-
-    private BizException invalidPrincipalCredential() {
-        return new InvalidPasswordException();
     }
 }

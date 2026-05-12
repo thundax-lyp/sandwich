@@ -47,6 +47,7 @@
         <byte-buddy.version>1.11.13</byte-buddy.version>
         <archunit.version>1.4.1</archunit.version>
         <jetcache.version>2.5.16</jetcache.version>
+        <rocketmq-spring-boot.version>2.0.3</rocketmq-spring-boot.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
         <checkstyle.version>8.33</checkstyle.version>
         <spotless-maven-plugin.version>2.22.8</spotless-maven-plugin.version>
@@ -132,6 +133,11 @@
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-core</artifactId>
                 <version>${jetcache.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring-boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>

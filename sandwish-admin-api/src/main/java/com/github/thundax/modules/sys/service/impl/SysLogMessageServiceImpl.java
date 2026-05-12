@@ -2,6 +2,8 @@ package com.github.thundax.modules.sys.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.common.mq.SandwishMqMessage;
+import com.github.thundax.common.mq.SandwishMqSender;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.SysLogMessageService;
@@ -17,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
     private static final DateFormat LOG_FILENAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final String LOG_EXTEND_NAME = ".log";
 
-    private final AmqpTemplate template;
+    private final SandwishMqSender mqSender;
     private final SandwishProperties sandwishProperties;
     private final LogService logService;
     private final ObjectMapper objectMapper;
@@ -40,16 +40,18 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
     @Override
     public void saveLog(Log sysLog) {
         try {
-            template.convertAndSend(QUEUE_SAVE_LOG, objectMapper.writeValueAsString(sysLog));
+            String payload = objectMapper.writeValueAsString(sysLog);
+            mqSender.send(SandwishMqMessage.forQueue(QUEUE_SAVE_LOG, null, payload)
+                    .withHeader("sandwish-message-type", "sys-log"));
         } catch (Exception e) {
             log.warn("can not serialize sys-log message", e);
         }
     }
 
-    @RabbitListener(queues = QUEUE_SAVE_LOG, concurrency = "2")
-    public void saveLogHandler(String paramString) {
+    @Override
+    public void consumeLog(String payload) {
         try {
-            Log sysLog = objectMapper.readValue(paramString, Log.class);
+            Log sysLog = objectMapper.readValue(payload, Log.class);
             if (sysLog != null) {
                 sysLog.setId(logService.create(toCreateCommand(sysLog)));
 
@@ -57,7 +59,7 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
                     String filename = LOG_FILENAME_FORMAT.format(sysLog.getLogDate()) + LOG_EXTEND_NAME;
                     File logFile = new File(logProperties().getStoragePath(), filename);
 
-                    FileUtils.writeLines(logFile, new ArrayList<>(Collections.singletonList(paramString)), true);
+                    FileUtils.writeLines(logFile, new ArrayList<>(Collections.singletonList(payload)), true);
 
                 } catch (Exception e) {
                     log.warn("can not save sys-log to {}", logProperties().getStoragePath(), e);

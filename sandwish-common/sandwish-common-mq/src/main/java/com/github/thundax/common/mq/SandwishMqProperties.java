@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SandwishMqProperties {
 
     private boolean enabled = true;
-    private String defaultTopic = "sandwish.events";
+    private SandwishMqType type = SandwishMqType.RABBITMQ;
 
     public boolean isEnabled() {
         return enabled;
@@ -16,11 +16,11 @@ public class SandwishMqProperties {
         this.enabled = enabled;
     }
 
-    public String getDefaultTopic() {
-        return defaultTopic;
+    public SandwishMqType getType() {
+        return type;
     }
 
-    public void setDefaultTopic(String defaultTopic) {
-        this.defaultTopic = defaultTopic;
+    public void setType(SandwishMqType type) {
+        this.type = type;
     }
 }

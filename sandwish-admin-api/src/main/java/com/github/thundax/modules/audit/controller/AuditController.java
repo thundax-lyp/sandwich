@@ -1,9 +1,9 @@
 package com.github.thundax.modules.audit.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.PageRequest;
 import com.github.thundax.common.web.response.PageResponse;
@@ -48,7 +48,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -63,7 +63,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -79,7 +79,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -94,7 +94,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -112,7 +112,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -128,7 +128,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -145,7 +145,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -159,7 +159,7 @@ public class AuditController {
     @HasPermission("audit:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

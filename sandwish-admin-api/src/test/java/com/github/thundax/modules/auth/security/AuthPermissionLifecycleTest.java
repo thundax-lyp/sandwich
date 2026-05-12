@@ -3,7 +3,6 @@ package com.github.thundax.modules.auth.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.autoconfigure.SandwishProperties;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -11,6 +10,7 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -344,7 +344,7 @@ public class AuthPermissionLifecycleTest {
                 objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
-        request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
+        request.addHeader(AccessTokenNames.HEADER_TOKEN, accessToken.getToken());
         MockHttpServletResponse response = new MockHttpServletResponse();
         MockFilterChain chain = new MockFilterChain();
 
@@ -372,7 +372,7 @@ public class AuthPermissionLifecycleTest {
                 objectMapper);
 
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/sys/user");
-        request.addHeader(Constants.HEADER_TOKEN, accessToken.getToken());
+        request.addHeader(AccessTokenNames.HEADER_TOKEN, accessToken.getToken());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         filter.doFilter(request, response, (servletRequest, servletResponse) -> {

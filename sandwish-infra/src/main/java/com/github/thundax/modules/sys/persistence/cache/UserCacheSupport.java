@@ -3,8 +3,8 @@ package com.github.thundax.modules.sys.persistence.cache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class UserCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.user";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "sys.user";
     private static final String ROLES_PREFIX = ".roles_";
     private static final String KEY_INDEX = "keys";
 

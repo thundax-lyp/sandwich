@@ -3,8 +3,8 @@ package com.github.thundax.modules.auth.persistence.dao;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.auth.codec.PrincipalAuthSessionIdCodec;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 @Profile("!test")
 public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
 
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "PRINCIPAL_AUTH_SESSION_";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "PRINCIPAL_AUTH_SESSION_";
     private static final String SESSION_PREFIX = CACHE_SECTION + "SESSION_";
 
     @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)

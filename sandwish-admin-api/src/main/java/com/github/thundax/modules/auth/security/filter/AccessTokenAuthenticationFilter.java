@@ -2,10 +2,10 @@ package com.github.thundax.modules.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.security.context.SandwishSubjectType;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.exception.WebErrorCode;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
@@ -32,8 +32,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String HEADER_TOKEN = Constants.HEADER_TOKEN;
-    private static final String PARAM_TOKEN = Constants.PARAM_TOKEN;
+    private static final String HEADER_TOKEN = AccessTokenNames.HEADER_TOKEN;
+    private static final String PARAM_TOKEN = AccessTokenNames.PARAM_TOKEN;
     private static final String APPLICATION_JSON_UTF8_VALUE = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8";
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();

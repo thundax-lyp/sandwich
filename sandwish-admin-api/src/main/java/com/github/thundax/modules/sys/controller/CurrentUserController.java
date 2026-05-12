@@ -1,10 +1,10 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -77,7 +77,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -94,7 +94,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -125,7 +125,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -153,7 +153,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -179,7 +179,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -198,7 +198,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -214,7 +214,7 @@ public class CurrentUserController {
     @HasPermission("user")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

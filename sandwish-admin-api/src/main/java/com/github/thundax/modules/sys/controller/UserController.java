@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
@@ -8,6 +7,7 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -140,7 +140,7 @@ public class UserController {
     @ApiOperation(value = "获取对象", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -160,7 +160,7 @@ public class UserController {
     @ApiOperation(value = "获取列表", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -178,7 +178,7 @@ public class UserController {
     @ApiOperation(value = "获取分页列表", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -196,7 +196,7 @@ public class UserController {
     @ApiOperation(value = "添加", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -238,7 +238,7 @@ public class UserController {
     @ApiOperation(value = "更新", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -292,7 +292,7 @@ public class UserController {
     @ApiOperation(value = "上传头像", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -315,7 +315,7 @@ public class UserController {
     @ApiOperation(value = "删除头像", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -332,7 +332,7 @@ public class UserController {
     @ApiOperation(value = "获取头像相对路径", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -346,7 +346,7 @@ public class UserController {
     @ApiOperation(value = "启用/禁用", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -383,7 +383,7 @@ public class UserController {
     @ApiOperation(value = "排序", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -415,7 +415,7 @@ public class UserController {
     @ApiOperation(value = "删除", notes = "sys:user:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -451,7 +451,7 @@ public class UserController {
     @ApiOperation(value = "检查 [loginName]是否存在", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -466,7 +466,7 @@ public class UserController {
     @ApiOperation(value = "获取部门树", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -483,7 +483,7 @@ public class UserController {
     @ApiOperation(value = "获取权限列表", notes = "sys:user:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

@@ -3,8 +3,8 @@ package com.github.thundax.modules.sys.persistence.cache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.valueobject.DictIdCodec;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class DictCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "sys.dict.";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "sys.dict.";
 
     @CreateCache(
             name = CACHE_SECTION,

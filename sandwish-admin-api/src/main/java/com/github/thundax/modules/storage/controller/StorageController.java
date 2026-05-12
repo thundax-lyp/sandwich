@@ -1,12 +1,12 @@
 package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -192,7 +192,7 @@ public class StorageController {
     @ApiOperation(value = "排序", notes = "storage:storage:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

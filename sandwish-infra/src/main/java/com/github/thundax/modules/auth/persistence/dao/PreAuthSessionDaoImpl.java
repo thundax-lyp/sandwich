@@ -3,8 +3,8 @@ package com.github.thundax.modules.auth.persistence.dao;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PreAuthSession.PreAuthSessionValue;
@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
 @Profile("!test")
 public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
 
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "PRE_AUTH_SESSION_";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "PRE_AUTH_SESSION_";
     private static final String SESSION_PREFIX = CACHE_SECTION + "SESSION_";
     private static final String TOKEN_PREFIX = CACHE_SECTION + "TOKEN_";
     private static final String REFRESH_TOKEN_PREFIX = CACHE_SECTION + "REFRESH_";

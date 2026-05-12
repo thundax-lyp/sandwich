@@ -3,8 +3,8 @@ package com.github.thundax.modules.auth.persistence.dao;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
 @Profile("!test")
 public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
 
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "PRINCIPAL_REFRESH_TOKEN_";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "PRINCIPAL_REFRESH_TOKEN_";
     private static final String TOKEN_HASH_PREFIX = CACHE_SECTION + "HASH_";
     private static final String TOKEN_CODE_PREFIX = CACHE_SECTION + "TOKEN_CODE_";
     private static final String PRINCIPAL_INDEX_PREFIX = CACHE_SECTION + "PRINCIPAL_";

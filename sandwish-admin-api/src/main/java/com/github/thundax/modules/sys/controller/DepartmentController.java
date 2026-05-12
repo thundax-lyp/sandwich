@@ -1,8 +1,8 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.tree.TreeNodeListHelper;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.annotation.WrappedApiController;
@@ -54,7 +54,7 @@ public class DepartmentController {
     @ApiOperation(value = "获取对象", notes = "sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -73,7 +73,7 @@ public class DepartmentController {
     @ApiOperation(value = "获取列表", notes = "sys:department:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -92,7 +92,7 @@ public class DepartmentController {
     @ApiOperation(value = "添加", notes = "sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -124,7 +124,7 @@ public class DepartmentController {
     @ApiOperation(value = "更新", notes = "sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -155,7 +155,7 @@ public class DepartmentController {
     @ApiOperation(value = "删除", notes = "sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -184,7 +184,7 @@ public class DepartmentController {
     @ApiOperation(value = "获取列表", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -228,7 +228,7 @@ public class DepartmentController {
     @ApiOperation(value = "移动", notes = "sys:department:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

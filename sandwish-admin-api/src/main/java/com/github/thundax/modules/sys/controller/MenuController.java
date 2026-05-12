@@ -1,8 +1,8 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.tree.TreeNodeListHelper;
 import com.github.thundax.common.tree.TreeNodeMoveType;
 import com.github.thundax.common.web.annotation.WrappedApiController;
@@ -57,7 +57,7 @@ public class MenuController {
     @ApiOperation(value = "获取对象", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -76,7 +76,7 @@ public class MenuController {
     @ApiOperation(value = "获取列表", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -95,7 +95,7 @@ public class MenuController {
     @ApiOperation(value = "添加", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -127,7 +127,7 @@ public class MenuController {
     @ApiOperation(value = "更新", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -158,7 +158,7 @@ public class MenuController {
     @ApiOperation(value = "显示/隐藏", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -189,7 +189,7 @@ public class MenuController {
     @ApiOperation(value = "删除", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -218,7 +218,7 @@ public class MenuController {
     @ApiOperation(value = "获取列表", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -262,7 +262,7 @@ public class MenuController {
     @ApiOperation(value = "排序", notes = "super")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

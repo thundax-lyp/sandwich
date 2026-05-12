@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import com.alicp.jetcache.Cache;
-import com.github.thundax.common.Constants;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.auth.entity.PrincipalAuthSession;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId;
@@ -60,7 +60,7 @@ public class PrincipalAuthSessionDaoImplTest {
     }
 
     private String sessionKey(String sessionId) {
-        return Constants.CACHE_PREFIX + "PRINCIPAL_AUTH_SESSION_SESSION_" + sessionId;
+        return SandwishCacheNames.PREFIX + "PRINCIPAL_AUTH_SESSION_SESSION_" + sessionId;
     }
 
     private void injectCache(PrincipalAuthSessionDaoImpl dao, TestCache cache) throws Exception {

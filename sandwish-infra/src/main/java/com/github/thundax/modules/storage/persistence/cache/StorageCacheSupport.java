@@ -3,8 +3,8 @@ package com.github.thundax.modules.storage.persistence.cache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.cache.CacheDTO;
+import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class StorageCacheSupport {
 
     private static final int OBJECT_EXPIRE_SECONDS = 3600;
-    private static final String CACHE_SECTION = Constants.CACHE_PREFIX + "assist.storage.";
+    private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "assist.storage.";
 
     @CreateCache(
             name = CACHE_SECTION,

@@ -1,8 +1,8 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.Constants;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -97,7 +97,7 @@ public class RoleController {
     @ApiOperation(value = "获取对象", notes = "sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -116,7 +116,7 @@ public class RoleController {
     @ApiOperation(value = "获取列表", notes = "sys:role:view")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -133,7 +133,7 @@ public class RoleController {
     @ApiOperation(value = "添加", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -160,7 +160,7 @@ public class RoleController {
     @ApiOperation(value = "更新", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -186,7 +186,7 @@ public class RoleController {
     @ApiOperation(value = "启用/禁用", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -216,7 +216,7 @@ public class RoleController {
     @ApiOperation(value = "排序", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -247,7 +247,7 @@ public class RoleController {
     @ApiOperation(value = "删除", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -276,7 +276,7 @@ public class RoleController {
     @ApiOperation(value = "获取菜单树", notes = "sys:role:view, sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -292,7 +292,7 @@ public class RoleController {
     @ApiOperation(value = "获取用户树", notes = "sys:role:view, sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -322,7 +322,7 @@ public class RoleController {
     @ApiOperation(value = "获取权限用户列表", notes = "sys:role:view, sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),
@@ -343,7 +343,7 @@ public class RoleController {
     @ApiOperation(value = "更新权限用户列表", notes = "sys:role:edit")
     @ApiImplicitParams({
         @ApiImplicitParam(
-                name = Constants.HEADER_TOKEN,
+                name = AccessTokenNames.HEADER_TOKEN,
                 value = "令牌",
                 paramType = "header",
                 dataTypeClass = String.class),

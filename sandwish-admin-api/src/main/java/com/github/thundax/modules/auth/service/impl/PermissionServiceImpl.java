@@ -19,8 +19,10 @@ import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.query.CurrentUserQuery;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -134,12 +136,25 @@ public class PermissionServiceImpl implements PermissionService {
             return null;
         }
         Set<String> permissions = new HashSet<>();
-        for (Object item : new HashSet<>((Collection<?>) value)) {
+        for (Object item : snapshotCollection((Collection<?>) value)) {
             if (item != null) {
                 permissions.add(String.valueOf(item));
             }
         }
         return permissions;
+    }
+
+    private Collection<?> snapshotCollection(Collection<?> source) {
+        for (int index = 0; index < 3; index++) {
+            try {
+                return new ArrayList<>(source);
+            } catch (ConcurrentModificationException ignored) {
+                Thread.yield();
+            }
+        }
+        synchronized (source) {
+            return new ArrayList<>(source);
+        }
     }
 
     private int expiredSeconds(PrincipalAuthSession session) {

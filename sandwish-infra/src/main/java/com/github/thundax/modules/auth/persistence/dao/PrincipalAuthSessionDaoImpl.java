@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalAuthSessionId
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -116,15 +117,41 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
 
     private static Object copyValue(Object value) {
         if (value instanceof Set) {
-            return new LinkedHashSet<>((Set<?>) value);
+            return new LinkedHashSet<>(snapshotCollection((Set<?>) value));
         }
         if (value instanceof Collection) {
-            return new ArrayList<>((Collection<?>) value);
+            return new ArrayList<>(snapshotCollection((Collection<?>) value));
         }
         if (value instanceof Map) {
-            return new LinkedHashMap<>((Map<?, ?>) value);
+            return snapshotMap((Map<?, ?>) value);
         }
         return value;
+    }
+
+    private static Collection<?> snapshotCollection(Collection<?> source) {
+        for (int index = 0; index < 3; index++) {
+            try {
+                return new ArrayList<>(source);
+            } catch (ConcurrentModificationException ignored) {
+                Thread.yield();
+            }
+        }
+        synchronized (source) {
+            return new ArrayList<>(source);
+        }
+    }
+
+    private static Map<?, ?> snapshotMap(Map<?, ?> source) {
+        for (int index = 0; index < 3; index++) {
+            try {
+                return new LinkedHashMap<>(source);
+            } catch (ConcurrentModificationException ignored) {
+                Thread.yield();
+            }
+        }
+        synchronized (source) {
+            return new LinkedHashMap<>(source);
+        }
     }
 
     private static class PrincipalAuthSessionCacheDTO implements CacheDTO {

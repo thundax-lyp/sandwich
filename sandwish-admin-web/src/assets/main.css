@@ -1152,6 +1152,11 @@ p {
     margin: 4px 0 10px;
 }
 
+.user-table-toolbar .ant-space {
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
 .user-table-toolbar .ant-btn {
     border-color: var(--line-subtle);
     font-size: 13px;

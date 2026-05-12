@@ -13,6 +13,10 @@
     --accent-violet: #9e58f5;
     --accent-orange: #ff8a00;
     --accent-blue: #2c78ff;
+    --logo-tile: #17242f;
+    --logo-middle: #f5f0e8;
+    --logo-middle-line: #17242f;
+    --logo-top-line: #17242f;
     --shadow-soft: 0 18px 50px rgba(23, 23, 23, 0.07);
     --sidebar-width: 248px;
     --rail-width: 288px;
@@ -40,6 +44,10 @@ html[data-theme="dark"] {
     --accent-violet: #bf7cff;
     --accent-orange: #ff9f2f;
     --accent-blue: #75a7ff;
+    --logo-tile: #f5f0e8;
+    --logo-middle: #171717;
+    --logo-middle-line: #f5f0e8;
+    --logo-top-line: #171717;
     --shadow-soft: 0 20px 70px rgba(0, 0, 0, 0.42);
 }
 
@@ -89,6 +97,14 @@ button {
     margin-bottom: 32px;
 }
 
+.sidebar.ant-layout-sider-collapsed {
+    padding-inline: 16px;
+}
+
+.sidebar.ant-layout-sider-collapsed .brand {
+    justify-content: center;
+}
+
 .brand-logo {
     display: grid;
     width: 44px;
@@ -97,15 +113,59 @@ button {
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
 }
 
+.logo-tile {
+    fill: var(--logo-tile);
+}
+
+.logo-top {
+    fill: var(--accent-yellow);
+}
+
+.logo-middle {
+    fill: var(--logo-middle);
+}
+
+.logo-bottom {
+    fill: var(--accent-lime);
+}
+
+.logo-middle-line {
+    stroke: var(--logo-middle-line);
+}
+
+.logo-top-line {
+    stroke: var(--logo-top-line);
+}
+
 .brand strong,
 .brand span {
     display: block;
+}
+
+.brand-copy {
+    min-width: 0;
 }
 
 .brand span {
     margin-top: 4px;
     color: var(--text-secondary);
     font-size: 12px;
+}
+
+.sidebar-toggle {
+    flex: 0 0 auto;
+    margin-top: 6px;
+    color: var(--text-secondary);
+    background: var(--surface-soft);
+}
+
+.sidebar-toggle:hover {
+    color: var(--text-primary) !important;
+    background: var(--surface-hover) !important;
+}
+
+.sidebar.ant-layout-sider-collapsed .brand-copy {
+    display: none;
 }
 
 .nav-menu {
@@ -167,6 +227,17 @@ button {
     line-height: normal;
 }
 
+.topbar-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
+}
+
+.topbar-heading > div {
+    min-width: 0;
+}
+
 .topbar-path {
     color: var(--text-muted);
     font-size: 15px;
@@ -180,40 +251,6 @@ button {
 .topbar-actions {
     flex-wrap: wrap;
     justify-content: flex-end;
-}
-
-.topbar-search {
-    display: inline-grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 12px;
-    align-items: center;
-    width: 240px;
-    height: 44px;
-    padding: 0 14px;
-    color: var(--text-muted);
-    background: var(--surface-soft);
-    border: 1px solid transparent;
-    border-radius: 10px;
-}
-
-.topbar-search kbd {
-    color: var(--text-muted);
-    font: inherit;
-}
-
-.notification-button {
-    position: relative;
-}
-
-.notification-button::after {
-    position: absolute;
-    top: 6px;
-    right: 8px;
-    width: 7px;
-    height: 7px;
-    background: var(--accent-orange);
-    border-radius: 999px;
-    content: "";
 }
 
 .eyebrow {
@@ -839,8 +876,11 @@ p {
         padding: 24px 18px 0;
     }
 
-    .topbar-actions,
-    .topbar-search {
+    .topbar-heading {
+        width: 100%;
+    }
+
+    .topbar-actions {
         width: 100%;
     }
 

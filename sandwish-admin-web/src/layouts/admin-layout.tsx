@@ -1,16 +1,14 @@
 import {
     AppstoreOutlined,
     AuditOutlined,
-    BellOutlined,
     BookOutlined,
-    CalendarOutlined,
     CloudServerOutlined,
-    FilterOutlined,
     LogoutOutlined,
+    MenuFoldOutlined,
     MenuOutlined,
+    MenuUnfoldOutlined,
     MoonOutlined,
     SafetyCertificateOutlined,
-    SearchOutlined,
     SunOutlined,
     TeamOutlined,
     UserOutlined
@@ -25,6 +23,7 @@ import { logout } from "../api/auth-api";
 import { refreshAccessTokenIfNeeded } from "../api/http";
 import { replacePermissions } from "../auth/permission-storage";
 import { clearAccessToken, getAccessToken } from "../auth/token-storage";
+import { SandwichLogo } from "../components/sandwich-logo";
 import {
     getCurrentUserInfo,
     listCurrentUserMenus,
@@ -179,6 +178,7 @@ export const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const currentUserInfoQuery = useQuery({
         queryKey: ["current-user", "info"],
         queryFn: getCurrentUserInfo,
@@ -245,10 +245,16 @@ export const AdminLayout = () => {
 
     return (
         <Layout className="admin-shell">
-            <Sider className="sidebar" width={248}>
+            <Sider
+                className="sidebar"
+                width={248}
+                collapsedWidth={88}
+                collapsed={sidebarCollapsed}
+                trigger={null}
+            >
                 <div className="brand">
-                    <img className="brand-logo" src="/sandwich-logo.svg" alt="Sandwich" />
-                    <div>
+                    <SandwichLogo className="brand-logo" />
+                    <div className="brand-copy">
                         <strong>Sandwich</strong>
                         <span>Admin Console</span>
                     </div>
@@ -266,19 +272,21 @@ export const AdminLayout = () => {
 
             <Layout>
                 <Header className="topbar">
-                    <div>
-                        <Text className="topbar-path">Sandwich / Admin Console</Text>
-                        <Title level={1}>后台管理台</Title>
+                    <div className="topbar-heading">
+                        <Button
+                            className="sidebar-toggle"
+                            type="text"
+                            shape="circle"
+                            aria-label={sidebarCollapsed ? "展开菜单" : "收起菜单"}
+                            icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                            onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+                        />
+                        <div>
+                            <Text className="topbar-path">Sandwich / Admin Console</Text>
+                            <Title level={1}>后台管理台</Title>
+                        </div>
                     </div>
                     <Space className="topbar-actions">
-                        <div className="topbar-search">
-                            <SearchOutlined />
-                            <span>Search</span>
-                            <kbd>⌘ /</kbd>
-                        </div>
-                        <Button icon={<CalendarOutlined />}>今日</Button>
-                        <Button icon={<FilterOutlined />}>筛选</Button>
-                        <Button className="notification-button" shape="circle" icon={<BellOutlined />} />
                         <Button
                             shape="circle"
                             icon={themeName === "dark" ? <SunOutlined /> : <MoonOutlined />}

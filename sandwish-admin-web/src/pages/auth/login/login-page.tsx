@@ -7,6 +7,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { buildCaptchaUrl, createLoginForm, refreshCaptcha } from "@/api/auth-api";
 import { loginWithPermissions } from "@/auth/auth-session-service";
 import { getAccessToken } from "@/auth/token-storage";
+import { SandwichLogo } from "@/components/sandwich-logo";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -85,7 +86,7 @@ export const LoginPage = () => {
     return (
         <main className="login-page">
             <section className="login-hero">
-                <img className="login-logo" src="/sandwich-logo.svg" alt="Sandwich" />
+                <SandwichLogo className="login-logo" />
                 <Text className="eyebrow">Sandwich Admin</Text>
                 <Title level={1}>后台管理台</Title>
                 <Paragraph>通过后台账号、SM2 密码加密和图形验证码进入管理工作区。</Paragraph>

@@ -288,7 +288,7 @@ export const AdminLayout = () => {
                 />
             </Sider>
 
-            <Layout>
+            <Layout className="admin-main">
                 <Header className="topbar">
                     <div className="topbar-heading">
                         <Button

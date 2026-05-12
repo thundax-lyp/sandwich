@@ -1077,6 +1077,7 @@ p {
 }
 
 .user-table .ant-table-thead > tr > th {
+    position: relative;
     padding: 12px 14px;
     color: var(--text-secondary);
     font-size: 12px;
@@ -1085,12 +1086,56 @@ p {
     border-bottom-color: var(--line-subtle);
 }
 
+.user-column-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.user-column-resize-handle {
+    position: absolute;
+    top: 8px;
+    right: -3px;
+    bottom: 8px;
+    z-index: 3;
+    width: 7px;
+    cursor: col-resize;
+}
+
+.user-column-resize-handle::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 3px;
+    width: 1px;
+    content: "";
+    background: transparent;
+}
+
+.user-column-resize-handle:hover::after {
+    background: var(--accent-blue);
+}
+
 .user-table .ant-table-tbody > tr > td {
     padding: 11px 14px;
     border-bottom-color: var(--line-subtle);
 }
 
 .user-table .ant-table-tbody > tr:hover > td {
+    background: var(--surface-hover) !important;
+}
+
+.user-table .ant-table-cell-fix-right {
+    background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
+}
+
+.user-table .ant-table-thead > tr > th.ant-table-cell-fix-right {
+    background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
+}
+
+.user-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
     background: var(--surface-hover) !important;
 }
 

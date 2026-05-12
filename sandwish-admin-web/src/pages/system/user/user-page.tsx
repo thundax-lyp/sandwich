@@ -23,8 +23,21 @@ import {
 } from "antd";
 import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 
 const { Text, Title } = Typography;
+
+const MIN_COLUMN_WIDTH = 96;
+const DEFAULT_COLUMN_WIDTHS = {
+    name: 220,
+    email: 220,
+    role: 120,
+    status: 130,
+    lastLogin: 160,
+    actions: 140
+};
+
+type UserColumnKey = keyof typeof DEFAULT_COLUMN_WIDTHS;
 
 interface UserRecord {
     id: string;
@@ -128,6 +141,42 @@ export const UserPage = () => {
     const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
+    const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
+
+    const startResizeColumn = (columnKey: UserColumnKey) => (event: ReactMouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const startX = event.clientX;
+        const startWidth = columnWidths[columnKey];
+
+        const resizeColumn = (moveEvent: MouseEvent) => {
+            const nextWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + moveEvent.clientX - startX);
+            setColumnWidths((currentWidths) => ({
+                ...currentWidths,
+                [columnKey]: nextWidth
+            }));
+        };
+
+        const stopResizeColumn = () => {
+            document.removeEventListener("mousemove", resizeColumn);
+            document.removeEventListener("mouseup", stopResizeColumn);
+        };
+
+        document.addEventListener("mousemove", resizeColumn);
+        document.addEventListener("mouseup", stopResizeColumn);
+    };
+
+    const renderResizableTitle = (columnKey: UserColumnKey, title: string) => (
+        <span className="user-column-title">
+            {title}
+            <span
+                aria-hidden="true"
+                className="user-column-resize-handle"
+                onMouseDown={startResizeColumn(columnKey)}
+            />
+        </span>
+    );
 
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
@@ -155,10 +204,10 @@ export const UserPage = () => {
 
     const columns: TableProps<UserRecord>["columns"] = [
         {
-            title: "User",
+            title: renderResizableTitle("name", "User"),
             dataIndex: "name",
             key: "name",
-            width: 220,
+            width: columnWidths.name,
             render: (name: string, user) => (
                 <Space size={10}>
                     <Avatar style={{ backgroundColor: user.avatarColor }}>
@@ -169,37 +218,38 @@ export const UserPage = () => {
             )
         },
         {
-            title: "Email",
+            title: renderResizableTitle("email", "Email"),
             dataIndex: "email",
             key: "email",
-            width: 220
+            width: columnWidths.email
         },
         {
-            title: "Role",
+            title: renderResizableTitle("role", "Role"),
             dataIndex: "role",
             key: "role",
-            width: 120,
+            width: columnWidths.role,
             render: (role: UserRecord["role"]) => <Tag className={roleClassName[role]}>{role}</Tag>
         },
         {
-            title: "Status",
+            title: renderResizableTitle("status", "Status"),
             dataIndex: "status",
             key: "status",
-            width: 130,
+            width: columnWidths.status,
             render: (status: UserRecord["status"]) => (
                 <Tag className={statusClassName[status]}>{status}</Tag>
             )
         },
         {
-            title: "Last Login",
+            title: renderResizableTitle("lastLogin", "Last Login"),
             dataIndex: "lastLogin",
             key: "lastLogin",
-            width: 160
+            width: columnWidths.lastLogin
         },
         {
-            title: "Actions",
+            title: renderResizableTitle("actions", "Actions"),
             key: "actions",
-            width: 140,
+            width: columnWidths.actions,
+            fixed: "right",
             render: (_, user) => (
                 <Space size={6}>
                     <Button
@@ -274,7 +324,7 @@ export const UserPage = () => {
                         showTotal: () => "1,248 users"
                     }}
                     rowSelection={{}}
-                    scroll={{ x: 920 }}
+                    scroll={{ x: Object.values(columnWidths).reduce((sum, width) => sum + width, 0) }}
                 />
             </section>
 

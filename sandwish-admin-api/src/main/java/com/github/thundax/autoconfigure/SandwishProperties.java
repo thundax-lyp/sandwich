@@ -131,6 +131,9 @@ public class SandwishProperties {
         @Setter
         private Integer aliveDays;
 
+        @Setter
+        private SysLogProperties sys;
+
         @NonNull
         public String getStoragePath() {
             if (StringUtils.isBlank(storagePath)) {
@@ -144,6 +147,42 @@ public class SandwishProperties {
         @NonNull
         public Integer getAliveDays() {
             return aliveDays == null ? DEFAULT_LOG_ALIVE_DAYS : aliveDays;
+        }
+
+        @NonNull
+        public SysLogProperties getSys() {
+            return sys != null ? sys : new SysLogProperties();
+        }
+    }
+
+    public static class SysLogProperties {
+        private static final String DEFAULT_QUEUE = "sandwish.save-log";
+        private static final String DEFAULT_TOPIC = "sandwish_save_log";
+
+        @Setter
+        private String queue;
+
+        @Setter
+        private String topic;
+
+        @Setter
+        private String tag;
+
+        @NonNull
+        public String getQueue() {
+            return StringUtils.defaultIfBlank(queue, DEFAULT_QUEUE);
+        }
+
+        @NonNull
+        public String getTopic() {
+            return StringUtils.defaultIfBlank(topic, DEFAULT_TOPIC);
+        }
+
+        public String getTag() {
+            if (StringUtils.isBlank(tag) || "*".equals(tag)) {
+                return null;
+            }
+            return tag;
         }
     }
 

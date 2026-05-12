@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnProperty(prefix = "sandwish.mq", name = "type", havingValue = "ROCKETMQ")
 @RocketMQMessageListener(
-        topic = "${sandwish.log.sys.topic:" + SysLogMessageService.QUEUE_SAVE_LOG + "}",
+        topic = "${sandwish.log.sys.topic:" + SysLogMessageService.TOPIC_SAVE_LOG + "}",
         consumerGroup = "${sandwish.log.sys.consumer-group:sandwish-admin-api-sys-log-consumer}",
-        selectorExpression = "${sandwish.log.sys.tag:*}")
+        selectorExpression = "*")
 public class RocketMqSysLogConsumer implements RocketMQListener<String> {
 
     private final SysLogMessageService sysLogMessageService;

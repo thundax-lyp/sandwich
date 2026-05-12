@@ -7,6 +7,7 @@ import com.github.thundax.common.mq.support.RabbitSandwishMqSender;
 import com.github.thundax.common.mq.support.RocketMqSandwishMqSender;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,6 +17,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@AutoConfigureAfter(
+        name = {
+            "org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration",
+            "org.apache.rocketmq.spring.autoconfigure.RocketMQAutoConfiguration"
+        })
 @EnableConfigurationProperties(SandwishMqProperties.class)
 public class SandwishMqAutoConfiguration {
 
@@ -42,11 +48,5 @@ public class SandwishMqAutoConfiguration {
     @ConditionalOnMissingBean(SandwishMqSender.class)
     public SandwishMqSender rocketMqSender(RocketMQTemplate rocketMQTemplate) {
         return new RocketMqSandwishMqSender(rocketMQTemplate);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(SandwishMqSender.class)
-    public SandwishMqSender fallbackSandwishMqSender() {
-        return new NoOpSandwishMqSender();
     }
 }

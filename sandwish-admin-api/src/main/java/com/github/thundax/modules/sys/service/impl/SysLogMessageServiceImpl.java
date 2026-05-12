@@ -3,7 +3,9 @@ package com.github.thundax.modules.sys.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.mq.SandwishMqMessage;
+import com.github.thundax.common.mq.SandwishMqProperties;
 import com.github.thundax.common.mq.SandwishMqSender;
+import com.github.thundax.common.mq.SandwishMqType;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.SysLogMessageService;
@@ -33,6 +35,7 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
     private static final String LOG_EXTEND_NAME = ".log";
 
     private final SandwishMqSender mqSender;
+    private final SandwishMqProperties mqProperties;
     private final SandwishProperties sandwishProperties;
     private final LogService logService;
     private final ObjectMapper objectMapper;
@@ -41,8 +44,7 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
     public void saveLog(Log sysLog) {
         try {
             String payload = objectMapper.writeValueAsString(sysLog);
-            mqSender.send(SandwishMqMessage.forQueue(QUEUE_SAVE_LOG, null, payload)
-                    .withHeader("sandwish-message-type", "sys-log"));
+            mqSender.send(buildMessage(payload).withHeader("sandwish-message-type", "sys-log"));
         } catch (Exception e) {
             log.warn("can not serialize sys-log message", e);
         }
@@ -81,6 +83,15 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
 
     private SandwishProperties.LogProperties logProperties() {
         return sandwishProperties.getLog();
+    }
+
+    private SandwishMqMessage buildMessage(String payload) {
+        SandwishProperties.SysLogProperties sysLogProperties = logProperties().getSys();
+        if (SandwishMqType.ROCKETMQ == mqProperties.getType()) {
+            return SandwishMqMessage.forTopicWithTag(
+                    sysLogProperties.getTopic(), sysLogProperties.getTag(), null, payload);
+        }
+        return SandwishMqMessage.forQueue(sysLogProperties.getQueue(), null, payload);
     }
 
     private CreateLogCommand toCreateCommand(Log log) {

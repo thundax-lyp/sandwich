@@ -53,9 +53,6 @@ public class SysLogMethodInterceptor implements MethodInterceptor {
         }
 
         if (StringUtils.isEmpty(value) || ArrayUtils.isEmpty(modules) || StringUtils.isEmpty(category)) {
-            Class<?> clazz = methodInvocation.getClass();
-            System.out.println(clazz);
-
             SysLogger parentAnnotation = AnnotationUtils.findAnnotation(method.getDeclaringClass(), SysLogger.class);
             Assert.notNull(parentAnnotation, "modules of annotation '@SysLogger' is empty");
 

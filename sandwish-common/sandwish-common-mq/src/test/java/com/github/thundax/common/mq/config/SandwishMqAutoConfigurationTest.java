@@ -27,10 +27,10 @@ public class SandwishMqAutoConfigurationTest {
             new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(SandwishMqAutoConfiguration.class));
 
     @Test
-    public void shouldCreateNoOpSenderAndProperties() {
+    public void shouldCreatePropertiesWithoutSenderWhenNoBrokerClientConfigured() {
         contextRunner.run(context -> {
             assertNotNull(context.getBean(SandwishMqProperties.class));
-            assertNotNull(context.getBean(SandwishMqSender.class));
+            assertTrue(context.getBeansOfType(SandwishMqSender.class).isEmpty());
         });
     }
 

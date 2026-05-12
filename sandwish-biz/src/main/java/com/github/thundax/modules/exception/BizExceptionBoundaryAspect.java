@@ -1,6 +1,7 @@
 package com.github.thundax.modules.exception;
 
 import com.github.thundax.common.exception.BizException;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Slf4j
 public class BizExceptionBoundaryAspect {
 
     public static final String TECHNICAL_FAILURE_CODE = "BIZ-00001";
@@ -25,6 +27,7 @@ public class BizExceptionBoundaryAspect {
         } catch (Error error) {
             throw error;
         } catch (Throwable throwable) {
+            log.warn("technical exception converted to BizException", throwable);
             throw new BizException(
                     TECHNICAL_FAILURE_CODE, TECHNICAL_FAILURE_MESSAGE_KEY, TECHNICAL_FAILURE_MESSAGE, throwable);
         }

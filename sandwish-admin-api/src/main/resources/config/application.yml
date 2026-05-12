@@ -90,7 +90,7 @@ sandwish:
     storage-path: ${SANDWISH_LOG_STORAGE_PATH:${java.io.tmpdir}/sandwish/sys-log}
     sys:
       queue: ${SANDWISH_LOG_SYS_QUEUE:sandwish.save-log}
-      topic: ${SANDWISH_LOG_SYS_TOPIC:sandwish.save-log}
+      topic: ${SANDWISH_LOG_SYS_TOPIC:sandwish_save_log}
       tag: ${SANDWISH_LOG_SYS_TAG:*}
       consumer-group: ${SANDWISH_LOG_SYS_CONSUMER_GROUP:sandwish-admin-api-sys-log-consumer}
       rabbit:

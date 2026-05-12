@@ -45,8 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @WrappedApiController
 public class MenuController {
 
-    private static final String MENU_NAME = "Menu";
-
     private final MenuService menuService;
 
     @Autowired

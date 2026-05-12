@@ -32,7 +32,7 @@ public class UserServiceImplTest {
 
         UserId userId = service.create(new CreateUserCommand(
                 user.getId(),
-                DepartmentIdCodec.toDomain(null),
+                DepartmentIdCodec.toDomain((Long) null),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),
@@ -59,7 +59,7 @@ public class UserServiceImplTest {
 
         service.changeInfo(new ChangeUserInfoCommand(
                 user.getId(),
-                DepartmentIdCodec.toDomain(null),
+                DepartmentIdCodec.toDomain((Long) null),
                 user.getEmail(),
                 user.getMobile(),
                 user.getTel(),

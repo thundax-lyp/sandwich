@@ -123,7 +123,7 @@ public class DictControllerContractTest {
         DictService dictService = mock(DictService.class);
         DictController controller = new DictController(dictService);
         DictSortRequest request = new DictSortRequest();
-        request.setOrderedIds(Arrays.asList(101L, 102L));
+        request.setOrderedIds(Arrays.asList("101", "102"));
         request.setSortDirection(SortDirection.DESC);
 
         controller.sort(request);
@@ -140,14 +140,14 @@ public class DictControllerContractTest {
     public void shouldRejectDuplicateSortIds() throws Exception {
         DictController controller = new DictController(mock(DictService.class));
         DictSortRequest request = new DictSortRequest();
-        request.setOrderedIds(Arrays.asList(101L, 101L));
+        request.setOrderedIds(Arrays.asList("101", "101"));
 
         controller.sort(request);
     }
 
     private DictIdRequest idRequest(Long id) {
         DictIdRequest request = new DictIdRequest();
-        request.setId(id);
+        request.setId(String.valueOf(id));
         return request;
     }
 

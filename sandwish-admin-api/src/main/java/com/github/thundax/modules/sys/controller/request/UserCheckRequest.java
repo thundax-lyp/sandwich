@@ -20,7 +20,7 @@ public class UserCheckRequest implements Serializable {
     @ApiModelProperty(name = "id", value = "用户ID")
     @JsonProperty("id")
     @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "loginName", value = "登录名")
     @JsonProperty("loginName")

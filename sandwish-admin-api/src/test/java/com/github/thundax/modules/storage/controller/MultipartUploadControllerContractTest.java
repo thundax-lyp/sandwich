@@ -61,7 +61,7 @@ public class MultipartUploadControllerContractTest {
 
         ArgumentCaptor<InitMultipartUploadCommand> captor = ArgumentCaptor.forClass(InitMultipartUploadCommand.class);
         verify(service).init(captor.capture());
-        assertEquals(Long.valueOf(9301L), response.getId());
+        assertEquals("9301", response.getId());
         assertEquals("upload-1", response.getUploadId());
         assertEquals(StorageOwnerType.USER, captor.getValue().getOwnerType());
         assertEquals(StorageType.LOCAL_FILE, captor.getValue().getStorageType());
@@ -89,7 +89,7 @@ public class MultipartUploadControllerContractTest {
 
         ArgumentCaptor<UploadMultipartPartCommand> captor = ArgumentCaptor.forClass(UploadMultipartPartCommand.class);
         verify(service).uploadPart(captor.capture());
-        assertEquals(Long.valueOf(9401L), response.getId());
+        assertEquals("9401", response.getId());
         assertEquals("upload-1", captor.getValue().getUploadId());
         assertEquals(Integer.valueOf(2), captor.getValue().getPartNumber());
         assertEquals(Long.valueOf(3L), captor.getValue().getSize());

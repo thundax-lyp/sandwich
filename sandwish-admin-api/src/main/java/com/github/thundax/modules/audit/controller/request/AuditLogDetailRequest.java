@@ -18,5 +18,5 @@ public class AuditLogDetailRequest implements Serializable {
 
     @NotNull
     @ApiModelProperty(name = "id", value = "审计日志ID")
-    private Long id;
+    private String id;
 }

@@ -11,6 +11,13 @@ public final class DepartmentIdCodec {
         return DepartmentId.ofNullable(value);
     }
 
+    public static DepartmentId toDomain(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return toDomain(Long.valueOf(value.trim()));
+    }
+
     public static Long toValue(DepartmentId id) {
         return id == null ? null : id.value();
     }

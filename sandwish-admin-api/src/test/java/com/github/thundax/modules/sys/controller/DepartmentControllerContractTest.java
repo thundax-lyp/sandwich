@@ -69,14 +69,14 @@ public class DepartmentControllerContractTest {
 
     private DepartmentIdRequest idRequest(Long id) {
         DepartmentIdRequest request = new DepartmentIdRequest();
-        request.setId(id);
+        request.setId(String.valueOf(id));
         return request;
     }
 
     private DepartmentMoveRequest moveRequest(Long fromNodeId, Long toNodeId, String type) {
         DepartmentMoveRequest request = new DepartmentMoveRequest();
-        request.setFromNodeId(fromNodeId);
-        request.setToNodeId(toNodeId);
+        request.setFromNodeId(String.valueOf(fromNodeId));
+        request.setToNodeId(String.valueOf(toNodeId));
         request.setType(type);
         return request;
     }

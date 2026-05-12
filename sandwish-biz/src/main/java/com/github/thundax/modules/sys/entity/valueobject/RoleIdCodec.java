@@ -11,6 +11,13 @@ public final class RoleIdCodec {
         return RoleId.ofNullable(value);
     }
 
+    public static RoleId toDomain(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return toDomain(Long.valueOf(value.trim()));
+    }
+
     public static Long toValue(RoleId id) {
         return id == null ? null : id.value();
     }

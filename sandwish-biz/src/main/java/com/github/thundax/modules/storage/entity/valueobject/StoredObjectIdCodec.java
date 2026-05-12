@@ -11,6 +11,13 @@ public final class StoredObjectIdCodec {
         return StoredObjectId.ofNullable(value);
     }
 
+    public static StoredObjectId toDomain(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return toDomain(Long.valueOf(value.trim()));
+    }
+
     public static Long toValue(StoredObjectId id) {
         return id == null ? null : id.value();
     }

@@ -25,12 +25,12 @@ public class DepartmentMoveRequest implements Serializable {
     @ApiModelProperty(name = "fromNodeId", value = "源节点")
     @JsonProperty("fromNodeId")
     @NotEmpty(message = "\"源节点\"不能为空")
-    private Long fromNodeId;
+    private String fromNodeId;
 
     @ApiModelProperty(name = "toNodeId", value = "目标节点")
     @JsonProperty("toNodeId")
     @NotEmpty(message = "\"目标节点\"不能为空")
-    private Long toNodeId;
+    private String toNodeId;
 
     @ApiModelProperty(name = "type", value = "操作", example = TYPE_AFTER)
     @JsonProperty("type")

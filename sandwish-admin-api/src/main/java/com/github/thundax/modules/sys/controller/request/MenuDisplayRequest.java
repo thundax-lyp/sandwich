@@ -22,7 +22,7 @@ public class MenuDisplayRequest implements Serializable {
     @JsonProperty("id")
     @NotEmpty(message = "ID不能为空")
     @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "display", value = "显示/隐藏")
     @JsonProperty("display")

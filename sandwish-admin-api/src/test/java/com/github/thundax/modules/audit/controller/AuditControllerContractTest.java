@@ -33,7 +33,7 @@ public class AuditControllerContractTest {
 
         AuditLogDetailResponse response = controller.detail(detailRequest(1001L));
 
-        assertEquals(Long.valueOf(1001L), response.getId());
+        assertEquals("1001", response.getId());
         assertEquals("User", response.getObjectType());
         assertEquals("后台用户", response.getObjectTypeLabel());
         assertEquals("创建", response.getActionLabel());
@@ -63,7 +63,7 @@ public class AuditControllerContractTest {
 
     private AuditLogDetailRequest detailRequest(Long id) {
         AuditLogDetailRequest request = new AuditLogDetailRequest();
-        request.setId(id);
+        request.setId(String.valueOf(id));
         return request;
     }
 

@@ -19,11 +19,11 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RoleAssignUserRequest implements Serializable {
 
-    @ApiModelProperty(name = "id", value = "角色ID")
-    @JsonProperty("id")
+    @ApiModelProperty(name = "roleId", value = "角色ID")
+    @JsonProperty("roleId")
     @Size(max = 64, message = "\"角色ID\"长度不能超过64")
     @NotEmpty(message = "\"角色ID\"不能为空")
-    private Long roleId;
+    private String roleId;
 
     @ApiModelProperty(name = "users", value = "用户列表")
     @JsonProperty("users")

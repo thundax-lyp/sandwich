@@ -154,7 +154,7 @@ public final class RoleInterfaceAssembler {
                 request.getMenuList() == null
                         ? new ArrayList<>()
                         : request.getMenuList().stream()
-                                .map(menu -> menu.getId())
+                                .map(menu -> MenuIdCodec.toValue(MenuIdCodec.toDomain(menu.getId())))
                                 .collect(Collectors.toList()));
         return entity;
     }

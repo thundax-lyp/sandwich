@@ -22,5 +22,5 @@ public class UserRoleRequest implements Serializable {
     @JsonProperty("id")
     @NotEmpty(message = "角色ID不能为空")
     @Size(max = 64, message = "角色ID长度不能超过64")
-    private Long id;
+    private String id;
 }

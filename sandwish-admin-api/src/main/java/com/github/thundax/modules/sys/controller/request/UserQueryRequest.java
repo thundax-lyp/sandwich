@@ -20,7 +20,7 @@ public class UserQueryRequest extends PageRequest {
     @ApiModelProperty(name = "departmentId", value = "部门ID")
     @JsonProperty("departmentId")
     @Size(max = 64, message = "\"部门ID\"长度不能超过64")
-    private Long departmentId;
+    private String departmentId;
 
     @ApiModelProperty(name = "loginName", value = "登录名，模糊查询")
     @JsonProperty("loginName")

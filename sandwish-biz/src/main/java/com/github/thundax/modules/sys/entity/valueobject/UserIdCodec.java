@@ -11,6 +11,13 @@ public final class UserIdCodec {
         return UserId.ofNullable(value);
     }
 
+    public static UserId toDomain(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return toDomain(Long.valueOf(value.trim()));
+    }
+
     public static Long toValue(UserId id) {
         return id == null ? null : id.value();
     }

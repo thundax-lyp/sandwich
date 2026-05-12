@@ -21,7 +21,7 @@ public class RoleSortRequest {
     @ApiModelProperty(name = "orderedIds", value = "排序实体ID序列")
     @JsonProperty("orderedIds")
     @NotEmpty(message = "orderedIds不能为空")
-    private List<Long> orderedIds;
+    private List<String> orderedIds;
 
     @ApiModelProperty(name = "sortDirection", value = "排序方向")
     @JsonProperty("sortDirection")

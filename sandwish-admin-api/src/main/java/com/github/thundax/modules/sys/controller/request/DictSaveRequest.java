@@ -20,7 +20,7 @@ public class DictSaveRequest implements Serializable {
     @ApiModelProperty(name = "id", value = "字典ID")
     @JsonProperty("id")
     @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

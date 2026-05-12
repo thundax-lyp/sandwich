@@ -11,6 +11,13 @@ public final class DictIdCodec {
         return DictId.ofNullable(value);
     }
 
+    public static DictId toDomain(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return toDomain(Long.valueOf(value.trim()));
+    }
+
     public static Long toValue(DictId id) {
         return id == null ? null : id.value();
     }

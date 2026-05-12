@@ -22,7 +22,7 @@ public class MenuSaveRequest implements Serializable {
     @ApiModelProperty(name = "id", value = "菜单ID")
     @JsonProperty("id")
     @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
@@ -32,7 +32,7 @@ public class MenuSaveRequest implements Serializable {
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")
     @Size(max = 64, message = "父节点ID长度必须小于64")
-    private Long parentId;
+    private String parentId;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")

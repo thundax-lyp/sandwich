@@ -232,11 +232,14 @@ public class RoleController {
         return true;
     }
 
-    private List<Long> readOrderedIds(List<Long> sourceList) {
-        List<Long> orderedIds = RequestListHelper.present(sourceList);
-        if (sourceList == null || orderedIds.size() != sourceList.size() || orderedIds.isEmpty()) {
+    private List<Long> readOrderedIds(List<String> sourceList) {
+        List<String> orderedIdValues = RequestListHelper.present(sourceList);
+        if (sourceList == null || orderedIdValues.size() != sourceList.size() || orderedIdValues.isEmpty()) {
             throw AdminResponseExceptions.invalidParameter("orderedIds");
         }
+        List<Long> orderedIds = orderedIdValues.stream()
+                .map(value -> Long.valueOf(value.trim()))
+                .collect(Collectors.toList());
         Set<Long> uniqueIds = new HashSet<>(orderedIds);
         if (uniqueIds.size() != orderedIds.size()) {
             throw AdminResponseExceptions.invalidParameter("orderedIds");
@@ -419,6 +422,12 @@ public class RoleController {
 
     private RoleQuery roleQuery(Role role) {
         return roleQuery(RoleIdCodec.toValue(role.getId()));
+    }
+
+    private RoleQuery roleQuery(String roleId) {
+        RoleQuery query = new RoleQuery();
+        query.setId(RoleIdCodec.toDomain(roleId));
+        return query;
     }
 
     private RoleQuery roleQuery(Long roleId) {

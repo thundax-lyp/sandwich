@@ -22,7 +22,7 @@ public class UserStatusRequest implements Serializable {
     @JsonProperty("id")
     @NotEmpty(message = "ID不能为空")
     @Size(max = 64, message = "ID长度不能超过64")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "enable", value = "启用/禁用")
     @JsonProperty("enable")

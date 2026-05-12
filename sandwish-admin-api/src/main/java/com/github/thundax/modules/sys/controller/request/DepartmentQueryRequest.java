@@ -20,7 +20,7 @@ public class DepartmentQueryRequest implements Serializable {
     @ApiModelProperty(name = "parentId", value = "父节点ID，为空则查询跟节点")
     @JsonProperty("parentId")
     @Size(max = 64, message = "父节点ID长度不能超过64")
-    private Long parentId;
+    private String parentId;
 
     @ApiModelProperty(name = "name", value = "名称，模糊匹配名称和简称")
     @JsonProperty("name")

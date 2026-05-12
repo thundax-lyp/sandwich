@@ -38,7 +38,6 @@
         <httpclient.version>4.5.10</httpclient.version>
         <ant.version>1.10.7</ant.version>
         <jsoup.version>1.12.1</jsoup.version>
-        <poi.version>4.1.2</poi.version>
         <jwt.version>3.8.3</jwt.version>
         <cxf.version>3.4.0</cxf.version>
         <swagger.version>2.9.2</swagger.version>
@@ -208,28 +207,6 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
                 <version>${cxf.version}</version>
-            </dependency>
-
-            <!-- POI -->
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml-schemas</artifactId>
-                <version>${poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${poi.version}</version>
             </dependency>
 
             <!-- JWT -->

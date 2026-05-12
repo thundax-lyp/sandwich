@@ -30,13 +30,16 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
 
         assertTrue(
                 "Service methods must use one of the target parameter shapes: (*Query), (*Query, PageQuery), "
-                        + "(*Id), or (*Command). Violations: "
+                        + "(*Id), (*Token), (*Command), or no parameters. Violations: "
                         + violations,
                 violations.isEmpty());
     }
 
     private boolean matchesTargetShape(JavaMethod method) {
         List<JavaClass> parameters = new ArrayList<JavaClass>(method.getRawParameterTypes());
+        if (parameters.isEmpty()) {
+            return true;
+        }
         if ("page".equals(method.getName())) {
             return parameters.size() == 2
                     && isServiceQuery(parameters.get(0))
@@ -44,7 +47,10 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
                     && isPageResult(method.getRawReturnType());
         }
         if (isIdMethod(method.getName())) {
-            return parameters.size() == 1 && (isServiceQuery(parameters.get(0)) || isServiceId(parameters.get(0)));
+            return parameters.size() == 1
+                    && (isServiceQuery(parameters.get(0))
+                            || isServiceId(parameters.get(0))
+                            || isServiceToken(parameters.get(0)));
         }
         if ("remove".equals(method.getName())) {
             return parameters.size() == 1 && (isServiceCommand(parameters.get(0)) || isServiceId(parameters.get(0)));
@@ -79,6 +85,11 @@ public class ServiceMethodParameterArchitectureTest extends AbstractArchitecture
 
     private boolean isServiceId(JavaClass javaClass) {
         return javaClass.getSimpleName().endsWith("Id")
+                && javaClass.getPackageName().contains(".entity.valueobject");
+    }
+
+    private boolean isServiceToken(JavaClass javaClass) {
+        return javaClass.getSimpleName().endsWith("Token")
                 && javaClass.getPackageName().contains(".entity.valueobject");
     }
 

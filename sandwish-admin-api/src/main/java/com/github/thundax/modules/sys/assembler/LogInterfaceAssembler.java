@@ -32,7 +32,7 @@ public final class LogInterfaceAssembler {
             return LogResponse.builder().build();
         }
         return LogResponse.builder()
-                .id(LogIdCodec.toValue(entity.getId()))
+                .id(LogIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .createDate(entity.getLogDate())
                 .type(entity.getType() == null ? null : entity.getType().value())
@@ -66,7 +66,7 @@ public final class LogInterfaceAssembler {
             return LogUserResponse.builder().build();
         }
         return LogUserResponse.builder()
-                .id(UserIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toStringValue(entity.getId()))
                 .loginName(loginName)
                 .name(entity.getName())
                 .department(toDepartmentResponse(department, departmentLoader))
@@ -80,7 +80,7 @@ public final class LogInterfaceAssembler {
             return LogDepartmentResponse.builder().build();
         }
         return LogDepartmentResponse.builder()
-                .id(DepartmentIdCodec.toValue(entity.getId()))
+                .id(DepartmentIdCodec.toStringValue(entity.getId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
@@ -89,7 +89,7 @@ public final class LogInterfaceAssembler {
     private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toStringValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

@@ -19,7 +19,7 @@ public class UserResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "用户ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

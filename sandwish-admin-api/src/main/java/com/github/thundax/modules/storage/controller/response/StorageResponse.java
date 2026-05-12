@@ -18,7 +18,7 @@ public class StorageResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "存储资源ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "originalFilename", value = "文件名称")
     @JsonProperty("originalFilename")

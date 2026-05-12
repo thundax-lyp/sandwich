@@ -43,7 +43,7 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: 1,
+                                id: "1",
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -63,11 +63,12 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: [
-                                { id: 10, name: "系统管理" },
+                                { id: "10", name: "系统管理", displayParams: "{\"icon\":\"system\"}" },
                                 {
-                                    id: 11,
-                                    parentId: 10,
+                                    id: "11",
+                                    parentId: "10",
                                     name: "用户管理",
+                                    icon: "users",
                                     url: "/system/users"
                                 }
                             ]
@@ -127,7 +128,8 @@ describe("App", () => {
                 method: "POST"
             })
         );
-        expect(screen.getByText("系统管理")).toBeInTheDocument();
+        expect(await screen.findByText("系统管理")).toBeInTheDocument();
+        expect(document.querySelector(".anticon-safety-certificate")).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/sys/current-user/menus",
             expect.objectContaining({
@@ -231,7 +233,7 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: 1,
+                                id: "1",
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -298,7 +300,7 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: 1,
+                                id: "1",
                                 loginName: "developer",
                                 name: "Developer"
                             }
@@ -381,15 +383,15 @@ describe("App", () => {
                             message: "success",
                             data: [
                                 {
-                                    id: 1,
+                                    id: "1",
                                     name: "总部",
                                     shortName: "HQ",
                                     namePath: "总部",
                                     remarks: "核心组织"
                                 },
                                 {
-                                    id: 2,
-                                    parentId: 1,
+                                    id: "2",
+                                    parentId: "1",
                                     name: "技术部",
                                     shortName: "Tech",
                                     namePath: "总部/技术部"
@@ -455,14 +457,14 @@ describe("App", () => {
                                 totalCount: 2,
                                 records: [
                                     {
-                                        id: 1,
+                                        id: "1",
                                         type: "user_status",
                                         label: "启用",
                                         value: "ENABLED",
                                         remarks: "允许登录"
                                     },
                                     {
-                                        id: 2,
+                                        id: "2",
                                         type: "user_status",
                                         label: "停用",
                                         value: "DISABLED"
@@ -583,7 +585,7 @@ describe("App", () => {
                             code: "COMMON-00000",
                             message: "success",
                             data: {
-                                id: 1,
+                                id: "1",
                                 loginName: "developer",
                                 name: "Developer"
                             }

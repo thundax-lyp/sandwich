@@ -20,9 +20,9 @@ public final class MenuInterfaceAssembler {
         if (entity == null) {
             return MenuResponse.builder().build();
         }
-        Long parentId = MenuIdCodec.toValue(entity.getParentId());
+        String parentId = MenuIdCodec.toStringValue(entity.getParentId());
         return MenuResponse.builder()
-                .id(MenuIdCodec.toValue(entity.getId()))
+                .id(MenuIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .parentId(parentId)
                 .name(entity.getName())
@@ -40,8 +40,8 @@ public final class MenuInterfaceAssembler {
             return MenuResponse.builder().build();
         }
         return MenuResponse.builder()
-                .id(MenuIdCodec.toValue(entity.getId()))
-                .parentId(MenuIdCodec.toValue(entity.getParentId()))
+                .id(MenuIdCodec.toStringValue(entity.getId()))
+                .parentId(MenuIdCodec.toStringValue(entity.getParentId()))
                 .name(entity.getName())
                 .build();
     }

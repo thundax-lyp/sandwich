@@ -24,7 +24,7 @@ public final class DictInterfaceAssembler {
             return DictResponse.builder().build();
         }
         return DictResponse.builder()
-                .id(DictIdCodec.toValue(entity.getId()))
+                .id(DictIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .label(entity.getLabel())
                 .type(entity.getType())

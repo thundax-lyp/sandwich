@@ -18,7 +18,7 @@ public class MenuResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "菜单ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")
@@ -26,7 +26,7 @@ public class MenuResponse implements Serializable {
 
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")
-    private Long parentId;
+    private String parentId;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")

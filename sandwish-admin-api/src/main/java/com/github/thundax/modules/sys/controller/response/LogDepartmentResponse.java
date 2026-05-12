@@ -18,7 +18,7 @@ public class LogDepartmentResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "部门ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")

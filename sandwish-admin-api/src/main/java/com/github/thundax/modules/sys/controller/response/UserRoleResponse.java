@@ -18,7 +18,7 @@ public class UserRoleResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "角色ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")

@@ -39,7 +39,7 @@ const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
 
 interface DictFormValues {
-    id?: number | null;
+    id?: string | null;
     type: string;
     label: string;
     value: string;
@@ -184,7 +184,7 @@ export const DictionaryPage = () => {
         saveMutation.mutate(readFormRequest(values));
     };
 
-    const confirmDelete = (ids: number[]) => {
+    const confirmDelete = (ids: string[]) => {
         Modal.confirm({
             title: "删除字典项",
             content: `确认删除 ${ids.length} 个字典项？删除后需要重新新增。`,
@@ -355,7 +355,7 @@ export const DictionaryPage = () => {
                         icon={<DeleteOutlined />}
                         disabled={!canEditDictionary || selectedRowKeys.length === 0}
                         loading={deleteMutation.isPending}
-                        onClick={() => confirmDelete(selectedRowKeys.map(Number))}
+                        onClick={() => confirmDelete(selectedRowKeys.map(String))}
                     >
                         批量删除
                     </Button>

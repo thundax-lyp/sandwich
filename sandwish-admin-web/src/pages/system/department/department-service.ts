@@ -1,14 +1,14 @@
 import { postJson } from "@/api/http";
 
 export interface DepartmentListRequest {
-    parentId?: number | null;
+    parentId?: string | null;
     name?: string | null;
     remarks?: string | null;
 }
 
 export interface DepartmentResponse {
-    id: number;
-    parentId?: number | null;
+    id: string;
+    parentId?: string | null;
     name: string;
     shortName?: string | null;
     namePath?: string | null;

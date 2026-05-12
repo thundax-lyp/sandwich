@@ -1,7 +1,7 @@
 import { postJson } from "../api/http";
 
 export interface CurrentUserInfoResponse {
-    id: number;
+    id: string;
     loginName: string;
     ranks?: number | null;
     name?: string | null;
@@ -13,10 +13,11 @@ export interface CurrentUserInfoResponse {
 }
 
 export interface CurrentUserMenuResponse {
-    id: number;
-    parentId?: number | null;
+    id: string;
+    parentId?: string | null;
     name: string;
     url?: string | null;
+    icon?: string | null;
     displayParams?: string | null;
 }
 

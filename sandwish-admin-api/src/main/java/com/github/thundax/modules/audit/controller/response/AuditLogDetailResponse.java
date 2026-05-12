@@ -18,7 +18,7 @@ import lombok.Getter;
 public class AuditLogDetailResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "ID")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "objectType", value = "对象类型")
     private String objectType;

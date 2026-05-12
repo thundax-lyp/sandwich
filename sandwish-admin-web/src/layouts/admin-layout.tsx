@@ -37,63 +37,6 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 const TOKEN_KEEP_ALIVE_INTERVAL_MS = 30 * 1000;
 
-const fallbackMenuItems: MenuProps["items"] = [
-    {
-        key: "/dashboard",
-        icon: <AppstoreOutlined />,
-        label: "仪表盘"
-    },
-    {
-        key: "system",
-        icon: <SafetyCertificateOutlined />,
-        label: "系统管理",
-        children: [
-            {
-                key: "/system/users",
-                icon: <TeamOutlined />,
-                label: "用户管理"
-            },
-            {
-                key: "/system/departments",
-                icon: <AppstoreOutlined />,
-                label: "部门管理"
-            },
-            {
-                key: "/system/roles",
-                icon: <SafetyCertificateOutlined />,
-                label: "角色管理"
-            },
-            {
-                key: "/system/menus",
-                icon: <MenuOutlined />,
-                label: "菜单管理"
-            },
-            {
-                key: "/system/dictionaries",
-                icon: <BookOutlined />,
-                label: "字典管理"
-            },
-            {
-                key: "/system/logs",
-                icon: <AuditOutlined />,
-                label: "系统日志"
-            }
-        ]
-    },
-    {
-        key: "storage",
-        icon: <CloudServerOutlined />,
-        label: "存储管理",
-        children: [
-            {
-                key: "/storage/objects",
-                icon: <CloudServerOutlined />,
-                label: "存储对象"
-            }
-        ]
-    }
-];
-
 const menuIconMap: Record<string, ReactNode> = {
     dashboard: <AppstoreOutlined />,
     system: <SafetyCertificateOutlined />,
@@ -105,32 +48,24 @@ const menuIconMap: Record<string, ReactNode> = {
     logs: <AuditOutlined />,
     storage: <CloudServerOutlined />,
     "storage-objects": <CloudServerOutlined />,
-    permission: <SafetyCertificateOutlined />,
-    "/dashboard": <AppstoreOutlined />,
-    "/system/users": <TeamOutlined />,
-    "/system/departments": <AppstoreOutlined />,
-    "/system/roles": <SafetyCertificateOutlined />,
-    "/system/menus": <MenuOutlined />,
-    "/system/dictionaries": <BookOutlined />,
-    "/system/logs": <AuditOutlined />,
-    "/storage/objects": <CloudServerOutlined />
+    permission: <SafetyCertificateOutlined />
 };
 
 const getOpenKeys = (pathname: string) => {
     const openKeys: string[] = [];
 
     if (pathname.startsWith("/system/")) {
-        openKeys.push("system");
+        openKeys.push("/system");
     }
 
     if (pathname.startsWith("/storage/")) {
-        openKeys.push("storage");
+        openKeys.push("/storage");
     }
 
     return openKeys;
 };
 
-const normalizeMenuKey = (menu: { id: number; url?: string | null }) => {
+const normalizeMenuKey = (menu: { id: string; url?: string | null }) => {
     return menu.url || String(menu.id);
 };
 
@@ -147,15 +82,35 @@ const getDisplayIcon = (displayParams?: string | null) => {
     }
 };
 
+const renderMenuIcon = (icon?: string | null, displayParams?: string | null) => {
+    const configuredIcon = icon || getDisplayIcon(displayParams);
+    const iconKey = configuredIcon?.trim();
+    if (!iconKey) {
+        return (
+            <span className="menu-icon-config-error" title="菜单缺少 icon">
+                !
+            </span>
+        );
+    }
+
+    return (
+        menuIconMap[iconKey] || (
+            <span className="menu-icon-config-error" title={`未知菜单 icon: ${iconKey}`}>
+                !
+            </span>
+        )
+    );
+};
+
 const buildAuthorizedMenuItems = (
     menus: Awaited<ReturnType<typeof listCurrentUserMenus>>
 ): MenuProps["items"] => {
     if (!menus.length) {
-        return fallbackMenuItems;
+        return [];
     }
 
     const menuIds = new Set(menus.map((menu) => menu.id));
-    const childrenByParentId = new Map<number | null, typeof menus>();
+    const childrenByParentId = new Map<string | null, typeof menus>();
     menus.forEach((menu) => {
         const parentId = menu.parentId && menu.parentId !== menu.id && menuIds.has(menu.parentId) ? menu.parentId : null;
         const siblings = childrenByParentId.get(parentId) || [];
@@ -163,10 +118,10 @@ const buildAuthorizedMenuItems = (
         childrenByParentId.set(parentId, siblings);
     });
 
-    const visited = new Set<number>();
+    const visited = new Set<string>();
     const toMenuItem = (
         menu: (typeof menus)[number],
-        ancestors: Set<number> = new Set()
+        ancestors: Set<string> = new Set()
     ): NonNullable<MenuProps["items"]>[number] => {
         const key = normalizeMenuKey(menu);
         const nextAncestors = new Set(ancestors);
@@ -176,7 +131,7 @@ const buildAuthorizedMenuItems = (
 
         return {
             key,
-            icon: menuIconMap[getDisplayIcon(menu.displayParams) || ""] || menuIconMap[key] || menuIconMap[String(menu.id)],
+            icon: renderMenuIcon(menu.icon, menu.displayParams),
             label: menu.name,
             children: children.length ? children.map((child) => toMenuItem(child, nextAncestors)) : undefined
         };
@@ -188,11 +143,6 @@ const buildAuthorizedMenuItems = (
         .map((menu) => toMenuItem(menu));
 
     return [
-        {
-            key: "/dashboard",
-            icon: <AppstoreOutlined />,
-            label: "仪表盘"
-        },
         ...(rootMenuItems as NonNullable<MenuProps["items"]>),
         ...(orphanMenuItems as NonNullable<MenuProps["items"]>)
     ];
@@ -238,7 +188,7 @@ export const AdminLayout = () => {
     });
     const menuItems = currentUserMenusQuery.data
         ? buildAuthorizedMenuItems(currentUserMenusQuery.data)
-        : fallbackMenuItems;
+        : [];
     const currentUser = currentUserInfoQuery.data;
     const currentUserName = currentUser?.name || currentUser?.loginName || "当前用户";
 

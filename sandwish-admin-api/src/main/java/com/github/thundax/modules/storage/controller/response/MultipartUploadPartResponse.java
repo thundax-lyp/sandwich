@@ -18,7 +18,7 @@ public class MultipartUploadPartResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "分片ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "uploadId", value = "上传会话标识")
     @JsonProperty("uploadId")

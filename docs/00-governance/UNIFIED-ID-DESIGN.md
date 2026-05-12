@@ -36,7 +36,8 @@
 - 统一 ID 公共能力固定放在 `sandwish-common-core`
 - 当前基础类型位于 `com.github.thundax.common.id`
 - `sandwish-biz` 的 Entity、Service 和 DAO interface 优先使用 `EntityId`
-- `sandwish-admin-api` 和 `sandwish-front-api` 的 Request / Response 使用 `Long` 承载数据库主键
+- `sandwish-admin-api` 和 `sandwish-front-api` 的 Java Request / Response 默认使用 `Long` 承载数据库主键
+- 面向浏览器或 JavaScript 调用方的 JSON 响应中，雪花 ID、数据库主键和父子关系 ID 必须使用 `String` 表达，避免超过 `Number.MAX_SAFE_INTEGER` 后发生精度丢失
 - `sandwish-infra` 的 `DO/DataObject` 使用 `Long` 承载数据库主键
 - API 边界和持久化边界转换固定通过 `EntityIdCodec`
 
@@ -89,9 +90,12 @@ String auditObjectId = EntityIdCodec.toStringValue(entity.getId());
 
 ### 7.1 Controller / InterfaceAssembler
 
-- Request / Response 使用 `Long` 承载数据库主键
+- Java Request / Response 默认使用 `Long` 承载数据库主键
+- 面向浏览器或 JavaScript 调用方的 Response 字段，如果承载雪花 ID 或其他可能超过 `Number.MAX_SAFE_INTEGER` 的 `Long` 值，必须使用 `String`
+- 父子关系、树结构、排序列表等依赖 ID 相等性的前端协议，必须把 `id`、`parentId`、`orderedIds` 等字段作为字符串处理
 - 外部系统 ID、业务编号和 Audit 对象坐标可以继续使用 `String`
 - HTTP `Long` 到 `EntityId` 的转换固定放在 Controller 或 `InterfaceAssembler`
+- `EntityId` 到浏览器 JSON 的转换固定使用 `EntityIdCodec.toStringValue(...)` 或业务专属 `*IdCodec.toStringValue(...)`
 - `InterfaceAssembler` 不新增通用 `toEntityId(...)` 公开方法；避免把 ID 转换包装成新的全局抽象层
 
 ### 7.2 Service / DAO Interface / Entity

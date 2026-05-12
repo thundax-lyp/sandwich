@@ -86,7 +86,7 @@ public class DictControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
-                .andExpect(jsonPath("$.data.records[0].id").value(1));
+                .andExpect(jsonPath("$.data.records[0].id").value("1"));
     }
 
     @Test

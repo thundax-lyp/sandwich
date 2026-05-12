@@ -19,7 +19,7 @@ public class RoleResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "角色ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "remarks", value = "备注")
     @JsonProperty("remarks")

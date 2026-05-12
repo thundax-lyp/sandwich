@@ -102,7 +102,7 @@ public final class AuditInterfaceAssembler {
             return AuditMetaResponse.builder().build();
         }
         return AuditMetaResponse.builder()
-                .id(AuditMetaIdCodec.toValue(entity.getId()))
+                .id(AuditMetaIdCodec.toStringValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectId(entity.getObjectId())
                 .version(entity.getVersion())
@@ -130,7 +130,7 @@ public final class AuditInterfaceAssembler {
                     .build();
         }
         return AuditLogDetailResponse.builder()
-                .id(AuditLogIdCodec.toValue(entity.getId()))
+                .id(AuditLogIdCodec.toStringValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
                 .objectId(entity.getObjectId())
@@ -201,7 +201,7 @@ public final class AuditInterfaceAssembler {
 
     private static AuditLogResponse.AuditLogResponseBuilder logResponseBuilder(AuditLog entity) {
         return AuditLogResponse.builder()
-                .id(AuditLogIdCodec.toValue(entity.getId()))
+                .id(AuditLogIdCodec.toStringValue(entity.getId()))
                 .objectType(entity.getObjectType())
                 .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
                 .objectId(entity.getObjectId())

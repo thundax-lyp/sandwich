@@ -10,7 +10,7 @@ export interface DictPageRequest {
 }
 
 export interface DictSaveRequest {
-    id?: number | null;
+    id?: string | null;
     type?: string | null;
     label?: string | null;
     value?: string | null;
@@ -18,7 +18,7 @@ export interface DictSaveRequest {
 }
 
 export interface DictResponse {
-    id: number;
+    id: string;
     type: string;
     label: string;
     value: string;
@@ -43,8 +43,8 @@ export const updateDictionary = (request: DictSaveRequest) => {
     });
 };
 
-export const deleteDictionaries = (ids: number[]) => {
-    return postJson<boolean, Array<{ id: number }>>("/sys/dict/delete", {
+export const deleteDictionaries = (ids: string[]) => {
+    return postJson<boolean, Array<{ id: string }>>("/sys/dict/delete", {
         body: ids.map((id) => ({ id }))
     });
 };

@@ -25,9 +25,9 @@ public final class DepartmentInterfaceAssembler {
             return DepartmentResponse.builder().build();
         }
         return DepartmentResponse.builder()
-                .id(DepartmentIdCodec.toValue(entity.getId()))
+                .id(DepartmentIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
-                .parentId(DepartmentIdCodec.toValue(entity.getParentId()))
+                .parentId(DepartmentIdCodec.toStringValue(entity.getParentId()))
                 .name(entity.getName())
                 .shortName(entity.getShortName())
                 .namePath(namePath(entity, departmentLoader))
@@ -40,8 +40,8 @@ public final class DepartmentInterfaceAssembler {
             return DepartmentResponse.builder().build();
         }
         return DepartmentResponse.builder()
-                .id(DepartmentIdCodec.toValue(entity.getId()))
-                .parentId(DepartmentIdCodec.toValue(entity.getParentId()))
+                .id(DepartmentIdCodec.toStringValue(entity.getId()))
+                .parentId(DepartmentIdCodec.toStringValue(entity.getParentId()))
                 .name(entity.getName())
                 .shortName(entity.getShortName())
                 .build();
@@ -85,7 +85,7 @@ public final class DepartmentInterfaceAssembler {
     private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toStringValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

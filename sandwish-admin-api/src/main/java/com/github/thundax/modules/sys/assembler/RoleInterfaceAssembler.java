@@ -39,7 +39,7 @@ public final class RoleInterfaceAssembler {
         }
 
         return RoleResponse.builder()
-                .id(RoleIdCodec.toValue(entity.getId()))
+                .id(RoleIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .name(entity.getName())
                 .admin(entity.isAdmin())
@@ -59,9 +59,9 @@ public final class RoleInterfaceAssembler {
             return RoleMenuResponse.builder().build();
         }
 
-        Long parentId = MenuIdCodec.toValue(entity.getParentId());
+        String parentId = MenuIdCodec.toStringValue(entity.getParentId());
         return RoleMenuResponse.builder()
-                .id(MenuIdCodec.toValue(entity.getId()))
+                .id(MenuIdCodec.toStringValue(entity.getId()))
                 .parentId(parentId)
                 .name(entity.getName())
                 .perms(entity.getPerms())
@@ -76,7 +76,7 @@ public final class RoleInterfaceAssembler {
         }
 
         return RoleUserResponse.builder()
-                .id(UserIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toStringValue(entity.getId()))
                 .name(entity.getName())
                 .loginName(loginName)
                 .department(toDepartmentResponse(department, departmentLoader))
@@ -88,7 +88,9 @@ public final class RoleInterfaceAssembler {
         return RoleUserTreeNodeResponse.builder()
                 .id(id)
                 .parentId(
-                        entity.getParentId() == null ? null : idPrefix(DepartmentIdCodec.toValue(entity.getParentId())))
+                        entity.getParentId() == null
+                                ? null
+                                : idPrefix(DepartmentIdCodec.toStringValue(entity.getParentId())))
                 .name(entity.getName())
                 .build();
     }
@@ -101,8 +103,8 @@ public final class RoleInterfaceAssembler {
             Department department,
             Function<DepartmentId, Department> departmentLoader) {
         return RoleUserTreeNodeResponse.builder()
-                .id(String.valueOf(UserIdCodec.toValue(entity.getId())))
-                .parentId(departmentIdPrefix + DepartmentIdCodec.toValue(entity.getDepartmentId()))
+                .id(UserIdCodec.toStringValue(entity.getId()))
+                .parentId(departmentIdPrefix + DepartmentIdCodec.toStringValue(entity.getDepartmentId()))
                 .name(entity.getName())
                 .user(toUserResponse(entity, loginName, department, departmentLoader))
                 .build();
@@ -173,20 +175,20 @@ public final class RoleInterfaceAssembler {
         }
 
         return RoleDepartmentResponse.builder()
-                .id(DepartmentIdCodec.toValue(entity.getId()))
+                .id(DepartmentIdCodec.toStringValue(entity.getId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
     }
 
-    private static String idPrefix(Long id) {
+    private static String idPrefix(String id) {
         return "DEPARTMENT_" + id;
     }
 
     private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toStringValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

@@ -36,7 +36,7 @@ public class DepartmentControllerContractTest {
         List<DepartmentResponse> responses = controller.tree(Collections.singletonList(idRequest(1L)));
 
         assertEquals(1, responses.size());
-        assertEquals(Long.valueOf(3L), responses.get(0).getId());
+        assertEquals("3", responses.get(0).getId());
     }
 
     @Test

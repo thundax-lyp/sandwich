@@ -42,7 +42,7 @@ public final class UserInterfaceAssembler {
         }
 
         return UserResponse.builder()
-                .id(UserIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toStringValue(entity.getId()))
                 .remarks(entity.getRemarks())
                 .loginName(loginName)
                 .ranks(AccessRankCodec.toValue(entity.getRank()))
@@ -71,8 +71,8 @@ public final class UserInterfaceAssembler {
         }
 
         return UserDepartmentResponse.builder()
-                .id(DepartmentIdCodec.toValue(entity.getId()))
-                .parentId(DepartmentIdCodec.toValue(entity.getParentId()))
+                .id(DepartmentIdCodec.toStringValue(entity.getId()))
+                .parentId(DepartmentIdCodec.toStringValue(entity.getParentId()))
                 .name(entity.getName())
                 .namePath(namePath(entity, departmentLoader))
                 .build();
@@ -85,7 +85,7 @@ public final class UserInterfaceAssembler {
         }
 
         return UserRoleResponse.builder()
-                .id(RoleIdCodec.toValue(entity.getId()))
+                .id(RoleIdCodec.toStringValue(entity.getId()))
                 .name(entity.getName())
                 .build();
     }
@@ -169,7 +169,7 @@ public final class UserInterfaceAssembler {
     private static String namePath(Department department, Function<DepartmentId, Department> departmentLoader) {
         List<String> names = new ArrayList<>();
         Department node = department;
-        while (node != null && DepartmentIdCodec.toValue(node.getId()) != null) {
+        while (node != null && DepartmentIdCodec.toStringValue(node.getId()) != null) {
             node = departmentLoader.apply(node.getId());
             if (node != null) {
                 names.add(0, node.getName());

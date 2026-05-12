@@ -32,7 +32,7 @@ const readDepartmentQuery = (values: DepartmentListRequest): DepartmentListReque
 };
 
 const buildDepartmentTree = (departments: DepartmentResponse[]) => {
-    const nodeMap = new Map<number, DepartmentTableNode>();
+    const nodeMap = new Map<string, DepartmentTableNode>();
     const roots: DepartmentTableNode[] = [];
 
     departments.forEach((department) => {
@@ -65,7 +65,7 @@ const countLeafDepartments = (departments: DepartmentTableNode[]): number => {
     }, 0);
 };
 
-const collectDepartmentIds = (departments: DepartmentTableNode[]): number[] => {
+const collectDepartmentIds = (departments: DepartmentTableNode[]): string[] => {
     return departments.flatMap((department) => [
         department.id,
         ...(department.children ? collectDepartmentIds(department.children) : [])

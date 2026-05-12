@@ -28,7 +28,7 @@ public final class StorageInterfaceAssembler {
             return StorageUploadResponse.builder().build();
         }
         return StorageUploadResponse.builder()
-                .id(StoredObjectIdCodec.toValue(entity.getId()))
+                .id(StoredObjectIdCodec.toStringValue(entity.getId()))
                 .originalFilename(entity.getOriginalFileName())
                 .extendName(entity.getExtendName())
                 .contentType(entity.getContentType())
@@ -52,7 +52,7 @@ public final class StorageInterfaceAssembler {
             return StorageResponse.builder().build();
         }
         return StorageResponse.builder()
-                .id(StoredObjectIdCodec.toValue(entity.getId()))
+                .id(StoredObjectIdCodec.toStringValue(entity.getId()))
                 .originalFilename(entity.getOriginalFilename())
                 .extendName(entity.getExtendName())
                 .contentType(entity.getContentType())
@@ -106,7 +106,7 @@ public final class StorageInterfaceAssembler {
             return MultipartUploadSessionResponse.builder().build();
         }
         return MultipartUploadSessionResponse.builder()
-                .id(MultipartUploadSessionIdCodec.toValue(entity.getId()))
+                .id(MultipartUploadSessionIdCodec.toStringValue(entity.getId()))
                 .uploadId(entity.getUploadId())
                 .uploadStatus(
                         entity.getUploadStatus() == null
@@ -122,7 +122,7 @@ public final class StorageInterfaceAssembler {
             return MultipartUploadPartResponse.builder().build();
         }
         return MultipartUploadPartResponse.builder()
-                .id(MultipartUploadPartIdCodec.toValue(entity.getId()))
+                .id(MultipartUploadPartIdCodec.toStringValue(entity.getId()))
                 .uploadId(entity.getUploadId())
                 .partNumber(entity.getPartNumber())
                 .etag(entity.getEtag())

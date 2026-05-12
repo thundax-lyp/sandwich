@@ -216,6 +216,21 @@ button {
     box-shadow: inset 4px 0 0 var(--accent-yellow);
 }
 
+.menu-icon-config-error {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    align-items: center;
+    justify-content: center;
+    color: #8a3b00;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    background: #ffd666;
+    border: 1px solid #d48806;
+    border-radius: 50%;
+}
+
 .workspace {
     display: grid;
     align-content: start;

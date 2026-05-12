@@ -1,5 +1,7 @@
 package com.github.thundax.modules.sys.assembler;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.modules.sys.codec.AccessRankCodec;
 import com.github.thundax.modules.sys.controller.request.PersonalInfoUpdateRequest;
 import com.github.thundax.modules.sys.controller.response.PersonalAvatarResponse;
@@ -14,6 +16,8 @@ import java.util.Set;
 import org.springframework.lang.NonNull;
 
 public final class PersonalInterfaceAssembler {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private PersonalInterfaceAssembler() {}
 
     @NonNull
@@ -22,7 +26,7 @@ public final class PersonalInterfaceAssembler {
             return PersonalInfoResponse.builder().build();
         }
         return PersonalInfoResponse.builder()
-                .id(UserIdCodec.toValue(entity.getId()))
+                .id(UserIdCodec.toStringValue(entity.getId()))
                 .loginName(loginName)
                 .ranks(AccessRankCodec.toValue(entity.getRank()))
                 .name(entity.getName())
@@ -45,10 +49,11 @@ public final class PersonalInterfaceAssembler {
             return PersonalMenuResponse.builder().build();
         }
         return PersonalMenuResponse.builder()
-                .id(MenuIdCodec.toValue(entity.getId()))
-                .parentId(MenuIdCodec.toValue(entity.getParentId()))
+                .id(MenuIdCodec.toStringValue(entity.getId()))
+                .parentId(MenuIdCodec.toStringValue(entity.getParentId()))
                 .name(entity.getName())
                 .url(entity.getUrl())
+                .icon(readIcon(entity.getDisplayParams()))
                 .displayParams(entity.getDisplayParams())
                 .build();
     }
@@ -64,5 +69,20 @@ public final class PersonalInterfaceAssembler {
         entity.setEmail(request.getEmail());
         entity.setMobile(request.getMobile());
         return entity;
+    }
+
+    private static String readIcon(String displayParams) {
+        if (displayParams == null || displayParams.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            JsonNode icon = OBJECT_MAPPER.readTree(displayParams).get("icon");
+            if (icon == null || !icon.isTextual() || icon.asText().trim().isEmpty()) {
+                return null;
+            }
+            return icon.asText().trim();
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 }

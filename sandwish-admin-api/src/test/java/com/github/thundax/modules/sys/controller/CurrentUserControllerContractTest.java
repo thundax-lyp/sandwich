@@ -69,7 +69,8 @@ public class CurrentUserControllerContractTest {
     public void shouldReturnVisibleMenusFromCurrentUserService() {
         UserService userService = mock(UserService.class);
         CurrentUserService currentUserService = mock(CurrentUserService.class);
-        List<Menu> menus = Arrays.asList(menu(10L, null, "系统管理"), menu(11L, 10L, "用户管理"));
+        List<Menu> menus = Arrays.asList(
+                menu(10L, null, "系统管理", "{\"icon\":\" system \"}"), menu(11L, 10L, "用户管理", "{\"icon\":\"users\"}"));
         User currentUser = superUser();
 
         when(userService.get(org.mockito.ArgumentMatchers.any())).thenReturn(currentUser);
@@ -87,9 +88,11 @@ public class CurrentUserControllerContractTest {
         List<PersonalMenuResponse> responses = controller.menus();
 
         assertEquals(2, responses.size());
-        assertEquals(Long.valueOf(10L), responses.get(0).getId());
-        assertEquals(Long.valueOf(11L), responses.get(1).getId());
-        assertEquals(Long.valueOf(10L), responses.get(1).getParentId());
+        assertEquals("10", responses.get(0).getId());
+        assertEquals("system", responses.get(0).getIcon());
+        assertEquals("11", responses.get(1).getId());
+        assertEquals("10", responses.get(1).getParentId());
+        assertEquals("users", responses.get(1).getIcon());
     }
 
     private void assertMapping(RequestMapping mapping, String value) {
@@ -111,11 +114,12 @@ public class CurrentUserControllerContractTest {
         return user;
     }
 
-    private Menu menu(Long id, Long parentId, String name) {
+    private Menu menu(Long id, Long parentId, String name, String displayParams) {
         Menu menu = new Menu();
         menu.setId(MenuIdCodec.toDomain(id));
         menu.setParentId(MenuIdCodec.toDomain(parentId));
         menu.setName(name);
+        menu.setDisplayParams(displayParams);
         return menu;
     }
 }

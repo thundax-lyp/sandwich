@@ -18,11 +18,11 @@ public class PersonalMenuResponse implements Serializable {
 
     @ApiModelProperty(name = "id", value = "菜单ID")
     @JsonProperty("id")
-    private Long id;
+    private String id;
 
     @ApiModelProperty(name = "parentId", value = "父节点ID")
     @JsonProperty("parentId")
-    private Long parentId;
+    private String parentId;
 
     @ApiModelProperty(name = "name", value = "名称")
     @JsonProperty("name")
@@ -31,6 +31,10 @@ public class PersonalMenuResponse implements Serializable {
     @ApiModelProperty(name = "url", value = "URL")
     @JsonProperty("url")
     private String url;
+
+    @ApiModelProperty(name = "icon", value = "图标")
+    @JsonProperty("icon")
+    private String icon;
 
     @ApiModelProperty(name = "displayParams", value = "显示参数，前端使用")
     @JsonProperty("displayParams")

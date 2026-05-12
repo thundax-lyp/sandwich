@@ -2,23 +2,23 @@ package com.github.thundax.modules.auth.service;
 
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 
 public interface PreAuthSessionService {
 
-    int count(PreAuthSessionQuery query);
+    int count();
 
     PreAuthSession create(CreatePreAuthSessionCommand command);
 
-    PreAuthSessionId getIdByToken(PreAuthSessionQuery query);
+    PreAuthSessionId getIdByToken(PreAuthSessionToken token);
 
-    PreAuthSessionId getIdByRefreshToken(PreAuthSessionQuery query);
+    PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken);
 
-    PreAuthSession get(PreAuthSessionQuery query);
+    PreAuthSession get(PreAuthSessionId id);
 
     PreAuthSession refresh(RefreshPreAuthSessionCommand command);
 
@@ -26,5 +26,5 @@ public interface PreAuthSessionService {
 
     void upsertValue(UpsertPreAuthSessionValueCommand command);
 
-    String getValue(PreAuthSessionQuery query);
+    String getValue(PreAuthSessionId id, String name);
 }

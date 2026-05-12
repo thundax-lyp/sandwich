@@ -12,7 +12,6 @@ import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.exception.InvalidCaptchaException;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -114,8 +113,7 @@ public class CaptchaController {
     }
 
     private String getCaptcha(String loginToken) {
-        String captcha = preAuthSessionService.getValue(
-                new PreAuthSessionQuery(requireSessionIdByToken(loginToken), null, null, CAPTCHA_ITEM));
+        String captcha = preAuthSessionService.getValue(requireSessionIdByToken(loginToken), CAPTCHA_ITEM);
         if (StringUtils.isEmpty(captcha)) {
             throw new InvalidCaptchaException();
         }
@@ -123,8 +121,7 @@ public class CaptchaController {
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) {
-        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
-                new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(PreAuthSessionToken.of(token));
         if (sessionId == null) {
             throw AdminResponseExceptions.invalidParameter("loginToken");
         }

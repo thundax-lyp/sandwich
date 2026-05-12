@@ -4,12 +4,12 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.exception.BizExceptionBoundary;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
-    public int count(PreAuthSessionQuery query) {
+    public int count() {
         return preAuthSessionDao.count();
     }
 
@@ -36,18 +36,18 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     }
 
     @Override
-    public PreAuthSessionId getIdByToken(PreAuthSessionQuery query) {
-        return preAuthSessionDao.getByToken(query.getToken());
+    public PreAuthSessionId getIdByToken(PreAuthSessionToken token) {
+        return preAuthSessionDao.getByToken(token);
     }
 
     @Override
-    public PreAuthSessionId getIdByRefreshToken(PreAuthSessionQuery query) {
-        return preAuthSessionDao.getByRefreshToken(query.getRefreshToken());
+    public PreAuthSessionId getIdByRefreshToken(PreAuthSessionToken refreshToken) {
+        return preAuthSessionDao.getByRefreshToken(refreshToken);
     }
 
     @Override
-    public PreAuthSession get(PreAuthSessionQuery query) {
-        PreAuthSession session = preAuthSessionDao.getById(query.getId());
+    public PreAuthSession get(PreAuthSessionId id) {
+        PreAuthSession session = preAuthSessionDao.getById(id);
         if (session == null || session.isExpired()) {
             throw new BizException("AUTH-00006", "auth.exception.invalid-token", "token 已失效");
         }
@@ -56,9 +56,7 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
 
     @Override
     public PreAuthSession refresh(RefreshPreAuthSessionCommand command) {
-        PreAuthSessionQuery query = new PreAuthSessionQuery();
-        query.setId(command.getId());
-        PreAuthSession session = get(query);
+        PreAuthSession session = get(command.getId());
         session.refresh(command.getExpiredSeconds(), command.getRefreshTokenGraceSeconds());
         preAuthSessionDao.update(session);
         return session;
@@ -71,15 +69,13 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
 
     @Override
     public void upsertValue(UpsertPreAuthSessionValueCommand command) {
-        PreAuthSessionQuery query = new PreAuthSessionQuery();
-        query.setId(command.getId());
-        PreAuthSession session = get(query);
+        PreAuthSession session = get(command.getId());
         session.upsertValue(command.getName(), command.getValue(), command.getExpiredAt());
         preAuthSessionDao.update(session);
     }
 
     @Override
-    public String getValue(PreAuthSessionQuery query) {
-        return get(query).findValue(query.getName());
+    public String getValue(PreAuthSessionId id, String name) {
+        return get(id).findValue(name);
     }
 }

@@ -15,7 +15,6 @@ import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.security.CurrentUserResolver;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
 import com.github.thundax.modules.sys.assembler.PersonalInterfaceAssembler;
@@ -255,13 +254,11 @@ public class CurrentUserController {
     }
 
     private String getPrivateKey(String token) {
-        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(
-                new PreAuthSessionQuery(null, PreAuthSessionToken.of(token), null, null));
+        PreAuthSessionId sessionId = preAuthSessionService.getIdByToken(PreAuthSessionToken.of(token));
         if (sessionId == null) {
             throw AdminResponseExceptions.invalidToken();
         }
-        String privateKey =
-                preAuthSessionService.getValue(new PreAuthSessionQuery(sessionId, null, null, PRIVATE_KEY_ITEM));
+        String privateKey = preAuthSessionService.getValue(sessionId, PRIVATE_KEY_ITEM);
         if (StringUtils.isBlank(privateKey)) {
             throw AdminResponseExceptions.invalidToken();
         }

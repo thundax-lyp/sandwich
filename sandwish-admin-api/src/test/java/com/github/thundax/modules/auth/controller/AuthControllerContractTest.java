@@ -16,12 +16,12 @@ import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
-import com.github.thundax.modules.auth.service.query.PreAuthSessionQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -43,7 +43,7 @@ public class AuthControllerContractTest {
         PreAuthSession session = preAuthSession();
         when(preAuthSessionService.create(any(CreatePreAuthSessionCommand.class)))
                 .thenReturn(session);
-        when(preAuthSessionService.get(any(PreAuthSessionQuery.class))).thenReturn(session);
+        when(preAuthSessionService.get(any(PreAuthSessionId.class))).thenReturn(session);
 
         mockMvc(authService, preAuthSessionService)
                 .perform(post("/api/auth/session/pre-auth-session").contentType(MediaType.APPLICATION_JSON))
@@ -64,8 +64,8 @@ public class AuthControllerContractTest {
         AdminAuthService authService = mock(AdminAuthService.class);
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSessionId sessionId = PreAuthSessionId.of("session-1");
-        when(preAuthSessionService.getIdByToken(any(PreAuthSessionQuery.class))).thenReturn(sessionId);
-        when(preAuthSessionService.getValue(any(PreAuthSessionQuery.class)))
+        when(preAuthSessionService.getIdByToken(any(PreAuthSessionToken.class))).thenReturn(sessionId);
+        when(preAuthSessionService.getValue(any(PreAuthSessionId.class), any(String.class)))
                 .thenReturn("1234", keyPair.getPrivateKey());
         when(authService.authenticatePassword(any(AdminAuthCommand.class))).thenReturn(user());
         when(authService.createAccessToken(any(AdminAuthCommand.class))).thenReturn(accessToken("access-token-1"));

@@ -12,8 +12,8 @@ import com.github.thundax.modules.sys.service.SysLogMessageService;
 import com.github.thundax.modules.sys.service.command.CreateLogCommand;
 import com.github.thundax.modules.sys.service.query.LogQuery;
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SysLogMessageServiceImpl implements SysLogMessageService {
 
-    private static final DateFormat LOG_FILENAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateTimeFormatter LOG_FILENAME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String LOG_EXTEND_NAME = ".log";
 
     private final SandwishMqSender mqSender;
@@ -58,7 +58,7 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
                 sysLog.setId(logService.create(toCreateCommand(sysLog)));
 
                 try {
-                    String filename = LOG_FILENAME_FORMAT.format(sysLog.getLogDate()) + LOG_EXTEND_NAME;
+                    String filename = logFilename(sysLog.getLogDate());
                     File logFile = new File(logProperties().getStoragePath(), filename);
 
                     FileUtils.writeLines(logFile, new ArrayList<>(Collections.singletonList(payload)), true);
@@ -83,6 +83,10 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
 
     private SandwishProperties.LogProperties logProperties() {
         return sandwishProperties.getLog();
+    }
+
+    private String logFilename(Date logDate) {
+        return LOG_FILENAME_FORMAT.format(logDate.toInstant().atZone(ZoneId.systemDefault())) + LOG_EXTEND_NAME;
     }
 
     private SandwishMqMessage buildMessage(String payload) {

@@ -21,7 +21,6 @@ import com.github.thundax.modules.storage.controller.response.StorageUploadRespo
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
@@ -134,7 +133,7 @@ public class StorageController {
     @HasPermission("storage:storage:view")
     @GetMapping(value = "{id}/content")
     public void content(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-        StoredObject storage = storageService.get(storedObjectId(id));
+        StoredObject storage = storageService.get(StoredObjectIdCodec.toDomain(id));
         if (storage == null) {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
@@ -173,7 +172,7 @@ public class StorageController {
     public Boolean delete(@Valid @RequestBody List<StorageIdRequest> list) {
         List<StoredObject> storageList = new ArrayList<>();
         for (StorageIdRequest request : RequestListHelper.present(list)) {
-            StoredObject storage = storageService.get(storedObjectId(request.getId()));
+            StoredObject storage = storageService.get(StoredObjectIdCodec.toDomain(request.getId()));
             if (storage == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
@@ -277,14 +276,6 @@ public class StorageController {
         StorageQuery query = new StorageQuery();
         query.setId(StoredObjectIdCodec.toDomain(id));
         return query;
-    }
-
-    private StoredObjectId storedObjectId(Long id) {
-        return StoredObjectIdCodec.toDomain(id);
-    }
-
-    private StoredObjectId storedObjectId(String id) {
-        return StoredObjectIdCodec.toDomain(id);
     }
 
     private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {

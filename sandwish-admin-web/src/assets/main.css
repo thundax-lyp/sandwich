@@ -1303,7 +1303,15 @@ p {
 }
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right {
+    text-align: center;
     background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
+}
+
+.user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .ant-table-cell-content,
+.user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .ant-table-column-title {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .user-column-title {

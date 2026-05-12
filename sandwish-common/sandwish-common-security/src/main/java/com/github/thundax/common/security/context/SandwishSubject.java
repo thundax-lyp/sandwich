@@ -47,7 +47,7 @@ public class SandwishSubject implements Serializable {
         return subjectId != null && !subjectId.trim().isEmpty() && subjectType != SandwishSubjectType.ANONYMOUS;
     }
 
-    public boolean hasAuthority(String authority) {
+    public synchronized boolean hasAuthority(String authority) {
         return authorities.contains(authority);
     }
 
@@ -55,11 +55,11 @@ public class SandwishSubject implements Serializable {
         this.subjectType = subjectType == null ? SandwishSubjectType.UNKNOWN : subjectType;
     }
 
-    public Set<String> getAuthorities() {
-        return Collections.unmodifiableSet(authorities);
+    public synchronized Set<String> getAuthorities() {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(authorities));
     }
 
-    public void setAuthorities(Collection<String> authorities) {
+    public synchronized void setAuthorities(Collection<String> authorities) {
         this.authorities.clear();
         if (authorities == null) {
             return;

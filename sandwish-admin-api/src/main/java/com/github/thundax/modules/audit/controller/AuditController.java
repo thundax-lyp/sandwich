@@ -5,7 +5,7 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
-import com.github.thundax.common.web.request.PageRequest;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.audit.assembler.AuditInterfaceAssembler;
@@ -120,7 +120,8 @@ public class AuditController {
     @PostMapping(value = "object/page")
     public PageResponse<AuditLogResponse> objectPage(@Valid @RequestBody AuditObjectPageRequest request) {
         return PageResponseHelper.fromPageResult(
-                auditService.page(AuditInterfaceAssembler.toLogQuery(request), readPage(request)),
+                auditService.page(
+                        AuditInterfaceAssembler.toLogQuery(request), PageInterfaceAssembler.toPageQuery(request)),
                 AuditInterfaceAssembler::toLogResponse);
     }
 
@@ -135,7 +136,7 @@ public class AuditController {
     })
     @PostMapping(value = "page")
     public PageResponse<AuditLogResponse> page(@Valid @RequestBody AuditLogPageRequest request) {
-        PageQuery pageQuery = readPage(request);
+        PageQuery pageQuery = PageInterfaceAssembler.toPageQuery(request);
         return PageResponseHelper.fromPageResult(
                 auditService.page(AuditInterfaceAssembler.toLogQuery(request), pageQuery),
                 AuditInterfaceAssembler::toLogResponse);
@@ -167,17 +168,5 @@ public class AuditController {
     @PostMapping(value = "fields")
     public List<AuditObjectFieldResponse> fields(@Valid @RequestBody AuditObjectFieldRequest request) {
         return AuditInterfaceAssembler.toFieldResponses(request.getObjectType());
-    }
-
-    private PageQuery readPage(PageRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-        return new PageQuery(pageNo, pageSize);
     }
 }

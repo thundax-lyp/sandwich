@@ -2,12 +2,11 @@ package com.github.thundax.modules.storage.controller;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.exception.AdminResponseExceptions;
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -88,9 +87,8 @@ public class StorageController {
     @PostMapping(value = "page")
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
-        PageQuery page = readStoragePage(request);
         return PageResponseHelper.fromPageResult(
-                storageService.page(query, page),
+                storageService.page(query, PageInterfaceAssembler.toPageQuery(request)),
                 storage -> StorageInterfaceAssembler.toResponse(storage, storageConverter));
     }
 
@@ -244,24 +242,6 @@ public class StorageController {
             return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
         }
         return StorageInterfaceAssembler.toUploadEmptyResponse();
-    }
-
-    private PageQuery readStoragePage(StoragePageRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
-
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-
-        PageQuery page = new PageQuery();
-        page.setPageNo(pageNo);
-        page.setPageSize(pageSize);
-        return page;
     }
 
     private void applyStoredObject(StoredObject storage, StoredObject object) {

@@ -1,7 +1,7 @@
 package com.github.thundax.common.web;
 
 import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolation;
@@ -128,17 +128,6 @@ public class BaseFrontController {
     }
 
     public static PageQuery readPage(Integer pageNo, Integer pageSize) {
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-
-        PageQuery page = new PageQuery();
-        page.setPageNo(pageNo);
-        page.setPageSize(pageSize);
-        return page;
+        return PageInterfaceAssembler.toPageQuery(pageNo, pageSize);
     }
 }

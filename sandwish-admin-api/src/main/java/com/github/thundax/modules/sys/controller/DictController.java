@@ -1,11 +1,10 @@
 package com.github.thundax.modules.sys.controller;
 
 import com.github.thundax.common.exception.AdminResponseExceptions;
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -96,8 +95,9 @@ public class DictController {
     @PostMapping(value = "page")
     public PageResponse<DictResponse> page(@Valid @RequestBody DictPageRequest request) {
         DictQuery query = DictInterfaceAssembler.toQuery(request);
-        PageQuery page = readDictPage(request);
-        return PageResponseHelper.fromPageResult(dictService.page(query, page), DictInterfaceAssembler::toResponse);
+        return PageResponseHelper.fromPageResult(
+                dictService.page(query, PageInterfaceAssembler.toPageQuery(request)),
+                DictInterfaceAssembler::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:dict:edit")
@@ -197,23 +197,5 @@ public class DictController {
             throw AdminResponseExceptions.invalidParameter("orderedIds");
         }
         return orderedIds;
-    }
-
-    private PageQuery readDictPage(DictPageRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
-
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-
-        PageQuery page = new PageQuery();
-        page.setPageNo(pageNo);
-        page.setPageSize(pageSize);
-        return page;
     }
 }

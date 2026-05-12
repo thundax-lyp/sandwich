@@ -3,12 +3,11 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
@@ -185,9 +184,9 @@ public class UserController {
     @PostMapping(value = "page")
     public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) {
         UserQuery query = readQuery(request);
-        PageQuery page = readUserPage(request);
 
-        return PageResponseHelper.fromPageResult(userService.page(query, page), this::toResponse);
+        return PageResponseHelper.fromPageResult(
+                userService.page(query, PageInterfaceAssembler.toPageQuery(request)), this::toResponse);
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")
@@ -573,24 +572,6 @@ public class UserController {
                 }
             }
         }
-    }
-
-    private PageQuery readUserPage(UserQueryRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
-
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-
-        PageQuery page = new PageQuery();
-        page.setPageNo(pageNo);
-        page.setPageSize(pageSize);
-        return page;
     }
 
     private boolean isLoginNameAvailable(String loginName, String id) {

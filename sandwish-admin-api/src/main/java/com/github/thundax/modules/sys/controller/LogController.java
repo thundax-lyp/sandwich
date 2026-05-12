@@ -1,10 +1,9 @@
 package com.github.thundax.modules.sys.controller;
 
-import com.github.thundax.common.page.PageQuery;
-import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -69,7 +68,8 @@ public class LogController {
     public PageResponse<LogResponse> page(@Valid @RequestBody LogPageRequest request) {
         LogQuery query = LogInterfaceAssembler.toQuery(request);
 
-        return PageResponseHelper.fromPageResult(logService.page(query, readLogPage(request)), this::toResponse);
+        return PageResponseHelper.fromPageResult(
+                logService.page(query, PageInterfaceAssembler.toPageQuery(request)), this::toResponse);
     }
 
     private LogResponse toResponse(Log log) {
@@ -94,23 +94,5 @@ public class LogController {
         query.setPrincipalKey(principalKey);
         query.setIdentityType(identityType);
         return query;
-    }
-
-    private PageQuery readLogPage(LogPageRequest request) {
-        Integer pageNo = request.getPageNo();
-        Integer pageSize = request.getPageSize();
-
-        if (pageNo == null || pageNo < PageRules.firstPageIndex()) {
-            pageNo = PageRules.firstPageIndex();
-        }
-
-        if (pageSize == null || pageSize <= 0) {
-            pageSize = PageRules.defaultPageSize();
-        }
-
-        PageQuery page = new PageQuery();
-        page.setPageNo(pageNo);
-        page.setPageSize(pageSize);
-        return page;
     }
 }

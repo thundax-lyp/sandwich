@@ -1,7 +1,7 @@
 import {
     ApartmentOutlined,
-    ArrowDownOutlined,
-    ArrowUpOutlined,
+    ArrowLeftOutlined,
+    ArrowRightOutlined,
     BranchesOutlined,
     DeleteOutlined,
     EditOutlined,
@@ -336,6 +336,28 @@ export const DepartmentPage = () => {
                 <div className="sandwish-table-row-actions">
                     <Space.Compact className="sandwish-table-row-actions-inline">
                         <Button
+                            aria-label={`升级 ${department.name}`}
+                            className="sandwish-table-row-action"
+                            disabled={
+                                !canEditDepartment || !department.parentId || moveMutation.isPending
+                            }
+                            icon={<ArrowLeftOutlined />}
+                            type="text"
+                            onClick={() => promoteDepartment(department)}
+                        />
+                        <Button
+                            aria-label={`降级 ${department.name}`}
+                            className="sandwish-table-row-action"
+                            disabled={
+                                !canEditDepartment ||
+                                !readPreviousSiblingDepartment(department) ||
+                                moveMutation.isPending
+                            }
+                            icon={<ArrowRightOutlined />}
+                            type="text"
+                            onClick={() => demoteDepartment(department)}
+                        />
+                        <Button
                             aria-label={`编辑 ${department.name}`}
                             className="sandwish-table-row-action"
                             disabled={!canEditDepartment}
@@ -351,28 +373,6 @@ export const DepartmentPage = () => {
                             type="text"
                             danger
                             onClick={() => openDeleteConfirm(department)}
-                        />
-                        <Button
-                            aria-label={`升级 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={
-                                !canEditDepartment || !department.parentId || moveMutation.isPending
-                            }
-                            icon={<ArrowUpOutlined />}
-                            type="text"
-                            onClick={() => promoteDepartment(department)}
-                        />
-                        <Button
-                            aria-label={`降级 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={
-                                !canEditDepartment ||
-                                !readPreviousSiblingDepartment(department) ||
-                                moveMutation.isPending
-                            }
-                            icon={<ArrowDownOutlined />}
-                            type="text"
-                            onClick={() => demoteDepartment(department)}
                         />
                         <Button
                             aria-label={`拖动 ${department.name}`}

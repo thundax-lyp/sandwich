@@ -430,7 +430,6 @@ html[data-theme="dark"] .user-delete-modal .ant-modal-header {
     }
 
     .user-department-panel {
-        min-height: 280px;
-        max-height: 360px;
+        display: none;
     }
 }

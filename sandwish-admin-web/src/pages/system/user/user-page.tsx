@@ -523,6 +523,7 @@ export const UserPage = () => {
                     selectedRowKeys,
                     onChange: setSelectedRowKeys
                 }}
+                tableAsidePlacement="left"
                 tableAside={
                     <div className="user-department-panel">
                         <div className="user-department-panel-head">

@@ -43,6 +43,7 @@ export interface ListPageProps<RecordType extends object = object>
     selectedCount?: number;
     subjectName?: string;
     tableAside?: ReactNode;
+    tableAsidePlacement?: "left" | "right";
     title: ReactNode;
 }
 
@@ -72,6 +73,7 @@ export const ListPage = <RecordType extends object = object>({
     selectedCount = 0,
     subjectName,
     tableAside,
+    tableAsidePlacement = "right",
     title,
     ...tableProps
 }: ListPageProps<RecordType>) => {
@@ -165,7 +167,12 @@ export const ListPage = <RecordType extends object = object>({
             ) : null}
 
             {tableAside ? (
-                <div className="list-page-table-area">
+                <div
+                    className={[
+                        "list-page-table-area",
+                        `list-page-table-area-aside-${tableAsidePlacement}`
+                    ].join(" ")}
+                >
                     <div className="list-page-table-main">
                         <SandwishTable<RecordType> {...tableProps} />
                     </div>

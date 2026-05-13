@@ -11,7 +11,7 @@ export interface SandwishDrawerProps extends Omit<DrawerProps, "size" | "width">
 export const SandwishDrawer = ({
     className,
     placement = "right",
-    size = "small",
+    size = "middle",
     ...drawerProps
 }: SandwishDrawerProps) => {
     return (

@@ -8,13 +8,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import springfox.documentation.annotations.ApiIgnore;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
@@ -44,12 +40,6 @@ public class SwaggerAutoConfiguration implements WebMvcConfigurer {
     @ConditionalOnMissingBean
     public SwaggerEndpointLogger swaggerEndpointLogger() {
         return new SwaggerEndpointLogger(properties);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SwaggerCsrfProbeController swaggerCsrfProbeController() {
-        return new SwaggerCsrfProbeController();
     }
 
     @SuppressWarnings("deprecation")
@@ -104,15 +94,5 @@ public class SwaggerAutoConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
-
-    @ApiIgnore
-    @RestController
-    static final class SwaggerCsrfProbeController {
-
-        @GetMapping("/csrf")
-        public ResponseEntity<Void> csrf() {
-            return ResponseEntity.noContent().build();
-        }
     }
 }

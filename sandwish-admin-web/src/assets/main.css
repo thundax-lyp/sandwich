@@ -1205,22 +1205,41 @@ p {
 }
 
 .user-command-panel {
+    position: relative;
     min-width: 0;
     padding: 20px 22px 18px;
     overflow: hidden;
     background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.12), transparent 34%),
+        linear-gradient(225deg, rgba(8, 145, 178, 0.08), transparent 36%),
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.88),
-            rgba(248, 251, 255, 0.66)
+            rgba(255, 255, 255, 0.66),
+            rgba(248, 251, 255, 0.42)
         );
     border: 1px solid var(--user-line);
     border-radius: 14px;
-    box-shadow: var(--user-shadow);
-    backdrop-filter: blur(18px) saturate(1.18);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -1px 0 rgba(107, 124, 150, 0.1),
+        var(--user-shadow);
+    backdrop-filter: blur(24px) saturate(1.28);
+}
+
+.user-command-panel::before {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.32), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent 24%);
+    opacity: 0.72;
 }
 
 .user-page-header {
+    position: relative;
+    z-index: 1;
     display: flex;
     min-width: 0;
     align-items: flex-start;
@@ -1325,6 +1344,8 @@ p {
 }
 
 .user-filter-panel {
+    position: relative;
+    z-index: 1;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -1384,6 +1405,8 @@ p {
 }
 
 .user-table-toolbar {
+    position: relative;
+    z-index: 1;
     display: flex;
     min-width: 0;
     align-items: center;
@@ -1439,6 +1462,8 @@ p {
 }
 
 .user-table {
+    position: relative;
+    z-index: 1;
     min-width: 0;
 }
 

@@ -1,1 +1,220 @@
+.storage-object-page {
+    --storage-object-ink: #111827;
+    --storage-object-copy: #52627a;
+    --storage-object-line: rgba(107, 124, 150, 0.24);
+    --storage-object-line-strong: rgba(71, 91, 121, 0.34);
+    --storage-object-blue: #2563eb;
+    --storage-object-blue-hover: #1d4ed8;
+    --storage-object-blue-soft: rgba(37, 99, 235, 0.1);
+    --storage-object-blue-line: rgba(37, 99, 235, 0.26);
+    --storage-object-green: #0f766e;
+    --storage-object-green-soft: rgba(15, 118, 110, 0.1);
+    --storage-object-green-line: rgba(15, 118, 110, 0.24);
+    --storage-object-amber: #b45309;
+    --storage-object-amber-soft: rgba(180, 83, 9, 0.1);
+    --storage-object-amber-line: rgba(180, 83, 9, 0.24);
+    --storage-object-red: #dc2626;
+    --storage-object-red-soft: rgba(220, 38, 38, 0.1);
+    --storage-object-red-line: rgba(220, 38, 38, 0.24);
+    --storage-object-code: #5b5fd6;
+    --storage-object-code-soft: rgba(91, 95, 214, 0.1);
+    --storage-object-code-line: rgba(91, 95, 214, 0.24);
+    --storage-object-button-bg: rgba(255, 255, 255, 0.64);
+    --storage-object-field-bg: rgba(255, 255, 255, 0.7);
+    --storage-object-filter-bg-end: rgba(248, 251, 255, 0.48);
+    --storage-object-filter-bg-start: rgba(226, 235, 247, 0.62);
+    --storage-object-filter-inset: color-mix(in srgb, white 56%, transparent);
+    color: var(--storage-object-ink);
+}
 
+html[data-theme="dark"] .storage-object-page {
+    --storage-object-ink: #f8fbff;
+    --storage-object-copy: #b8c4d8;
+    --storage-object-line: rgba(171, 191, 222, 0.16);
+    --storage-object-line-strong: rgba(191, 207, 232, 0.28);
+    --storage-object-blue: #3b82f6;
+    --storage-object-blue-hover: #60a5fa;
+    --storage-object-blue-soft: rgba(59, 130, 246, 0.16);
+    --storage-object-blue-line: rgba(59, 130, 246, 0.3);
+    --storage-object-green: #2dd4bf;
+    --storage-object-green-soft: rgba(45, 212, 191, 0.13);
+    --storage-object-green-line: rgba(45, 212, 191, 0.28);
+    --storage-object-amber: #f59e0b;
+    --storage-object-amber-soft: rgba(245, 158, 11, 0.13);
+    --storage-object-amber-line: rgba(245, 158, 11, 0.28);
+    --storage-object-red: #f87171;
+    --storage-object-red-soft: rgba(248, 113, 113, 0.12);
+    --storage-object-red-line: rgba(248, 113, 113, 0.3);
+    --storage-object-code: #a78bfa;
+    --storage-object-code-soft: rgba(167, 139, 250, 0.13);
+    --storage-object-code-line: rgba(167, 139, 250, 0.26);
+    --storage-object-button-bg: rgba(17, 28, 46, 0.64);
+    --storage-object-field-bg: rgba(12, 22, 38, 0.7);
+    --storage-object-filter-bg-end: rgba(12, 22, 38, 0.48);
+    --storage-object-filter-bg-start: rgba(48, 72, 110, 0.52);
+    --storage-object-filter-inset: rgba(185, 207, 238, 0.12);
+}
+
+.storage-object-page .ant-typography-secondary {
+    color: var(--storage-object-copy);
+}
+
+.storage-object-page .ant-btn-default {
+    color: var(--storage-object-ink);
+    background: var(--storage-object-button-bg);
+    border-color: var(--storage-object-line);
+}
+
+.storage-object-page .ant-btn-default:not(:disabled):hover {
+    color: var(--storage-object-blue) !important;
+    background: var(--storage-object-blue-soft) !important;
+    border-color: var(--storage-object-blue-line) !important;
+}
+
+.storage-object-page .ant-input-affix-wrapper,
+.storage-object-page .ant-input,
+.storage-object-page .ant-select-selector {
+    color: var(--storage-object-ink);
+    background: var(--storage-object-field-bg) !important;
+    border-color: var(--storage-object-line) !important;
+}
+
+.storage-object-page .ant-input-affix-wrapper:hover,
+.storage-object-page .ant-input:hover,
+.storage-object-page .ant-select-selector:hover {
+    border-color: var(--storage-object-line-strong) !important;
+}
+
+.storage-object-page .ant-input-affix-wrapper:focus,
+.storage-object-page .ant-input-affix-wrapper-focused,
+.storage-object-page .ant-input:focus,
+.storage-object-page .ant-select-focused .ant-select-selector {
+    border-color: var(--storage-object-blue) !important;
+    box-shadow: 0 0 0 3px var(--storage-object-blue-soft) !important;
+}
+
+.storage-object-filter-form {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(150px, 180px) minmax(180px, 1fr) minmax(86px, 120px) minmax(86px, 120px);
+    min-width: 0;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    background:
+        linear-gradient(
+            180deg,
+            var(--storage-object-filter-bg-start),
+            var(--storage-object-filter-bg-end)
+        );
+    border: 1px solid var(--storage-object-line);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 var(--storage-object-filter-inset);
+    backdrop-filter: blur(10px);
+}
+
+.storage-object-filter-form label {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    color: var(--storage-object-copy);
+    font-size: 12px;
+}
+
+.storage-object-filter-form .ant-btn {
+    min-width: 86px;
+    max-width: 120px;
+}
+
+.storage-object-filter-search {
+    color: var(--storage-object-blue);
+    background: var(--storage-object-blue-soft);
+    border-color: var(--storage-object-blue-line);
+}
+
+.storage-object-filter-search:hover {
+    color: var(--storage-object-blue) !important;
+    background: color-mix(in srgb, var(--storage-object-blue) 14%, transparent) !important;
+    border-color: color-mix(in srgb, var(--storage-object-blue) 34%, transparent) !important;
+}
+
+.storage-object-table-toolbar .ant-btn-dangerous:not(:disabled) {
+    color: var(--storage-object-red);
+    border-color: var(--storage-object-red-line);
+}
+
+.storage-object-file-icon {
+    color: var(--storage-object-blue);
+}
+
+.storage-object-name-cell,
+.storage-object-owner-cell {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.storage-object-name-cell > .ant-typography,
+.storage-object-owner-cell > .ant-typography {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.storage-object-table .ant-typography code {
+    padding: 2px 7px;
+    color: var(--storage-object-code);
+    font-size: 12px;
+    background: var(--storage-object-code-soft);
+    border: 1px solid var(--storage-object-code-line);
+    border-radius: 6px;
+}
+
+.storage-object-status,
+.storage-object-reference {
+    border: 1px solid transparent;
+    border-radius: 7px;
+}
+
+.storage-object-status-active,
+.storage-object-reference-referenced {
+    color: var(--storage-object-green);
+    background: var(--storage-object-green-soft);
+    border-color: var(--storage-object-green-line);
+}
+
+.storage-object-status-deleting {
+    color: var(--storage-object-amber);
+    background: var(--storage-object-amber-soft);
+    border-color: var(--storage-object-amber-line);
+}
+
+.storage-object-status-deleted {
+    color: var(--storage-object-red);
+    background: var(--storage-object-red-soft);
+    border-color: var(--storage-object-red-line);
+}
+
+.storage-object-reference-unreferenced {
+    color: var(--storage-object-copy);
+    background: transparent;
+    border-color: var(--storage-object-line);
+}
+
+@media (max-width: 1020px) {
+    .storage-object-filter-form {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .storage-object-filter-form {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .storage-object-filter-form label,
+    .storage-object-filter-form .ant-btn {
+        width: 100%;
+        max-width: none;
+    }
+}

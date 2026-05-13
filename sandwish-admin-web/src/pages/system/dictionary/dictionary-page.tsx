@@ -31,6 +31,7 @@ import {
     updateDictionary
 } from "./dictionary-service";
 import type { DictPageRequest, DictResponse, DictSaveRequest } from "./dictionary-service";
+import "./dictionary-page.css";
 
 const { Text, Title } = Typography;
 const { TextArea } = Input;

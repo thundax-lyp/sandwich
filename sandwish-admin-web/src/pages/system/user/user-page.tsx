@@ -24,6 +24,7 @@ import type { Key } from "react";
 import { ListPage } from "@/components/list-page";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import "./user-page.css";
 
 const { Text } = Typography;
 

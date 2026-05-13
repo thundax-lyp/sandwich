@@ -12,6 +12,7 @@ import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { listDepartments } from "./department-service";
 import type { DepartmentListRequest, DepartmentResponse } from "./department-service";
+import "./department-page.css";
 
 const { Text, Title } = Typography;
 

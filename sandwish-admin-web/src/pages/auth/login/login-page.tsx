@@ -8,6 +8,7 @@ import { buildCaptchaUrl, createLoginForm, refreshCaptcha } from "@/api/auth-api
 import { loginWithPermissions } from "@/auth/auth-session-service";
 import { getAccessToken } from "@/auth/token-storage";
 import { SandwichLogo } from "@/components/sandwich-logo";
+import "./login-page.css";
 
 const { Title, Text, Paragraph } = Typography;
 

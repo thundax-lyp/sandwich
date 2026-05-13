@@ -62,6 +62,7 @@
 
 - `ADMIN_WEB_NAME_FILE_KEBAB_CASE`：`sandwish-admin-web/src` 下新增文件名固定使用 kebab-case。
 - `ADMIN_WEB_NAME_PAGE_FILE`：页面文件固定命名为 `<domain>-page.tsx`。
+- `ADMIN_WEB_NAME_PAGE_STYLE_FILE`：页面专属样式文件固定与页面同目录，命名为 `<domain>-page.css`。
 - `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面专属 service 文件固定命名为 `<domain>-service.ts`。
 - `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面专属类型文件固定命名为 `<domain>-types.ts`。
 - `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件固定使用 PascalCase named export。
@@ -93,7 +94,8 @@
 - API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
 - 第三方库缺失类型声明、Vite 环境声明和全局前端扩展类型放在 `src/types/`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。
-- 页面专属样式可以暂时放在 `src/assets/main.css`，但 className 必须用页面域前缀隔离。
+- 页面专属样式固定与页面同目录放置，形成 `pages/<module>/<domain>/<domain>-page.tsx` + `<domain>-page.css` 组合；页面组件由 `*-page.tsx` 显式 import 同目录 CSS。
+- `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。
 
@@ -150,5 +152,4 @@
 
 ## Open Items
 
-- 是否把页面专属样式从 `src/assets/main.css` 拆到页面同目录，待页面数量和样式规模增长后再决策。
 - 是否为复杂页面固定引入 `<domain>-hooks.ts`，待出现重复且稳定的页面逻辑后再决策。

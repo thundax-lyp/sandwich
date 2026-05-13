@@ -1,5 +1,6 @@
 import { AppstoreOutlined, AuditOutlined, CloudServerOutlined, TeamOutlined } from "@ant-design/icons";
 import { Card, Typography } from "antd";
+import "./dashboard-page.css";
 
 const { Title, Text, Paragraph } = Typography;
 

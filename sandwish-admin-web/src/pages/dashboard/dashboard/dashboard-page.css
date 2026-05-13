@@ -1,0 +1,297 @@
+.dashboard-page {
+    display: grid;
+    gap: 34px;
+}
+
+.dashboard-hero {
+    display: grid;
+    gap: 4px;
+}
+
+.dashboard-hero h2.ant-typography {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.03;
+}
+
+.dashboard-hero > strong {
+    width: fit-content;
+    font-size: 58px;
+    font-weight: 800;
+    line-height: 1.02;
+    background: linear-gradient(90deg, var(--accent-violet), #f06bbf 48%, var(--accent-orange));
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dashboard-hero p.ant-typography {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: var(--text-secondary);
+    font-size: 17px;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+    background: var(--surface-panel);
+    border: 1px solid var(--line-subtle);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+}
+
+.metric-card {
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--line-subtle);
+    border-radius: 0;
+}
+
+.metric-card:last-child {
+    border-right: 0;
+}
+
+.metric-card .ant-card-body {
+    display: grid;
+    gap: 28px;
+    min-height: 210px;
+    padding: 34px 36px;
+}
+
+.metric-card strong {
+    color: var(--text-primary);
+    font-size: 38px;
+    line-height: 1;
+}
+
+.metric-card-heading,
+.metric-card-body {
+    display: flex;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.metric-card-heading {
+    align-items: center;
+}
+
+.metric-card-heading .ant-typography {
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.metric-card-heading > span:last-child {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: var(--text-primary);
+    background: var(--surface-soft);
+    border-radius: 999px;
+}
+
+.metric-card-heading .anticon {
+    font-size: 18px;
+}
+
+.metric-card-body {
+    align-items: end;
+}
+
+.metric-card-body p {
+    margin: 12px 0 0;
+    color: var(--text-secondary);
+}
+
+.metric-delta {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    padding: 4px 8px;
+    color: #168813;
+    font-weight: 700;
+    background: rgba(148, 240, 111, 0.25);
+    border-radius: 999px;
+}
+
+.metric-card-body > svg {
+    width: 132px;
+    min-width: 112px;
+    height: 78px;
+}
+
+.metric-chart-line,
+.metric-chart-fill {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.metric-chart-line {
+    stroke-width: 4;
+}
+
+.metric-chart-fill {
+    opacity: 0.16;
+    stroke: none;
+}
+
+.metric-card-green .metric-chart-line {
+    stroke: var(--accent-lime);
+}
+
+.metric-card-green .metric-chart-fill {
+    fill: var(--accent-lime);
+}
+
+.metric-card-orange .metric-chart-line {
+    stroke: var(--accent-orange);
+}
+
+.metric-card-orange .metric-chart-fill {
+    fill: var(--accent-orange);
+}
+
+.metric-card-violet .metric-chart-line {
+    stroke: var(--accent-violet);
+}
+
+.metric-card-violet .metric-chart-fill {
+    fill: var(--accent-violet);
+}
+
+.section-title-row {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.section-title-row h3.ant-typography {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 32px;
+    line-height: 1.15;
+}
+
+.section-title-row button,
+.add-operation {
+    padding: 0;
+    color: var(--text-primary);
+    font: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.operation-columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.operation-column {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+}
+
+.operation-column > .ant-typography {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.operation-column > .ant-typography span {
+    margin-left: 6px;
+    padding: 1px 8px;
+    color: var(--text-primary);
+    font-weight: 700;
+    background: var(--surface-soft);
+    border-radius: 7px;
+}
+
+.operation-card {
+    display: grid;
+    gap: 14px;
+    min-height: 210px;
+    padding: 28px;
+    background: var(--surface-panel);
+    border: 1px solid var(--line-subtle);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+}
+
+.operation-card-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--accent-yellow), var(--accent-lime));
+    border-radius: 999px;
+}
+
+.operation-card strong {
+    color: var(--text-primary);
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.operation-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.operation-progress {
+    height: 6px;
+    margin-top: auto;
+    overflow: hidden;
+    background: var(--surface-soft);
+    border-radius: 999px;
+}
+
+.operation-progress span {
+    display: block;
+    width: 54%;
+    height: 100%;
+    background: #168813;
+    border-radius: inherit;
+}
+
+.add-operation {
+    width: fit-content;
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+@media (max-width: 760px) {
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-card {
+        border-right: 0;
+        border-bottom: 1px solid var(--line-subtle);
+    }
+
+    .metric-card:last-child {
+        border-bottom: 0;
+    }
+
+    .dashboard-hero h2.ant-typography,
+    .dashboard-hero > strong {
+        font-size: 36px;
+    }
+
+    .operation-columns {
+        grid-template-columns: 1fr;
+    }
+}

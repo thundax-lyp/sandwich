@@ -1,5 +1,7 @@
 import {
     ApartmentOutlined,
+    ArrowDownOutlined,
+    ArrowUpOutlined,
     BranchesOutlined,
     DeleteOutlined,
     EditOutlined,
@@ -37,7 +39,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
     namePath: 320,
     remarks: 320,
-    actions: 128
+    actions: 208
 };
 
 interface DepartmentTableNode extends DepartmentResponse {
@@ -261,6 +263,42 @@ export const DepartmentPage = () => {
         });
     };
 
+    const readSiblingDepartments = (department: DepartmentTableNode) => {
+        if (!department.parentId) {
+            return departmentTree;
+        }
+        return flatDepartments.find((item) => item.id === department.parentId)?.children || [];
+    };
+
+    const readPreviousSiblingDepartment = (department: DepartmentTableNode) => {
+        const siblings = readSiblingDepartments(department);
+        const index = siblings.findIndex((item) => item.id === department.id);
+        return index > 0 ? siblings[index - 1] : null;
+    };
+
+    const promoteDepartment = (department: DepartmentTableNode) => {
+        if (!canEditDepartment || !department.parentId) {
+            return;
+        }
+        moveMutation.mutate({
+            fromNodeId: department.id,
+            toNodeId: department.parentId,
+            type: "after"
+        });
+    };
+
+    const demoteDepartment = (department: DepartmentTableNode) => {
+        const previousSibling = readPreviousSiblingDepartment(department);
+        if (!canEditDepartment || !previousSibling) {
+            return;
+        }
+        moveMutation.mutate({
+            fromNodeId: department.id,
+            toNodeId: previousSibling.id,
+            type: "insideLast"
+        });
+    };
+
     const columns: SandwishTableProps<DepartmentTableNode>["columns"] = [
         {
             title: "部门名称",
@@ -315,6 +353,28 @@ export const DepartmentPage = () => {
                             onClick={() => openDeleteConfirm(department)}
                         />
                         <Button
+                            aria-label={`升级 ${department.name}`}
+                            className="sandwish-table-row-action"
+                            disabled={
+                                !canEditDepartment || !department.parentId || moveMutation.isPending
+                            }
+                            icon={<ArrowUpOutlined />}
+                            type="text"
+                            onClick={() => promoteDepartment(department)}
+                        />
+                        <Button
+                            aria-label={`降级 ${department.name}`}
+                            className="sandwish-table-row-action"
+                            disabled={
+                                !canEditDepartment ||
+                                !readPreviousSiblingDepartment(department) ||
+                                moveMutation.isPending
+                            }
+                            icon={<ArrowDownOutlined />}
+                            type="text"
+                            onClick={() => demoteDepartment(department)}
+                        />
+                        <Button
                             aria-label={`拖动 ${department.name}`}
                             className="sandwish-table-row-action department-drag-action"
                             disabled={!canEditDepartment || moveMutation.isPending}
@@ -353,7 +413,7 @@ export const DepartmentPage = () => {
                 dataSource={departmentTree}
                 loading={departmentQuery.isFetching || moveMutation.isPending}
                 pagination={false}
-                scroll={{ x: 1028 }}
+                scroll={{ x: 1108 }}
                 expandable={{
                     defaultExpandAllRows: true,
                     expandedRowKeys: actualExpandedRowKeys,

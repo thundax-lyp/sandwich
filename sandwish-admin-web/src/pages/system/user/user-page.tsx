@@ -3,223 +3,146 @@ import {
     CameraOutlined,
     DeleteOutlined,
     EditOutlined,
-    ExclamationCircleOutlined,
     HolderOutlined,
     MoreOutlined,
     PoweroffOutlined,
+    ReloadOutlined,
     SearchOutlined
 } from "@ant-design/icons";
-import {
-    Avatar,
-    Button,
-    Dropdown,
-    Input,
-    Modal,
-    Select,
-    Space,
-    Tag,
-    Tree,
-    Typography
-} from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Avatar, Button, Dropdown, Input, Select, Space, Tag, Tree, Typography, message } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
+import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
+import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import {
+    deleteUsers,
+    listUserDepartments,
+    pageUsers,
+    sortUsers,
+    updateUserStatus
+} from "./user-service";
+import type { UserDepartmentResponse, UserPageRequest, UserResponse } from "./user-service";
 import "./user-page.css";
 
 const { Text } = Typography;
 
+const ALL_DEPARTMENT_ID = "all";
+const DEFAULT_PAGE_NO = 1;
+const DEFAULT_PAGE_SIZE = 10;
+
 const DEFAULT_COLUMN_WIDTHS = {
-    name: 220,
-    email: 220,
-    role: 120,
-    status: 130,
-    lastLogin: 160,
+    name: 230,
+    loginName: 160,
+    department: 190,
+    roles: 190,
+    status: 120,
+    ranks: 90,
     actions: 116
 };
 
-interface UserRecord {
-    id: string;
-    name: string;
-    email: string;
-    role: "Admin" | "Editor" | "Viewer";
-    status: "Active" | "Inactive" | "Invited";
-    lastLogin: string;
-    avatarColor: string;
-    departmentId: string;
-}
-
-interface DepartmentRecord {
-    id: string;
-    parentId?: string | null;
-    name: string;
-    shortName: string;
-}
-
-type UserFilterRole = "All" | UserRecord["role"];
-type UserFilterStatus = "All" | UserRecord["status"];
+type UserFilterStatus = "ALL" | "ENABLED" | "DISABLED";
 
 interface UserFilters {
-    email: string;
-    role: UserFilterRole;
-    status: UserFilterStatus;
+    loginName: string;
+    enable: UserFilterStatus;
 }
 
 const DEFAULT_USER_FILTERS: UserFilters = {
-    email: "",
-    role: "All",
-    status: "All"
+    loginName: "",
+    enable: "ALL"
 };
 
-const USER_RECORDS: UserRecord[] = [
-    {
-        id: "1",
-        name: "Ethan Chen",
-        email: "ethan@acme.com",
-        role: "Admin",
-        status: "Active",
-        lastLogin: "2 分钟前",
-        avatarColor: "#0f766e",
-        departmentId: "platform"
-    },
-    {
-        id: "2",
-        name: "Sophia Carter",
-        email: "sophia@acme.com",
-        role: "Editor",
-        status: "Active",
-        lastLogin: "1 小时前",
-        avatarColor: "#c2410c",
-        departmentId: "product-planning"
-    },
-    {
-        id: "3",
-        name: "Liam Johnson",
-        email: "liam@acme.com",
-        role: "Viewer",
-        status: "Active",
-        lastLogin: "3 小时前",
-        avatarColor: "#1d4ed8",
-        departmentId: "backend"
-    },
-    {
-        id: "4",
-        name: "Olivia Martinez",
-        email: "olivia@acme.com",
-        role: "Editor",
-        status: "Inactive",
-        lastLogin: "2 天前",
-        avatarColor: "#be185d",
-        departmentId: "marketing"
-    },
-    {
-        id: "5",
-        name: "Noah Williams",
-        email: "noah@acme.com",
-        role: "Viewer",
-        status: "Invited",
-        lastLogin: "从未登录",
-        avatarColor: "#0369a1",
-        departmentId: "customer-success"
-    },
-    {
-        id: "6",
-        name: "Ava Brown",
-        email: "ava@acme.com",
-        role: "Admin",
-        status: "Active",
-        lastLogin: "5 分钟前",
-        avatarColor: "#7c3aed",
-        departmentId: "frontend"
-    },
-    {
-        id: "7",
-        name: "James Davis",
-        email: "james@acme.com",
-        role: "Editor",
-        status: "Active",
-        lastLogin: "1 天前",
-        avatarColor: "#b45309",
-        departmentId: "qa"
+const normalizeSearch = (value?: string | null) => {
+    const normalizedValue = value?.trim();
+    return normalizedValue || undefined;
+};
+
+const getInitials = (name?: string | null) => {
+    const normalizedName = normalizeSearch(name) || "U";
+    return Array.from(normalizedName.replace(/\s+/g, "")).slice(0, 2).join("");
+};
+
+const readUserName = (user: UserResponse) => {
+    return normalizeSearch(user.name) || normalizeSearch(user.loginName) || `用户 ${user.id}`;
+};
+
+const readDepartmentName = (user: UserResponse) => {
+    return user.department?.namePath || user.department?.name || "";
+};
+
+const readRoleNames = (user: UserResponse) => {
+    return (user.roles || []).map((role) => role.name).filter(Boolean);
+};
+
+const statusLabel = (user: UserResponse) => {
+    return user.enable === false ? "禁用" : "启用";
+};
+
+const statusClassName = (user: UserResponse) => {
+    return user.enable === false ? "user-status-inactive" : "user-status-active";
+};
+
+const roleClassName = (user: UserResponse, index: number) => {
+    if (user.admin || user.superAdmin) {
+        return "user-role-admin";
     }
-];
-
-const DEPARTMENT_RECORDS: DepartmentRecord[] = [
-    { id: "all", parentId: null, name: "全部部门", shortName: "全部" },
-    { id: "rd", parentId: "all", name: "研发中心", shortName: "研发" },
-    { id: "platform", parentId: "rd", name: "平台架构部", shortName: "平台" },
-    { id: "backend", parentId: "rd", name: "后端研发部", shortName: "后端" },
-    { id: "frontend", parentId: "rd", name: "前端体验部", shortName: "前端" },
-    { id: "qa", parentId: "rd", name: "测试质量部", shortName: "测试" },
-    { id: "product", parentId: "all", name: "产品中心", shortName: "产品" },
-    { id: "product-planning", parentId: "product", name: "产品规划部", shortName: "规划" },
-    { id: "design", parentId: "product", name: "交互设计部", shortName: "设计" },
-    { id: "business", parentId: "all", name: "商业化中心", shortName: "商业" },
-    { id: "marketing", parentId: "business", name: "市场运营部", shortName: "市场" },
-    { id: "customer-success", parentId: "business", name: "客户成功部", shortName: "客户" }
-];
-
-const roleClassName: Record<UserRecord["role"], string> = {
-    Admin: "user-role-admin",
-    Editor: "user-role-editor",
-    Viewer: "user-role-viewer"
+    return index === 0 ? "user-role-editor" : "user-role-viewer";
 };
 
-const roleLabel: Record<UserRecord["role"], string> = {
-    Admin: "管理员",
-    Editor: "编辑者",
-    Viewer: "只读用户"
-};
-
-const statusClassName: Record<UserRecord["status"], string> = {
-    Active: "user-status-active",
-    Inactive: "user-status-inactive",
-    Invited: "user-status-invited"
-};
-
-const statusLabel: Record<UserRecord["status"], string> = {
-    Active: "启用",
-    Inactive: "禁用",
-    Invited: "已邀请"
-};
-
-const getInitials = (name: string) => {
-    return name
-        .split(" ")
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2);
-};
-
-const collectDepartmentIds = (departmentId: string): string[] => {
-    const children = DEPARTMENT_RECORDS.filter((department) => department.parentId === departmentId);
+const collectDepartmentIds = (departments: UserDepartmentResponse[], departmentId: string): string[] => {
+    const children = departments.filter((department) => department.parentId === departmentId);
     return [
         departmentId,
-        ...children.flatMap((department) => collectDepartmentIds(department.id))
+        ...children.flatMap((department) => collectDepartmentIds(departments, department.id))
     ];
 };
 
-const countDepartmentUsers = (departmentId: string, users: UserRecord[]) => {
-    const departmentIds = new Set(collectDepartmentIds(departmentId));
-    return users.filter((user) => departmentIds.has(user.departmentId)).length;
+const countDepartmentUsers = (
+    departments: UserDepartmentResponse[],
+    departmentId: string,
+    users: UserResponse[],
+    totalCount: number
+) => {
+    if (departmentId === ALL_DEPARTMENT_ID) {
+        return totalCount;
+    }
+    const departmentIds = new Set(collectDepartmentIds(departments, departmentId));
+    return users.filter((user) => user.department?.id && departmentIds.has(user.department.id)).length;
 };
 
-const buildDepartmentTree = (users: UserRecord[]): DataNode[] => {
-    const childrenByParentId = new Map<string | null | undefined, DepartmentRecord[]>();
-    DEPARTMENT_RECORDS.forEach((department) => {
-        const children = childrenByParentId.get(department.parentId) || [];
+const buildDepartmentTree = (
+    departments: UserDepartmentResponse[],
+    users: UserResponse[],
+    totalCount: number
+): DataNode[] => {
+    const rootDepartment: UserDepartmentResponse = {
+        id: ALL_DEPARTMENT_ID,
+        parentId: null,
+        name: "全部部门",
+        shortName: "全部"
+    };
+    const allDepartments = [rootDepartment, ...departments];
+    const childrenByParentId = new Map<string | null | undefined, UserDepartmentResponse[]>();
+    allDepartments.forEach((department) => {
+        const parentId = department.parentId || (department.id === ALL_DEPARTMENT_ID ? null : ALL_DEPARTMENT_ID);
+        const children = childrenByParentId.get(parentId) || [];
         children.push(department);
-        childrenByParentId.set(department.parentId, children);
+        childrenByParentId.set(parentId, children);
     });
 
-    const toNode = (department: DepartmentRecord): DataNode => ({
+    const toNode = (department: UserDepartmentResponse): DataNode => ({
         key: department.id,
         title: (
             <span className="user-department-node">
                 <span>{department.name}</span>
-                <Text type="secondary">{countDepartmentUsers(department.id, users)}</Text>
+                <Text type="secondary">
+                    {countDepartmentUsers(departments, department.id, users, totalCount)}
+                </Text>
             </span>
         ),
         children: childrenByParentId.get(department.id)?.map(toNode)
@@ -228,226 +151,372 @@ const buildDepartmentTree = (users: UserRecord[]): DataNode[] => {
     return (childrenByParentId.get(null) || []).map(toNode);
 };
 
+const collectTreeKeys = (nodes: DataNode[]): Key[] => {
+    return nodes.flatMap((node) => [
+        node.key,
+        ...(node.children ? collectTreeKeys(node.children) : [])
+    ]);
+};
+
+const sortByMove = (
+    users: UserResponse[],
+    sourceUser: UserResponse,
+    targetUser: UserResponse,
+    position: SandwishTableSortPosition
+) => {
+    const sourceIndex = users.findIndex((user) => user.id === sourceUser.id);
+    const targetIndex = users.findIndex((user) => user.id === targetUser.id);
+    if (sourceIndex < 0 || targetIndex < 0) {
+        return users;
+    }
+
+    const nextUsers = [...users];
+    const [movedUser] = nextUsers.splice(sourceIndex, 1);
+    const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUser.id);
+    nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, movedUser);
+    return nextUsers;
+};
+
+const toEnableQueryValue = (enable: UserFilterStatus) => {
+    if (enable === "ENABLED") {
+        return true;
+    }
+    if (enable === "DISABLED") {
+        return false;
+    }
+    return undefined;
+};
+
 export const UserPage = () => {
-    const [users, setUsers] = useState<UserRecord[]>(USER_RECORDS);
+    const [messageApi, contextHolder] = message.useMessage();
+    const queryClient = useQueryClient();
+    const [query, setQuery] = useState<UserPageRequest>({
+        pageNo: DEFAULT_PAGE_NO,
+        pageSize: DEFAULT_PAGE_SIZE
+    });
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
-    const [selectedDepartmentId, setSelectedDepartmentId] = useState("all");
-    const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
-    const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
-    const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
+    const [selectedDepartmentId, setSelectedDepartmentId] = useState(ALL_DEPARTMENT_ID);
+    const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
+    const [deletingUser, setDeletingUser] = useState<UserResponse | null>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const hasSelectedUsers = selectedRowKeys.length > 0;
-    const hasActiveFilters =
-        Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
+    const hasActiveFilters = Boolean(filters.loginName.trim()) || filters.enable !== "ALL";
+    const canEditUser = hasPermission("sys:user:edit");
 
-    const filteredUsers = useMemo(() => {
-        const keyword = searchText.trim().toLowerCase();
-        const emailKeyword = filters.email.trim().toLowerCase();
-        const selectedDepartmentIds = new Set(collectDepartmentIds(selectedDepartmentId));
-        return users.filter((user) => {
-            const isDepartmentMatched =
-                selectedDepartmentId === "all" || selectedDepartmentIds.has(user.departmentId);
-            const isEmailMatched = !emailKeyword || user.email.toLowerCase().includes(emailKeyword);
-            const isRoleMatched = filters.role === "All" || user.role === filters.role;
-            const isStatusMatched = filters.status === "All" || user.status === filters.status;
-            const isKeywordMatched =
-                !keyword ||
-                user.name.toLowerCase().includes(keyword) ||
-                user.email.toLowerCase().includes(keyword) ||
-                user.role.toLowerCase().includes(keyword);
+    const userQuery = useQuery({
+        queryKey: ["user", "page", query],
+        queryFn: () => pageUsers(query),
+        retry: false
+    });
+    const departmentQuery = useQuery({
+        queryKey: ["user", "department", "tree"],
+        queryFn: () => listUserDepartments(),
+        retry: false
+    });
+    const pageData = userQuery.data;
+    const users = pageData?.records || [];
+    const totalCount = pageData?.count ?? pageData?.totalCount ?? 0;
+    const departments = departmentQuery.data || [];
+    const departmentTreeData = useMemo(
+        () => buildDepartmentTree(departments, users, totalCount),
+        [departments, totalCount, users]
+    );
+    const departmentTreeKeys = useMemo(() => collectTreeKeys(departmentTreeData), [departmentTreeData]);
 
-            return isDepartmentMatched && isEmailMatched && isRoleMatched && isStatusMatched && isKeywordMatched;
-        });
-    }, [filters, searchText, selectedDepartmentId, users]);
-    const departmentTreeData = useMemo(() => buildDepartmentTree(users), [users]);
+    const invalidateUserPage = async () => {
+        await queryClient.invalidateQueries({ queryKey: ["user", "page"] });
+    };
 
-    const moveUser = (
-        sourceUser: UserRecord,
-        targetUser: UserRecord,
-        position: SandwishTableSortPosition
-    ) => {
-        if (sourceUser.id === targetUser.id) {
-            return;
+    const statusMutation = useMutation({
+        mutationFn: updateUserStatus,
+        onSuccess: async () => {
+            setSelectedRowKeys([]);
+            await invalidateUserPage();
+            messageApi.success("用户状态已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "状态更新失败");
         }
+    });
 
-        setUsers((currentUsers) => {
-            const sourceIndex = currentUsers.findIndex((user) => user.id === sourceUser.id);
-            const targetIndex = currentUsers.findIndex((user) => user.id === targetUser.id);
-            if (sourceIndex < 0 || targetIndex < 0) {
-                return currentUsers;
-            }
+    const deleteMutation = useMutation({
+        mutationFn: deleteUsers,
+        onSuccess: async () => {
+            setDeletingUser(null);
+            setSelectedRowKeys([]);
+            await invalidateUserPage();
+            messageApi.success("用户已删除");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "删除失败");
+        }
+    });
 
-            const nextUsers = [...currentUsers];
-            const [movedUser] = nextUsers.splice(sourceIndex, 1);
-            const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUser.id);
-            nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, movedUser);
-            return nextUsers;
-        });
+    const sortMutation = useMutation({
+        mutationFn: sortUsers,
+        onSuccess: async () => {
+            await invalidateUserPage();
+            messageApi.success("用户顺序已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "排序失败");
+        }
+    });
+
+    const updateQuery = (nextQuery: Partial<UserPageRequest>) => {
+        setSelectedRowKeys([]);
+        setQuery((currentQuery) => ({
+            ...currentQuery,
+            ...nextQuery,
+            pageNo: nextQuery.pageNo || DEFAULT_PAGE_NO
+        }));
+    };
+
+    const searchUsers = (value: string) => {
+        setSearchText(value);
+        updateQuery({ name: normalizeSearch(value), pageNo: DEFAULT_PAGE_NO });
     };
 
     const resetFilters = () => {
         setFilters(DEFAULT_USER_FILTERS);
+        updateQuery({
+            loginName: undefined,
+            enable: undefined,
+            pageNo: DEFAULT_PAGE_NO
+        });
     };
 
-    const columns: SandwishTableProps<UserRecord>["columns"] = [
+    const applyFilters = (closeFilter: () => void) => {
+        updateQuery({
+            loginName: normalizeSearch(filters.loginName),
+            enable: toEnableQueryValue(filters.enable),
+            pageNo: DEFAULT_PAGE_NO
+        });
+        closeFilter();
+    };
+
+    const selectDepartment = (keys: Key[]) => {
+        const nextDepartmentId = String(keys[0] || ALL_DEPARTMENT_ID);
+        setSelectedDepartmentId(nextDepartmentId);
+        updateQuery({
+            departmentId: nextDepartmentId === ALL_DEPARTMENT_ID ? undefined : nextDepartmentId,
+            pageNo: DEFAULT_PAGE_NO
+        });
+    };
+
+    const deleteUser = () => {
+        if (!deletingUser) {
+            return;
+        }
+        deleteMutation.mutate([deletingUser.id]);
+    };
+
+    const batchDeleteUsers = () => {
+        if (!hasSelectedUsers || !canEditUser) {
+            return;
+        }
+        deleteMutation.mutate(selectedRowKeys.map(String));
+    };
+
+    const batchUpdateStatus = (enable: boolean) => {
+        if (!hasSelectedUsers || !canEditUser) {
+            return;
+        }
+        statusMutation.mutate(selectedRowKeys.map((id) => ({ id: String(id), enable })));
+    };
+
+    const moveUser = (
+        sourceUser: UserResponse,
+        targetUser: UserResponse,
+        position: SandwishTableSortPosition
+    ) => {
+        if (!canEditUser || sourceUser.id === targetUser.id) {
+            return;
+        }
+        const nextUsers = sortByMove(users, sourceUser, targetUser, position);
+        sortMutation.mutate({
+            orderedIds: nextUsers.map((user) => user.id)
+        });
+    };
+
+    const columns: SandwishTableProps<UserResponse>["columns"] = [
         {
             title: "用户",
             dataIndex: "name",
             key: "name",
             width: DEFAULT_COLUMN_WIDTHS.name,
-            render: (name: string, user) => (
-                <Space size={10}>
-                    <Avatar style={{ backgroundColor: user.avatarColor }}>
-                        {getInitials(name)}
-                    </Avatar>
-                    <Text strong>{name}</Text>
-                </Space>
-            )
+            render: (_, user) => {
+                const userName = readUserName(user);
+                return (
+                    <Space size={10}>
+                        <Avatar src={user.avatar || undefined}>
+                            {user.avatar ? null : getInitials(userName)}
+                        </Avatar>
+                        <div className="user-name-cell">
+                            <Text strong>{userName}</Text>
+                            {user.email ? <Text type="secondary">{user.email}</Text> : null}
+                        </div>
+                    </Space>
+                );
+            }
         },
         {
-            title: "邮箱",
-            dataIndex: "email",
-            key: "email",
-            width: DEFAULT_COLUMN_WIDTHS.email
+            title: "登录名",
+            dataIndex: "loginName",
+            key: "loginName",
+            width: DEFAULT_COLUMN_WIDTHS.loginName,
+            render: (loginName?: string | null) => loginName || null
+        },
+        {
+            title: "部门",
+            key: "department",
+            width: DEFAULT_COLUMN_WIDTHS.department,
+            render: (_, user) => readDepartmentName(user) || null
         },
         {
             title: "角色",
-            dataIndex: "role",
-            key: "role",
-            width: DEFAULT_COLUMN_WIDTHS.role,
-            render: (role: UserRecord["role"]) => <Tag className={roleClassName[role]}>{roleLabel[role]}</Tag>
+            key: "roles",
+            width: DEFAULT_COLUMN_WIDTHS.roles,
+            render: (_, user) => {
+                const roleNames = readRoleNames(user);
+                if (!roleNames.length) {
+                    return null;
+                }
+                return (
+                    <Space size={[4, 4]} wrap>
+                        {roleNames.map((roleName, index) => (
+                            <Tag key={roleName} className={roleClassName(user, index)}>
+                                {roleName}
+                            </Tag>
+                        ))}
+                    </Space>
+                );
+            }
         },
         {
             title: "状态",
-            dataIndex: "status",
+            dataIndex: "enable",
             key: "status",
             width: DEFAULT_COLUMN_WIDTHS.status,
-            render: (status: UserRecord["status"]) => (
-                <Tag className={statusClassName[status]}>{statusLabel[status]}</Tag>
+            render: (_, user) => (
+                <Tag className={statusClassName(user)}>
+                    {statusLabel(user)}
+                </Tag>
             )
         },
         {
-            title: "最近登录",
-            dataIndex: "lastLogin",
-            key: "lastLogin",
-            width: DEFAULT_COLUMN_WIDTHS.lastLogin
+            title: "排序",
+            dataIndex: "ranks",
+            key: "ranks",
+            width: DEFAULT_COLUMN_WIDTHS.ranks,
+            render: (ranks?: number | null) => ranks ?? null
         },
         {
             title: "操作",
             key: "actions",
             width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, user) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`编辑 ${user.name}`}
-                            className="sandwish-table-row-action"
-                            icon={<EditOutlined />}
-                            type="text"
-                            onClick={() => setEditingUser(user)}
-                        />
-                        <Button
-                            aria-label={`删除 ${user.name}`}
-                            className="sandwish-table-row-action"
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => {
-                                setDeletingUser(user);
-                                setDeleteConfirmText("delete");
+            render: (_, user) => {
+                const userName = readUserName(user);
+                const editDisabled = !canEditUser;
+                const deleteDisabled = !canEditUser || Boolean(user.superAdmin);
+                return (
+                    <div className="sandwish-table-row-actions">
+                        <Space.Compact className="sandwish-table-row-actions-inline">
+                            <Button
+                                aria-label={`编辑 ${userName}`}
+                                className="sandwish-table-row-action"
+                                disabled={editDisabled}
+                                icon={<EditOutlined />}
+                                type="text"
+                                onClick={() => setEditingUser(user)}
+                            />
+                            <Button
+                                aria-label={`删除 ${userName}`}
+                                className="sandwish-table-row-action"
+                                disabled={deleteDisabled}
+                                icon={<DeleteOutlined />}
+                                type="text"
+                                danger
+                                onClick={() => setDeletingUser(user)}
+                            />
+                        </Space.Compact>
+                        <button
+                            aria-label={`拖动排序 ${userName}`}
+                            className="sandwish-table-row-action sandwish-table-row-drag-handle"
+                            disabled={!canEditUser}
+                            type="button"
+                        >
+                            <HolderOutlined />
+                        </button>
+                        <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: "edit",
+                                        disabled: editDisabled,
+                                        icon: <EditOutlined />,
+                                        label: "编辑"
+                                    },
+                                    {
+                                        key: "delete",
+                                        danger: true,
+                                        disabled: deleteDisabled,
+                                        icon: <DeleteOutlined />,
+                                        label: "删除"
+                                    }
+                                ],
+                                onClick: ({ key }) => {
+                                    if (key === "edit") {
+                                        setEditingUser(user);
+                                    }
+                                    if (key === "delete") {
+                                        setDeletingUser(user);
+                                    }
+                                }
                             }}
-                        />
-                    </Space.Compact>
-                    <button
-                        aria-label={`拖动排序 ${user.name}`}
-                        className="sandwish-table-row-action sandwish-table-row-drag-handle"
-                        type="button"
-                    >
-                        <HolderOutlined />
-                    </button>
-                    <Dropdown
-                        menu={{
-                            items: [
-                                {
-                                    key: "edit",
-                                    icon: <EditOutlined />,
-                                    label: "编辑"
-                                },
-                                {
-                                    key: "delete",
-                                    danger: true,
-                                    icon: <DeleteOutlined />,
-                                    label: "删除"
-                                }
-                            ],
-                            onClick: ({ key }) => {
-                                if (key === "edit") {
-                                    setEditingUser(user);
-                                }
-                                if (key === "delete") {
-                                    setDeletingUser(user);
-                                    setDeleteConfirmText("delete");
-                                }
-                            }
-                        }}
-                        trigger={["click"]}
-                    >
-                        <Button
-                            aria-label={`展开 ${user.name} 操作`}
-                            className="sandwish-table-row-action sandwish-table-row-action-more"
-                            icon={<MoreOutlined />}
-                            type="text"
-                        />
-                    </Dropdown>
-                </div>
-            )
+                            trigger={["click"]}
+                        >
+                            <Button
+                                aria-label={`展开 ${userName} 操作`}
+                                className="sandwish-table-row-action sandwish-table-row-action-more"
+                                icon={<MoreOutlined />}
+                                type="text"
+                            />
+                        </Dropdown>
+                    </div>
+                );
+            }
         }
     ];
 
     return (
         <>
-            <ListPage<UserRecord>
+            {contextHolder}
+            <ListPage<UserResponse>
                 pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
                 subjectName="用户"
-                enableAdd
                 enableFilter
                 enableSearch
                 searchShortcut="⌘K"
                 searchValue={searchText}
-                onSearchChange={setSearchText}
+                onSearchChange={searchUsers}
                 filterActive={hasActiveFilters}
                 filterClassName="user-filter-panel"
                 filter={({ closeFilter }) => (
                     <div className="user-filter-form">
                         <label>
-                            <span>邮箱</span>
+                            <span>登录名</span>
                             <Input
                                 allowClear
-                                placeholder="name@company.com"
-                                value={filters.email}
+                                placeholder="developer"
+                                value={filters.loginName}
                                 onChange={(event) =>
                                     setFilters((currentFilters) => ({
                                         ...currentFilters,
-                                        email: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>角色</span>
-                            <Select<UserFilterRole>
-                                value={filters.role}
-                                options={["All", "Admin", "Editor", "Viewer"].map((value) => ({
-                                    value: value as UserFilterRole,
-                                    label: value === "All" ? "全部" : roleLabel[value as UserRecord["role"]]
-                                }))}
-                                onChange={(role) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        role
+                                        loginName: event.target.value
                                     }))
                                 }
                             />
@@ -455,15 +524,16 @@ export const UserPage = () => {
                         <label>
                             <span>状态</span>
                             <Select<UserFilterStatus>
-                                value={filters.status}
-                                options={["All", "Active", "Inactive", "Invited"].map((value) => ({
-                                    value: value as UserFilterStatus,
-                                    label: value === "All" ? "全部" : statusLabel[value as UserRecord["status"]]
-                                }))}
-                                onChange={(status) =>
+                                value={filters.enable}
+                                options={[
+                                    { value: "ALL", label: "全部" },
+                                    { value: "ENABLED", label: "启用" },
+                                    { value: "DISABLED", label: "禁用" }
+                                ]}
+                                onChange={(enable) =>
                                     setFilters((currentFilters) => ({
                                         ...currentFilters,
-                                        status
+                                        enable
                                     }))
                                 }
                             />
@@ -474,54 +544,77 @@ export const UserPage = () => {
                         <Button
                             className="user-filter-search"
                             icon={<SearchOutlined />}
-                            onClick={closeFilter}
+                            onClick={() => applyFilters(closeFilter)}
                         >
                             查询
                         </Button>
                     </div>
                 )}
+                pageActions={
+                    <Button
+                        icon={<ReloadOutlined />}
+                        loading={userQuery.isFetching || departmentQuery.isFetching}
+                        onClick={() => {
+                            userQuery.refetch();
+                            departmentQuery.refetch();
+                        }}
+                    >
+                        刷新
+                    </Button>
+                }
                 batchClassName="user-table-toolbar"
                 selectedCount={selectedRowKeys.length}
                 batchActions={
                     <Space wrap>
                         <Button
-                            danger
-                            icon={<DeleteOutlined />}
-                            disabled={!hasSelectedUsers}
-                        >
-                            批量删除
-                        </Button>
-                        <Button
                             className="user-batch-neutral"
                             icon={<PoweroffOutlined />}
-                            disabled={!hasSelectedUsers}
+                            disabled={!hasSelectedUsers || !canEditUser}
+                            loading={statusMutation.isPending}
+                            onClick={() => batchUpdateStatus(false)}
                         >
                             禁用
                         </Button>
                         <Button
                             className="user-batch-enable"
                             icon={<PoweroffOutlined />}
-                            disabled={!hasSelectedUsers}
+                            disabled={!hasSelectedUsers || !canEditUser}
+                            loading={statusMutation.isPending}
+                            onClick={() => batchUpdateStatus(true)}
                         >
                             启用
+                        </Button>
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            disabled={!hasSelectedUsers || !canEditUser}
+                            loading={deleteMutation.isPending}
+                            onClick={batchDeleteUsers}
+                        >
+                            批量删除
                         </Button>
                     </Space>
                 }
                 rowKey="id"
                 className="user-table"
                 columns={columns}
-                dataSource={filteredUsers}
+                dataSource={users}
+                loading={userQuery.isFetching || sortMutation.isPending}
                 onSort={moveUser}
                 pagination={{
-                    current: 1,
-                    pageSize: 50,
-                    total: 1248,
-                    showSizeChanger: false,
-                    showTotal: () => "1,248 个用户"
+                    current: query.pageNo || DEFAULT_PAGE_NO,
+                    pageSize: query.pageSize || DEFAULT_PAGE_SIZE,
+                    total: totalCount,
+                    showSizeChanger: true,
+                    showTotal: (total) => `${total} 个用户`,
+                    onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}
                 rowSelection={{
                     selectedRowKeys,
-                    onChange: setSelectedRowKeys
+                    onChange: setSelectedRowKeys,
+                    getCheckboxProps: (user) => ({
+                        disabled: Boolean(user.superAdmin)
+                    })
                 }}
                 tableAsidePlacement="left"
                 tableAside={
@@ -531,21 +624,19 @@ export const UserPage = () => {
                                 <ApartmentOutlined />
                                 <Text strong>部门</Text>
                             </Space>
-                            <Text type="secondary">{filteredUsers.length} 人</Text>
+                            <Text type="secondary">{totalCount} 人</Text>
                         </div>
                         <Tree
+                            key={departmentTreeKeys.join(",")}
                             blockNode
-                            defaultExpandAll
+                            defaultExpandedKeys={departmentTreeKeys}
                             selectedKeys={[selectedDepartmentId]}
                             treeData={departmentTreeData}
-                            onSelect={(keys) => {
-                                setSelectedDepartmentId(String(keys[0] || "all"));
-                                setSelectedRowKeys([]);
-                            }}
+                            onSelect={selectDepartment}
                         />
                     </div>
                 }
-                sortable
+                sortable={canEditUser}
             />
 
             <SandwishDrawer
@@ -567,98 +658,61 @@ export const UserPage = () => {
                 {editingUser ? (
                     <div className="user-edit-form">
                         <div className="user-edit-avatar">
-                            <Avatar size={64} style={{ backgroundColor: editingUser.avatarColor }}>
-                                {getInitials(editingUser.name)}
+                            <Avatar size={64} src={editingUser.avatar || undefined}>
+                                {editingUser.avatar ? null : getInitials(readUserName(editingUser))}
                             </Avatar>
                             <Button size="small" shape="circle" icon={<CameraOutlined />} />
                         </div>
                         <label>
                             <span>姓名</span>
-                            <Input value={editingUser.name} readOnly />
+                            <Input value={readUserName(editingUser)} readOnly />
+                        </label>
+                        <label>
+                            <span>登录名</span>
+                            <Input value={editingUser.loginName || ""} readOnly />
                         </label>
                         <label>
                             <span>邮箱</span>
-                            <Input value={editingUser.email} readOnly />
+                            <Input value={editingUser.email || ""} readOnly />
+                        </label>
+                        <label>
+                            <span>手机</span>
+                            <Input value={editingUser.mobile || ""} readOnly />
+                        </label>
+                        <label>
+                            <span>部门</span>
+                            <Input value={readDepartmentName(editingUser)} readOnly />
                         </label>
                         <label>
                             <span>角色</span>
                             <Select
-                                value={editingUser.role}
-                                options={["Admin", "Editor", "Viewer"].map((value) => ({
-                                    value,
-                                    label: roleLabel[value as UserRecord["role"]]
-                                }))}
-                            />
-                        </label>
-                        <label>
-                            <span>状态</span>
-                            <Select
-                                value={editingUser.status}
-                                options={["Active", "Inactive", "Invited"].map((value) => ({
-                                    value,
-                                    label: statusLabel[value as UserRecord["status"]]
-                                }))}
-                            />
-                        </label>
-                        <label>
-                            <span>组织</span>
-                            <Select
-                                value="Acme Corporation"
-                                options={[{ value: "Acme Corporation" }]}
-                            />
-                        </label>
-                        <label>
-                            <span>项目</span>
-                            <Select
                                 mode="multiple"
-                                value={["AI Platform", "Data Infrastructure"]}
-                                options={["AI Platform", "Data Infrastructure", "Security"].map(
-                                    (value) => ({ value })
-                                )}
+                                value={readRoleNames(editingUser)}
+                                options={readRoleNames(editingUser).map((roleName) => ({
+                                    value: roleName,
+                                    label: roleName
+                                }))}
                             />
                         </label>
                     </div>
                 ) : null}
             </SandwishDrawer>
 
-            <Modal
-                className="user-delete-modal"
+            <SandwishConfirmModal
                 title="删除用户"
                 open={Boolean(deletingUser)}
-                centered
-                width={360}
-                okText="删除用户"
+                message={`确认删除 ${deletingUser ? readUserName(deletingUser) : ""}？`}
+                description="删除后需要重新新增。若用户存在安全约束，接口会按后端校验结果拦截。"
+                okText="删除"
+                confirmLoading={deleteMutation.isPending}
                 cancelText="取消"
-                okButtonProps={{ danger: true, disabled: deleteConfirmText !== "delete" }}
-                onCancel={() => setDeletingUser(null)}
-                onOk={() => setDeletingUser(null)}
-            >
-                {deletingUser ? (
-                    <div className="user-delete-content">
-                        <ExclamationCircleOutlined className="user-delete-warning" />
-                        <strong>确认删除这个用户？</strong>
-                        <Text type="secondary">
-                            此操作不可撤销，相关用户数据将被永久移除。
-                        </Text>
-                        <div className="user-delete-person">
-                            <Avatar style={{ backgroundColor: deletingUser.avatarColor }}>
-                                {getInitials(deletingUser.name)}
-                            </Avatar>
-                            <div>
-                                <Text strong>{deletingUser.name}</Text>
-                                <Text type="secondary">{deletingUser.email}</Text>
-                            </div>
-                        </div>
-                        <label>
-                            <span>输入 delete 确认删除</span>
-                            <Input
-                                value={deleteConfirmText}
-                                onChange={(event) => setDeleteConfirmText(event.target.value)}
-                            />
-                        </label>
-                    </div>
-                ) : null}
-            </Modal>
+                onCancel={() => {
+                    if (!deleteMutation.isPending) {
+                        setDeletingUser(null);
+                    }
+                }}
+                onOk={deleteUser}
+            />
         </>
     );
 };

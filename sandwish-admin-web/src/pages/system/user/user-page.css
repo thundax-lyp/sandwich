@@ -126,7 +126,7 @@ html[data-theme="dark"] .user-page {
 
 .user-filter-form {
     display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(150px, 180px) auto auto;
+    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(86px, 120px) minmax(86px, 120px);
     min-width: 0;
     align-items: flex-end;
     gap: 12px;
@@ -153,6 +153,7 @@ html[data-theme="dark"] .user-page {
 
 .user-filter-form .ant-btn {
     min-width: 86px;
+    max-width: 120px;
 }
 
 .user-filter-form .user-filter-search {
@@ -268,6 +269,18 @@ html[data-theme="dark"] .user-page {
     white-space: nowrap;
 }
 
+.user-name-cell {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.user-name-cell > .ant-typography {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .user-role-admin,
 .user-role-editor,
 .user-role-viewer,
@@ -314,35 +327,6 @@ html[data-theme="dark"] .user-page {
     border-color: var(--user-warning-line);
 }
 
-.user-delete-modal .ant-modal-content {
-    color: var(--user-ink, #111827);
-    background:
-        linear-gradient(180deg, rgba(226, 235, 247, 0.58), transparent),
-        var(--user-glass-strong, rgba(248, 251, 255, 0.9));
-    border: 1px solid var(--user-line, rgba(107, 124, 150, 0.24));
-    box-shadow: var(--user-shadow, 0 18px 46px rgba(31, 45, 71, 0.13));
-    backdrop-filter: blur(18px) saturate(1.18);
-    -webkit-backdrop-filter: blur(18px) saturate(1.18);
-}
-
-.user-delete-modal .ant-modal-header {
-    background: transparent;
-    border-color: var(--user-line, rgba(107, 124, 150, 0.24));
-}
-
-html[data-theme="dark"] .user-delete-modal .ant-modal-content {
-    color: var(--text-primary);
-    background:
-        linear-gradient(180deg, rgba(48, 72, 110, 0.34), transparent),
-        rgba(12, 22, 38, 0.72);
-    border-color: rgba(171, 191, 222, 0.18);
-    box-shadow: 0 28px 76px rgba(0, 0, 0, 0.52);
-}
-
-html[data-theme="dark"] .user-delete-modal .ant-modal-header {
-    border-color: rgba(171, 191, 222, 0.18);
-}
-
 .user-edit-form {
     display: grid;
     gap: 14px;
@@ -360,8 +344,7 @@ html[data-theme="dark"] .user-delete-modal .ant-modal-header {
     bottom: -3px;
 }
 
-.user-edit-form label,
-.user-delete-content label {
+.user-edit-form label {
     display: grid;
     gap: 5px;
     color: var(--user-copy);
@@ -372,50 +355,6 @@ html[data-theme="dark"] .user-delete-modal .ant-modal-header {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-}
-
-.user-delete-content {
-    display: grid;
-    gap: 14px;
-    padding-top: 8px;
-    text-align: center;
-}
-
-.user-delete-warning {
-    color: var(--user-danger);
-    font-size: 46px;
-}
-
-.user-delete-content > strong {
-    color: var(--user-ink);
-}
-
-.user-delete-content > .ant-typography {
-    max-width: 280px;
-    margin: 0 auto;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.user-delete-person {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 8px;
-    padding: 12px;
-    text-align: left;
-    background: rgba(226, 235, 247, 0.54);
-    border: 1px solid var(--user-line);
-    border-radius: 8px;
-}
-
-.user-delete-person > div {
-    display: grid;
-    gap: 2px;
-}
-
-.user-delete-content label {
-    text-align: left;
 }
 
 @media (max-width: 760px) {
@@ -430,6 +369,10 @@ html[data-theme="dark"] .user-delete-modal .ant-modal-header {
     }
 
     .user-department-panel {
+        display: none;
+    }
+
+    .user-page .list-page-table-aside {
         display: none;
     }
 }

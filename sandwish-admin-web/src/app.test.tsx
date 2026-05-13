@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
 import { postJson } from "./api/http";
 import { clearPermissions, hasPermission } from "./auth/permission-storage";
+import { SandwishTable } from "./components/sandwish-table";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
 import { UserPage } from "./pages/system/user/user-page";
@@ -547,6 +548,53 @@ describe("App", () => {
 
         expect((await screen.findAllByText("删除用户")).length).toBeGreaterThan(0);
         expect(screen.getByText("确认删除这个用户？")).toBeInTheDocument();
+    });
+
+    it("emits sortable table row movement", () => {
+        const records = [
+            { id: "1", name: "Ethan Chen" },
+            { id: "2", name: "Sophia Carter" }
+        ];
+        const onSort = vi.fn();
+        const dataTransfer = {
+            dropEffect: "",
+            effectAllowed: "",
+            setData: vi.fn()
+        };
+
+        render(
+            <SandwishTable
+                rowKey="id"
+                columns={[{ title: "用户", dataIndex: "name", key: "name", width: 160 }]}
+                dataSource={records}
+                onSort={onSort}
+                pagination={false}
+                sortable
+            />
+        );
+
+        const sourceRow = screen.getByText("Ethan Chen").closest("tr");
+        const targetRow = screen.getByText("Sophia Carter").closest("tr");
+        expect(sourceRow).not.toBeNull();
+        expect(targetRow).not.toBeNull();
+
+        targetRow!.getBoundingClientRect = () => ({
+            bottom: 40,
+            height: 40,
+            left: 0,
+            right: 160,
+            top: 0,
+            width: 160,
+            x: 0,
+            y: 0,
+            toJSON: () => undefined
+        });
+
+        fireEvent.dragStart(sourceRow!, { dataTransfer });
+        fireEvent.dragOver(targetRow!, { clientY: 5, dataTransfer });
+        fireEvent.drop(targetRow!, { clientY: 5, dataTransfer });
+
+        expect(onSort).toHaveBeenCalledWith(records[0], records[1], "after");
     });
 
     it("clears stale tokens when protected menu loading is unauthorized", async () => {

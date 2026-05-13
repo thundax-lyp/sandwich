@@ -1,4 +1,4 @@
-import type { Key, MouseEvent as ReactMouseEvent, ReactNode } from "react";
+import type { DragEvent as ReactDragEvent, Key, MouseEvent as ReactMouseEvent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Table } from "antd";
 import type { TableProps } from "antd";
@@ -8,6 +8,8 @@ const DEFAULT_ACTION_COLUMN_WIDTH = 116;
 const DEFAULT_ACTION_COLUMN_MOBILE_WIDTH = 54;
 const DEFAULT_MIN_COLUMN_WIDTH = 96;
 const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
+
+export type SandwishTableSortPosition = "before" | "after";
 
 const readColumnKey = <RecordType extends object>(
     column: NonNullable<TableProps<RecordType>["columns"]>[number]
@@ -45,12 +47,27 @@ const sumColumnWidths = <RecordType extends object>(
     }, 0);
 };
 
+const callHandler = <EventType,>(
+    handler: ((event: EventType) => void) | undefined,
+    event: EventType
+) => {
+    if (handler) {
+        handler(event);
+    }
+};
+
 export interface SandwishTableProps<RecordType extends object = object>
     extends TableProps<RecordType> {
     actionColumnKey?: Key;
     actionColumnMobileWidth?: number;
     actionColumnWidth?: number;
+    getSortableRowKey?: (record: RecordType, index?: number) => Key;
     minColumnWidth?: number;
+    onSort?: (
+        sourceRecord: RecordType,
+        targetRecord: RecordType,
+        position: SandwishTableSortPosition
+    ) => void;
     resizableColumns?: boolean;
     responsive?: boolean;
     sortable?: boolean;
@@ -62,9 +79,13 @@ export const SandwishTable = <RecordType extends object = object>({
     actionColumnWidth = DEFAULT_ACTION_COLUMN_WIDTH,
     className,
     columns,
+    getSortableRowKey,
     minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
+    onRow,
+    onSort,
     resizableColumns = true,
     responsive = true,
+    rowKey,
     rowSelection,
     scroll,
     sortable = false,
@@ -72,6 +93,32 @@ export const SandwishTable = <RecordType extends object = object>({
 }: SandwishTableProps<RecordType>) => {
     const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
     const [isMobile, setIsMobile] = useState(false);
+    const [draggingRecord, setDraggingRecord] = useState<RecordType | null>(null);
+    const [dropTarget, setDropTarget] = useState<{
+        position: SandwishTableSortPosition;
+        rowKey: Key;
+    } | null>(null);
+    const sortableEnabled = sortable && Boolean(onSort);
+
+    const readRowKey = useCallback((record: RecordType, index?: number): Key | undefined => {
+        if (getSortableRowKey) {
+            return getSortableRowKey(record, index);
+        }
+
+        if (typeof rowKey === "function") {
+            return rowKey(record, index);
+        }
+
+        if (typeof rowKey === "string") {
+            return record[rowKey as keyof RecordType] as Key | undefined;
+        }
+
+        if ("key" in record) {
+            return record.key as Key | undefined;
+        }
+
+        return undefined;
+    }, [getSortableRowKey, rowKey]);
 
     useEffect(() => {
         if (!responsive || typeof window.matchMedia !== "function") {
@@ -195,6 +242,92 @@ export const SandwishTable = <RecordType extends object = object>({
         return totalWidth > 0 ? totalWidth : undefined;
     }, [normalizedColumns, scroll?.x]);
 
+    const readDropPosition = useCallback((event: ReactDragEvent<HTMLElement>): SandwishTableSortPosition => {
+        const rowRect = event.currentTarget.getBoundingClientRect();
+        return event.clientY < rowRect.top + rowRect.height / 2 ? "before" : "after";
+    }, []);
+
+    const mergedOnRow = useCallback<NonNullable<TableProps<RecordType>["onRow"]>>((record, index) => {
+        const rowProps = onRow ? onRow(record, index) : {};
+
+        if (!sortableEnabled) {
+            return rowProps;
+        }
+
+        const currentRowKey = readRowKey(record, index);
+        const isDropTarget = currentRowKey !== undefined && dropTarget?.rowKey === currentRowKey;
+        const sortableClassName = isDropTarget
+            ? `sandwish-table-row-drop-${dropTarget.position}`
+            : "";
+
+        return {
+            ...rowProps,
+            className: [
+                rowProps.className,
+                sortableClassName
+            ]
+                .filter(Boolean)
+                .join(" ") || undefined,
+            draggable: true,
+            onDragEnd: (event) => {
+                callHandler(rowProps.onDragEnd, event);
+                setDraggingRecord(null);
+                setDropTarget(null);
+            },
+            onDragEnter: (event) => {
+                callHandler(rowProps.onDragEnter, event);
+                if (!draggingRecord || draggingRecord === record || currentRowKey === undefined) {
+                    return;
+                }
+                setDropTarget({ rowKey: currentRowKey, position: "before" });
+            },
+            onDragOver: (event) => {
+                callHandler(rowProps.onDragOver, event);
+                if (!draggingRecord || draggingRecord === record || currentRowKey === undefined) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                setDropTarget({ rowKey: currentRowKey, position: readDropPosition(event) });
+            },
+            onDragLeave: (event) => {
+                callHandler(rowProps.onDragLeave, event);
+                if (currentRowKey !== undefined && dropTarget?.rowKey === currentRowKey) {
+                    setDropTarget(null);
+                }
+            },
+            onDragStart: (event) => {
+                callHandler(rowProps.onDragStart, event);
+                const sourceRowKey = readRowKey(record, index);
+                setDraggingRecord(record);
+                event.dataTransfer.effectAllowed = "move";
+                if (sourceRowKey !== undefined) {
+                    event.dataTransfer.setData("text/plain", String(sourceRowKey));
+                }
+            },
+            onDrop: (event) => {
+                callHandler(rowProps.onDrop, event);
+                if (!draggingRecord || draggingRecord === record) {
+                    return;
+                }
+
+                event.preventDefault();
+                onSort?.(draggingRecord, record, readDropPosition(event));
+                setDraggingRecord(null);
+                setDropTarget(null);
+            }
+        };
+    }, [
+        draggingRecord,
+        dropTarget,
+        onRow,
+        onSort,
+        readDropPosition,
+        readRowKey,
+        sortableEnabled
+    ]);
+
     return (
         <Table<RecordType>
             {...tableProps}
@@ -207,6 +340,8 @@ export const SandwishTable = <RecordType extends object = object>({
                 .filter(Boolean)
                 .join(" ")}
             columns={normalizedColumns}
+            onRow={mergedOnRow}
+            rowKey={rowKey}
             rowSelection={rowSelection}
             scroll={{ ...scroll, x: scrollX }}
         />

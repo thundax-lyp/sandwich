@@ -24,12 +24,11 @@ import {
 } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
-import type { DragEvent as ReactDragEvent } from "react";
 import { SandwishBatchActionBar } from "@/components/sandwish-batch-action-bar";
 import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
 import { SandwishTable } from "@/components/sandwish-table";
-import type { SandwishTableProps } from "@/components/sandwish-table";
+import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 
 const { Text } = Typography;
 
@@ -54,7 +53,6 @@ interface UserRecord {
 
 type UserFilterRole = "All" | UserRecord["role"];
 type UserFilterStatus = "All" | UserRecord["status"];
-type DropPosition = "before" | "after";
 
 interface UserFilters {
     email: string;
@@ -175,8 +173,6 @@ export const UserPage = () => {
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-    const [draggingUserId, setDraggingUserId] = useState<string | null>(null);
-    const [dropTarget, setDropTarget] = useState<{ userId: string; position: DropPosition } | null>(null);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters =
         Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
@@ -198,40 +194,28 @@ export const UserPage = () => {
         });
     }, [filters, searchText, users]);
 
-    const startUserDrag = (userId: string) => (event: ReactDragEvent<HTMLButtonElement>) => {
-        setDraggingUserId(userId);
-        event.dataTransfer.effectAllowed = "move";
-        event.dataTransfer.setData("text/plain", userId);
-    };
-
-    const readDropPosition = (event: ReactDragEvent<HTMLElement>): DropPosition => {
-        const rowRect = event.currentTarget.getBoundingClientRect();
-        return event.clientY < rowRect.top + rowRect.height / 2 ? "before" : "after";
-    };
-
-    const moveUser = (sourceUserId: string, targetUserId: string, position: DropPosition) => {
-        if (sourceUserId === targetUserId) {
+    const moveUser = (
+        sourceUser: UserRecord,
+        targetUser: UserRecord,
+        position: SandwishTableSortPosition
+    ) => {
+        if (sourceUser.id === targetUser.id) {
             return;
         }
 
         setUsers((currentUsers) => {
-            const sourceIndex = currentUsers.findIndex((user) => user.id === sourceUserId);
-            const targetIndex = currentUsers.findIndex((user) => user.id === targetUserId);
+            const sourceIndex = currentUsers.findIndex((user) => user.id === sourceUser.id);
+            const targetIndex = currentUsers.findIndex((user) => user.id === targetUser.id);
             if (sourceIndex < 0 || targetIndex < 0) {
                 return currentUsers;
             }
 
             const nextUsers = [...currentUsers];
-            const [sourceUser] = nextUsers.splice(sourceIndex, 1);
-            const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUserId);
-            nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, sourceUser);
+            const [movedUser] = nextUsers.splice(sourceIndex, 1);
+            const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUser.id);
+            nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, movedUser);
             return nextUsers;
         });
-    };
-
-    const clearUserDrag = () => {
-        setDraggingUserId(null);
-        setDropTarget(null);
     };
 
     const resetFilters = () => {
@@ -310,10 +294,7 @@ export const UserPage = () => {
                     <button
                         aria-label={`拖动排序 ${user.name}`}
                         className="sandwish-table-row-action sandwish-table-row-drag-handle"
-                        draggable
                         type="button"
-                        onDragEnd={clearUserDrag}
-                        onDragStart={startUserDrag(user.id)}
                     >
                         <HolderOutlined />
                     </button>
@@ -484,37 +465,7 @@ export const UserPage = () => {
                     className="user-table"
                     columns={columns}
                     dataSource={filteredUsers}
-                    onRow={(user) => ({
-                        className:
-                            dropTarget?.userId === user.id
-                                ? `sandwish-table-row-drop-${dropTarget.position}`
-                                : undefined,
-                        onDragEnter: () => {
-                            if (draggingUserId && draggingUserId !== user.id) {
-                                setDropTarget({ userId: user.id, position: "before" });
-                            }
-                        },
-                        onDragOver: (event) => {
-                            if (draggingUserId && draggingUserId !== user.id) {
-                                event.preventDefault();
-                                event.dataTransfer.dropEffect = "move";
-                                setDropTarget({ userId: user.id, position: readDropPosition(event) });
-                            }
-                        },
-                        onDragLeave: () => {
-                            if (dropTarget?.userId === user.id) {
-                                setDropTarget(null);
-                            }
-                        },
-                        onDrop: (event) => {
-                            event.preventDefault();
-                            const sourceUserId = event.dataTransfer.getData("text/plain") || draggingUserId;
-                            if (sourceUserId) {
-                                moveUser(sourceUserId, user.id, readDropPosition(event));
-                            }
-                            clearUserDrag();
-                        }
-                    })}
+                    onSort={moveUser}
                     pagination={{
                         current: 1,
                         pageSize: 50,

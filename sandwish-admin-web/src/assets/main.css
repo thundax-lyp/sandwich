@@ -1520,11 +1520,14 @@ p {
 .user-table .ant-table-thead > tr > th {
     position: relative;
     padding: 12px 14px;
-    color: var(--user-copy);
-    font-size: 12px;
-    font-weight: 700;
-    background: rgba(226, 235, 247, 0.76);
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    background: rgba(226, 235, 247, 0.88);
     border-bottom-color: var(--user-line);
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
 }
 
 .user-column-title {
@@ -1575,7 +1578,7 @@ p {
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right {
     text-align: center;
-    background: rgba(226, 235, 247, 0.86);
+    background: rgba(226, 235, 247, 0.94);
 }
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .ant-table-cell-content,

@@ -127,6 +127,107 @@ html[data-theme="dark"] .department-page {
     border-radius: 7px;
 }
 
+.department-drag-action {
+    cursor: grab;
+}
+
+.department-editor-form {
+    padding-top: 6px;
+}
+
+.department-edit-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.department-delete-modal-root {
+    --department-delete-bg: rgba(255, 255, 255, 0.94);
+    --department-delete-ink: #111827;
+    --department-delete-copy: #52627a;
+    --department-delete-line: rgba(107, 124, 150, 0.24);
+    --department-delete-danger: #dc2626;
+    --department-delete-danger-soft: rgba(220, 38, 38, 0.1);
+    --department-delete-danger-line: rgba(220, 38, 38, 0.24);
+    --department-delete-shadow: 0 24px 70px rgba(31, 45, 71, 0.2);
+}
+
+html[data-theme="dark"] .department-delete-modal-root {
+    --department-delete-bg: rgba(12, 22, 38, 0.94);
+    --department-delete-ink: #f8fbff;
+    --department-delete-copy: #b8c4d8;
+    --department-delete-line: rgba(191, 207, 232, 0.22);
+    --department-delete-danger: #f87171;
+    --department-delete-danger-soft: rgba(248, 113, 113, 0.13);
+    --department-delete-danger-line: rgba(248, 113, 113, 0.3);
+    --department-delete-shadow: 0 28px 82px rgba(0, 0, 0, 0.52);
+}
+
+.department-delete-modal .ant-modal-content {
+    color: var(--department-delete-ink);
+    background: var(--department-delete-bg);
+    border: 1px solid var(--department-delete-line);
+    border-radius: 14px;
+    box-shadow: var(--department-delete-shadow);
+    backdrop-filter: blur(16px);
+}
+
+.department-delete-modal .ant-modal-header {
+    background: transparent;
+}
+
+.department-delete-modal .ant-modal-title {
+    color: var(--department-delete-ink);
+}
+
+.department-delete-modal .ant-modal-close {
+    color: var(--department-delete-copy);
+}
+
+.department-delete-modal .ant-modal-footer .ant-btn-default {
+    color: var(--department-delete-ink);
+    background: transparent;
+    border-color: var(--department-delete-line);
+}
+
+.department-delete-modal .ant-modal-footer .ant-btn-primary {
+    color: #fff;
+    background: var(--department-delete-danger);
+    border-color: var(--department-delete-danger);
+}
+
+.department-delete-content {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 12px;
+    align-items: flex-start;
+    padding-top: 4px;
+}
+
+.department-delete-content > div {
+    display: grid;
+    gap: 6px;
+}
+
+.department-delete-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    color: var(--department-delete-danger);
+    background: var(--department-delete-danger-soft);
+    border: 1px solid var(--department-delete-danger-line);
+    border-radius: 10px;
+}
+
+.department-delete-content .ant-typography {
+    color: var(--department-delete-ink);
+}
+
+.department-delete-content .ant-typography-secondary {
+    color: var(--department-delete-copy);
+}
+
 .department-empty-icon {
     font-size: 28px;
 }

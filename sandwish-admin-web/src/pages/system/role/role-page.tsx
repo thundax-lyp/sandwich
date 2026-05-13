@@ -1,4 +1,5 @@
 import { PlaceholderPage } from "@/components/placeholder-page";
+import "./role-page.css";
 
 export const RolePage = () => {
     return (

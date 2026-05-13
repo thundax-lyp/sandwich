@@ -1,4 +1,5 @@
 import { PlaceholderPage } from "@/components/placeholder-page";
+import "./menu-page.css";
 
 export const MenuPage = () => {
     return (

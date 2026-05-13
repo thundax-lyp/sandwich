@@ -95,6 +95,7 @@
 - 第三方库缺失类型声明、Vite 环境声明和全局前端扩展类型放在 `src/types/`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。
 - 页面专属样式固定与页面同目录放置，形成 `pages/<module>/<domain>/<domain>-page.tsx` + `<domain>-page.css` 组合；页面组件由 `*-page.tsx` 显式 import 同目录 CSS。
+- 页面当前没有专属样式时，允许同目录 `*-page.css` 为空文件，用于保留稳定页面样式槽位。
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。

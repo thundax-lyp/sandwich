@@ -1,4 +1,5 @@
 import { PlaceholderPage } from "@/components/placeholder-page";
+import "./system-log-page.css";
 
 export const SystemLogPage = () => {
     return (

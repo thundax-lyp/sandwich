@@ -1,4 +1,5 @@
 import { PlaceholderPage } from "@/components/placeholder-page";
+import "./storage-object-page.css";
 
 export const StorageObjectPage = () => {
     return (

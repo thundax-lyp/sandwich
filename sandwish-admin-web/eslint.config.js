@@ -4,6 +4,7 @@ import boundaries from "eslint-plugin-boundaries";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
+import fs from "node:fs";
 import path from "node:path";
 import tseslint from "typescript-eslint";
 
@@ -24,6 +25,49 @@ const localRules = {
                                 node,
                                 message:
                                     "ADMIN_WEB_NAME_FILE_KEBAB_CASE: frontend source file names must use kebab-case."
+                            });
+                        }
+                    }
+                };
+            }
+        },
+        "page-style-file": {
+            create(context) {
+                return {
+                    Program(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+                        const fileName = path.basename(filePath);
+
+                        if (
+                            !normalizedFilePath.includes("/src/pages/") ||
+                            !fileName.endsWith("-page.tsx")
+                        ) {
+                            return;
+                        }
+
+                        const styleFileName = fileName.replace(/\.tsx$/, ".css");
+                        const styleFilePath = path.join(path.dirname(filePath), styleFileName);
+                        const requiredImport = `./${styleFileName}`;
+                        const hasStyleImport = node.body.some((statement) => {
+                            return (
+                                statement.type === "ImportDeclaration" &&
+                                statement.source.value === requiredImport
+                            );
+                        });
+
+                        if (!fs.existsSync(styleFilePath)) {
+                            context.report({
+                                node,
+                                message: `ADMIN_WEB_NAME_PAGE_STYLE_FILE: page ${fileName} must have sibling style file ${styleFileName}.`
+                            });
+                            return;
+                        }
+
+                        if (!hasStyleImport) {
+                            context.report({
+                                node,
+                                message: `ADMIN_WEB_NAME_PAGE_STYLE_FILE: page ${fileName} must explicitly import "${requiredImport}".`
                             });
                         }
                     }
@@ -118,6 +162,7 @@ export default tseslint.config(
                 }
             ],
             "local/kebab-case-file-name": "error",
+            "local/page-style-file": "error",
             "no-restricted-imports": [
                 "error",
                 {

@@ -311,7 +311,7 @@ export const MenuPage = () => {
             key: "url",
             width: DEFAULT_COLUMN_WIDTHS.url,
             ellipsis: true,
-            render: (url?: string | null) => url || <Text type="secondary">未配置</Text>
+            render: (url?: string | null) => url || null
         },
         {
             title: "权限标识",

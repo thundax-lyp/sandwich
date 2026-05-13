@@ -1154,19 +1154,55 @@ p {
 }
 
 .user-page {
+    --user-glass: rgba(255, 255, 255, 0.76);
+    --user-glass-strong: rgba(248, 251, 255, 0.9);
+    --user-ice: rgba(226, 235, 247, 0.72);
+    --user-hover: rgba(214, 226, 242, 0.82);
+    --user-ink: #111827;
+    --user-copy: #52627a;
+    --user-muted: #8a99ad;
+    --user-line: rgba(107, 124, 150, 0.24);
+    --user-line-strong: rgba(71, 91, 121, 0.34);
+    --user-blue: #2563eb;
+    --user-blue-hover: #1d4ed8;
+    --user-blue-soft: rgba(37, 99, 235, 0.1);
+    --user-blue-line: rgba(37, 99, 235, 0.26);
+    --user-cyan: #0891b2;
+    --user-cyan-soft: rgba(8, 145, 178, 0.11);
+    --user-cyan-line: rgba(8, 145, 178, 0.24);
+    --user-code: #5b5fd6;
+    --user-code-soft: rgba(91, 95, 214, 0.1);
+    --user-code-line: rgba(91, 95, 214, 0.24);
+    --user-success: #059669;
+    --user-success-soft: rgba(5, 150, 105, 0.11);
+    --user-success-line: rgba(5, 150, 105, 0.24);
+    --user-warning: #b7791f;
+    --user-warning-soft: rgba(245, 158, 11, 0.13);
+    --user-warning-line: rgba(245, 158, 11, 0.26);
+    --user-danger: #dc2626;
+    --user-danger-soft: rgba(220, 38, 38, 0.1);
+    --user-danger-line: rgba(220, 38, 38, 0.24);
+    --user-shadow: 0 18px 46px rgba(31, 45, 71, 0.13);
+    --user-blue-shadow: 0 10px 26px rgba(37, 99, 235, 0.2);
     display: grid;
     min-width: 0;
+    color: var(--user-ink);
 }
 
 .user-command-panel {
     min-width: 0;
     padding: 20px 22px 18px;
     overflow: hidden;
-    background: var(--surface-panel);
-    border: 1px solid var(--line-subtle);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.88),
+            rgba(248, 251, 255, 0.66)
+        );
+    border: 1px solid var(--user-line);
     border-radius: 14px;
-    box-shadow: var(--shadow-soft);
-    backdrop-filter: blur(18px);
+    box-shadow: var(--user-shadow);
+    backdrop-filter: blur(18px) saturate(1.18);
 }
 
 .user-page-header {
@@ -1180,9 +1216,58 @@ p {
 
 .user-page-header h2.ant-typography {
     margin: 0 0 4px;
-    color: var(--text-primary);
+    color: var(--user-ink);
     font-size: 24px;
     line-height: 1.15;
+}
+
+.user-page .ant-typography-secondary {
+    color: var(--user-copy);
+}
+
+.user-page .ant-btn-primary {
+    background: linear-gradient(135deg, var(--user-blue), #1e40af);
+    border-color: var(--user-blue);
+    box-shadow: var(--user-blue-shadow);
+}
+
+.user-page .ant-btn-primary:not(:disabled):hover {
+    background: linear-gradient(135deg, #2f6ff0, var(--user-blue-hover)) !important;
+    border-color: var(--user-blue-hover) !important;
+}
+
+.user-page .ant-btn-default {
+    color: var(--user-ink);
+    background: rgba(255, 255, 255, 0.64);
+    border-color: var(--user-line);
+}
+
+.user-page .ant-btn-default:not(:disabled):hover {
+    color: var(--user-blue) !important;
+    background: var(--user-blue-soft) !important;
+    border-color: var(--user-blue-line) !important;
+}
+
+.user-page .ant-input-affix-wrapper,
+.user-page .ant-input,
+.user-page .ant-select-selector {
+    color: var(--user-ink);
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: var(--user-line) !important;
+}
+
+.user-page .ant-input-affix-wrapper:hover,
+.user-page .ant-input:hover,
+.user-page .ant-select-selector:hover {
+    border-color: var(--user-line-strong) !important;
+}
+
+.user-page .ant-input-affix-wrapper:focus,
+.user-page .ant-input-affix-wrapper-focused,
+.user-page .ant-input:focus,
+.user-page .ant-select-focused .ant-select-selector {
+    border-color: var(--user-blue) !important;
+    box-shadow: 0 0 0 3px var(--user-blue-soft) !important;
 }
 
 .user-page-actions {
@@ -1208,20 +1293,20 @@ p {
 }
 
 .user-search-shortcut {
-    color: var(--text-muted);
+    color: var(--user-muted);
     font-size: 11px;
 }
 
 .user-page-actions .user-filter-toggle-active {
-    color: var(--accent-blue);
-    background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
-    border-color: color-mix(in srgb, var(--accent-blue) 24%, var(--line-subtle));
+    color: var(--user-blue);
+    background: var(--user-blue-soft);
+    border-color: var(--user-blue-line);
 }
 
 .user-page-actions .user-filter-toggle-active:hover {
-    color: var(--accent-blue) !important;
-    background: color-mix(in srgb, var(--accent-blue) 12%, transparent) !important;
-    border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--line-subtle)) !important;
+    color: var(--user-blue) !important;
+    background: rgba(37, 99, 235, 0.14) !important;
+    border-color: rgba(37, 99, 235, 0.34) !important;
 }
 
 .user-filter-panel {
@@ -1250,10 +1335,10 @@ p {
     background:
         linear-gradient(
             180deg,
-            color-mix(in srgb, var(--surface-soft) 36%, transparent),
-            color-mix(in srgb, var(--surface-panel) 42%, transparent)
+            rgba(226, 235, 247, 0.62),
+            rgba(248, 251, 255, 0.48)
         );
-    border: 1px solid var(--line-subtle);
+    border: 1px solid var(--user-line);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 color-mix(in srgb, white 56%, transparent);
     backdrop-filter: blur(10px);
@@ -1263,7 +1348,7 @@ p {
     display: grid;
     gap: 5px;
     min-width: 0;
-    color: var(--text-secondary);
+    color: var(--user-copy);
     font-size: 12px;
 }
 
@@ -1272,15 +1357,15 @@ p {
 }
 
 .user-filter-form .user-filter-search {
-    color: var(--accent-blue);
-    background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
-    border-color: color-mix(in srgb, var(--accent-blue) 24%, var(--line-subtle));
+    color: var(--user-blue);
+    background: var(--user-blue-soft);
+    border-color: var(--user-blue-line);
 }
 
 .user-filter-form .user-filter-search:hover {
-    color: var(--accent-blue) !important;
-    background: color-mix(in srgb, var(--accent-blue) 12%, transparent) !important;
-    border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--line-subtle)) !important;
+    color: var(--user-blue) !important;
+    background: rgba(37, 99, 235, 0.14) !important;
+    border-color: rgba(37, 99, 235, 0.34) !important;
 }
 
 .user-table-toolbar {
@@ -1298,7 +1383,7 @@ p {
 }
 
 .user-table-toolbar .ant-btn {
-    border-color: var(--line-subtle);
+    border-color: var(--user-line);
     font-size: 13px;
     font-weight: 400;
 }
@@ -1309,33 +1394,33 @@ p {
 
 .user-table-toolbar .ant-btn:disabled,
 .user-table-toolbar .ant-btn:disabled:hover {
-    color: color-mix(in srgb, var(--text-muted) 78%, transparent);
+    color: color-mix(in srgb, var(--user-muted) 78%, transparent);
     background: transparent;
-    border-color: var(--line-subtle);
+    border-color: var(--user-line);
 }
 
 .user-table-toolbar .user-batch-neutral:not(:disabled) {
-    color: var(--text-secondary);
+    color: var(--user-copy);
     background: transparent;
-    border-color: var(--line-subtle);
+    border-color: var(--user-line);
 }
 
 .user-table-toolbar .user-batch-neutral:not(:disabled):hover {
-    color: var(--text-primary) !important;
-    background: var(--surface-hover) !important;
-    border-color: var(--line-strong) !important;
+    color: var(--user-ink) !important;
+    background: var(--user-hover) !important;
+    border-color: var(--user-line-strong) !important;
 }
 
 .user-table-toolbar .user-batch-enable:not(:disabled) {
-    color: var(--accent-blue);
-    background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
-    border-color: var(--line-subtle);
+    color: var(--user-blue);
+    background: var(--user-blue-soft);
+    border-color: var(--user-line);
 }
 
 .user-table-toolbar .user-batch-enable:not(:disabled):hover {
-    color: var(--accent-blue) !important;
-    background: color-mix(in srgb, var(--accent-blue) 12%, transparent) !important;
-    border-color: var(--line-subtle) !important;
+    color: var(--user-blue) !important;
+    background: rgba(37, 99, 235, 0.14) !important;
+    border-color: var(--user-line) !important;
 }
 
 .user-table {
@@ -1343,14 +1428,14 @@ p {
 }
 
 .user-table .ant-table {
-    color: var(--text-primary);
+    color: var(--user-ink);
     background: transparent;
 }
 
 .user-table .ant-table-container {
     overflow: hidden;
-    background: color-mix(in srgb, var(--surface-panel) 70%, transparent);
-    border: 1px solid var(--line-subtle);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid var(--user-line);
     border-radius: 10px;
 }
 
@@ -1362,7 +1447,7 @@ p {
 
 .user-table:hover .ant-table-content,
 .user-table:hover .ant-table-body {
-    scrollbar-color: color-mix(in srgb, var(--text-muted) 42%, transparent) transparent;
+    scrollbar-color: color-mix(in srgb, var(--user-muted) 42%, transparent) transparent;
 }
 
 .user-table .ant-table-content::-webkit-scrollbar,
@@ -1384,22 +1469,22 @@ p {
 
 .user-table:hover .ant-table-content::-webkit-scrollbar-thumb,
 .user-table:hover .ant-table-body::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--text-muted) 42%, transparent);
+    background: color-mix(in srgb, var(--user-muted) 42%, transparent);
 }
 
 .user-table .ant-table-content::-webkit-scrollbar-thumb:hover,
 .user-table .ant-table-body::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--text-muted) 62%, transparent);
+    background: color-mix(in srgb, var(--user-muted) 62%, transparent);
 }
 
 .user-table .ant-table-thead > tr > th {
     position: relative;
     padding: 12px 14px;
-    color: var(--text-secondary);
+    color: var(--user-copy);
     font-size: 12px;
     font-weight: 700;
-    background: color-mix(in srgb, var(--surface-soft) 64%, transparent);
-    border-bottom-color: var(--line-subtle);
+    background: rgba(226, 235, 247, 0.76);
+    border-bottom-color: var(--user-line);
 }
 
 .user-column-title {
@@ -1432,25 +1517,25 @@ p {
 }
 
 .user-column-resize-handle:hover::after {
-    background: var(--accent-blue);
+    background: var(--user-blue);
 }
 
 .user-table .ant-table-tbody > tr > td {
     padding: 11px 14px;
-    border-bottom-color: var(--line-subtle);
+    border-bottom-color: var(--user-line);
 }
 
 .user-table .ant-table-tbody > tr:hover > td {
-    background: var(--surface-hover) !important;
+    background: var(--user-hover) !important;
 }
 
 .user-table .ant-table-cell-fix-right {
-    background: color-mix(in srgb, var(--surface-panel) 92%, transparent);
+    background: rgba(248, 251, 255, 0.94);
 }
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right {
     text-align: center;
-    background: color-mix(in srgb, var(--surface-soft) 76%, transparent);
+    background: rgba(226, 235, 247, 0.86);
 }
 
 .user-table .ant-table-thead > tr > th.ant-table-cell-fix-right .ant-table-cell-content,
@@ -1471,7 +1556,7 @@ p {
 }
 
 .user-table .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
-    background: var(--surface-hover) !important;
+    background: var(--user-hover) !important;
 }
 
 .user-row-actions {
@@ -1497,15 +1582,15 @@ p {
 }
 
 .user-row-drag-handle {
-    color: var(--text-muted);
+    color: var(--user-muted);
     background: transparent;
     border: 0;
     cursor: grab;
 }
 
 .user-row-drag-handle:hover {
-    color: var(--text-primary);
-    background: var(--surface-hover);
+    color: var(--user-ink);
+    background: var(--user-hover);
 }
 
 .user-row-drag-handle:active {
@@ -1522,15 +1607,15 @@ p {
 
 .user-row-drop-before > td,
 .user-row-drop-after > td {
-    background: color-mix(in srgb, var(--accent-blue) 4%, transparent) !important;
+    background: rgba(37, 99, 235, 0.04) !important;
 }
 
 .user-row-drop-before > td {
-    box-shadow: inset 0 2px 0 var(--accent-blue);
+    box-shadow: inset 0 2px 0 var(--user-blue);
 }
 
 .user-row-drop-after > td {
-    box-shadow: inset 0 -2px 0 var(--accent-blue);
+    box-shadow: inset 0 -2px 0 var(--user-blue);
 }
 
 .user-table .ant-pagination {
@@ -1548,61 +1633,61 @@ p {
 }
 
 .user-role-admin {
-    color: #1d4ed8;
-    background: rgba(37, 99, 235, 0.12);
-    border-color: rgba(37, 99, 235, 0.22);
+    color: var(--user-blue);
+    background: var(--user-blue-soft);
+    border-color: var(--user-blue-line);
 }
 
 .user-role-editor {
-    color: #6d28d9;
-    background: rgba(124, 58, 237, 0.12);
-    border-color: rgba(124, 58, 237, 0.22);
+    color: var(--user-code);
+    background: var(--user-code-soft);
+    border-color: var(--user-code-line);
 }
 
 .user-role-viewer {
-    color: var(--text-secondary);
-    background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
-    border-color: var(--line-subtle);
+    color: var(--user-copy);
+    background: rgba(255, 255, 255, 0.58);
+    border-color: var(--user-line);
 }
 
 .user-status-active {
-    color: #047857;
-    background: rgba(16, 185, 129, 0.13);
-    border-color: rgba(16, 185, 129, 0.24);
+    color: var(--user-success);
+    background: var(--user-success-soft);
+    border-color: var(--user-success-line);
 }
 
 .user-status-inactive {
-    color: #dc2626;
-    background: rgba(239, 68, 68, 0.12);
-    border-color: rgba(239, 68, 68, 0.24);
+    color: var(--user-danger);
+    background: var(--user-danger-soft);
+    border-color: var(--user-danger-line);
 }
 
 .user-status-invited {
-    color: #b45309;
-    background: rgba(245, 158, 11, 0.14);
-    border-color: rgba(245, 158, 11, 0.26);
+    color: var(--user-warning);
+    background: var(--user-warning-soft);
+    border-color: var(--user-warning-line);
 }
 
 .user-edit-drawer .ant-drawer-content,
 .user-delete-modal .ant-modal-content {
-    color: var(--text-primary);
+    color: var(--user-ink);
     background:
         linear-gradient(
             180deg,
-            color-mix(in srgb, var(--surface-soft) 42%, transparent),
+            rgba(226, 235, 247, 0.58),
             transparent
         ),
-        var(--surface-panel);
-    border: 1px solid var(--line-subtle);
-    box-shadow: var(--shadow-soft);
-    backdrop-filter: blur(18px);
+        var(--user-glass-strong);
+    border: 1px solid var(--user-line);
+    box-shadow: var(--user-shadow);
+    backdrop-filter: blur(18px) saturate(1.18);
 }
 
 .user-edit-drawer .ant-drawer-header,
 .user-edit-drawer .ant-drawer-footer,
 .user-delete-modal .ant-modal-header {
     background: transparent;
-    border-color: var(--line-subtle);
+    border-color: var(--user-line);
 }
 
 .user-edit-form {
@@ -1626,7 +1711,7 @@ p {
 .user-delete-content label {
     display: grid;
     gap: 5px;
-    color: var(--text-secondary);
+    color: var(--user-copy);
     font-size: 12px;
 }
 
@@ -1638,7 +1723,7 @@ p {
 
 .user-edit-footer .ant-btn-primary,
 .user-page-actions .ant-btn-primary {
-    box-shadow: var(--shadow-blue);
+    box-shadow: var(--user-blue-shadow);
 }
 
 .user-delete-content {
@@ -1649,12 +1734,12 @@ p {
 }
 
 .user-delete-warning {
-    color: #ef4444;
+    color: var(--user-danger);
     font-size: 46px;
 }
 
 .user-delete-content > strong {
-    color: var(--text-primary);
+    color: var(--user-ink);
 }
 
 .user-delete-content > .ant-typography {
@@ -1671,8 +1756,8 @@ p {
     margin-top: 8px;
     padding: 12px;
     text-align: left;
-    background: color-mix(in srgb, var(--surface-soft) 60%, transparent);
-    border: 1px solid var(--line-subtle);
+    background: rgba(226, 235, 247, 0.54);
+    border: 1px solid var(--user-line);
     border-radius: 8px;
 }
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Typography } from "antd";
+import "./sandwish-batch-action-bar.css";
 
 const { Text } = Typography;
 

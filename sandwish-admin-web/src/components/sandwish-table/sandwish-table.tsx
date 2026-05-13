@@ -2,6 +2,7 @@ import type { DragEvent as ReactDragEvent, Key, MouseEvent as ReactMouseEvent, R
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Table } from "antd";
 import type { TableProps } from "antd";
+import "./sandwish-table.css";
 
 const DEFAULT_ACTION_COLUMN_KEY = "actions";
 const DEFAULT_ACTION_COLUMN_WIDTH = 116;

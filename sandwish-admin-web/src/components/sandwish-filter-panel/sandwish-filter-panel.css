@@ -1,0 +1,17 @@
+.sandwish-filter-panel {
+    position: relative;
+    z-index: 1;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+        max-height 0.2s ease,
+        opacity 0.16s ease,
+        margin 0.2s ease;
+}
+
+.sandwish-filter-panel-open {
+    max-height: 420px;
+    margin: var(--sandwish-filter-panel-open-margin, 0 0 10px);
+    opacity: 1;
+}

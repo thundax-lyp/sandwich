@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./sandwish-filter-panel.css";
 
 export interface SandwishFilterPanelProps {
     children: ReactNode;

@@ -84,6 +84,7 @@
 - 多个页面域复用的组件放在 `src/components/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
+- 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
 - 页面专属组件不得从其他页面域目录直接导入。
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
@@ -109,8 +110,10 @@
 - `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`，同目录或父级目录内引用可以使用 `./` 或 `../`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - 共享组件不得依赖具体页面 service、路由路径、权限字符串或业务页面状态。
+- `Sandwish*` 通用技术组件的 CSS 变量只能表达组件自身的技术主题，不引用 `--user-*`、`--dictionary-*` 等业务 token；业务页面不得反向覆盖组件内部变量来实现页面语义。
 - `SandwishPage` 只负责页面外壳布局与视觉，不内置列表、表格、筛选、表单等页面内容形态配置。
 - `SandwishFilterPanel` 作为独立通用面板暴露，不与 `SandwishPage` 联动；筛选按钮、展开状态和查询行为由业务页面拥有。
+- `SandwishDrawer` 只薄包装 AntD `Drawer` 的外壳视觉和 `full`、`large`、`middle`、`small` 四档宽度；`open`、`onClose`、`title`、`footer` 和内容仍按 AntD API 透传，不承载业务编辑语义。
 - `SandwishBatchActionBar` 只负责选中数量展示、右侧操作布局和未选中时的禁用态视觉；具体批量操作、按钮文案和业务禁用条件由业务页面拥有。
 - `SandwishTable` 只薄包装 AntD `Table` 的外壳视觉、滚动/分页样式、列宽拖动、操作列格式、响应式行为和行拖拽排序交互协议；`columns`、`pagination`、`rowSelection` 等成熟 AntD API 保持透传，排序结果通过 `onSort` 交还业务页面处理。
 - `ListPage` 是通用业务列表页骨架，负责搜索、新增、筛选展开、批量操作条和表格的显示编排；它可组合 `SandwishPage`、`SandwishFilterPanel`、`SandwishBatchActionBar` 和 `SandwishTable`，但查询条件、批量动作、表格数据、排序结果和弹窗等具体业务状态仍由业务页面拥有。

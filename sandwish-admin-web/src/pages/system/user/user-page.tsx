@@ -11,7 +11,6 @@ import {
 import {
     Avatar,
     Button,
-    Drawer,
     Dropdown,
     Input,
     Modal,
@@ -23,6 +22,7 @@ import {
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { ListPage } from "@/components/list-page";
+import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 
 const { Text } = Typography;
@@ -452,11 +452,11 @@ export const UserPage = () => {
                 sortable
             />
 
-            <Drawer
+            <SandwishDrawer
                 className="user-edit-drawer"
                 title="编辑用户"
                 open={Boolean(editingUser)}
-                size="default"
+                size="small"
                 onClose={() => setEditingUser(null)}
                 extra={<Button size="small">−</Button>}
                 footer={
@@ -523,7 +523,7 @@ export const UserPage = () => {
                         </label>
                     </div>
                 ) : null}
-            </Drawer>
+            </SandwishDrawer>
 
             <Modal
                 className="user-delete-modal"

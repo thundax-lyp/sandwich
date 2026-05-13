@@ -7,6 +7,7 @@ import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
 import { SandwishTable } from "@/components/sandwish-table";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import "./list-page.css";
 
 export interface ListPageFilterState {
     closeFilter: () => void;

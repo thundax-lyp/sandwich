@@ -201,6 +201,73 @@ html[data-theme="dark"] .user-page {
     border-color: var(--user-line) !important;
 }
 
+.user-department-panel {
+    display: grid;
+    gap: 10px;
+    min-height: 420px;
+    max-height: min(620px, calc(100vh - 250px));
+    padding: 12px;
+    overflow: hidden;
+    color: var(--user-ink);
+    background:
+        linear-gradient(180deg, var(--user-filter-bg-start), var(--user-filter-bg-end)),
+        var(--user-glass);
+    border: 1px solid var(--user-line);
+    border-radius: 10px;
+    box-shadow:
+        inset 0 1px 0 var(--user-filter-inset),
+        var(--user-shadow);
+}
+
+.user-department-panel-head {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--user-line);
+}
+
+.user-department-panel-head .anticon {
+    color: var(--user-blue);
+}
+
+.user-department-panel .ant-tree {
+    min-height: 0;
+    overflow: auto;
+    color: var(--user-ink);
+    background: transparent;
+}
+
+.user-department-panel .ant-tree-treenode {
+    width: 100%;
+}
+
+.user-department-panel .ant-tree-node-content-wrapper {
+    min-width: 0;
+    border-radius: 7px;
+}
+
+.user-department-panel .ant-tree-node-content-wrapper:hover,
+.user-department-panel .ant-tree-node-selected {
+    background: var(--user-blue-soft) !important;
+}
+
+.user-department-node {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.user-department-node > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .user-role-admin,
 .user-role-editor,
 .user-role-viewer,
@@ -360,5 +427,10 @@ html[data-theme="dark"] .user-delete-modal .ant-modal-header {
     .user-filter-form label,
     .user-filter-form .ant-btn {
         width: 100%;
+    }
+
+    .user-department-panel {
+        min-height: 280px;
+        max-height: 360px;
     }
 }

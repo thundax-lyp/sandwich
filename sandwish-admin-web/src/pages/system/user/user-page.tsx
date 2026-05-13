@@ -1,4 +1,5 @@
 import {
+    ApartmentOutlined,
     CameraOutlined,
     DeleteOutlined,
     EditOutlined,
@@ -17,8 +18,10 @@ import {
     Select,
     Space,
     Tag,
+    Tree,
     Typography
 } from "antd";
+import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { ListPage } from "@/components/list-page";
@@ -45,6 +48,14 @@ interface UserRecord {
     status: "Active" | "Inactive" | "Invited";
     lastLogin: string;
     avatarColor: string;
+    departmentId: string;
+}
+
+interface DepartmentRecord {
+    id: string;
+    parentId?: string | null;
+    name: string;
+    shortName: string;
 }
 
 type UserFilterRole = "All" | UserRecord["role"];
@@ -70,7 +81,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Admin",
         status: "Active",
         lastLogin: "2 分钟前",
-        avatarColor: "#0f766e"
+        avatarColor: "#0f766e",
+        departmentId: "platform"
     },
     {
         id: "2",
@@ -79,7 +91,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Editor",
         status: "Active",
         lastLogin: "1 小时前",
-        avatarColor: "#c2410c"
+        avatarColor: "#c2410c",
+        departmentId: "product-planning"
     },
     {
         id: "3",
@@ -88,7 +101,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Viewer",
         status: "Active",
         lastLogin: "3 小时前",
-        avatarColor: "#1d4ed8"
+        avatarColor: "#1d4ed8",
+        departmentId: "backend"
     },
     {
         id: "4",
@@ -97,7 +111,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Editor",
         status: "Inactive",
         lastLogin: "2 天前",
-        avatarColor: "#be185d"
+        avatarColor: "#be185d",
+        departmentId: "marketing"
     },
     {
         id: "5",
@@ -106,7 +121,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Viewer",
         status: "Invited",
         lastLogin: "从未登录",
-        avatarColor: "#0369a1"
+        avatarColor: "#0369a1",
+        departmentId: "customer-success"
     },
     {
         id: "6",
@@ -115,7 +131,8 @@ const USER_RECORDS: UserRecord[] = [
         role: "Admin",
         status: "Active",
         lastLogin: "5 分钟前",
-        avatarColor: "#7c3aed"
+        avatarColor: "#7c3aed",
+        departmentId: "frontend"
     },
     {
         id: "7",
@@ -124,8 +141,24 @@ const USER_RECORDS: UserRecord[] = [
         role: "Editor",
         status: "Active",
         lastLogin: "1 天前",
-        avatarColor: "#b45309"
+        avatarColor: "#b45309",
+        departmentId: "qa"
     }
+];
+
+const DEPARTMENT_RECORDS: DepartmentRecord[] = [
+    { id: "all", parentId: null, name: "全部部门", shortName: "全部" },
+    { id: "rd", parentId: "all", name: "研发中心", shortName: "研发" },
+    { id: "platform", parentId: "rd", name: "平台架构部", shortName: "平台" },
+    { id: "backend", parentId: "rd", name: "后端研发部", shortName: "后端" },
+    { id: "frontend", parentId: "rd", name: "前端体验部", shortName: "前端" },
+    { id: "qa", parentId: "rd", name: "测试质量部", shortName: "测试" },
+    { id: "product", parentId: "all", name: "产品中心", shortName: "产品" },
+    { id: "product-planning", parentId: "product", name: "产品规划部", shortName: "规划" },
+    { id: "design", parentId: "product", name: "交互设计部", shortName: "设计" },
+    { id: "business", parentId: "all", name: "商业化中心", shortName: "商业" },
+    { id: "marketing", parentId: "business", name: "市场运营部", shortName: "市场" },
+    { id: "customer-success", parentId: "business", name: "客户成功部", shortName: "客户" }
 ];
 
 const roleClassName: Record<UserRecord["role"], string> = {
@@ -160,10 +193,46 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
+const collectDepartmentIds = (departmentId: string): string[] => {
+    const children = DEPARTMENT_RECORDS.filter((department) => department.parentId === departmentId);
+    return [
+        departmentId,
+        ...children.flatMap((department) => collectDepartmentIds(department.id))
+    ];
+};
+
+const countDepartmentUsers = (departmentId: string, users: UserRecord[]) => {
+    const departmentIds = new Set(collectDepartmentIds(departmentId));
+    return users.filter((user) => departmentIds.has(user.departmentId)).length;
+};
+
+const buildDepartmentTree = (users: UserRecord[]): DataNode[] => {
+    const childrenByParentId = new Map<string | null | undefined, DepartmentRecord[]>();
+    DEPARTMENT_RECORDS.forEach((department) => {
+        const children = childrenByParentId.get(department.parentId) || [];
+        children.push(department);
+        childrenByParentId.set(department.parentId, children);
+    });
+
+    const toNode = (department: DepartmentRecord): DataNode => ({
+        key: department.id,
+        title: (
+            <span className="user-department-node">
+                <span>{department.name}</span>
+                <Text type="secondary">{countDepartmentUsers(department.id, users)}</Text>
+            </span>
+        ),
+        children: childrenByParentId.get(department.id)?.map(toNode)
+    });
+
+    return (childrenByParentId.get(null) || []).map(toNode);
+};
+
 export const UserPage = () => {
     const [users, setUsers] = useState<UserRecord[]>(USER_RECORDS);
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
+    const [selectedDepartmentId, setSelectedDepartmentId] = useState("all");
     const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
@@ -175,7 +244,10 @@ export const UserPage = () => {
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
         const emailKeyword = filters.email.trim().toLowerCase();
+        const selectedDepartmentIds = new Set(collectDepartmentIds(selectedDepartmentId));
         return users.filter((user) => {
+            const isDepartmentMatched =
+                selectedDepartmentId === "all" || selectedDepartmentIds.has(user.departmentId);
             const isEmailMatched = !emailKeyword || user.email.toLowerCase().includes(emailKeyword);
             const isRoleMatched = filters.role === "All" || user.role === filters.role;
             const isStatusMatched = filters.status === "All" || user.status === filters.status;
@@ -185,9 +257,10 @@ export const UserPage = () => {
                 user.email.toLowerCase().includes(keyword) ||
                 user.role.toLowerCase().includes(keyword);
 
-            return isEmailMatched && isRoleMatched && isStatusMatched && isKeywordMatched;
+            return isDepartmentMatched && isEmailMatched && isRoleMatched && isStatusMatched && isKeywordMatched;
         });
-    }, [filters, searchText, users]);
+    }, [filters, searchText, selectedDepartmentId, users]);
+    const departmentTreeData = useMemo(() => buildDepartmentTree(users), [users]);
 
     const moveUser = (
         sourceUser: UserRecord,
@@ -450,6 +523,27 @@ export const UserPage = () => {
                     selectedRowKeys,
                     onChange: setSelectedRowKeys
                 }}
+                tableAside={
+                    <div className="user-department-panel">
+                        <div className="user-department-panel-head">
+                            <Space size={8}>
+                                <ApartmentOutlined />
+                                <Text strong>部门</Text>
+                            </Space>
+                            <Text type="secondary">{filteredUsers.length} 人</Text>
+                        </div>
+                        <Tree
+                            blockNode
+                            defaultExpandAll
+                            selectedKeys={[selectedDepartmentId]}
+                            treeData={departmentTreeData}
+                            onSelect={(keys) => {
+                                setSelectedDepartmentId(String(keys[0] || "all"));
+                                setSelectedRowKeys([]);
+                            }}
+                        />
+                    </div>
+                }
                 sortable
             />
 

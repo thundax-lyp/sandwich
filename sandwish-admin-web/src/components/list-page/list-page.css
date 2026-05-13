@@ -46,6 +46,23 @@
     box-shadow: var(--list-page-accent-shadow);
 }
 
+.list-page-table-area {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+    gap: 14px;
+    align-items: start;
+}
+
+.list-page-table-main {
+    min-width: 0;
+}
+
+.list-page-table-aside {
+    min-width: 0;
+}
+
 @media (max-width: 760px) {
     .list-page-actions {
         display: grid !important;
@@ -73,5 +90,9 @@
 
     .list-page-search-hidden {
         display: none;
+    }
+
+    .list-page-table-area {
+        grid-template-columns: 1fr;
     }
 }

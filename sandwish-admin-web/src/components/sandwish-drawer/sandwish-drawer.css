@@ -42,6 +42,7 @@ html[data-theme="dark"] .sandwish-drawer-root .ant-drawer-mask {
         rgba(2, 6, 14, 0.22);
 }
 
+.sandwish-drawer-root .sandwish-drawer,
 .sandwish-drawer-root .ant-drawer-content {
     position: relative;
     overflow: hidden;
@@ -57,6 +58,7 @@ html[data-theme="dark"] .sandwish-drawer-root .ant-drawer-mask {
     -webkit-backdrop-filter: blur(30px) saturate(1.34);
 }
 
+.sandwish-drawer-root .sandwish-drawer::before,
 .sandwish-drawer-root .ant-drawer-content::before {
     position: absolute;
     inset: 0;

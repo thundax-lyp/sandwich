@@ -82,6 +82,7 @@
 - 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
 - 只服务单个页面域的组件放在页面目录下的 `components/`。
 - 多个页面域复用的组件放在 `src/components/`。
+- 项目自有通用 UI 技术组件放在 `src/components/sandwish/`，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
 - 页面专属组件不得从其他页面域目录直接导入。
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。
@@ -121,6 +122,8 @@
 - 普通方法和变量使用 camelCase。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 - 权限判断变量使用 `canXxx`。
+- `Sandwish*` 只用于项目自有通用 UI 技术组件，不承载具体业务价值；业务页面、业务表单、业务弹窗和业务操作组件使用真实业务名，例如 `UserPage`、`UserFilterForm`、`UserEditDrawer`。
+- 不使用 `SandwishUserTable`、`SandwishDictionaryEditor` 这类混合命名；如果组件表达用户、字典、部门等业务语义，优先使用对应业务前缀。
 - 页面级 className 必须带页面域前缀，例如 `dictionary-page`、`dictionary-list-panel`。
 - 共享组件样式必须使用组件域前缀，避免污染页面样式。
 

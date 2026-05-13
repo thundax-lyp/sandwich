@@ -254,10 +254,25 @@ button {
     color: var(--text-primary) !important;
 }
 
-.nav-menu .ant-menu-item-selected {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-    box-shadow: var(--shadow-blue);
+.nav-menu .ant-menu-item-selected,
+.nav-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: var(--accent-blue) !important;
+    background: var(--accent-blue-soft) !important;
+    border: 1px solid color-mix(in srgb, var(--accent-blue) 18%, var(--line-subtle));
+    box-shadow: none;
+}
+
+.nav-menu .ant-menu-item-selected::after,
+.nav-menu .ant-menu-submenu-selected > .ant-menu-submenu-title::after {
+    display: none;
+}
+
+.nav-menu .ant-menu-item-selected .ant-menu-item-icon,
+.nav-menu .ant-menu-item-selected .anticon,
+.nav-menu .ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-item-icon,
+.nav-menu .ant-menu-submenu-selected > .ant-menu-submenu-title .anticon,
+.nav-menu .ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-submenu-arrow {
+    color: var(--accent-blue) !important;
 }
 
 .menu-icon-config-error {

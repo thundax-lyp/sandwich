@@ -3,10 +3,8 @@ import {
     DeleteOutlined,
     EditOutlined,
     ExclamationCircleOutlined,
-    FilterOutlined,
     HolderOutlined,
     MoreOutlined,
-    PlusOutlined,
     PoweroffOutlined,
     SearchOutlined
 } from "@ant-design/icons";
@@ -24,7 +22,7 @@ import {
 } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
-import { SandwishListPage } from "@/components/sandwish-list-page";
+import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 
 const { Text } = Typography;
@@ -335,35 +333,18 @@ export const UserPage = () => {
 
     return (
         <>
-            <SandwishListPage<UserRecord>
+            <ListPage<UserRecord>
                 pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
+                subjectName="用户"
+                enableAdd
                 enableFilter
-                pageActions={({ filterOpen, toggleFilter }) => (
-                    <Space className="user-page-actions">
-                        <Input
-                            allowClear
-                            className={`user-search${filterOpen ? " user-search-hidden" : ""}`}
-                            placeholder="搜索用户..."
-                            prefix={<SearchOutlined />}
-                            suffix={<span className="user-search-shortcut">⌘K</span>}
-                            value={searchText}
-                            onChange={(event) => setSearchText(event.target.value)}
-                        />
-                        <Button
-                            className={filterOpen || hasActiveFilters ? "user-filter-toggle-active" : undefined}
-                            icon={<FilterOutlined />}
-                            aria-expanded={filterOpen}
-                            onClick={toggleFilter}
-                        >
-                            筛选
-                        </Button>
-                        <Button type="primary" icon={<PlusOutlined />}>
-                            新增用户
-                        </Button>
-                    </Space>
-                )}
+                enableSearch
+                searchShortcut="⌘K"
+                searchValue={searchText}
+                onSearchChange={setSearchText}
+                filterActive={hasActiveFilters}
                 filterClassName="user-filter-panel"
                 filter={({ closeFilter }) => (
                     <div className="user-filter-form">

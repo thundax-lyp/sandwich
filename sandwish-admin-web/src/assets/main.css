@@ -1286,6 +1286,11 @@ p {
     --sandwish-page-ink: var(--user-ink);
     --sandwish-page-line: var(--user-line);
     --sandwish-page-shadow: var(--user-shadow);
+    --list-page-accent: var(--user-blue);
+    --list-page-accent-line: var(--user-blue-line);
+    --list-page-accent-shadow: var(--user-blue-shadow);
+    --list-page-accent-soft: var(--user-blue-soft);
+    --list-page-muted: var(--user-muted);
     color: var(--user-ink);
 }
 
@@ -1338,12 +1343,12 @@ p {
     box-shadow: 0 0 0 3px var(--user-blue-soft) !important;
 }
 
-.user-page-actions {
+.list-page-actions {
     flex-wrap: wrap;
     justify-content: flex-end;
 }
 
-.user-search {
+.list-page-search {
     width: 250px;
     transition:
         width 0.18s ease,
@@ -1351,7 +1356,7 @@ p {
         margin 0.18s ease;
 }
 
-.user-search-hidden {
+.list-page-search-hidden {
     width: 0;
     min-width: 0;
     margin: 0;
@@ -1360,21 +1365,21 @@ p {
     pointer-events: none;
 }
 
-.user-search-shortcut {
-    color: var(--user-muted);
+.list-page-search-shortcut {
+    color: var(--list-page-muted, var(--text-muted));
     font-size: 11px;
 }
 
-.user-page-actions .user-filter-toggle-active {
-    color: var(--user-blue);
-    background: var(--user-blue-soft);
-    border-color: var(--user-blue-line);
+.list-page-actions .list-page-filter-toggle-active {
+    color: var(--list-page-accent, var(--accent-blue));
+    background: var(--list-page-accent-soft, color-mix(in srgb, var(--accent-blue) 12%, transparent));
+    border-color: var(--list-page-accent-line, color-mix(in srgb, var(--accent-blue) 24%, transparent));
 }
 
-.user-page-actions .user-filter-toggle-active:hover {
-    color: var(--user-blue) !important;
-    background: rgba(37, 99, 235, 0.14) !important;
-    border-color: rgba(37, 99, 235, 0.34) !important;
+.list-page-actions .list-page-filter-toggle-active:hover {
+    color: var(--list-page-accent, var(--accent-blue)) !important;
+    background: color-mix(in srgb, var(--list-page-accent, var(--accent-blue)) 14%, transparent) !important;
+    border-color: color-mix(in srgb, var(--list-page-accent, var(--accent-blue)) 34%, transparent) !important;
 }
 
 .sandwish-filter-panel {
@@ -1864,8 +1869,8 @@ p {
 }
 
 .user-edit-footer .ant-btn-primary,
-.user-page-actions .ant-btn-primary {
-    box-shadow: var(--user-blue-shadow);
+.list-page-actions .ant-btn-primary {
+    box-shadow: var(--list-page-accent-shadow, var(--shadow-soft));
 }
 
 .user-delete-content {
@@ -2022,31 +2027,31 @@ p {
         align-items: stretch;
     }
 
-    .user-page-actions {
+    .list-page-actions {
         display: grid !important;
         grid-template-columns: minmax(0, 1fr) max-content max-content;
         width: 100%;
         align-items: center;
     }
 
-    .user-page-actions .ant-space-item {
+    .list-page-actions .ant-space-item {
         min-width: 0;
     }
 
-    .user-page-actions .ant-space-item:has(.user-search-hidden) {
+    .list-page-actions .ant-space-item:has(.list-page-search-hidden) {
         display: none;
     }
 
-    .user-search {
+    .list-page-search {
         width: 100%;
     }
 
-    .user-page-actions .ant-btn {
+    .list-page-actions .ant-btn {
         width: auto;
         white-space: nowrap;
     }
 
-    .user-search-hidden {
+    .list-page-search-hidden {
         display: none;
     }
 

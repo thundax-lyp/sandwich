@@ -761,9 +761,32 @@ p {
 }
 
 .dictionary-page {
+    --dictionary-glass: rgba(255, 255, 255, 0.76);
+    --dictionary-glass-strong: rgba(248, 251, 255, 0.9);
+    --dictionary-ice: rgba(226, 235, 247, 0.72);
+    --dictionary-ice-solid: #edf3fb;
+    --dictionary-hover: rgba(214, 226, 242, 0.82);
+    --dictionary-ink: #111827;
+    --dictionary-copy: #52627a;
+    --dictionary-muted: #8a99ad;
+    --dictionary-line: rgba(107, 124, 150, 0.24);
+    --dictionary-line-strong: rgba(71, 91, 121, 0.34);
+    --dictionary-blue: #2563eb;
+    --dictionary-blue-hover: #1d4ed8;
+    --dictionary-blue-soft: rgba(37, 99, 235, 0.1);
+    --dictionary-blue-line: rgba(37, 99, 235, 0.26);
+    --dictionary-cyan: #0891b2;
+    --dictionary-cyan-soft: rgba(8, 145, 178, 0.11);
+    --dictionary-cyan-line: rgba(8, 145, 178, 0.24);
+    --dictionary-code: #5b5fd6;
+    --dictionary-code-soft: rgba(91, 95, 214, 0.1);
+    --dictionary-code-line: rgba(91, 95, 214, 0.24);
+    --dictionary-shadow: 0 18px 46px rgba(31, 45, 71, 0.13);
+    --dictionary-blue-shadow: 0 10px 26px rgba(37, 99, 235, 0.2);
     display: grid;
-    gap: 14px;
+    gap: 16px;
     min-width: 0;
+    color: var(--dictionary-ink);
 }
 
 .dictionary-page-header {
@@ -772,6 +795,7 @@ p {
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
+    padding: 2px 4px 0;
 }
 
 .dictionary-page > *,
@@ -786,29 +810,94 @@ p {
 .dictionary-page-header h2.ant-typography,
 .dictionary-list-toolbar h3.ant-typography {
     margin: 0;
+    color: var(--dictionary-ink);
+    letter-spacing: 0;
+}
+
+.dictionary-page .eyebrow {
+    color: var(--dictionary-blue);
+    letter-spacing: 0.02em;
+}
+
+.dictionary-page .ant-typography-secondary {
+    color: var(--dictionary-copy);
+}
+
+.dictionary-page .ant-btn-primary {
+    background: linear-gradient(135deg, var(--dictionary-blue), #1e40af);
+    border-color: var(--dictionary-blue);
+    box-shadow: var(--dictionary-blue-shadow);
+}
+
+.dictionary-page .ant-btn-primary:not(:disabled):hover {
+    background: linear-gradient(135deg, #2f6ff0, var(--dictionary-blue-hover)) !important;
+    border-color: var(--dictionary-blue-hover) !important;
+}
+
+.dictionary-page .ant-btn-default {
+    color: var(--dictionary-ink);
+    background: rgba(255, 255, 255, 0.64);
+    border-color: var(--dictionary-line);
+}
+
+.dictionary-page .ant-btn-default:not(:disabled):hover {
+    color: var(--dictionary-blue) !important;
+    background: var(--dictionary-blue-soft) !important;
+    border-color: var(--dictionary-blue-line) !important;
 }
 
 .dictionary-summary {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
     max-width: 100%;
 }
 
 .dictionary-summary-card,
 .dictionary-list-panel {
     max-width: 100%;
-    border-color: var(--line-subtle);
+    overflow: hidden;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.88),
+            rgba(248, 251, 255, 0.66)
+        );
+    border-color: var(--dictionary-line);
+    box-shadow: var(--dictionary-shadow);
+    backdrop-filter: blur(18px) saturate(1.18);
+}
+
+.dictionary-summary-card {
+    border-radius: 12px;
+}
+
+.dictionary-summary-card:nth-child(1) {
+    background:
+        linear-gradient(135deg, rgba(37, 99, 235, 0.1), transparent 54%),
+        var(--dictionary-glass);
+}
+
+.dictionary-summary-card:nth-child(2) {
+    background:
+        linear-gradient(135deg, rgba(8, 145, 178, 0.1), transparent 54%),
+        var(--dictionary-glass);
+}
+
+.dictionary-summary-card:nth-child(3) {
+    background:
+        linear-gradient(135deg, rgba(91, 95, 214, 0.1), transparent 54%),
+        var(--dictionary-glass);
 }
 
 .dictionary-summary-card .ant-card-body {
     display: grid;
-    gap: 6px;
-    padding: 16px 18px;
+    gap: 7px;
+    padding: 17px 18px;
 }
 
 .dictionary-summary-card strong {
-    color: var(--text-primary);
+    color: var(--dictionary-ink);
     font-size: 28px;
     line-height: 1;
 }
@@ -819,7 +908,7 @@ p {
     align-items: flex-start;
     justify-content: space-between;
     gap: 14px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .dictionary-list-toolbar h3.ant-typography {
@@ -837,12 +926,31 @@ p {
     margin-bottom: 0;
 }
 
+.dictionary-search-form .ant-input-affix-wrapper,
+.dictionary-search-form .ant-input {
+    color: var(--dictionary-ink);
+    background: rgba(255, 255, 255, 0.7);
+    border-color: var(--dictionary-line);
+}
+
+.dictionary-search-form .ant-input-affix-wrapper:hover,
+.dictionary-search-form .ant-input:hover {
+    border-color: var(--dictionary-line-strong);
+}
+
+.dictionary-search-form .ant-input-affix-wrapper:focus,
+.dictionary-search-form .ant-input-affix-wrapper-focused,
+.dictionary-search-form .ant-input:focus {
+    border-color: var(--dictionary-blue);
+    box-shadow: 0 0 0 3px var(--dictionary-blue-soft);
+}
+
 .dictionary-type-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 7px;
     min-height: 26px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .dictionary-bulk-bar {
@@ -851,11 +959,15 @@ p {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: rgba(248, 251, 255, 0.54);
+    border: 1px solid var(--dictionary-line);
+    border-radius: 10px;
 }
 
 .dictionary-list-panel .ant-card-body {
-    padding: 18px 20px;
+    padding: 18px 20px 20px;
 }
 
 .dictionary-list-panel .ant-table-wrapper,
@@ -873,37 +985,38 @@ p {
 }
 
 .dictionary-list-panel .ant-table {
-    color: var(--text-primary);
+    color: var(--dictionary-ink);
     font-size: 14px;
     background: transparent;
 }
 
 .dictionary-list-panel .ant-table-container {
     overflow: hidden;
-    background: color-mix(in srgb, var(--surface-panel) 70%, transparent);
-    border: 1px solid var(--line-subtle);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid var(--dictionary-line);
     border-radius: 10px;
 }
 
 .dictionary-list-panel .ant-table-thead > tr > th {
     padding: 12px 14px;
-    color: var(--text-secondary);
+    color: var(--dictionary-copy);
     font-size: 12px;
     font-weight: 700;
-    background: color-mix(in srgb, var(--surface-soft) 64%, transparent);
-    border-bottom-color: var(--line-subtle);
+    background: rgba(226, 235, 247, 0.76);
+    border-bottom-color: var(--dictionary-line);
 }
 
 .dictionary-list-panel .ant-table-tbody > tr > td {
     padding: 11px 14px;
-    border-bottom-color: var(--line-subtle);
+    border-bottom-color: var(--dictionary-line);
 }
 
 .dictionary-list-panel .ant-table-tbody > tr:hover > td {
-    background: var(--surface-hover) !important;
+    background: var(--dictionary-hover) !important;
 }
 
 .dictionary-list-panel .ant-table-tbody strong {
+    color: var(--dictionary-ink);
     font-size: 14px;
 }
 
@@ -913,9 +1026,36 @@ p {
 }
 
 .dictionary-list-panel .ant-typography code {
-    padding: 1px 6px;
+    padding: 2px 7px;
+    color: var(--dictionary-code);
     font-size: 12px;
+    background: var(--dictionary-code-soft);
+    border: 1px solid var(--dictionary-code-line);
     border-radius: 6px;
+}
+
+.dictionary-type-tag {
+    color: var(--dictionary-cyan);
+    background: var(--dictionary-cyan-soft);
+    border-color: var(--dictionary-cyan-line);
+}
+
+.dictionary-strip-tag {
+    color: var(--dictionary-copy);
+    background: rgba(255, 255, 255, 0.58);
+    border-color: var(--dictionary-line);
+}
+
+.dictionary-strip-tag:nth-child(2n) {
+    color: var(--dictionary-blue);
+    background: var(--dictionary-blue-soft);
+    border-color: var(--dictionary-blue-line);
+}
+
+.dictionary-strip-tag:nth-child(3n) {
+    color: var(--dictionary-cyan);
+    background: var(--dictionary-cyan-soft);
+    border-color: var(--dictionary-cyan-line);
 }
 
 .dictionary-list-panel .ant-pagination {
@@ -923,7 +1063,7 @@ p {
 }
 
 .dictionary-empty-icon {
-    color: var(--text-primary);
+    color: var(--dictionary-blue);
     font-size: 28px;
 }
 

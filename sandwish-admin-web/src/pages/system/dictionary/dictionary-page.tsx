@@ -204,7 +204,7 @@ export const DictionaryPage = () => {
             dataIndex: "type",
             key: "type",
             width: 220,
-            render: (type: string) => <Tag color="green">{type}</Tag>
+            render: (type: string) => <Tag className="dictionary-type-tag">{type}</Tag>
         },
         {
             title: "标签",
@@ -328,7 +328,7 @@ export const DictionaryPage = () => {
                 <div className="dictionary-type-strip" aria-label="当前页类型分布">
                     {topTypes.length ? (
                         topTypes.map(([type, count]) => (
-                            <Tag key={type} color="default">
+                            <Tag key={type} className="dictionary-strip-tag">
                                 {type} · {count}
                             </Tag>
                         ))

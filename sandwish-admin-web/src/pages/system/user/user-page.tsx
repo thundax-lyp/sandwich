@@ -27,6 +27,7 @@ import type { TableProps } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
 import type { DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent } from "react";
+import { SandwishBatchActionBar } from "@/components/sandwish-batch-action-bar";
 import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
 
@@ -510,34 +511,35 @@ export const UserPage = () => {
                     </div>
                 </SandwishFilterPanel>
 
-                <div className="user-table-toolbar">
-                    <Text type={hasSelectedUsers ? undefined : "secondary"}>
-                        已选择 {selectedRowKeys.length} 项
-                    </Text>
-                    <Space wrap>
-                        <Button
-                            danger
-                            icon={<DeleteOutlined />}
-                            disabled={!hasSelectedUsers}
-                        >
-                            批量删除
-                        </Button>
-                        <Button
-                            className="user-batch-neutral"
-                            icon={<PoweroffOutlined />}
-                            disabled={!hasSelectedUsers}
-                        >
-                            禁用
-                        </Button>
-                        <Button
-                            className="user-batch-enable"
-                            icon={<PoweroffOutlined />}
-                            disabled={!hasSelectedUsers}
-                        >
-                            启用
-                        </Button>
-                    </Space>
-                </div>
+                <SandwishBatchActionBar
+                    className="user-table-toolbar"
+                    selectedCount={selectedRowKeys.length}
+                    actions={
+                        <Space wrap>
+                            <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                disabled={!hasSelectedUsers}
+                            >
+                                批量删除
+                            </Button>
+                            <Button
+                                className="user-batch-neutral"
+                                icon={<PoweroffOutlined />}
+                                disabled={!hasSelectedUsers}
+                            >
+                                禁用
+                            </Button>
+                            <Button
+                                className="user-batch-enable"
+                                icon={<PoweroffOutlined />}
+                                disabled={!hasSelectedUsers}
+                            >
+                                启用
+                            </Button>
+                        </Space>
+                    }
+                />
 
                 <Table<UserRecord>
                     rowKey="id"

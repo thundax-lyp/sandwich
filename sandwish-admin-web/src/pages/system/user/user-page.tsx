@@ -19,34 +19,28 @@ import {
     Modal,
     Select,
     Space,
-    Table,
     Tag,
     Typography
 } from "antd";
-import type { TableProps } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Key } from "react";
-import type { DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent } from "react";
+import type { DragEvent as ReactDragEvent } from "react";
 import { SandwishBatchActionBar } from "@/components/sandwish-batch-action-bar";
 import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
+import { SandwishTable } from "@/components/sandwish-table";
+import type { SandwishTableProps } from "@/components/sandwish-table";
 
 const { Text } = Typography;
 
-const MIN_COLUMN_WIDTH = 96;
-const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
-const DESKTOP_ACTION_COLUMN_WIDTH = 116;
-const MOBILE_ACTION_COLUMN_WIDTH = 54;
 const DEFAULT_COLUMN_WIDTHS = {
     name: 220,
     email: 220,
     role: 120,
     status: 130,
     lastLogin: 160,
-    actions: DESKTOP_ACTION_COLUMN_WIDTH
+    actions: 116
 };
-
-type UserColumnKey = keyof typeof DEFAULT_COLUMN_WIDTHS;
 
 interface UserRecord {
     id: string;
@@ -180,67 +174,12 @@ export const UserPage = () => {
     const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [deleteConfirmText, setDeleteConfirmText] = useState("delete");
-    const [columnWidths, setColumnWidths] = useState(DEFAULT_COLUMN_WIDTHS);
-    const [isMobileTable, setIsMobileTable] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [draggingUserId, setDraggingUserId] = useState<string | null>(null);
     const [dropTarget, setDropTarget] = useState<{ userId: string; position: DropPosition } | null>(null);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters =
         Boolean(filters.email.trim()) || filters.role !== "All" || filters.status !== "All";
-
-    const startResizeColumn = (columnKey: UserColumnKey) => (event: ReactMouseEvent) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const startX = event.clientX;
-        const startWidth = columnWidths[columnKey];
-
-        const resizeColumn = (moveEvent: MouseEvent) => {
-            const nextWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + moveEvent.clientX - startX);
-            setColumnWidths((currentWidths) => ({
-                ...currentWidths,
-                [columnKey]: nextWidth
-            }));
-        };
-
-        const stopResizeColumn = () => {
-            document.removeEventListener("mousemove", resizeColumn);
-            document.removeEventListener("mouseup", stopResizeColumn);
-        };
-
-        document.addEventListener("mousemove", resizeColumn);
-        document.addEventListener("mouseup", stopResizeColumn);
-    };
-
-    const renderResizableTitle = (columnKey: UserColumnKey, title: string) => (
-        <span className="user-column-title">
-            {title}
-            <span
-                aria-hidden="true"
-                className="user-column-resize-handle"
-                onMouseDown={startResizeColumn(columnKey)}
-            />
-        </span>
-    );
-
-    useEffect(() => {
-        if (typeof window.matchMedia !== "function") {
-            return undefined;
-        }
-
-        const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
-        const updateMobileTable = () => setIsMobileTable(mediaQueryList.matches);
-
-        updateMobileTable();
-        mediaQueryList.addEventListener("change", updateMobileTable);
-        return () => mediaQueryList.removeEventListener("change", updateMobileTable);
-    }, []);
-
-    const actionColumnWidth = isMobileTable ? MOBILE_ACTION_COLUMN_WIDTH : DESKTOP_ACTION_COLUMN_WIDTH;
-    const tableScrollX =
-        columnWidths.name + columnWidths.email + columnWidths.role + columnWidths.status + columnWidths.lastLogin
-        + actionColumnWidth;
 
     const filteredUsers = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
@@ -299,12 +238,12 @@ export const UserPage = () => {
         setFilters(DEFAULT_USER_FILTERS);
     };
 
-    const columns: TableProps<UserRecord>["columns"] = [
+    const columns: SandwishTableProps<UserRecord>["columns"] = [
         {
-            title: renderResizableTitle("name", "用户"),
+            title: "用户",
             dataIndex: "name",
             key: "name",
-            width: columnWidths.name,
+            width: DEFAULT_COLUMN_WIDTHS.name,
             render: (name: string, user) => (
                 <Space size={10}>
                     <Avatar style={{ backgroundColor: user.avatarColor }}>
@@ -315,51 +254,50 @@ export const UserPage = () => {
             )
         },
         {
-            title: renderResizableTitle("email", "邮箱"),
+            title: "邮箱",
             dataIndex: "email",
             key: "email",
-            width: columnWidths.email
+            width: DEFAULT_COLUMN_WIDTHS.email
         },
         {
-            title: renderResizableTitle("role", "角色"),
+            title: "角色",
             dataIndex: "role",
             key: "role",
-            width: columnWidths.role,
+            width: DEFAULT_COLUMN_WIDTHS.role,
             render: (role: UserRecord["role"]) => <Tag className={roleClassName[role]}>{roleLabel[role]}</Tag>
         },
         {
-            title: renderResizableTitle("status", "状态"),
+            title: "状态",
             dataIndex: "status",
             key: "status",
-            width: columnWidths.status,
+            width: DEFAULT_COLUMN_WIDTHS.status,
             render: (status: UserRecord["status"]) => (
                 <Tag className={statusClassName[status]}>{statusLabel[status]}</Tag>
             )
         },
         {
-            title: renderResizableTitle("lastLogin", "最近登录"),
+            title: "最近登录",
             dataIndex: "lastLogin",
             key: "lastLogin",
-            width: columnWidths.lastLogin
+            width: DEFAULT_COLUMN_WIDTHS.lastLogin
         },
         {
-            title: renderResizableTitle("actions", "操作"),
+            title: "操作",
             key: "actions",
-            width: actionColumnWidth,
-            fixed: "right",
+            width: DEFAULT_COLUMN_WIDTHS.actions,
             render: (_, user) => (
-                <div className="user-row-actions">
-                    <Space.Compact className="user-row-actions-inline">
+                <div className="sandwish-table-row-actions">
+                    <Space.Compact className="sandwish-table-row-actions-inline">
                         <Button
                             aria-label={`编辑 ${user.name}`}
-                            className="user-row-action"
+                            className="sandwish-table-row-action"
                             icon={<EditOutlined />}
                             type="text"
                             onClick={() => setEditingUser(user)}
                         />
                         <Button
                             aria-label={`删除 ${user.name}`}
-                            className="user-row-action"
+                            className="sandwish-table-row-action"
                             icon={<DeleteOutlined />}
                             type="text"
                             danger
@@ -371,7 +309,7 @@ export const UserPage = () => {
                     </Space.Compact>
                     <button
                         aria-label={`拖动排序 ${user.name}`}
-                        className="user-row-action user-row-drag-handle"
+                        className="sandwish-table-row-action sandwish-table-row-drag-handle"
                         draggable
                         type="button"
                         onDragEnd={clearUserDrag}
@@ -408,7 +346,7 @@ export const UserPage = () => {
                     >
                         <Button
                             aria-label={`展开 ${user.name} 操作`}
-                            className="user-row-action user-row-action-more"
+                            className="sandwish-table-row-action sandwish-table-row-action-more"
                             icon={<MoreOutlined />}
                             type="text"
                         />
@@ -541,7 +479,7 @@ export const UserPage = () => {
                     }
                 />
 
-                <Table<UserRecord>
+                <SandwishTable<UserRecord>
                     rowKey="id"
                     className="user-table"
                     columns={columns}
@@ -549,7 +487,7 @@ export const UserPage = () => {
                     onRow={(user) => ({
                         className:
                             dropTarget?.userId === user.id
-                                ? `user-row-drop-${dropTarget.position}`
+                                ? `sandwish-table-row-drop-${dropTarget.position}`
                                 : undefined,
                         onDragEnter: () => {
                             if (draggingUserId && draggingUserId !== user.id) {
@@ -588,7 +526,7 @@ export const UserPage = () => {
                         selectedRowKeys,
                         onChange: setSelectedRowKeys
                     }}
-                    scroll={{ x: tableScrollX }}
+                    sortable
                 />
             </SandwishPage>
 

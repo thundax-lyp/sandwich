@@ -8,11 +8,12 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Input, Modal, Select, Space, Tag, Typography, message } from "antd";
+import { Button, Form, Input, Select, Space, Tag, Typography, message } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
+import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import {
@@ -495,28 +496,17 @@ export const DepartmentPage = () => {
                 </Form>
             </SandwishDrawer>
 
-            <Modal
-                className="department-delete-modal"
-                rootClassName="department-delete-modal-root"
+            <SandwishConfirmModal
                 title="删除部门"
                 open={Boolean(deletingDepartment)}
+                message={`确认删除 ${deletingDepartment?.name || ""}？`}
+                description="删除后需要重新新增。若该部门下仍有关联用户或子部门，接口会按后端校验结果拦截。"
                 okText="删除"
-                okButtonProps={{ danger: true }}
                 confirmLoading={deleteMutation.isPending}
                 cancelText="取消"
                 onCancel={closeDeleteConfirm}
                 onOk={deleteDepartment}
-            >
-                <div className="department-delete-content">
-                    <DeleteOutlined className="department-delete-icon" />
-                    <div>
-                        <Text strong>确认删除 {deletingDepartment?.name}？</Text>
-                        <Text type="secondary">
-                            删除后需要重新新增。若该部门下仍有关联用户或子部门，接口会按后端校验结果拦截。
-                        </Text>
-                    </div>
-                </div>
-            </Modal>
+            />
         </>
     );
 };

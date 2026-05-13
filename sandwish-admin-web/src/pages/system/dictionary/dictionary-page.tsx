@@ -2,28 +2,28 @@ import {
     BookOutlined,
     DeleteOutlined,
     EditOutlined,
-    PlusOutlined,
+    MoreOutlined,
     ReloadOutlined,
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    Alert,
     Button,
-    Card,
+    Dropdown,
     Form,
     Input,
     Modal,
     Space,
-    Table,
     Tag,
     Typography,
     message
 } from "antd";
-import type { TableProps } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
+import { ListPage } from "@/components/list-page";
+import { SandwishDrawer } from "@/components/sandwish-drawer";
+import type { SandwishTableProps } from "@/components/sandwish-table";
 import {
     addDictionary,
     deleteDictionaries,
@@ -33,11 +33,19 @@ import {
 import type { DictPageRequest, DictResponse, DictSaveRequest } from "./dictionary-service";
 import "./dictionary-page.css";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
+
+const DEFAULT_COLUMN_WIDTHS = {
+    type: 220,
+    label: 180,
+    value: 180,
+    remarks: 320,
+    actions: 116
+};
 
 interface DictFormValues {
     id?: string | null;
@@ -47,17 +55,19 @@ interface DictFormValues {
     remarks?: string | null;
 }
 
+interface DictionaryFilters {
+    remarks: string;
+    type: string;
+}
+
+const DEFAULT_DICTIONARY_FILTERS: DictionaryFilters = {
+    remarks: "",
+    type: ""
+};
+
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
     return normalizedValue || undefined;
-};
-
-const readDictionaryQuery = (values: DictPageRequest): DictPageRequest => {
-    return {
-        type: normalizeSearch(values.type),
-        label: normalizeSearch(values.label),
-        remarks: normalizeSearch(values.remarks)
-    };
 };
 
 const readFormRequest = (values: DictFormValues): DictSaveRequest => {
@@ -72,7 +82,6 @@ const readFormRequest = (values: DictFormValues): DictSaveRequest => {
 
 export const DictionaryPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
-    const [form] = Form.useForm<DictPageRequest>();
     const [editForm] = Form.useForm<DictFormValues>();
     const queryClient = useQueryClient();
     const canEditDictionary = hasPermission("sys:dict:edit");
@@ -80,9 +89,13 @@ export const DictionaryPage = () => {
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
+    const [searchText, setSearchText] = useState("");
+    const [filters, setFilters] = useState<DictionaryFilters>(DEFAULT_DICTIONARY_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [editingDictionary, setEditingDictionary] = useState<DictResponse | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
+    const hasSelectedDictionaries = selectedRowKeys.length > 0;
+    const hasActiveFilters = Boolean(filters.type.trim()) || Boolean(filters.remarks.trim());
 
     const dictionaryQuery = useQuery({
         queryKey: ["dictionary", "page", query],
@@ -94,19 +107,6 @@ export const DictionaryPage = () => {
     const totalCount = dictionaryPage?.totalCount || 0;
     const currentPageNo = query.pageNo || DEFAULT_PAGE_NO;
     const currentPageSize = query.pageSize || DEFAULT_PAGE_SIZE;
-    const typeCount = useMemo(
-        () => new Set(dictionaries.map((item) => item.type)).size,
-        [dictionaries]
-    );
-    const topTypes = useMemo(() => {
-        const typeMap = new Map<string, number>();
-        dictionaries.forEach((item) => {
-            typeMap.set(item.type, (typeMap.get(item.type) || 0) + 1);
-        });
-        return Array.from(typeMap.entries())
-            .sort((first, second) => second[1] - first[1])
-            .slice(0, 5);
-    }, [dictionaries]);
 
     const saveMutation = useMutation({
         mutationFn: (values: DictSaveRequest) =>
@@ -135,21 +135,37 @@ export const DictionaryPage = () => {
         }
     });
 
-    const searchDictionaries = (values: DictPageRequest) => {
+    const updateQuery = (values: Partial<DictPageRequest>) => {
         setSelectedRowKeys([]);
-        setQuery((currentQuery) => ({
-            ...readDictionaryQuery(values),
-            pageNo: DEFAULT_PAGE_NO,
-            pageSize: currentQuery.pageSize || DEFAULT_PAGE_SIZE
-        }));
+        setQuery((currentQuery) => {
+            const nextQuery = { ...currentQuery, ...values };
+            return {
+                type: nextQuery.type,
+                label: nextQuery.label,
+                remarks: nextQuery.remarks,
+                pageNo: DEFAULT_PAGE_NO,
+                pageSize: currentQuery.pageSize || DEFAULT_PAGE_SIZE
+            };
+        });
     };
 
-    const resetSearch = () => {
-        form.resetFields();
-        setSelectedRowKeys([]);
-        setQuery({
-            pageNo: DEFAULT_PAGE_NO,
-            pageSize: query.pageSize || DEFAULT_PAGE_SIZE
+    const searchDictionaries = (value: string) => {
+        setSearchText(value);
+        updateQuery({ label: normalizeSearch(value) });
+    };
+
+    const applyFilters = () => {
+        updateQuery({
+            remarks: normalizeSearch(filters.remarks),
+            type: normalizeSearch(filters.type)
+        });
+    };
+
+    const resetFilters = () => {
+        setFilters(DEFAULT_DICTIONARY_FILTERS);
+        updateQuery({
+            remarks: undefined,
+            type: undefined
         });
     };
 
@@ -199,216 +215,234 @@ export const DictionaryPage = () => {
         });
     };
 
-    const columns: TableProps<DictResponse>["columns"] = [
+    const columns: SandwishTableProps<DictResponse>["columns"] = [
         {
             title: "字典类型",
             dataIndex: "type",
             key: "type",
-            width: 220,
+            width: DEFAULT_COLUMN_WIDTHS.type,
             render: (type: string) => <Tag className="dictionary-type-tag">{type}</Tag>
         },
         {
             title: "标签",
             dataIndex: "label",
             key: "label",
-            width: 180,
-            render: (label: string) => <strong>{label}</strong>
+            width: DEFAULT_COLUMN_WIDTHS.label,
+            render: (label: string) => <Text strong>{label}</Text>
         },
         {
             title: "值",
             dataIndex: "value",
             key: "value",
-            width: 180,
+            width: DEFAULT_COLUMN_WIDTHS.value,
             render: (value: string) => <Text code>{value}</Text>
         },
         {
             title: "备注",
             dataIndex: "remarks",
             key: "remarks",
+            width: DEFAULT_COLUMN_WIDTHS.remarks,
             ellipsis: true,
             render: (remarks?: string | null) => remarks || <Text type="secondary">未填写</Text>
         },
         {
             title: "操作",
-            key: "action",
-            width: 150,
-            fixed: "right",
+            key: "actions",
+            width: DEFAULT_COLUMN_WIDTHS.actions,
             render: (_, dictionary) => (
-                <Space size={4}>
-                    <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        disabled={!canEditDictionary}
-                        onClick={() => openEditEditor(dictionary)}
+                <div className="sandwish-table-row-actions">
+                    <Space.Compact className="sandwish-table-row-actions-inline">
+                        <Button
+                            aria-label={`编辑 ${dictionary.label}`}
+                            className="sandwish-table-row-action"
+                            disabled={!canEditDictionary}
+                            icon={<EditOutlined />}
+                            type="text"
+                            onClick={() => openEditEditor(dictionary)}
+                        />
+                        <Button
+                            aria-label={`删除 ${dictionary.label}`}
+                            className="sandwish-table-row-action"
+                            disabled={!canEditDictionary}
+                            icon={<DeleteOutlined />}
+                            type="text"
+                            danger
+                            onClick={() => confirmDelete([dictionary.id])}
+                        />
+                    </Space.Compact>
+                    <Dropdown
+                        menu={{
+                            items: [
+                                {
+                                    key: "edit",
+                                    disabled: !canEditDictionary,
+                                    icon: <EditOutlined />,
+                                    label: "编辑"
+                                },
+                                {
+                                    key: "delete",
+                                    danger: true,
+                                    disabled: !canEditDictionary,
+                                    icon: <DeleteOutlined />,
+                                    label: "删除"
+                                }
+                            ],
+                            onClick: ({ key }) => {
+                                if (key === "edit") {
+                                    openEditEditor(dictionary);
+                                }
+                                if (key === "delete") {
+                                    confirmDelete([dictionary.id]);
+                                }
+                            }
+                        }}
+                        trigger={["click"]}
                     >
-                        编辑
-                    </Button>
-                    <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        disabled={!canEditDictionary}
-                        onClick={() => confirmDelete([dictionary.id])}
-                    />
-                </Space>
+                        <Button
+                            aria-label={`展开 ${dictionary.label} 操作`}
+                            className="sandwish-table-row-action sandwish-table-row-action-more"
+                            icon={<MoreOutlined />}
+                            type="text"
+                        />
+                    </Dropdown>
+                </div>
             )
         }
     ];
 
     return (
-        <main className="dictionary-page">
+        <>
             {contextHolder}
-            <section className="dictionary-page-header">
-                <div>
-                    <Text className="eyebrow">system / dictionary</Text>
-                    <Title level={2}>字典管理</Title>
-                    <Text type="secondary">维护系统字典类型、展示标签、业务值和排序。</Text>
-                </div>
-                <Space>
+            <ListPage<DictResponse>
+                pageClassName="dictionary-page"
+                title="字典管理"
+                description="维护系统字典类型、展示标签、业务值和备注说明。"
+                subjectName="字典项"
+                enableAdd={canEditDictionary}
+                enableFilter
+                enableSearch
+                searchShortcut="⌘K"
+                searchValue={searchText}
+                onSearchChange={searchDictionaries}
+                onAdd={openCreateEditor}
+                filterActive={hasActiveFilters}
+                filter={({ closeFilter }) => (
+                    <div className="dictionary-filter-form">
+                        <label>
+                            <span>字典类型</span>
+                            <Input
+                                allowClear
+                                placeholder="user_status"
+                                prefix={<BookOutlined />}
+                                value={filters.type}
+                                onChange={(event) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        type: event.target.value
+                                    }))
+                                }
+                            />
+                        </label>
+                        <label>
+                            <span>备注</span>
+                            <Input
+                                allowClear
+                                placeholder="备注关键词"
+                                value={filters.remarks}
+                                onChange={(event) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        remarks: event.target.value
+                                    }))
+                                }
+                            />
+                        </label>
+                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
+                            重置
+                        </Button>
+                        <Button
+                            className="dictionary-filter-search"
+                            icon={<SearchOutlined />}
+                            onClick={() => {
+                                applyFilters();
+                                closeFilter();
+                            }}
+                        >
+                            查询
+                        </Button>
+                    </div>
+                )}
+                pageActions={
                     <Button icon={<ReloadOutlined />} onClick={() => dictionaryQuery.refetch()}>
                         刷新
                     </Button>
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        disabled={!canEditDictionary}
-                        onClick={openCreateEditor}
-                    >
-                        新增字典项
-                    </Button>
-                </Space>
-            </section>
+                }
+                batchClassName="dictionary-table-toolbar"
+                selectedCount={selectedRowKeys.length}
+                batchActions={
+                    <Space wrap>
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            disabled={!canEditDictionary || !hasSelectedDictionaries}
+                            loading={deleteMutation.isPending}
+                            onClick={() => confirmDelete(selectedRowKeys.map(String))}
+                        >
+                            批量删除
+                        </Button>
+                    </Space>
+                }
+                rowKey="id"
+                className="dictionary-table"
+                columns={columns}
+                dataSource={dictionaries}
+                loading={dictionaryQuery.isFetching}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: setSelectedRowKeys,
+                    getCheckboxProps: () => ({
+                        disabled: !canEditDictionary
+                    })
+                }}
+                pagination={{
+                    current: currentPageNo,
+                    pageSize: currentPageSize,
+                    total: totalCount,
+                    showSizeChanger: true,
+                    showTotal: (total) => `共 ${total} 项`,
+                    onChange: (pageNo, pageSize) => {
+                        setQuery((currentQuery) => ({
+                            ...currentQuery,
+                            pageNo,
+                            pageSize
+                        }));
+                    }
+                }}
+                locale={{
+                    emptyText: dictionaryQuery.isError
+                        ? "字典列表加载失败，请确认权限和接口状态。"
+                        : "暂无字典项"
+                }}
+            />
 
-            <section className="dictionary-summary" aria-label="字典概览">
-                <Card className="dictionary-summary-card">
-                    <Text type="secondary">字典项</Text>
-                    <strong>{totalCount}</strong>
-                </Card>
-                <Card className="dictionary-summary-card">
-                    <Text type="secondary">当前页类型</Text>
-                    <strong>{typeCount}</strong>
-                </Card>
-                <Card className="dictionary-summary-card">
-                    <Text type="secondary">当前页</Text>
-                    <strong>{dictionaries.length}</strong>
-                </Card>
-            </section>
-
-            <Card className="dictionary-list-panel">
-                <div className="dictionary-list-toolbar">
-                    <div>
-                        <Text className="eyebrow">dictionary list</Text>
-                        <Title level={3}>字典项列表</Title>
-                    </div>
-                    <Form<DictPageRequest>
-                        form={form}
-                        className="dictionary-search-form"
-                        layout="inline"
-                        onFinish={searchDictionaries}
-                    >
-                        <Form.Item name="type">
-                            <Input allowClear placeholder="字典类型" prefix={<BookOutlined />} />
-                        </Form.Item>
-                        <Form.Item name="label">
-                            <Input allowClear placeholder="标签" prefix={<SearchOutlined />} />
-                        </Form.Item>
-                        <Form.Item name="remarks">
-                            <Input allowClear placeholder="备注关键词" />
-                        </Form.Item>
-                        <Form.Item>
-                            <Space>
-                                <Button htmlType="submit" type="primary">
-                                    查询
-                                </Button>
-                                <Button onClick={resetSearch}>重置</Button>
-                            </Space>
-                        </Form.Item>
-                    </Form>
-                </div>
-
-                <div className="dictionary-type-strip" aria-label="当前页类型分布">
-                    {topTypes.length ? (
-                        topTypes.map(([type, count]) => (
-                            <Tag key={type} className="dictionary-strip-tag">
-                                {type} · {count}
-                            </Tag>
-                        ))
-                    ) : (
-                        <Text type="secondary">当前筛选暂无类型分布</Text>
-                    )}
-                </div>
-
-                {dictionaryQuery.isError ? (
-                    <Alert
-                        type="warning"
-                        showIcon
-                        message="字典列表加载失败"
-                        description="请确认当前账号拥有 sys:dict:view 权限，并检查 admin-api 字典分页接口。"
-                        action={<Button onClick={() => dictionaryQuery.refetch()}>重试</Button>}
-                        style={{ marginBottom: 16 }}
-                    />
-                ) : null}
-
-                <div className="dictionary-bulk-bar">
-                    <Text type="secondary">已选择 {selectedRowKeys.length} 项</Text>
-                    <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        disabled={!canEditDictionary || selectedRowKeys.length === 0}
-                        loading={deleteMutation.isPending}
-                        onClick={() => confirmDelete(selectedRowKeys.map(String))}
-                    >
-                        批量删除
-                    </Button>
-                </div>
-
-                <Table<DictResponse>
-                    rowKey="id"
-                    columns={columns}
-                    dataSource={dictionaries}
-                    loading={dictionaryQuery.isFetching}
-                    rowSelection={{
-                        selectedRowKeys,
-                        onChange: setSelectedRowKeys,
-                        getCheckboxProps: () => ({
-                            disabled: !canEditDictionary
-                        })
-                    }}
-                    pagination={{
-                        current: currentPageNo,
-                        pageSize: currentPageSize,
-                        total: totalCount,
-                        showSizeChanger: true,
-                        showTotal: (total) => `共 ${total} 项`,
-                        onChange: (pageNo, pageSize) => {
-                            setQuery((currentQuery) => ({
-                                ...currentQuery,
-                                pageNo,
-                                pageSize
-                            }));
-                        }
-                    }}
-                    scroll={{ x: 1120 }}
-                    locale={{
-                        emptyText: (
-                            <Space orientation="vertical" size={8}>
-                                <BookOutlined className="dictionary-empty-icon" />
-                                <Text type="secondary">暂无字典项</Text>
-                            </Space>
-                        )
-                    }}
-                />
-            </Card>
-
-            <Modal
+            <SandwishDrawer
+                className="dictionary-edit-drawer"
                 title={editingDictionary ? "编辑字典项" : "新增字典项"}
                 open={editorOpen}
-                okText="保存"
-                cancelText="取消"
-                confirmLoading={saveMutation.isPending}
-                onCancel={closeEditor}
-                onOk={saveDictionary}
-                destroyOnHidden
+                size="small"
+                onClose={closeEditor}
+                footer={
+                    <div className="dictionary-edit-footer">
+                        <Button onClick={closeEditor}>取消</Button>
+                        <Button
+                            type="primary"
+                            loading={saveMutation.isPending}
+                            onClick={saveDictionary}
+                        >
+                            保存字典项
+                        </Button>
+                    </div>
+                }
             >
                 <Form<DictFormValues>
                     form={editForm}
@@ -443,7 +477,7 @@ export const DictionaryPage = () => {
                         <TextArea rows={3} maxLength={200} showCount placeholder="补充使用说明" />
                     </Form.Item>
                 </Form>
-            </Modal>
-        </main>
+            </SandwishDrawer>
+        </>
     );
 };

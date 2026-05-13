@@ -507,7 +507,8 @@ describe("App", () => {
         expect(await screen.findByText("启用")).toBeInTheDocument();
         expect(screen.getByText("DISABLED")).toBeInTheDocument();
 
-        await userEvent.type(screen.getByPlaceholderText("字典类型"), "user_status");
+        await userEvent.click(screen.getByRole("button", { name: /筛选/ }));
+        await userEvent.type(screen.getByPlaceholderText("user_status"), "user_status");
         await userEvent.click(screen.getByRole("button", { name: /查\s*询/ }));
 
         await waitFor(() =>

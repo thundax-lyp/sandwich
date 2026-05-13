@@ -24,10 +24,7 @@ import {
 } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
-import { SandwishBatchActionBar } from "@/components/sandwish-batch-action-bar";
-import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
-import { SandwishPage } from "@/components/sandwish-page";
-import { SandwishTable } from "@/components/sandwish-table";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 
 const { Text } = Typography;
@@ -339,11 +336,11 @@ export const UserPage = () => {
 
     return (
         <>
-            <SandwishPage
-                className="user-page"
+            <SandwishListPage<UserRecord>
+                pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
-                actions={
+                pageActions={
                     <Space className="user-page-actions">
                         <Input
                             allowClear
@@ -367,9 +364,9 @@ export const UserPage = () => {
                         </Button>
                     </Space>
                 }
-            >
-
-                <SandwishFilterPanel open={filtersOpen} className="user-filter-panel">
+                filterOpen={filtersOpen}
+                filterClassName="user-filter-panel"
+                filter={
                     <div className="user-filter-form">
                         <label>
                             <span>邮箱</span>
@@ -428,58 +425,52 @@ export const UserPage = () => {
                             查询
                         </Button>
                     </div>
-                </SandwishFilterPanel>
-
-                <SandwishBatchActionBar
-                    className="user-table-toolbar"
-                    selectedCount={selectedRowKeys.length}
-                    actions={
-                        <Space wrap>
-                            <Button
-                                danger
-                                icon={<DeleteOutlined />}
-                                disabled={!hasSelectedUsers}
-                            >
-                                批量删除
-                            </Button>
-                            <Button
-                                className="user-batch-neutral"
-                                icon={<PoweroffOutlined />}
-                                disabled={!hasSelectedUsers}
-                            >
-                                禁用
-                            </Button>
-                            <Button
-                                className="user-batch-enable"
-                                icon={<PoweroffOutlined />}
-                                disabled={!hasSelectedUsers}
-                            >
-                                启用
-                            </Button>
-                        </Space>
-                    }
-                />
-
-                <SandwishTable<UserRecord>
-                    rowKey="id"
-                    className="user-table"
-                    columns={columns}
-                    dataSource={filteredUsers}
-                    onSort={moveUser}
-                    pagination={{
-                        current: 1,
-                        pageSize: 50,
-                        total: 1248,
-                        showSizeChanger: false,
-                        showTotal: () => "1,248 个用户"
-                    }}
-                    rowSelection={{
-                        selectedRowKeys,
-                        onChange: setSelectedRowKeys
-                    }}
-                    sortable
-                />
-            </SandwishPage>
+                }
+                batchClassName="user-table-toolbar"
+                selectedCount={selectedRowKeys.length}
+                batchActions={
+                    <Space wrap>
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            批量删除
+                        </Button>
+                        <Button
+                            className="user-batch-neutral"
+                            icon={<PoweroffOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            禁用
+                        </Button>
+                        <Button
+                            className="user-batch-enable"
+                            icon={<PoweroffOutlined />}
+                            disabled={!hasSelectedUsers}
+                        >
+                            启用
+                        </Button>
+                    </Space>
+                }
+                rowKey="id"
+                className="user-table"
+                columns={columns}
+                dataSource={filteredUsers}
+                onSort={moveUser}
+                pagination={{
+                    current: 1,
+                    pageSize: 50,
+                    total: 1248,
+                    showSizeChanger: false,
+                    showTotal: () => "1,248 个用户"
+                }}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: setSelectedRowKeys
+                }}
+                sortable
+            />
 
             <Drawer
                 className="user-edit-drawer"

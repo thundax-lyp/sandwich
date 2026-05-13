@@ -204,6 +204,7 @@ html[data-theme="dark"] .user-page {
 
 .user-department-panel {
     display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 10px;
     min-height: 420px;
     max-height: min(620px, calc(100vh - 250px));
@@ -236,6 +237,7 @@ html[data-theme="dark"] .user-page {
 
 .user-department-panel .ant-tree {
     min-height: 0;
+    height: 100%;
     overflow: auto;
     color: var(--user-ink);
     background: transparent;

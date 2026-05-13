@@ -113,7 +113,7 @@
 - `SandwishFilterPanel` 作为独立通用面板暴露，不与 `SandwishPage` 联动；筛选按钮、展开状态和查询行为由业务页面拥有。
 - `SandwishBatchActionBar` 只负责选中数量展示、右侧操作布局和未选中时的禁用态视觉；具体批量操作、按钮文案和业务禁用条件由业务页面拥有。
 - `SandwishTable` 只薄包装 AntD `Table` 的外壳视觉、滚动/分页样式、列宽拖动、操作列格式、响应式行为和行拖拽排序交互协议；`columns`、`pagination`、`rowSelection` 等成熟 AntD API 保持透传，排序结果通过 `onSort` 交还业务页面处理。
-- `SandwishListPage` 只组合 `SandwishPage`、`SandwishFilterPanel`、`SandwishBatchActionBar` 和 `SandwishTable` 的显示结构；查询条件、批量动作、表格数据、排序结果和弹窗等业务状态仍由业务页面拥有。
+- `SandwishListPage` 只组合 `SandwishPage`、`SandwishFilterPanel`、`SandwishBatchActionBar` 和 `SandwishTable` 的显示结构，并可通过 `enableFilter` 托管筛选面板展开状态；查询条件、批量动作、表格数据、排序结果和弹窗等业务状态仍由业务页面拥有。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 - 权限字符串优先集中在页面或专门 helper 中，不在多个无关组件中重复散落。
 - 测试应验证用户可见结果和关键请求契约，不验证 Ant Design 内部 DOM 细节。

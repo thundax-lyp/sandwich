@@ -164,7 +164,6 @@ const getInitials = (name: string) => {
 export const UserPage = () => {
     const [users, setUsers] = useState<UserRecord[]>(USER_RECORDS);
     const [searchText, setSearchText] = useState("");
-    const [filtersOpen, setFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
     const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
     const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
@@ -340,11 +339,12 @@ export const UserPage = () => {
                 pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
-                pageActions={
+                enableFilter
+                pageActions={({ filterOpen, toggleFilter }) => (
                     <Space className="user-page-actions">
                         <Input
                             allowClear
-                            className={`user-search${filtersOpen ? " user-search-hidden" : ""}`}
+                            className={`user-search${filterOpen ? " user-search-hidden" : ""}`}
                             placeholder="搜索用户..."
                             prefix={<SearchOutlined />}
                             suffix={<span className="user-search-shortcut">⌘K</span>}
@@ -352,10 +352,10 @@ export const UserPage = () => {
                             onChange={(event) => setSearchText(event.target.value)}
                         />
                         <Button
-                            className={filtersOpen || hasActiveFilters ? "user-filter-toggle-active" : undefined}
+                            className={filterOpen || hasActiveFilters ? "user-filter-toggle-active" : undefined}
                             icon={<FilterOutlined />}
-                            aria-expanded={filtersOpen}
-                            onClick={() => setFiltersOpen((open) => !open)}
+                            aria-expanded={filterOpen}
+                            onClick={toggleFilter}
                         >
                             筛选
                         </Button>
@@ -363,10 +363,9 @@ export const UserPage = () => {
                             新增用户
                         </Button>
                     </Space>
-                }
-                filterOpen={filtersOpen}
+                )}
                 filterClassName="user-filter-panel"
-                filter={
+                filter={({ closeFilter }) => (
                     <div className="user-filter-form">
                         <label>
                             <span>邮箱</span>
@@ -420,12 +419,12 @@ export const UserPage = () => {
                         <Button
                             className="user-filter-search"
                             icon={<SearchOutlined />}
-                            onClick={() => setFiltersOpen(false)}
+                            onClick={closeFilter}
                         >
                             查询
                         </Button>
                     </div>
-                }
+                )}
                 batchClassName="user-table-toolbar"
                 selectedCount={selectedRowKeys.length}
                 batchActions={

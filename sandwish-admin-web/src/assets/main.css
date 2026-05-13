@@ -1437,6 +1437,16 @@ p {
     border-color: var(--user-line);
 }
 
+.user-table-toolbar .ant-btn-dangerous:not(:disabled) {
+    color: var(--user-danger);
+    border-color: var(--user-danger-line);
+}
+
+.user-table-toolbar .ant-btn-dangerous:not(:disabled):hover {
+    color: var(--user-danger) !important;
+    border-color: rgba(220, 38, 38, 0.34) !important;
+}
+
 .user-table-toolbar .user-batch-neutral:not(:disabled) {
     color: var(--user-copy);
     background: transparent;

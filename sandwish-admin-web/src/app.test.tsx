@@ -530,23 +530,23 @@ describe("App", () => {
     it("renders the silver user management layout interactions", async () => {
         render(<UserPage />);
 
-        expect(screen.getByRole("heading", { name: "Users" })).toBeInTheDocument();
+        expect(screen.getByRole("heading", { name: "用户管理" })).toBeInTheDocument();
         expect(screen.getByText("Ethan Chen")).toBeInTheDocument();
 
-        await userEvent.type(screen.getByPlaceholderText("Search users..."), "olivia");
+        await userEvent.type(screen.getByPlaceholderText("搜索用户..."), "olivia");
 
         expect(screen.getByText("Olivia Martinez")).toBeInTheDocument();
         expect(screen.queryByText("Ethan Chen")).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole("button", { name: "编辑 Olivia Martinez" }));
 
-        expect(await screen.findByText("Edit User")).toBeInTheDocument();
+        expect(await screen.findByText("编辑用户")).toBeInTheDocument();
         expect(screen.getByDisplayValue("Olivia Martinez")).toBeInTheDocument();
 
         await userEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));
 
-        expect((await screen.findAllByText("Delete User")).length).toBeGreaterThan(0);
-        expect(screen.getByText("Are you sure you want to delete this user?")).toBeInTheDocument();
+        expect((await screen.findAllByText("删除用户")).length).toBeGreaterThan(0);
+        expect(screen.getByText("确认删除这个用户？")).toBeInTheDocument();
     });
 
     it("clears stale tokens when protected menu loading is unauthorized", async () => {

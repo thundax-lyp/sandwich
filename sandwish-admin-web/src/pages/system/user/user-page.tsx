@@ -27,6 +27,7 @@ import type { TableProps } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
 import type { DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent } from "react";
+import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
 
 const { Text } = Typography;
@@ -448,7 +449,7 @@ export const UserPage = () => {
                 }
             >
 
-                <div className={`user-filter-panel${filtersOpen ? " user-filter-panel-open" : ""}`}>
+                <SandwishFilterPanel open={filtersOpen} className="user-filter-panel">
                     <div className="user-filter-form">
                         <label>
                             <span>邮箱</span>
@@ -507,7 +508,7 @@ export const UserPage = () => {
                             查询
                         </Button>
                     </div>
-                </div>
+                </SandwishFilterPanel>
 
                 <div className="user-table-toolbar">
                     <Text type={hasSelectedUsers ? undefined : "secondary"}>

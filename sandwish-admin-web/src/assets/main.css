@@ -1377,7 +1377,7 @@ p {
     border-color: rgba(37, 99, 235, 0.34) !important;
 }
 
-.user-filter-panel {
+.sandwish-filter-panel {
     position: relative;
     z-index: 1;
     max-height: 0;
@@ -1389,10 +1389,14 @@ p {
         margin 0.2s ease;
 }
 
-.user-filter-panel-open {
-    max-height: 180px;
-    margin: 0 0 10px;
+.sandwish-filter-panel-open {
+    max-height: var(--sandwish-filter-panel-max-height, 180px);
+    margin: var(--sandwish-filter-panel-open-margin, 0 0 10px);
     opacity: 1;
+}
+
+.user-filter-panel {
+    --sandwish-filter-panel-max-height: 180px;
 }
 
 .user-filter-form {
@@ -1995,8 +1999,8 @@ p {
         display: none;
     }
 
-    .user-filter-panel-open {
-        max-height: 380px;
+    .user-filter-panel {
+        --sandwish-filter-panel-max-height: 380px;
     }
 
     .user-filter-form {

@@ -4,8 +4,8 @@ import {
     DeleteOutlined,
     EditOutlined,
     HolderOutlined,
-    ReloadOutlined,
-    SearchOutlined
+    PlusOutlined,
+    ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input, Select, Space, Tag, Typography, message } from "antd";
@@ -24,7 +24,6 @@ import {
     updateDepartment
 } from "./department-service";
 import type {
-    DepartmentListRequest,
     DepartmentMoveRequest,
     DepartmentResponse,
     DepartmentSaveRequest
@@ -45,10 +44,6 @@ interface DepartmentTableNode extends DepartmentResponse {
     children?: DepartmentTableNode[];
 }
 
-interface DepartmentFilters {
-    remarks: string;
-}
-
 interface DepartmentFormValues {
     id?: string | null;
     parentId?: string | null;
@@ -56,10 +51,6 @@ interface DepartmentFormValues {
     shortName?: string | null;
     remarks?: string | null;
 }
-
-const DEFAULT_DEPARTMENT_FILTERS: DepartmentFilters = {
-    remarks: ""
-};
 
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
@@ -130,18 +121,14 @@ export const DepartmentPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const [editForm] = Form.useForm<DepartmentFormValues>();
     const queryClient = useQueryClient();
-    const [query, setQuery] = useState<DepartmentListRequest>({});
-    const [searchText, setSearchText] = useState("");
-    const [filters, setFilters] = useState<DepartmentFilters>(DEFAULT_DEPARTMENT_FILTERS);
     const [editingDepartment, setEditingDepartment] = useState<DepartmentTableNode | null>(null);
     const [deletingDepartment, setDeletingDepartment] = useState<DepartmentTableNode | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const [expandedRowKeys, setExpandedRowKeys] = useState<Key[] | null>(null);
     const canEditDepartment = hasPermission("sys:department:edit");
-    const hasActiveFilters = Boolean(filters.remarks.trim());
     const departmentQuery = useQuery({
-        queryKey: ["department", "list", query],
-        queryFn: () => listDepartments(query),
+        queryKey: ["department", "list"],
+        queryFn: () => listDepartments(),
         retry: false
     });
     const departments = useMemo(() => departmentQuery.data || [], [departmentQuery.data]);
@@ -207,32 +194,6 @@ export const DepartmentPage = () => {
             messageApi.error(error instanceof Error ? error.message : "移动失败");
         }
     });
-
-    const updateQuery = (values: Partial<DepartmentListRequest>) => {
-        setQuery((currentQuery) => ({
-            name: currentQuery.name,
-            remarks: currentQuery.remarks,
-            ...values
-        }));
-    };
-
-    const searchDepartments = (value: string) => {
-        setSearchText(value);
-        updateQuery({ name: normalizeSearch(value) });
-    };
-
-    const applyFilters = () => {
-        updateQuery({
-            remarks: normalizeSearch(filters.remarks)
-        });
-    };
-
-    const resetFilters = () => {
-        setFilters(DEFAULT_DEPARTMENT_FILTERS);
-        updateQuery({
-            remarks: undefined
-        });
-    };
 
     const openCreateEditor = () => {
         setEditingDepartment(null);
@@ -374,49 +335,17 @@ export const DepartmentPage = () => {
                 title="部门管理"
                 description="维护组织树、部门简称、排序和备注信息。"
                 subjectName="部门"
-                enableAdd={canEditDepartment}
-                enableFilter
-                enableSearch
-                searchShortcut="⌘K"
-                searchValue={searchText}
-                onSearchChange={searchDepartments}
-                onAdd={openCreateEditor}
-                filterActive={hasActiveFilters}
-                filter={({ closeFilter }) => (
-                    <div className="department-filter-form">
-                        <label>
-                            <span>备注</span>
-                            <Input
-                                allowClear
-                                placeholder="备注关键词"
-                                value={filters.remarks}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        remarks: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="department-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => {
-                                applyFilters();
-                                closeFilter();
-                            }}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
                 pageActions={
-                    <Button icon={<ReloadOutlined />} onClick={() => departmentQuery.refetch()}>
-                        刷新
-                    </Button>
+                    <>
+                        <Button icon={<ReloadOutlined />} onClick={() => departmentQuery.refetch()}>
+                            刷新
+                        </Button>
+                        {canEditDepartment ? (
+                            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateEditor}>
+                                新增部门
+                            </Button>
+                        ) : null}
+                    </>
                 }
                 rowKey="id"
                 className="department-table"

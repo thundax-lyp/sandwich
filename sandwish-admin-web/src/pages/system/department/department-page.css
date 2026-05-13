@@ -12,9 +12,6 @@
     --department-amber-line: rgba(180, 83, 9, 0.24);
     --department-button-bg: rgba(255, 255, 255, 0.64);
     --department-field-bg: rgba(255, 255, 255, 0.7);
-    --department-filter-bg-end: rgba(248, 251, 255, 0.48);
-    --department-filter-bg-start: rgba(226, 235, 247, 0.62);
-    --department-filter-inset: color-mix(in srgb, white 56%, transparent);
     color: var(--department-ink);
 }
 
@@ -32,9 +29,6 @@ html[data-theme="dark"] .department-page {
     --department-amber-line: rgba(245, 158, 11, 0.28);
     --department-button-bg: rgba(17, 28, 46, 0.64);
     --department-field-bg: rgba(12, 22, 38, 0.7);
-    --department-filter-bg-end: rgba(12, 22, 38, 0.48);
-    --department-filter-bg-start: rgba(48, 72, 110, 0.52);
-    --department-filter-inset: rgba(185, 207, 238, 0.12);
 }
 
 .department-page .ant-typography-secondary {
@@ -72,49 +66,6 @@ html[data-theme="dark"] .department-page {
     box-shadow: 0 0 0 3px var(--department-green-soft) !important;
 }
 
-.department-filter-form {
-    display: grid;
-    grid-template-columns: minmax(180px, 1fr) auto auto;
-    min-width: 0;
-    align-items: flex-end;
-    gap: 12px;
-    padding: 12px;
-    background:
-        linear-gradient(
-            180deg,
-            var(--department-filter-bg-start),
-            var(--department-filter-bg-end)
-        );
-    border: 1px solid var(--department-line);
-    border-radius: 10px;
-    box-shadow: inset 0 1px 0 var(--department-filter-inset);
-    backdrop-filter: blur(10px);
-}
-
-.department-filter-form label {
-    display: grid;
-    gap: 5px;
-    min-width: 0;
-    color: var(--department-copy);
-    font-size: 12px;
-}
-
-.department-filter-form .ant-btn {
-    min-width: 86px;
-}
-
-.department-filter-form .department-filter-search {
-    color: var(--department-green);
-    background: var(--department-green-soft);
-    border-color: var(--department-green-line);
-}
-
-.department-filter-form .department-filter-search:hover {
-    color: var(--department-green) !important;
-    background: color-mix(in srgb, var(--department-green) 14%, transparent) !important;
-    border-color: color-mix(in srgb, var(--department-green) 34%, transparent) !important;
-}
-
 .department-name-icon,
 .department-empty-icon {
     color: var(--department-green);
@@ -143,16 +94,4 @@ html[data-theme="dark"] .department-page {
 
 .department-empty-icon {
     font-size: 28px;
-}
-
-@media (max-width: 760px) {
-    .department-filter-form {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-    }
-
-    .department-filter-form label,
-    .department-filter-form .ant-btn {
-        width: 100%;
-    }
 }

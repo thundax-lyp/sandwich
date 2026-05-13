@@ -38,6 +38,9 @@ public class AuditServiceImplTest {
 
         assertEquals(AuditLogId.of(9002L), id);
         assertEquals("User", metaDao.inserted.getObjectType());
+        assertEquals(AuditAction.CREATE, metaDao.inserted.getLastAction());
+        assertEquals(logDao.inserted.getOperatorType(), metaDao.inserted.getLastOperatorType());
+        assertEquals(logDao.inserted.getOccurredAt(), metaDao.inserted.getLastOperatedAt());
         assertEquals(AuditMetaId.of(9001L), logDao.inserted.getMetaId());
         assertEquals(1L, logDao.inserted.getVersion().longValue());
         assertEquals(AuditLogId.of(9002L), metaDao.updated.getLastLogId());
@@ -63,14 +66,31 @@ public class AuditServiceImplTest {
 
         @Override
         public AuditMetaId insert(AuditMeta meta) {
-            this.inserted = meta;
+            this.inserted = copy(meta);
             return AuditMetaId.of(9001L);
         }
 
         @Override
         public int update(AuditMeta meta) {
-            this.updated = meta;
+            this.updated = copy(meta);
             return 1;
+        }
+
+        private AuditMeta copy(AuditMeta meta) {
+            AuditMeta copied = new AuditMeta();
+            copied.setId(meta.getId());
+            copied.setObjectType(meta.getObjectType());
+            copied.setObjectId(meta.getObjectId());
+            copied.setVersion(meta.getVersion());
+            copied.setLastLogId(meta.getLastLogId());
+            copied.setLastAction(meta.getLastAction());
+            copied.setLastOperatorType(meta.getLastOperatorType());
+            copied.setLastOperatorId(meta.getLastOperatorId());
+            copied.setLastOperatorName(meta.getLastOperatorName());
+            copied.setLastOperatedAt(meta.getLastOperatedAt());
+            copied.setCreatedLogId(meta.getCreatedLogId());
+            copied.setCreatedAt(meta.getCreatedAt());
+            return copied;
         }
     }
 

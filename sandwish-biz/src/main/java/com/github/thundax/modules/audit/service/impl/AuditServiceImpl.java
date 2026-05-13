@@ -95,6 +95,11 @@ public class AuditServiceImpl implements AuditService {
             meta.setObjectType(command.getObjectType());
             meta.setObjectId(command.getObjectId());
             meta.setVersion(1L);
+            meta.setLastAction(log.getAction());
+            meta.setLastOperatorType(log.getOperatorType());
+            meta.setLastOperatorId(log.getOperatorId());
+            meta.setLastOperatorName(log.getOperatorName());
+            meta.setLastOperatedAt(log.getOccurredAt());
             meta.setCreatedAt(occurredAt);
             AuditMetaId metaId = auditMetaDao.insert(meta);
             meta.setId(metaId);

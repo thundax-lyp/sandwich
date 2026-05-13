@@ -27,8 +27,9 @@ import type { TableProps } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import type { Key } from "react";
 import type { DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent } from "react";
+import { SandwishPage } from "@/components/sandwish-page";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const MIN_COLUMN_WIDTH = 96;
 const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
@@ -416,13 +417,12 @@ export const UserPage = () => {
     ];
 
     return (
-        <main className="user-page">
-            <section className="user-command-panel">
-                <div className="user-page-header">
-                    <div>
-                        <Title level={2}>用户管理</Title>
-                        <Text type="secondary">管理后台用户、角色与权限状态。</Text>
-                    </div>
+        <>
+            <SandwishPage
+                className="user-page"
+                title="用户管理"
+                description="管理后台用户、角色与权限状态。"
+                actions={
                     <Space className="user-page-actions">
                         <Input
                             allowClear
@@ -445,7 +445,8 @@ export const UserPage = () => {
                             新增用户
                         </Button>
                     </Space>
-                </div>
+                }
+            >
 
                 <div className={`user-filter-panel${filtersOpen ? " user-filter-panel-open" : ""}`}>
                     <div className="user-filter-form">
@@ -586,7 +587,7 @@ export const UserPage = () => {
                     }}
                     scroll={{ x: tableScrollX }}
                 />
-            </section>
+            </SandwishPage>
 
             <Drawer
                 className="user-edit-drawer"
@@ -699,6 +700,6 @@ export const UserPage = () => {
                     </div>
                 ) : null}
             </Modal>
-        </main>
+        </>
     );
 };

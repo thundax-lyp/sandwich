@@ -82,7 +82,9 @@
 - 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
 - 只服务单个页面域的组件放在页面目录下的 `components/`。
 - 多个页面域复用的组件放在 `src/components/`。
-- 项目自有通用 UI 技术组件放在 `src/components/`，文件名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
+- 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
+- `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
+- 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
 - 页面专属组件不得从其他页面域目录直接导入。
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。

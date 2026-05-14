@@ -298,10 +298,13 @@ export const MenuPage = () => {
             dataIndex: "name",
             key: "name",
             width: DEFAULT_COLUMN_WIDTHS.name,
+            ellipsis: true,
             render: (name: string) => (
-                <Space size={8}>
+                <Space size={8} className="menu-name-cell">
                     <MenuOutlined className="menu-name-icon" />
-                    <span>{name}</span>
+                    <span className="menu-name-text" title={name}>
+                        {name}
+                    </span>
                 </Space>
             )
         },
@@ -311,7 +314,12 @@ export const MenuPage = () => {
             key: "url",
             width: DEFAULT_COLUMN_WIDTHS.url,
             ellipsis: true,
-            render: (url?: string | null) => url || null
+            render: (url?: string | null) =>
+                url ? (
+                    <span className="menu-path-text" title={url}>
+                        {url}
+                    </span>
+                ) : null
         },
         {
             title: "权限标识",
@@ -319,7 +327,12 @@ export const MenuPage = () => {
             key: "perms",
             width: DEFAULT_COLUMN_WIDTHS.perms,
             ellipsis: true,
-            render: (perms?: string | null) => perms || null
+            render: (perms?: string | null) =>
+                perms ? (
+                    <span className="menu-path-text" title={perms}>
+                        {perms}
+                    </span>
+                ) : null
         },
         {
             title: "显示",

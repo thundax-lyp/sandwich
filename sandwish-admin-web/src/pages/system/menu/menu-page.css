@@ -70,6 +70,30 @@ html[data-theme="dark"] .menu-page {
     color: var(--menu-green);
 }
 
+.menu-name-cell {
+    display: inline-flex;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.menu-name-cell .ant-space-item:nth-child(2) {
+    min-width: 0;
+}
+
+.menu-name-text,
+.menu-path-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.menu-name-text {
+    min-width: 0;
+}
+
 .menu-table .ant-tag {
     color: var(--menu-amber);
     background: var(--menu-amber-soft);

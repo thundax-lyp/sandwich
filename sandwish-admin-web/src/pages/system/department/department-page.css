@@ -71,6 +71,30 @@ html[data-theme="dark"] .department-page {
     color: var(--department-green);
 }
 
+.department-name-cell {
+    display: inline-flex;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.department-name-cell .ant-space-item:nth-child(2) {
+    min-width: 0;
+}
+
+.department-name-text,
+.department-path-text {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.department-name-text {
+    min-width: 0;
+}
+
 .department-table .ant-tag {
     color: var(--department-amber);
     background: var(--department-amber-soft);

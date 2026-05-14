@@ -305,10 +305,13 @@ export const DepartmentPage = () => {
             dataIndex: "name",
             key: "name",
             width: DEFAULT_COLUMN_WIDTHS.name,
+            ellipsis: true,
             render: (name: string, department) => (
-                <Space size={8}>
+                <Space size={8} className="department-name-cell">
                     <ApartmentOutlined className="department-name-icon" />
-                    <span>{name}</span>
+                    <span className="department-name-text" title={name}>
+                        {name}
+                    </span>
                     {department.shortName ? <Tag>{department.shortName}</Tag> : null}
                 </Space>
             )
@@ -318,7 +321,15 @@ export const DepartmentPage = () => {
             dataIndex: "namePath",
             key: "namePath",
             width: DEFAULT_COLUMN_WIDTHS.namePath,
-            render: (namePath?: string | null) => namePath || <Text type="secondary">根部门</Text>
+            ellipsis: true,
+            render: (namePath?: string | null) =>
+                namePath ? (
+                    <span className="department-path-text" title={namePath}>
+                        {namePath}
+                    </span>
+                ) : (
+                    <Text type="secondary">根部门</Text>
+                )
         },
         {
             title: "备注",

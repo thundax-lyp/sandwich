@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+const USER_DEPARTMENT_PANEL_BOTTOM_GAP = 8;
+
 const expectNoPageHorizontalOverflow = async (page: Page) => {
     await expect
         .poll(async () =>
@@ -294,7 +296,10 @@ test.describe("admin layout", () => {
         const initialMetrics = await readUserDepartmentPanelMetrics(page);
         expect(initialMetrics.panel.top).toBeGreaterThan(initialMetrics.topbar.bottom);
         expect(
-            Math.abs(initialMetrics.panel.bottom - initialMetrics.sidebar.bottom)
+            Math.abs(
+                initialMetrics.panel.bottom -
+                    (initialMetrics.sidebar.bottom - USER_DEPARTMENT_PANEL_BOTTOM_GAP)
+            )
         ).toBeLessThanOrEqual(2);
 
         await page.evaluate(() => window.scrollTo(0, 160));
@@ -302,7 +307,9 @@ test.describe("admin layout", () => {
             .poll(async () => {
                 const metrics = await readUserDepartmentPanelMetrics(page);
                 return {
-                    bottomWithinSidebar: metrics.panel.bottom <= metrics.sidebar.bottom + 2,
+                    bottomWithinSidebar:
+                        metrics.panel.bottom <=
+                        metrics.sidebar.bottom - USER_DEPARTMENT_PANEL_BOTTOM_GAP + 2,
                     belowTopbar: metrics.panel.top >= metrics.topbar.bottom
                 };
             })

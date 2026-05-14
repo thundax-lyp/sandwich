@@ -45,6 +45,7 @@ const { Text } = Typography;
 const ALL_DEPARTMENT_ID = "all";
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
+const DEPARTMENT_PANEL_BOTTOM_GAP = 8;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 230,
@@ -268,7 +269,11 @@ export const UserPage = () => {
             const stickyTop = Math.ceil((topbar?.bottom ?? 76) + 12);
             const bottomInset = Math.max(
                 12,
-                Math.round(window.innerHeight - (sidebar?.bottom ?? window.innerHeight - 12))
+                Math.round(
+                    window.innerHeight -
+                        (sidebar?.bottom ?? window.innerHeight - 12) +
+                        DEPARTMENT_PANEL_BOTTOM_GAP
+                )
             );
             const floatingTop = Math.max(
                 stickyTop,

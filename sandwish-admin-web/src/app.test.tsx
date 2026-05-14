@@ -632,6 +632,18 @@ describe("App", () => {
         expect(screen.getByRole("heading", { name: "用户管理" })).toBeInTheDocument();
         expect(await screen.findByText("Ethan Chen")).toBeInTheDocument();
 
+        const filterButton = screen.getByRole("button", { name: /筛选/ });
+        fireEvent.click(filterButton);
+        fireEvent.change(screen.getByPlaceholderText("developer"), {
+            target: { value: "ethan" }
+        });
+        fireEvent.click(screen.getByRole("button", { name: /查\s*询/ }));
+
+        expect(filterButton).toHaveAttribute("aria-expanded", "true");
+        expect(screen.getByPlaceholderText("developer")).toHaveValue("ethan");
+
+        fireEvent.click(filterButton);
+
         fireEvent.change(screen.getByPlaceholderText("搜索用户..."), {
             target: { value: "olivia" }
         });

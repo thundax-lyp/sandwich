@@ -352,13 +352,12 @@ export const UserPage = () => {
         });
     };
 
-    const applyFilters = (closeFilter: () => void) => {
+    const applyFilters = () => {
         updateQuery({
             loginName: normalizeSearch(filters.loginName),
             enable: toEnableQueryValue(filters.enable),
             pageNo: DEFAULT_PAGE_NO
         });
-        closeFilter();
     };
 
     const selectDepartment = (keys: Key[]) => {
@@ -566,7 +565,7 @@ export const UserPage = () => {
                 onSearchChange={searchUsers}
                 filterActive={hasActiveFilters}
                 filterClassName="user-filter-panel"
-                filter={({ closeFilter }) => (
+                filter={() => (
                     <div className="user-filter-form">
                         <label>
                             <span>登录名</span>
@@ -605,7 +604,7 @@ export const UserPage = () => {
                         <Button
                             className="user-filter-search"
                             icon={<SearchOutlined />}
-                            onClick={() => applyFilters(closeFilter)}
+                            onClick={applyFilters}
                         >
                             查询
                         </Button>

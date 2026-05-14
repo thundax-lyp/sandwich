@@ -12,7 +12,6 @@ import com.github.thundax.modules.storage.controller.response.MultipartUploadSes
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.service.MultipartUploadService;
 import com.github.thundax.modules.storage.service.command.AbortMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.CompleteMultipartUploadCommand;
@@ -162,10 +161,7 @@ public class MultipartUploadController {
             String uploadId, MultipartUploadCompleteRequest request) {
         CompleteMultipartUploadCommand command = new CompleteMultipartUploadCommand();
         command.setUploadId(uploadId);
-        command.setStorageType(
-                StringUtils.isBlank(request.getStorageType())
-                        ? storedObjectStore.type()
-                        : StorageType.from(request.getStorageType()));
+        command.setStorageType(storedObjectStore.type());
         command.setBucketName(request.getBucketName());
         command.setObjectKey(request.getObjectKey());
         command.setSize(request.getSize());

@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
     `mime_type` varchar(128) DEFAULT NULL,
     `owner_id` varchar(64) DEFAULT NULL,
     `owner_type` varchar(64) DEFAULT NULL,
-    `storage_type` varchar(32) NOT NULL,
     `bucket_name` varchar(128) DEFAULT NULL,
     `object_key` varchar(512) NOT NULL,
     `size` bigint NOT NULL,
@@ -15,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage` (
     `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_assist_storage_key` (`storage_type`, `bucket_name`, `object_key`),
+    UNIQUE KEY `uk_assist_storage_key` (`bucket_name`, `object_key`),
     UNIQUE KEY `uk_assist_storage_priority` (`priority`),
     KEY `idx_assist_storage_status` (`object_status`, `reference_status`),
     KEY `idx_assist_storage_mime_type` (`mime_type`)
@@ -40,7 +39,6 @@ CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload` (
     `business_type` varchar(64) DEFAULT NULL,
     `original_filename` varchar(255) NOT NULL,
     `mime_type` varchar(128) NOT NULL,
-    `storage_type` varchar(32) NOT NULL,
     `bucket_name` varchar(128) DEFAULT NULL,
     `object_key` varchar(512) NOT NULL,
     `provider_upload_id` varchar(128) DEFAULT NULL,
@@ -52,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `assist_storage_multipart_upload` (
     `aborted_date` datetime(3) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_assist_storage_multipart_upload_upload_id` (`upload_id`),
-    KEY `idx_assist_storage_multipart_upload_object_key` (`storage_type`, `bucket_name`, `object_key`),
+    KEY `idx_assist_storage_multipart_upload_object_key` (`bucket_name`, `object_key`),
     KEY `idx_assist_storage_multipart_upload_owner` (`owner_type`, `owner_id`, `upload_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分片上传会话表';
 

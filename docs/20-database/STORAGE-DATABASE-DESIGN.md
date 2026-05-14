@@ -46,7 +46,7 @@
 - DAO `deleteById` 将 `object_status` 更新为 `DELETED`。
 - DAO get/list/page 默认排除 `object_status = DELETED`；显式按 `DELETED` 查询时返回已删除对象。
 - 枚举字段使用 `varchar` 存储。
-- `storage_type` 固定使用 `LOCAL_FILE` 或 `OSS`。
+- 底层存储类型由运行时 `StoredObjectStore` 配置决定，不落业务数据库。
 - `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`，默认值固定为 `ACTIVE`。
 - `reference_status` 固定使用 `UNREFERENCED`、`REFERENCED`，对象主表默认值固定为 `UNREFERENCED`，引用关系表默认值固定为 `REFERENCED`。
 - `upload_status` 固定使用 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
@@ -63,7 +63,6 @@
 - MIME 类型列固定为 `mime_type`。
 - 上传或持有方字段固定为 `owner_id` 和 `owner_type`。
 - 引用方字段固定为 `reference_owner_id` 和 `reference_owner_type`。
-- 底层存储类型字段固定为 `storage_type`。
 - 存储桶或本地逻辑目录字段固定为 `bucket_name`。
 - 底层对象键字段固定为 `object_key`。
 - 派生访问端点字段固定为 `access_endpoint`。
@@ -95,7 +94,6 @@
 | `mime_type` | `mimeType` | `mimeType` | 否 | 内容 MIME 类型 |
 | `owner_id` | `ownerId` | `ownerId` | 否 | 上传或持有方 ID |
 | `owner_type` | `ownerType` | `ownerType` | 否 | 上传或持有方类型 |
-| `storage_type` | `storageType` | `storageType` | 是 | 底层存储类型 |
 | `bucket_name` | `bucketName` | `bucketName` | 否 | 存储桶或本地逻辑目录 |
 | `object_key` | `objectKey` | `objectKey` | 是 | 底层对象键 |
 | `size` | `size` | `size` | 是 | 文件大小，字节 |
@@ -110,7 +108,6 @@
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `originalFilename` 是 Entity 派生字段，优先使用显式值，其次由 `name + extendName` 派生。
 - `contentType` 是 Entity 内容类型字段，优先使用显式值，并同步到 `mimeType`。
-- `storage_type` 通过 `StorageType.value()` 写入。
 - `object_status` 通过 `StoredObjectStatus.value()` 写入。
 - `reference_status` 通过 `StoredObjectReferenceStatus.value()` 写入。
 - `object_key` 在当前底层存储内必须唯一。
@@ -119,7 +116,7 @@
 索引设计：
 
 - 主键：`pk_assist_storage(id)`
-- 唯一索引：`uk_assist_storage_key(storage_type, bucket_name, object_key)`
+- 唯一索引：`uk_assist_storage_key(bucket_name, object_key)`
 - 唯一索引：`uk_assist_storage_priority(priority)`
 - 普通索引：`idx_assist_storage_status(object_status, reference_status`
 - 普通索引：`idx_assist_storage_mime_type(mime_type)`
@@ -161,7 +158,6 @@
 | `business_type` | `businessType` | `businessType` | 否 | 业务分类 |
 | `original_filename` | `originalFilename` | `originalFilename` | 是 | 原始文件名 |
 | `mime_type` | `mimeType` | `mimeType` | 是 | 内容 MIME 类型 |
-| `storage_type` | `storageType` | `storageType` | 是 | 底层存储类型 |
 | `bucket_name` | `bucketName` | `bucketName` | 否 | 存储桶或本地逻辑目录 |
 | `object_key` | `objectKey` | `objectKey` | 是 | 最终对象键 |
 | `provider_upload_id` | `providerUploadId` | `providerUploadId` | 否 | 底层存储供应商分片会话标识 |
@@ -184,7 +180,7 @@
 
 - 主键：`pk_assist_storage_multipart_upload(id)`
 - 唯一索引：`uk_assist_storage_multipart_upload_upload_id(upload_id)`
-- 普通索引：`idx_assist_storage_multipart_upload_object_key(storage_type, bucket_name, object_key)`
+- 普通索引：`idx_assist_storage_multipart_upload_object_key(bucket_name, object_key)`
 - 普通索引：`idx_assist_storage_multipart_upload_owner(owner_type, owner_id, upload_status`
 
 ### 6.4 assist_storage_multipart_upload_part

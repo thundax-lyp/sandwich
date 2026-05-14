@@ -69,7 +69,6 @@
 - `mimeType`：内容 MIME 类型。
 - `ownerId`：上传或持有方 ID。
 - `ownerType`：上传或持有方类型。
-- `storageType`：底层存储类型。
 - `bucketName`：存储桶或本地逻辑目录。
 - `objectKey`：底层对象键。
 - `originalFilename`：原始文件名；未显式提供时由 `name + extendName` 派生。
@@ -120,14 +119,9 @@
 - `UNREFERENCED`
 - `REFERENCED`
 
-### 5.5 StorageType
+### 5.5 底层存储配置
 
-`StorageType` 固定表达底层存储类型。
-
-固定值：
-
-- `LOCAL_FILE`
-- `OSS`
+底层存储类型由运行时 `StoredObjectStore` 配置决定，不作为业务字段持久化。
 
 ### 5.6 MultipartUploadSession
 
@@ -142,7 +136,6 @@
 - `businessType`：业务分类。
 - `originalFilename`：原始文件名。
 - `mimeType`：内容 MIME 类型。
-- `storageType`：底层存储类型。
 - `bucketName`：存储桶或本地逻辑目录。
 - `objectKey`：底层对象键。
 - `providerUploadId`：底层存储供应商分片会话标识。
@@ -276,7 +269,7 @@ Storage 公开入口固定使用资源型路径。
 1. Controller 接收 multipart 请求。
 2. Controller 完成入口参数校验。
 3. Service 调用底层存储端口写入对象内容。
-4. 底层存储端口返回 `storageType`、`bucketName`、`objectKey`、`size` 和 `contentType`。
+4. 底层存储端口返回 `bucketName`、`objectKey`、`size` 和 `contentType`。
 5. Service 创建 `StoredObject` 主数据。
 6. Controller 组装上传响应。
 

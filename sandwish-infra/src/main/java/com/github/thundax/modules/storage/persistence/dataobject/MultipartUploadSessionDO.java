@@ -31,8 +31,6 @@ public class MultipartUploadSessionDO {
 
     private String mimeType;
 
-    private String storageType;
-
     private String bucketName;
 
     private String objectKey;

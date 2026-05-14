@@ -6,7 +6,6 @@ import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.StoredObjectReference;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
@@ -34,7 +33,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setMimeType(entity.getMimeType());
         dataObject.setOwnerId(entity.getOwnerId());
         dataObject.setOwnerType(ownerTypeValue(entity.getOwnerType()));
-        dataObject.setStorageType(storageTypeValue(entity.getStorageType()));
         dataObject.setBucketName(entity.getBucketName());
         dataObject.setObjectKey(entity.getObjectKey());
         dataObject.setSize(entity.getSize());
@@ -57,7 +55,6 @@ public final class StoragePersistenceAssembler {
         entity.setMimeType(dataObject.getMimeType());
         entity.setOwnerId(dataObject.getOwnerId());
         entity.setOwnerType(ownerTypeFrom(dataObject.getOwnerType()));
-        entity.setStorageType(storageTypeFrom(dataObject.getStorageType()));
         entity.setBucketName(dataObject.getBucketName());
         entity.setObjectKey(dataObject.getObjectKey());
         entity.setSize(dataObject.getSize());
@@ -90,14 +87,6 @@ public final class StoragePersistenceAssembler {
 
     private static StorageOwnerType ownerTypeFrom(String ownerType) {
         return ownerType == null ? null : StorageOwnerType.from(ownerType);
-    }
-
-    private static String storageTypeValue(StorageType storageType) {
-        return storageType == null ? null : storageType.value();
-    }
-
-    private static StorageType storageTypeFrom(String storageType) {
-        return storageType == null ? null : StorageType.from(storageType);
     }
 
     private static String statusValue(StoredObjectStatus status) {
@@ -176,7 +165,6 @@ public final class StoragePersistenceAssembler {
         dataObject.setBusinessType(entity.getBusinessType());
         dataObject.setOriginalFilename(entity.getOriginalFilename());
         dataObject.setMimeType(entity.getMimeType());
-        dataObject.setStorageType(storageTypeValue(entity.getStorageType()));
         dataObject.setBucketName(entity.getBucketName());
         dataObject.setObjectKey(entity.getObjectKey());
         dataObject.setProviderUploadId(entity.getProviderUploadId());
@@ -201,7 +189,6 @@ public final class StoragePersistenceAssembler {
         entity.setBusinessType(dataObject.getBusinessType());
         entity.setOriginalFilename(dataObject.getOriginalFilename());
         entity.setMimeType(dataObject.getMimeType());
-        entity.setStorageType(storageTypeFrom(dataObject.getStorageType()));
         entity.setBucketName(dataObject.getBucketName());
         entity.setObjectKey(dataObject.getObjectKey());
         entity.setProviderUploadId(dataObject.getProviderUploadId());

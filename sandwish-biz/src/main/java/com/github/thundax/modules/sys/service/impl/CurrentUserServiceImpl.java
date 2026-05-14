@@ -154,13 +154,12 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
         byte[] avatarBytes = readAvatarBytes(command.getInputStream());
         StoredObject storage = toAvatarStorage(command.getUserId(), command.getOriginalFilename());
-        storage.setId(storageService.create(toCreateStorageCommand(storage)));
         try {
             applyStoredObject(storage, storedObjectStore.save(storage, new ByteArrayInputStream(avatarBytes)));
         } catch (IOException e) {
             throw storageFailure(e.getMessage());
         }
-        storageService.change(toChangeStorageCommand(storage));
+        storage.setId(storageService.create(toCreateStorageCommand(storage)));
         return storage;
     }
 
@@ -388,6 +387,11 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
+        command.setStorageType(storage.getStorageType());
+        command.setBucketName(storage.getBucketName());
+        command.setObjectKey(storage.getObjectKey());
+        command.setSize(storage.getSize());
+        command.setAccessEndpoint(storage.getAccessEndpoint());
         command.setObjectStatus(storage.getObjectStatus());
         command.setReferenceStatus(storage.getReferenceStatus());
         command.setRemarks(storage.getRemarks());

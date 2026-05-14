@@ -7,8 +7,14 @@ import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 
 public class ObjectStorageStoredObjectStore implements StoredObjectStore {
+
+    private static final String PATH_FORMAT = "yyyyMM";
 
     private final ObjectStorageClient objectStorageClient;
     private final StorageType storageType;
@@ -30,13 +36,15 @@ public class ObjectStorageStoredObjectStore implements StoredObjectStore {
 
     @Override
     public StoredObject save(StoredObject storage, InputStream inputStream) throws IOException {
-        ObjectStorageWriteResult result = objectStorageClient.put(storage.getPathName(), inputStream);
+        ObjectStorageWriteResult result = objectStorageClient.put(writeObjectKey(storage), inputStream);
         StoredObject storedObject = new StoredObject();
         storedObject.setStorageType(type());
         storedObject.setBucketName(bucketName);
         storedObject.setObjectKey(result.getKey());
         storedObject.setSize(result.getSize());
-        storedObject.setAccessEndpoint(contentPath + StoredObjectIdCodec.toValue(storage.getId()) + "/content");
+        if (storage.getId() != null) {
+            storedObject.setAccessEndpoint(contentPath + StoredObjectIdCodec.toValue(storage.getId()) + "/content");
+        }
         return storedObject;
     }
 
@@ -52,5 +60,16 @@ public class ObjectStorageStoredObjectStore implements StoredObjectStore {
 
     private String objectKey(StoredObject storage) {
         return storage.getObjectKey() == null ? storage.getPathName() : storage.getObjectKey();
+    }
+
+    private String writeObjectKey(StoredObject storage) {
+        if (StringUtils.isNotBlank(storage.getObjectKey())) {
+            return storage.getObjectKey();
+        }
+        if (storage.getId() != null) {
+            return storage.getPathName();
+        }
+        String extendName = StringUtils.defaultIfBlank(storage.getExtendName(), "bin");
+        return new SimpleDateFormat(PATH_FORMAT).format(new Date()) + "/" + UUID.randomUUID() + "." + extendName;
     }
 }

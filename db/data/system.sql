@@ -649,12 +649,6 @@ INSERT INTO `sys_dict` (
         1000000000000002040, 'oauth_refresh_token_status', '已过期', 'EXPIRED', 3, 'OAuth2 刷新令牌过期状态'
     ),
     (
-        1000000000000002041, 'storage_type', '本地文件', 'LOCAL_FILE', 0, '本地文件存储后端'
-    ),
-    (
-        1000000000000002042, 'storage_type', '对象存储', 'OSS', 1, '对象存储后端'
-    ),
-    (
         1000000000000002043, 'storage_owner_type', '后台用户', 'USER', 0, '后台用户存储归属'
     ),
     (

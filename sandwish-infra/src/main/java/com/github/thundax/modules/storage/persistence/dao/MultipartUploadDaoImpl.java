@@ -58,7 +58,6 @@ public class MultipartUploadDaoImpl implements MultipartUploadDao {
                         .set(MultipartUploadSessionDO::getBusinessType, dataObject.getBusinessType())
                         .set(MultipartUploadSessionDO::getOriginalFilename, dataObject.getOriginalFilename())
                         .set(MultipartUploadSessionDO::getMimeType, dataObject.getMimeType())
-                        .set(MultipartUploadSessionDO::getStorageType, dataObject.getStorageType())
                         .set(MultipartUploadSessionDO::getBucketName, dataObject.getBucketName())
                         .set(MultipartUploadSessionDO::getObjectKey, dataObject.getObjectKey())
                         .set(MultipartUploadSessionDO::getProviderUploadId, dataObject.getProviderUploadId())

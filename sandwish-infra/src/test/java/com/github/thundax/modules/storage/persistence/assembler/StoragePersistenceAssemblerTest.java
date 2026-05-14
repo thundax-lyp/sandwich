@@ -22,19 +22,16 @@ public class StoragePersistenceAssemblerTest {
     public void shouldReadLegacyLowerCaseOwnerType() {
         StoredObjectDO dataObject = new StoredObjectDO();
         dataObject.setOwnerType("user");
-        dataObject.setStorageType("local_file");
 
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
         assertSame(StorageOwnerType.USER, entity.getOwnerType());
-        assertSame(StorageType.LOCAL_FILE, entity.getStorageType());
     }
 
     @Test
     public void shouldWriteEnumOwnerTypeValue() {
         StoredObject entity = new StoredObject();
         entity.setOwnerType(StorageOwnerType.MEMBER);
-        entity.setStorageType(StorageType.LOCAL_FILE);
         entity.setBucketName("/tmp/storage/");
         entity.setObjectKey("202605/s1.png");
         entity.setSize(10L);
@@ -43,7 +40,6 @@ public class StoragePersistenceAssemblerTest {
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);
 
         assertEquals("MEMBER", dataObject.getOwnerType());
-        assertEquals("LOCAL_FILE", dataObject.getStorageType());
         assertEquals("/tmp/storage/", dataObject.getBucketName());
         assertEquals("202605/s1.png", dataObject.getObjectKey());
         assertEquals(Long.valueOf(10L), dataObject.getSize());
@@ -147,7 +143,6 @@ public class StoragePersistenceAssemblerTest {
         entity.setBusinessType("product");
         entity.setOriginalFilename("demo.png");
         entity.setMimeType("image/png");
-        entity.setStorageType(StorageType.OSS);
         entity.setBucketName("bucket-a");
         entity.setObjectKey("202605/demo.png");
         entity.setProviderUploadId("provider-1");
@@ -164,12 +159,10 @@ public class StoragePersistenceAssemblerTest {
         assertEquals(Long.valueOf(5002L), dataObject.getId());
         assertEquals("upload-1", dataObject.getUploadId());
         assertEquals("USER", dataObject.getOwnerType());
-        assertEquals("OSS", dataObject.getStorageType());
         assertEquals("UPLOADING", dataObject.getUploadStatus());
         assertEquals(Integer.valueOf(2), dataObject.getUploadedPartCount());
         assertEquals(Long.valueOf(5002L), restored.getId().value());
         assertSame(StorageOwnerType.USER, restored.getOwnerType());
-        assertSame(StorageType.OSS, restored.getStorageType());
         assertSame(MultipartUploadStatus.UPLOADING, restored.getUploadStatus());
         assertEquals("provider-1", restored.getProviderUploadId());
         assertEquals(completedDate, restored.getCompletedDate());
@@ -180,13 +173,11 @@ public class StoragePersistenceAssemblerTest {
     public void shouldReadLegacyLowerCaseMultipartSessionEnums() {
         MultipartUploadSessionDO dataObject = new MultipartUploadSessionDO();
         dataObject.setOwnerType("member");
-        dataObject.setStorageType("local_file");
         dataObject.setUploadStatus("initiated");
 
         MultipartUploadSession entity = StoragePersistenceAssembler.toMultipartSessionEntity(dataObject);
 
         assertSame(StorageOwnerType.MEMBER, entity.getOwnerType());
-        assertSame(StorageType.LOCAL_FILE, entity.getStorageType());
         assertSame(MultipartUploadStatus.INITIATED, entity.getUploadStatus());
         assertEquals(Integer.valueOf(0), entity.getUploadedPartCount());
     }

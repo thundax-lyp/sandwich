@@ -17,11 +17,6 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MultipartUploadCompleteRequest implements Serializable {
 
-    @ApiModelProperty(name = "storageType", value = "存储类型")
-    @JsonProperty("storageType")
-    @Size(max = 32, message = "存储类型长度不能超过32")
-    private String storageType;
-
     @ApiModelProperty(name = "bucketName", value = "存储桶")
     @JsonProperty("bucketName")
     @Size(max = 255, message = "存储桶长度不能超过255")

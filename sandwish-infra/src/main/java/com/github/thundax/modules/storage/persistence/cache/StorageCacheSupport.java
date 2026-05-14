@@ -7,7 +7,6 @@ import com.github.thundax.common.cache.CacheDTO;
 import com.github.thundax.common.cache.SandwishCacheNames;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
@@ -59,7 +58,6 @@ public class StorageCacheSupport {
         storage.setMimeType(cacheDTO.mimeType);
         storage.setOwnerId(cacheDTO.ownerId);
         storage.setOwnerType(cacheDTO.ownerType == null ? null : StorageOwnerType.from(cacheDTO.ownerType));
-        storage.setStorageType(cacheDTO.storageType == null ? null : StorageType.from(cacheDTO.storageType));
         storage.setBucketName(cacheDTO.bucketName);
         storage.setObjectKey(cacheDTO.objectKey);
         storage.setSize(cacheDTO.size);
@@ -83,9 +81,6 @@ public class StorageCacheSupport {
         cacheDTO.ownerId = storage.getOwnerId();
         cacheDTO.ownerType =
                 storage.getOwnerType() == null ? null : storage.getOwnerType().value();
-        cacheDTO.storageType = storage.getStorageType() == null
-                ? null
-                : storage.getStorageType().value();
         cacheDTO.bucketName = storage.getBucketName();
         cacheDTO.objectKey = storage.getObjectKey();
         cacheDTO.size = storage.getSize();
@@ -110,7 +105,6 @@ public class StorageCacheSupport {
         private String mimeType;
         private String ownerId;
         private String ownerType;
-        private String storageType;
         private String bucketName;
         private String objectKey;
         private Long size;

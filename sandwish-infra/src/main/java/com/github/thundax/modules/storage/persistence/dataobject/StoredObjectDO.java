@@ -28,8 +28,6 @@ public class StoredObjectDO {
 
     private String ownerType;
 
-    private String storageType;
-
     private String bucketName;
 
     private String objectKey;

@@ -1,6 +1,8 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,7 +18,6 @@ import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.service.command.ChangeStorageCommand;
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -46,11 +47,10 @@ public class CurrentUserAvatarServiceTest {
         when(storageService.list(any())).thenReturn(Collections.singletonList(oldAvatar));
         when(storageService.create(any())).thenReturn(StoredObjectIdCodec.toDomain(8001L));
         when(storedObjectStore.save(any(), any(InputStream.class))).thenAnswer(invocation -> {
-            StoredObject storage = invocation.getArgument(0);
             StoredObject storedObject = new StoredObject();
             storedObject.setStorageType(StorageType.LOCAL_FILE);
             storedObject.setBucketName("local");
-            storedObject.setObjectKey(storage.getPathName());
+            storedObject.setObjectKey("202605/avatar.jpg");
             storedObject.setSize(12L);
             return storedObject;
         });
@@ -80,15 +80,10 @@ public class CurrentUserAvatarServiceTest {
         assertEquals(
                 StoredObjectReferenceStatus.UNREFERENCED,
                 createCaptor.getValue().getReferenceStatus());
+        assertTrue(createCaptor.getValue().getSize() > 0L);
+        assertNotNull(createCaptor.getValue().getObjectKey());
+        assertEquals("local", createCaptor.getValue().getBucketName());
         assertEquals("avatar", createCaptor.getValue().getRemarks());
-
-        ArgumentCaptor<ChangeStorageCommand> changeCaptor = ArgumentCaptor.forClass(ChangeStorageCommand.class);
-        verify(storageService).change(changeCaptor.capture());
-        assertEquals(
-                StoredObjectIdCodec.toDomain(8001L), changeCaptor.getValue().getId());
-        assertEquals(StorageType.LOCAL_FILE, changeCaptor.getValue().getStorageType());
-        assertEquals("local", changeCaptor.getValue().getBucketName());
-        assertEquals(Long.valueOf(12L), changeCaptor.getValue().getSize());
     }
 
     private MultipartFile avatarFile() throws Exception {

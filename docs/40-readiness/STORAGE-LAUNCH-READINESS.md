@@ -35,7 +35,7 @@
 
 - 存储相关数据库表与 `StoredObjectDO`、`StoredObjectReferenceDO` 字段一致
 - 分片上传相关数据库表与 `MultipartUploadSessionDO`、`MultipartUploadPartDO` 字段一致
-- `StoredObjectDO` 中底层存储字段与数据库 `storage_type`、`bucket_name`、`object_key`、`size`、`access_endpoint` 一致
+- `StoredObjectDO` 中底层存储定位字段与数据库 `bucket_name`、`object_key`、`size`、`access_endpoint` 一致
 - `StoragePersistenceAssembler` 中 `Entity <-> DO` 字段转换完整
 - 枚举字段写入值与数据库 `varchar` 存储值一致
 - 共享主键或业务绑定关系符合 `DATABASE-RULES.md`

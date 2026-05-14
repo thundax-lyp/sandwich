@@ -1,11 +1,11 @@
-# Sandwish API Deploy README
+# Sandwish Deploy README
 
 本文档用途：人工操作说明。
 部署边界以 `docs/00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md` 为准。
 
 ## Purpose
 
-本目录提供 `sandwish-admin-api` 和 `sandwish-front-api` 的 Docker Compose 部署样例。
+本目录提供全局 Docker Compose 部署样例，包含 `sandwish-admin-web`、`sandwish-admin-api`、`sandwish-front-api` 和基础设施。
 
 ## Topology
 
@@ -17,59 +17,97 @@
 - `mysql`
 - `redis`
 - `minio`
+- `minio-init`
 
 流量路径：
 
+- 后台页面：`client -> nginx -> sandwish-admin-web static files`
 - 后台 API：`client -> nginx -> sandwish-admin-api`
 - 前台 API：`client -> nginx -> sandwish-front-api`
+- 前台页面：`client -> nginx -> front static files`
 
 ## Build
 
 ```bash
 mvn -q -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
+cd sandwish-admin-web && npm ci && npm run build
 ```
 
 产物路径：
 
 - `sandwish-admin-api/target/sandwish-admin-api.jar`
 - `sandwish-front-api/target/sandwish-front-api.jar`
+- `sandwish-admin-web/dist`
+
+一键构建 API jar、admin-web dist、本地 Docker 镜像，并导出镜像文件：
+
+```bash
+SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
+```
+
+默认镜像名：
+
+- `sandwish/admin-api:dev`
+- `sandwish/front-api:dev`
+- `sandwish/nginx:dev`
+
+脚本还会拉取并导出基础设施镜像：
+
+- `mysql:8.4`
+- `redis:7.4-alpine`
+- `minio/minio:RELEASE.2025-02-28T09-55-16Z`
+- `minio/mc:RELEASE.2025-02-21T16-00-46Z`
+
+镜像文件默认输出到 `deploy/image-files/`，可用 `SANDWISH_IMAGE_OUTPUT_DIR` 覆盖。目标机器导入镜像：
+
+```bash
+for image in deploy/image-files/*.tar; do docker load -i "$image"; done
+```
+
+如果当前机器已经有基础设施镜像，或外网 registry 不稳定，可以跳过拉取：
+
+```bash
+SANDWISH_PULL_INFRA_IMAGES=false deploy/build-images.sh
+```
 
 ## Start
 
 复制环境变量样例：
 
 ```bash
-cp deploy/sandwish-api/.env.example deploy/sandwish-api/.env
+cp deploy/.env.example deploy/.env
 ```
 
 本地私密配置可以使用：
 
 ```bash
-cp deploy/sandwish-api/.env.example deploy/sandwish-api/.env.dev
+cp deploy/.env.example deploy/.env.dev
 ```
 
 启动：
 
 ```bash
-docker compose --env-file deploy/sandwish-api/.env -f deploy/sandwish-api/docker-compose.yml up -d
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
 ```
 
 使用本地私密配置启动：
 
 ```bash
-docker compose --env-file deploy/sandwish-api/.env.dev -f deploy/sandwish-api/docker-compose.yml up -d
+docker compose --env-file deploy/.env.dev -f deploy/docker-compose.yml up -d
 ```
 
 停止：
 
 ```bash
-docker compose --env-file deploy/sandwish-api/.env -f deploy/sandwish-api/docker-compose.yml down
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml down
 ```
 
 ## Access
 
 - 后台 API：`http://127.0.0.1:18080/admin-api`
+- 后台页面：`http://127.0.0.1:18080/admin/`
 - 前台 API：`http://127.0.0.1:18080/front-api`
+- 前台页面：`http://127.0.0.1:18080/`
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
 
@@ -119,6 +157,8 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 
 业务数据库中的 `storage_type` 字段仍写入领域枚举值：`LOCAL_FILE` 或 `OSS`。
 
+Compose 默认使用 MinIO S3 模式。MinIO 数据通过 `SANDWISH_MINIO_DATA_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/minio`，便于人工备份。`minio-init` 会在启动时创建 `SANDWISH_OSS_S3_BUCKET` 指定的 bucket。
+
 ## Environment Variables
 
 单应用运行样例：
@@ -143,12 +183,17 @@ SERVER_PORT=20002 SERVER_SERVLET_CONTEXT_PATH=/front-api java -jar sandwish-fron
 
 Compose 部署样例：
 
-- `deploy/sandwish-api/.env.example`
+- `deploy/.env.example`
 
 关键变量：
 
-- `SANDWISH_ADMIN_API_JAR`
-- `SANDWISH_FRONT_API_JAR`
+- `SANDWISH_ADMIN_API_IMAGE`
+- `SANDWISH_FRONT_API_IMAGE`
+- `SANDWISH_NGINX_RUNTIME_IMAGE`
+- `SANDWISH_MYSQL_IMAGE`
+- `SANDWISH_REDIS_IMAGE`
+- `SANDWISH_MINIO_IMAGE`
+- `SANDWISH_MINIO_MC_IMAGE`
 - `SANDWISH_DB_URL`
 - `SANDWISH_DB_USERNAME`
 - `SANDWISH_DB_PASSWORD`

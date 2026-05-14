@@ -492,6 +492,24 @@ export const UserPage = () => {
         });
     };
 
+    const changeEditingUserRoles = (roleIds: string[]) => {
+        if (!editingUser) {
+            return;
+        }
+        const roleById = new Map<string, UserRoleResponse>();
+        [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(editingUser.roles ?? [])].forEach(
+            (role) => {
+                if (role?.id) {
+                    roleById.set(role.id, role);
+                }
+            }
+        );
+        setEditingUser({
+            ...editingUser,
+            roles: roleIds.map((roleId) => roleById.get(roleId) ?? { id: roleId, name: roleId })
+        });
+    };
+
     const columns: SandwishTableProps<UserResponse>["columns"] = [
         {
             title: "用户",
@@ -856,6 +874,7 @@ export const UserPage = () => {
                                 options={userRoleOptions}
                                 loading={userRoleQuery.isFetching}
                                 placeholder="选择角色"
+                                onChange={changeEditingUserRoles}
                             />
                         </label>
                     </div>

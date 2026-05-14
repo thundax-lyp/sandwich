@@ -12,6 +12,8 @@ import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
+import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.security.CurrentUserResolver;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
@@ -84,6 +86,34 @@ public class UserControllerContractTest {
                 .andExpect(jsonPath("$.data.records[0].id").value("1001"))
                 .andExpect(jsonPath("$.data.records[0].loginName").value("server.user"))
                 .andExpect(jsonPath("$.data.records[0].roles[0].name").value("系统管理员"));
+    }
+
+    @Test
+    public void shouldAllowDottedLoginNameWhenBelongsToSameUser() throws Exception {
+        PrincipalIdentityService principalIdentityService = mock(PrincipalIdentityService.class);
+        PrincipalIdentity identity = new PrincipalIdentity();
+        identity.setIdentityValue("lin.zhiyuan");
+        identity.setPrincipalKey(PrincipalKey.of(PrincipalType.USER, 1001L));
+        when(principalIdentityService.get(any())).thenReturn(identity);
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
+                        mock(UserService.class),
+                        mock(DepartmentService.class),
+                        mock(RoleService.class),
+                        principalIdentityService,
+                        mock(PrincipalCredentialService.class),
+                        mock(PreAuthSessionService.class),
+                        mock(CurrentUserResolver.class),
+                        mock(CurrentUserService.class)))
+                .setControllerAdvice(new ApiResponseBodyAdvice())
+                .build();
+
+        mockMvc.perform(post("/api/sys/user/check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"1001\",\"loginName\":\"lin.zhiyuan\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data").value(true));
     }
 
     private User user() {

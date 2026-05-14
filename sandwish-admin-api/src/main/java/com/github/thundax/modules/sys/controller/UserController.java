@@ -583,7 +583,14 @@ public class UserController {
         }
 
         return identity.getPrincipalKey() != null
-                && Objects.equals(identity.getPrincipalKey().getPrincipalId(), id);
+                && Objects.equals(identity.getPrincipalKey().getPrincipalId(), readUserIdValue(id));
+    }
+
+    private Long readUserIdValue(String id) {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        return UserIdCodec.toValue(UserIdCodec.toDomain(id));
     }
 
     private void validateEditableUser(User currentUser, User targetUser) {

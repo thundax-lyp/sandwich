@@ -26,6 +26,7 @@ import type { DataNode } from "antd/es/tree";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
+import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
@@ -202,6 +203,7 @@ export const UserPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const queryClient = useQueryClient();
     const departmentPanelRef = useRef<HTMLDivElement | null>(null);
+    const accessToken = useCurrentAccessToken();
     const [query, setQuery] = useState<UserPageRequest>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
@@ -503,9 +505,10 @@ export const UserPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.name,
             render: (_, user) => {
                 const userName = readUserName(user);
+                const avatarUrl = toAuthenticatedResourceUrl(user.avatar, accessToken);
                 return (
                     <Space size={10}>
-                        <Avatar src={user.avatar || undefined}>
+                        <Avatar src={avatarUrl}>
                             {user.avatar ? null : getInitials(userName)}
                         </Avatar>
                         <div className="user-name-cell">
@@ -808,7 +811,10 @@ export const UserPage = () => {
                 {editingUser ? (
                     <div className="user-edit-form">
                         <div className="user-edit-avatar">
-                            <Avatar size={64} src={editingUser.avatar || undefined}>
+                            <Avatar
+                                size={64}
+                                src={toAuthenticatedResourceUrl(editingUser.avatar, accessToken)}
+                            >
                                 {editingUser.avatar ? null : getInitials(readUserName(editingUser))}
                             </Avatar>
                             <Upload

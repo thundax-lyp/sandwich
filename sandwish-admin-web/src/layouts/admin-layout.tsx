@@ -24,6 +24,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../api/auth-api";
 import { refreshAccessTokenIfNeeded } from "../api/http";
 import { replacePermissions } from "../auth/permission-storage";
+import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "../auth/resource-url";
 import { clearAccessToken, getAccessToken } from "../auth/token-storage";
 import { SandwichLogo } from "../components/sandwich-logo";
 import {
@@ -112,7 +113,10 @@ const buildAuthorizedMenuItems = (
     const menuIds = new Set(menus.map((menu) => menu.id));
     const childrenByParentId = new Map<string | null, typeof menus>();
     menus.forEach((menu) => {
-        const parentId = menu.parentId && menu.parentId !== menu.id && menuIds.has(menu.parentId) ? menu.parentId : null;
+        const parentId =
+            menu.parentId && menu.parentId !== menu.id && menuIds.has(menu.parentId)
+                ? menu.parentId
+                : null;
         const siblings = childrenByParentId.get(parentId) || [];
         siblings.push(menu);
         childrenByParentId.set(parentId, siblings);
@@ -127,13 +131,17 @@ const buildAuthorizedMenuItems = (
         const nextAncestors = new Set(ancestors);
         nextAncestors.add(menu.id);
         visited.add(menu.id);
-        const children = (childrenByParentId.get(menu.id) || []).filter((child) => !nextAncestors.has(child.id));
+        const children = (childrenByParentId.get(menu.id) || []).filter(
+            (child) => !nextAncestors.has(child.id)
+        );
 
         return {
             key,
             icon: renderMenuIcon(menu.icon, menu.displayParams),
             label: menu.name,
-            children: children.length ? children.map((child) => toMenuItem(child, nextAncestors)) : undefined
+            children: children.length
+                ? children.map((child) => toMenuItem(child, nextAncestors))
+                : undefined
         };
     };
     const rootMenus = childrenByParentId.get(null) || [];
@@ -154,6 +162,7 @@ export const AdminLayout = () => {
     const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isMobileLayout, setIsMobileLayout] = useState(false);
+    const accessToken = useCurrentAccessToken();
     const currentUserInfoQuery = useQuery({
         queryKey: ["current-user", "info"],
         queryFn: getCurrentUserInfo,
@@ -190,14 +199,15 @@ export const AdminLayout = () => {
         ? buildAuthorizedMenuItems(currentUserMenusQuery.data)
         : [];
     const currentUser = currentUserInfoQuery.data;
+    const currentUserAvatar = toAuthenticatedResourceUrl(currentUser?.avatar, accessToken);
     const currentUserName = currentUser?.name || currentUser?.loginName || "当前用户";
     const sidebarState = isMobileLayout
         ? sidebarCollapsed
             ? "closed"
             : "open"
         : sidebarCollapsed
-            ? "collapsed"
-            : "expanded";
+          ? "collapsed"
+          : "expanded";
 
     useEffect(() => {
         if (currentUserPermsQuery.data) {
@@ -330,11 +340,16 @@ export const AdminLayout = () => {
                             }}
                             trigger={["click"]}
                         >
-                            <Button className="user-menu-trigger" loading={logoutMutation.isPending}>
-                                <Avatar size={32} src={currentUser?.avatar} icon={<UserOutlined />} />
+                            <Button
+                                className="user-menu-trigger"
+                                loading={logoutMutation.isPending}
+                            >
+                                <Avatar size={32} src={currentUserAvatar} icon={<UserOutlined />} />
                                 <span className="user-menu-copy">
                                     <Text strong>{currentUserName}</Text>
-                                    <Text type="secondary">{currentUser?.loginName || "未连接"}</Text>
+                                    <Text type="secondary">
+                                        {currentUser?.loginName || "未连接"}
+                                    </Text>
                                 </span>
                                 <DownOutlined />
                             </Button>

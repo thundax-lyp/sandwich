@@ -12,6 +12,7 @@ import { Button, Dropdown, Input, Select, Space, Tag, Typography, message } from
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
+import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
@@ -94,7 +95,9 @@ const objectStatusClassName = (status?: string | null) => {
 };
 
 const referenceStatusClassName = (status?: string | null) => {
-    return status ? `storage-object-reference storage-object-reference-${status.toLowerCase()}` : "";
+    return status
+        ? `storage-object-reference storage-object-reference-${status.toLowerCase()}`
+        : "";
 };
 
 const sortByMove = (
@@ -112,7 +115,11 @@ const sortByMove = (
     const nextStorages = [...storages];
     const [movedStorage] = nextStorages.splice(sourceIndex, 1);
     const nextTargetIndex = nextStorages.findIndex((storage) => storage.id === targetStorage.id);
-    nextStorages.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, movedStorage);
+    nextStorages.splice(
+        position === "before" ? nextTargetIndex : nextTargetIndex + 1,
+        0,
+        movedStorage
+    );
     return nextStorages;
 };
 
@@ -120,6 +127,7 @@ export const StorageObjectPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const queryClient = useQueryClient();
     const canEditStorage = hasPermission("storage:storage:edit");
+    const accessToken = useCurrentAccessToken();
     const [query, setQuery] = useState<StoragePageRequest>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
@@ -131,9 +139,9 @@ export const StorageObjectPage = () => {
     const hasSelectedStorages = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(
         filters.contentType.trim() ||
-            filters.remarks.trim() ||
-            filters.objectStatus !== "ALL" ||
-            filters.referenceStatus !== "ALL"
+        filters.remarks.trim() ||
+        filters.objectStatus !== "ALL" ||
+        filters.referenceStatus !== "ALL"
     );
 
     const storageQuery = useQuery({
@@ -266,7 +274,9 @@ export const StorageObjectPage = () => {
                     <FileOutlined className="storage-object-file-icon" />
                     <div className="storage-object-name-cell">
                         <Text strong>{readFilename(storage)}</Text>
-                        {storage.extendName ? <Text type="secondary">{storage.extendName}</Text> : null}
+                        {storage.extendName ? (
+                            <Text type="secondary">{storage.extendName}</Text>
+                        ) : null}
                     </div>
                 </Space>
             )
@@ -277,14 +287,17 @@ export const StorageObjectPage = () => {
             key: "contentType",
             width: DEFAULT_COLUMN_WIDTHS.contentType,
             ellipsis: true,
-            render: (contentType?: string | null) => (contentType ? <Text code>{contentType}</Text> : null)
+            render: (contentType?: string | null) =>
+                contentType ? <Text code>{contentType}</Text> : null
         },
         {
             title: "归属",
             key: "owner",
             width: DEFAULT_COLUMN_WIDTHS.owner,
             render: (_, storage) => {
-                const ownerType = storage.ownerType ? ownerTypeLabels[storage.ownerType] || storage.ownerType : "";
+                const ownerType = storage.ownerType
+                    ? ownerTypeLabels[storage.ownerType] || storage.ownerType
+                    : "";
                 if (!ownerType && !storage.ownerId) {
                     return null;
                 }
@@ -304,7 +317,8 @@ export const StorageObjectPage = () => {
             render: (status?: string | null) =>
                 status ? (
                     <Tag className={objectStatusClassName(status)}>
-                        {objectStatusLabels[status as Exclude<StorageObjectStatusFilter, "ALL">] || status}
+                        {objectStatusLabels[status as Exclude<StorageObjectStatusFilter, "ALL">] ||
+                            status}
                     </Tag>
                 ) : null
         },
@@ -316,7 +330,9 @@ export const StorageObjectPage = () => {
             render: (status?: string | null) =>
                 status ? (
                     <Tag className={referenceStatusClassName(status)}>
-                        {referenceStatusLabels[status as Exclude<StorageReferenceStatusFilter, "ALL">] || status}
+                        {referenceStatusLabels[
+                            status as Exclude<StorageReferenceStatusFilter, "ALL">
+                        ] || status}
                     </Tag>
                 ) : null
         },
@@ -334,14 +350,15 @@ export const StorageObjectPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.actions,
             render: (_, storage) => {
                 const filename = readFilename(storage);
+                const previewUrl = toAuthenticatedResourceUrl(storage.contentUrl, accessToken);
                 return (
                     <div className="sandwish-table-row-actions">
                         <Space.Compact className="sandwish-table-row-actions-inline">
                             <Button
                                 aria-label={`预览 ${filename}`}
                                 className="sandwish-table-row-action"
-                                disabled={!storage.contentUrl}
-                                href={storage.contentUrl || undefined}
+                                disabled={!previewUrl}
+                                href={previewUrl}
                                 icon={<EyeOutlined />}
                                 target="_blank"
                                 type="text"
@@ -369,10 +386,10 @@ export const StorageObjectPage = () => {
                                 items: [
                                     {
                                         key: "preview",
-                                        disabled: !storage.contentUrl,
+                                        disabled: !previewUrl,
                                         icon: <EyeOutlined />,
-                                        label: storage.contentUrl ? (
-                                            <a href={storage.contentUrl} target="_blank" rel="noreferrer">
+                                        label: previewUrl ? (
+                                            <a href={previewUrl} target="_blank" rel="noreferrer">
                                                 预览
                                             </a>
                                         ) : (

@@ -16,6 +16,8 @@
 - `sandwish-front-api`
 - `mysql`
 - `redis`
+- `rocketmq-namesrv`
+- `rocketmq-broker`
 - `minio`
 - `minio-init`
 
@@ -55,6 +57,7 @@ SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
 
 - `mysql:8.4`
 - `redis:7.4-alpine`
+- `apache/rocketmq:5.4.0`
 - `minio/minio:RELEASE.2025-02-28T09-55-16Z`
 - `minio/mc:RELEASE.2025-02-21T16-00-46Z`
 
@@ -110,6 +113,8 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml down
 - 前台页面：`http://127.0.0.1:18080/`
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
+- RocketMQ NameServer：`127.0.0.1:19876`
+- RocketMQ Broker：`127.0.0.1:10911`
 
 ## Smoke Check
 
@@ -159,6 +164,8 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 
 Compose 默认使用 MinIO S3 模式。MinIO 数据通过 `SANDWISH_MINIO_DATA_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/minio`，便于人工备份。`minio-init` 会在启动时创建 `SANDWISH_OSS_S3_BUCKET` 指定的 bucket。
 
+Compose 默认使用 RocketMQ 作为后台系统日志消息通道。RocketMQ 数据通过 `SANDWISH_ROCKETMQ_*_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/rocketmq`。
+
 ## Environment Variables
 
 单应用运行样例：
@@ -192,12 +199,15 @@ Compose 部署样例：
 - `SANDWISH_NGINX_RUNTIME_IMAGE`
 - `SANDWISH_MYSQL_IMAGE`
 - `SANDWISH_REDIS_IMAGE`
+- `SANDWISH_ROCKETMQ_IMAGE`
 - `SANDWISH_MINIO_IMAGE`
 - `SANDWISH_MINIO_MC_IMAGE`
 - `SANDWISH_DB_URL`
 - `SANDWISH_DB_USERNAME`
 - `SANDWISH_DB_PASSWORD`
 - `SANDWISH_REDIS_URI`
+- `SANDWISH_MQ_TYPE`
+- `SANDWISH_ROCKETMQ_NAME_SERVER`
 - `SANDWISH_LOG_STORAGE_PATH`
 - `SANDWISH_OSS_TYPE`
 - `SANDWISH_OSS_S3_ENDPOINT`

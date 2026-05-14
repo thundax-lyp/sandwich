@@ -12,6 +12,7 @@ JRE_IMAGE="${SANDWISH_JRE_IMAGE:-eclipse-temurin:8-jre}"
 NGINX_IMAGE="${SANDWISH_NGINX_IMAGE:-nginx:1.27-alpine}"
 MYSQL_IMAGE="${SANDWISH_MYSQL_IMAGE:-mysql:8.4}"
 REDIS_IMAGE="${SANDWISH_REDIS_IMAGE:-redis:7.4-alpine}"
+ROCKETMQ_IMAGE="${SANDWISH_ROCKETMQ_IMAGE:-apache/rocketmq:5.4.0}"
 MINIO_IMAGE="${SANDWISH_MINIO_IMAGE:-minio/minio:RELEASE.2025-02-28T09-55-16Z}"
 MINIO_MC_IMAGE="${SANDWISH_MINIO_MC_IMAGE:-minio/mc:RELEASE.2025-02-21T16-00-46Z}"
 
@@ -59,6 +60,7 @@ if [ "$PULL_INFRA_IMAGES" = "true" ]; then
     echo "==> Pulling infrastructure images"
     docker pull "$MYSQL_IMAGE"
     docker pull "$REDIS_IMAGE"
+    docker pull "$ROCKETMQ_IMAGE"
     docker pull "$MINIO_IMAGE"
     docker pull "$MINIO_MC_IMAGE"
 else
@@ -72,6 +74,7 @@ docker save -o "$OUTPUT_DIR/sandwish-front-api-$TAG.tar" "$FRONT_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-nginx-$TAG.tar" "$NGINX_RUNTIME_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-mysql.tar" "$MYSQL_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-redis.tar" "$REDIS_IMAGE"
+docker save -o "$OUTPUT_DIR/sandwish-rocketmq.tar" "$ROCKETMQ_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-minio.tar" "$MINIO_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-minio-mc.tar" "$MINIO_MC_IMAGE"
 
@@ -81,6 +84,7 @@ $FRONT_API_IMAGE -> sandwish-front-api-$TAG.tar
 $NGINX_RUNTIME_IMAGE -> sandwish-nginx-$TAG.tar
 $MYSQL_IMAGE -> sandwish-mysql.tar
 $REDIS_IMAGE -> sandwish-redis.tar
+$ROCKETMQ_IMAGE -> sandwish-rocketmq.tar
 $MINIO_IMAGE -> sandwish-minio.tar
 $MINIO_MC_IMAGE -> sandwish-minio-mc.tar
 EOF

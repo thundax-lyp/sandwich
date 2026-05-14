@@ -18,6 +18,7 @@ services:
       - mysql
       - redis
       - minio
+      - rocketmq-broker
     environment:
       SERVER_PORT: 8080
       SERVER_SERVLET_CONTEXT_PATH: /admin-api
@@ -29,6 +30,13 @@ services:
       SANDWISH_REDIS_URI: "${SANDWISH_REDIS_URI}"
       SANDWISH_REDIS_PASSWORD: "${SANDWISH_REDIS_PASSWORD}"
       SANDWISH_REDIS_TIMEOUT: "${SANDWISH_REDIS_TIMEOUT}"
+      SANDWISH_MQ_ENABLED: "${SANDWISH_MQ_ENABLED}"
+      SANDWISH_MQ_TYPE: "${SANDWISH_MQ_TYPE}"
+      SANDWISH_ROCKETMQ_NAME_SERVER: "${SANDWISH_ROCKETMQ_NAME_SERVER}"
+      SANDWISH_ROCKETMQ_PRODUCER_GROUP: "${SANDWISH_ROCKETMQ_PRODUCER_GROUP}"
+      SANDWISH_LOG_SYS_TOPIC: "${SANDWISH_LOG_SYS_TOPIC}"
+      SANDWISH_LOG_SYS_TAG: "${SANDWISH_LOG_SYS_TAG}"
+      SANDWISH_LOG_SYS_CONSUMER_GROUP: "${SANDWISH_LOG_SYS_CONSUMER_GROUP}"
       SANDWISH_LOG_STORAGE_PATH: "${SANDWISH_LOG_STORAGE_PATH}"
       SANDWISH_OSS_TYPE: "${SANDWISH_OSS_TYPE}"
       SANDWISH_OSS_LOCAL_ROOT_PATH: "${SANDWISH_OSS_LOCAL_ROOT_PATH}"
@@ -109,6 +117,32 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - sandwish-redis-data:/data
+    networks:
+      - backend
+
+  rocketmq-namesrv:
+    image: "${SANDWISH_ROCKETMQ_IMAGE:-apache/rocketmq:5.4.0}"
+    command: ["sh", "mqnamesrv"]
+    ports:
+      - "${ROCKETMQ_NAMESRV_PORT:-19876}:9876"
+    volumes:
+      - "${SANDWISH_ROCKETMQ_NAMESRV_LOG_PATH:-./data/rocketmq/namesrv/logs}:/home/rocketmq/logs"
+    networks:
+      - backend
+
+  rocketmq-broker:
+    image: "${SANDWISH_ROCKETMQ_IMAGE:-apache/rocketmq:5.4.0}"
+    depends_on:
+      - rocketmq-namesrv
+    command: ["sh", "mqbroker", "-n", "rocketmq-namesrv:9876"]
+    environment:
+      NAMESRV_ADDR: "rocketmq-namesrv:9876"
+    ports:
+      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
+      - "${ROCKETMQ_BROKER_FAST_PORT:-10909}:10909"
+    volumes:
+      - "${SANDWISH_ROCKETMQ_BROKER_STORE_PATH:-./data/rocketmq/broker/store}:/home/rocketmq/store"
+      - "${SANDWISH_ROCKETMQ_BROKER_LOG_PATH:-./data/rocketmq/broker/logs}:/home/rocketmq/logs"
     networks:
       - backend
 

@@ -127,8 +127,7 @@ public class UserControllerContractTest {
 
         try {
             org.junit.Assert.assertEquals(
-                    "/admin-api/api/sys/user/avatar?id=1001&token=token-1",
-                    UserController.getAvatarUrl("1001", "token-1"));
+                    "/admin-api/api/sys/user/avatar?id=1001", UserController.getAvatarUrl("1001"));
         } finally {
             RequestContextHolder.resetRequestAttributes();
         }

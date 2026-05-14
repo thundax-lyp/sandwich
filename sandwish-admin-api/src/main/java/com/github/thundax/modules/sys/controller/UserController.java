@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
 import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
@@ -676,11 +675,10 @@ public class UserController {
         return privateKey;
     }
 
-    public static String getAvatarUrl(String userId, String token) {
+    public static String getAvatarUrl(String userId) {
         return UriComponentsBuilder.fromPath(currentContextPath())
                 .path(AVATAR_PATH)
                 .queryParam("id", userId)
-                .queryParam("token", token)
                 .build()
                 .toUriString();
     }
@@ -701,6 +699,6 @@ public class UserController {
         if (!currentUserService.existsAvatar(userId)) {
             return null;
         }
-        return getAvatarUrl(UserIdCodec.toStringValue(userId), SandwishContextHolder.currentToken());
+        return getAvatarUrl(UserIdCodec.toStringValue(userId));
     }
 }

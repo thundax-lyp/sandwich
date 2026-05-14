@@ -3,7 +3,6 @@ package com.github.thundax.modules.sys.controller;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
-import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
@@ -237,8 +236,7 @@ public class CurrentUserController {
         if (user == null || !currentUserService.existsAvatar(user.getId())) {
             return null;
         }
-        return UserController.getAvatarUrl(
-                UserIdCodec.toStringValue(user.getId()), SandwishContextHolder.currentToken());
+        return UserController.getAvatarUrl(UserIdCodec.toStringValue(user.getId()));
     }
 
     private PrincipalIdentityQuery identityQuery(PrincipalKey principalKey, PrincipalIdentityType identityType) {

@@ -199,12 +199,13 @@ public class CurrentUserServiceImpl implements CurrentUserService {
 
     @Override
     public List<Menu> listAccessibleMenus(CurrentUserQuery query) {
-        if (isSuper(query)) {
+        if (query != null && UserPrivilege.SUPER == query.getPrivilege()) {
             return sortedMenus(menuService.list(new MenuQuery()));
         }
 
         List<Role> roleList = userService.listUserRoles(userQuery(query.getUserId()));
-        boolean isAdmin = isAdmin(query) || roleList.stream().anyMatch(Role::isAdmin);
+        boolean isAdmin = query != null && UserPrivilege.ADMIN == query.getPrivilege()
+                || roleList.stream().anyMatch(Role::isAdmin);
         if (isAdmin) {
             MenuQuery menuQuery = new MenuQuery();
             menuQuery.setMaxRank(query.getRank());
@@ -441,14 +442,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         query.setIdentityId(identityId);
         query.setCredentialType(credentialType);
         return query;
-    }
-
-    private boolean isSuper(CurrentUserQuery query) {
-        return query != null && UserPrivilege.SUPER == query.getPrivilege();
-    }
-
-    private boolean isAdmin(CurrentUserQuery query) {
-        return query != null && UserPrivilege.ADMIN == query.getPrivilege();
     }
 
     private User toUser(ChangeCurrentUserInfoCommand command) {

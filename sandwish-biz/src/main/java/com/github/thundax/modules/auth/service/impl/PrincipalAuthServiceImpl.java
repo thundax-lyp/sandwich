@@ -51,7 +51,10 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
         if (credential == null) {
             throw new InvalidPasswordException();
         }
-        validateCredential(credential, command.getPlainPassword(), effectivePolicy(command.getPasswordPolicy()));
+        PrincipalPasswordPolicyDTO passwordPolicy = command.getPasswordPolicy() == null
+                ? PrincipalPasswordPolicyDTO.disabled()
+                : command.getPasswordPolicy();
+        validateCredential(credential, command.getPlainPassword(), passwordPolicy);
         return identity;
     }
 
@@ -92,10 +95,6 @@ public class PrincipalAuthServiceImpl implements PrincipalAuthService {
                 + "次后将被锁定，剩余"
                 + (credential.getFailedLimit() - credential.getFailedCount())
                 + "次");
-    }
-
-    private PrincipalPasswordPolicyDTO effectivePolicy(PrincipalPasswordPolicyDTO passwordPolicy) {
-        return passwordPolicy == null ? PrincipalPasswordPolicyDTO.disabled() : passwordPolicy;
     }
 
     private PrincipalIdentityQuery identityQuery(AuthenticateIdentityCommand command) {

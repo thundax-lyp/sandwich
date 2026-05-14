@@ -413,6 +413,7 @@ OSS 存储链路允许 infra 和入口装配依赖：
 - 不直接暴露业务 `Entity` 作为公开 HTTP 响应模型。
 - 不把 API `Request` / `Response` 下沉到 Service。
 - 分页入口固定接收 `PageRequest` 或基础分页参数，分页出口固定输出 `PageResponse` 或统一响应包装。
+- `Controller`、`ServiceImpl`、`DaoImpl` 中的 `private` / `protected` 方法不得只是无复用的一行代码；确有语义边界或框架适配价值时，必须声明 `@OneLineMethodAllowed(reason = "...")`。
 
 ### Service
 

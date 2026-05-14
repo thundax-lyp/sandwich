@@ -5,6 +5,7 @@ import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.S
 import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.SUPER;
 import static com.github.thundax.modules.sys.entity.valueobject.PermissionCode.USER;
 
+import com.github.thundax.common.arch.OneLineMethodAllowed;
 import com.github.thundax.common.security.permission.PermissionMatcher;
 import com.github.thundax.common.security.permission.PrefixPermissionMatcher;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
@@ -88,7 +89,9 @@ public class PermissionServiceImpl implements PermissionService {
         Assert.notNull(user, "user can not be null");
 
         Set<String> permissions = new HashSet<>();
-        List<Menu> menuList = currentUserService.listAccessibleMenus(currentUserQuery(user));
+        CurrentUserQuery currentUserQuery =
+                new CurrentUserQuery(user.getId(), user.getPrivilege(), user.getStatus(), user.getRank());
+        List<Menu> menuList = currentUserService.listAccessibleMenus(currentUserQuery);
         if (menuList != null && !menuList.isEmpty()) {
             menuList.forEach(menu -> {
                 if (StringUtils.isNotBlank(menu.getPerms())) {
@@ -127,10 +130,6 @@ public class PermissionServiceImpl implements PermissionService {
         return session;
     }
 
-    private CurrentUserQuery currentUserQuery(User user) {
-        return new CurrentUserQuery(user.getId(), user.getPrivilege(), user.getStatus(), user.getRank());
-    }
-
     private Set<String> toPermissionSet(Object value) {
         if (!(value instanceof Collection)) {
             return null;
@@ -157,6 +156,7 @@ public class PermissionServiceImpl implements PermissionService {
         }
     }
 
+    @OneLineMethodAllowed(reason = "表达权限会话缓存 TTL 的安全余量边界")
     private int expiredSeconds(PrincipalAuthSession session) {
         return session.remainingSeconds(new Date()) + SAFETY_SECONDS;
     }

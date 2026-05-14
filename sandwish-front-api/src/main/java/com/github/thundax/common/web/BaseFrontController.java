@@ -60,7 +60,9 @@ public class BaseFrontController {
     }
 
     protected void addMessage(@NotNull RedirectAttributes redirectAttributes, String message) {
-        redirectAttributes.addFlashAttribute(ATTR_MESSAGE, message);
+        if (redirectAttributes != null) {
+            redirectAttributes.addFlashAttribute(ATTR_MESSAGE, message);
+        }
     }
 
     protected <T> boolean validate(RedirectAttributes redirectAttributes, T object) {

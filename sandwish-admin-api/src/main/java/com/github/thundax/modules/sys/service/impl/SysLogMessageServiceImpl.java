@@ -58,7 +58,9 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
                 sysLog.setId(logService.create(toCreateCommand(sysLog)));
 
                 try {
-                    String filename = logFilename(sysLog.getLogDate());
+                    String filename = LOG_FILENAME_FORMAT.format(
+                                    sysLog.getLogDate().toInstant().atZone(ZoneId.systemDefault()))
+                            + LOG_EXTEND_NAME;
                     File logFile = new File(logProperties().getStoragePath(), filename);
 
                     FileUtils.writeLines(logFile, new ArrayList<>(Collections.singletonList(payload)), true);
@@ -83,10 +85,6 @@ public class SysLogMessageServiceImpl implements SysLogMessageService {
 
     private SandwishProperties.LogProperties logProperties() {
         return sandwishProperties.getLog();
-    }
-
-    private String logFilename(Date logDate) {
-        return LOG_FILENAME_FORMAT.format(logDate.toInstant().atZone(ZoneId.systemDefault())) + LOG_EXTEND_NAME;
     }
 
     private SandwishMqMessage buildMessage(String payload) {

@@ -17,6 +17,7 @@ import com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO;
 import com.github.thundax.modules.sys.persistence.mapper.DepartmentMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
@@ -107,7 +108,7 @@ public class DepartmentDaoImpl implements DepartmentDao {
         DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(DepartmentIdCodec.toDomain(dataObject.getParentId()));
-        if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !Objects.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(
@@ -175,7 +176,12 @@ public class DepartmentDaoImpl implements DepartmentDao {
         moveTreeLfts(fromNode.getLft(), -treeSpan(fromNode));
         moveTreeRgts(fromNode.getLft(), -treeSpan(fromNode));
 
-        updateParent(DepartmentPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
+        DepartmentDO parentUpdateDataObject =
+                DepartmentPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId);
+        mapper.update(
+                null,
+                buildIdUpdateWrapper(parentUpdateDataObject)
+                        .set(DepartmentDO::getParentId, parentUpdateDataObject.getParentId()));
         cacheSupport.removeAll();
     }
 
@@ -237,10 +243,6 @@ public class DepartmentDaoImpl implements DepartmentDao {
         return ((Number) maxValues.get(0)).intValue();
     }
 
-    private void updateParent(DepartmentDO node) {
-        mapper.update(null, buildIdUpdateWrapper(node).set(DepartmentDO::getParentId, node.getParentId()));
-    }
-
     private void moveTreeRgts(Integer from, Integer offset) {
         LambdaUpdateWrapper<DepartmentDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.ge(DepartmentDO::getRgt, from).setSql("rgt = rgt + " + offset);
@@ -290,10 +292,6 @@ public class DepartmentDaoImpl implements DepartmentDao {
         if (node != null && (node.getParentId() == null || ROOT_ID.equals(node.getParentId()))) {
             node.setParentId(null);
         }
-    }
-
-    private static boolean equalsLong(Long left, Long right) {
-        return left == null ? right == null : left.equals(right);
     }
 
     private static int treeSpan(DepartmentDO node) {

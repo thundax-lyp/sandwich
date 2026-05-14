@@ -48,7 +48,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
 
     @Override
     public int count() {
-        removeExpiredActiveSessions();
+        redis().zremrangebyscore(ACTIVE_SESSION_KEY, 0, System.currentTimeMillis());
         return redis().zcard(ACTIVE_SESSION_KEY).intValue();
     }
 
@@ -137,10 +137,6 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
     private long ttlSeconds(long expiredAt) {
         long remainingMillis = expiredAt - System.currentTimeMillis();
         return remainingMillis <= 0 ? 0L : (remainingMillis + 999L) / 1000L;
-    }
-
-    private void removeExpiredActiveSessions() {
-        redis().zremrangebyscore(ACTIVE_SESSION_KEY, 0, System.currentTimeMillis());
     }
 
     private static PreAuthSession toEntity(PreAuthSessionCacheDTO cacheDTO) {

@@ -244,7 +244,10 @@ public class LoginController {
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 session.getId(), PUBLIC_KEY_ITEM, keyPair.getPublicKey(), session.getExpiredAt()));
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
-                session.getId(), PRIVATE_KEY_ITEM, memberPrivateKeyValue(keyPair), session.getExpiredAt()));
+                session.getId(),
+                PRIVATE_KEY_ITEM,
+                keyPair.getModulus() + MEMBER_PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent(),
+                session.getExpiredAt()));
         return preAuthSessionService.get(session.getId());
     }
 
@@ -299,10 +302,6 @@ public class LoginController {
     private void writeCaptcha(PreAuthSessionId sessionId, String captcha) {
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
-    }
-
-    private String memberPrivateKeyValue(RsaCrypto.ReadableKeyPair keyPair) {
-        return keyPair.getModulus() + MEMBER_PRIVATE_KEY_SEPARATOR + keyPair.getPrivateKeyExponent();
     }
 
     private String ip(HttpServletRequest request) {

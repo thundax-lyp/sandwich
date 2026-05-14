@@ -19,6 +19,7 @@ import com.github.thundax.modules.sys.persistence.mapper.MenuMapper;
 import com.github.thundax.modules.sys.persistence.mapper.MenuRoleMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
@@ -110,7 +111,7 @@ public class MenuDaoImpl implements MenuDao {
         MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
         normalizeParentId(dataObject);
         entity.setParentId(MenuIdCodec.toDomain(dataObject.getParentId()));
-        if (oldNode != null && !equalsLong(oldNode.getParentId(), dataObject.getParentId())) {
+        if (oldNode != null && !Objects.equals(oldNode.getParentId(), dataObject.getParentId())) {
             moveNodeToParent(oldNode, dataObject.getParentId());
         }
         int count = mapper.update(
@@ -182,7 +183,11 @@ public class MenuDaoImpl implements MenuDao {
         moveTreeLfts(fromNode.getLft(), -treeSpan(fromNode));
         moveTreeRgts(fromNode.getLft(), -treeSpan(fromNode));
 
-        updateParent(MenuPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId));
+        MenuDO parentUpdateDataObject = MenuPersistenceAssembler.toParentUpdateDataObject(fromId, newParentId);
+        mapper.update(
+                null,
+                buildIdUpdateWrapper(parentUpdateDataObject)
+                        .set(MenuDO::getParentId, parentUpdateDataObject.getParentId()));
         cacheSupport.removeAll();
     }
 
@@ -260,10 +265,6 @@ public class MenuDaoImpl implements MenuDao {
         return ((Number) maxValues.get(0)).intValue();
     }
 
-    private void updateParent(MenuDO node) {
-        mapper.update(null, buildIdUpdateWrapper(node).set(MenuDO::getParentId, node.getParentId()));
-    }
-
     private void moveTreeRgts(Integer from, Integer offset) {
         LambdaUpdateWrapper<MenuDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.ge(MenuDO::getRgt, from).setSql("rgt = rgt + " + offset);
@@ -313,10 +314,6 @@ public class MenuDaoImpl implements MenuDao {
         if (node != null && (node.getParentId() == null || ROOT_ID.equals(node.getParentId()))) {
             node.setParentId(null);
         }
-    }
-
-    private static boolean equalsLong(Long left, Long right) {
-        return left == null ? right == null : left.equals(right);
     }
 
     private static int treeSpan(MenuDO node) {

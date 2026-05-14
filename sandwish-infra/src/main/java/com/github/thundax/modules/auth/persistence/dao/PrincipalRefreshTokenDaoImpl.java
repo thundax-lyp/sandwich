@@ -88,7 +88,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
             return new ArrayList<>();
         }
         String indexKey = principalIndexKey(principalKey, clientId, status);
-        removeExpired(indexKey);
+        redis().zremrangebyscore(indexKey, 0, System.currentTimeMillis());
         List<String> tokenHashes = redis().zrange(indexKey, 0, -1);
         List<PrincipalRefreshToken> tokens = new ArrayList<>();
         for (String tokenHash : tokenHashes) {
@@ -121,7 +121,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         String tokenHash = tokenHashById(refreshToken.getId());
         PrincipalRefreshToken oldToken = getByTokenHash(tokenHash);
         if (oldToken != null) {
-            removeIndex(oldToken);
+            redis().zrem(principalIndexKey(oldToken), tokenHashById(oldToken.getId()));
         }
         Assert.notNull(refreshToken.getExpireAt(), "expireAt can not be null");
         Assert.notNull(refreshToken.getStatus(), "status can not be null");
@@ -142,10 +142,6 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
         redis().zadd(principalIndexKey(refreshToken), refreshToken.getExpireAt().getTime(), tokenHash);
     }
 
-    private void removeIndex(PrincipalRefreshToken refreshToken) {
-        redis().zrem(principalIndexKey(refreshToken), tokenHashById(refreshToken.getId()));
-    }
-
     private String tokenHashById(PrincipalRefreshTokenId id) {
         if (id == null) {
             return null;
@@ -164,10 +160,6 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
 
     private String tokenHash(String token) {
         return StringUtils.isBlank(token) ? null : Sha256Digest.hashBase64Url(token);
-    }
-
-    private void removeExpired(String indexKey) {
-        redis().zremrangebyscore(indexKey, 0, System.currentTimeMillis());
     }
 
     private String principalIndexKey(PrincipalRefreshToken refreshToken) {

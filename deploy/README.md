@@ -53,13 +53,15 @@ SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
 - `sandwish/front-api:dev`
 - `sandwish/nginx:dev`
 
-脚本还会拉取并导出基础设施镜像：
+脚本还会把基础设施镜像打成 `sandwish/*` 名称并导出：
 
-- `mysql:8.4`
-- `redis:7.4-alpine`
-- `apache/rocketmq:5.4.0`
-- `minio/minio:RELEASE.2025-02-28T09-55-16Z`
-- `minio/mc:RELEASE.2025-02-21T16-00-46Z`
+- `sandwish/mysql:8.4`
+- `sandwish/redis:7.4-alpine`
+- `sandwish/rocketmq:5.4.0`
+- `sandwish/minio:RELEASE.2025-02-28T09-55-16Z`
+- `sandwish/minio-mc:RELEASE.2025-02-21T16-00-46Z`
+
+默认上游来源仍分别为 `mysql:8.4`、`redis:7.4-alpine`、`apache/rocketmq:5.4.0`、`minio/minio:RELEASE.2025-02-28T09-55-16Z` 和 `minio/mc:RELEASE.2025-02-21T16-00-46Z`，可通过 `SANDWISH_*_SOURCE_IMAGE` 覆盖。
 
 镜像文件默认输出到 `deploy/image-files/`，可用 `SANDWISH_IMAGE_OUTPUT_DIR` 覆盖。目标机器导入镜像：
 
@@ -99,6 +101,8 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
 docker compose --env-file deploy/.env.dev -f deploy/docker-compose.yml up -d
 ```
 
+Compose 会等待 MySQL、Redis、MinIO 和 RocketMQ healthcheck 通过后再启动 `sandwish-admin-api` 和 `sandwish-front-api`，避免 API 容器早于基础设施可用状态启动。
+
 停止：
 
 ```bash
@@ -114,7 +118,7 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml down
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
 - RocketMQ NameServer：`127.0.0.1:19876`
-- RocketMQ Broker：`127.0.0.1:10911`
+- RocketMQ Broker：`127.0.0.1:20911`
 
 ## Smoke Check
 

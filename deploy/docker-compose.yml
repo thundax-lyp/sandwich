@@ -2,8 +2,10 @@ services:
   nginx:
     image: "${SANDWISH_NGINX_RUNTIME_IMAGE:-sandwish/nginx:dev}"
     depends_on:
-      - sandwish-admin-api
-      - sandwish-front-api
+      sandwish-admin-api:
+        condition: service_started
+      sandwish-front-api:
+        condition: service_started
     ports:
       - "${SANDWISH_PUBLIC_HTTP_PORT:-18080}:80"
     networks:
@@ -15,10 +17,14 @@ services:
     working_dir: /app
     command: ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
     depends_on:
-      - mysql
-      - redis
-      - minio
-      - rocketmq-broker
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      rocketmq-broker:
+        condition: service_healthy
     environment:
       SERVER_PORT: 8080
       SERVER_SERVLET_CONTEXT_PATH: /admin-api
@@ -59,9 +65,12 @@ services:
     working_dir: /app
     command: ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
     depends_on:
-      - mysql
-      - redis
-      - minio
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     environment:
       SERVER_PORT: 8080
       SERVER_SERVLET_CONTEXT_PATH: /front-api
@@ -90,7 +99,7 @@ services:
       - backend
 
   mysql:
-    image: "${SANDWISH_MYSQL_IMAGE:-mysql:8.4}"
+    image: "${SANDWISH_MYSQL_IMAGE:-sandwish/mysql:8.4}"
     command: ["mysqld", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     environment:
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
@@ -109,45 +118,70 @@ services:
       - ../db/data/member.sql:/docker-entrypoint-initdb.d/08-data-member.sql:ro
       - ../db/schema/audit.sql:/docker-entrypoint-initdb.d/09-schema-audit.sql:ro
       - ../db/data/audit.sql:/docker-entrypoint-initdb.d/10-data-audit.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     networks:
       - backend
 
   redis:
-    image: "${SANDWISH_REDIS_IMAGE:-redis:7.4-alpine}"
+    image: "${SANDWISH_REDIS_IMAGE:-sandwish/redis:7.4-alpine}"
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - sandwish-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
     networks:
       - backend
 
   rocketmq-namesrv:
-    image: "${SANDWISH_ROCKETMQ_IMAGE:-apache/rocketmq:5.4.0}"
+    image: "${SANDWISH_ROCKETMQ_IMAGE:-sandwish/rocketmq:5.4.0}"
     command: ["sh", "mqnamesrv"]
     ports:
       - "${ROCKETMQ_NAMESRV_PORT:-19876}:9876"
     volumes:
       - "${SANDWISH_ROCKETMQ_NAMESRV_LOG_PATH:-./data/rocketmq/namesrv/logs}:/home/rocketmq/logs"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/127.0.0.1/9876'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
     networks:
       - backend
 
   rocketmq-broker:
-    image: "${SANDWISH_ROCKETMQ_IMAGE:-apache/rocketmq:5.4.0}"
+    image: "${SANDWISH_ROCKETMQ_IMAGE:-sandwish/rocketmq:5.4.0}"
     depends_on:
-      - rocketmq-namesrv
+      rocketmq-namesrv:
+        condition: service_healthy
     command: ["sh", "mqbroker", "-n", "rocketmq-namesrv:9876"]
     environment:
       NAMESRV_ADDR: "rocketmq-namesrv:9876"
     ports:
-      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
-      - "${ROCKETMQ_BROKER_FAST_PORT:-10909}:10909"
+      - "${ROCKETMQ_BROKER_PORT:-20911}:10911"
+      - "${ROCKETMQ_BROKER_FAST_PORT:-20909}:10909"
     volumes:
       - "${SANDWISH_ROCKETMQ_BROKER_STORE_PATH:-./data/rocketmq/broker/store}:/home/rocketmq/store"
       - "${SANDWISH_ROCKETMQ_BROKER_LOG_PATH:-./data/rocketmq/broker/logs}:/home/rocketmq/logs"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/127.0.0.1/10911'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     networks:
       - backend
 
   minio:
-    image: "${SANDWISH_MINIO_IMAGE:-minio/minio:RELEASE.2025-02-28T09-55-16Z}"
+    image: "${SANDWISH_MINIO_IMAGE:-sandwish/minio:RELEASE.2025-02-28T09-55-16Z}"
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
       MINIO_ROOT_USER: "${SANDWISH_OSS_S3_ACCESS_KEY}"
@@ -157,13 +191,20 @@ services:
       - "${MINIO_CONSOLE_PORT:-19001}:9001"
     volumes:
       - "${SANDWISH_MINIO_DATA_PATH:-./data/minio}:/data"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/minio/health/ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
     networks:
       - backend
 
   minio-init:
-    image: "${SANDWISH_MINIO_MC_IMAGE:-minio/mc:RELEASE.2025-02-21T16-00-46Z}"
+    image: "${SANDWISH_MINIO_MC_IMAGE:-sandwish/minio-mc:RELEASE.2025-02-21T16-00-46Z}"
     depends_on:
-      - minio
+      minio:
+        condition: service_healthy
     entrypoint:
       - /bin/sh
       - -c

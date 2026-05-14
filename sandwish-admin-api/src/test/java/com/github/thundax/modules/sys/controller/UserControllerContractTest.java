@@ -48,12 +48,16 @@ public class UserControllerContractTest {
         User user = user();
         Department department = department();
         Role role = role();
+        Role relationRole = new Role();
+        relationRole.setId(role.getId());
+        RoleService roleService = mock(RoleService.class);
         PrincipalIdentity identity = new PrincipalIdentity();
         identity.setIdentityValue("server.user");
 
         when(userService.page(any(UserQuery.class), any(PageQuery.class)))
                 .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(user)));
-        when(userService.listUserRoles(any(UserQuery.class))).thenReturn(Collections.singletonList(role));
+        when(userService.listUserRoles(any(UserQuery.class))).thenReturn(Collections.singletonList(relationRole));
+        when(roleService.get(role.getId())).thenReturn(role);
         when(departmentService.get(any(DepartmentId.class))).thenReturn(department);
         when(principalIdentityService.get(any())).thenReturn(identity);
         when(currentUserService.existsAvatar(any())).thenReturn(false);
@@ -61,7 +65,7 @@ public class UserControllerContractTest {
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
                         userService,
                         departmentService,
-                        mock(RoleService.class),
+                        roleService,
                         principalIdentityService,
                         mock(PrincipalCredentialService.class),
                         mock(PreAuthSessionService.class),

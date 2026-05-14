@@ -590,14 +590,24 @@ public class UserController {
 
     private UserResponse toResponse(User user) {
         Department department = departmentService.get(user.getDepartmentId());
-        List<Role> roleList = userService.listUserRoles(userQuery(user.getId()));
         return UserInterfaceAssembler.toResponse(
                 user,
                 getAccountLoginName(user.getId()),
                 department,
-                roleList,
+                loadUserRoles(user),
                 readAvatarUrl(user.getId()),
                 departmentService::get);
+    }
+
+    private List<Role> loadUserRoles(User user) {
+        List<Role> userRoles = userService.listUserRoles(userQuery(user.getId()));
+        if (userRoles == null) {
+            return new ArrayList<>();
+        }
+        return userRoles.stream()
+                .map(role -> role == null ? null : roleService.get(role.getId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private UserQuery userQuery(UserId userId) {

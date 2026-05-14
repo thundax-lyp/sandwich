@@ -466,7 +466,7 @@ export const UserPage = () => {
             render: (_, user) => <Tag className={statusClassName(user)}>{statusLabel(user)}</Tag>
         },
         {
-            title: "排序",
+            title: "级别",
             dataIndex: "ranks",
             key: "ranks",
             width: DEFAULT_COLUMN_WIDTHS.ranks,

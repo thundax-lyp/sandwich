@@ -93,7 +93,7 @@ export const LoginPage = () => {
                     <SandwichLogo className="login-logo" />
                     <Text className="eyebrow">Sandwich Admin</Text>
                     <Title level={1}>后台管理台</Title>
-                    <Paragraph>通过后台账号、SM2 密码加密和图形验证码进入管理工作区。</Paragraph>
+                    <Paragraph>使用后台账号和验证码进入管理工作区。</Paragraph>
                 </section>
 
                 <Card className="login-card">

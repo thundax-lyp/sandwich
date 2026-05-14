@@ -1,10 +1,11 @@
 .login-page {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 420px;
-    gap: 56px;
+    grid-template-columns: minmax(420px, 1fr) minmax(360px, 420px);
+    gap: 64px;
     align-items: center;
+    justify-content: center;
     min-height: 100vh;
-    padding: 56px;
+    padding: 56px 72px;
     background:
         linear-gradient(
             135deg,
@@ -15,26 +16,51 @@
 }
 
 .login-hero {
+    position: relative;
     max-width: 560px;
+    padding: 18px 0 18px 28px;
+}
+
+.login-hero::before {
+    position: absolute;
+    top: 24px;
+    bottom: 24px;
+    left: 0;
+    width: 3px;
+    content: "";
+    background: linear-gradient(
+        180deg,
+        var(--accent-yellow),
+        color-mix(in srgb, var(--accent-blue) 70%, var(--accent-yellow))
+    );
+    border-radius: 999px;
 }
 
 .login-logo {
     width: 64px;
     height: 64px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+}
+
+.login-hero .eyebrow {
+    display: inline-flex;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .login-hero h1.ant-typography {
-    margin: 6px 0 16px;
-    font-size: 42px;
-    line-height: 1.15;
+    margin: 6px 0 18px;
+    font-size: 48px;
+    line-height: 1.12;
 }
 
 .login-hero .ant-typography:last-child {
-    max-width: 480px;
+    max-width: 420px;
     color: var(--text-secondary);
     font-size: 16px;
-    line-height: 1.8;
+    line-height: 1.75;
 }
 
 .login-card {
@@ -85,6 +111,14 @@
         grid-template-columns: 1fr;
         gap: 24px;
         padding: 28px 18px;
+    }
+
+    .login-hero {
+        padding: 0;
+    }
+
+    .login-hero::before {
+        display: none;
     }
 
     .login-hero h1.ant-typography {

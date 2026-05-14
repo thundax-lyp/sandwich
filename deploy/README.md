@@ -164,6 +164,8 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 
 Compose 默认使用 MinIO S3 模式。MinIO 数据通过 `SANDWISH_MINIO_DATA_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/minio`，便于人工备份。`minio-init` 会在启动时创建 `SANDWISH_OSS_S3_BUCKET` 指定的 bucket。
 
+MinIO Server 和 MinIO Client 使用 GNU AGPLv3 许可证。当前 Compose 中的 MinIO 仅作为开发、测试和内部部署的 S3 兼容对象存储示例。若用于对外商业交付、SaaS 或其他可能触发 AGPLv3 义务的场景，应自行完成许可合规评估、购买商业许可，或通过 `SANDWISH_OSS_S3_ENDPOINT` 替换为外部 S3 兼容存储服务。
+
 Compose 默认使用 RocketMQ 作为后台系统日志消息通道。RocketMQ 数据通过 `SANDWISH_ROCKETMQ_*_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/rocketmq`。
 
 ## Environment Variables

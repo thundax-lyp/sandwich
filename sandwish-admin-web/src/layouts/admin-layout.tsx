@@ -159,6 +159,7 @@ const buildAuthorizedMenuItems = (
 export const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [messageApi, contextHolder] = message.useMessage();
     const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isMobileLayout, setIsMobileLayout] = useState(false);
@@ -191,7 +192,7 @@ export const AdminLayout = () => {
         },
         onSettled: () => {
             clearAccessToken();
-            message.success("已退出登录");
+            messageApi.success("已退出登录");
             navigate("/login", { replace: true });
         }
     });
@@ -267,6 +268,7 @@ export const AdminLayout = () => {
 
     return (
         <Layout className="admin-shell">
+            {contextHolder}
             {isMobileLayout && !sidebarCollapsed ? (
                 <button
                     className="sidebar-backdrop"
@@ -334,7 +336,7 @@ export const AdminLayout = () => {
                                         logoutMutation.mutate();
                                     }
                                     if (key === "profile") {
-                                        message.info("个人资料功能待接入");
+                                        messageApi.info("个人资料功能待接入");
                                     }
                                 }
                             }}

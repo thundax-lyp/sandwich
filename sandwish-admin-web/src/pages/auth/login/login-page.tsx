@@ -32,6 +32,7 @@ const resolveRedirectPath = (state: unknown) => {
 export const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [messageApi, contextHolder] = message.useMessage();
     const [captchaVersion, setCaptchaVersion] = useState(() => Date.now());
 
     const loginFormQuery = useQuery({
@@ -70,12 +71,12 @@ export const LoginPage = () => {
             });
         },
         onSuccess: () => {
-            message.success("登录成功");
+            messageApi.success("登录成功");
             navigate(resolveRedirectPath(location.state), { replace: true });
         },
         onError: (error) => {
             const description = error instanceof Error ? error.message : "请检查账号、密码和验证码";
-            message.error(description);
+            messageApi.error(description);
             refreshCaptchaMutation.mutate();
         }
     });
@@ -85,102 +86,105 @@ export const LoginPage = () => {
     }
 
     return (
-        <main className="login-page">
-            <section className="login-hero">
-                <SandwichLogo className="login-logo" />
-                <Text className="eyebrow">Sandwich Admin</Text>
-                <Title level={1}>后台管理台</Title>
-                <Paragraph>通过后台账号、SM2 密码加密和图形验证码进入管理工作区。</Paragraph>
-            </section>
+        <>
+            {contextHolder}
+            <main className="login-page">
+                <section className="login-hero">
+                    <SandwichLogo className="login-logo" />
+                    <Text className="eyebrow">Sandwich Admin</Text>
+                    <Title level={1}>后台管理台</Title>
+                    <Paragraph>通过后台账号、SM2 密码加密和图形验证码进入管理工作区。</Paragraph>
+                </section>
 
-            <Card className="login-card">
-                <Space orientation="vertical" size={24} className="login-card-content">
-                    <div>
-                        <Title level={2}>登录</Title>
-                        <Text type="secondary">请输入后台账号信息</Text>
-                    </div>
+                <Card className="login-card">
+                    <Space orientation="vertical" size={24} className="login-card-content">
+                        <div>
+                            <Title level={2}>登录</Title>
+                            <Text type="secondary">请输入后台账号信息</Text>
+                        </div>
 
-                    {loginFormQuery.isError ? (
-                        <Alert
-                            type="error"
-                            showIcon
-                            message="登录表单初始化失败"
-                            description="请确认 admin-api 服务已启动，并检查 /admin-api 代理配置。"
-                            action={
-                                <Button size="small" onClick={() => loginFormQuery.refetch()}>
-                                    重试
-                                </Button>
-                            }
-                        />
-                    ) : null}
-
-                    <Form<LoginFormValues>
-                        layout="vertical"
-                        requiredMark={false}
-                        onFinish={(values) => loginMutation.mutate(values)}
-                    >
-                        <Form.Item
-                            label="账号"
-                            name="userName"
-                            rules={[{ required: true, message: "请输入账号" }]}
-                        >
-                            <Input
-                                size="large"
-                                prefix={<UserOutlined />}
-                                placeholder="请输入后台账号"
-                                autoComplete="username"
+                        {loginFormQuery.isError ? (
+                            <Alert
+                                type="error"
+                                showIcon
+                                message="登录表单初始化失败"
+                                description="请确认 admin-api 服务已启动，并检查 /admin-api 代理配置。"
+                                action={
+                                    <Button size="small" onClick={() => loginFormQuery.refetch()}>
+                                        重试
+                                    </Button>
+                                }
                             />
-                        </Form.Item>
+                        ) : null}
 
-                        <Form.Item
-                            label="密码"
-                            name="password"
-                            rules={[{ required: true, message: "请输入密码" }]}
+                        <Form<LoginFormValues>
+                            layout="vertical"
+                            requiredMark={false}
+                            onFinish={(values) => loginMutation.mutate(values)}
                         >
-                            <Input.Password
+                            <Form.Item
+                                label="账号"
+                                name="userName"
+                                rules={[{ required: true, message: "请输入账号" }]}
+                            >
+                                <Input
+                                    size="large"
+                                    prefix={<UserOutlined />}
+                                    placeholder="请输入后台账号"
+                                    autoComplete="username"
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="密码"
+                                name="password"
+                                rules={[{ required: true, message: "请输入密码" }]}
+                            >
+                                <Input.Password
+                                    size="large"
+                                    prefix={<LockOutlined />}
+                                    placeholder="请输入密码"
+                                    autoComplete="current-password"
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="验证码"
+                                name="captcha"
+                                rules={[{ required: true, message: "请输入验证码" }]}
+                            >
+                                <Space.Compact className="captcha-row">
+                                    <Input size="large" placeholder="验证码" autoComplete="off" />
+                                    <button
+                                        className="captcha-image-button"
+                                        type="button"
+                                        onClick={() => refreshCaptchaMutation.mutate()}
+                                        disabled={!captchaUrl || refreshCaptchaMutation.isPending}
+                                        aria-label="刷新验证码"
+                                    >
+                                        {captchaUrl ? (
+                                            <img src={captchaUrl} alt="图形验证码" />
+                                        ) : (
+                                            <ReloadOutlined />
+                                        )}
+                                    </button>
+                                </Space.Compact>
+                            </Form.Item>
+
+                            <Button
+                                block
                                 size="large"
-                                prefix={<LockOutlined />}
-                                placeholder="请输入密码"
-                                autoComplete="current-password"
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="验证码"
-                            name="captcha"
-                            rules={[{ required: true, message: "请输入验证码" }]}
-                        >
-                            <Space.Compact className="captcha-row">
-                                <Input size="large" placeholder="验证码" autoComplete="off" />
-                                <button
-                                    className="captcha-image-button"
-                                    type="button"
-                                    onClick={() => refreshCaptchaMutation.mutate()}
-                                    disabled={!captchaUrl || refreshCaptchaMutation.isPending}
-                                    aria-label="刷新验证码"
-                                >
-                                    {captchaUrl ? (
-                                        <img src={captchaUrl} alt="图形验证码" />
-                                    ) : (
-                                        <ReloadOutlined />
-                                    )}
-                                </button>
-                            </Space.Compact>
-                        </Form.Item>
-
-                        <Button
-                            block
-                            size="large"
-                            type="primary"
-                            htmlType="submit"
-                            loading={loginMutation.isPending || loginFormQuery.isLoading}
-                            disabled={!loginForm}
-                        >
-                            登录
-                        </Button>
-                    </Form>
-                </Space>
-            </Card>
-        </main>
+                                type="primary"
+                                htmlType="submit"
+                                loading={loginMutation.isPending || loginFormQuery.isLoading}
+                                disabled={!loginForm}
+                            >
+                                登录
+                            </Button>
+                        </Form>
+                    </Space>
+                </Card>
+            </main>
+        </>
     );
 };

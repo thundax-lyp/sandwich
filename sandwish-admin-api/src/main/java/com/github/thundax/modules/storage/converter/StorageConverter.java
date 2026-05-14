@@ -6,9 +6,15 @@ import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec
 import com.github.thundax.modules.storage.service.StorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class StorageConverter {
+
+    private static final String DEFAULT_CONTEXT_PATH = "/admin-api";
 
     private final String contentPath;
     private final StorageService storageService;
@@ -19,9 +25,10 @@ public class StorageConverter {
     }
 
     public String toPreviewUrl(StoredObject entity) {
-        return StringUtils.isBlank(entity.getAccessEndpoint())
+        String previewPath = StringUtils.isBlank(entity.getAccessEndpoint())
                 ? this.contentPath + StoredObjectIdCodec.toValue(entity.getId()) + "/content"
                 : entity.getAccessEndpoint();
+        return withContextPath(previewPath);
     }
 
     public StoredObject toEntity(String previewUrl) {
@@ -31,5 +38,30 @@ public class StorageConverter {
 
         String objectId = StringUtils.removeEnd(StringUtils.substringAfter(previewUrl, contentPath), "/content");
         return storageService.get(StoredObjectIdCodec.toDomain(Long.valueOf(objectId)));
+    }
+
+    private String withContextPath(String path) {
+        if (StringUtils.isBlank(path)
+                || StringUtils.startsWithIgnoreCase(path, "http://")
+                || StringUtils.startsWithIgnoreCase(path, "https://")) {
+            return path;
+        }
+        String contextPath = currentContextPath();
+        if (StringUtils.startsWith(path, contextPath + "/")) {
+            return path;
+        }
+        return UriComponentsBuilder.fromPath(contextPath).path(path).build().toUriString();
+    }
+
+    private String currentContextPath() {
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof ServletRequestAttributes) {
+            String contextPath =
+                    ((ServletRequestAttributes) attributes).getRequest().getContextPath();
+            if (StringUtils.isNotBlank(contextPath)) {
+                return contextPath;
+            }
+        }
+        return DEFAULT_CONTEXT_PATH;
     }
 }

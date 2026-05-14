@@ -1,4 +1,9 @@
-import { AppstoreOutlined, AuditOutlined, CloudServerOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+    AppstoreOutlined,
+    AuditOutlined,
+    CloudServerOutlined,
+    TeamOutlined
+} from "@ant-design/icons";
 import { Card, Typography } from "antd";
 import "./dashboard-page.css";
 
@@ -79,7 +84,10 @@ export const DashboardPage = () => {
                                 <p>较上周</p>
                             </div>
                             <svg viewBox="0 0 120 72" role="img" aria-label={`${metric.label}趋势`}>
-                                <path className="metric-chart-fill" d={`${metric.line} L112 72 L8 72 Z`} />
+                                <path
+                                    className="metric-chart-fill"
+                                    d={`${metric.line} L112 72 L8 72 Z`}
+                                />
                                 <path className="metric-chart-line" d={metric.line} />
                             </svg>
                         </div>

@@ -64,13 +64,21 @@ html[data-theme="dark"] .dictionary-page {
 }
 
 .dictionary-page .ant-btn-primary {
-    background: linear-gradient(135deg, var(--dictionary-blue), color-mix(in srgb, var(--dictionary-blue) 72%, #102542));
+    background: linear-gradient(
+        135deg,
+        var(--dictionary-blue),
+        color-mix(in srgb, var(--dictionary-blue) 72%, #102542)
+    );
     border-color: var(--dictionary-blue);
     box-shadow: var(--dictionary-blue-shadow);
 }
 
 .dictionary-page .ant-btn-primary:not(:disabled):hover {
-    background: linear-gradient(135deg, var(--dictionary-blue-hover), var(--dictionary-blue)) !important;
+    background: linear-gradient(
+        135deg,
+        var(--dictionary-blue-hover),
+        var(--dictionary-blue)
+    ) !important;
     border-color: var(--dictionary-blue-hover) !important;
 }
 
@@ -115,12 +123,11 @@ html[data-theme="dark"] .dictionary-page {
     align-items: flex-end;
     gap: 12px;
     padding: 12px;
-    background:
-        linear-gradient(
-            180deg,
-            var(--dictionary-filter-bg-start),
-            var(--dictionary-filter-bg-end)
-        );
+    background: linear-gradient(
+        180deg,
+        var(--dictionary-filter-bg-start),
+        var(--dictionary-filter-bg-end)
+    );
     border: 1px solid var(--dictionary-line);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 var(--dictionary-filter-inset);

@@ -54,7 +54,11 @@ html[data-theme="dark"] .role-page {
 }
 
 .role-page .ant-btn-primary {
-    background: linear-gradient(135deg, var(--role-blue), color-mix(in srgb, var(--role-blue) 72%, #102542));
+    background: linear-gradient(
+        135deg,
+        var(--role-blue),
+        color-mix(in srgb, var(--role-blue) 72%, #102542)
+    );
     border-color: var(--role-blue);
     box-shadow: var(--role-blue-shadow);
 }
@@ -106,12 +110,7 @@ html[data-theme="dark"] .role-page {
     align-items: flex-end;
     gap: 12px;
     padding: 12px;
-    background:
-        linear-gradient(
-            180deg,
-            var(--role-filter-bg-start),
-            var(--role-filter-bg-end)
-        );
+    background: linear-gradient(180deg, var(--role-filter-bg-start), var(--role-filter-bg-end));
     border: 1px solid var(--role-line);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 var(--role-filter-inset);

@@ -27,19 +27,10 @@ export const SandwishConfirmModal = ({
     return (
         <Modal
             {...modalProps}
-            className={[
-                "sandwish-confirm-modal",
-                `sandwish-confirm-modal-${tone}`,
-                className
-            ]
+            className={["sandwish-confirm-modal", `sandwish-confirm-modal-${tone}`, className]
                 .filter(Boolean)
                 .join(" ")}
-            rootClassName={[
-                "sandwish-confirm-modal-root",
-                rootClassName
-            ]
-                .filter(Boolean)
-                .join(" ")}
+            rootClassName={["sandwish-confirm-modal-root", rootClassName].filter(Boolean).join(" ")}
             okButtonProps={{
                 danger: tone === "danger",
                 ...okButtonProps

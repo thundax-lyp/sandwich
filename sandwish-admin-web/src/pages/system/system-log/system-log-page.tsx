@@ -76,11 +76,11 @@ export const SystemLogPage = () => {
     const [filters, setFilters] = useState<SystemLogFilters>(DEFAULT_SYSTEM_LOG_FILTERS);
     const hasActiveFilters = Boolean(
         filters.beginDate.trim() ||
-            filters.endDate.trim() ||
-            filters.remoteAddr.trim() ||
-            filters.requestUri.trim() ||
-            filters.userLoginName.trim() ||
-            filters.userName.trim()
+        filters.endDate.trim() ||
+        filters.remoteAddr.trim() ||
+        filters.requestUri.trim() ||
+        filters.userLoginName.trim() ||
+        filters.userName.trim()
     );
 
     const logQuery = useQuery({

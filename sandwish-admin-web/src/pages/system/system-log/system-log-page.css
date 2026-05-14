@@ -70,13 +70,21 @@ html[data-theme="dark"] .system-log-page {
 }
 
 .system-log-page .ant-btn-primary {
-    background: linear-gradient(135deg, var(--system-log-blue), color-mix(in srgb, var(--system-log-blue) 72%, #102542));
+    background: linear-gradient(
+        135deg,
+        var(--system-log-blue),
+        color-mix(in srgb, var(--system-log-blue) 72%, #102542)
+    );
     border-color: var(--system-log-blue);
     box-shadow: var(--system-log-blue-shadow);
 }
 
 .system-log-page .ant-btn-primary:not(:disabled):hover {
-    background: linear-gradient(135deg, var(--system-log-blue-hover), var(--system-log-blue)) !important;
+    background: linear-gradient(
+        135deg,
+        var(--system-log-blue-hover),
+        var(--system-log-blue)
+    ) !important;
     border-color: var(--system-log-blue-hover) !important;
 }
 
@@ -121,12 +129,11 @@ html[data-theme="dark"] .system-log-page {
     align-items: flex-end;
     gap: 12px;
     padding: 12px;
-    background:
-        linear-gradient(
-            180deg,
-            var(--system-log-filter-bg-start),
-            var(--system-log-filter-bg-end)
-        );
+    background: linear-gradient(
+        180deg,
+        var(--system-log-filter-bg-start),
+        var(--system-log-filter-bg-end)
+    );
     border: 1px solid var(--system-log-line);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 var(--system-log-filter-inset);

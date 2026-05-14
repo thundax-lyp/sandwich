@@ -33,9 +33,7 @@ export const SandwishBatchActionBar = ({
             >
                 已选择 {selectedCount} 项
             </Text>
-            <div className="sandwish-batch-action-bar-actions">
-                {actions}
-            </div>
+            <div className="sandwish-batch-action-bar-actions">{actions}</div>
         </div>
     );
 };

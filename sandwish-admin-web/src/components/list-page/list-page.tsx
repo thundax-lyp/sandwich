@@ -16,8 +16,10 @@ export interface ListPageFilterState {
     toggleFilter: () => void;
 }
 
-export interface ListPageProps<RecordType extends object = object>
-    extends Omit<SandwishTableProps<RecordType>, "title"> {
+export interface ListPageProps<RecordType extends object = object> extends Omit<
+    SandwishTableProps<RecordType>,
+    "title"
+> {
     batchActions?: ReactNode;
     batchClassName?: string;
     addText?: ReactNode;
@@ -78,7 +80,7 @@ export const ListPage = <RecordType extends object = object>({
     ...tableProps
 }: ListPageProps<RecordType>) => {
     const [internalFilterOpen, setInternalFilterOpen] = useState(defaultFilterOpen);
-    const actualFilterOpen = enableFilter ? filterOpen ?? internalFilterOpen : false;
+    const actualFilterOpen = enableFilter ? (filterOpen ?? internalFilterOpen) : false;
     const setFilterOpen = (open: boolean) => {
         if (filterOpen === undefined) {
             setInternalFilterOpen(open);
@@ -93,9 +95,9 @@ export const ListPage = <RecordType extends object = object>({
     };
     const resolvedPageActions =
         typeof pageActions === "function" ? pageActions(filterState) : pageActions;
-    const resolvedFilter =
-        typeof filter === "function" ? filter(filterState) : filter;
-    const resolvedSearchPlaceholder = searchPlaceholder ?? (subjectName ? `搜索${subjectName}...` : "搜索...");
+    const resolvedFilter = typeof filter === "function" ? filter(filterState) : filter;
+    const resolvedSearchPlaceholder =
+        searchPlaceholder ?? (subjectName ? `搜索${subjectName}...` : "搜索...");
     const resolvedAddText = addText ?? (subjectName ? `新增${subjectName}` : undefined);
     const headerActions = (
         <Space className="list-page-actions">
@@ -112,9 +114,7 @@ export const ListPage = <RecordType extends object = object>({
                     prefix={<SearchOutlined />}
                     suffix={
                         searchShortcut ? (
-                            <span className="list-page-search-shortcut">
-                                {searchShortcut}
-                            </span>
+                            <span className="list-page-search-shortcut">{searchShortcut}</span>
                         ) : null
                     }
                     value={searchValue}
@@ -176,9 +176,7 @@ export const ListPage = <RecordType extends object = object>({
                     <div className="list-page-table-main">
                         <SandwishTable<RecordType> {...tableProps} />
                     </div>
-                    <aside className="list-page-table-aside">
-                        {tableAside}
-                    </aside>
+                    <aside className="list-page-table-aside">{tableAside}</aside>
                 </div>
             ) : (
                 <SandwishTable<RecordType> {...tableProps} />

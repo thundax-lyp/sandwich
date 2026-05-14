@@ -20,8 +20,7 @@ html[data-theme="dark"] .sandwish-drawer-root {
     --sandwish-drawer-ambient: rgba(59, 130, 246, 0.14);
     --sandwish-drawer-line: rgba(171, 191, 222, 0.18);
     --sandwish-drawer-shadow:
-        0 28px 76px rgba(0, 0, 0, 0.52),
-        inset 1px 0 0 var(--sandwish-drawer-edge-glow);
+        0 28px 76px rgba(0, 0, 0, 0.52), inset 1px 0 0 var(--sandwish-drawer-edge-glow);
 }
 
 body:has(.admin-main[data-sidebar-state="collapsed"]) .sandwish-drawer-root {
@@ -65,8 +64,16 @@ html[data-theme="dark"] .sandwish-drawer-root .ant-drawer-mask {
     pointer-events: none;
     content: "";
     background:
-        linear-gradient(90deg, color-mix(in srgb, var(--sandwish-drawer-edge-glow) 82%, transparent), transparent 18%),
-        linear-gradient(180deg, color-mix(in srgb, var(--sandwish-drawer-edge-glow) 62%, transparent), transparent 28%);
+        linear-gradient(
+            90deg,
+            color-mix(in srgb, var(--sandwish-drawer-edge-glow) 82%, transparent),
+            transparent 18%
+        ),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--sandwish-drawer-edge-glow) 62%, transparent),
+            transparent 28%
+        );
     opacity: 0.62;
 }
 

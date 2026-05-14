@@ -20,19 +20,11 @@ export const SandwishDrawer = ({
     return (
         <Drawer
             {...drawerProps}
-            className={[
-                "sandwish-drawer",
-                `sandwish-drawer-${size}`,
-                className
-            ]
+            className={["sandwish-drawer", `sandwish-drawer-${size}`, className]
                 .filter(Boolean)
                 .join(" ")}
             placement={placement}
-            rootClassName={[
-                "sandwish-drawer-root",
-                `sandwish-drawer-root-${size}`,
-                rootClassName
-            ]
+            rootClassName={["sandwish-drawer-root", `sandwish-drawer-root-${size}`, rootClassName]
                 .filter(Boolean)
                 .join(" ")}
             size={drawerSize}

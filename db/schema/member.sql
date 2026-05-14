@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `member_member` (
     `id` bigint NOT NULL,
     `name` varchar(128) DEFAULT NULL,

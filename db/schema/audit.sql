@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `audit_meta` (
     `id` bigint NOT NULL,
     `object_type` varchar(64) NOT NULL,

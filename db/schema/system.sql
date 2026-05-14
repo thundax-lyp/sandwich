@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `sys_department` (
     `id` bigint NOT NULL,
     `parent_id` bigint DEFAULT NULL,

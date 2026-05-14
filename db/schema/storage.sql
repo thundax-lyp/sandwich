@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `assist_storage` (
     `id` bigint NOT NULL,
     `name` varchar(255) NOT NULL,

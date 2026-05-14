@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 -- Default front-api member account:
 --   account: member
 --   password hash is initialized from the deployment default password and must be rotated.

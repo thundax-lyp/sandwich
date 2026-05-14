@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `auth_principal_identity` (
     `id` bigint NOT NULL,
     `principal_type` varchar(32) NOT NULL,

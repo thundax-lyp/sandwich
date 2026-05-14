@@ -1,3 +1,5 @@
+SET NAMES utf8mb4;
+
 -- Execute after db/data/system.sql so user_id and identity_id references are stable.
 -- Default principal accounts:
 --   admin-api: developer / Q1w2e3r$

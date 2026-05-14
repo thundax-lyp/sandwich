@@ -79,8 +79,42 @@ html[data-theme="dark"] .user-page {
     color: var(--user-copy);
 }
 
+.user-page .sandwish-page-panel {
+    overflow: visible;
+    padding-bottom: 0;
+}
+
+.user-page .list-page-table-aside {
+    position: sticky;
+    top: var(--user-department-sticky-top, 88px);
+    z-index: 2;
+    align-self: start;
+    height: max(
+        360px,
+        calc(
+            100vh - var(--user-department-floating-top, 218px) -
+                var(--user-department-floating-bottom, 12px)
+        )
+    );
+    max-height: calc(
+        100vh - var(--user-department-sticky-top, 88px) -
+            var(--user-department-floating-bottom, 12px)
+    );
+}
+
+.user-page .list-page-table-area {
+    min-height: calc(
+        100vh - var(--user-department-sticky-top, 88px) -
+            var(--user-department-floating-bottom, 12px)
+    );
+}
+
 .user-page .ant-btn-primary {
-    background: linear-gradient(135deg, var(--user-blue), color-mix(in srgb, var(--user-blue) 72%, #102542));
+    background: linear-gradient(
+        135deg,
+        var(--user-blue),
+        color-mix(in srgb, var(--user-blue) 72%, #102542)
+    );
     border-color: var(--user-blue);
     box-shadow: var(--user-blue-shadow);
 }
@@ -126,17 +160,15 @@ html[data-theme="dark"] .user-page {
 
 .user-filter-form {
     display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(86px, 120px) minmax(86px, 120px);
+    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) minmax(86px, 120px) minmax(
+            86px,
+            120px
+        );
     min-width: 0;
     align-items: flex-end;
     gap: 12px;
     padding: 12px;
-    background:
-        linear-gradient(
-            180deg,
-            var(--user-filter-bg-start),
-            var(--user-filter-bg-end)
-        );
+    background: linear-gradient(180deg, var(--user-filter-bg-start), var(--user-filter-bg-end));
     border: 1px solid var(--user-line);
     border-radius: 10px;
     box-shadow: inset 0 1px 0 var(--user-filter-inset);
@@ -206,8 +238,8 @@ html[data-theme="dark"] .user-page {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     gap: 10px;
-    min-height: 420px;
-    max-height: min(620px, calc(100vh - 250px));
+    height: 100%;
+    min-height: 0;
     padding: 12px;
     overflow: hidden;
     color: var(--user-ink);

@@ -10,9 +10,20 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Avatar, Button, Dropdown, Input, Select, Space, Tag, Tree, Typography, message } from "antd";
+import {
+    Avatar,
+    Button,
+    Dropdown,
+    Input,
+    Select,
+    Space,
+    Tag,
+    Tree,
+    Typography,
+    message
+} from "antd";
 import type { DataNode } from "antd/es/tree";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
@@ -57,6 +68,9 @@ const DEFAULT_USER_FILTERS: UserFilters = {
     enable: "ALL"
 };
 
+const EMPTY_USERS: UserResponse[] = [];
+const EMPTY_DEPARTMENTS: UserDepartmentResponse[] = [];
+
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
     return normalizedValue || undefined;
@@ -94,7 +108,10 @@ const roleClassName = (user: UserResponse, index: number) => {
     return index === 0 ? "user-role-editor" : "user-role-viewer";
 };
 
-const collectDepartmentIds = (departments: UserDepartmentResponse[], departmentId: string): string[] => {
+const collectDepartmentIds = (
+    departments: UserDepartmentResponse[],
+    departmentId: string
+): string[] => {
     const children = departments.filter((department) => department.parentId === departmentId);
     return [
         departmentId,
@@ -112,7 +129,8 @@ const countDepartmentUsers = (
         return totalCount;
     }
     const departmentIds = new Set(collectDepartmentIds(departments, departmentId));
-    return users.filter((user) => user.department?.id && departmentIds.has(user.department.id)).length;
+    return users.filter((user) => user.department?.id && departmentIds.has(user.department.id))
+        .length;
 };
 
 const buildDepartmentTree = (
@@ -129,7 +147,8 @@ const buildDepartmentTree = (
     const allDepartments = [rootDepartment, ...departments];
     const childrenByParentId = new Map<string | null | undefined, UserDepartmentResponse[]>();
     allDepartments.forEach((department) => {
-        const parentId = department.parentId || (department.id === ALL_DEPARTMENT_ID ? null : ALL_DEPARTMENT_ID);
+        const parentId =
+            department.parentId || (department.id === ALL_DEPARTMENT_ID ? null : ALL_DEPARTMENT_ID);
         const children = childrenByParentId.get(parentId) || [];
         children.push(department);
         childrenByParentId.set(parentId, children);
@@ -190,6 +209,7 @@ const toEnableQueryValue = (enable: UserFilterStatus) => {
 export const UserPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const queryClient = useQueryClient();
+    const departmentPanelRef = useRef<HTMLDivElement | null>(null);
     const [query, setQuery] = useState<UserPageRequest>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
@@ -215,14 +235,89 @@ export const UserPage = () => {
         retry: false
     });
     const pageData = userQuery.data;
-    const users = pageData?.records || [];
+    const users = useMemo(() => pageData?.records ?? EMPTY_USERS, [pageData?.records]);
     const totalCount = pageData?.count ?? pageData?.totalCount ?? 0;
-    const departments = departmentQuery.data || [];
+    const departments = useMemo(
+        () => departmentQuery.data ?? EMPTY_DEPARTMENTS,
+        [departmentQuery.data]
+    );
     const departmentTreeData = useMemo(
         () => buildDepartmentTree(departments, users, totalCount),
         [departments, totalCount, users]
     );
-    const departmentTreeKeys = useMemo(() => collectTreeKeys(departmentTreeData), [departmentTreeData]);
+    const departmentTreeKeys = useMemo(
+        () => collectTreeKeys(departmentTreeData),
+        [departmentTreeData]
+    );
+
+    useEffect(() => {
+        const departmentPanel = departmentPanelRef.current;
+        if (!departmentPanel) {
+            return undefined;
+        }
+
+        let frame = 0;
+        const updateFloatingBounds = () => {
+            frame = 0;
+            const floatingContainer =
+                departmentPanel.closest<HTMLElement>(".list-page-table-aside") ?? departmentPanel;
+            const tableArea =
+                departmentPanel.closest<HTMLElement>(".list-page-table-area") ?? floatingContainer;
+            const topbar = document.querySelector(".topbar")?.getBoundingClientRect();
+            const sidebar = document.querySelector(".sidebar")?.getBoundingClientRect();
+            const stickyTop = Math.ceil((topbar?.bottom ?? 76) + 12);
+            const bottomInset = Math.max(
+                12,
+                Math.round(window.innerHeight - (sidebar?.bottom ?? window.innerHeight - 12))
+            );
+            const floatingTop = Math.max(
+                stickyTop,
+                Math.ceil(floatingContainer.getBoundingClientRect().top)
+            );
+
+            floatingContainer.style.setProperty("--user-department-sticky-top", `${stickyTop}px`);
+            floatingContainer.style.setProperty(
+                "--user-department-floating-top",
+                `${floatingTop}px`
+            );
+            floatingContainer.style.setProperty(
+                "--user-department-floating-bottom",
+                `${bottomInset}px`
+            );
+            tableArea.style.setProperty("--user-department-sticky-top", `${stickyTop}px`);
+            tableArea.style.setProperty("--user-department-floating-bottom", `${bottomInset}px`);
+        };
+        const scheduleUpdate = () => {
+            if (frame) {
+                return;
+            }
+            frame = window.requestAnimationFrame(updateFloatingBounds);
+        };
+
+        updateFloatingBounds();
+        window.addEventListener("scroll", scheduleUpdate, { passive: true });
+        window.addEventListener("resize", scheduleUpdate);
+
+        const observer =
+            typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleUpdate);
+        const topbarElement = document.querySelector(".topbar");
+        const sidebarElement = document.querySelector(".sidebar");
+        if (observer && topbarElement) {
+            observer.observe(topbarElement);
+        }
+        if (observer && sidebarElement) {
+            observer.observe(sidebarElement);
+        }
+
+        return () => {
+            if (frame) {
+                window.cancelAnimationFrame(frame);
+            }
+            window.removeEventListener("scroll", scheduleUpdate);
+            window.removeEventListener("resize", scheduleUpdate);
+            observer?.disconnect();
+        };
+    }, [departmentTreeData]);
 
     const invalidateUserPage = async () => {
         await queryClient.invalidateQueries({ queryKey: ["user", "page"] });
@@ -399,11 +494,7 @@ export const UserPage = () => {
             dataIndex: "enable",
             key: "status",
             width: DEFAULT_COLUMN_WIDTHS.status,
-            render: (_, user) => (
-                <Tag className={statusClassName(user)}>
-                    {statusLabel(user)}
-                </Tag>
-            )
+            render: (_, user) => <Tag className={statusClassName(user)}>{statusLabel(user)}</Tag>
         },
         {
             title: "排序",
@@ -618,7 +709,7 @@ export const UserPage = () => {
                 }}
                 tableAsidePlacement="left"
                 tableAside={
-                    <div className="user-department-panel">
+                    <div className="user-department-panel" ref={departmentPanelRef}>
                         <div className="user-department-panel-head">
                             <Space size={8}>
                                 <ApartmentOutlined />

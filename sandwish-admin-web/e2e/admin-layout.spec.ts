@@ -18,6 +18,91 @@ const expectNoPageHorizontalOverflow = async (page: Page) => {
     ).toBeLessThanOrEqual(metrics.viewportWidth);
 };
 
+const mockUserManagementApis = async (page: Page) => {
+    await page.route("**/admin-api/api/sys/user/department/tree", async (route) => {
+        await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({
+                code: "COMMON-00000",
+                message: "success",
+                data: [
+                    {
+                        id: "100",
+                        name: "技术中心",
+                        shortName: "技术",
+                        namePath: "技术中心"
+                    },
+                    {
+                        id: "101",
+                        parentId: "100",
+                        name: "平台研发部",
+                        shortName: "平台",
+                        namePath: "技术中心/平台研发部"
+                    },
+                    {
+                        id: "102",
+                        parentId: "100",
+                        name: "质量保障部",
+                        shortName: "质量",
+                        namePath: "技术中心/质量保障部"
+                    }
+                ]
+            })
+        });
+    });
+    await page.route("**/admin-api/api/sys/user/page", async (route) => {
+        await route.fulfill({
+            contentType: "application/json",
+            body: JSON.stringify({
+                code: "COMMON-00000",
+                message: "success",
+                data: {
+                    pageNo: 1,
+                    pageSize: 10,
+                    totalCount: 18,
+                    records: Array.from({ length: 10 }, (_, index) => ({
+                        id: String(index + 1),
+                        loginName: `user${index + 1}`,
+                        name: `User ${index + 1}`,
+                        email: `user${index + 1}@example.com`,
+                        ranks: index + 1,
+                        enable: index % 3 !== 0,
+                        department: {
+                            id: index % 2 ? "101" : "102",
+                            name: index % 2 ? "平台研发部" : "质量保障部",
+                            namePath: index % 2 ? "技术中心/平台研发部" : "技术中心/质量保障部"
+                        },
+                        roles: [{ id: "r1", name: index % 2 ? "管理员" : "观察员" }]
+                    }))
+                }
+            })
+        });
+    });
+};
+
+const readUserDepartmentPanelMetrics = async (page: Page) => {
+    return page.evaluate(() => {
+        const rect = (selector: string) => {
+            const element = document.querySelector(selector);
+            if (!element) {
+                throw new Error(`${selector} not found`);
+            }
+            const bounds = element.getBoundingClientRect();
+            return {
+                bottom: bounds.bottom,
+                height: bounds.height,
+                top: bounds.top
+            };
+        };
+
+        return {
+            panel: rect(".user-department-panel"),
+            sidebar: rect(".sidebar"),
+            topbar: rect(".topbar")
+        };
+    });
+};
+
 test.describe("admin layout", () => {
     test.beforeEach(async ({ page }) => {
         await page.route("**/admin-api/api/sys/current-user/info", async (route) => {
@@ -198,5 +283,32 @@ test.describe("admin layout", () => {
         await expect(main).toHaveCSS("width", "370px");
         await expect(workspaceContent).toHaveCSS("width", "338px");
         await expectNoPageHorizontalOverflow(page);
+    });
+
+    test("keeps the user department tree floating below the topbar", async ({ page }) => {
+        await mockUserManagementApis(page);
+        await page.setViewportSize({ width: 1280, height: 800 });
+        await page.goto("/system/users");
+
+        await expect(page.getByRole("heading", { name: "用户管理" })).toBeVisible();
+        const initialMetrics = await readUserDepartmentPanelMetrics(page);
+        expect(initialMetrics.panel.top).toBeGreaterThan(initialMetrics.topbar.bottom);
+        expect(
+            Math.abs(initialMetrics.panel.bottom - initialMetrics.sidebar.bottom)
+        ).toBeLessThanOrEqual(2);
+
+        await page.evaluate(() => window.scrollTo(0, 160));
+        await expect
+            .poll(async () => {
+                const metrics = await readUserDepartmentPanelMetrics(page);
+                return {
+                    bottomWithinSidebar: metrics.panel.bottom <= metrics.sidebar.bottom + 2,
+                    belowTopbar: metrics.panel.top >= metrics.topbar.bottom
+                };
+            })
+            .toEqual({
+                belowTopbar: true,
+                bottomWithinSidebar: true
+            });
     });
 });

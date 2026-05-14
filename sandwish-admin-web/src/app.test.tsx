@@ -537,26 +537,118 @@ describe("App", () => {
     });
 
     it("renders the silver user management layout interactions", async () => {
-        render(<UserPage />);
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["sys:user:view", "sys:user:edit"])
+        );
+        replacePermissions(["sys:user:view", "sys:user:edit"]);
+        vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
+            const url = String(input);
+            if (url.endsWith("/sys/user/department/tree")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: [
+                                {
+                                    id: "1",
+                                    name: "Product",
+                                    namePath: "Product"
+                                }
+                            ]
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+            if (url.endsWith("/sys/user/page")) {
+                const body = init?.body ? JSON.parse(String(init.body)) : {};
+                const allUsers = [
+                    {
+                        id: "1",
+                        loginName: "ethan",
+                        name: "Ethan Chen",
+                        email: "ethan@example.com",
+                        ranks: 1,
+                        enable: true,
+                        department: { id: "1", name: "Product", namePath: "Product" },
+                        roles: [{ id: "r1", name: "管理员" }]
+                    },
+                    {
+                        id: "2",
+                        loginName: "olivia",
+                        name: "Olivia Martinez",
+                        email: "olivia@example.com",
+                        ranks: 2,
+                        enable: false,
+                        department: { id: "1", name: "Product", namePath: "Product" },
+                        roles: [{ id: "r2", name: "观察员" }]
+                    }
+                ];
+                const records = body.name
+                    ? allUsers.filter((user) =>
+                          user.name.toLowerCase().includes(String(body.name).toLowerCase())
+                      )
+                    : allUsers;
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalCount: records.length,
+                                records
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <UserPage />
+            </QueryClientProvider>
+        );
 
         expect(screen.getByRole("heading", { name: "用户管理" })).toBeInTheDocument();
-        expect(screen.getByText("Ethan Chen")).toBeInTheDocument();
+        expect(await screen.findByText("Ethan Chen")).toBeInTheDocument();
 
-        await userEvent.type(screen.getByPlaceholderText("搜索用户..."), "olivia");
+        fireEvent.change(screen.getByPlaceholderText("搜索用户..."), {
+            target: { value: "olivia" }
+        });
 
-        expect(screen.getByText("Olivia Martinez")).toBeInTheDocument();
-        expect(screen.queryByText("Ethan Chen")).not.toBeInTheDocument();
+        expect(await screen.findByText("Olivia Martinez")).toBeInTheDocument();
+        await waitFor(() => expect(screen.queryByText("Ethan Chen")).not.toBeInTheDocument());
 
-        await userEvent.click(screen.getByRole("button", { name: "编辑 Olivia Martinez" }));
+        fireEvent.click(screen.getByRole("button", { name: "编辑 Olivia Martinez" }));
 
         expect(await screen.findByText("编辑用户")).toBeInTheDocument();
         expect(screen.getByDisplayValue("Olivia Martinez")).toBeInTheDocument();
 
-        await userEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));
+        fireEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));
 
         expect((await screen.findAllByText("删除用户")).length).toBeGreaterThan(0);
-        expect(screen.getByText("确认删除这个用户？")).toBeInTheDocument();
-    });
+        expect(screen.getByText("确认删除 Olivia Martinez？")).toBeInTheDocument();
+    }, 10000);
 
     it("emits sortable table row movement", () => {
         const records = [

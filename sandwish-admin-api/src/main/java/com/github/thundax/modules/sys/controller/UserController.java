@@ -181,6 +181,7 @@ public class UserController {
     @HasPermission("sys:user:view")
     @SysLogger("分页")
     @PostMapping(value = "page")
+    @WrappedApiResponse
     public PageResponse<UserResponse> page(@Valid @RequestBody UserQueryRequest request) {
         UserQuery query = readQuery(request);
 

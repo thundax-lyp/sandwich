@@ -22,6 +22,10 @@
     justify-content: flex-end;
 }
 
+.sandwish-batch-action-bar-actions .ant-space-item:has(.ant-btn-dangerous) {
+    order: 10;
+}
+
 .sandwish-batch-action-bar-muted .sandwish-batch-action-bar-count {
     color: var(--sandwish-batch-action-bar-muted);
 }

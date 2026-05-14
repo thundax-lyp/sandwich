@@ -5,11 +5,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
+import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
+import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
@@ -25,8 +30,11 @@ import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 public class StorageControllerContractTest {
 
@@ -61,6 +69,31 @@ public class StorageControllerContractTest {
         assertEquals("image/png", queryCaptor.getValue().getContentType());
         assertEquals("avatar", queryCaptor.getValue().getOriginalFilename());
         assertEquals("profile", queryCaptor.getValue().getRemarks());
+    }
+
+    @Test
+    public void shouldWrapPageJsonResponseWithApiResponseAdvice() throws Exception {
+        StorageService storageService = mock(StorageService.class);
+        StoredObject storage = storage(1001L);
+        storage.setOriginalFilename("profile.png");
+        storage.setContentType("image/png");
+        when(storageService.page(any(StorageQuery.class), any(PageQuery.class)))
+                .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(storage)));
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(
+                        controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class)))
+                .setControllerAdvice(new ApiResponseBodyAdvice())
+                .build();
+
+        mockMvc.perform(post("/api/storage/object/page")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"pageNo\":1,\"pageSize\":10}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
+                .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
+                .andExpect(jsonPath("$.data.count").value(1))
+                .andExpect(jsonPath("$.data.records[0].id").value("1001"))
+                .andExpect(jsonPath("$.data.records[0].originalFilename").value("profile.png"));
     }
 
     @Test

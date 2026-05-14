@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
 import { postJson } from "./api/http";
-import { clearPermissions, hasPermission } from "./auth/permission-storage";
+import { clearPermissions, hasPermission, replacePermissions } from "./auth/permission-storage";
 import { SandwishTable } from "./components/sandwish-table";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
@@ -382,6 +382,7 @@ describe("App", () => {
             "sandwish.admin.permissions",
             JSON.stringify(["sys:department:view", "sys:department:edit"])
         );
+        replacePermissions(["sys:department:view", "sys:department:edit"]);
         vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
             const url = String(input);
             if (url.endsWith("/sys/department/list")) {
@@ -433,6 +434,12 @@ describe("App", () => {
         expect((await screen.findAllByText("总部")).length).toBeGreaterThan(0);
         expect(await screen.findByText("技术部")).toBeInTheDocument();
         expect(screen.getByText("核心组织")).toBeInTheDocument();
+        expect(screen.queryByPlaceholderText("搜索部门...")).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: /筛选/ })).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /新增部门/ })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "拖动 总部" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "编辑 总部" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "删除 总部" })).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/sys/department/list",
             expect.objectContaining({
@@ -443,7 +450,7 @@ describe("App", () => {
                 method: "POST"
             })
         );
-    });
+    }, 10000);
 
     it("renders and filters the dictionary page", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "test-token");

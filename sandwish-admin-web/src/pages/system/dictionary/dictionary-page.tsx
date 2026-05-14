@@ -104,9 +104,9 @@ export const DictionaryPage = () => {
     });
     const dictionaryPage = dictionaryQuery.data;
     const dictionaries = useMemo(() => dictionaryPage?.records || [], [dictionaryPage?.records]);
-    const totalCount = dictionaryPage?.totalCount || 0;
-    const currentPageNo = query.pageNo || DEFAULT_PAGE_NO;
-    const currentPageSize = query.pageSize || DEFAULT_PAGE_SIZE;
+    const totalCount = dictionaryPage?.count ?? dictionaryPage?.totalCount ?? 0;
+    const currentPageNo = dictionaryPage?.pageNo || query.pageNo || DEFAULT_PAGE_NO;
+    const currentPageSize = dictionaryPage?.pageSize || query.pageSize || DEFAULT_PAGE_SIZE;
 
     const saveMutation = useMutation({
         mutationFn: (values: DictSaveRequest) =>

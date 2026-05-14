@@ -84,6 +84,7 @@ public class StorageController {
         @ApiImplicitParam(name = "X-Access-Token", value = "令牌", paramType = "header", dataTypeClass = String.class),
     })
     @PostMapping(value = "page")
+    @WrappedApiResponse
     public PageResponse<StorageResponse> page(@Valid @RequestBody StoragePageRequest request) {
         StorageQuery query = StorageInterfaceAssembler.toQuery(request);
         return PageResponseHelper.fromPageResult(

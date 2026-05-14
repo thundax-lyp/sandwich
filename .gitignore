@@ -12,6 +12,7 @@
 
 # Log file
 *.log
+/storage/
 
 # BlueJ files
 *.ctxt

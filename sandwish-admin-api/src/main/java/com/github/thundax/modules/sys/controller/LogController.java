@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,10 +74,21 @@ public class LogController {
     }
 
     private LogResponse toResponse(Log log) {
-        User user = userService.get(UserIdCodec.toDomain(Long.valueOf(log.getUserId())));
+        User user = getLogUser(log);
         Department department = user == null ? null : departmentService.get(user.getDepartmentId());
         return LogInterfaceAssembler.toResponse(
                 log, user, getAccountLoginName(user), department, departmentService::get);
+    }
+
+    private User getLogUser(Log log) {
+        if (log == null || StringUtils.isBlank(log.getUserId())) {
+            return null;
+        }
+        try {
+            return userService.get(UserIdCodec.toDomain(Long.valueOf(log.getUserId())));
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
     }
 
     private String getAccountLoginName(User user) {

@@ -11,9 +11,12 @@ export interface SandwishDrawerProps extends Omit<DrawerProps, "size" | "width">
 export const SandwishDrawer = ({
     className,
     placement = "right",
-    size = "middle",
+    rootClassName,
+    size = "small",
     ...drawerProps
 }: SandwishDrawerProps) => {
+    const drawerSize = `var(--sandwish-drawer-${size}-width)`;
+
     return (
         <Drawer
             {...drawerProps}
@@ -25,7 +28,14 @@ export const SandwishDrawer = ({
                 .filter(Boolean)
                 .join(" ")}
             placement={placement}
-            width={`var(--sandwish-drawer-${size}-width)`}
+            rootClassName={[
+                "sandwish-drawer-root",
+                `sandwish-drawer-root-${size}`,
+                rootClassName
+            ]
+                .filter(Boolean)
+                .join(" ")}
+            size={drawerSize}
         />
     );
 };

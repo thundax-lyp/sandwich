@@ -121,6 +121,16 @@ public class StoredObjectDaoImplTest {
         assertParamsContain(wrapperCaptor.getValue(), "text/plain", "ACTIVE");
     }
 
+    @Test
+    public void shouldReturnZeroWhenMaxPriorityResultIsNull() {
+        StoredObjectMapper mapper = mock(StoredObjectMapper.class);
+        StoredObjectReferenceMapper referenceMapper = mock(StoredObjectReferenceMapper.class);
+        StoredObjectDaoImpl dao = dao(mapper, referenceMapper);
+        when(mapper.selectObjs(any())).thenReturn(Collections.singletonList(null));
+
+        assertEquals(0, dao.maxPriority());
+    }
+
     private StoredObjectDaoImpl dao(StoredObjectMapper mapper, StoredObjectReferenceMapper referenceMapper) {
         return new StoredObjectDaoImpl(mapper, referenceMapper, mock(StorageCacheSupport.class));
     }

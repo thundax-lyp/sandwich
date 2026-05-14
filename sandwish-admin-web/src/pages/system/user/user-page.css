@@ -290,14 +290,12 @@ html[data-theme="dark"] .user-page {
 }
 
 .user-department-node {
-    display: flex;
+    display: block;
     min-width: 0;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
 }
 
 .user-department-node > span:first-child {
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

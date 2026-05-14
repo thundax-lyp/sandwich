@@ -109,36 +109,7 @@ const roleClassName = (user: UserResponse, index: number) => {
     return index === 0 ? "user-role-editor" : "user-role-viewer";
 };
 
-const collectDepartmentIds = (
-    departments: UserDepartmentResponse[],
-    departmentId: string
-): string[] => {
-    const children = departments.filter((department) => department.parentId === departmentId);
-    return [
-        departmentId,
-        ...children.flatMap((department) => collectDepartmentIds(departments, department.id))
-    ];
-};
-
-const countDepartmentUsers = (
-    departments: UserDepartmentResponse[],
-    departmentId: string,
-    users: UserResponse[],
-    totalCount: number
-) => {
-    if (departmentId === ALL_DEPARTMENT_ID) {
-        return totalCount;
-    }
-    const departmentIds = new Set(collectDepartmentIds(departments, departmentId));
-    return users.filter((user) => user.department?.id && departmentIds.has(user.department.id))
-        .length;
-};
-
-const buildDepartmentTree = (
-    departments: UserDepartmentResponse[],
-    users: UserResponse[],
-    totalCount: number
-): DataNode[] => {
+const buildDepartmentTree = (departments: UserDepartmentResponse[]): DataNode[] => {
     const rootDepartment: UserDepartmentResponse = {
         id: ALL_DEPARTMENT_ID,
         parentId: null,
@@ -160,9 +131,6 @@ const buildDepartmentTree = (
         title: (
             <span className="user-department-node">
                 <span>{department.name}</span>
-                <Text type="secondary">
-                    {countDepartmentUsers(departments, department.id, users, totalCount)}
-                </Text>
             </span>
         ),
         children: childrenByParentId.get(department.id)?.map(toNode)
@@ -242,10 +210,7 @@ export const UserPage = () => {
         () => departmentQuery.data ?? EMPTY_DEPARTMENTS,
         [departmentQuery.data]
     );
-    const departmentTreeData = useMemo(
-        () => buildDepartmentTree(departments, users, totalCount),
-        [departments, totalCount, users]
-    );
+    const departmentTreeData = useMemo(() => buildDepartmentTree(departments), [departments]);
     const departmentTreeKeys = useMemo(
         () => collectTreeKeys(departmentTreeData),
         [departmentTreeData]
@@ -720,7 +685,6 @@ export const UserPage = () => {
                                 <ApartmentOutlined />
                                 <Text strong>部门</Text>
                             </Space>
-                            <Text type="secondary">{totalCount} 人</Text>
                         </div>
                         <Tree
                             key={departmentTreeKeys.join(",")}

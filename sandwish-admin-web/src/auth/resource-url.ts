@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { getAccessToken, subscribeAccessTokenChange } from "./token-storage";
+import { getAccessToken } from "./token-storage";
 
 export const toAuthenticatedResourceUrl = (
     resourceUrl?: string | null,
@@ -14,14 +13,4 @@ export const toAuthenticatedResourceUrl = (
     return url.origin === window.location.origin
         ? `${url.pathname}${url.search}${url.hash}`
         : url.toString();
-};
-
-export const useCurrentAccessToken = () => {
-    const [accessToken, setAccessToken] = useState(() => getAccessToken());
-
-    useEffect(() => {
-        return subscribeAccessTokenChange(() => setAccessToken(getAccessToken()));
-    }, []);
-
-    return accessToken;
 };

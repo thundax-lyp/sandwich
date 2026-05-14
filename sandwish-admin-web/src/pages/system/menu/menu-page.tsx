@@ -9,7 +9,7 @@ import {
     ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Input, InputNumber, Select, Space, Tag, Typography, message } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
@@ -113,7 +113,7 @@ const toMoveType = (position: SandwishTableSortPosition): MenuMoveRequest["type"
 };
 
 export const MenuPage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [editForm] = Form.useForm<MenuFormValues>();
     const queryClient = useQueryClient();
     const [editingMenu, setEditingMenu] = useState<MenuTableNode | null>(null);
@@ -361,7 +361,9 @@ export const MenuPage = () => {
                             aria-label={`降级 ${menu.name}`}
                             className="sandwish-table-row-action"
                             disabled={
-                                !canEditMenu || !readPreviousSiblingMenu(menu) || moveMutation.isPending
+                                !canEditMenu ||
+                                !readPreviousSiblingMenu(menu) ||
+                                moveMutation.isPending
                             }
                             icon={<ArrowRightOutlined />}
                             type="text"
@@ -399,7 +401,6 @@ export const MenuPage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<MenuTableNode>
                 pageClassName="menu-page"
                 title="菜单管理"
@@ -411,7 +412,11 @@ export const MenuPage = () => {
                             刷新
                         </Button>
                         {canEditMenu ? (
-                            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateEditor}>
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={openCreateEditor}
+                            >
                                 新增菜单
                             </Button>
                         ) : null}
@@ -460,12 +465,20 @@ export const MenuPage = () => {
                     </div>
                 }
             >
-                <Form<MenuFormValues> form={editForm} layout="vertical" className="menu-editor-form">
+                <Form<MenuFormValues>
+                    form={editForm}
+                    layout="vertical"
+                    className="menu-editor-form"
+                >
                     <Form.Item name="id" hidden>
                         <Input />
                     </Form.Item>
                     <Form.Item name="parentId" label="上级菜单">
-                        <Select allowClear placeholder="不选择则作为根菜单" options={parentOptions} />
+                        <Select
+                            allowClear
+                            placeholder="不选择则作为根菜单"
+                            options={parentOptions}
+                        />
                     </Form.Item>
                     <Form.Item
                         name="name"
@@ -492,7 +505,12 @@ export const MenuPage = () => {
                         />
                     </Form.Item>
                     <Form.Item name="displayParams" label="显示参数">
-                        <TextArea rows={3} maxLength={1000} showCount placeholder='例如：{"icon":"menu"}' />
+                        <TextArea
+                            rows={3}
+                            maxLength={1000}
+                            showCount
+                            placeholder='例如：{"icon":"menu"}'
+                        />
                     </Form.Item>
                     <Form.Item name="remarks" label="备注">
                         <TextArea rows={3} maxLength={200} showCount placeholder="菜单说明" />

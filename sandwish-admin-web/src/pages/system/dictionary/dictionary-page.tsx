@@ -7,17 +7,7 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-    Button,
-    Dropdown,
-    Form,
-    Input,
-    Modal,
-    Space,
-    Tag,
-    Typography,
-    message
-} from "antd";
+import { App, Button, Dropdown, Form, Input, Modal, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
@@ -81,7 +71,7 @@ const readFormRequest = (values: DictFormValues): DictSaveRequest => {
 };
 
 export const DictionaryPage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [editForm] = Form.useForm<DictFormValues>();
     const queryClient = useQueryClient();
     const canEditDictionary = hasPermission("sys:dict:edit");
@@ -312,7 +302,6 @@ export const DictionaryPage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<DictResponse>
                 pageClassName="dictionary-page"
                 title="字典管理"

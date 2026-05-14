@@ -47,6 +47,7 @@ import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
@@ -207,6 +208,7 @@ public class UserController {
         request.setLoginPass(password);
         validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
+        validateCreatableRank(currentUserResolver.currentUser(), request);
 
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
             throw AdminResponseExceptions.invalidParameter("loginName");
@@ -567,6 +569,20 @@ public class UserController {
                 || targetUser == null
                 || targetUser.getRank() == null
                 || targetUser.getRank().value() >= currentUser.getRank().value()) {
+            throw AdminResponseExceptions.permissionDenied();
+        }
+    }
+
+    private void validateCreatableRank(User currentUser, UserSaveRequest request) {
+        int currentRank = currentUser == null || currentUser.getRank() == null
+                ? AccessRank.MIN_VALUE
+                : currentUser.getRank().value();
+        int maxRank = Math.max(currentRank - 1, AccessRank.MIN_VALUE);
+        if (request.getRanks() == null) {
+            request.setRanks(maxRank);
+            return;
+        }
+        if (request.getRanks() > maxRank) {
             throw AdminResponseExceptions.permissionDenied();
         }
     }

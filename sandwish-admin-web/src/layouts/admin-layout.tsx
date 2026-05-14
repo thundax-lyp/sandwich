@@ -15,7 +15,7 @@ import {
     TeamOutlined,
     UserOutlined
 } from "@ant-design/icons";
-import { Alert, Avatar, Button, Dropdown, Layout, Menu, Space, Typography, message } from "antd";
+import { Alert, App, Avatar, Button, Dropdown, Layout, Menu, Space, Typography } from "antd";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { MenuProps } from "antd";
 import { useEffect, useState } from "react";
@@ -23,8 +23,9 @@ import type { ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../api/auth-api";
 import { refreshAccessTokenIfNeeded } from "../api/http";
+import { useCurrentAccessToken } from "../auth/hooks";
 import { replacePermissions } from "../auth/permission-storage";
-import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "../auth/resource-url";
+import { toAuthenticatedResourceUrl } from "../auth/resource-url";
 import { clearAccessToken, getAccessToken } from "../auth/token-storage";
 import { SandwichLogo } from "../components/sandwich-logo";
 import {
@@ -159,7 +160,7 @@ const buildAuthorizedMenuItems = (
 export const AdminLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [themeName, setThemeName] = useState<"light" | "dark">(getStoredTheme);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isMobileLayout, setIsMobileLayout] = useState(false);
@@ -268,7 +269,6 @@ export const AdminLayout = () => {
 
     return (
         <Layout className="admin-shell">
-            {contextHolder}
             {isMobileLayout && !sidebarCollapsed ? (
                 <button
                     className="sidebar-backdrop"

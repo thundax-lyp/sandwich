@@ -10,7 +10,7 @@ import {
     ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Input, Select, Space, Tag, Typography, message } from "antd";
+import { App, Button, Form, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
@@ -120,7 +120,7 @@ const toMoveType = (position: SandwishTableSortPosition): DepartmentMoveRequest[
 };
 
 export const DepartmentPage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [editForm] = Form.useForm<DepartmentFormValues>();
     const queryClient = useQueryClient();
     const [editingDepartment, setEditingDepartment] = useState<DepartmentTableNode | null>(null);
@@ -400,7 +400,6 @@ export const DepartmentPage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<DepartmentTableNode>
                 pageClassName="department-page"
                 title="部门管理"
@@ -412,7 +411,11 @@ export const DepartmentPage = () => {
                             刷新
                         </Button>
                         {canEditDepartment ? (
-                            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateEditor}>
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={openCreateEditor}
+                            >
                                 新增部门
                             </Button>
                         ) : null}

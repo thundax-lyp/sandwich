@@ -2,28 +2,39 @@ package com.github.thundax.modules.sys.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
+import com.github.thundax.common.web.exception.SandwishException;
+import com.github.thundax.common.web.exception.WebErrorCode;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
+import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionToken;
 import com.github.thundax.modules.auth.entity.valueobject.PrincipalKey;
 import com.github.thundax.modules.auth.security.CurrentUserResolver;
 import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
+import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
+import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentId;
 import com.github.thundax.modules.sys.entity.valueobject.DepartmentIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
@@ -32,6 +43,7 @@ import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collections;
 import org.junit.Test;
@@ -117,6 +129,51 @@ public class UserControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @Test
+    public void shouldRejectCreatingUserWhenRankExceedsCurrentUserMaxRank() {
+        Sm2Crypto.StringKeyPair keyPair = Sm2Crypto.generateKeyPair();
+        UserService userService = mock(UserService.class);
+        DepartmentService departmentService = mock(DepartmentService.class);
+        PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+        PreAuthSessionId sessionId = PreAuthSessionId.of("session-1");
+        User currentUser = user();
+        UserDepartmentRequest departmentRequest = new UserDepartmentRequest();
+        UserSaveRequest request = new UserSaveRequest();
+
+        currentUser.setRank(AccessRank.of(3));
+        departmentRequest.setId("2001");
+        request.setLoginName("new.user");
+        request.setLoginPass(Sm2Crypto.encrypt("Plain@123", keyPair.getPublicKey()));
+        request.setToken("login-token-1");
+        request.setName("新用户");
+        request.setRanks(3);
+        request.setDepartment(departmentRequest);
+
+        when(preAuthSessionService.getIdByToken(any(PreAuthSessionToken.class))).thenReturn(sessionId);
+        when(preAuthSessionService.getValue(any(PreAuthSessionValueQuery.class)))
+                .thenReturn(keyPair.getPrivateKey());
+        when(departmentService.get(any(DepartmentId.class))).thenReturn(department());
+        when(currentUserResolver.currentUser()).thenReturn(currentUser);
+
+        try {
+            new UserController(
+                            userService,
+                            departmentService,
+                            mock(RoleService.class),
+                            mock(PrincipalIdentityService.class),
+                            mock(PrincipalCredentialService.class),
+                            preAuthSessionService,
+                            currentUserResolver,
+                            mock(CurrentUserService.class))
+                    .add(request);
+            org.junit.Assert.fail("creating user with too high rank should be rejected");
+        } catch (SandwishException e) {
+            org.junit.Assert.assertEquals(WebErrorCode.FORBIDDEN, e.getErrorCode());
+        }
+        verify(userService, never()).create(any(CreateUserCommand.class));
     }
 
     @Test

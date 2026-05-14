@@ -9,7 +9,19 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Dropdown, Form, Input, Select, Space, Switch, Tag, Tree, Typography, message } from "antd";
+import {
+    App,
+    Button,
+    Dropdown,
+    Form,
+    Input,
+    Select,
+    Space,
+    Switch,
+    Tag,
+    Tree,
+    Typography
+} from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
@@ -141,7 +153,7 @@ const sortByMove = (
 };
 
 export const RolePage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [editForm] = Form.useForm<RoleFormValues>();
     const queryClient = useQueryClient();
     const canViewRole = hasPermission("sys:role:view") || hasPermission("sys:role:edit");
@@ -446,7 +458,6 @@ export const RolePage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<RoleResponse>
                 pageClassName="role-page"
                 title="角色管理"
@@ -498,7 +509,11 @@ export const RolePage = () => {
                             刷新
                         </Button>
                         {canEditRole ? (
-                            <Button type="primary" icon={<PlusOutlined />} onClick={openCreateEditor}>
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={openCreateEditor}
+                            >
                                 新增角色
                             </Button>
                         ) : null}
@@ -571,7 +586,11 @@ export const RolePage = () => {
                     </div>
                 }
             >
-                <Form<RoleFormValues> form={editForm} layout="vertical" className="role-editor-form">
+                <Form<RoleFormValues>
+                    form={editForm}
+                    layout="vertical"
+                    className="role-editor-form"
+                >
                     <Form.Item name="id" hidden>
                         <Input />
                     </Form.Item>
@@ -605,7 +624,9 @@ export const RolePage = () => {
                             defaultExpandedKeys={expandedMenuIds}
                             treeData={treeData}
                             selectable={false}
-                            onCheck={(keys) => setCheckedMenuKeys(Array.isArray(keys) ? keys : keys.checked)}
+                            onCheck={(keys) =>
+                                setCheckedMenuKeys(Array.isArray(keys) ? keys : keys.checked)
+                            }
                         />
                     </div>
                 </Form>

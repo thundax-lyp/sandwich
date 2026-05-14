@@ -45,10 +45,25 @@ export interface UserStatusRequest {
     enable?: boolean | null;
 }
 
+export interface CreateUserForm {
+    loginName: string;
+    loginPass: string;
+    name: string;
+    email?: string | null;
+    mobile?: string | null;
+    departmentId?: string | null;
+    roleIds: string[];
+    ranks: number;
+    admin: boolean;
+    enable: boolean;
+}
+
 export interface UserSaveRequest {
-    id: string;
+    id?: string | null;
     remarks?: string | null;
     loginName?: string | null;
+    loginPass?: string | null;
+    token?: string | null;
     ranks?: number | null;
     name?: string | null;
     email?: string | null;
@@ -82,6 +97,12 @@ export const updateUserStatus = (request: UserStatusRequest[]) => {
 export const deleteUsers = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/user/delete", {
         body: ids.map((id) => ({ id }))
+    });
+};
+
+export const createUser = (request: UserSaveRequest) => {
+    return postJson<UserResponse, UserSaveRequest>("/sys/user/create", {
+        body: request
     });
 };
 

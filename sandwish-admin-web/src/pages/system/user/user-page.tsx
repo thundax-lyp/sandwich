@@ -1,48 +1,38 @@
 import {
     ApartmentOutlined,
-    CameraOutlined,
     DeleteOutlined,
     EditOutlined,
     MoreOutlined,
+    PlusOutlined,
     PoweroffOutlined,
     ReloadOutlined,
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-    Avatar,
-    Button,
-    Dropdown,
-    Input,
-    Select,
-    Space,
-    Tag,
-    Tree,
-    Typography,
-    Upload,
-    message
-} from "antd";
+import { App, Button, Dropdown, Input, Select, Space, Tag, Tree, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Key } from "react";
+import { sm2 } from "sm-crypto";
+import { createLoginForm } from "@/api/auth-api";
 import { hasPermission } from "@/auth/permission-storage";
-import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
+import { UserAvatar, UserEdit } from "./components/user-edit";
 import {
+    createUser,
     deleteUsers,
     listUserDepartments,
-    listUserRoles,
     pageUsers,
     updateUser,
     uploadUserAvatar,
     updateUserStatus
 } from "./user-service";
 import type {
+    CreateUserForm,
     UserDepartmentResponse,
     UserPageRequest,
     UserResponse,
@@ -82,16 +72,10 @@ const DEFAULT_USER_FILTERS: UserFilters = {
 
 const EMPTY_USERS: UserResponse[] = [];
 const EMPTY_DEPARTMENTS: UserDepartmentResponse[] = [];
-const EMPTY_USER_ROLES: UserRoleResponse[] = [];
 
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
     return normalizedValue || undefined;
-};
-
-const getInitials = (name?: string | null) => {
-    const normalizedName = normalizeSearch(name) || "U";
-    return Array.from(normalizedName.replace(/\s+/g, "")).slice(0, 2).join("");
 };
 
 const readUserName = (user: UserResponse) => {
@@ -200,10 +184,9 @@ const toEnableQueryValue = (enable: UserFilterStatus) => {
 };
 
 export const UserPage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const departmentPanelRef = useRef<HTMLDivElement | null>(null);
-    const accessToken = useCurrentAccessToken();
     const [query, setQuery] = useState<UserPageRequest>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
@@ -211,12 +194,14 @@ export const UserPage = () => {
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
     const [selectedDepartmentId, setSelectedDepartmentId] = useState(ALL_DEPARTMENT_ID);
-    const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
+    const [activeUser, setActiveUser] = useState<UserResponse | null>(null);
+    const [userEditorOpen, setUserEditorOpen] = useState(false);
     const [deletingUser, setDeletingUser] = useState<UserResponse | null>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.loginName.trim()) || filters.enable !== "ALL";
     const canEditUser = hasPermission("sys:user:edit");
+    const isCreatingUser = userEditorOpen && !activeUser?.id;
 
     const userQuery = useQuery({
         queryKey: ["user", "page", query],
@@ -233,12 +218,6 @@ export const UserPage = () => {
         queryFn: getCurrentUserInfo,
         retry: false
     });
-    const userRoleQuery = useQuery({
-        queryKey: ["user", "role", "list"],
-        queryFn: () => listUserRoles(),
-        enabled: Boolean(editingUser),
-        retry: false
-    });
     const pageData = userQuery.data;
     const users = useMemo(() => pageData?.records ?? EMPTY_USERS, [pageData?.records]);
     const totalCount = pageData?.count ?? pageData?.totalCount ?? 0;
@@ -251,21 +230,6 @@ export const UserPage = () => {
         () => collectTreeKeys(departmentTreeData),
         [departmentTreeData]
     );
-    const userRoleOptions = useMemo(() => {
-        const roleById = new Map<string, UserRoleResponse>();
-        [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(editingUser?.roles ?? [])].forEach(
-            (role) => {
-                if (role?.id) {
-                    roleById.set(role.id, role);
-                }
-            }
-        );
-        return Array.from(roleById.values()).map((role) => ({
-            value: role.id,
-            label: role.name || role.id
-        }));
-    }, [editingUser?.roles, userRoleQuery.data]);
-
     useEffect(() => {
         const departmentPanel = departmentPanelRef.current;
         if (!departmentPanel) {
@@ -376,7 +340,7 @@ export const UserPage = () => {
                 (user) => user.id === variables.id
             );
             if (refreshedUser) {
-                setEditingUser(refreshedUser);
+                setActiveUser(refreshedUser);
             }
             messageApi.success("头像已更新");
         },
@@ -387,13 +351,31 @@ export const UserPage = () => {
     const updateMutation = useMutation({
         mutationFn: updateUser,
         onSuccess: async (savedUser) => {
-            setEditingUser(savedUser);
+            setActiveUser(savedUser);
             await invalidateUserPage();
-            setEditingUser(null);
+            setUserEditorOpen(false);
+            setActiveUser(null);
             messageApi.success("用户已更新");
         },
         onError: (error) => {
             messageApi.error(error instanceof Error ? error.message : "更新失败");
+        }
+    });
+    const createMutation = useMutation({
+        mutationFn: async (form: CreateUserForm) => {
+            const loginForm = await createLoginForm();
+            const encryptedPassword = sm2.doEncrypt(form.loginPass, loginForm.publicKey, 0);
+            return createUser(
+                toCreateUserSaveRequest(form, encryptedPassword, loginForm.loginToken)
+            );
+        },
+        onSuccess: async () => {
+            setUserEditorOpen(false);
+            await invalidateUserPage();
+            messageApi.success("用户已新增");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "新增失败");
         }
     });
 
@@ -458,21 +440,34 @@ export const UserPage = () => {
         statusMutation.mutate(selectedRowKeys.map((id) => ({ id: String(id), enable })));
     };
 
-    const changeEditingUserRoles = (roleIds: string[]) => {
-        if (!editingUser) {
+    const openCreateUser = () => {
+        const selectedDepartment = departments.find(
+            (department) => department.id === selectedDepartmentId
+        );
+        setActiveUser(
+            selectedDepartment
+                ? {
+                      id: "",
+                      name: "",
+                      department: selectedDepartment,
+                      roles: []
+                  }
+                : {
+                      id: "",
+                      name: "",
+                      roles: []
+                  }
+        );
+        setUserEditorOpen(true);
+    };
+
+    const changeEditingUserRoles = (roles: UserRoleResponse[]) => {
+        if (!activeUser) {
             return;
         }
-        const roleById = new Map<string, UserRoleResponse>();
-        [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(editingUser.roles ?? [])].forEach(
-            (role) => {
-                if (role?.id) {
-                    roleById.set(role.id, role);
-                }
-            }
-        );
-        setEditingUser({
-            ...editingUser,
-            roles: roleIds.map((roleId) => roleById.get(roleId) ?? { id: roleId, name: roleId })
+        setActiveUser({
+            ...activeUser,
+            roles
         });
     };
 
@@ -490,11 +485,49 @@ export const UserPage = () => {
         roles: (user.roles || []).map((role) => ({ id: role.id }))
     });
 
-    const saveEditingUser = () => {
-        if (!editingUser) {
+    const toCreateUserSaveRequest = (
+        form: CreateUserForm,
+        encryptedPassword: string,
+        token: string
+    ): UserSaveRequest => ({
+        loginName: normalizeSearch(form.loginName),
+        loginPass: encryptedPassword,
+        token,
+        ranks: form.ranks,
+        name: normalizeSearch(form.name),
+        email: normalizeSearch(form.email),
+        mobile: normalizeSearch(form.mobile),
+        admin: form.admin,
+        enable: form.enable,
+        department: form.departmentId ? { id: form.departmentId } : null,
+        roles: form.roleIds.map((roleId) => ({ id: roleId }))
+    });
+
+    const saveCreatingUser = (form: CreateUserForm) => {
+        if (!normalizeSearch(form.loginName)) {
+            messageApi.error("请填写登录名");
             return;
         }
-        updateMutation.mutate(toUserSaveRequest(editingUser));
+        if (!form.loginPass) {
+            messageApi.error("请填写登录密码");
+            return;
+        }
+        if (!normalizeSearch(form.name)) {
+            messageApi.error("请填写姓名");
+            return;
+        }
+        if (!form.departmentId) {
+            messageApi.error("请选择部门");
+            return;
+        }
+        createMutation.mutate(form);
+    };
+
+    const saveEditingUser = () => {
+        if (!activeUser) {
+            return;
+        }
+        updateMutation.mutate(toUserSaveRequest(activeUser));
     };
 
     const columns: SandwishTableProps<UserResponse>["columns"] = [
@@ -505,12 +538,9 @@ export const UserPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.name,
             render: (_, user) => {
                 const userName = readUserName(user);
-                const avatarUrl = toAuthenticatedResourceUrl(user.avatar, accessToken);
                 return (
                     <Space size={10}>
-                        <Avatar src={avatarUrl}>
-                            {user.avatar ? null : getInitials(userName)}
-                        </Avatar>
+                        <UserAvatar user={user} />
                         <div className="user-name-cell">
                             <Text strong>{userName}</Text>
                             {user.email ? <Text type="secondary">{user.email}</Text> : null}
@@ -584,7 +614,10 @@ export const UserPage = () => {
                                 disabled={editDisabled}
                                 icon={<EditOutlined />}
                                 type="text"
-                                onClick={() => setEditingUser(user)}
+                                onClick={() => {
+                                    setActiveUser(user);
+                                    setUserEditorOpen(true);
+                                }}
                             />
                             <Button
                                 aria-label={`删除 ${userName}`}
@@ -615,7 +648,8 @@ export const UserPage = () => {
                                 ],
                                 onClick: ({ key }) => {
                                     if (key === "edit") {
-                                        setEditingUser(user);
+                                        setActiveUser(user);
+                                        setUserEditorOpen(true);
                                     }
                                     if (key === "delete") {
                                         setDeletingUser(user);
@@ -639,7 +673,6 @@ export const UserPage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<UserResponse>
                 pageClassName="user-page"
                 title="用户管理"
@@ -698,16 +731,26 @@ export const UserPage = () => {
                     </div>
                 )}
                 pageActions={
-                    <Button
-                        icon={<ReloadOutlined />}
-                        loading={userQuery.isFetching || departmentQuery.isFetching}
-                        onClick={() => {
-                            userQuery.refetch();
-                            departmentQuery.refetch();
-                        }}
-                    >
-                        刷新
-                    </Button>
+                    <Space wrap>
+                        <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            disabled={!canEditUser}
+                            onClick={openCreateUser}
+                        >
+                            新增用户
+                        </Button>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            loading={userQuery.isFetching || departmentQuery.isFetching}
+                            onClick={() => {
+                                userQuery.refetch();
+                                departmentQuery.refetch();
+                            }}
+                        >
+                            刷新
+                        </Button>
+                    </Space>
                 }
                 batchClassName="user-table-toolbar"
                 selectedCount={selectedRowKeys.length}
@@ -783,93 +826,27 @@ export const UserPage = () => {
                 }
             />
 
-            <SandwishDrawer
-                className="user-edit-drawer"
-                title="编辑用户"
-                open={Boolean(editingUser)}
-                size="small"
-                onClose={() => setEditingUser(null)}
-                extra={<Button size="small">−</Button>}
-                footer={
-                    <div className="user-edit-footer">
-                        <Button
-                            disabled={updateMutation.isPending}
-                            onClick={() => setEditingUser(null)}
-                        >
-                            取消
-                        </Button>
-                        <Button
-                            type="primary"
-                            loading={updateMutation.isPending}
-                            onClick={saveEditingUser}
-                        >
-                            更新用户
-                        </Button>
-                    </div>
-                }
-            >
-                {editingUser ? (
-                    <div className="user-edit-form">
-                        <div className="user-edit-avatar">
-                            <Avatar
-                                size={64}
-                                src={toAuthenticatedResourceUrl(editingUser.avatar, accessToken)}
-                            >
-                                {editingUser.avatar ? null : getInitials(readUserName(editingUser))}
-                            </Avatar>
-                            <Upload
-                                accept="image/*"
-                                showUploadList={false}
-                                beforeUpload={(file) => {
-                                    avatarUploadMutation.mutate({
-                                        id: editingUser.id,
-                                        avatar: file
-                                    });
-                                    return Upload.LIST_IGNORE;
-                                }}
-                            >
-                                <Button
-                                    size="small"
-                                    shape="circle"
-                                    icon={<CameraOutlined />}
-                                    loading={avatarUploadMutation.isPending}
-                                />
-                            </Upload>
-                        </div>
-                        <label>
-                            <span>姓名</span>
-                            <Input value={readUserName(editingUser)} readOnly />
-                        </label>
-                        <label>
-                            <span>登录名</span>
-                            <Input value={editingUser.loginName || ""} readOnly />
-                        </label>
-                        <label>
-                            <span>邮箱</span>
-                            <Input value={editingUser.email || ""} readOnly />
-                        </label>
-                        <label>
-                            <span>手机</span>
-                            <Input value={editingUser.mobile || ""} readOnly />
-                        </label>
-                        <label>
-                            <span>部门</span>
-                            <Input value={readDepartmentName(editingUser)} readOnly />
-                        </label>
-                        <label>
-                            <span>角色</span>
-                            <Select
-                                mode="multiple"
-                                value={(editingUser.roles || []).map((role) => role.id)}
-                                options={userRoleOptions}
-                                loading={userRoleQuery.isFetching}
-                                placeholder="选择角色"
-                                onChange={changeEditingUserRoles}
-                            />
-                        </label>
-                    </div>
-                ) : null}
-            </SandwishDrawer>
+            <UserEdit
+                open={userEditorOpen}
+                title={isCreatingUser ? "新增用户" : "编辑用户"}
+                saveText={isCreatingUser ? "新增用户" : "更新用户"}
+                user={activeUser}
+                departments={departments}
+                saving={isCreatingUser ? createMutation.isPending : updateMutation.isPending}
+                onClose={() => {
+                    setUserEditorOpen(false);
+                    setActiveUser(null);
+                }}
+                onCreate={saveCreatingUser}
+                onSave={saveEditingUser}
+                onAvatarUpload={(avatar) => {
+                    if (activeUser?.id) {
+                        return avatarUploadMutation.mutateAsync({ id: activeUser.id, avatar });
+                    }
+                    return undefined;
+                }}
+                onRolesChange={changeEditingUserRoles}
+            />
 
             <SandwishConfirmModal
                 title="删除用户"

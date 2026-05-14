@@ -8,11 +8,12 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Dropdown, Input, Select, Space, Tag, Typography, message } from "antd";
+import { App, Button, Dropdown, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
+import { useCurrentAccessToken } from "@/auth/hooks";
 import { hasPermission } from "@/auth/permission-storage";
-import { toAuthenticatedResourceUrl, useCurrentAccessToken } from "@/auth/resource-url";
+import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
@@ -124,7 +125,7 @@ const sortByMove = (
 };
 
 export const StorageObjectPage = () => {
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const canEditStorage = hasPermission("storage:storage:edit");
     const accessToken = useCurrentAccessToken();
@@ -427,7 +428,6 @@ export const StorageObjectPage = () => {
 
     return (
         <>
-            {contextHolder}
             <ListPage<StorageResponse>
                 pageClassName="storage-object-page"
                 title="存储对象"

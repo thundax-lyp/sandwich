@@ -1,6 +1,6 @@
 import { LockOutlined, ReloadOutlined, UserOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Alert, Button, Card, Form, Input, Space, Typography, message } from "antd";
+import { Alert, App, Button, Card, Form, Input, Space, Typography } from "antd";
 import { sm2 } from "sm-crypto";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +32,7 @@ const resolveRedirectPath = (state: unknown) => {
 export const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [messageApi, contextHolder] = message.useMessage();
+    const { message: messageApi } = App.useApp();
     const [captchaVersion, setCaptchaVersion] = useState(() => Date.now());
 
     const loginFormQuery = useQuery({
@@ -87,7 +87,6 @@ export const LoginPage = () => {
 
     return (
         <>
-            {contextHolder}
             <main className="login-page">
                 <section className="login-hero">
                     <SandwichLogo className="login-logo" />

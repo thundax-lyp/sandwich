@@ -94,7 +94,6 @@
 | `ranks` | `ranks` | `rank` | 是 | 访问等级 |
 | `privilege` | `privilege` | `privilege` | 是 | 用户权限等级 |
 | `status` | `status` | `status` | 是 | 启用状态 |
-| `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 
 字段规则：
@@ -110,7 +109,7 @@
 
 - 主键：`pk_sys_user(id)`
 - 普通索引：`idx_sys_user_department(department_id)`
-- 普通索引：`idx_sys_user_status(status, priority`
+- 普通索引：`idx_sys_user_status(status, id)`
 
 ### 6.2 sys_role
 
@@ -366,7 +365,7 @@
 
 排序规则：
 
-- 用户默认按 `priority` 升序。
+- 用户默认按 `id` 升序，不提供 `priority` 重排能力。
 - 角色默认按 `priority` 升序。
 - 菜单默认按 `lft` 升序。
 - 部门默认按 `lft` 升序。

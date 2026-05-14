@@ -24,6 +24,5 @@ public class ChangeCurrentUserInfoCommand {
     private AccessRank rank;
     private UserPrivilege privilege;
     private UserStatus status;
-    private int priority;
     private String remarks;
 }

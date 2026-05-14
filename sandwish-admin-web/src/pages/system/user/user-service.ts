@@ -45,11 +45,6 @@ export interface UserStatusRequest {
     enable?: boolean | null;
 }
 
-export interface UserSortRequest {
-    orderedIds: string[];
-    sortDirection?: "ASC" | "DESC";
-}
-
 export interface UserSaveRequest {
     id: string;
     remarks?: string | null;
@@ -80,12 +75,6 @@ export const listUserRoles = () => {
 
 export const updateUserStatus = (request: UserStatusRequest[]) => {
     return postJson<boolean, UserStatusRequest[]>("/sys/user/enable", {
-        body: request
-    });
-};
-
-export const sortUsers = (request: UserSortRequest) => {
-    return postJson<boolean, UserSortRequest>("/sys/user/sort", {
         body: request
     });
 };

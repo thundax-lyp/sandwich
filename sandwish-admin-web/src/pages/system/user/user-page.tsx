@@ -3,7 +3,6 @@ import {
     CameraOutlined,
     DeleteOutlined,
     EditOutlined,
-    HolderOutlined,
     MoreOutlined,
     PoweroffOutlined,
     ReloadOutlined,
@@ -30,7 +29,7 @@ import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
 import {
@@ -38,7 +37,6 @@ import {
     listUserDepartments,
     listUserRoles,
     pageUsers,
-    sortUsers,
     updateUser,
     uploadUserAvatar,
     updateUserStatus
@@ -188,25 +186,6 @@ const collectTreeKeys = (nodes: DataNode[]): Key[] => {
         node.key,
         ...(node.children ? collectTreeKeys(node.children) : [])
     ]);
-};
-
-const sortByMove = (
-    users: UserResponse[],
-    sourceUser: UserResponse,
-    targetUser: UserResponse,
-    position: SandwishTableSortPosition
-) => {
-    const sourceIndex = users.findIndex((user) => user.id === sourceUser.id);
-    const targetIndex = users.findIndex((user) => user.id === targetUser.id);
-    if (sourceIndex < 0 || targetIndex < 0) {
-        return users;
-    }
-
-    const nextUsers = [...users];
-    const [movedUser] = nextUsers.splice(sourceIndex, 1);
-    const nextTargetIndex = nextUsers.findIndex((user) => user.id === targetUser.id);
-    nextUsers.splice(position === "before" ? nextTargetIndex : nextTargetIndex + 1, 0, movedUser);
-    return nextUsers;
 };
 
 const toEnableQueryValue = (enable: UserFilterStatus) => {
@@ -387,16 +366,6 @@ export const UserPage = () => {
         }
     });
 
-    const sortMutation = useMutation({
-        mutationFn: sortUsers,
-        onSuccess: async () => {
-            await invalidateUserPage();
-            messageApi.success("用户顺序已更新");
-        },
-        onError: (error) => {
-            messageApi.error(error instanceof Error ? error.message : "排序失败");
-        }
-    });
     const avatarUploadMutation = useMutation({
         mutationFn: ({ id, avatar }: { id: string; avatar: File }) => uploadUserAvatar(id, avatar),
         onSuccess: async (_, variables) => {
@@ -485,25 +454,6 @@ export const UserPage = () => {
             return;
         }
         statusMutation.mutate(selectedRowKeys.map((id) => ({ id: String(id), enable })));
-    };
-
-    const moveUser = (
-        sourceUser: UserResponse,
-        targetUser: UserResponse,
-        position: SandwishTableSortPosition
-    ) => {
-        if (
-            !canEditUser ||
-            !canManageUserByRank(currentUserQuery.data, sourceUser) ||
-            !canManageUserByRank(currentUserQuery.data, targetUser) ||
-            sourceUser.id === targetUser.id
-        ) {
-            return;
-        }
-        const nextUsers = sortByMove(users, sourceUser, targetUser, position);
-        sortMutation.mutate({
-            orderedIds: nextUsers.map((user) => user.id)
-        });
     };
 
     const changeEditingUserRoles = (roleIds: string[]) => {
@@ -643,14 +593,6 @@ export const UserPage = () => {
                                 onClick={() => setDeletingUser(user)}
                             />
                         </Space.Compact>
-                        <button
-                            aria-label={`拖动排序 ${userName}`}
-                            className="sandwish-table-row-action sandwish-table-row-drag-handle"
-                            disabled={!canEditUser}
-                            type="button"
-                        >
-                            <HolderOutlined />
-                        </button>
                         <Dropdown
                             menu={{
                                 items: [
@@ -801,8 +743,7 @@ export const UserPage = () => {
                 className="user-table"
                 columns={columns}
                 dataSource={users}
-                loading={userQuery.isFetching || sortMutation.isPending}
-                onSort={moveUser}
+                loading={userQuery.isFetching}
                 pagination={{
                     current: query.pageNo || DEFAULT_PAGE_NO,
                     pageSize: query.pageSize || DEFAULT_PAGE_SIZE,
@@ -837,7 +778,6 @@ export const UserPage = () => {
                         />
                     </div>
                 }
-                sortable={canEditUser}
             />
 
             <SandwishDrawer

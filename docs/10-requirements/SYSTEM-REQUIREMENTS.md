@@ -71,7 +71,6 @@
 - `rank`：用户访问等级，使用 `AccessRank`；持久化到 `sys_user.ranks`。
 - `privilege`：用户权限等级。
 - `status`：用户状态。
-- `priority`：排序值。
 - `remarks`：备注。
 
 固定约束：
@@ -209,7 +208,7 @@
 - Service `*Query` 类级注解必须且只能包含 `@Getter`、`@Setter`、`@NoArgsConstructor`、`@AllArgsConstructor`。
 - DO、Mapper、缓存和持久化装配器固定在 `sandwish-infra`。
 - `AccessRank` 是用户和菜单共用的访问等级值对象。
-- 角色、菜单、用户、部门和字典的排序使用 `priority`。
+- 角色和字典的平铺排序使用 `priority`；菜单和部门的树形排序使用树结构索引；用户不暴露排序能力。
 - 后台系统管理 API 固定归属 `sandwish-admin-api`。
 
 ## 7. Functional Requirements

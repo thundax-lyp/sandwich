@@ -36,6 +36,5 @@ public class UserDO {
 
     private String status;
 
-    private Integer priority;
     private String remarks;
 }

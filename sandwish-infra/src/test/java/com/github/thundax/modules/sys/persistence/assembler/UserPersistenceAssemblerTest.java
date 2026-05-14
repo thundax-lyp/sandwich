@@ -49,19 +49,6 @@ public class UserPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
-        User entity = new User();
-        entity.setPriority(-1);
-        UserDO dataObject = new UserDO();
-        dataObject.setPriority(-1);
-
-        assertEquals(
-                Integer.valueOf(0),
-                UserPersistenceAssembler.toDataObject(entity).getPriority());
-        assertEquals(0, UserPersistenceAssembler.toEntity(dataObject).getPriority());
-    }
-
-    @Test
     public void shouldMapRankValueObjectToRanksColumn() {
         User entity = new User();
         entity.setRank(AccessRank.of(12));

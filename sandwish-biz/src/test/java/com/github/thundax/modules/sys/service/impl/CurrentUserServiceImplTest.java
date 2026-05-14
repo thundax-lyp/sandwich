@@ -141,7 +141,6 @@ public class CurrentUserServiceImplTest {
                 currentUser.getRank(),
                 currentUser.getPrivilege(),
                 currentUser.getStatus(),
-                currentUser.getPriority(),
                 currentUser.getRemarks()));
 
         assertEquals("New Name", updated.getName());

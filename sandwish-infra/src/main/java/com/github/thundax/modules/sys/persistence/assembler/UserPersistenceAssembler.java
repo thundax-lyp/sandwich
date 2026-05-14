@@ -29,7 +29,6 @@ public final class UserPersistenceAssembler {
         dataObject.setRanks(AccessRankCodec.toValue(entity.getRank()));
         dataObject.setPrivilege(privilegeValue(entity.getPrivilege()));
         dataObject.setStatus(statusValue(entity.getStatus()));
-        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         return dataObject;
     }
@@ -48,7 +47,6 @@ public final class UserPersistenceAssembler {
         entity.setRank(AccessRankCodec.toDomain(dataObject.getRanks()));
         entity.setPrivilege(privilegeFrom(dataObject.getPrivilege()));
         entity.setStatus(statusFrom(dataObject.getStatus()));
-        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         return entity;
     }
@@ -66,10 +64,6 @@ public final class UserPersistenceAssembler {
 
     public static UserRoleDO toUserRoleDataObject(Long userId, Long roleId) {
         return new UserRoleDO(userId, roleId);
-    }
-
-    private static int priorityOrDefault(Integer priority) {
-        return priority == null || priority < 0 ? 0 : priority;
     }
 
     private static String privilegeValue(UserPrivilege privilege) {

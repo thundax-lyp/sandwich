@@ -1,7 +1,6 @@
 package com.github.thundax.modules.sys.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
@@ -16,14 +15,6 @@ public interface UserDao {
 
     List<User> list(Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege);
 
-    List<User> list(
-            Long departmentId,
-            String loginName,
-            String name,
-            UserStatus status,
-            UserPrivilege privilege,
-            SortDirection sortDirection);
-
     Page<User> page(
             Long departmentId,
             String loginName,
@@ -33,13 +24,9 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
-    int maxPriority();
-
     UserId insert(User user);
 
     int update(User user);
-
-    int updatePriority(User user);
 
     int deleteById(UserId id);
 

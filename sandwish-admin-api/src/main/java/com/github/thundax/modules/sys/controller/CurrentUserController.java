@@ -114,7 +114,6 @@ public class CurrentUserController {
                 currentUser.getRank(),
                 currentUser.getPrivilege(),
                 currentUser.getStatus(),
-                currentUser.getPriority(),
                 currentUser.getRemarks()));
 
         return PersonalInterfaceAssembler.toInfoResponse(

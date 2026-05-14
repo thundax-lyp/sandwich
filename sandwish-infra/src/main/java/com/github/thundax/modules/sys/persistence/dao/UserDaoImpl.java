@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.thundax.common.domain.SortDirection;
 import com.github.thundax.common.id.SnowflakeIdGenerator;
 import com.github.thundax.modules.sys.dao.UserDao;
 import com.github.thundax.modules.sys.entity.User;
@@ -88,37 +87,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> list(
             Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
-        return list(departmentId, loginName, name, status, privilege, SortDirection.ASC);
-    }
-
-    @Override
-    public List<User> list(
-            Long departmentId,
-            String loginName,
-            String name,
-            UserStatus status,
-            UserPrivilege privilege,
-            SortDirection sortDirection) {
         return UserPersistenceAssembler.toEntityList(
-                mapper.selectList(buildListWrapper(departmentId, loginName, name, status, privilege, sortDirection)));
-    }
-
-    @Override
-    public int maxPriority() {
-        Object max = mapper.selectObjs(new QueryWrapper<UserDO>().select("max(priority)")).stream()
-                .findFirst()
-                .orElse(null);
-        if (max == null) {
-            return 0;
-        }
-        if (max instanceof Number) {
-            return ((Number) max).intValue();
-        }
-        try {
-            return Integer.parseInt(String.valueOf(max));
-        } catch (NumberFormatException exception) {
-            return 0;
-        }
+                mapper.selectList(buildListWrapper(departmentId, loginName, name, status, privilege)));
     }
 
     @Override
@@ -161,17 +131,7 @@ public class UserDaoImpl implements UserDao {
                         .set(UserDO::getRanks, dataObject.getRanks())
                         .set(UserDO::getPrivilege, dataObject.getPrivilege())
                         .set(UserDO::getStatus, dataObject.getStatus())
-                        .set(UserDO::getPriority, dataObject.getPriority())
                         .set(UserDO::getRemarks, dataObject.getRemarks()));
-        removeUserCaches(UserIdCodec.toValue(entity.getId()));
-        return count;
-    }
-
-    @Override
-    public int updatePriority(User entity) {
-        UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(UserDO::getPriority, dataObject.getPriority()));
         removeUserCaches(UserIdCodec.toValue(entity.getId()));
         return count;
     }
@@ -231,16 +191,6 @@ public class UserDaoImpl implements UserDao {
 
     private QueryWrapper<UserDO> buildListWrapper(
             Long departmentId, String loginName, String name, UserStatus status, UserPrivilege privilege) {
-        return buildListWrapper(departmentId, loginName, name, status, privilege, SortDirection.ASC);
-    }
-
-    private QueryWrapper<UserDO> buildListWrapper(
-            Long departmentId,
-            String loginName,
-            String name,
-            UserStatus status,
-            UserPrivilege privilege,
-            SortDirection sortDirection) {
         QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
         if (departmentId != null) {
             wrapper.apply(DEPARTMENT_TREE_FILTER_SQL, departmentId);
@@ -256,11 +206,6 @@ public class UserDaoImpl implements UserDao {
         }
         if (privilege != null) {
             wrapper.eq("privilege", privilege.value());
-        }
-        if (SortDirection.DESC == sortDirection) {
-            wrapper.orderByDesc("priority");
-        } else {
-            wrapper.orderByAsc("priority");
         }
         wrapper.orderByAsc("id");
         return wrapper;

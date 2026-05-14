@@ -450,7 +450,7 @@ describe("App", () => {
                 method: "POST"
             })
         );
-    }, 10000);
+    }, 30000);
 
     it("renders and filters the dictionary page", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "test-token");

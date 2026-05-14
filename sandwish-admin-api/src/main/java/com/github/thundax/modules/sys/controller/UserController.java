@@ -39,7 +39,6 @@ import com.github.thundax.modules.sys.controller.request.UserIdRequest;
 import com.github.thundax.modules.sys.controller.request.UserQueryRequest;
 import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
-import com.github.thundax.modules.sys.controller.request.UserSortRequest;
 import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
@@ -60,7 +59,6 @@ import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
-import com.github.thundax.modules.sys.service.command.UserSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -72,10 +70,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -375,41 +371,6 @@ public class UserController {
         commandList.forEach(userService::changeStatus);
 
         return true;
-    }
-
-    @ApiOperation(value = "排序", notes = "sys:user:edit")
-    @ApiImplicitParams({
-        @ApiImplicitParam(
-                name = AccessTokenNames.HEADER_TOKEN,
-                value = "令牌",
-                paramType = "header",
-                dataTypeClass = String.class),
-    })
-    @HasPermission("sys:user:edit")
-    @SysLogger("排序")
-    @PostMapping(value = "sort")
-    @WrappedApiResponse
-    public Boolean sort(@Valid @RequestBody UserSortRequest request) {
-        userService.sort(new UserSortCommand(
-                RequestListHelper.map(
-                        readOrderedIds(request == null ? null : request.getOrderedIds()), UserIdCodec::toDomain),
-                request == null ? null : request.getSortDirection()));
-        return true;
-    }
-
-    private List<Long> readOrderedIds(List<String> sourceList) {
-        List<String> orderedIdValues = RequestListHelper.present(sourceList);
-        if (sourceList == null || orderedIdValues.size() != sourceList.size() || orderedIdValues.isEmpty()) {
-            throw AdminResponseExceptions.invalidParameter("orderedIds");
-        }
-        List<Long> orderedIds = orderedIdValues.stream()
-                .map(value -> Long.valueOf(value.trim()))
-                .collect(Collectors.toList());
-        Set<Long> uniqueIds = new HashSet<>(orderedIds);
-        if (uniqueIds.size() != orderedIds.size()) {
-            throw AdminResponseExceptions.invalidParameter("orderedIds");
-        }
-        return orderedIds;
     }
 
     @ApiOperation(value = "删除", notes = "sys:user:edit")

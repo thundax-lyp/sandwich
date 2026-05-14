@@ -31,7 +31,6 @@
 |---|---|---|---|
 | `com.github.thundax.modules.sys.entity.Dict` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.sys.entity.Role` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
-| `com.github.thundax.modules.sys.entity.User` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.sys.entity.Department` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`） |
 | `com.github.thundax.modules.sys.entity.Menu` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`），`visibility/maxRank` 仅作过滤 |
 | `com.github.thundax.modules.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |

@@ -120,7 +120,6 @@ public class UserCacheSupport {
         user.setRank(AccessRankCodec.toDomain(cacheDTO.rank));
         user.setPrivilege(cacheDTO.privilege == null ? null : UserPrivilege.from(cacheDTO.privilege));
         user.setStatus(cacheDTO.status == null ? null : UserStatus.from(cacheDTO.status));
-        user.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         user.setRemarks(cacheDTO.remarks);
         return user;
     }
@@ -137,7 +136,6 @@ public class UserCacheSupport {
         cacheDTO.privilege =
                 user.getPrivilege() == null ? null : user.getPrivilege().value();
         cacheDTO.status = user.getStatus() == null ? null : user.getStatus().value();
-        cacheDTO.priority = user.getPriority();
         cacheDTO.remarks = user.getRemarks();
         return cacheDTO;
     }
@@ -152,7 +150,6 @@ public class UserCacheSupport {
         private Integer rank;
         private String privilege;
         private String status;
-        private Integer priority;
         private String remarks;
     }
 }

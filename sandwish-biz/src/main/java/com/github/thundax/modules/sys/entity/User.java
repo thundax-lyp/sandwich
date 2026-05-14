@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.modules.sys.entity.enums.UserPrivilege;
 import com.github.thundax.modules.sys.entity.enums.UserStatus;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
@@ -19,7 +18,7 @@ import org.springframework.lang.NonNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Sortable {
+public class User {
     private UserId id;
 
     private DepartmentId departmentId;
@@ -32,7 +31,6 @@ public class User implements Sortable {
 
     private UserPrivilege privilege = UserPrivilege.NORMAL;
     private UserStatus status;
-    private int priority;
     private String remarks;
 
     @NonNull

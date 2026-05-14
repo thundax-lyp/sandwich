@@ -22,12 +22,10 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `ranks` int NOT NULL DEFAULT 0,
     `privilege` varchar(16) NOT NULL DEFAULT 'NORMAL',
     `status` varchar(16) NOT NULL DEFAULT 'ENABLED',
-    `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_sys_user_department` (`department_id`),
-    KEY `idx_sys_user_status` (`status`, `priority`),
-    UNIQUE KEY `uk_sys_user_priority` (`priority`)
+    KEY `idx_sys_user_status` (`status`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户主体表';
 
 CREATE TABLE IF NOT EXISTS `sys_role` (

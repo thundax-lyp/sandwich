@@ -830,9 +830,6 @@ public class AuthPermissionLifecycleTest {
         @Override
         public void changeInfo(ChangeUserInfoCommand command) {}
 
-        @Override
-        public void sort(com.github.thundax.modules.sys.service.command.UserSortCommand command) {}
-
         public int remove(UserId id) {
             return 1;
         }

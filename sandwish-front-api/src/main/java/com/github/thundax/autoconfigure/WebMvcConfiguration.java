@@ -3,7 +3,6 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.filter.xss.XssFilter;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.config.SandwishOssProperties;
-import com.github.thundax.common.oss.support.LocalFileObjectStorageClient;
 import com.github.thundax.common.web.ProcessTimeFilter;
 import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.store.ObjectStorageStoredObjectStore;
@@ -33,9 +32,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                     objectStorageClient, StorageType.OSS, ossProperties.getS3().getBucket(), upload.getContentPath());
         }
         return new ObjectStorageStoredObjectStore(
-                new LocalFileObjectStorageClient(upload.getStoragePath(), ""),
+                objectStorageClient,
                 StorageType.LOCAL_FILE,
-                upload.getStoragePath(),
+                ossProperties.getLocal().getRootPath(),
                 upload.getContentPath());
     }
 

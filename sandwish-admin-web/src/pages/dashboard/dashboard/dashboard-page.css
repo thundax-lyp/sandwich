@@ -1,36 +1,23 @@
-.dashboard-page {
+.dashboard-content {
     display: grid;
-    gap: 34px;
+    gap: 24px;
+    min-width: 0;
 }
 
-.dashboard-hero {
-    display: grid;
-    gap: 4px;
-}
-
-.dashboard-hero h2.ant-typography {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 56px;
-    font-weight: 800;
-    line-height: 1.03;
-}
-
-.dashboard-hero > strong {
+.dashboard-brand {
+    display: inline-flex;
+    white-space: nowrap;
     width: fit-content;
-    font-size: 58px;
+    font-size: 18px;
     font-weight: 800;
-    line-height: 1.02;
+    line-height: 1;
     background: linear-gradient(90deg, var(--accent-violet), #f06bbf 48%, var(--accent-orange));
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.dashboard-hero p.ant-typography {
-    max-width: 620px;
-    margin: 10px 0 0;
-    color: var(--text-secondary);
-    font-size: 17px;
+.dashboard-page .sandwish-page-header {
+    margin-bottom: 22px;
 }
 
 .metrics {
@@ -57,9 +44,9 @@
 
 .metric-card .ant-card-body {
     display: grid;
-    gap: 28px;
-    min-height: 210px;
-    padding: 34px 36px;
+    gap: 20px;
+    min-height: 168px;
+    padding: 26px 28px;
 }
 
 .metric-card strong {
@@ -81,7 +68,7 @@
 
 .metric-card-heading .ant-typography {
     color: var(--text-primary);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
 }
 
@@ -104,7 +91,7 @@
 }
 
 .metric-card-body p {
-    margin: 12px 0 0;
+    margin: 10px 0 0;
     color: var(--text-secondary);
 }
 
@@ -170,13 +157,13 @@
     align-items: end;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
 .section-title-row h3.ant-typography {
     margin: 0;
     color: var(--text-primary);
-    font-size: 32px;
+    font-size: 24px;
     line-height: 1.15;
 }
 
@@ -194,7 +181,7 @@
 .operation-columns {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
+    gap: 18px;
 }
 
 .operation-column {
@@ -219,9 +206,9 @@
 
 .operation-card {
     display: grid;
-    gap: 14px;
-    min-height: 210px;
-    padding: 28px;
+    gap: 10px;
+    min-height: 168px;
+    padding: 20px;
     background: var(--surface-panel);
     border: 1px solid var(--line-subtle);
     border-radius: 8px;
@@ -247,7 +234,7 @@
 .operation-card p {
     margin: 0;
     color: var(--text-secondary);
-    line-height: 1.7;
+    line-height: 1.58;
 }
 
 .operation-progress {
@@ -273,6 +260,18 @@
 }
 
 @media (max-width: 760px) {
+    .dashboard-content {
+        gap: 18px;
+    }
+
+    .dashboard-page .sandwish-page-header {
+        margin-bottom: 18px;
+    }
+
+    .dashboard-brand {
+        font-size: 16px;
+    }
+
     .metrics {
         grid-template-columns: 1fr;
     }
@@ -286,9 +285,9 @@
         border-bottom: 0;
     }
 
-    .dashboard-hero h2.ant-typography,
-    .dashboard-hero > strong {
-        font-size: 36px;
+    .metric-card .ant-card-body {
+        min-height: 0;
+        padding: 22px;
     }
 
     .operation-columns {

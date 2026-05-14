@@ -117,7 +117,7 @@ describe("App", () => {
 
         render(<App />);
 
-        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘" })).toBeInTheDocument();
         expect(await screen.findByText("Developer")).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/sys/current-user/info",
@@ -273,7 +273,7 @@ describe("App", () => {
         await userEvent.type(screen.getByPlaceholderText("验证码"), "1234");
         await userEvent.click(screen.getByRole("button", { name: /登\s*录/ }));
 
-        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘" })).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("login-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("login-refresh-token");
         expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe(
@@ -873,7 +873,7 @@ describe("App", () => {
 
         render(<App />);
 
-        expect(await screen.findByRole("heading", { name: "仪表盘已就绪" })).toBeInTheDocument();
+        expect(await screen.findByRole("heading", { name: "仪表盘" })).toBeInTheDocument();
         expect(localStorage.getItem("sandwish.admin.accessToken")).toBe("refreshed-access-token");
         expect(localStorage.getItem("sandwish.admin.refreshToken")).toBe("rotated-refresh-token");
         expect(localStorage.getItem("sandwish.admin.accessTokenExpireAt")).toBe("1778514052155");

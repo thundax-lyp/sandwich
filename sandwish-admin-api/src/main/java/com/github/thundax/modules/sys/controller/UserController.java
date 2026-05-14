@@ -86,7 +86,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Api(tags = "系统/用户")
 @SysLogger(module = {"系统", "用户"})
@@ -94,7 +98,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class UserController {
 
-    private static final String AVATAR_URL_FORMAT = "/api/sys/user/avatar?id=%s&token=%s";
+    private static final String DEFAULT_CONTEXT_PATH = "/admin-api";
+    private static final String AVATAR_PATH = "/api/sys/user/avatar";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
     private static final String PRIVATE_KEY_ITEM = "privateKey";
 
@@ -672,7 +677,24 @@ public class UserController {
     }
 
     public static String getAvatarUrl(String userId, String token) {
-        return String.format(AVATAR_URL_FORMAT, userId, token);
+        return UriComponentsBuilder.fromPath(currentContextPath())
+                .path(AVATAR_PATH)
+                .queryParam("id", userId)
+                .queryParam("token", token)
+                .build()
+                .toUriString();
+    }
+
+    private static String currentContextPath() {
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        if (attributes instanceof ServletRequestAttributes) {
+            String contextPath =
+                    ((ServletRequestAttributes) attributes).getRequest().getContextPath();
+            if (StringUtils.isNotBlank(contextPath)) {
+                return contextPath;
+            }
+        }
+        return DEFAULT_CONTEXT_PATH;
     }
 
     private String readAvatarUrl(UserId userId) {

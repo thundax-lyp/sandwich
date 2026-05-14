@@ -36,8 +36,11 @@ import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collections;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 public class UserControllerContractTest {
 
@@ -114,6 +117,21 @@ public class UserControllerContractTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
                 .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @Test
+    public void shouldBuildAvatarUrlWithContextPath() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setContextPath("/admin-api");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        try {
+            org.junit.Assert.assertEquals(
+                    "/admin-api/api/sys/user/avatar?id=1001&token=token-1",
+                    UserController.getAvatarUrl("1001", "token-1"));
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
     }
 
     private User user() {

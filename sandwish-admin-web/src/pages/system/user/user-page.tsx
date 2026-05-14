@@ -39,6 +39,7 @@ import {
     listUserRoles,
     pageUsers,
     sortUsers,
+    updateUser,
     uploadUserAvatar,
     updateUserStatus
 } from "./user-service";
@@ -46,7 +47,8 @@ import type {
     UserDepartmentResponse,
     UserPageRequest,
     UserResponse,
-    UserRoleResponse
+    UserRoleResponse,
+    UserSaveRequest
 } from "./user-service";
 import "./user-page.css";
 
@@ -411,6 +413,18 @@ export const UserPage = () => {
             messageApi.error(error instanceof Error ? error.message : "头像上传失败");
         }
     });
+    const updateMutation = useMutation({
+        mutationFn: updateUser,
+        onSuccess: async (savedUser) => {
+            setEditingUser(savedUser);
+            await invalidateUserPage();
+            setEditingUser(null);
+            messageApi.success("用户已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "更新失败");
+        }
+    });
 
     const updateQuery = (nextQuery: Partial<UserPageRequest>) => {
         setSelectedRowKeys([]);
@@ -508,6 +522,27 @@ export const UserPage = () => {
             ...editingUser,
             roles: roleIds.map((roleId) => roleById.get(roleId) ?? { id: roleId, name: roleId })
         });
+    };
+
+    const toUserSaveRequest = (user: UserResponse): UserSaveRequest => ({
+        id: user.id,
+        remarks: user.remarks,
+        loginName: user.loginName,
+        ranks: user.ranks,
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile,
+        admin: user.admin,
+        enable: user.enable,
+        department: user.department?.id ? { id: user.department.id } : null,
+        roles: (user.roles || []).map((role) => ({ id: role.id }))
+    });
+
+    const saveEditingUser = () => {
+        if (!editingUser) {
+            return;
+        }
+        updateMutation.mutate(toUserSaveRequest(editingUser));
     };
 
     const columns: SandwishTableProps<UserResponse>["columns"] = [
@@ -814,8 +849,17 @@ export const UserPage = () => {
                 extra={<Button size="small">−</Button>}
                 footer={
                     <div className="user-edit-footer">
-                        <Button onClick={() => setEditingUser(null)}>取消</Button>
-                        <Button type="primary" onClick={() => setEditingUser(null)}>
+                        <Button
+                            disabled={updateMutation.isPending}
+                            onClick={() => setEditingUser(null)}
+                        >
+                            取消
+                        </Button>
+                        <Button
+                            type="primary"
+                            loading={updateMutation.isPending}
+                            onClick={saveEditingUser}
+                        >
                             更新用户
                         </Button>
                     </div>

@@ -76,7 +76,6 @@ public class UserSaveRequest implements Serializable {
 
     @ApiModelProperty(name = "token", value = "令牌")
     @JsonProperty("token")
-    @NotEmpty(message = "\"token\"不能为空")
     private String token;
 
     @ApiModelProperty(name = "department", value = "归属部门")

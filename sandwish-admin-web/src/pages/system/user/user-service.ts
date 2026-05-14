@@ -50,6 +50,20 @@ export interface UserSortRequest {
     sortDirection?: "ASC" | "DESC";
 }
 
+export interface UserSaveRequest {
+    id: string;
+    remarks?: string | null;
+    loginName?: string | null;
+    ranks?: number | null;
+    name?: string | null;
+    email?: string | null;
+    mobile?: string | null;
+    admin?: boolean | null;
+    enable?: boolean | null;
+    department?: { id: string } | null;
+    roles?: Array<{ id: string }> | null;
+}
+
 export const pageUsers = (request: UserPageRequest = {}) => {
     return postJson<PageResponse<UserResponse>, UserPageRequest>("/sys/user/page", {
         body: request
@@ -79,6 +93,12 @@ export const sortUsers = (request: UserSortRequest) => {
 export const deleteUsers = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/user/delete", {
         body: ids.map((id) => ({ id }))
+    });
+};
+
+export const updateUser = (request: UserSaveRequest) => {
+    return postJson<UserResponse, UserSaveRequest>("/sys/user/update", {
+        body: request
     });
 };
 

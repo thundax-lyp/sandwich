@@ -120,18 +120,18 @@ public class StorageControllerContractTest {
     }
 
     @Test
-    public void shouldReturnForbiddenWhenCurrentUserCannotReadContent() throws Exception {
+    public void shouldReturnNotFoundWhenContentObjectDisabled() throws Exception {
         StoredObject storage = storage(1001L);
+        storage.setObjectStatus(com.github.thundax.modules.storage.entity.enums.StoredObjectStatus.DELETED);
         StorageService storageService = mock(StorageService.class);
         when(storageService.get(any(StoredObjectId.class))).thenReturn(storage);
-        when(storageService.existsReadableContent(any(StorageQuery.class))).thenReturn(false);
         StorageController controller =
                 controller(storageService, mock(StorageConverter.class), mock(StoredObjectStore.class));
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         controller.content(1001L, response);
 
-        assertEquals(403, response.getStatus());
+        assertEquals(404, response.getStatus());
     }
 
     @Test
@@ -140,7 +140,6 @@ public class StorageControllerContractTest {
         StorageService storageService = mock(StorageService.class);
         StoredObjectStore objectStore = mock(StoredObjectStore.class);
         when(storageService.get(any(StoredObjectId.class))).thenReturn(storage);
-        when(storageService.existsReadableContent(any(StorageQuery.class))).thenReturn(true);
         when(objectStore.exists(storage)).thenReturn(true);
         when(objectStore.open(storage)).thenReturn(new ByteArrayInputStream("hello".getBytes("UTF-8")));
         StorageController controller = controller(storageService, mock(StorageConverter.class), objectStore);

@@ -136,11 +136,8 @@ public class StorageController {
             response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
-        StorageQuery accessQuery = storageQuery(id);
-        accessQuery.setOwnerType(StorageOwnerType.USER);
-        accessQuery.setOwnerId(SandwishContextHolder.currentSubjectId());
-        if (!storageService.existsReadableContent(accessQuery)) {
-            response.sendError(HttpStatus.SC_FORBIDDEN);
+        if (!storage.isEnable()) {
+            response.sendError(HttpStatus.SC_NOT_FOUND);
             return;
         }
 
@@ -250,12 +247,6 @@ public class StorageController {
         storage.setObjectKey(object.getObjectKey());
         storage.setSize(object.getSize());
         storage.setAccessEndpoint(object.getAccessEndpoint());
-    }
-
-    private StorageQuery storageQuery(Long id) {
-        StorageQuery query = new StorageQuery();
-        query.setId(StoredObjectIdCodec.toDomain(id));
-        return query;
     }
 
     private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {

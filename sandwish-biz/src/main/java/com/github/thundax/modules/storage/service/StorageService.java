@@ -46,6 +46,7 @@ public interface StorageService {
 
     List<StoredObjectReference> listReferences(StorageQuery query);
 
+    @LayerPublicApi(reason = "存储对象下载或预览前校验内容可读性的业务入口")
     boolean existsReadableContent(StorageQuery query);
 
     void sort(StorageSortCommand command);

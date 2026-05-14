@@ -1,4 +1,4 @@
-import { postJson } from "@/api/http";
+import { postFormData, postJson } from "@/api/http";
 import type { PageResponse } from "@/api/page-response";
 
 export interface UserPageRequest {
@@ -60,6 +60,10 @@ export const listUserDepartments = () => {
     return postJson<UserDepartmentResponse[]>("/sys/user/department/tree");
 };
 
+export const listUserRoles = () => {
+    return postJson<UserRoleResponse[]>("/sys/user/role/list");
+};
+
 export const updateUserStatus = (request: UserStatusRequest[]) => {
     return postJson<boolean, UserStatusRequest[]>("/sys/user/enable", {
         body: request
@@ -76,4 +80,11 @@ export const deleteUsers = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/user/delete", {
         body: ids.map((id) => ({ id }))
     });
+};
+
+export const uploadUserAvatar = (id: string, avatar: File) => {
+    const body = new FormData();
+    body.append("id", id);
+    body.append("avatar", avatar);
+    return postFormData<boolean>("/sys/user/avatar/upload", body);
 };

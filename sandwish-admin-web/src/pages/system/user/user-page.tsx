@@ -20,6 +20,7 @@ import {
     Tag,
     Tree,
     Typography,
+    Upload,
     message
 } from "antd";
 import type { DataNode } from "antd/es/tree";
@@ -30,14 +31,23 @@ import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { getCurrentUserInfo } from "@/service/current-user-service";
+import type { CurrentUserInfoResponse } from "@/service/current-user-service";
 import {
     deleteUsers,
     listUserDepartments,
+    listUserRoles,
     pageUsers,
     sortUsers,
+    uploadUserAvatar,
     updateUserStatus
 } from "./user-service";
-import type { UserDepartmentResponse, UserPageRequest, UserResponse } from "./user-service";
+import type {
+    UserDepartmentResponse,
+    UserPageRequest,
+    UserResponse,
+    UserRoleResponse
+} from "./user-service";
 import "./user-page.css";
 
 const { Text } = Typography;
@@ -71,6 +81,7 @@ const DEFAULT_USER_FILTERS: UserFilters = {
 
 const EMPTY_USERS: UserResponse[] = [];
 const EMPTY_DEPARTMENTS: UserDepartmentResponse[] = [];
+const EMPTY_USER_ROLES: UserRoleResponse[] = [];
 
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
@@ -118,6 +129,26 @@ const roleClassName = (user: UserResponse, index: number) => {
         return "user-role-admin";
     }
     return index === 0 ? "user-role-editor" : "user-role-viewer";
+};
+
+const readRankValue = (user?: Pick<UserResponse, "ranks" | "superAdmin"> | null) => {
+    if (!user) {
+        return -1;
+    }
+    if (user.superAdmin) {
+        return 9;
+    }
+    return user.ranks ?? 0;
+};
+
+const canManageUserByRank = (
+    currentUser: CurrentUserInfoResponse | undefined,
+    targetUser: UserResponse
+) => {
+    if (currentUser?.superAdmin) {
+        return true;
+    }
+    return readRankValue(targetUser) < readRankValue(currentUser);
 };
 
 const buildDepartmentTree = (departments: UserDepartmentResponse[]): DataNode[] => {
@@ -214,6 +245,17 @@ export const UserPage = () => {
         queryFn: () => listUserDepartments(),
         retry: false
     });
+    const currentUserQuery = useQuery({
+        queryKey: ["current-user", "info"],
+        queryFn: getCurrentUserInfo,
+        retry: false
+    });
+    const userRoleQuery = useQuery({
+        queryKey: ["user", "role", "list"],
+        queryFn: () => listUserRoles(),
+        enabled: Boolean(editingUser),
+        retry: false
+    });
     const pageData = userQuery.data;
     const users = useMemo(() => pageData?.records ?? EMPTY_USERS, [pageData?.records]);
     const totalCount = pageData?.count ?? pageData?.totalCount ?? 0;
@@ -226,6 +268,20 @@ export const UserPage = () => {
         () => collectTreeKeys(departmentTreeData),
         [departmentTreeData]
     );
+    const userRoleOptions = useMemo(() => {
+        const roleById = new Map<string, UserRoleResponse>();
+        [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(editingUser?.roles ?? [])].forEach(
+            (role) => {
+                if (role?.id) {
+                    roleById.set(role.id, role);
+                }
+            }
+        );
+        return Array.from(roleById.values()).map((role) => ({
+            value: role.id,
+            label: role.name || role.id
+        }));
+    }, [editingUser?.roles, userRoleQuery.data]);
 
     useEffect(() => {
         const departmentPanel = departmentPanelRef.current;
@@ -339,6 +395,22 @@ export const UserPage = () => {
             messageApi.error(error instanceof Error ? error.message : "排序失败");
         }
     });
+    const avatarUploadMutation = useMutation({
+        mutationFn: ({ id, avatar }: { id: string; avatar: File }) => uploadUserAvatar(id, avatar),
+        onSuccess: async (_, variables) => {
+            const refreshedUsers = await userQuery.refetch();
+            const refreshedUser = refreshedUsers.data?.records?.find(
+                (user) => user.id === variables.id
+            );
+            if (refreshedUser) {
+                setEditingUser(refreshedUser);
+            }
+            messageApi.success("头像已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "头像上传失败");
+        }
+    });
 
     const updateQuery = (nextQuery: Partial<UserPageRequest>) => {
         setSelectedRowKeys([]);
@@ -406,7 +478,12 @@ export const UserPage = () => {
         targetUser: UserResponse,
         position: SandwishTableSortPosition
     ) => {
-        if (!canEditUser || sourceUser.id === targetUser.id) {
+        if (
+            !canEditUser ||
+            !canManageUserByRank(currentUserQuery.data, sourceUser) ||
+            !canManageUserByRank(currentUserQuery.data, targetUser) ||
+            sourceUser.id === targetUser.id
+        ) {
             return;
         }
         const nextUsers = sortByMove(users, sourceUser, targetUser, position);
@@ -489,8 +566,9 @@ export const UserPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.actions,
             render: (_, user) => {
                 const userName = readUserName(user);
-                const editDisabled = !canEditUser;
-                const deleteDisabled = !canEditUser || Boolean(user.superAdmin);
+                const canManageCurrentUser = canManageUserByRank(currentUserQuery.data, user);
+                const editDisabled = !canEditUser || !canManageCurrentUser;
+                const deleteDisabled = !canEditUser || !canManageCurrentUser;
                 return (
                     <div className="sandwish-table-row-actions">
                         <Space.Compact className="sandwish-table-row-actions-inline">
@@ -684,7 +762,7 @@ export const UserPage = () => {
                     selectedRowKeys,
                     onChange: setSelectedRowKeys,
                     getCheckboxProps: (user) => ({
-                        disabled: Boolean(user.superAdmin)
+                        disabled: !canEditUser || !canManageUserByRank(currentUserQuery.data, user)
                     })
                 }}
                 tableAsidePlacement="left"
@@ -731,7 +809,24 @@ export const UserPage = () => {
                             <Avatar size={64} src={editingUser.avatar || undefined}>
                                 {editingUser.avatar ? null : getInitials(readUserName(editingUser))}
                             </Avatar>
-                            <Button size="small" shape="circle" icon={<CameraOutlined />} />
+                            <Upload
+                                accept="image/*"
+                                showUploadList={false}
+                                beforeUpload={(file) => {
+                                    avatarUploadMutation.mutate({
+                                        id: editingUser.id,
+                                        avatar: file
+                                    });
+                                    return Upload.LIST_IGNORE;
+                                }}
+                            >
+                                <Button
+                                    size="small"
+                                    shape="circle"
+                                    icon={<CameraOutlined />}
+                                    loading={avatarUploadMutation.isPending}
+                                />
+                            </Upload>
                         </div>
                         <label>
                             <span>姓名</span>
@@ -757,11 +852,10 @@ export const UserPage = () => {
                             <span>角色</span>
                             <Select
                                 mode="multiple"
-                                value={readRoleNames(editingUser)}
-                                options={readRoleNames(editingUser).map((roleName) => ({
-                                    value: roleName,
-                                    label: roleName
-                                }))}
+                                value={(editingUser.roles || []).map((role) => role.id)}
+                                options={userRoleOptions}
+                                loading={userRoleQuery.isFetching}
+                                placeholder="选择角色"
                             />
                         </label>
                     </div>

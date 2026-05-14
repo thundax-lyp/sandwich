@@ -545,6 +545,28 @@ describe("App", () => {
         replacePermissions(["sys:user:view", "sys:user:edit"]);
         vi.spyOn(globalThis, "fetch").mockImplementation((input, init) => {
             const url = String(input);
+            if (url.endsWith("/sys/current-user/info")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                id: "current",
+                                loginName: "root",
+                                name: "Root",
+                                ranks: 9,
+                                superAdmin: true,
+                                admin: true
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
             if (url.endsWith("/sys/user/department/tree")) {
                 return Promise.resolve(
                     new Response(
@@ -557,6 +579,25 @@ describe("App", () => {
                                     name: "Product",
                                     namePath: "Product"
                                 }
+                            ]
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+            if (url.endsWith("/sys/user/role/list")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: [
+                                { id: "r1", name: "管理员" },
+                                { id: "r2", name: "观察员" },
+                                { id: "r3", name: "审计员" }
                             ]
                         }),
                         {
@@ -655,6 +696,12 @@ describe("App", () => {
 
         expect(await screen.findByText("编辑用户")).toBeInTheDocument();
         expect(screen.getByDisplayValue("Olivia Martinez")).toBeInTheDocument();
+        await waitFor(() =>
+            expect(globalThis.fetch).toHaveBeenCalledWith(
+                "/admin-api/api/sys/user/role/list",
+                expect.any(Object)
+            )
+        );
 
         fireEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));
 

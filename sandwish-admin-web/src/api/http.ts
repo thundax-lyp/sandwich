@@ -51,7 +51,9 @@ const shouldRefreshBeforeRequest = () => {
     const token = getAccessToken();
     const refreshToken = getRefreshToken();
     const expireAt = getAccessTokenExpireAt();
-    return Boolean(token && refreshToken && expireAt && expireAt <= Date.now() + TOKEN_REFRESH_AHEAD_MS);
+    return Boolean(
+        token && refreshToken && expireAt && expireAt <= Date.now() + TOKEN_REFRESH_AHEAD_MS
+    );
 };
 
 let refreshPromise: Promise<AccessTokenResponse | null> | null = null;
@@ -129,6 +131,22 @@ const requestJson = async <TResponse, TBody = unknown>(
     return { response, payload };
 };
 
+const requestFormData = async <TResponse>(path: string, body: FormData, token: string | null) => {
+    const headers: HeadersInit = {};
+    if (token) {
+        headers[ACCESS_TOKEN_HEADER] = token;
+    }
+
+    const response = await fetch(`${ADMIN_API_BASE_URL}${path}`, {
+        method: "POST",
+        headers,
+        body
+    });
+
+    const payload = (await response.json()) as ApiResponse<TResponse>;
+    return { response, payload };
+};
+
 export const postJson = async <TResponse, TBody = unknown>(
     path: string,
     options: RequestOptions<TBody> = {}
@@ -145,7 +163,45 @@ export const postJson = async <TResponse, TBody = unknown>(
         if (path !== TOKEN_REFRESH_PATH && isAuthInvalid(response, code) && getRefreshToken()) {
             const refreshedToken = await refreshAccessToken();
             if (refreshedToken?.token) {
-                const retryResult = await requestJson<TResponse, TBody>(path, options, refreshedToken.token);
+                const retryResult = await requestJson<TResponse, TBody>(
+                    path,
+                    options,
+                    refreshedToken.token
+                );
+                response = retryResult.response;
+                payload = retryResult.payload;
+
+                if (response.ok && isSuccessCode(payload.code)) {
+                    return payload.data;
+                }
+            }
+        }
+
+        if (isAuthInvalid(response, code)) {
+            clearAccessToken();
+        }
+        throw new ApiError(code, payload.message || "请求失败");
+    }
+
+    return payload.data;
+};
+
+export const postFormData = async <TResponse>(path: string, body: FormData) => {
+    await refreshAccessTokenIfNeeded();
+
+    const token = getAccessToken();
+    let { response, payload } = await requestFormData<TResponse>(path, body, token);
+
+    if (!response.ok || !isSuccessCode(payload.code)) {
+        const code = payload.code ?? response.status;
+        if (isAuthInvalid(response, code) && getRefreshToken()) {
+            const refreshedToken = await refreshAccessToken();
+            if (refreshedToken?.token) {
+                const retryResult = await requestFormData<TResponse>(
+                    path,
+                    body,
+                    refreshedToken.token
+                );
                 response = retryResult.response;
                 payload = retryResult.payload;
 

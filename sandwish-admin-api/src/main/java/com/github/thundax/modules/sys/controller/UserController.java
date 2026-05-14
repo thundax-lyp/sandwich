@@ -262,16 +262,10 @@ public class UserController {
             throw AdminResponseExceptions.objectNotFound();
         }
         User currentUser = currentUserResolver.currentUser();
+        validateEditableUser(currentUser, bean);
         // 非超管用户无权限开启/关闭管理员
         if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw AdminResponseExceptions.permissionDenied();
-        }
-        // 无权限修改超管/等级高于自身的用户信息
-        if (!currentUser.isSuper()) {
-            if (bean.isSuper()
-                    || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw AdminResponseExceptions.permissionDenied();
-            }
         }
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
@@ -299,6 +293,11 @@ public class UserController {
     @PostMapping(value = "avatar/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @WrappedApiResponse
     public Boolean uploadAvatar(@RequestParam(value = "id") String id, MultipartFile avatar) {
+        User bean = userService.get(UserIdCodec.toDomain(Long.valueOf(id)));
+        if (bean == null) {
+            throw AdminResponseExceptions.objectNotFound();
+        }
+        validateEditableUser(currentUserResolver.currentUser(), bean);
         try {
             currentUserService.changeAvatar(new ChangeCurrentUserAvatarCommand(
                     UserIdCodec.toDomain(Long.valueOf(id)), avatar.getInputStream(), avatar.getOriginalFilename()));
@@ -321,6 +320,11 @@ public class UserController {
     @PostMapping(value = "avatar/delete")
     @WrappedApiResponse
     public Boolean deleteAvatar(@Valid @RequestBody UserAvatarRequest request) {
+        User bean = userService.get(UserIdCodec.toDomain(request.getId()));
+        if (bean == null) {
+            throw AdminResponseExceptions.objectNotFound();
+        }
+        validateEditableUser(currentUserResolver.currentUser(), bean);
         currentUserService.removeAvatar(new RemoveCurrentUserAvatarCommand(UserIdCodec.toDomain(request.getId())));
         return true;
     }
@@ -360,10 +364,7 @@ public class UserController {
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            if (bean.isSuper()
-                    || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw AdminResponseExceptions.permissionDenied();
-            }
+            validateEditableUser(currentUser, bean);
             commandList.add(new ChangeUserStatusCommand(
                     bean.getId(), Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
         }
@@ -432,10 +433,7 @@ public class UserController {
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            if (bean.isSuper()
-                    || bean.getRank().value() >= currentUser.getRank().value()) {
-                throw AdminResponseExceptions.permissionDenied();
-            }
+            validateEditableUser(currentUser, bean);
             idList.add(bean.getId());
         }
         if (idList.isEmpty()) {
@@ -586,6 +584,19 @@ public class UserController {
 
         return identity.getPrincipalKey() != null
                 && Objects.equals(identity.getPrincipalKey().getPrincipalId(), id);
+    }
+
+    private void validateEditableUser(User currentUser, User targetUser) {
+        if (currentUser != null && currentUser.isSuper()) {
+            return;
+        }
+        if (currentUser == null
+                || currentUser.getRank() == null
+                || targetUser == null
+                || targetUser.getRank() == null
+                || targetUser.getRank().value() >= currentUser.getRank().value()) {
+            throw AdminResponseExceptions.permissionDenied();
+        }
     }
 
     private UserResponse toResponse(User user) {

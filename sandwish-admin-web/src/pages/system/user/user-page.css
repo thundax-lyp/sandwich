@@ -316,6 +316,8 @@ html[data-theme="dark"] .user-page {
 .user-role-admin,
 .user-role-editor,
 .user-role-viewer,
+.user-rank-badge,
+.user-rank-super-admin,
 .user-status-active,
 .user-status-inactive,
 .user-status-invited {
@@ -339,6 +341,18 @@ html[data-theme="dark"] .user-page {
     color: var(--user-copy);
     background: rgba(255, 255, 255, 0.58);
     border-color: var(--user-line);
+}
+
+.user-rank-badge {
+    color: var(--user-cyan);
+    background: var(--user-cyan-soft);
+    border-color: var(--user-cyan-line);
+}
+
+.user-rank-super-admin {
+    color: var(--user-blue);
+    background: var(--user-blue-soft);
+    border-color: var(--user-blue-line);
 }
 
 .user-status-active {

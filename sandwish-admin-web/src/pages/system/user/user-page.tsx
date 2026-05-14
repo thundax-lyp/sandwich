@@ -102,6 +102,17 @@ const statusClassName = (user: UserResponse) => {
     return user.enable === false ? "user-status-inactive" : "user-status-active";
 };
 
+const rankLabel = (user: UserResponse) => {
+    if (user.superAdmin || user.ranks === 9) {
+        return "超级管理员";
+    }
+    return `等级 ${user.ranks ?? 0}`;
+};
+
+const rankClassName = (user: UserResponse) => {
+    return user.superAdmin || user.ranks === 9 ? "user-rank-super-admin" : "user-rank-badge";
+};
+
 const roleClassName = (user: UserResponse, index: number) => {
     if (user.admin || user.superAdmin) {
         return "user-role-admin";
@@ -470,7 +481,7 @@ export const UserPage = () => {
             dataIndex: "ranks",
             key: "ranks",
             width: DEFAULT_COLUMN_WIDTHS.ranks,
-            render: (ranks?: number | null) => ranks ?? null
+            render: (_, user) => <Tag className={rankClassName(user)}>{rankLabel(user)}</Tag>
         },
         {
             title: "操作",

@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.converter;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;
@@ -28,7 +29,7 @@ public class StorageConverter {
         String previewPath = StringUtils.isBlank(entity.getAccessEndpoint())
                 ? this.contentPath + StoredObjectIdCodec.toValue(entity.getId()) + "/content"
                 : entity.getAccessEndpoint();
-        return withContextPath(previewPath);
+        return withAccessToken(withContextPath(previewPath));
     }
 
     public StoredObject toEntity(String previewUrl) {
@@ -36,7 +37,8 @@ public class StorageConverter {
             return null;
         }
 
-        String objectId = StringUtils.removeEnd(StringUtils.substringAfter(previewUrl, contentPath), "/content");
+        String objectPath = StringUtils.substringBefore(StringUtils.substringAfter(previewUrl, contentPath), "?");
+        String objectId = StringUtils.removeEnd(objectPath, "/content");
         return storageService.get(StoredObjectIdCodec.toDomain(Long.valueOf(objectId)));
     }
 
@@ -51,6 +53,19 @@ public class StorageConverter {
             return path;
         }
         return UriComponentsBuilder.fromPath(contextPath).path(path).build().toUriString();
+    }
+
+    private String withAccessToken(String previewUrl) {
+        String token = SandwishContextHolder.currentToken();
+        if (StringUtils.isBlank(previewUrl)
+                || StringUtils.isBlank(token)
+                || StringUtils.contains(previewUrl, "token=")) {
+            return previewUrl;
+        }
+        return UriComponentsBuilder.fromUriString(previewUrl)
+                .queryParam("token", token)
+                .build()
+                .toUriString();
     }
 
     private String currentContextPath() {

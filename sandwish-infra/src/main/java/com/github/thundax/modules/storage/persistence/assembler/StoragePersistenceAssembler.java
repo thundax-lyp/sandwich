@@ -111,9 +111,9 @@ public final class StoragePersistenceAssembler {
         }
         StoredObjectReferenceDO dataObject = new StoredObjectReferenceDO();
         dataObject.setFileId(StoredObjectIdCodec.toValue(entity.getId()));
-        dataObject.setReferenceOwnerId(entity.getBusinessId());
-        dataObject.setReferenceOwnerType(entity.getBusinessType());
-        dataObject.setBusinessParams(entity.getBusinessParams());
+        dataObject.setReferenceOwnerId(entity.getOwnerId());
+        dataObject.setReferenceOwnerType(ownerTypeValue(entity.getOwnerType()));
+        dataObject.setBusinessParams(entity.getOwnerParams());
         dataObject.setReferenceStatus(referenceStatusValue(entity.getReferenceStatus()));
         return dataObject;
     }
@@ -124,9 +124,9 @@ public final class StoragePersistenceAssembler {
         }
         StoredObjectReference entity = new StoredObjectReference();
         entity.setId(StoredObjectIdCodec.toDomain(dataObject.getFileId()));
-        entity.setBusinessId(dataObject.getReferenceOwnerId());
-        entity.setBusinessType(dataObject.getReferenceOwnerType());
-        entity.setBusinessParams(dataObject.getBusinessParams());
+        entity.setOwnerId(dataObject.getReferenceOwnerId());
+        entity.setOwnerType(ownerTypeFrom(dataObject.getReferenceOwnerType()));
+        entity.setOwnerParams(dataObject.getBusinessParams());
         entity.setReferenceStatus(referenceStatusFrom(dataObject.getReferenceStatus()));
         return entity;
     }

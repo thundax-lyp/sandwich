@@ -27,28 +27,4 @@ public class StoredObjectReference {
     public void setId(StoredObjectId id) {
         this.objectId = id;
     }
-
-    public String getBusinessId() {
-        return ownerId;
-    }
-
-    public void setBusinessId(String referenceOwnerId) {
-        this.ownerId = referenceOwnerId;
-    }
-
-    public String getBusinessType() {
-        return ownerType == null ? null : ownerType.value();
-    }
-
-    public void setBusinessType(String referenceOwnerType) {
-        this.ownerType = referenceOwnerType == null ? null : StorageOwnerType.from(referenceOwnerType);
-    }
-
-    public String getBusinessParams() {
-        return ownerParams;
-    }
-
-    public void setBusinessParams(String businessParams) {
-        this.ownerParams = businessParams;
-    }
 }

@@ -54,7 +54,7 @@ public class StoragePersistenceAssemblerTest {
 
         StoredObject entity = StoragePersistenceAssembler.toEntity(dataObject);
 
-        assertSame(StoredObjectStatus.ACTIVE, entity.getStatus());
+        assertSame(StoredObjectStatus.ACTIVE, entity.getObjectStatus());
         assertSame(StoredObjectReferenceStatus.REFERENCED, entity.getReferenceStatus());
     }
 
@@ -84,7 +84,7 @@ public class StoragePersistenceAssemblerTest {
     @Test
     public void shouldWriteDomainValuesToStatuses() {
         StoredObject entity = new StoredObject();
-        entity.setStatus(StoredObjectStatus.DELETED);
+        entity.setObjectStatus(StoredObjectStatus.DELETED);
         entity.setReferenceStatus(StoredObjectReferenceStatus.UNREFERENCED);
 
         StoredObjectDO dataObject = StoragePersistenceAssembler.toDataObject(entity);

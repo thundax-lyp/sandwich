@@ -43,10 +43,6 @@ public class StoredObject implements Sortable {
         return StringUtils.isBlank(originalFilename) ? getOriginalFileName() : originalFilename;
     }
 
-    public void setOriginalFilename(String originalFilename) {
-        this.originalFilename = originalFilename;
-    }
-
     public String getContentType() {
         return StringUtils.isBlank(contentType) ? mimeType : contentType;
     }
@@ -54,39 +50,6 @@ public class StoredObject implements Sortable {
     public void setContentType(String contentType) {
         this.contentType = contentType;
         this.mimeType = contentType;
-    }
-
-    public void setStatus(String status) {
-        this.objectStatus = StringUtils.isBlank(status) ? null : StoredObjectStatus.from(status);
-    }
-
-    public void setStatus(StoredObjectStatus status) {
-        this.objectStatus = status;
-    }
-
-    public StoredObjectStatus getStatus() {
-        return objectStatus;
-    }
-
-    public void setObjectStatus(String objectStatus) {
-        this.objectStatus = StringUtils.isBlank(objectStatus) ? null : StoredObjectStatus.from(objectStatus);
-    }
-
-    public void setObjectStatus(StoredObjectStatus objectStatus) {
-        this.objectStatus = objectStatus;
-    }
-
-    public void setReferenceStatus(String referenceStatus) {
-        this.referenceStatus =
-                StringUtils.isBlank(referenceStatus) ? null : StoredObjectReferenceStatus.from(referenceStatus);
-    }
-
-    public void setReferenceStatus(StoredObjectReferenceStatus referenceStatus) {
-        this.referenceStatus = referenceStatus;
-    }
-
-    public void setOwnerType(StorageOwnerType ownerType) {
-        this.ownerType = ownerType;
     }
 
     public boolean isEnable() {

@@ -37,7 +37,7 @@ public final class StoragePersistenceAssembler {
         dataObject.setObjectKey(entity.getObjectKey());
         dataObject.setSize(entity.getSize());
         dataObject.setAccessEndpoint(entity.getAccessEndpoint());
-        dataObject.setObjectStatus(statusValue(entity.getStatus()));
+        dataObject.setObjectStatus(statusValue(entity.getObjectStatus()));
         dataObject.setReferenceStatus(referenceStatusValue(entity.getReferenceStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
@@ -59,7 +59,7 @@ public final class StoragePersistenceAssembler {
         entity.setObjectKey(dataObject.getObjectKey());
         entity.setSize(dataObject.getSize());
         entity.setAccessEndpoint(dataObject.getAccessEndpoint());
-        entity.setStatus(statusFrom(dataObject.getObjectStatus()));
+        entity.setObjectStatus(statusFrom(dataObject.getObjectStatus()));
         entity.setReferenceStatus(referenceStatusFrom(dataObject.getReferenceStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());

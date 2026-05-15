@@ -46,6 +46,8 @@
   - 实现 `StoredObjectDao`、`StoredObjectReferenceDao`、`MultipartUploadDao`，并通过 `StoredObjectStore` 适配 `common-oss` 对象存储客户端。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/StorageController.java`
   - 提供后台上传、分页、内容读取、删除和引用管理接口。
+- `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/helper/StorageUploadRequestHelper.java`
+  - 封装入口层 multipart 请求校验、文件元数据转换和 Storage Service 上传命令组装，供后台通用上传入口和业务专用上传入口复用。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/storage/controller/MultipartUploadController.java`
   - 提供后台分片上传初始化、分片上传、完成和取消接口。
 - `sandwish-front-api`
@@ -184,7 +186,9 @@
 - Storage Service 是业务流程入口，Controller 不直接访问 DAO / Mapper。
 - DAO interface 只定义持久化访问契约，不承载 HTTP 适配。
 - 底层存储端口固定下沉到 infra，实际读写通过 `common-oss` 的 `ObjectStorageClient` 完成，不作为业务接口模型暴露。
-- Storage 当前公开上传入口固定在后台 API；前台 API 当前只装配底层存储能力，不开放通用上传 Controller。
+- Storage 当前公开通用上传入口固定在后台 API；业务模块可以按自身权限边界提供专用上传入口，并复用 `StorageUploadRequestHelper` 和 `sandwish-biz` 的 Storage Service。
+- 业务专用上传入口不得绕过 Storage Service，不得直接访问 `StoredObjectStore` 或 DAO。
+- 前台 API 当前只装配底层存储能力，不开放通用上传 Controller。
 - 前台后续需要上传时，必须先沉淀明确业务资源和权限边界，再新增前台业务专用接口，并复用 `sandwish-biz` 的 Storage Service。
 - 公开 API 路径应该是 REST resource。
 - 公开 API、Response、数据库主数据和业务模块不得固定暴露 `/servlet/...`。

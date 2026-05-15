@@ -17,7 +17,10 @@ import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
+import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionSortRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
@@ -33,9 +36,11 @@ import com.github.thundax.modules.submission.service.command.SubmissionSortComma
 import com.github.thundax.modules.submission.service.query.SubmissionQuery;
 import java.util.Arrays;
 import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -44,7 +49,8 @@ public class SubmissionControllerContractTest {
     @Test
     public void shouldNormalizePageRequestBeforeCallingService() {
         SubmissionService submissionService = mock(SubmissionService.class);
-        SubmissionController controller = new SubmissionController(submissionService);
+        SubmissionController controller =
+                new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class));
         when(submissionService.page(any(SubmissionQuery.class), any(PageQuery.class)))
                 .thenAnswer(invocation -> {
                     PageQuery page = invocation.getArgument(1);
@@ -78,7 +84,8 @@ public class SubmissionControllerContractTest {
         when(submissionService.page(any(SubmissionQuery.class), any(PageQuery.class)))
                 .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(submission(1001L))));
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new SubmissionController(submissionService))
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(
+                        new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class)))
                 .setControllerAdvice(new ApiResponseBodyAdvice())
                 .build();
 
@@ -96,7 +103,8 @@ public class SubmissionControllerContractTest {
     @Test
     public void shouldConvertStatusRequestToCommand() {
         SubmissionService submissionService = mock(SubmissionService.class);
-        SubmissionController controller = new SubmissionController(submissionService);
+        SubmissionController controller =
+                new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class));
         SubmissionStatusRequest request = new SubmissionStatusRequest();
         request.setId("1001");
         request.setStatus("APPROVED");
@@ -113,7 +121,8 @@ public class SubmissionControllerContractTest {
     @Test
     public void shouldConvertSortRequestToCommand() {
         SubmissionService submissionService = mock(SubmissionService.class);
-        SubmissionController controller = new SubmissionController(submissionService);
+        SubmissionController controller =
+                new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class));
         SubmissionSortRequest request = new SubmissionSortRequest();
         request.setOrderedIds(Arrays.asList("1001", "1002"));
         request.setSortDirection(SortDirection.ASC);
@@ -127,6 +136,23 @@ public class SubmissionControllerContractTest {
         assertEquals(
                 Long.valueOf(1002L), captor.getValue().getOrderedIds().get(1).value());
         assertEquals(SortDirection.ASC, captor.getValue().getSortDirection());
+    }
+
+    @Test
+    public void shouldDelegateImageUploadWithSubmissionOwnerType() {
+        SubmissionService submissionService = mock(SubmissionService.class);
+        StorageUploadRequestHelper storageUploadRequestHelper = mock(StorageUploadRequestHelper.class);
+        StorageUploadResponse uploadResponse =
+                StorageUploadResponse.builder().id("3001").build();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        when(storageUploadRequestHelper.upload(any(HttpServletRequest.class), any(StorageOwnerType.class), any()))
+                .thenReturn(uploadResponse);
+        SubmissionController controller = new SubmissionController(submissionService, storageUploadRequestHelper);
+
+        StorageUploadResponse response = controller.uploadImage(request);
+
+        assertEquals("3001", response.getId());
+        verify(storageUploadRequestHelper).upload(request, StorageOwnerType.SUBMISSION, null);
     }
 
     private Submission submission(Long id) {

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.storage.controller;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.context.SandwishContextHolder;
@@ -21,12 +20,11 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
+import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.storage.service.StorageService;
-import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.StorageSortCommand;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
-import com.github.thundax.modules.storage.utils.StorageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -37,14 +35,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,29 +48,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Api(tags = "存储")
 @RequestMapping(value = "/api/storage/object")
 @RestController
 public class StorageController {
 
-    private final SandwishProperties.UploadProperties properties;
     private final StorageService storageService;
     private final StorageConverter storageConverter;
     private final StoredObjectStore storedObjectStore;
+    private final StorageUploadRequestHelper storageUploadRequestHelper;
 
     @Autowired
     public StorageController(
-            SandwishProperties properties,
             StorageService storageService,
             StorageConverter storageConverter,
-            StoredObjectStore storedObjectStore) {
-        this.properties = properties.getUpload();
+            StoredObjectStore storedObjectStore,
+            StorageUploadRequestHelper storageUploadRequestHelper) {
         this.storageService = storageService;
         this.storageConverter = storageConverter;
         this.storedObjectStore = storedObjectStore;
+        this.storageUploadRequestHelper = storageUploadRequestHelper;
     }
 
     @ApiOperation(value = "分页查询存储资源", notes = "storage:storage:view")
@@ -100,31 +93,8 @@ public class StorageController {
     @PostMapping(value = "upload")
     @WrappedApiResponse
     public StorageUploadResponse upload(HttpServletRequest request) {
-        if (!(request instanceof MultipartHttpServletRequest)) {
-            return StorageInterfaceAssembler.toUploadErrorResponse("错误的请求格式");
-        }
-
-        Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest) request).getFileMap();
-        StorageUploadResponse response = StorageInterfaceAssembler.toUploadEmptyResponse();
-        for (MultipartFile file : fileMap.values()) {
-            StorageUploadResponse validatedResponse = validateUploadFile(file);
-            if (validatedResponse.getError() != null) {
-                return validatedResponse;
-            }
-
-            StoredObject storage = new StoredObject();
-            storage.setOwnerType(StorageOwnerType.USER);
-            storage.setOwnerId(SandwishContextHolder.currentSubjectId());
-            StorageUtils.applyFileMetadata(file, storage);
-            try {
-                applyStoredObject(storage, storedObjectStore.save(storage, file.getInputStream()));
-            } catch (IOException e) {
-                return StorageInterfaceAssembler.toUploadErrorResponse(e.getMessage());
-            }
-            storage.setId(storageService.create(toCreateStorageCommand(storage)));
-            response = StorageInterfaceAssembler.toUploadResponse(storage, storageConverter);
-        }
-        return response;
+        return storageUploadRequestHelper.upload(
+                request, StorageOwnerType.USER, SandwishContextHolder.currentSubjectId());
     }
 
     @ApiOperation(value = "读取存储对象内容", notes = "storage:storage:view")
@@ -226,47 +196,5 @@ public class StorageController {
         return storageService.listReferenceOwnerTypes(new StorageQuery()).stream()
                 .map(StorageInterfaceAssembler::toBusinessTypeTreeNode)
                 .collect(Collectors.toList());
-    }
-
-    private StorageUploadResponse validateUploadFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return StorageInterfaceAssembler.toUploadErrorResponse("文件不能为空");
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        String extendName = StringUtils.lowerCase(FilenameUtils.getExtension(originalFilename));
-        if (!properties.getAllowSuffix().contains(extendName)) {
-            return StorageInterfaceAssembler.toUploadErrorResponse("无效的后缀名");
-        }
-        return StorageInterfaceAssembler.toUploadEmptyResponse();
-    }
-
-    private void applyStoredObject(StoredObject storage, StoredObject object) {
-        storage.setStorageType(object.getStorageType());
-        storage.setBucketName(object.getBucketName());
-        storage.setObjectKey(object.getObjectKey());
-        storage.setSize(object.getSize());
-        storage.setAccessEndpoint(object.getAccessEndpoint());
-    }
-
-    private CreateStorageCommand toCreateStorageCommand(StoredObject storage) {
-        CreateStorageCommand command = new CreateStorageCommand();
-        command.setId(storage.getId());
-        command.setOriginalFilename(storage.getOriginalFilename());
-        command.setContentType(storage.getContentType());
-        command.setName(storage.getName());
-        command.setExtendName(storage.getExtendName());
-        command.setMimeType(storage.getMimeType());
-        command.setOwnerId(storage.getOwnerId());
-        command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
-        command.setBucketName(storage.getBucketName());
-        command.setObjectKey(storage.getObjectKey());
-        command.setSize(storage.getSize());
-        command.setAccessEndpoint(storage.getAccessEndpoint());
-        command.setObjectStatus(storage.getObjectStatus());
-        command.setReferenceStatus(storage.getReferenceStatus());
-        command.setRemarks(storage.getRemarks());
-        return command;
     }
 }

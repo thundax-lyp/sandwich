@@ -8,6 +8,9 @@ import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
+import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.submission.assembler.SubmissionInterfaceAssembler;
 import com.github.thundax.modules.submission.controller.request.SubmissionIdRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
@@ -27,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,9 +42,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SubmissionController {
 
     private final SubmissionService submissionService;
+    private final StorageUploadRequestHelper storageUploadRequestHelper;
 
-    public SubmissionController(SubmissionService submissionService) {
+    public SubmissionController(
+            SubmissionService submissionService, StorageUploadRequestHelper storageUploadRequestHelper) {
         this.submissionService = submissionService;
+        this.storageUploadRequestHelper = storageUploadRequestHelper;
     }
 
     @ApiOperation(value = "获取分页列表", notes = "submission:submission:view")
@@ -109,6 +116,20 @@ public class SubmissionController {
                         readOrderedIds(request == null ? null : request.getOrderedIds()), SubmissionIdCodec::toDomain),
                 request == null ? null : request.getSortDirection()));
         return true;
+    }
+
+    @ApiOperation(value = "上传提交图片", notes = "submission:submission:edit")
+    @HasPermission("submission:submission:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = AccessTokenNames.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @PostMapping(value = "image/upload")
+    public StorageUploadResponse uploadImage(HttpServletRequest request) {
+        return storageUploadRequestHelper.upload(request, StorageOwnerType.SUBMISSION, null);
     }
 
     private List<Long> readOrderedIds(List<String> sourceList) {

@@ -12,6 +12,7 @@
 
 - 提交内容主体 `Submission`
 - 提交内容图片 `SubmissionImage`
+- 提交内容图片上传入口
 - 标题、正文、图片列表和来源 client
 - 提交内容生命周期状态
 - 提交内容平铺排序
@@ -23,7 +24,6 @@
 - 富文本编辑器。
 - 评论、点赞、收藏、转发等互动能力。
 - 内容分类、标签和搜索索引。
-- 图片上传本身，图片上传归属 `Storage`。
 - 图片处理、裁剪、水印和审核。
 - 面向终端用户的公开内容展示。
 
@@ -42,7 +42,7 @@
 - `sandwish-infra/src/main/java/com/github/thundax/modules/submission`
   - 实现 `Submission` 持久化对象、Mapper、DAO implementation 和持久化转换。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission`
-  - 提供后台查询、详情和状态调整入口适配。
+  - 提供后台查询、详情、状态调整、排序和提交图片上传入口适配。
 - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission`
   - 提供第三方提交入口适配。
 - `sandwish-front-api`
@@ -136,7 +136,9 @@ Command 固定不包含：
 
 ### 6.2 Image Boundary
 
-`Submission` 不负责上传图片。
+`Submission` 提供业务专用图片上传入口，权限固定使用 `submission:submission:edit`。
+
+上传实现固定复用 `StorageUploadRequestHelper` 和 Storage Service，上传后的存储对象 `ownerType` 固定为 `SUBMISSION`。Submission Controller 不直接访问 `StoredObjectStore`、DAO 或底层对象存储实现。
 
 开放接口和后台入口必须先通过 Storage 能力得到图片对象 ID，再提交 `imageObjectIds`。Service 固定校验图片对象 ID 列表，并写入 `SubmissionImage`。
 
@@ -207,6 +209,16 @@ Command 固定不包含：
 - 只更新 `priority`。
 - 刷新查询后顺序与 `orderedIds` 一致。
 - 不修改提交内容状态、标题、正文、图片引用和提交时间。
+
+### 7.6 Upload Submission Image
+
+后台必须支持在提交内容模块上传图片。
+
+上传成功后：
+
+- 返回 Storage 对象 ID、原始文件名、contentType 和内容访问 URL。
+- Storage 对象 `ownerType` 固定为 `SUBMISSION`。
+- Storage 对象 ID 可作为后续创建提交内容时的 `imageObjectIds`。
 
 ## 8. Key Flows
 

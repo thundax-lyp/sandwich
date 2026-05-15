@@ -23,6 +23,7 @@ import com.github.thundax.modules.storage.converter.StorageConverter;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
+import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.storage.service.StorageService;
 import com.github.thundax.modules.storage.service.query.StorageQuery;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
@@ -158,7 +159,11 @@ public class StorageControllerContractTest {
         SandwishProperties.UploadProperties upload = new SandwishProperties.UploadProperties();
         upload.setAllowSuffix(Collections.singletonList("txt"));
         properties.setUpload(upload);
-        return new StorageController(properties, storageService, storageConverter, objectStore);
+        return new StorageController(
+                storageService,
+                storageConverter,
+                objectStore,
+                new StorageUploadRequestHelper(properties, storageService, storageConverter, objectStore));
     }
 
     private StoredObject storage(Long id) {

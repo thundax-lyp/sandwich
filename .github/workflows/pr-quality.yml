@@ -11,6 +11,38 @@ permissions:
   contents: read
 
 jobs:
+  admin-web-quality:
+    name: Admin Web Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    defaults:
+      run:
+        working-directory: sandwish-admin-web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: sandwish-admin-web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run prettier check
+        run: npm run format:check
+
+      - name: Run build
+        run: npm run build
+
   spotless:
     name: Spotless Check
     runs-on: ubuntu-latest

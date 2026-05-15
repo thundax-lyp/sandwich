@@ -2,6 +2,7 @@ import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom"
 import { AdminLayout } from "../layouts/admin-layout";
 import { LoginPage } from "../pages/auth/login/login-page";
 import { DashboardPage } from "../pages/dashboard/dashboard/dashboard-page";
+import { OpenClientPage } from "../pages/open/open-client/open-client-page";
 import { StorageObjectPage } from "../pages/storage/storage-object/storage-object-page";
 import { SubmissionPage } from "../pages/submission/submission/submission-page";
 import { DepartmentPage } from "../pages/system/department/department-page";
@@ -65,6 +66,10 @@ const router = createBrowserRouter(
                         {
                             path: "storage/objects",
                             element: <StorageObjectPage />
+                        },
+                        {
+                            path: "open/clients",
+                            element: <OpenClientPage />
                         },
                         {
                             path: "submission/submissions",

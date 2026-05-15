@@ -12,17 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-client-admin-web`：增加 OpenClient 管理台配置页面
-  - 范围文件：
-    - `sandwish-admin-web/src/router/index.tsx`
-    - `sandwish-admin-web/src/pages/open/open-client/open-client-page.tsx`
-    - `sandwish-admin-web/src/pages/open/open-client/open-client-page.css`
-    - `sandwish-admin-web/src/pages/open/open-client/open-client-service.ts`
-    - `sandwish-admin-web/src/app.test.tsx`
-  - 处理动作：新增 OpenClient 分页、创建、启停、重置 API SECRET、维护 IP 白名单、维护过期时间和维护权限的管理台页面。
-  - 验收点：创建和重置 secret 后只一次性展示 API SECRET 明文，重置 secret 有二次确认，菜单 URL 与 `system.sql` 一致。
-  - 重要度：10/10
-
 - [ ] `open-api-auth-foundation`：实现 Open API 签名认证和权限校验基础设施
   - 范围文件：
     - `sandwish-open-api/src/main/java/com/github/thundax/common/exception/OpenApiExceptionTranslator.java`

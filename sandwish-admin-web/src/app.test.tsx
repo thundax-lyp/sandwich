@@ -5,6 +5,7 @@ import App from "./app";
 import { postJson } from "./api/http";
 import { clearPermissions, hasPermission, replacePermissions } from "./auth/permission-storage";
 import { SandwishTable } from "./components/sandwish-table";
+import { OpenClientPage } from "./pages/open/open-client/open-client-page";
 import { SubmissionPage } from "./pages/submission/submission/submission-page";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
@@ -603,6 +604,81 @@ describe("App", () => {
                     pageNo: 1,
                     pageSize: 10,
                     sortDirection: "ASC"
+                }),
+                headers: expect.objectContaining({
+                    "Access-Token": "test-token"
+                }),
+                method: "POST"
+            })
+        );
+    });
+
+    it("renders the open client page", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["open:client:view", "open:client:edit"])
+        );
+        replacePermissions(["open:client:view", "open:client:edit"]);
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/open/client/page")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalPage: 1,
+                                totalCount: 1,
+                                records: [
+                                    {
+                                        id: "1",
+                                        name: "调试客户端",
+                                        status: "ENABLED",
+                                        apiKey: "swk_test",
+                                        ipWhitelist: '["127.0.0.1"]',
+                                        expiredAt: "2026-05-15T10:00:00.000+08:00",
+                                        permissions: ["submission:submission:create"]
+                                    }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <OpenClientPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByRole("heading", { name: "开放客户端" })).toBeInTheDocument();
+        expect(await screen.findByText("调试客户端")).toBeInTheDocument();
+        expect(screen.getByText("swk_test")).toBeInTheDocument();
+        expect(screen.getByText("submission:submission:create")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /新增客户端/ })).toBeInTheDocument();
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/open/client/page",
+            expect.objectContaining({
+                body: JSON.stringify({
+                    pageNo: 1,
+                    pageSize: 10
                 }),
                 headers: expect.objectContaining({
                     "Access-Token": "test-token"

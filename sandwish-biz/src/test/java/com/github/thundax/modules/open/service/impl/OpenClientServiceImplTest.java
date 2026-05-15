@@ -78,6 +78,28 @@ public class OpenClientServiceImplTest {
     }
 
     @Test
+    public void shouldCreateApiKeyAndSecretWhenResetSeedClientWithoutIdentity() {
+        RecordingOpenClientDao openClientDao = new RecordingOpenClientDao();
+        RecordingPrincipalIdentityDao identityDao = new RecordingPrincipalIdentityDao();
+        RecordingPrincipalCredentialDao credentialDao = new RecordingPrincipalCredentialDao();
+        OpenClientServiceImpl service = new OpenClientServiceImpl(openClientDao, identityDao, credentialDao);
+        OpenClient seedClient = new OpenClient();
+        seedClient.setName("seed");
+        seedClient.setStatus(OpenClientStatus.ENABLED);
+        OpenClientId seedClientId = openClientDao.insert(seedClient);
+
+        OpenClientDTO reset = service.resetSecret(new ResetOpenClientSecretCommand(seedClientId));
+
+        assertEquals(seedClientId, reset.getId());
+        assertTrue(reset.getApiKey().startsWith("swak_"));
+        assertTrue(reset.getApiSecret().startsWith("swas_"));
+        assertEquals(PrincipalIdentityType.API_KEY, identityDao.inserted.getType());
+        assertEquals(reset.getApiKey(), identityDao.inserted.getIdentityValue());
+        assertEquals(PrincipalCredentialType.API_SECRET, credentialDao.inserted.getCredentialType());
+        assertNotEquals(reset.getApiSecret(), credentialDao.inserted.getCredentialValue());
+    }
+
+    @Test
     public void shouldUpdateStatusAndReplacePermissions() {
         RecordingOpenClientDao openClientDao = new RecordingOpenClientDao();
         OpenClientServiceImpl service = new OpenClientServiceImpl(

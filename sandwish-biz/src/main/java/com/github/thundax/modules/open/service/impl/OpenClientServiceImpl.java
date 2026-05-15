@@ -146,7 +146,11 @@ public class OpenClientServiceImpl implements OpenClientService {
         PrincipalIdentity identity =
                 principalIdentityDao.getByPrincipalKeyAndType(principalKey, PrincipalIdentityType.API_KEY);
         if (identity == null || identity.getId() == null) {
-            throw invalidParameter("OpenClient API key does not exist");
+            String apiKey = generateApiKey();
+            String apiSecret = generateApiSecret();
+            identity = createIdentity(client.getId(), apiKey);
+            createCredential(client.getId(), identity.getId(), apiSecret);
+            return toDTO(client, apiKey, apiSecret);
         }
 
         String apiSecret = generateApiSecret();

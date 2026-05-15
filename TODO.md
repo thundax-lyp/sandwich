@@ -12,17 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `submission-infra`：实现提交内容持久化
-  - 范围文件：
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/submission/persistence/dataobject/**`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/submission/persistence/mapper/**`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/submission/persistence/assembler/**`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/submission/persistence/dao/**`
-    - `sandwish-infra/src/test/java/com/github/thundax/modules/submission/**`
-  - 处理动作：按 `docs/20-database/SUBMISSION-DATABASE-DESIGN.md` 和 RUNBOOK 新增 DO、Mapper、DAO implementation、assembler、排序持久化和测试
-  - 验收点：持久化字段与 `db/schema/submission.sql` 一致，分页按 `priority asc, id asc`，图片按 `sort_order` 装载，且 `mvn -pl sandwish-infra -am -Dtest='*Submission*Test' test` 通过
-  - 重要度：9/10
-
 - [ ] `submission-admin-api`：实现提交内容后台接口
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission/controller/**`

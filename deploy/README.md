@@ -5,7 +5,7 @@
 
 ## Purpose
 
-本目录提供全局 Docker Compose 部署样例，包含 `sandwish-admin-web`、`sandwish-admin-api`、`sandwish-front-api` 和基础设施。
+本目录提供全局 Docker Compose 部署样例，包含 `sandwish-admin-web`、`sandwish-admin-api`、`sandwish-front-api`、`sandwish-open-api` 和基础设施。
 
 ## Topology
 
@@ -14,6 +14,7 @@
 - `nginx`
 - `sandwish-admin-api`
 - `sandwish-front-api`
+- `sandwish-open-api`
 - `mysql`
 - `redis`
 - `rocketmq-namesrv`
@@ -26,12 +27,13 @@
 - 后台页面：`client -> nginx -> sandwish-admin-web static files`
 - 后台 API：`client -> nginx -> sandwish-admin-api`
 - 前台 API：`client -> nginx -> sandwish-front-api`
+- 开放 API：`client -> nginx -> sandwish-open-api`
 - 前台页面：`client -> nginx -> front static files`
 
 ## Build
 
 ```bash
-mvn -q -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
+mvn -q -pl sandwish-admin-api,sandwish-front-api,sandwish-open-api -am -DskipTests package
 cd sandwish-admin-web && npm ci && npm run build
 ```
 
@@ -39,6 +41,7 @@ cd sandwish-admin-web && npm ci && npm run build
 
 - `sandwish-admin-api/target/sandwish-admin-api.jar`
 - `sandwish-front-api/target/sandwish-front-api.jar`
+- `sandwish-open-api/target/sandwish-open-api.jar`
 - `sandwish-admin-web/dist`
 
 一键构建 API jar、admin-web dist、本地 Docker 镜像，并导出镜像文件：
@@ -51,6 +54,7 @@ SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
 
 - `sandwish/admin-api:dev`
 - `sandwish/front-api:dev`
+- `sandwish/open-api:dev`
 - `sandwish/nginx:dev`
 
 脚本还会把基础设施镜像打成 `sandwish/*` 名称并导出：
@@ -101,7 +105,9 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
 docker compose --env-file deploy/.env.dev -f deploy/docker-compose.yml up -d
 ```
 
-Compose 会等待 MySQL、Redis、MinIO 和 RocketMQ healthcheck 通过后再启动 `sandwish-admin-api` 和 `sandwish-front-api`，避免 API 容器早于基础设施可用状态启动。
+Compose 会等待 MySQL、Redis、MinIO 和 RocketMQ healthcheck 通过后再启动 `sandwish-admin-api`，等待 MySQL、Redis、MinIO healthcheck 通过后再启动 `sandwish-front-api` 和 `sandwish-open-api`，避免 API 容器早于基础设施可用状态启动。
+
+MySQL 数据通过 `SANDWISH_MYSQL_DATA_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/mysql`，便于人工备份和排查。
 
 停止：
 
@@ -114,6 +120,7 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml down
 - 后台 API：`http://127.0.0.1:18080/admin-api`
 - 后台页面：`http://127.0.0.1:18080/admin/`
 - 前台 API：`http://127.0.0.1:18080/front-api`
+- 开放 API：`http://127.0.0.1:18080/open-api`
 - 前台页面：`http://127.0.0.1:18080/`
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
@@ -142,12 +149,16 @@ MySQL 首次初始化会按以下顺序自动导入数据库脚本：
 4. `db/data/auth.sql`
 5. `db/schema/storage.sql`
 6. `db/data/storage.sql`
-7. `db/schema/member.sql`
-8. `db/data/member.sql`
-9. `db/schema/audit.sql`
-10. `db/data/audit.sql`
+7. `db/schema/submission.sql`
+8. `db/data/submission.sql`
+9. `db/schema/open.sql`
+10. `db/data/open.sql`
+11. `db/schema/member.sql`
+12. `db/data/member.sql`
+13. `db/schema/audit.sql`
+14. `db/data/audit.sql`
 
-初始化只在 `sandwish-mysql-data` volume 为空时自动执行。若需要重新初始化本地数据，先停止服务并删除该 volume。
+初始化只在 `SANDWISH_MYSQL_DATA_PATH` 对应的数据目录为空时自动执行。若需要重新初始化本地数据，先停止服务并清空该目录。
 
 初始化数据中的数据库主键使用固定雪花 ID，业务键保持对应业务值。
 
@@ -194,6 +205,13 @@ set -a; . ./dev.env; set +a
 SERVER_PORT=20002 SERVER_SERVLET_CONTEXT_PATH=/front-api java -jar sandwish-front-api/target/sandwish-front-api.jar
 ```
 
+开放接口入口：
+
+```bash
+set -a; . ./dev.env; set +a
+SERVER_PORT=20010 SERVER_SERVLET_CONTEXT_PATH=/open-api java -jar sandwish-open-api/target/sandwish-open-api.jar
+```
+
 Compose 部署样例：
 
 - `deploy/.env.example`
@@ -202,6 +220,7 @@ Compose 部署样例：
 
 - `SANDWISH_ADMIN_API_IMAGE`
 - `SANDWISH_FRONT_API_IMAGE`
+- `SANDWISH_OPEN_API_IMAGE`
 - `SANDWISH_NGINX_RUNTIME_IMAGE`
 - `SANDWISH_MYSQL_IMAGE`
 - `SANDWISH_REDIS_IMAGE`

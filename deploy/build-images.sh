@@ -18,6 +18,7 @@ MINIO_MC_SOURCE_IMAGE="${SANDWISH_MINIO_MC_SOURCE_IMAGE:-minio/mc:RELEASE.2025-0
 
 ADMIN_API_IMAGE="$REGISTRY/admin-api:$TAG"
 FRONT_API_IMAGE="$REGISTRY/front-api:$TAG"
+OPEN_API_IMAGE="$REGISTRY/open-api:$TAG"
 NGINX_RUNTIME_IMAGE="$REGISTRY/nginx:$TAG"
 MYSQL_IMAGE="$REGISTRY/mysql:8.4"
 REDIS_IMAGE="$REGISTRY/redis:7.4-alpine"
@@ -28,7 +29,7 @@ MINIO_MC_IMAGE="$REGISTRY/minio-mc:RELEASE.2025-02-21T16-00-46Z"
 cd "$ROOT_DIR"
 
 echo "==> Building API jars"
-mvn -q -pl sandwish-admin-api,sandwish-front-api -am -DskipTests package
+mvn -q -pl sandwish-admin-api,sandwish-front-api,sandwish-open-api -am -DskipTests package
 
 echo "==> Building admin web"
 cd "$ROOT_DIR/sandwish-admin-web"
@@ -52,6 +53,13 @@ docker build \
     -f "$ROOT_DIR/deploy/images/front-api.Dockerfile" \
     --build-arg "SANDWISH_JRE_IMAGE=$JRE_IMAGE" \
     -t "$FRONT_API_IMAGE" \
+    "$ROOT_DIR"
+
+echo "==> Building Docker image: $REGISTRY/open-api:$TAG"
+docker build \
+    -f "$ROOT_DIR/deploy/images/open-api.Dockerfile" \
+    --build-arg "SANDWISH_JRE_IMAGE=$JRE_IMAGE" \
+    -t "$OPEN_API_IMAGE" \
     "$ROOT_DIR"
 
 echo "==> Building Docker image: $REGISTRY/nginx:$TAG"
@@ -83,6 +91,7 @@ echo "==> Exporting Docker image files"
 mkdir -p "$OUTPUT_DIR"
 docker save -o "$OUTPUT_DIR/sandwish-admin-api-$TAG.tar" "$ADMIN_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-front-api-$TAG.tar" "$FRONT_API_IMAGE"
+docker save -o "$OUTPUT_DIR/sandwish-open-api-$TAG.tar" "$OPEN_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-nginx-$TAG.tar" "$NGINX_RUNTIME_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-mysql.tar" "$MYSQL_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-redis.tar" "$REDIS_IMAGE"
@@ -93,6 +102,7 @@ docker save -o "$OUTPUT_DIR/sandwish-minio-mc.tar" "$MINIO_MC_IMAGE"
 cat > "$OUTPUT_DIR/manifest.txt" <<EOF
 $ADMIN_API_IMAGE -> sandwish-admin-api-$TAG.tar
 $FRONT_API_IMAGE -> sandwish-front-api-$TAG.tar
+$OPEN_API_IMAGE -> sandwish-open-api-$TAG.tar
 $NGINX_RUNTIME_IMAGE -> sandwish-nginx-$TAG.tar
 $MYSQL_IMAGE -> sandwish-mysql.tar
 $REDIS_IMAGE -> sandwish-redis.tar

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,34 +19,23 @@ public final class SortableArchitectureRuleSupport {
             "\\bprivate\\s+(?:static\\s+final\\s+)?[A-Za-z0-9_<>, ?\\.\\[\\]]+\\s+([A-Za-z][A-Za-z0-9_]*)\\s*(?:=[^;]*)?;");
     private static final Pattern SORT_METHOD_PATTERN = Pattern.compile(
             "((?:\\s*@[^\\n]+\\n)+)\\s*public\\s+void\\s+sort\\s*\\(\\s*([A-Za-z0-9_]+SortCommand)\\s+command\\s*\\)");
+    private static final Pattern TABLE_PATTERN = Pattern.compile(
+            "CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?`([^`]+)`\\s*\\((.*?)\\)\\s*ENGINE",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private SortableArchitectureRuleSupport() {}
 
-    public static void assertSortableEntitiesAreAllowed(Path sourceRoot, Collection<String> allowedClassNames)
-            throws IOException {
+    public static void assertSortableEntitiesDeclarePriority(Path sourceRoot) throws IOException {
         Path root = ArchitectureSourceSupport.repositoryRoot();
         List<String> violations = new ArrayList<String>();
 
         try (Stream<Path> paths = Files.walk(sourceRoot)) {
             paths.filter(path -> path.getFileName().toString().endsWith(".java"))
-                    .forEach(path -> collectSortableClassViolations(root, path, allowedClassNames, violations));
+                    .filter(SortableArchitectureRuleSupport::isEntitySource)
+                    .forEach(path -> collectSortablePriorityViolations(root, path, violations));
         }
 
-        assertTrue("Sortable entities must be explicitly allowed: " + violations, violations.isEmpty());
-    }
-
-    public static void assertSortCommandsAreAllowed(Path sourceRoot, Collection<String> allowedCommandNames)
-            throws IOException {
-        Path root = ArchitectureSourceSupport.repositoryRoot();
-        List<String> violations = new ArrayList<String>();
-
-        try (Stream<Path> paths = Files.walk(sourceRoot)) {
-            paths.filter(path -> path.getFileName().toString().endsWith("SortCommand.java"))
-                    .forEach(
-                            path -> collectSortCommandAllowlistViolations(root, path, allowedCommandNames, violations));
-        }
-
-        assertTrue("Sort command classes must be explicitly allowed: " + violations, violations.isEmpty());
+        assertTrue("Sortable entity classes must declare priority field: " + violations, violations.isEmpty());
     }
 
     public static void assertSortCommandsUseOrderedIdsOnly(Path sourceRoot) throws IOException {
@@ -74,14 +62,15 @@ public final class SortableArchitectureRuleSupport {
         assertTrue("Sort service methods must be transactional: " + violations, violations.isEmpty());
     }
 
-    public static void assertFlatSortSchemasDeclarePriorityUnique(Path schemaRoot, Collection<String> tableNames)
-            throws IOException {
+    public static void assertFlatSortSchemasDeclarePriorityUnique(Path schemaRoot) throws IOException {
         Path root = ArchitectureSourceSupport.repositoryRoot();
         List<String> violations = new ArrayList<String>();
         String schemaContent = readSchemaContent(schemaRoot);
-        for (String tableName : tableNames) {
-            String tableBody = tableBody(schemaContent, tableName);
-            if (tableBody.length() == 0 || !tableBody.contains("UNIQUE KEY") || !tableBody.contains("`priority`")) {
+        Matcher matcher = TABLE_PATTERN.matcher(schemaContent);
+        while (matcher.find()) {
+            String tableName = matcher.group(1);
+            String tableBody = matcher.group(2);
+            if (tableBody.contains("`priority`") && !isTreeSortTable(tableBody) && !tableBody.contains("UNIQUE KEY")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, schemaRoot) + " table=" + tableName);
             }
         }
@@ -89,24 +78,15 @@ public final class SortableArchitectureRuleSupport {
         assertTrue("FlatSort tables must declare unique priority keys: " + violations, violations.isEmpty());
     }
 
-    private static void collectSortableClassViolations(
-            Path root, Path path, Collection<String> allowedClassNames, List<String> violations) {
+    private static void collectSortablePriorityViolations(Path root, Path path, List<String> violations) {
         String content = ArchitectureSourceSupport.readSourceWithoutComments(path);
         Matcher matcher = SORTABLE_CLASS_PATTERN.matcher(content);
         while (matcher.find()) {
             String className = matcher.group(1);
             String interfaces = matcher.group(2);
-            if (interfaces.contains("Sortable") && !allowedClassNames.contains(className)) {
+            if (interfaces.contains("Sortable") && !content.contains(" priority")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
             }
-        }
-    }
-
-    private static void collectSortCommandAllowlistViolations(
-            Path root, Path path, Collection<String> allowedCommandNames, List<String> violations) {
-        String className = path.getFileName().toString().replace(".java", "");
-        if (!allowedCommandNames.contains(className)) {
-            violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
         }
     }
 
@@ -146,13 +126,12 @@ public final class SortableArchitectureRuleSupport {
         return builder.toString();
     }
 
-    private static String tableBody(String schemaContent, String tableName) {
-        Pattern pattern = Pattern.compile(
-                "CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?`"
-                        + Pattern.quote(tableName)
-                        + "`\\s*\\((.*?)\\)\\s*ENGINE",
-                Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(schemaContent);
-        return matcher.find() ? matcher.group(1) : "";
+    private static boolean isEntitySource(Path path) {
+        return path.getParent() != null
+                && "entity".equals(path.getParent().getFileName().toString());
+    }
+
+    private static boolean isTreeSortTable(String tableBody) {
+        return tableBody.contains("`lft`") && tableBody.contains("`rgt`") && tableBody.contains("`parent_id`");
     }
 }

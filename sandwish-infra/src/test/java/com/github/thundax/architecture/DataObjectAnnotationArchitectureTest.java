@@ -36,6 +36,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO",
+        "com.github.thundax.modules.submission.persistence.dataobject.SubmissionDO",
+        "com.github.thundax.modules.submission.persistence.dataobject.SubmissionImageDO",
         "com.github.thundax.modules.sys.persistence.dataobject.DepartmentDO",
         "com.github.thundax.modules.sys.persistence.dataobject.DictDO",
         "com.github.thundax.modules.sys.persistence.dataobject.LogDO",
@@ -222,7 +224,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
                 || tableName.startsWith("auth_")
                 || tableName.startsWith("assist_")
                 || tableName.startsWith("audit_")
-                || tableName.startsWith("member_")) {
+                || tableName.startsWith("member_")
+                || tableName.startsWith("submission_")) {
             return;
         }
         fail(javaClass.getFullName() + " uses unsupported table prefix: " + tableName);

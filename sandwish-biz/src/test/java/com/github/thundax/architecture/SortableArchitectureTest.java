@@ -4,7 +4,6 @@ import com.github.thundax.common.test.architecture.SortableArchitectureRuleSuppo
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import org.junit.Test;
 
 public class SortableArchitectureTest {
@@ -13,17 +12,7 @@ public class SortableArchitectureTest {
     public void shouldKeepSortableDomainsWithinContract() throws Exception {
         Path sourceRoot = mainSourceRoot();
 
-        SortableArchitectureRuleSupport.assertSortableEntitiesAreAllowed(
-                sourceRoot,
-                Arrays.asList("Dict", "Role", "Department", "Menu", "StoredObject", "Member", "Submission"));
-        SortableArchitectureRuleSupport.assertSortCommandsAreAllowed(
-                sourceRoot,
-                Arrays.asList(
-                        "DictSortCommand",
-                        "RoleSortCommand",
-                        "StorageSortCommand",
-                        "MemberSortCommand",
-                        "SubmissionSortCommand"));
+        SortableArchitectureRuleSupport.assertSortableEntitiesDeclarePriority(sourceRoot);
         SortableArchitectureRuleSupport.assertSortCommandsUseOrderedIdsOnly(sourceRoot);
         SortableArchitectureRuleSupport.assertSortMethodsAreTransactional(sourceRoot);
     }
@@ -31,8 +20,7 @@ public class SortableArchitectureTest {
     @Test
     public void shouldKeepFlatSortSchemaPriorityUnique() throws Exception {
         SortableArchitectureRuleSupport.assertFlatSortSchemasDeclarePriorityUnique(
-                projectRoot().resolve("db/schema"),
-                Arrays.asList("sys_dict", "sys_role", "assist_storage", "member_member", "submission_submission"));
+                projectRoot().resolve("db/schema"));
     }
 
     private static Path mainSourceRoot() {

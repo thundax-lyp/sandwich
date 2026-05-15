@@ -13,13 +13,10 @@ import {
     App,
     Button,
     Dropdown,
-    Form,
-    Input,
     Select,
     Space,
     Switch,
     Tag,
-    Tree,
     Typography
 } from "antd";
 import type { DataNode } from "antd/es/tree";
@@ -28,8 +25,8 @@ import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { RoleEdit } from "./components/role-edit";
 import {
     addRole,
     deleteRoles,
@@ -43,7 +40,6 @@ import type { RoleMenuResponse, RoleResponse, RoleSaveRequest } from "./role-ser
 import "./role-page.css";
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 220,
@@ -53,14 +49,6 @@ const DEFAULT_COLUMN_WIDTHS = {
     remarks: 280,
     actions: 154
 };
-
-interface RoleFormValues {
-    id?: string | null;
-    name: string;
-    admin?: boolean | null;
-    enable?: boolean | null;
-    remarks?: string | null;
-}
 
 interface RoleFilters {
     enable: "ALL" | "ENABLED" | "DISABLED";
@@ -72,11 +60,6 @@ interface RoleMenuTreeNode extends RoleMenuResponse {
 
 const DEFAULT_ROLE_FILTERS: RoleFilters = {
     enable: "ALL"
-};
-
-const normalizeText = (value?: string | null) => {
-    const normalizedValue = value?.trim();
-    return normalizedValue || undefined;
 };
 
 const buildMenuTree = (menus: RoleMenuResponse[]) => {
@@ -122,17 +105,6 @@ const toTreeData = (menus: RoleMenuTreeNode[]): DataNode[] => {
     }));
 };
 
-const readFormRequest = (values: RoleFormValues, checkedMenuKeys: Key[]): RoleSaveRequest => {
-    return {
-        id: values.id,
-        name: values.name.trim(),
-        admin: Boolean(values.admin),
-        enable: values.enable !== false,
-        remarks: normalizeText(values.remarks),
-        menus: checkedMenuKeys.map(String).map((id) => ({ id }))
-    };
-};
-
 const sortByMove = (
     roles: RoleResponse[],
     sourceRole: RoleResponse,
@@ -154,7 +126,6 @@ const sortByMove = (
 
 export const RolePage = () => {
     const { message: messageApi } = App.useApp();
-    const [editForm] = Form.useForm<RoleFormValues>();
     const queryClient = useQueryClient();
     const canViewRole = hasPermission("sys:role:view") || hasPermission("sys:role:edit");
     const canEditRole = hasPermission("sys:role:edit");
@@ -164,7 +135,6 @@ export const RolePage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [editingRole, setEditingRole] = useState<RoleResponse | null>(null);
     const [deletingRole, setDeletingRole] = useState<RoleResponse | null>(null);
-    const [checkedMenuKeys, setCheckedMenuKeys] = useState<Key[]>([]);
     const [editorOpen, setEditorOpen] = useState(false);
     const hasSelectedRoles = selectedRowKeys.length > 0;
     const hasActiveFilters = filters.enable !== "ALL";
@@ -203,8 +173,6 @@ export const RolePage = () => {
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingRole(null);
-            setCheckedMenuKeys([]);
-            editForm.resetFields();
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
             messageApi.success("角色已保存");
         },
@@ -264,22 +232,11 @@ export const RolePage = () => {
 
     const openCreateEditor = () => {
         setEditingRole(null);
-        setCheckedMenuKeys([]);
-        editForm.resetFields();
-        editForm.setFieldsValue({ admin: false, enable: true });
         setEditorOpen(true);
     };
 
     const openEditEditor = (role: RoleResponse) => {
         setEditingRole(role);
-        setCheckedMenuKeys((role.menus || []).map((menu) => menu.id));
-        editForm.setFieldsValue({
-            id: role.id,
-            name: role.name,
-            admin: Boolean(role.admin),
-            enable: role.enable !== false,
-            remarks: role.remarks
-        });
         setEditorOpen(true);
     };
 
@@ -289,13 +246,10 @@ export const RolePage = () => {
         }
         setEditorOpen(false);
         setEditingRole(null);
-        setCheckedMenuKeys([]);
-        editForm.resetFields();
     };
 
-    const saveRole = async () => {
-        const values = await editForm.validateFields();
-        saveMutation.mutate(readFormRequest(values, checkedMenuKeys));
+    const saveRole = (request: RoleSaveRequest) => {
+        saveMutation.mutate(request);
     };
 
     const updateSingleStatus = (role: RoleResponse, enable: boolean) => {
@@ -571,66 +525,16 @@ export const RolePage = () => {
                 sortable={canEditRole}
             />
 
-            <SandwishDrawer
-                className="role-edit-drawer"
-                title={editingRole ? "编辑角色" : "新增角色"}
+            <RoleEdit
+                key={editorOpen ? editingRole?.id || "create" : "closed"}
                 open={editorOpen}
-                size="middle"
+                role={editingRole}
+                treeData={treeData}
+                expandedMenuIds={expandedMenuIds}
+                saving={saveMutation.isPending}
                 onClose={closeEditor}
-                footer={
-                    <div className="role-edit-footer">
-                        <Button onClick={closeEditor}>取消</Button>
-                        <Button type="primary" loading={saveMutation.isPending} onClick={saveRole}>
-                            保存角色
-                        </Button>
-                    </div>
-                }
-            >
-                <Form<RoleFormValues>
-                    form={editForm}
-                    layout="vertical"
-                    className="role-editor-form"
-                >
-                    <Form.Item name="id" hidden>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="name"
-                        label="角色名称"
-                        rules={[{ required: true, message: "请输入角色名称" }]}
-                    >
-                        <Input placeholder="例如：运营管理员" />
-                    </Form.Item>
-                    <div className="role-editor-switches">
-                        <Form.Item name="admin" label="管理权限" valuePropName="checked">
-                            <Switch checkedChildren="管理" unCheckedChildren="普通" />
-                        </Form.Item>
-                        <Form.Item name="enable" label="角色状态" valuePropName="checked">
-                            <Switch checkedChildren="启用" unCheckedChildren="禁用" />
-                        </Form.Item>
-                    </div>
-                    <Form.Item name="remarks" label="备注">
-                        <TextArea rows={3} maxLength={200} showCount placeholder="角色说明" />
-                    </Form.Item>
-                    <div className="role-menu-panel">
-                        <div className="role-menu-panel-head">
-                            <Text strong>菜单权限</Text>
-                            <Text type="secondary">{checkedMenuKeys.length} 项已选</Text>
-                        </div>
-                        <Tree
-                            checkable
-                            defaultExpandAll
-                            checkedKeys={checkedMenuKeys}
-                            defaultExpandedKeys={expandedMenuIds}
-                            treeData={treeData}
-                            selectable={false}
-                            onCheck={(keys) =>
-                                setCheckedMenuKeys(Array.isArray(keys) ? keys : keys.checked)
-                            }
-                        />
-                    </div>
-                </Form>
-            </SandwishDrawer>
+                onSave={saveRole}
+            />
 
             <SandwishConfirmModal
                 title="删除角色"

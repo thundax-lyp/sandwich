@@ -14,10 +14,16 @@ public class SortableArchitectureTest {
         Path sourceRoot = mainSourceRoot();
 
         SortableArchitectureRuleSupport.assertSortableEntitiesAreAllowed(
-                sourceRoot, Arrays.asList("Dict", "Role", "Department", "Menu", "StoredObject", "Member"));
+                sourceRoot,
+                Arrays.asList("Dict", "Role", "Department", "Menu", "StoredObject", "Member", "Submission"));
         SortableArchitectureRuleSupport.assertSortCommandsAreAllowed(
                 sourceRoot,
-                Arrays.asList("DictSortCommand", "RoleSortCommand", "StorageSortCommand", "MemberSortCommand"));
+                Arrays.asList(
+                        "DictSortCommand",
+                        "RoleSortCommand",
+                        "StorageSortCommand",
+                        "MemberSortCommand",
+                        "SubmissionSortCommand"));
         SortableArchitectureRuleSupport.assertSortCommandsUseOrderedIdsOnly(sourceRoot);
         SortableArchitectureRuleSupport.assertSortMethodsAreTransactional(sourceRoot);
     }
@@ -26,7 +32,7 @@ public class SortableArchitectureTest {
     public void shouldKeepFlatSortSchemaPriorityUnique() throws Exception {
         SortableArchitectureRuleSupport.assertFlatSortSchemasDeclarePriorityUnique(
                 projectRoot().resolve("db/schema"),
-                Arrays.asList("sys_dict", "sys_role", "assist_storage", "member_member"));
+                Arrays.asList("sys_dict", "sys_role", "assist_storage", "member_member", "submission_submission"));
     }
 
     private static Path mainSourceRoot() {

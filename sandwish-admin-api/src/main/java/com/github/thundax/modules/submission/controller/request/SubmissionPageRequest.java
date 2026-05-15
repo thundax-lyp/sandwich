@@ -26,7 +26,7 @@ public class SubmissionPageRequest extends PageRequest {
 
     @ApiModelProperty(name = "sourceClientId", value = "来源client ID")
     @JsonProperty("sourceClientId")
-    @Size(max = 64, message = "来源client ID长度不能超过64")
+    @Size(max = 128, message = "来源client ID长度不能超过128")
     private String sourceClientId;
 
     @ApiModelProperty(name = "submittedAtBegin", value = "提交开始时间")

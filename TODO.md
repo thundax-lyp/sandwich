@@ -12,17 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `submission-biz`：实现提交内容业务服务
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/submission/entity/**`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/submission/dao/**`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/submission/service/**`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/submission/**`
-    - `sandwish-biz/src/test/java/com/github/thundax/modules/submission/**`
-  - 处理动作：按 `docs/30-designs/RUNBOOK-SUBMISSION-IMPLEMENTATION.md` 新增 `Submission` 领域对象、Service、排序、审计快照和业务测试
-  - 验收点：`Submission` 可创建、查询、状态调整、排序并接入 Audit，且 `mvn -pl sandwish-biz -am -Dtest='*Submission*Test,*Audit*Test' test` 通过
-  - 重要度：9/10
-
 - [ ] `submission-infra`：实现提交内容持久化
   - 范围文件：
     - `sandwish-infra/src/main/java/com/github/thundax/modules/submission/persistence/dataobject/**`

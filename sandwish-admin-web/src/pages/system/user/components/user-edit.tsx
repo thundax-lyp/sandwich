@@ -1,6 +1,6 @@
 import { CameraOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Button, Input, Select, Switch, Upload } from "antd";
+import { Button, Input, Select, Switch, Upload } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
     listUserRoles,
@@ -9,11 +9,10 @@ import {
     type UserRoleResponse,
     type UserResponse
 } from "../user-service";
-import { useCurrentAccessToken } from "@/auth/hooks";
-import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
+import { UserAvatar } from "./user-avatar";
 
 interface UserEditProps {
     open?: boolean;
@@ -29,19 +28,9 @@ interface UserEditProps {
     onRolesChange?: (roles: UserRoleResponse[]) => void;
 }
 
-interface UserAvatarProps {
-    user: UserResponse;
-    size?: number;
-}
-
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
     return normalizedValue || undefined;
-};
-
-const getInitials = (name?: string | null) => {
-    const normalizedName = normalizeSearch(name) || "U";
-    return Array.from(normalizedName.replace(/\s+/g, "")).slice(0, 2).join("");
 };
 
 const readUserName = (user: UserResponse) => {
@@ -97,17 +86,6 @@ const DEFAULT_CREATE_USER_FORM: CreateUserForm = {
     ranks: 0,
     admin: false,
     enable: true
-};
-
-export const UserAvatar = ({ user, size }: UserAvatarProps) => {
-    const accessToken = useCurrentAccessToken();
-    const userName = readUserName(user);
-
-    return (
-        <Avatar size={size} src={toAuthenticatedResourceUrl(user.avatar, accessToken)}>
-            {user.avatar ? null : getInitials(userName)}
-        </Avatar>
-    );
 };
 
 export const UserEdit = ({

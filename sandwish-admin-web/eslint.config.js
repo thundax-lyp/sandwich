@@ -73,6 +73,76 @@ const localRules = {
                     }
                 };
             }
+        },
+        "page-component-single-export": {
+            create(context) {
+                const isPascalCase = (name) => /^[A-Z][A-Za-z0-9]*$/.test(name);
+
+                const readExportedName = (specifier) => {
+                    if (specifier.exported?.type === "Identifier") {
+                        return specifier.exported.name;
+                    }
+                    if (specifier.local?.type === "Identifier") {
+                        return specifier.local.name;
+                    }
+                    return "";
+                };
+
+                return {
+                    Program(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+
+                        if (
+                            !normalizedFilePath.includes("/src/pages/") ||
+                            !normalizedFilePath.includes("/components/") ||
+                            !normalizedFilePath.endsWith(".tsx")
+                        ) {
+                            return;
+                        }
+
+                        const exportedComponents = [];
+                        node.body.forEach((statement) => {
+                            if (statement.type !== "ExportNamedDeclaration") {
+                                return;
+                            }
+
+                            if (statement.declaration?.type === "VariableDeclaration") {
+                                statement.declaration.declarations.forEach((declaration) => {
+                                    if (
+                                        declaration.id.type === "Identifier" &&
+                                        isPascalCase(declaration.id.name)
+                                    ) {
+                                        exportedComponents.push(declaration.id.name);
+                                    }
+                                });
+                            }
+
+                            if (
+                                statement.declaration?.type === "FunctionDeclaration" &&
+                                statement.declaration.id &&
+                                isPascalCase(statement.declaration.id.name)
+                            ) {
+                                exportedComponents.push(statement.declaration.id.name);
+                            }
+
+                            statement.specifiers.forEach((specifier) => {
+                                const exportedName = readExportedName(specifier);
+                                if (isPascalCase(exportedName)) {
+                                    exportedComponents.push(exportedName);
+                                }
+                            });
+                        });
+
+                        if (exportedComponents.length > 1) {
+                            context.report({
+                                node,
+                                message: `ADMIN_WEB_COMPONENT_SINGLE_EXPORT: page component files may export only one PascalCase component; move sibling components to separate files. Found ${exportedComponents.join(", ")}.`
+                            });
+                        }
+                    }
+                };
+            }
         }
     }
 };
@@ -162,6 +232,7 @@ export default tseslint.config(
                 }
             ],
             "local/kebab-case-file-name": "error",
+            "local/page-component-single-export": "error",
             "local/page-style-file": "error",
             "no-restricted-imports": [
                 "error",

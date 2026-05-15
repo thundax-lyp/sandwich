@@ -21,7 +21,8 @@ import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
-import { UserAvatar, UserEdit } from "./components/user-edit";
+import { UserAvatar } from "./components/user-avatar";
+import { UserEdit } from "./components/user-edit";
 import {
     createUser,
     deleteUsers,

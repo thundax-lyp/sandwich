@@ -66,6 +66,7 @@
 - `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面专属 service 文件固定命名为 `<domain>-service.ts`。
 - `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面专属类型文件固定命名为 `<domain>-types.ts`。
 - `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件固定使用 PascalCase named export。
+- `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：`src/pages/<module>/<domain>/components/*.tsx` 每个文件最多导出一个 PascalCase React 组件；私有子组件不导出，可以留在同文件。
 - `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
 - `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为，例如 `pageDictionaries`、`addDictionary`、`updateDictionary`、`deleteDictionaries`。

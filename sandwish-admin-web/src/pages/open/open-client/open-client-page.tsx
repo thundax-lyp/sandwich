@@ -13,7 +13,8 @@ import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps } from "@/components/sandwish-table";
-import { OpenClientEdit, OpenClientSecretModal } from "./components/open-client-edit";
+import { OpenClientEdit } from "./components/open-client-edit";
+import { OpenClientSecretModal } from "./components/open-client-secret-modal";
 import {
     changeOpenClientStatus,
     createOpenClient,

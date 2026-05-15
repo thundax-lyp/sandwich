@@ -1,12 +1,9 @@
-import { CopyOutlined, KeyOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Select, Space, Tooltip, Typography } from "antd";
+import { KeyOutlined } from "@ant-design/icons";
+import { Button, Form, Input, Select, Space, Typography } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type {
-    OpenClientResponse,
-    OpenClientSaveRequest,
-    OpenClientSecretResponse
-} from "../open-client-service";
+import type { OpenClientResponse, OpenClientSaveRequest } from "../open-client-service";
+import { OpenClientSecretField } from "./open-client-secret-field";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -30,12 +27,6 @@ interface OpenClientFormValues {
     expiredAt?: string | null;
     remarks?: string | null;
     permissions?: string[];
-}
-
-interface OpenClientSecretModalProps {
-    secret?: OpenClientSecretResponse | null;
-    onClose: () => void;
-    onCopySecret: (label: string, value?: string | null) => void;
 }
 
 const normalizeText = (value?: string | null) => {
@@ -117,39 +108,6 @@ const toFormValues = (client: OpenClientResponse): OpenClientFormValues => {
     };
 };
 
-export const OpenClientSecretField = ({
-    label,
-    value,
-    onCopy
-}: {
-    label: string;
-    value?: string | null;
-    onCopy: (label: string, value?: string | null) => void;
-}) => (
-    <div className="open-client-secret-field">
-        <div className="open-client-secret-field-header">
-            <Text strong>{label}</Text>
-        </div>
-        <div className="open-client-secret-control">
-            <div className="open-client-secret-value" title={value || undefined}>
-                {value || "-"}
-            </div>
-            <Tooltip title={`复制 ${label}`}>
-                <Button
-                    className="open-client-secret-copy"
-                    type="text"
-                    icon={<CopyOutlined />}
-                    aria-label={`复制 ${label}`}
-                    disabled={!value}
-                    onClick={() => onCopy(label, value)}
-                >
-                    复制
-                </Button>
-            </Tooltip>
-        </div>
-    </div>
-);
-
 export const OpenClientEdit = ({
     open,
     client,
@@ -166,7 +124,6 @@ export const OpenClientEdit = ({
 
     useEffect(() => {
         if (!open) {
-            form.resetFields();
             return;
         }
         if (client) {
@@ -258,36 +215,3 @@ export const OpenClientEdit = ({
         </SandwishDrawer>
     );
 };
-
-export const OpenClientSecretModal = ({
-    secret,
-    onClose,
-    onCopySecret
-}: OpenClientSecretModalProps) => (
-    <Modal
-        className="open-client-secret-modal"
-        open={Boolean(secret)}
-        width={680}
-        title="API SECRET 已重置"
-        okText="我已保存"
-        cancelButtonProps={{ style: { display: "none" } }}
-        onOk={onClose}
-        onCancel={onClose}
-    >
-        <Text className="open-client-secret-note" type="secondary">
-            API KEY 保持不变，新的 API SECRET 只在本次结果中显示。
-        </Text>
-        <div className="open-client-secret-panel">
-            <OpenClientSecretField
-                label="API KEY"
-                value={secret?.apiKey}
-                onCopy={onCopySecret}
-            />
-            <OpenClientSecretField
-                label="API SECRET"
-                value={secret?.apiSecret}
-                onCopy={onCopySecret}
-            />
-        </div>
-    </Modal>
-);

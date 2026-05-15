@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 public enum StorageOwnerType {
     USER,
-    MEMBER;
+    MEMBER,
+    SUBMISSION;
 
     public String value() {
         return name();

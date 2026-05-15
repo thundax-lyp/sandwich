@@ -655,6 +655,9 @@ INSERT INTO `sys_dict` (
         1000000000000002044, 'storage_owner_type', '前台会员', 'MEMBER', 1, '前台会员存储归属'
     ),
     (
+        1000000000000002105, 'storage_owner_type', '提交内容', 'SUBMISSION', 2, '提交内容存储归属'
+    ),
+    (
         1000000000000002045, 'stored_object_status', '可用', 'ACTIVE', 0, '存储对象可用状态'
     ),
     (

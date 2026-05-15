@@ -49,6 +49,7 @@
 - 底层存储类型由运行时 `StoredObjectStore` 配置决定，不落业务数据库。
 - `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`，默认值固定为 `ACTIVE`。
 - `reference_status` 固定使用 `UNREFERENCED`、`REFERENCED`，对象主表默认值固定为 `UNREFERENCED`，引用关系表默认值固定为 `REFERENCED`。
+- `owner_type` 固定使用 `USER`、`MEMBER`、`SUBMISSION`。
 - `upload_status` 固定使用 `INITIATED`、`UPLOADING`、`COMPLETED`、`ABORTED`。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 

@@ -100,7 +100,17 @@
 - 同一 `objectId + ownerType + ownerId` 引用关系应该幂等。
 - 引用关系只表达“谁正在引用该对象”，不替代业务模块自身规则。
 
-### 5.3 StoredObjectStatus
+### 5.3 StorageOwnerType
+
+`StorageOwnerType` 固定表达存储对象上传、持有或引用方类型。
+
+固定值：
+
+- `USER`：后台用户。
+- `MEMBER`：前台会员。
+- `SUBMISSION`：提交内容。
+
+### 5.4 StoredObjectStatus
 
 `StoredObjectStatus` 固定表达存储对象生命周期状态。
 
@@ -110,7 +120,7 @@
 - `DELETING`
 - `DELETED`
 
-### 5.4 StoredObjectReferenceStatus
+### 5.5 StoredObjectReferenceStatus
 
 `StoredObjectReferenceStatus` 固定表达存储对象引用状态。
 
@@ -119,11 +129,11 @@
 - `UNREFERENCED`
 - `REFERENCED`
 
-### 5.5 底层存储配置
+### 5.6 底层存储配置
 
 底层存储类型由运行时 `StoredObjectStore` 配置决定，不作为业务字段持久化。
 
-### 5.6 MultipartUploadSession
+### 5.7 MultipartUploadSession
 
 `MultipartUploadSession` 是分片上传会话对象。
 
@@ -146,7 +156,7 @@
 - `completedDate`：完成时间。
 - `abortedDate`：取消时间。
 
-### 5.7 MultipartUploadPart
+### 5.8 MultipartUploadPart
 
 `MultipartUploadPart` 是分片上传的单片记录。
 
@@ -158,7 +168,7 @@
 - `etag`：分片校验标识。
 - `size`：分片大小。
 
-### 5.8 MultipartUploadStatus
+### 5.9 MultipartUploadStatus
 
 `MultipartUploadStatus` 固定表达分片上传会话状态。
 

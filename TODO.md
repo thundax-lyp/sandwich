@@ -12,20 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-api-submission-endpoints`：增加 Open API Submission 创建和图片上传接口
-  - 范围文件：
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/storage/helper/StorageUploadStreamHelper.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/storage/controller/response/StorageUploadResponse.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/storage/assembler/StorageInterfaceAssembler.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission/assembler/SubmissionInterfaceAssembler.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission/controller/SubmissionController.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission/controller/request/SubmissionSaveRequest.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission/controller/response/SubmissionResponse.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/modules/submission/controller/SubmissionControllerContractTest.java`
-  - 处理动作：开放 `POST /api/submission/submission/create` 和 `POST /api/submission/submission/image/upload`，上传 helper 使用 stream-based 接口。
-  - 验收点：两个接口分别校验 `submission:submission:create` 和 `submission:submission:image:upload`，上传 helper 不依赖 `HttpServletRequest`，并复用 `SubmissionService` 与 Storage 能力。
-  - 重要度：10/10
-
 - [ ] `open-api-architecture-tests`：补齐 Open API 模块架构和契约测试
   - 范围文件：
     - `sandwish-open-api/src/test/java/com/github/thundax/architecture/ApiSurfaceArchitectureTest.java`

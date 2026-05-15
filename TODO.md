@@ -12,22 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-client-admin-api`：增加 OpenClient 后台管理最小入口
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/assembler/OpenClientInterfaceAssembler.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/OpenClientController.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/request/OpenClientIdRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/request/OpenClientPageRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/request/OpenClientSaveRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/request/OpenClientSecretResetRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/request/OpenClientStatusRequest.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/response/OpenClientResponse.java`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/controller/response/OpenClientSecretResponse.java`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/open/controller/OpenClientControllerContractTest.java`
-  - 处理动作：提供后台 OpenClient 创建、分页、详情、启停、重置 secret 和权限维护入口。
-  - 验收点：创建和重置接口只在响应中返回一次 API SECRET 明文，查询接口不返回 API SECRET 明文。
-  - 重要度：9/10
-
 - [ ] `open-client-admin-data`：增加并同步 OpenClient 后台菜单权限数据
   - 范围文件：
     - `db/data/system.sql`

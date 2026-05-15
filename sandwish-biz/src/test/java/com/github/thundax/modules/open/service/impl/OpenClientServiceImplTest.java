@@ -139,6 +139,21 @@ public class OpenClientServiceImplTest {
         assertEquals(2, openClientDao.pageNo);
         assertEquals(20, openClientDao.pageSize);
         assertNull(record.getApiSecret());
+        assertNull(record.getApiKey());
+    }
+
+    @Test
+    public void shouldGetOpenClientWithApiKeyWithoutSecret() {
+        RecordingOpenClientDao openClientDao = new RecordingOpenClientDao();
+        RecordingPrincipalIdentityDao identityDao = new RecordingPrincipalIdentityDao();
+        OpenClientServiceImpl service =
+                new OpenClientServiceImpl(openClientDao, identityDao, new RecordingPrincipalCredentialDao());
+        OpenClientDTO created = service.create(new CreateOpenClientCommand("client", null, null, null, null));
+
+        OpenClientDTO detail = service.get(created.getId());
+
+        assertEquals(created.getApiKey(), detail.getApiKey());
+        assertNull(detail.getApiSecret());
     }
 
     @Test

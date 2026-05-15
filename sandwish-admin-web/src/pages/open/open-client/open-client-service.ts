@@ -28,6 +28,10 @@ export interface OpenClientSecretResetRequest {
     id: string;
 }
 
+export interface OpenClientIdRequest {
+    id: string;
+}
+
 export interface OpenClientResponse {
     id: string;
     name: string;
@@ -47,6 +51,12 @@ export interface OpenClientSecretResponse {
 
 export const pageOpenClients = (request: OpenClientPageRequest = {}) => {
     return postJson<PageResponse<OpenClientResponse>, OpenClientPageRequest>("/open/client/page", {
+        body: request
+    });
+};
+
+export const getOpenClient = (request: OpenClientIdRequest) => {
+    return postJson<OpenClientResponse, OpenClientIdRequest>("/open/client/get", {
         body: request
     });
 };

@@ -638,12 +638,34 @@ describe("App", () => {
                                         id: "1",
                                         name: "调试客户端",
                                         status: "ENABLED",
-                                        apiKey: "swk_test",
                                         ipWhitelist: '["127.0.0.1"]',
                                         expiredAt: "2026-05-15T10:00:00.000+08:00",
                                         permissions: ["submission:submission:create"]
                                     }
                                 ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+            if (url.endsWith("/open/client/get")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                id: "1",
+                                name: "调试客户端",
+                                status: "ENABLED",
+                                apiKey: "swk_test",
+                                ipWhitelist: '["127.0.0.1"]',
+                                expiredAt: "2026-05-15T10:00:00.000+08:00",
+                                permissions: ["submission:submission:create"]
                             }
                         }),
                         {
@@ -670,7 +692,7 @@ describe("App", () => {
 
         expect(await screen.findByRole("heading", { name: "开放客户端" })).toBeInTheDocument();
         expect(await screen.findByText("调试客户端")).toBeInTheDocument();
-        expect(screen.getByText("swk_test")).toBeInTheDocument();
+        expect(screen.queryByText("swk_test")).not.toBeInTheDocument();
         expect(screen.getByText("submission:submission:create")).toBeInTheDocument();
         expect(screen.getByRole("button", { name: /新增客户端/ })).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
@@ -679,6 +701,22 @@ describe("App", () => {
                 body: JSON.stringify({
                     pageNo: 1,
                     pageSize: 10
+                }),
+                headers: expect.objectContaining({
+                    "Access-Token": "test-token"
+                }),
+                method: "POST"
+            })
+        );
+
+        await userEvent.click(screen.getByRole("button", { name: "编辑 调试客户端" }));
+
+        expect(await screen.findByText("swk_test")).toBeInTheDocument();
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/open/client/get",
+            expect.objectContaining({
+                body: JSON.stringify({
+                    id: "1"
                 }),
                 headers: expect.objectContaining({
                     "Access-Token": "test-token"

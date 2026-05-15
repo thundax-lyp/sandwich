@@ -73,10 +73,10 @@ public class OpenClientControllerContractTest {
     }
 
     @Test
-    public void shouldWrapPageJsonWithoutApiSecret() throws Exception {
+    public void shouldWrapPageJsonWithoutApiKeyAndApiSecret() throws Exception {
         OpenClientService openClientService = mock(OpenClientService.class);
         when(openClientService.page(any(OpenClientQuery.class), any(PageQuery.class)))
-                .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(dtoWithSecret())));
+                .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(dtoWithoutKeyAndSecret())));
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new OpenClientController(openClientService))
                 .setControllerAdvice(new ApiResponseBodyAdvice())
@@ -90,8 +90,27 @@ public class OpenClientControllerContractTest {
                 .andExpect(jsonPath("$.message").value(ApiResponse.SUCCESS_MESSAGE))
                 .andExpect(jsonPath("$.data.count").value(1))
                 .andExpect(jsonPath("$.data.records[0].id").value("9001"))
-                .andExpect(jsonPath("$.data.records[0].apiKey").value("swak_demo"))
+                .andExpect(jsonPath("$.data.records[0].apiKey").doesNotExist())
                 .andExpect(jsonPath("$.data.records[0].apiSecret").doesNotExist());
+    }
+
+    @Test
+    public void shouldWrapGetJsonWithApiKeyWithoutApiSecret() throws Exception {
+        OpenClientService openClientService = mock(OpenClientService.class);
+        when(openClientService.get(OpenClientId.of(9001L))).thenReturn(dtoWithSecret());
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new OpenClientController(openClientService))
+                .setControllerAdvice(new ApiResponseBodyAdvice())
+                .build();
+
+        mockMvc.perform(post("/api/open/client/get")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"9001\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data.id").value("9001"))
+                .andExpect(jsonPath("$.data.apiKey").value("swak_demo"))
+                .andExpect(jsonPath("$.data.apiSecret").doesNotExist());
     }
 
     @Test
@@ -192,6 +211,12 @@ public class OpenClientControllerContractTest {
         dto.setIpWhitelist("[\"127.0.0.1\"]");
         dto.setRemarks("remark");
         dto.setPermissions(Arrays.asList("submission:submission:create"));
+        return dto;
+    }
+
+    private OpenClientDTO dtoWithoutKeyAndSecret() {
+        OpenClientDTO dto = dtoWithoutSecret();
+        dto.setApiKey(null);
         return dto;
     }
 

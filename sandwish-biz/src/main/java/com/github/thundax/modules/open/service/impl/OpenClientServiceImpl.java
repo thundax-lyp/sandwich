@@ -68,7 +68,8 @@ public class OpenClientServiceImpl implements OpenClientService {
         if (id == null) {
             return null;
         }
-        return toDTO(openClientDao.getById(id), null, null);
+        OpenClient client = openClientDao.getById(id);
+        return toDTO(client, getApiKey(client), null);
     }
 
     @Override
@@ -220,6 +221,15 @@ public class OpenClientServiceImpl implements OpenClientService {
                 client.getExpiredAt(),
                 client.getRemarks(),
                 listPermissionValues(client.getId()));
+    }
+
+    private String getApiKey(OpenClient client) {
+        if (client == null || client.getId() == null) {
+            return null;
+        }
+        PrincipalIdentity identity = principalIdentityDao.getByPrincipalKeyAndType(
+                principalKey(client.getId()), PrincipalIdentityType.API_KEY);
+        return identity == null ? null : identity.getIdentityValue();
     }
 
     private List<String> listPermissionValues(OpenClientId clientId) {

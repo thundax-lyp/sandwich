@@ -8,7 +8,19 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Form, Input, Modal, Select, Space, Tag, Tooltip, Typography } from "antd";
+import {
+    App,
+    Button,
+    Dropdown,
+    Form,
+    Input,
+    Modal,
+    Select,
+    Space,
+    Tag,
+    Tooltip,
+    Typography
+} from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
@@ -18,6 +30,7 @@ import type { SandwishTableProps } from "@/components/sandwish-table";
 import {
     changeOpenClientStatus,
     createOpenClient,
+    getOpenClient,
     pageOpenClients,
     resetOpenClientSecret,
     updateOpenClient
@@ -39,11 +52,10 @@ const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
-    apiKey: 280,
     status: 120,
     expiredAt: 180,
     permissions: 280,
-    actions: 136
+    actions: 104
 };
 
 interface OpenClientFilters {
@@ -215,7 +227,11 @@ export const OpenClientPage = () => {
         await queryClient.invalidateQueries({ queryKey: ["open-client", "page"] });
     };
 
-    const saveMutation = useMutation({
+    const saveMutation = useMutation<
+        OpenClientResponse | OpenClientSecretResponse,
+        Error,
+        OpenClientSaveRequest
+    >({
         mutationFn: (request: OpenClientSaveRequest) =>
             request.id ? updateOpenClient(request) : createOpenClient(request),
         onSuccess: async (response, variables) => {
@@ -241,6 +257,18 @@ export const OpenClientPage = () => {
         },
         onError: (error) => {
             messageApi.error(error instanceof Error ? error.message : "状态更新失败");
+        }
+    });
+
+    const detailMutation = useMutation({
+        mutationFn: getOpenClient,
+        onSuccess: (client) => {
+            setEditingClient(client);
+            editForm.setFieldsValue(toFormValues(client));
+            setEditorOpen(true);
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "获取开放客户端失败");
         }
     });
 
@@ -288,9 +316,7 @@ export const OpenClientPage = () => {
     };
 
     const openUpdateEditor = (client: OpenClientResponse) => {
-        setEditingClient(client);
-        editForm.setFieldsValue(toFormValues(client));
-        setEditorOpen(true);
+        detailMutation.mutate({ id: client.id });
     };
 
     const closeEditor = () => {
@@ -369,20 +395,6 @@ export const OpenClientPage = () => {
             )
         },
         {
-            dataIndex: "apiKey",
-            key: "apiKey",
-            title: "API KEY",
-            width: DEFAULT_COLUMN_WIDTHS.apiKey,
-            render: (apiKey?: string | null) =>
-                apiKey ? (
-                    <Text code className="open-client-api-key">
-                        {apiKey}
-                    </Text>
-                ) : (
-                    "-"
-                )
-        },
-        {
             dataIndex: "status",
             key: "status",
             title: "状态",
@@ -424,18 +436,13 @@ export const OpenClientPage = () => {
                             aria-label={`编辑 ${client.name}`}
                             icon={<EditOutlined />}
                             size="small"
+                            loading={
+                                detailMutation.isPending &&
+                                detailMutation.variables?.id === client.id
+                            }
                             disabled={!canEditOpenClient}
                             onClick={() => openUpdateEditor(client)}
                         />
-                        <Tooltip title="复制 API KEY">
-                            <Button
-                                aria-label={`复制 ${client.name} API KEY`}
-                                icon={<CopyOutlined />}
-                                size="small"
-                                disabled={!client.apiKey}
-                                onClick={() => copySecretValue("API KEY", client.apiKey)}
-                            />
-                        </Tooltip>
                         <Dropdown
                             trigger={["click"]}
                             menu={{

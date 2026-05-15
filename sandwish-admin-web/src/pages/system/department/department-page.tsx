@@ -10,14 +10,14 @@ import {
     ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Form, Input, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { DepartmentEdit } from "./components/department-edit";
 import {
     addDepartment,
     deleteDepartments,
@@ -33,7 +33,6 @@ import type {
 import "./department-page.css";
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
@@ -45,19 +44,6 @@ const DEFAULT_COLUMN_WIDTHS = {
 interface DepartmentTableNode extends DepartmentResponse {
     children?: DepartmentTableNode[];
 }
-
-interface DepartmentFormValues {
-    id?: string | null;
-    parentId?: string | null;
-    name: string;
-    shortName?: string | null;
-    remarks?: string | null;
-}
-
-const normalizeSearch = (value?: string | null) => {
-    const normalizedValue = value?.trim();
-    return normalizedValue || undefined;
-};
 
 const buildDepartmentTree = (departments: DepartmentResponse[]) => {
     const nodeMap = new Map<string, DepartmentTableNode>();
@@ -105,23 +91,12 @@ const collectDescendantIds = (department?: DepartmentTableNode | null): Set<stri
     return new Set(collectDepartmentIds(department.children));
 };
 
-const readFormRequest = (values: DepartmentFormValues): DepartmentSaveRequest => {
-    return {
-        id: values.id,
-        parentId: values.parentId || null,
-        name: values.name.trim(),
-        shortName: normalizeSearch(values.shortName),
-        remarks: normalizeSearch(values.remarks)
-    };
-};
-
 const toMoveType = (position: SandwishTableSortPosition): DepartmentMoveRequest["type"] => {
     return position === "before" ? "before" : "after";
 };
 
 export const DepartmentPage = () => {
     const { message: messageApi } = App.useApp();
-    const [editForm] = Form.useForm<DepartmentFormValues>();
     const queryClient = useQueryClient();
     const [editingDepartment, setEditingDepartment] = useState<DepartmentTableNode | null>(null);
     const [deletingDepartment, setDeletingDepartment] = useState<DepartmentTableNode | null>(null);
@@ -165,7 +140,6 @@ export const DepartmentPage = () => {
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingDepartment(null);
-            editForm.resetFields();
             await queryClient.invalidateQueries({ queryKey: ["department", "list"] });
             messageApi.success("部门已保存");
         },
@@ -199,19 +173,11 @@ export const DepartmentPage = () => {
 
     const openCreateEditor = () => {
         setEditingDepartment(null);
-        editForm.resetFields();
         setEditorOpen(true);
     };
 
     const openEditEditor = (department: DepartmentTableNode) => {
         setEditingDepartment(department);
-        editForm.setFieldsValue({
-            id: department.id,
-            parentId: department.parentId || null,
-            name: department.name,
-            shortName: department.shortName,
-            remarks: department.remarks
-        });
         setEditorOpen(true);
     };
 
@@ -221,12 +187,10 @@ export const DepartmentPage = () => {
         }
         setEditorOpen(false);
         setEditingDepartment(null);
-        editForm.resetFields();
     };
 
-    const saveDepartment = async () => {
-        const values = await editForm.validateFields();
-        saveMutation.mutate(readFormRequest(values));
+    const saveDepartment = (request: DepartmentSaveRequest) => {
+        saveMutation.mutate(request);
     };
 
     const openDeleteConfirm = (department: DepartmentTableNode) => {
@@ -449,55 +413,14 @@ export const DepartmentPage = () => {
                 sortable={canEditDepartment}
             />
 
-            <SandwishDrawer
-                className="department-edit-drawer"
-                title={editingDepartment ? "编辑部门" : "新增部门"}
+            <DepartmentEdit
                 open={editorOpen}
-                size="small"
+                department={editingDepartment}
+                parentOptions={parentOptions}
+                saving={saveMutation.isPending}
                 onClose={closeEditor}
-                footer={
-                    <div className="department-edit-footer">
-                        <Button onClick={closeEditor}>取消</Button>
-                        <Button
-                            type="primary"
-                            loading={saveMutation.isPending}
-                            onClick={saveDepartment}
-                        >
-                            保存部门
-                        </Button>
-                    </div>
-                }
-            >
-                <Form<DepartmentFormValues>
-                    form={editForm}
-                    layout="vertical"
-                    className="department-editor-form"
-                >
-                    <Form.Item name="id" hidden>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="parentId" label="上级部门">
-                        <Select
-                            allowClear
-                            placeholder="不选择则作为根部门"
-                            options={parentOptions}
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        name="name"
-                        label="部门名称"
-                        rules={[{ required: true, message: "请输入部门名称" }]}
-                    >
-                        <Input placeholder="例如：研发中心" />
-                    </Form.Item>
-                    <Form.Item name="shortName" label="简称">
-                        <Input placeholder="例如：R&D" />
-                    </Form.Item>
-                    <Form.Item name="remarks" label="备注">
-                        <TextArea rows={4} maxLength={200} showCount placeholder="部门职责说明" />
-                    </Form.Item>
-                </Form>
-            </SandwishDrawer>
+                onSave={saveDepartment}
+            />
 
             <SandwishConfirmModal
                 title="删除部门"

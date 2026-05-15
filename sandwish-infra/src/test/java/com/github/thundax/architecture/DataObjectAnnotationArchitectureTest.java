@@ -33,6 +33,8 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalCredentialDO",
         "com.github.thundax.modules.auth.persistence.dataobject.PrincipalIdentityDO",
         "com.github.thundax.modules.member.persistence.dataobject.MemberDO",
+        "com.github.thundax.modules.open.persistence.dataobject.OpenClientDO",
+        "com.github.thundax.modules.open.persistence.dataobject.OpenClientPermissionDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadPartDO",
         "com.github.thundax.modules.storage.persistence.dataobject.MultipartUploadSessionDO",
         "com.github.thundax.modules.storage.persistence.dataobject.StoredObjectDO",
@@ -225,6 +227,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
                 || tableName.startsWith("assist_")
                 || tableName.startsWith("audit_")
                 || tableName.startsWith("member_")
+                || tableName.startsWith("open_")
                 || tableName.startsWith("submission_")) {
             return;
         }

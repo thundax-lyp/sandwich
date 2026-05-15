@@ -26,6 +26,7 @@ db/
 │   ├── auth.sql
 │   ├── storage.sql
 │   ├── submission.sql
+│   ├── open.sql
 │   ├── member.sql
 │   └── audit.sql
 └── data/
@@ -33,6 +34,7 @@ db/
     ├── auth.sql
     ├── storage.sql
     ├── submission.sql
+    ├── open.sql
     ├── member.sql
     └── audit.sql
 ```
@@ -48,6 +50,7 @@ db/
 - `Auth`: `schema/auth.sql`, `data/auth.sql`
 - `Storage`: `schema/storage.sql`, `data/storage.sql`
 - `Submission`: `schema/submission.sql`, `data/submission.sql`
+- `Open API`: `schema/open.sql`, `data/open.sql`
 - `Member`: `schema/member.sql`, `data/member.sql`
 - `Audit`: `schema/audit.sql`, `data/audit.sql`
 
@@ -63,10 +66,12 @@ db/
 6. `db/data/storage.sql`
 7. `db/schema/submission.sql`
 8. `db/data/submission.sql`
-9. `db/schema/member.sql`
-10. `db/data/member.sql`
-11. `db/schema/audit.sql`
-12. `db/data/audit.sql`
+9. `db/schema/open.sql`
+10. `db/data/open.sql`
+11. `db/schema/member.sql`
+12. `db/data/member.sql`
+13. `db/schema/audit.sql`
+14. `db/data/audit.sql`
 
 执行原则：
 

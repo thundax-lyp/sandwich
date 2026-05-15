@@ -12,23 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-client-database-infra`：增加 OpenClient 数据库设计、SQL 和持久化实现
-  - 范围文件：
-    - `docs/20-database/OPEN-API-DATABASE-DESIGN.md`
-    - `docs/AGENT.md`
-    - `db/AGENT.md`
-    - `db/schema/open.sql`
-    - `db/data/open.sql`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/dataobject/OpenClientDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/dataobject/OpenClientPermissionDO.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/mapper/OpenClientMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/mapper/OpenClientPermissionMapper.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/assembler/OpenClientPersistenceAssembler.java`
-    - `sandwish-infra/src/main/java/com/github/thundax/modules/open/persistence/dao/OpenClientDaoImpl.java`
-  - 处理动作：落 `open_client`、`open_client_permission` 表设计、初始化 SQL 和 infra 持久化端口。
-  - 验收点：`client_id + permission` 唯一约束存在，`ip_whitelist` 可保存 JSON array 字符串，infra 测试通过。
-  - 重要度：10/10
-
 - [ ] `open-client-admin-api`：增加 OpenClient 后台管理最小入口
   - 范围文件：
     - `sandwish-admin-api/src/main/java/com/github/thundax/modules/open/assembler/OpenClientInterfaceAssembler.java`

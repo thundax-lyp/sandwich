@@ -32,6 +32,8 @@
 - 开放接口、open-api、OpenClient、API KEY/SECRET、第三方签名认证：
   再读 `10-requirements/OPEN-API-REQUIREMENTS.md`
   再读 `30-designs/OPEN-API-AUTH-DESIGN.md`
+- 开放接口数据库、OpenClient 表、OpenClient 权限表：
+  再读 `20-database/OPEN-API-DATABASE-DESIGN.md`
 - 后台认证数据库、前台会员认证运行态表、登录标识表、认证凭据表、认证会话表、OAuth2 表：
   再读 `20-database/AUTH-DATABASE-DESIGN.md`
 - 存储对象、对象引用、分片上传、对象存储适配：

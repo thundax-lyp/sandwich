@@ -34,6 +34,13 @@ public class AuditOperatorResolverTest {
     }
 
     @Test
+    public void shouldResolveOpenClientOperatorType() {
+        setSubject(SandwishSubjectType.OPEN_CLIENT);
+
+        assertEquals(AuditOperatorType.OPEN_CLIENT, resolver.operatorType());
+    }
+
+    @Test
     public void shouldResolveSystemOperatorType() {
         setSubject(SandwishSubjectType.SYSTEM);
 

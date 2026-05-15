@@ -11,7 +11,8 @@ public enum PrincipalIdentityType {
     USER_GITHUB(PrincipalType.USER, "GITHUB"),
     MEMBER_ACCOUNT(PrincipalType.MEMBER, "ACCOUNT"),
     MEMBER_MOBILE(PrincipalType.MEMBER, "MOBILE"),
-    MEMBER_EMAIL(PrincipalType.MEMBER, "EMAIL");
+    MEMBER_EMAIL(PrincipalType.MEMBER, "EMAIL"),
+    API_KEY(PrincipalType.OPEN_CLIENT, "API_KEY");
 
     private final PrincipalType principalType;
     private final String identityName;
@@ -41,6 +42,10 @@ public enum PrincipalIdentityType {
         return PrincipalType.MEMBER == principalType;
     }
 
+    public boolean isOpenClientPrincipal() {
+        return PrincipalType.OPEN_CLIENT == principalType;
+    }
+
     public boolean isAccount() {
         return "ACCOUNT".equals(identityName);
     }
@@ -51,6 +56,10 @@ public enum PrincipalIdentityType {
 
     public boolean isEmail() {
         return "EMAIL".equals(identityName);
+    }
+
+    public boolean isApiKey() {
+        return "API_KEY".equals(identityName);
     }
 
     public static PrincipalIdentityType from(String value) {

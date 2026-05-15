@@ -27,4 +27,8 @@ public class PrincipalKey {
     public boolean isMember() {
         return PrincipalType.MEMBER == principalType;
     }
+
+    public boolean isOpenClient() {
+        return PrincipalType.OPEN_CLIENT == principalType;
+    }
 }

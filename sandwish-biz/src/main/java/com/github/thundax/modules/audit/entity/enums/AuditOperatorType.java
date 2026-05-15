@@ -6,6 +6,7 @@ import java.util.Arrays;
 public enum AuditOperatorType {
     USER,
     MEMBER,
+    OPEN_CLIENT,
     SYSTEM,
     UNKNOWN;
 

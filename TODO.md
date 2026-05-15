@@ -12,32 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-client-biz-model`：增加 OpenClient 业务模型和主体枚举
-  - 范围文件：
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/OpenClient.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/OpenClientPermission.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/enums/OpenClientStatus.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/valueobject/OpenClientId.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/valueobject/OpenClientIdCodec.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/valueobject/OpenClientPermissionId.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/valueobject/OpenClientPermissionIdCodec.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/dao/OpenClientDao.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/OpenClientService.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/command/CreateOpenClientCommand.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/command/ResetOpenClientSecretCommand.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/command/UpdateOpenClientCommand.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/query/OpenClientQuery.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/dto/OpenClientDTO.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/open/service/impl/OpenClientServiceImpl.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalIdentityType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/auth/entity/enums/PrincipalCredentialType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/entity/enums/AuditOperatorType.java`
-    - `sandwish-biz/src/main/java/com/github/thundax/modules/audit/runtime/AuditOperatorResolver.java`
-  - 处理动作：建立 OpenClient 业务主体、权限模型、API KEY/SECRET 主体枚举和 Audit operator 映射。
-  - 验收点：OpenClient Service 可创建、启停、重置 secret、维护权限，Audit 可解析 `OPEN_CLIENT`。
-  - 重要度：10/10
-
 - [ ] `open-client-database-infra`：增加 OpenClient 数据库设计、SQL 和持久化实现
   - 范围文件：
     - `docs/20-database/OPEN-API-DATABASE-DESIGN.md`

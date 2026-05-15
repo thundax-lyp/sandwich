@@ -19,6 +19,8 @@ public class AuditOperatorResolver {
                 return AuditOperatorType.USER;
             case FRONT_MEMBER:
                 return AuditOperatorType.MEMBER;
+            case OPEN_CLIENT:
+                return AuditOperatorType.OPEN_CLIENT;
             case SYSTEM:
                 return AuditOperatorType.SYSTEM;
             case UNKNOWN:

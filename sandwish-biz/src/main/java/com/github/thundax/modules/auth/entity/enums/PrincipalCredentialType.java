@@ -5,7 +5,8 @@ import java.util.Arrays;
 
 public enum PrincipalCredentialType {
     USER_PASSWORD(PrincipalType.USER, "PASSWORD"),
-    MEMBER_PASSWORD(PrincipalType.MEMBER, "PASSWORD");
+    MEMBER_PASSWORD(PrincipalType.MEMBER, "PASSWORD"),
+    API_SECRET(PrincipalType.OPEN_CLIENT, "API_SECRET");
 
     private final PrincipalType principalType;
     private final String credentialName;
@@ -35,8 +36,16 @@ public enum PrincipalCredentialType {
         return PrincipalType.MEMBER == principalType;
     }
 
+    public boolean isOpenClientPrincipal() {
+        return PrincipalType.OPEN_CLIENT == principalType;
+    }
+
     public boolean isPassword() {
         return "PASSWORD".equals(credentialName);
+    }
+
+    public boolean isApiSecret() {
+        return "API_SECRET".equals(credentialName);
     }
 
     public static PrincipalCredentialType from(String value) {

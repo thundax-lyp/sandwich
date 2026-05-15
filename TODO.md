@@ -12,18 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-api-architecture-tests`：补齐 Open API 模块架构和契约测试
-  - 范围文件：
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/ApiSurfaceArchitectureTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/ExceptionLayeringArchitectureTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/InterfaceAssemblerArchitectureTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/RequestAnnotationArchitectureTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/ResponseAnnotationArchitectureTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/architecture/ServletRegistrationArchitectureTest.java`
-  - 处理动作：让新入口模块被 API surface、异常分层、Request/Response、Assembler 和 Servlet 注册门禁覆盖。
-  - 验收点：`mvn -pl sandwish-open-api -am test` 包含架构测试且全部通过。
-  - 重要度：9/10
-
 - [ ] `open-api-runbook-cleanup`：完成 Open API RUNBOOK 现场清理
   - 范围文件：
     - `TODO.md`

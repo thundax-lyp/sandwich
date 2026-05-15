@@ -12,27 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-api-auth-foundation`：实现 Open API 签名认证和权限校验基础设施
-  - 范围文件：
-    - `sandwish-open-api/src/main/java/com/github/thundax/common/exception/OpenApiExceptionTranslator.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/common/exception/OpenApiResponseExceptions.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiSecurityConfiguration.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/filter/OpenApiAuthenticationFilter.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiHeaders.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiCanonicalRequest.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiSignatureVerifier.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiNonceStore.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiIpWhitelistMatcher.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/modules/auth/security/OpenApiPermissionChecker.java`
-    - `sandwish-open-api/src/main/resources/i18n/messages.properties`
-    - `sandwish-open-api/src/main/resources/i18n/messages_zh_CN.properties`
-    - `sandwish-open-api/src/test/java/com/github/thundax/modules/auth/security/OpenApiSignatureVerifierTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/modules/auth/security/OpenApiNonceStoreTest.java`
-    - `sandwish-open-api/src/test/java/com/github/thundax/modules/auth/security/OpenApiIpWhitelistMatcherTest.java`
-  - 处理动作：实现 API KEY、timestamp、nonce、body hash、HMAC 签名、IP 白名单、权限校验和 OpenClient 上下文注入。
-  - 验收点：任一认证失败不会进入 Controller，认证成功后 `SandwishContextHolder` 为 `OPEN_CLIENT`。
-  - 重要度：10/10
-
 - [ ] `open-api-submission-endpoints`：增加 Open API Submission 创建和图片上传接口
   - 范围文件：
     - `sandwish-open-api/src/main/java/com/github/thundax/modules/storage/helper/StorageUploadStreamHelper.java`

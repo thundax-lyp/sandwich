@@ -84,7 +84,6 @@ public class MultipartUploadServiceImplTest {
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(2), multipartPart(3));
         CompleteMultipartUploadCommand command = new CompleteMultipartUploadCommand();
         command.setUploadId("upload-1");
-        command.setStorageType(StorageType.LOCAL_FILE);
         command.setBucketName("/tmp/storage/");
         command.setObjectKey("202605/demo.png");
         command.setSize(300L);
@@ -98,7 +97,6 @@ public class MultipartUploadServiceImplTest {
         assertEquals("image/png", storage.getMimeType());
         assertEquals("owner-1", storage.getOwnerId());
         assertSame(StorageOwnerType.USER, storage.getOwnerType());
-        assertSame(StorageType.LOCAL_FILE, storage.getStorageType());
         assertEquals("202605/demo.png", storage.getObjectKey());
         assertEquals(Long.valueOf(300L), storage.getSize());
         assertEquals("/api/storage/object/s1/content", storage.getAccessEndpoint());
@@ -116,7 +114,7 @@ public class MultipartUploadServiceImplTest {
         dao.multipartSessionResult = multipartSession();
         dao.multipartParts = Arrays.asList(multipartPart(1), multipartPart(3));
 
-        service(dao).complete(new CompleteMultipartUploadCommand("upload-1", null, null, null, null, null));
+        service(dao).complete(new CompleteMultipartUploadCommand("upload-1", null, null, null, null));
     }
 
     @Test
@@ -142,7 +140,6 @@ public class MultipartUploadServiceImplTest {
         session.setOwnerType(StorageOwnerType.USER);
         session.setOriginalFilename("demo.png");
         session.setMimeType("image/png");
-        session.setStorageType(StorageType.LOCAL_FILE);
         session.setTotalSize(300L);
         session.setPartSize(100L);
         session.setUploadStatus(MultipartUploadStatus.INITIATED);
@@ -166,7 +163,6 @@ public class MultipartUploadServiceImplTest {
         command.setBusinessType(session.getBusinessType());
         command.setOriginalFilename(session.getOriginalFilename());
         command.setMimeType(session.getMimeType());
-        command.setStorageType(session.getStorageType());
         command.setBucketName(session.getBucketName());
         command.setObjectKey(session.getObjectKey());
         command.setProviderUploadId(session.getProviderUploadId());
@@ -411,7 +407,6 @@ public class MultipartUploadServiceImplTest {
             storage.setMimeType(command.getMimeType());
             storage.setOwnerId(command.getOwnerId());
             storage.setOwnerType(command.getOwnerType());
-            storage.setStorageType(command.getStorageType());
             storage.setBucketName(command.getBucketName());
             storage.setObjectKey(command.getObjectKey());
             storage.setSize(command.getSize());

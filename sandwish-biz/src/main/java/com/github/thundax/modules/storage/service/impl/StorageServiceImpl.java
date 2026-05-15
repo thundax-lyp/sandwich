@@ -297,7 +297,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setMimeType(command.getMimeType());
         storage.setOwnerId(command.getOwnerId());
         storage.setOwnerType(command.getOwnerType());
-        storage.setStorageType(command.getStorageType());
         storage.setBucketName(command.getBucketName());
         storage.setObjectKey(command.getObjectKey());
         storage.setSize(command.getSize());
@@ -318,7 +317,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setMimeType(command.getMimeType());
         storage.setOwnerId(command.getOwnerId());
         storage.setOwnerType(command.getOwnerType());
-        storage.setStorageType(command.getStorageType());
         storage.setBucketName(command.getBucketName());
         storage.setObjectKey(command.getObjectKey());
         storage.setSize(command.getSize());

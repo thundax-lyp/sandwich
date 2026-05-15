@@ -177,7 +177,6 @@ public class StorageServiceImplTest {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
         command.setBucketName(storage.getBucketName());
         command.setObjectKey(storage.getObjectKey());
         command.setSize(storage.getSize());

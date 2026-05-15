@@ -16,7 +16,6 @@ import com.github.thundax.modules.storage.entity.MultipartUploadSession;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadPartIdCodec;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionIdCodec;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
@@ -38,14 +37,12 @@ public class MultipartUploadControllerContractTest {
     public void shouldInitMultipartUploadSessionForCurrentAdminUser() {
         MultipartUploadService service = mock(MultipartUploadService.class);
         StoredObjectStore store = mock(StoredObjectStore.class);
-        when(store.type()).thenReturn(StorageType.LOCAL_FILE);
         when(service.init(any(InitMultipartUploadCommand.class))).thenAnswer(invocation -> {
             InitMultipartUploadCommand command = invocation.getArgument(0);
             MultipartUploadSession session = new MultipartUploadSession();
             session.setId(MultipartUploadSessionIdCodec.toDomain(9301L));
             session.setUploadId("upload-1");
             session.setOwnerType(command.getOwnerType());
-            session.setStorageType(command.getStorageType());
             session.setOriginalFilename(command.getOriginalFilename());
             session.setUploadStatus(MultipartUploadStatus.INITIATED);
             return session;
@@ -64,7 +61,6 @@ public class MultipartUploadControllerContractTest {
         assertEquals("9301", response.getId());
         assertEquals("upload-1", response.getUploadId());
         assertEquals(StorageOwnerType.USER, captor.getValue().getOwnerType());
-        assertEquals(StorageType.LOCAL_FILE, captor.getValue().getStorageType());
         assertEquals("demo.png", captor.getValue().getOriginalFilename());
     }
 
@@ -107,7 +103,6 @@ public class MultipartUploadControllerContractTest {
     public void shouldCompleteMultipartUploadWithStorageMetadata() {
         MultipartUploadService service = mock(MultipartUploadService.class);
         StoredObjectStore store = mock(StoredObjectStore.class);
-        when(store.type()).thenReturn(StorageType.LOCAL_FILE);
         StoredObject storage = new StoredObject();
         storage.setId(StoredObjectIdCodec.toDomain(9101L));
         storage.setOriginalFilename("demo.png");
@@ -123,7 +118,6 @@ public class MultipartUploadControllerContractTest {
                 ArgumentCaptor.forClass(CompleteMultipartUploadCommand.class);
         verify(service).complete(captor.capture());
         assertEquals("upload-1", captor.getValue().getUploadId());
-        assertEquals(StorageType.LOCAL_FILE, captor.getValue().getStorageType());
         assertEquals("202605/demo.png", captor.getValue().getObjectKey());
         assertEquals(Long.valueOf(300L), captor.getValue().getSize());
     }

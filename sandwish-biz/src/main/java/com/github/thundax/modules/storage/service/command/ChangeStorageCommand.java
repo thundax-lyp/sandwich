@@ -1,7 +1,6 @@
 package com.github.thundax.modules.storage.service.command;
 
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
@@ -23,7 +22,6 @@ public class ChangeStorageCommand {
     private String mimeType;
     private String ownerId;
     private StorageOwnerType ownerType;
-    private StorageType storageType;
     private String bucketName;
     private String objectKey;
     private Long size;

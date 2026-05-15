@@ -157,10 +157,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         storage.setMimeType(session.getMimeType());
         storage.setOwnerId(session.getOwnerId());
         storage.setOwnerType(session.getOwnerType());
-        storage.setStorageType(
-                command == null || command.getStorageType() == null
-                        ? session.getStorageType()
-                        : command.getStorageType());
         storage.setBucketName(
                 command == null || command.getBucketName() == null ? session.getBucketName() : command.getBucketName());
         storage.setObjectKey(
@@ -183,7 +179,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         session.setBusinessType(command.getBusinessType());
         session.setOriginalFilename(command.getOriginalFilename());
         session.setMimeType(command.getMimeType());
-        session.setStorageType(command.getStorageType());
         session.setBucketName(command.getBucketName());
         session.setObjectKey(command.getObjectKey());
         session.setProviderUploadId(command.getProviderUploadId());
@@ -202,7 +197,6 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
         command.setBucketName(storage.getBucketName());
         command.setObjectKey(storage.getObjectKey());
         command.setSize(storage.getSize());

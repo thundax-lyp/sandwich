@@ -2,7 +2,6 @@ package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
@@ -21,8 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoredObject implements Sortable {
-    public static final String BUSINESS_TYPE_UNDEFINED = "undefined";
-
     private static final String PATH_FORMAT = "yyyyMM";
 
     private StoredObjectId id;
@@ -33,7 +30,6 @@ public class StoredObject implements Sortable {
     private String mimeType;
     private String ownerId;
     private StorageOwnerType ownerType;
-    private StorageType storageType = StorageType.LOCAL_FILE;
     private String bucketName;
     private String objectKey;
     private Long size;
@@ -95,14 +91,6 @@ public class StoredObject implements Sortable {
 
     public void setOwnerType(StorageOwnerType ownerType) {
         this.ownerType = ownerType;
-    }
-
-    public void setStorageType(String storageType) {
-        this.storageType = StringUtils.isBlank(storageType) ? null : StorageType.from(storageType);
-    }
-
-    public void setStorageType(StorageType storageType) {
-        this.storageType = storageType;
     }
 
     public boolean isEnable() {

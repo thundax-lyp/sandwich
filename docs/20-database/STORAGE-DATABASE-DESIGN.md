@@ -46,7 +46,7 @@
 - DAO `deleteById` 将 `object_status` 更新为 `DELETED`。
 - DAO get/list/page 默认排除 `object_status = DELETED`；显式按 `DELETED` 查询时返回已删除对象。
 - 枚举字段使用 `varchar` 存储。
-- 底层存储类型由运行时 `StoredObjectStore` 配置决定，不落业务数据库。
+- 底层存储类型由运行时 `StoredObjectStore` 和配置文件决定，不落业务数据库，也不进入业务 Entity 或 Service Command。
 - `object_status` 固定使用 `ACTIVE`、`DELETING`、`DELETED`，默认值固定为 `ACTIVE`。
 - `reference_status` 固定使用 `UNREFERENCED`、`REFERENCED`，对象主表默认值固定为 `UNREFERENCED`，引用关系表默认值固定为 `REFERENCED`。
 - `owner_type` 固定使用 `USER`、`MEMBER`、`SUBMISSION`。

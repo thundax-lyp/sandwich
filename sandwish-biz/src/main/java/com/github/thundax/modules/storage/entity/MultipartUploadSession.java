@@ -2,7 +2,6 @@ package com.github.thundax.modules.storage.entity;
 
 import com.github.thundax.modules.storage.entity.enums.MultipartUploadStatus;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.valueobject.MultipartUploadSessionId;
 import java.util.Date;
 import lombok.Getter;
@@ -20,7 +19,6 @@ public class MultipartUploadSession {
     private String businessType;
     private String originalFilename;
     private String mimeType;
-    private StorageType storageType = StorageType.LOCAL_FILE;
     private String bucketName;
     private String objectKey;
     private String providerUploadId;
@@ -37,14 +35,6 @@ public class MultipartUploadSession {
 
     public void setOwnerType(StorageOwnerType ownerType) {
         this.ownerType = ownerType;
-    }
-
-    public void setStorageType(String storageType) {
-        this.storageType = StringUtils.isBlank(storageType) ? null : StorageType.from(storageType);
-    }
-
-    public void setStorageType(StorageType storageType) {
-        this.storageType = storageType;
     }
 
     public void setUploadStatus(String uploadStatus) {

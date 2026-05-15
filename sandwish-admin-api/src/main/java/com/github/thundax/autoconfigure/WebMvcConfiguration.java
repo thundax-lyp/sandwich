@@ -3,7 +3,6 @@ package com.github.thundax.autoconfigure;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.config.SandwishOssProperties;
 import com.github.thundax.common.web.ProcessTimeFilter;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.store.ObjectStorageStoredObjectStore;
 import com.github.thundax.modules.storage.store.StoredObjectStore;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -23,19 +22,16 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
             ObjectStorageClient objectStorageClient,
             SandwishOssProperties ossProperties) {
         SandwishProperties.UploadProperties upload = properties.getUpload();
-        if (StorageType.OSS == storageType(ossProperties)) {
+        if (isS3(ossProperties)) {
             return new ObjectStorageStoredObjectStore(
-                    objectStorageClient, StorageType.OSS, ossProperties.getS3().getBucket(), upload.getContentPath());
+                    objectStorageClient, ossProperties.getS3().getBucket(), upload.getContentPath());
         }
         return new ObjectStorageStoredObjectStore(
-                objectStorageClient,
-                StorageType.LOCAL_FILE,
-                ossProperties.getLocal().getRootPath(),
-                upload.getContentPath());
+                objectStorageClient, ossProperties.getLocal().getRootPath(), upload.getContentPath());
     }
 
-    private StorageType storageType(SandwishOssProperties ossProperties) {
-        return "s3".equalsIgnoreCase(ossProperties.getType()) ? StorageType.OSS : StorageType.LOCAL_FILE;
+    private boolean isS3(SandwishOssProperties ossProperties) {
+        return "s3".equalsIgnoreCase(ossProperties.getType());
     }
 
     @Bean

@@ -3,7 +3,6 @@ package com.github.thundax.modules.storage.store;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.model.ObjectStorageWriteResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,28 +16,20 @@ public class ObjectStorageStoredObjectStore implements StoredObjectStore {
     private static final String PATH_FORMAT = "yyyyMM";
 
     private final ObjectStorageClient objectStorageClient;
-    private final StorageType storageType;
     private final String bucketName;
     private final String contentPath;
 
     public ObjectStorageStoredObjectStore(
-            ObjectStorageClient objectStorageClient, StorageType storageType, String bucketName, String contentPath) {
+            ObjectStorageClient objectStorageClient, String bucketName, String contentPath) {
         this.objectStorageClient = objectStorageClient;
-        this.storageType = storageType;
         this.bucketName = bucketName;
         this.contentPath = contentPath;
-    }
-
-    @Override
-    public StorageType type() {
-        return storageType;
     }
 
     @Override
     public StoredObject save(StoredObject storage, InputStream inputStream) throws IOException {
         ObjectStorageWriteResult result = objectStorageClient.put(writeObjectKey(storage), inputStream);
         StoredObject storedObject = new StoredObject();
-        storedObject.setStorageType(type());
         storedObject.setBucketName(bucketName);
         storedObject.setObjectKey(result.getKey());
         storedObject.setSize(result.getSize());

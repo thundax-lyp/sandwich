@@ -370,7 +370,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     private void applyStoredObject(StoredObject storage, StoredObject storedObject) {
-        storage.setStorageType(storedObject.getStorageType());
         storage.setBucketName(storedObject.getBucketName());
         storage.setObjectKey(storedObject.getObjectKey());
         storage.setSize(storedObject.getSize());
@@ -386,7 +385,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
         command.setBucketName(storage.getBucketName());
         command.setObjectKey(storage.getObjectKey());
         command.setSize(storage.getSize());
@@ -407,7 +405,6 @@ public class CurrentUserServiceImpl implements CurrentUserService {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
         command.setBucketName(storage.getBucketName());
         command.setObjectKey(storage.getObjectKey());
         command.setSize(storage.getSize());

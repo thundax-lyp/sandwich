@@ -151,7 +151,6 @@ public class MultipartUploadController {
         command.setBusinessType(request.getBusinessType());
         command.setOriginalFilename(request.getOriginalFilename());
         command.setMimeType(request.getMimeType());
-        command.setStorageType(storedObjectStore.type());
         command.setTotalSize(request.getTotalSize());
         command.setPartSize(request.getPartSize());
         return command;
@@ -161,7 +160,6 @@ public class MultipartUploadController {
             String uploadId, MultipartUploadCompleteRequest request) {
         CompleteMultipartUploadCommand command = new CompleteMultipartUploadCommand();
         command.setUploadId(uploadId);
-        command.setStorageType(storedObjectStore.type());
         command.setBucketName(request.getBucketName());
         command.setObjectKey(request.getObjectKey());
         command.setSize(request.getSize());

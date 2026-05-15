@@ -12,7 +12,6 @@ import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
@@ -48,7 +47,6 @@ public class CurrentUserAvatarServiceTest {
         when(storageService.create(any())).thenReturn(StoredObjectIdCodec.toDomain(8001L));
         when(storedObjectStore.save(any(), any(InputStream.class))).thenAnswer(invocation -> {
             StoredObject storedObject = new StoredObject();
-            storedObject.setStorageType(StorageType.LOCAL_FILE);
             storedObject.setBucketName("local");
             storedObject.setObjectKey("202605/avatar.jpg");
             storedObject.setSize(12L);

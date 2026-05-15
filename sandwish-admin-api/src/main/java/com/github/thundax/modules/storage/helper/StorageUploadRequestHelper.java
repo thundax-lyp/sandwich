@@ -86,7 +86,6 @@ public class StorageUploadRequestHelper {
     }
 
     private void applyStoredObject(StoredObject storage, StoredObject object) {
-        storage.setStorageType(object.getStorageType());
         storage.setBucketName(object.getBucketName());
         storage.setObjectKey(object.getObjectKey());
         storage.setSize(object.getSize());
@@ -103,7 +102,6 @@ public class StorageUploadRequestHelper {
         command.setMimeType(storage.getMimeType());
         command.setOwnerId(storage.getOwnerId());
         command.setOwnerType(storage.getOwnerType());
-        command.setStorageType(storage.getStorageType());
         command.setBucketName(storage.getBucketName());
         command.setObjectKey(storage.getObjectKey());
         command.setSize(storage.getSize());

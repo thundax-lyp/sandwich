@@ -133,7 +133,7 @@
 
 ### 5.6 底层存储配置
 
-底层存储类型由运行时 `StoredObjectStore` 配置决定，不作为业务字段持久化。
+底层存储类型由运行时 `StoredObjectStore` 和配置文件决定，不作为业务字段持久化，也不进入 `StoredObject` 或 Service Command。
 
 ### 5.7 MultipartUploadSession
 

@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import com.github.thundax.common.oss.client.ObjectStorageClient;
 import com.github.thundax.common.oss.model.ObjectStorageWriteResult;
 import com.github.thundax.modules.storage.entity.StoredObject;
-import com.github.thundax.modules.storage.entity.enums.StorageType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,13 +18,11 @@ public class ObjectStorageStoredObjectStoreTest {
     @Test
     public void shouldSaveThroughObjectStorageClient() throws Exception {
         RecordingObjectStorageClient client = new RecordingObjectStorageClient();
-        ObjectStorageStoredObjectStore store =
-                new ObjectStorageStoredObjectStore(client, StorageType.OSS, "bucket-a", "/content/");
+        ObjectStorageStoredObjectStore store = new ObjectStorageStoredObjectStore(client, "bucket-a", "/content/");
         StoredObject storage = storage();
 
         StoredObject object = store.save(storage, new ByteArrayInputStream("hello".getBytes(StandardCharsets.UTF_8)));
 
-        assertEquals(StorageType.OSS, object.getStorageType());
         assertEquals("bucket-a", object.getBucketName());
         assertEquals(storage.getPathName(), object.getObjectKey());
         assertEquals(Long.valueOf(5L), object.getSize());

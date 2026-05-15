@@ -31,7 +31,7 @@ Open API 面向第三方系统调用。第三方系统不使用后台登录态�
 
 - OpenClient 管理 API 的完整 request / response 设计。
 - OpenClient 数据库字段完整 DDL。
-- Open API 错误码完整表。
+- Open API 错误码完整表，见 [`OPEN-API-ERROR-CODE-DESIGN.md`](./OPEN-API-ERROR-CODE-DESIGN.md)。
 - Open API SDK。
 - 非 HMAC 的公私钥签名方案。
 - OAuth2 授权码、client credentials 或 OIDC 流程。
@@ -56,7 +56,7 @@ Open API 面向第三方系统调用。第三方系统不使用后台登录态�
   - `open_client` 和 `open_client_permission` 持久化实现。
   - `auth_principal_identity` 和 `auth_principal_credential` 持久化实现复用现有 auth infra。
 - `sandwish-admin-api`
-  - 后续提供 OpenClient 管理入口，例如创建、禁用、重置 secret 和维护权限。
+  - 提供 OpenClient 管理入口，例如创建、禁用、重置 secret 和维护权限。
 
 `sandwish-open-api` 不依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
 
@@ -113,16 +113,11 @@ API SECRET 明文固定只在创建或重置时返回一次。
 - 不把 API SECRET 当作普通登录密码处理。
 - 不把 `credential_value` 理解为只能保存不可逆 password hash。
 - HMAC 签名要求服务端保存可验证材料。
-- 可验证材料可以是 API SECRET 的加密密文，也可以是等价 signing key。
-- 如果保存等价 signing key，它在安全语义上等同于签名凭据，数据库泄露后攻击者可用它构造签名。
-- 因此 API SECRET / signing key 的存储、读取和日志输出必须按敏感凭据处理。
+- 可验证材料固定使用 API SECRET 的加密密文。
+- 服务端校验签名前解密得到 signing secret。
+- 因此 API SECRET、加密密文和解密后的 signing secret 的存储、读取和日志输出必须按敏感凭据处理。
 
-实现落地前必须明确 API SECRET 的具体存储形式：
-
-- 加密密文：服务端校验签名前解密得到 signing secret。
-- 等价 signing key：服务端直接用 signing key 做 HMAC 校验。
-
-无论选择哪一种，API SECRET 明文都只允许在创建或重置响应中出现一次。
+API SECRET 明文只允许在创建或重置响应中出现一次。
 
 ## 6. Request Headers
 
@@ -142,7 +137,7 @@ X-Sandwish-Signature
 - `X-Sandwish-Timestamp`：客户端发起请求的时间戳。
 - `X-Sandwish-Nonce`：请求随机串，用于防重放。
 - `X-Sandwish-Content-SHA256`：请求 body 的 SHA-256 摘要。
-- `X-Sandwish-Signature`：使用 API SECRET 或 signing key 计算出的 HMAC-SHA256 签名。
+- `X-Sandwish-Signature`：使用 API SECRET 计算出的 HMAC-SHA256 签名。
 
 ## 7. Canonical Request
 
@@ -195,11 +190,29 @@ Open API 请求认证流程固定如下：
 
 任一认证步骤失败，请求不得进入业务 Service。
 
-## 9. Nonce Rule
+## 9. IP Whitelist Rule
+
+`open_client.ipWhitelist` 固定使用 JSON array 字符串保存。
+
+示例：
+
+```json
+["127.0.0.1", "10.0.0.0/24"]
+```
+
+固定约束：
+
+- 空值固定表示不限制调用来源 IP。
+- 空数组固定表示不限制调用来源 IP。
+- 元素固定支持单 IP 和 CIDR。
+- 元素不支持域名。
+- JSON 解析失败固定视为 OpenClient 配置错误，请求不得进入业务 Service。
+
+## 10. Nonce Rule
 
 nonce 固定按 API KEY 维度防重放。
 
-推荐运行态存储：
+固定运行态存储：
 
 ```text
 open-api:nonce:{apiKey}:{nonce}
@@ -207,7 +220,7 @@ open-api:nonce:{apiKey}:{nonce}
 
 TTL 固定等于或略大于 timestamp 允许时间窗。
 
-默认建议时间窗：
+默认时间窗固定为：
 
 ```text
 5 minutes
@@ -215,7 +228,7 @@ TTL 固定等于或略大于 timestamp 允许时间窗。
 
 nonce 写入必须是原子“仅当不存在才写入”。如果 nonce 已存在，请求固定判定为重放请求。
 
-## 10. Permission Model
+## 11. Permission Model
 
 OpenClient 权限固定使用独立表：
 
@@ -258,7 +271,7 @@ submission:submission:image:upload
 - `submission:submission:create`：允许创建 Submission。
 - `submission:submission:image:upload`：允许上传 Submission 图片。
 
-## 11. Context And Audit
+## 12. Context And Audit
 
 Open API 认证成功后必须注入统一上下文。
 
@@ -279,9 +292,11 @@ SandwishSubjectType.OPEN_CLIENT -> AuditOperatorType.OPEN_CLIENT
 
 Submission 等业务写操作进入 Audit 时，操作者必须能追踪到 OpenClient。
 
-OpenClient 来源不进入 `submission_submission` 主表。第三方来源归属认证上下文、Open API 调用日志或 Audit operator 维度。
+OpenClient 来源不进入 `submission_submission` 主表。第三方来源归属认证上下文和 Audit operator 维度。
 
-## 12. Reuse And Non-Reuse
+首批 Open API 不增加独立调用日志表。第三方来源固定通过认证上下文和 Audit operator 维度追踪。
+
+## 13. Reuse And Non-Reuse
 
 Open API 可以复用 `biz.auth` 的能力：
 
@@ -303,10 +318,6 @@ Open API 不复用以下流程：
 
 Open API 的签名认证是入口模块专属流程，固定放在 `sandwish-open-api`。
 
-## 13. Open Items
+## 14. Open Items
 
-- API SECRET 可验证材料最终选择加密密文还是等价 signing key。
-- `open_client` 状态枚举和过期字段命名。
-- IP 白名单字段使用 JSON 字符串还是独立表。
-- Open API error code 编号空间。
-- OpenClient 管理 API 的后台权限拆分。
+无

@@ -78,7 +78,7 @@
 - 异常分层、`BizException`、`DomainException`、`SandwishException`、`ExceptionTranslator` 或 API error code：
   先读 `ARCHITECTURE.md`
   再读 `00-governance/API-ANNOTATION-MATRIX.md`
-  再按入口读 `30-designs/ADMIN-API-ERROR-CODE-DESIGN.md` 或 `30-designs/FRONT-API-ERROR-CODE-DESIGN.md`
+  再按入口读 `30-designs/ADMIN-API-ERROR-CODE-DESIGN.md`、`30-designs/FRONT-API-ERROR-CODE-DESIGN.md` 或 `30-designs/OPEN-API-ERROR-CODE-DESIGN.md`
   只有处理一次性迁移任务时才读取对应 `RUNBOOK-*`
 - 登录态、当前用户、当前会员、线程上下文、异步身份透传：
   先读 `ARCHITECTURE.md`

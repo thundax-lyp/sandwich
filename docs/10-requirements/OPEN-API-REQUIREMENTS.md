@@ -10,6 +10,8 @@
 
 签名认证细节见 [`../30-designs/OPEN-API-AUTH-DESIGN.md`](../30-designs/OPEN-API-AUTH-DESIGN.md)。
 
+错误码设计见 [`../30-designs/OPEN-API-ERROR-CODE-DESIGN.md`](../30-designs/OPEN-API-ERROR-CODE-DESIGN.md)。
+
 ## 2. Scope
 
 当前覆盖范围：
@@ -31,7 +33,7 @@
 - 非对称签名。
 - OpenClient 后台管理页面。
 - OpenClient 管理 API 完整 request / response。
-- Open API 调用日志的完整字段和归档策略。
+- Open API 独立调用日志表。
 - 除 Submission 以外的业务模块开放。
 
 ## 3. Bounded Context
@@ -44,7 +46,7 @@
 
 `OpenClientPermission` 是 OpenClient 到业务权限码的直接映射。OpenClient 不使用后台 `sys_menu` / `sys_role` 组合授权模型。
 
-Open API 写入业务对象时，业务对象不保存 OpenClient 来源字段。来源归属 Open API 认证上下文、调用日志和 Audit operator。
+Open API 写入业务对象时，业务对象不保存 OpenClient 来源字段。来源归属 Open API 认证上下文和 Audit operator。
 
 ## 4. Module Mapping
 
@@ -103,6 +105,9 @@ Open API 写入业务对象时，业务对象不保存 OpenClient 来源字段�
 - OpenClient 禁用后全部 API KEY 和 API SECRET 均不可用于 Open API 调用。
 - OpenClient 过期后不得继续调用 Open API。
 - IP 白名单为空时固定表示不限制调用来源 IP。
+- `ipWhitelist` 固定使用 JSON array 字符串保存。
+- `ipWhitelist` 元素固定支持单 IP 和 CIDR。
+- `ipWhitelist` 不支持域名。
 
 ### 5.2 OpenClientPermission
 
@@ -166,7 +171,8 @@ auth_principal_credential.credential_type = API_SECRET
 - 系统不得提供 API SECRET 明文查询能力。
 - Open API 使用 HMAC 签名认证时，服务端必须保存可验证材料。
 - API SECRET 不按普通 password hash 语义处理。
-- 可验证材料的最终存储形式在实现前通过 `OPEN-API-AUTH-DESIGN.md` 收敛。
+- API SECRET 可验证材料固定使用加密密文保存。
+- 服务端校验签名前解密得到 signing secret。
 
 ## 6. Global Constraints
 
@@ -303,6 +309,13 @@ Open API 上传 Submission 图片时，必须复用 Storage 上传能力，上�
 - 维护 IP 白名单。
 - 维护过期时间。
 - 维护 OpenClient 权限。
+
+首批后台管理权限固定为：
+
+- `open:client:view`
+- `open:client:edit`
+
+OpenClient 管理权限随开放业务模块增加同步扩展。
 
 创建 OpenClient 成功后：
 
@@ -466,17 +479,19 @@ nonce 写入必须满足“仅当不存在才写入”的原子语义。
 
 ### 9.3 Logging
 
-Open API 调用日志不得保存 API SECRET 明文。
+首批 Open API 不增加独立调用日志表。
+
+Open API 运行日志不得保存 API SECRET 明文。
 
 日志中不得输出可验证签名材料。
 
-认证失败日志应能定位失败类型，但不得泄露签名串细节、secret、signing key 或完整敏感 header。
+认证失败日志应能定位失败类型，但不得泄露签名串细节、secret 或完整敏感 header。
 
 ### 9.4 Security
 
 - API SECRET 明文只展示一次。
 - API SECRET 不允许通过查询接口读取。
-- API SECRET / signing key / 加密密文按敏感凭据处理。
+- API SECRET、加密密文和解密后的 signing secret 按敏感凭据处理。
 - 签名比较必须使用常量时间比较。
 - body hash 必须参与签名。
 - timestamp 和 nonce 必须参与签名。
@@ -496,8 +511,4 @@ Open API 与现有模块的集成规则：
 
 ## 11. Open Items
 
-- API SECRET 可验证材料最终采用加密密文还是等价 signing key。
-- `open_client.ipWhitelist` 使用 JSON 字符串还是独立表。
-- Open API 错误码编号空间和错误响应文档。
-- OpenClient 管理入口由 admin-api 提供的具体权限拆分。
-- Open API 独立调用日志表的必要性和字段范围。
+无

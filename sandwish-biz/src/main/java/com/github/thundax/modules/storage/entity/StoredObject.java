@@ -85,10 +85,6 @@ public class StoredObject implements Sortable {
         this.referenceStatus = referenceStatus;
     }
 
-    public void setOwnerType(String ownerType) {
-        this.ownerType = StringUtils.isBlank(ownerType) ? null : StorageOwnerType.from(ownerType);
-    }
-
     public void setOwnerType(StorageOwnerType ownerType) {
         this.ownerType = ownerType;
     }

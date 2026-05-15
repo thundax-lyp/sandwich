@@ -9,7 +9,13 @@ import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.modules.audit.annotation.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
+import com.github.thundax.modules.storage.entity.StoredObjectReference;
+import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
+import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
+import com.github.thundax.modules.storage.service.StorageService;
+import com.github.thundax.modules.storage.service.command.AddStorageReferencesCommand;
+import com.github.thundax.modules.storage.service.command.RemoveStorageReferencesCommand;
 import com.github.thundax.modules.submission.dao.SubmissionDao;
 import com.github.thundax.modules.submission.dao.SubmissionImageDao;
 import com.github.thundax.modules.submission.entity.Submission;
@@ -43,10 +49,13 @@ public class SubmissionServiceImpl implements SubmissionService {
 
     private final SubmissionDao submissionDao;
     private final SubmissionImageDao submissionImageDao;
+    private final StorageService storageService;
 
-    public SubmissionServiceImpl(SubmissionDao submissionDao, SubmissionImageDao submissionImageDao) {
+    public SubmissionServiceImpl(
+            SubmissionDao submissionDao, SubmissionImageDao submissionImageDao, StorageService storageService) {
         this.submissionDao = submissionDao;
         this.submissionImageDao = submissionImageDao;
+        this.storageService = storageService;
     }
 
     @Override
@@ -100,7 +109,31 @@ public class SubmissionServiceImpl implements SubmissionService {
         submission.setSubmittedAt(new Date());
         submission.setId(submissionDao.insert(submission));
         submissionImageDao.batchInsert(toImages(submission.getId(), command.getImageObjectIds()));
+        storageService.addReferences(
+                new AddStorageReferencesCommand(toStorageReferences(submission.getId(), command.getImageObjectIds())));
         return submission.getId();
+    }
+
+    @Override
+    @AuditLog(
+            type = "Submission",
+            id = "#id.value()",
+            action = AuditAction.DELETE,
+            summary = "删除提交内容",
+            recordWhenUnchanged = true)
+    @Transactional(rollbackFor = Exception.class)
+    public int remove(SubmissionId id) {
+        if (id == null) {
+            return 0;
+        }
+        Submission submission = get(id);
+        if (submission == null) {
+            return 0;
+        }
+        String ownerId = String.valueOf(id.value());
+        storageService.removeReferences(new RemoveStorageReferencesCommand(StorageOwnerType.SUBMISSION, ownerId));
+        submissionImageDao.deleteBySubmissionId(id);
+        return submissionDao.deleteById(id);
     }
 
     @Override
@@ -252,6 +285,20 @@ public class SubmissionServiceImpl implements SubmissionService {
             images.add(image);
         }
         return images;
+    }
+
+    private static List<StoredObjectReference> toStorageReferences(
+            SubmissionId submissionId, List<StoredObjectId> imageObjectIds) {
+        List<StoredObjectReference> references = new ArrayList<>();
+        for (StoredObjectId imageObjectId : imageObjectIds) {
+            StoredObjectReference reference = new StoredObjectReference();
+            reference.setObjectId(imageObjectId);
+            reference.setOwnerType(StorageOwnerType.SUBMISSION);
+            reference.setOwnerId(String.valueOf(submissionId.value()));
+            reference.setReferenceStatus(StoredObjectReferenceStatus.REFERENCED);
+            references.add(reference);
+        }
+        return references;
     }
 
     private static void validateCreate(CreateSubmissionCommand command) {

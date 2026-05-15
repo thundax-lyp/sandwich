@@ -40,4 +40,11 @@ public class SubmissionImageDaoImpl implements SubmissionImageDao {
         wrapper.orderByAsc(SubmissionImageDO::getSortOrder);
         return SubmissionImagePersistenceAssembler.toEntityList(mapper.selectList(wrapper));
     }
+
+    @Override
+    public int deleteBySubmissionId(SubmissionId submissionId) {
+        LambdaQueryWrapper<SubmissionImageDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SubmissionImageDO::getSubmissionId, submissionId.value());
+        return mapper.delete(wrapper);
+    }
 }

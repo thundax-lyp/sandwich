@@ -9,4 +9,6 @@ public interface SubmissionImageDao {
     void batchInsert(List<SubmissionImage> images);
 
     List<SubmissionImage> listBySubmissionId(SubmissionId submissionId);
+
+    int deleteBySubmissionId(SubmissionId submissionId);
 }

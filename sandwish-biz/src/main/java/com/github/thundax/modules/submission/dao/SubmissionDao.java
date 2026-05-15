@@ -36,4 +36,6 @@ public interface SubmissionDao {
     int updateStatus(Submission entity);
 
     int updatePriority(SubmissionId id, int priority);
+
+    int deleteById(SubmissionId id);
 }

@@ -132,6 +132,7 @@
 - `submission_image.storage_object_id` 通过 Service 校验关联 `assist_storage.id`。
 - 当前 `Submission` 生命周期通过 `status` 表达，不设计逻辑删除字段。
 - 图片引用关系随创建写入，状态调整不修改图片引用。
+- 删除 `Submission` 时必须先清理对应 `submission_image` 记录，并解除 Storage 引用关系；不得删除 Storage 对象主数据。
 - 一个 `Submission` 可以关联多条 `SubmissionImage`。
 
 ## 8. Persistence Rules

@@ -39,4 +39,18 @@ public class SubmissionImageDaoImplTest {
         assertTrue(sql.contains("submission_id"));
         assertTrue(sql.contains("sort_order asc"));
     }
+
+    @Test
+    public void shouldDeleteImagesBySubmissionId() {
+        SubmissionImageMapper mapper = mock(SubmissionImageMapper.class);
+        SubmissionImageDaoImpl dao = new SubmissionImageDaoImpl(mapper);
+
+        dao.deleteBySubmissionId(SubmissionId.of(9001L));
+
+        ArgumentCaptor<Wrapper> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);
+        verify(mapper).delete(wrapperCaptor.capture());
+        String sql =
+                wrapperCaptor.getValue().getSqlSegment().replaceAll("\\s+", " ").toLowerCase();
+        assertTrue(sql.contains("submission_id"));
+    }
 }

@@ -113,6 +113,11 @@ public class SubmissionDaoImpl implements SubmissionDao {
         return mapper.update(null, buildIdUpdateWrapper(id).set(SubmissionDO::getPriority, priority));
     }
 
+    @Override
+    public int deleteById(SubmissionId id) {
+        return mapper.deleteById(id.value());
+    }
+
     private LambdaUpdateWrapper<SubmissionDO> buildIdUpdateWrapper(SubmissionDO dataObject) {
         LambdaUpdateWrapper<SubmissionDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(SubmissionDO::getId, dataObject.getId());

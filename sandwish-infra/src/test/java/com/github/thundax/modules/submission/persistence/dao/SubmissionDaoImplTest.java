@@ -79,6 +79,18 @@ public class SubmissionDaoImplTest {
         assertEquals(0, dao.maxPriority());
     }
 
+    @Test
+    public void shouldDeleteById() {
+        SubmissionMapper mapper = mock(SubmissionMapper.class);
+        SubmissionDaoImpl dao = new SubmissionDaoImpl(mapper);
+        when(mapper.deleteById(9001L)).thenReturn(1);
+
+        assertEquals(
+                1, dao.deleteById(com.github.thundax.modules.submission.entity.valueobject.SubmissionId.of(9001L)));
+
+        verify(mapper).deleteById(9001L);
+    }
+
     private Wrapper<SubmissionDO> captureListWrapper(SubmissionMapper mapper) {
         ArgumentCaptor<Wrapper> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);
         verify(mapper).selectList(wrapperCaptor.capture());

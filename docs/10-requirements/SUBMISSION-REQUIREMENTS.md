@@ -18,6 +18,7 @@
 - 提交内容平铺排序
 - 提交内容创建和查询
 - 提交内容状态调整
+- 提交内容删除
 
 当前不覆盖范围：
 
@@ -42,7 +43,7 @@
 - `sandwish-infra/src/main/java/com/github/thundax/modules/submission`
   - 实现 `Submission` 持久化对象、Mapper、DAO implementation 和持久化转换。
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission`
-  - 提供后台查询、详情、状态调整、排序和提交图片上传入口适配。
+  - 提供后台创建、查询、详情、状态调整、排序、删除和提交图片上传入口适配。
 - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission`
   - 提供第三方提交入口适配。
 - `sandwish-front-api`
@@ -175,6 +176,7 @@ Command 固定不包含：
 
 - 写入 `Submission`。
 - 写入 `SubmissionImage` 列表。
+- 建立 `StorageOwnerType.SUBMISSION + Submission.id` 的 Storage 引用关系。
 - `status` 固定为 `SUBMITTED`。
 - `priority` 固定由 Service 生成。
 - `submittedAt` 固定为提交发生时间。
@@ -220,6 +222,17 @@ Command 固定不包含：
 - Storage 对象 `ownerType` 固定为 `SUBMISSION`。
 - Storage 对象 ID 可作为后续创建提交内容时的 `imageObjectIds`。
 
+### 7.7 Delete Submission
+
+后台必须支持删除提交内容。
+
+删除成功后：
+
+- 解除 `StorageOwnerType.SUBMISSION + Submission.id` 的 Storage 引用关系。
+- 删除 `SubmissionImage` 图片引用关系。
+- 删除 `Submission` 主记录。
+- 不删除 Storage 对象本体；未引用存储对象的后续清理由 Storage 自身任务计划负责。
+
 ## 8. Key Flows
 
 ### 8.1 Open API Submit Flow
@@ -230,7 +243,7 @@ Command 固定不包含：
 2. 第三方上传图片并取得 storage object ID。
 3. 第三方提交 `title`、`content` 和 `imageObjectIds`。
 4. `sandwish-open-api` 组装创建提交内容 Command。
-5. `SubmissionService` 创建提交内容和图片引用。
+5. `SubmissionService` 创建提交内容、图片引用和 Storage 引用关系。
 6. Audit 记录 `Submission` 创建事实。
 7. 接口返回提交内容 ID。
 

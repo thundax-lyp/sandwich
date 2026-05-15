@@ -22,6 +22,7 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
+import com.github.thundax.modules.submission.controller.request.SubmissionSaveRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionSortRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
 import com.github.thundax.modules.submission.controller.response.SubmissionResponse;
@@ -32,6 +33,7 @@ import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionIdCodec;
 import com.github.thundax.modules.submission.service.SubmissionService;
 import com.github.thundax.modules.submission.service.command.ChangeSubmissionStatusCommand;
+import com.github.thundax.modules.submission.service.command.CreateSubmissionCommand;
 import com.github.thundax.modules.submission.service.command.SubmissionSortCommand;
 import com.github.thundax.modules.submission.service.query.SubmissionQuery;
 import java.util.Arrays;
@@ -119,6 +121,32 @@ public class SubmissionControllerContractTest {
     }
 
     @Test
+    public void shouldConvertCreateRequestToCommandAndReturnCreatedSubmission() {
+        SubmissionService submissionService = mock(SubmissionService.class);
+        SubmissionId submissionId = SubmissionId.of(1001L);
+        when(submissionService.create(any(CreateSubmissionCommand.class))).thenReturn(submissionId);
+        when(submissionService.get(submissionId)).thenReturn(submission(1001L));
+        SubmissionController controller =
+                new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class));
+        SubmissionSaveRequest request = new SubmissionSaveRequest();
+        request.setTitle("Title");
+        request.setContent("Content");
+        request.setImageObjectIds(Collections.singletonList("2001"));
+
+        SubmissionResponse response = controller.create(request);
+
+        ArgumentCaptor<CreateSubmissionCommand> captor = ArgumentCaptor.forClass(CreateSubmissionCommand.class);
+        verify(submissionService).create(captor.capture());
+        assertEquals("Title", captor.getValue().getTitle());
+        assertEquals("Content", captor.getValue().getContent());
+        assertEquals("ADMIN", captor.getValue().getSourceClientId());
+        assertEquals(
+                StoredObjectIdCodec.toDomain(2001L),
+                captor.getValue().getImageObjectIds().get(0));
+        assertEquals("1001", response.getId());
+    }
+
+    @Test
     public void shouldConvertSortRequestToCommand() {
         SubmissionService submissionService = mock(SubmissionService.class);
         SubmissionController controller =
@@ -136,6 +164,20 @@ public class SubmissionControllerContractTest {
         assertEquals(
                 Long.valueOf(1002L), captor.getValue().getOrderedIds().get(1).value());
         assertEquals(SortDirection.ASC, captor.getValue().getSortDirection());
+    }
+
+    @Test
+    public void shouldDeleteSubmissionIds() {
+        SubmissionService submissionService = mock(SubmissionService.class);
+        SubmissionController controller =
+                new SubmissionController(submissionService, mock(StorageUploadRequestHelper.class));
+        com.github.thundax.modules.submission.controller.request.SubmissionIdRequest request =
+                new com.github.thundax.modules.submission.controller.request.SubmissionIdRequest();
+        request.setId("1001");
+
+        assertTrue(controller.delete(Collections.singletonList(request)));
+
+        verify(submissionService).remove(SubmissionId.of(1001L));
     }
 
     @Test

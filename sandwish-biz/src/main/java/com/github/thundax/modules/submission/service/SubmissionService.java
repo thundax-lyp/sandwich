@@ -20,6 +20,8 @@ public interface SubmissionService {
 
     SubmissionId create(CreateSubmissionCommand command);
 
+    int remove(SubmissionId id);
+
     int changeStatus(ChangeSubmissionStatusCommand command);
 
     void sort(SubmissionSortCommand command);

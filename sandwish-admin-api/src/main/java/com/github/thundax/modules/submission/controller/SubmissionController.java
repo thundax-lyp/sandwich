@@ -14,10 +14,12 @@ import com.github.thundax.modules.storage.helper.StorageUploadRequestHelper;
 import com.github.thundax.modules.submission.assembler.SubmissionInterfaceAssembler;
 import com.github.thundax.modules.submission.controller.request.SubmissionIdRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
+import com.github.thundax.modules.submission.controller.request.SubmissionSaveRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionSortRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
 import com.github.thundax.modules.submission.controller.response.SubmissionResponse;
 import com.github.thundax.modules.submission.entity.Submission;
+import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionIdCodec;
 import com.github.thundax.modules.submission.service.SubmissionService;
 import com.github.thundax.modules.submission.service.command.SubmissionSortCommand;
@@ -41,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @WrappedApiController
 public class SubmissionController {
 
+    private static final String ADMIN_SOURCE_CLIENT_ID = "ADMIN";
+
     private final SubmissionService submissionService;
     private final StorageUploadRequestHelper storageUploadRequestHelper;
 
@@ -48,6 +52,22 @@ public class SubmissionController {
             SubmissionService submissionService, StorageUploadRequestHelper storageUploadRequestHelper) {
         this.submissionService = submissionService;
         this.storageUploadRequestHelper = storageUploadRequestHelper;
+    }
+
+    @ApiOperation(value = "创建提交内容", notes = "submission:submission:edit")
+    @HasPermission("submission:submission:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = AccessTokenNames.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @PostMapping(value = "create")
+    public SubmissionResponse create(@Valid @RequestBody SubmissionSaveRequest request) {
+        SubmissionId id =
+                submissionService.create(SubmissionInterfaceAssembler.toCreateCommand(request, ADMIN_SOURCE_CLIENT_ID));
+        return SubmissionInterfaceAssembler.toResponse(submissionService.get(id));
     }
 
     @ApiOperation(value = "获取分页列表", notes = "submission:submission:view")
@@ -97,6 +117,27 @@ public class SubmissionController {
     @PostMapping(value = "change-status")
     public Boolean changeStatus(@Valid @RequestBody SubmissionStatusRequest request) {
         submissionService.changeStatus(SubmissionInterfaceAssembler.toChangeStatusCommand(request));
+        return true;
+    }
+
+    @ApiOperation(value = "删除提交内容", notes = "submission:submission:edit")
+    @HasPermission("submission:submission:edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = AccessTokenNames.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @PostMapping(value = "delete")
+    public Boolean delete(@Valid @RequestBody List<SubmissionIdRequest> list) {
+        List<SubmissionIdRequest> requests = RequestListHelper.present(list);
+        if (list == null || requests.size() != list.size() || requests.isEmpty()) {
+            throw AdminResponseExceptions.invalidParameter("list");
+        }
+        for (SubmissionIdRequest request : requests) {
+            submissionService.remove(SubmissionInterfaceAssembler.toId(request));
+        }
         return true;
     }
 

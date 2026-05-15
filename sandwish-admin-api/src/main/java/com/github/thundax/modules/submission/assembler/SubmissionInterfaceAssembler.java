@@ -3,6 +3,7 @@ package com.github.thundax.modules.submission.assembler;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.submission.controller.request.SubmissionIdRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
+import com.github.thundax.modules.submission.controller.request.SubmissionSaveRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
 import com.github.thundax.modules.submission.controller.response.SubmissionResponse;
 import com.github.thundax.modules.submission.entity.Submission;
@@ -10,6 +11,7 @@ import com.github.thundax.modules.submission.entity.enums.SubmissionStatus;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionIdCodec;
 import com.github.thundax.modules.submission.service.command.ChangeSubmissionStatusCommand;
+import com.github.thundax.modules.submission.service.command.CreateSubmissionCommand;
 import com.github.thundax.modules.submission.service.query.SubmissionQuery;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -40,6 +42,22 @@ public final class SubmissionInterfaceAssembler {
         ChangeSubmissionStatusCommand command = new ChangeSubmissionStatusCommand();
         command.setId(SubmissionIdCodec.toDomain(request.getId()));
         command.setStatus(SubmissionStatus.from(request.getStatus()));
+        return command;
+    }
+
+    @NonNull
+    public static CreateSubmissionCommand toCreateCommand(
+            @NonNull SubmissionSaveRequest request, String sourceClientId) {
+        CreateSubmissionCommand command = new CreateSubmissionCommand();
+        command.setTitle(request.getTitle());
+        command.setContent(request.getContent());
+        command.setSourceClientId(sourceClientId);
+        command.setImageObjectIds(
+                request.getImageObjectIds() == null
+                        ? Collections.emptyList()
+                        : request.getImageObjectIds().stream()
+                                .map(StoredObjectIdCodec::toDomain)
+                                .collect(Collectors.toList()));
         return command;
     }
 

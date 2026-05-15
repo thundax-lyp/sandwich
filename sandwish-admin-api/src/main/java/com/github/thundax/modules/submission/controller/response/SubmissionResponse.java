@@ -38,10 +38,6 @@ public class SubmissionResponse implements Serializable {
     @JsonProperty("status")
     private String status;
 
-    @ApiModelProperty(name = "priority", value = "排序值")
-    @JsonProperty("priority")
-    private Integer priority;
-
     @ApiModelProperty(name = "submittedAt", value = "提交时间")
     @JsonProperty("submittedAt")
     private Date submittedAt;

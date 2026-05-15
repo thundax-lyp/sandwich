@@ -16,9 +16,11 @@ public class ApiSurfaceArchitectureTest {
         ApiSurfaceArchitectureRuleSupport.assertApiModelsDoNotExposePriority(sourceRoot);
         ApiSurfaceArchitectureRuleSupport.assertSortRequestsUseOrderedIdsOnly(sourceRoot);
         ApiSurfaceArchitectureRuleSupport.assertSortRequestsAreAllowed(
-                sourceRoot, Arrays.asList("DictSortRequest", "RoleSortRequest", "StorageSortRequest"));
+                sourceRoot,
+                Arrays.asList("DictSortRequest", "RoleSortRequest", "StorageSortRequest", "SubmissionSortRequest"));
         ApiSurfaceArchitectureRuleSupport.assertSortEndpointsAreAllowed(
-                sourceRoot, Arrays.asList("DictController", "RoleController", "StorageController"));
+                sourceRoot,
+                Arrays.asList("DictController", "RoleController", "StorageController", "SubmissionController"));
     }
 
     private static Path mainSourceRoot() {

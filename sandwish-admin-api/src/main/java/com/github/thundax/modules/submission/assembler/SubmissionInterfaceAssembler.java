@@ -56,7 +56,6 @@ public final class SubmissionInterfaceAssembler {
                 .content(entity.getContent())
                 .sourceClientId(entity.getSourceClientId())
                 .status(entity.getStatus() == null ? null : entity.getStatus().value())
-                .priority(entity.getPriority())
                 .submittedAt(entity.getSubmittedAt())
                 .lastStatusChangedAt(entity.getLastStatusChangedAt())
                 .imageObjectIds(

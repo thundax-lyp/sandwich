@@ -9,20 +9,19 @@ import {
     ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Form, Input, InputNumber, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { MenuEdit } from "./components/menu-edit";
 import { addMenu, deleteMenus, listMenus, moveMenu, updateMenu } from "./menu-service";
 import type { MenuMoveRequest, MenuResponse, MenuSaveRequest } from "./menu-service";
 import "./menu-page.css";
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
@@ -35,23 +34,6 @@ const DEFAULT_COLUMN_WIDTHS = {
 interface MenuTableNode extends MenuResponse {
     children?: MenuTableNode[];
 }
-
-interface MenuFormValues {
-    id?: string | null;
-    parentId?: string | null;
-    name: string;
-    perms?: string | null;
-    ranks?: number | null;
-    display?: boolean | null;
-    displayParams?: string | null;
-    url?: string | null;
-    remarks?: string | null;
-}
-
-const normalizeText = (value?: string | null) => {
-    const normalizedValue = value?.trim();
-    return normalizedValue || undefined;
-};
 
 const buildMenuTree = (menus: MenuResponse[]) => {
     const nodeMap = new Map<string, MenuTableNode>();
@@ -94,27 +76,12 @@ const collectDescendantIds = (menu?: MenuTableNode | null): Set<string> => {
     return new Set(collectMenuIds(menu.children));
 };
 
-const readFormRequest = (values: MenuFormValues): MenuSaveRequest => {
-    return {
-        id: values.id,
-        parentId: values.parentId || null,
-        name: values.name.trim(),
-        perms: normalizeText(values.perms),
-        ranks: values.ranks,
-        display: values.display !== false,
-        displayParams: normalizeText(values.displayParams),
-        url: normalizeText(values.url),
-        remarks: normalizeText(values.remarks)
-    };
-};
-
 const toMoveType = (position: SandwishTableSortPosition): MenuMoveRequest["type"] => {
     return position === "before" ? "before" : "after";
 };
 
 export const MenuPage = () => {
     const { message: messageApi } = App.useApp();
-    const [editForm] = Form.useForm<MenuFormValues>();
     const queryClient = useQueryClient();
     const [editingMenu, setEditingMenu] = useState<MenuTableNode | null>(null);
     const [deletingMenu, setDeletingMenu] = useState<MenuTableNode | null>(null);
@@ -154,7 +121,6 @@ export const MenuPage = () => {
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingMenu(null);
-            editForm.resetFields();
             await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });
             messageApi.success("菜单已保存");
         },
@@ -188,24 +154,11 @@ export const MenuPage = () => {
 
     const openCreateEditor = () => {
         setEditingMenu(null);
-        editForm.resetFields();
-        editForm.setFieldsValue({ display: true, ranks: 0 });
         setEditorOpen(true);
     };
 
     const openEditEditor = (menu: MenuTableNode) => {
         setEditingMenu(menu);
-        editForm.setFieldsValue({
-            id: menu.id,
-            parentId: menu.parentId || null,
-            name: menu.name,
-            perms: menu.perms,
-            ranks: menu.ranks,
-            display: menu.display !== false,
-            displayParams: menu.displayParams,
-            url: menu.url,
-            remarks: menu.remarks
-        });
         setEditorOpen(true);
     };
 
@@ -215,12 +168,10 @@ export const MenuPage = () => {
         }
         setEditorOpen(false);
         setEditingMenu(null);
-        editForm.resetFields();
     };
 
-    const saveMenu = async () => {
-        const values = await editForm.validateFields();
-        saveMutation.mutate(readFormRequest(values));
+    const saveMenu = (request: MenuSaveRequest) => {
+        saveMutation.mutate(request);
     };
 
     const openDeleteConfirm = (menu: MenuTableNode) => {
@@ -450,73 +401,14 @@ export const MenuPage = () => {
                 sortable={canEditMenu}
             />
 
-            <SandwishDrawer
-                className="menu-edit-drawer"
-                title={editingMenu ? "编辑菜单" : "新增菜单"}
+            <MenuEdit
                 open={editorOpen}
-                size="small"
+                menu={editingMenu}
+                parentOptions={parentOptions}
+                saving={saveMutation.isPending}
                 onClose={closeEditor}
-                footer={
-                    <div className="menu-edit-footer">
-                        <Button onClick={closeEditor}>取消</Button>
-                        <Button type="primary" loading={saveMutation.isPending} onClick={saveMenu}>
-                            保存菜单
-                        </Button>
-                    </div>
-                }
-            >
-                <Form<MenuFormValues>
-                    form={editForm}
-                    layout="vertical"
-                    className="menu-editor-form"
-                >
-                    <Form.Item name="id" hidden>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="parentId" label="上级菜单">
-                        <Select
-                            allowClear
-                            placeholder="不选择则作为根菜单"
-                            options={parentOptions}
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        name="name"
-                        label="菜单名称"
-                        rules={[{ required: true, message: "请输入菜单名称" }]}
-                    >
-                        <Input placeholder="例如：菜单管理" />
-                    </Form.Item>
-                    <Form.Item name="url" label="URL">
-                        <Input placeholder="例如：/system/menus" />
-                    </Form.Item>
-                    <Form.Item name="perms" label="权限标识">
-                        <Input placeholder="例如：sys:menu:view" />
-                    </Form.Item>
-                    <Form.Item name="ranks" label="等级">
-                        <InputNumber min={0} max={9} precision={0} className="menu-rank-input" />
-                    </Form.Item>
-                    <Form.Item name="display" label="显示状态">
-                        <Select
-                            options={[
-                                { label: "显示", value: true },
-                                { label: "隐藏", value: false }
-                            ]}
-                        />
-                    </Form.Item>
-                    <Form.Item name="displayParams" label="显示参数">
-                        <TextArea
-                            rows={3}
-                            maxLength={1000}
-                            showCount
-                            placeholder='例如：{"icon":"menu"}'
-                        />
-                    </Form.Item>
-                    <Form.Item name="remarks" label="备注">
-                        <TextArea rows={3} maxLength={200} showCount placeholder="菜单说明" />
-                    </Form.Item>
-                </Form>
-            </SandwishDrawer>
+                onSave={saveMenu}
+            />
 
             <SandwishConfirmModal
                 title="删除菜单"

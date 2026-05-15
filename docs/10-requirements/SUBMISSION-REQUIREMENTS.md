@@ -166,6 +166,28 @@ Command 固定不包含：
 - 创建提交内容时，Service 负责生成新的 `priority`。
 - 提交内容列表默认按 `priority` 升序查询。
 
+### 6.5 Admin API Boundary
+
+后台提交内容入口固定使用 `SubmissionController`，类级路径固定为 `/api/submission/submission`。
+
+固定 URL 和权限矩阵：
+
+| Method | URL | Permission | Description |
+| --- | --- | --- | --- |
+| `POST` | `/api/submission/submission/create` | `submission:submission:edit` | 创建提交内容 |
+| `POST` | `/api/submission/submission/page` | `submission:submission:view` | 分页查询提交内容 |
+| `POST` | `/api/submission/submission/get` | `submission:submission:view` | 查询提交内容详情 |
+| `POST` | `/api/submission/submission/change-status` | `submission:submission:edit` | 调整提交内容状态 |
+| `POST` | `/api/submission/submission/delete` | `submission:submission:edit` | 删除提交内容 |
+| `POST` | `/api/submission/submission/sort` | `submission:submission:edit` | 重排提交内容 |
+| `POST` | `/api/submission/submission/image/upload` | `submission:submission:edit` | 上传提交内容图片 |
+
+后台菜单和权限资源固定写入 `sys_menu`，初始化脚本归属 [`../../db/data/system.sql`](../../db/data/system.sql)：
+
+- 可见菜单：`/submission`、`/submission/submissions`。
+- 隐藏权限：`submission:submission:view`、`submission:submission:edit`。
+- 权限判断以 `@HasPermission` 和 `sys_menu.perms` 为准，`@ApiOperation.notes` 只作为接口文档提示。
+
 ## 7. Functional Requirements
 
 ### 7.1 Create Submission

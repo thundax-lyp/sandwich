@@ -25,12 +25,14 @@ db/
 │   ├── system.sql
 │   ├── auth.sql
 │   ├── storage.sql
+│   ├── submission.sql
 │   ├── member.sql
 │   └── audit.sql
 └── data/
     ├── system.sql
     ├── auth.sql
     ├── storage.sql
+    ├── submission.sql
     ├── member.sql
     └── audit.sql
 ```
@@ -45,6 +47,7 @@ db/
 - `System`: `schema/system.sql`, `data/system.sql`
 - `Auth`: `schema/auth.sql`, `data/auth.sql`
 - `Storage`: `schema/storage.sql`, `data/storage.sql`
+- `Submission`: `schema/submission.sql`, `data/submission.sql`
 - `Member`: `schema/member.sql`, `data/member.sql`
 - `Audit`: `schema/audit.sql`, `data/audit.sql`
 
@@ -58,16 +61,19 @@ db/
 4. `db/data/auth.sql`
 5. `db/schema/storage.sql`
 6. `db/data/storage.sql`
-7. `db/schema/member.sql`
-8. `db/data/member.sql`
-9. `db/schema/audit.sql`
-10. `db/data/audit.sql`
+7. `db/schema/submission.sql`
+8. `db/data/submission.sql`
+9. `db/schema/member.sql`
+10. `db/data/member.sql`
+11. `db/schema/audit.sql`
+12. `db/data/audit.sql`
 
 执行原则：
 
 - 先执行 `schema/`，再执行 `data/`。
 - `auth` 初始化依赖 `system` 的用户与登录标识主数据。
 - `storage` 当前不依赖其他业务域初始化数据。
+- `submission` 当前依赖 `storage` 的对象 ID 语义，不依赖固定初始化数据。
 - `member` 当前不依赖其他业务域初始化数据。
 
 ## 5. Change Policy

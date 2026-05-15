@@ -39,6 +39,10 @@
   再读 `10-requirements/MEMBER-REQUIREMENTS.md`
 - 前台会员数据库、会员主表：
   再读 `20-database/MEMBER-DATABASE-DESIGN.md`
+- 提交内容、外部提交、submission、占位业务域：
+  再读 `10-requirements/SUBMISSION-REQUIREMENTS.md`
+- 提交内容数据库、submission 表、提交图片表：
+  再读 `20-database/SUBMISSION-DATABASE-DESIGN.md`
 - 数据审计、审计元数据、审计日志、审计快照、审计对象坐标：
   再读 `10-requirements/AUDIT-REQUIREMENTS.md`
 - 数据审计数据库、审计元数据表、审计日志表：

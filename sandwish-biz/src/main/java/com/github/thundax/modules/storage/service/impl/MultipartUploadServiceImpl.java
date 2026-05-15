@@ -17,7 +17,6 @@ import com.github.thundax.modules.storage.service.command.CompleteMultipartUploa
 import com.github.thundax.modules.storage.service.command.CreateStorageCommand;
 import com.github.thundax.modules.storage.service.command.InitMultipartUploadCommand;
 import com.github.thundax.modules.storage.service.command.UploadMultipartPartCommand;
-import com.github.thundax.modules.storage.utils.MetaFile;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @BizExceptionBoundary
 public class MultipartUploadServiceImpl implements MultipartUploadService {
+    private static final String EXTENSION_SEPARATOR = ".";
 
     private final MultipartUploadDao multipartUploadDao;
     private final StorageService storageService;
@@ -223,7 +223,7 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         if (StringUtils.isBlank(originalFilename)) {
             return null;
         }
-        int index = originalFilename.lastIndexOf(MetaFile.DOT);
+        int index = originalFilename.lastIndexOf(EXTENSION_SEPARATOR);
         return index < 0 ? originalFilename : originalFilename.substring(0, index);
     }
 
@@ -231,7 +231,7 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         if (StringUtils.isBlank(originalFilename)) {
             return null;
         }
-        int index = originalFilename.lastIndexOf(MetaFile.DOT);
+        int index = originalFilename.lastIndexOf(EXTENSION_SEPARATOR);
         return index < 0 ? null : StringUtils.lowerCase(originalFilename.substring(index + 1));
     }
 }

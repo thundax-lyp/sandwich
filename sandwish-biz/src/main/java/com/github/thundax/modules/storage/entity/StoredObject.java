@@ -6,7 +6,6 @@ import com.github.thundax.modules.storage.entity.enums.StoredObjectReferenceStat
 import com.github.thundax.modules.storage.entity.enums.StoredObjectStatus;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
-import com.github.thundax.modules.storage.utils.MetaFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -21,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor
 public class StoredObject implements Sortable {
     private static final String PATH_FORMAT = "yyyyMM";
+    private static final String DOT = ".";
+    private static final String PATH_SEPARATOR = "/";
 
     private StoredObjectId id;
     private String originalFilename;
@@ -57,7 +58,7 @@ public class StoredObject implements Sortable {
     }
 
     public String getFileName() {
-        return StoredObjectIdCodec.toValue(getId()) + MetaFile.DOT + this.getExtendName();
+        return StoredObjectIdCodec.toValue(getId()) + DOT + this.getExtendName();
     }
 
     public String getOriginalFileName() {
@@ -67,10 +68,10 @@ public class StoredObject implements Sortable {
         if (StringUtils.isBlank(this.getExtendName())) {
             return this.getName();
         }
-        return this.getName() + MetaFile.DOT + this.getExtendName();
+        return this.getName() + DOT + this.getExtendName();
     }
 
     public String getPathName() {
-        return new SimpleDateFormat(PATH_FORMAT).format(new Date()) + MetaFile.SEPARATOR + this.getFileName();
+        return new SimpleDateFormat(PATH_FORMAT).format(new Date()) + PATH_SEPARATOR + this.getFileName();
     }
 }

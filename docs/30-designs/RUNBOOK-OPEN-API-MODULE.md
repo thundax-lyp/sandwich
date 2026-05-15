@@ -12,6 +12,7 @@
 
 - 新增 `sandwish-open-api` Maven 入口模块。
 - 新增 OpenClient 业务模型、持久化和后台管理最小能力。
+- 新增 OpenClient 管理台页面、菜单和权限数据。
 - 复用 `auth_principal_identity` 和 `auth_principal_credential` 支撑 API KEY / API SECRET。
 - 实现 Open API HMAC 签名认证、防重放、权限校验和上下文注入。
 - 实现 Open API Submission 创建和图片上传接口。
@@ -118,6 +119,7 @@ mvn -pl sandwish-infra -am test
 - 查询详情和分页不得返回 API SECRET 明文。
 - 后台权限使用 `open:client:view` 和 `open:client:edit`。
 - 在 `db/data/system.sql` 增加 OpenClient 后台菜单和权限。
+- 将 OpenClient 后台菜单和权限数据同步到当前开发数据库。
 - 增加后台 Controller contract test。
 
 验收：
@@ -126,7 +128,30 @@ mvn -pl sandwish-infra -am test
 mvn -pl sandwish-admin-api -am test
 ```
 
-### 4.5 Add Open API Auth Foundation
+### 4.5 Add Admin Web OpenClient Management
+
+目标：管理台具备 OpenClient 配置管理能力。
+
+动作：
+
+- 在 `sandwish-admin-web` 新增 OpenClient 管理页面、service、样式和路由。
+- 页面固定支持分页查询、创建、启用、禁用、重置 API SECRET、维护 IP 白名单、维护过期时间和维护权限。
+- 创建 OpenClient 成功后，页面必须展示 API KEY 和 API SECRET 明文一次。
+- 重置 API SECRET 成功后，页面必须展示新 API SECRET 明文一次。
+- 查询详情和分页不得展示 API SECRET 明文。
+- 重置 secret 功能必须有二次确认。
+- 菜单路由和 `db/data/system.sql` 中的菜单 URL 必须一致。
+- 确认 OpenClient 菜单和权限数据已经同步到当前开发数据库。
+
+验收：
+
+```text
+npm --prefix sandwish-admin-web run lint
+npm --prefix sandwish-admin-web run test
+npm --prefix sandwish-admin-web run build
+```
+
+### 4.6 Add Open API Auth Foundation
 
 目标：完成 Open API 独立认证、授权、错误响应和上下文注入。
 
@@ -147,7 +172,7 @@ mvn -pl sandwish-admin-api -am test
 mvn -pl sandwish-open-api -am test
 ```
 
-### 4.6 Add Open API Submission Endpoints
+### 4.7 Add Open API Submission Endpoints
 
 目标：开放第三方 Submission 创建和图片上传。
 
@@ -169,7 +194,7 @@ mvn -pl sandwish-open-api -am test
 mvn -pl sandwish-open-api -am test
 ```
 
-### 4.7 Add Architecture And Contract Tests
+### 4.8 Add Architecture And Contract Tests
 
 目标：让新入口模块被现有工程门禁覆盖。
 
@@ -187,7 +212,7 @@ mvn -pl sandwish-open-api -am test
 mvn test
 ```
 
-### 4.8 Final Cleanup
+### 4.9 Final Cleanup
 
 目标：完成执行现场收口。
 
@@ -214,6 +239,9 @@ mvn -pl sandwish-open-api -am test
 mvn -pl sandwish-biz -am test
 mvn -pl sandwish-infra -am test
 mvn -pl sandwish-admin-api -am test
+npm --prefix sandwish-admin-web run lint
+npm --prefix sandwish-admin-web run test
+npm --prefix sandwish-admin-web run build
 ```
 
 最终验证命令：

@@ -43,7 +43,8 @@
 ## 4. Entry Map
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
+flowchart LR
   Root["./AGENTS.md"] -->|"所有任务先读仓库规则"| DocsAgent["docs/AGENT.md"]
 
   DocsAgent -->|"实现 / 修改 / 评审代码"| Architecture["00-governance/ARCHITECTURE.md"]
@@ -58,7 +59,8 @@ flowchart TD
 ## 5. Business Route Map
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
+flowchart LR
   DocsAgent["docs/AGENT.md"]
 
   DocsAgent -->|"后台系统管理 / 用户 / 角色 / 菜单 / 部门 / 字典 / 系统日志"| SysReq["10-requirements/SYSTEM-REQUIREMENTS.md"]
@@ -83,7 +85,8 @@ flowchart TD
 ## 6. Open API Route Map
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
+flowchart LR
   Root["./AGENTS.md"] -->|"所有任务入口"| DocsAgent["docs/AGENT.md"]
 
   DocsAgent -->|"open-api / OpenClient / API KEY/SECRET / 第三方签名认证"| OpenReq["10-requirements/OPEN-API-REQUIREMENTS.md"]
@@ -103,7 +106,8 @@ flowchart TD
 ## 7. Error Code Route Map
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
+flowchart LR
   DocsAgent["docs/AGENT.md"] -->|"异常分层 / ExceptionTranslator / API error code"| Architecture["00-governance/ARCHITECTURE.md"]
   Architecture -->|"API 响应和异常入口规则"| ApiMatrix["00-governance/API-ANNOTATION-MATRIX.md"]
 
@@ -115,7 +119,8 @@ flowchart TD
 ## 8. TODO And RUNBOOK Route Map
 
 ```mermaid
-flowchart TD
+%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%
+flowchart LR
   DocsAgent["docs/AGENT.md"]
 
   DocsAgent -->|"TODO 协作 / 任务拆解 / 任务列表重写"| TodoRules["00-governance/TODO-RULES.md"]

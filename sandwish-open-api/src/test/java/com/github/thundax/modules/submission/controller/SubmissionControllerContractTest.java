@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.modules.auth.security.OpenApiHeaders;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
@@ -25,10 +26,15 @@ import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionImageId;
 import com.github.thundax.modules.submission.service.SubmissionService;
 import com.github.thundax.modules.submission.service.command.CreateSubmissionCommand;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mock.web.MockMultipartFile;
@@ -101,8 +107,28 @@ public class SubmissionControllerContractTest {
                 permission(SubmissionController.class.getMethod("uploadImage", MultipartFile.class)));
     }
 
+    @Test
+    public void shouldDeclareOpenApiSwaggerHeaders() throws Exception {
+        assertOpenApiHeaders(SubmissionController.class.getMethod("create", SubmissionSaveRequest.class));
+        assertOpenApiHeaders(SubmissionController.class.getMethod("uploadImage", MultipartFile.class));
+    }
+
     private String permission(java.lang.reflect.Method method) {
         return method.getAnnotation(HasPermission.class).value()[0];
+    }
+
+    private void assertOpenApiHeaders(Method method) {
+        ApiImplicitParams params = method.getAnnotation(ApiImplicitParams.class);
+        Set<String> names = new LinkedHashSet<>();
+        for (ApiImplicitParam param : params.value()) {
+            names.add(param.name());
+        }
+
+        assertEquals(true, names.contains(OpenApiHeaders.API_KEY));
+        assertEquals(true, names.contains(OpenApiHeaders.TIMESTAMP));
+        assertEquals(true, names.contains(OpenApiHeaders.NONCE));
+        assertEquals(true, names.contains(OpenApiHeaders.CONTENT_SHA256));
+        assertEquals(true, names.contains(OpenApiHeaders.SIGNATURE));
     }
 
     private SubmissionSaveRequest saveRequest() {

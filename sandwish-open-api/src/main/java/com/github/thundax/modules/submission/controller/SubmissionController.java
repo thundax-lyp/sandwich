@@ -3,6 +3,7 @@ package com.github.thundax.modules.submission.controller;
 import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.modules.auth.security.OpenApiHeaders;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
@@ -13,6 +14,8 @@ import com.github.thundax.modules.submission.controller.response.SubmissionRespo
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.service.SubmissionService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +46,33 @@ public class SubmissionController {
 
     @ApiOperation(value = "创建提交内容", notes = "submission:submission:create")
     @HasPermission("submission:submission:create")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = OpenApiHeaders.API_KEY,
+                value = "OpenClient API KEY",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.TIMESTAMP,
+                value = "请求时间戳，支持秒或毫秒",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.NONCE,
+                value = "请求随机串，同一 API KEY 下不可重复",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.CONTENT_SHA256,
+                value = "请求体 SHA-256 十六进制摘要",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.SIGNATURE,
+                value = "HMAC 签名",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
     @PostMapping(value = "create")
     public SubmissionResponse create(@Valid @RequestBody SubmissionSaveRequest request) {
         SubmissionId id = submissionService.create(SubmissionInterfaceAssembler.toCreateCommand(request));
@@ -51,6 +81,33 @@ public class SubmissionController {
 
     @ApiOperation(value = "上传提交图片", notes = "submission:submission:image:upload")
     @HasPermission("submission:submission:image:upload")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = OpenApiHeaders.API_KEY,
+                value = "OpenClient API KEY",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.TIMESTAMP,
+                value = "请求时间戳，支持秒或毫秒",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.NONCE,
+                value = "请求随机串，同一 API KEY 下不可重复",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.CONTENT_SHA256,
+                value = "请求体 SHA-256 十六进制摘要",
+                paramType = "header",
+                dataTypeClass = String.class),
+        @ApiImplicitParam(
+                name = OpenApiHeaders.SIGNATURE,
+                value = "HMAC 签名",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
     @PostMapping(value = "image/upload")
     public StorageUploadResponse uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         return StorageInterfaceAssembler.toUploadResponse(

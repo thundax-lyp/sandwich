@@ -24,6 +24,8 @@
 - OpenClient 后台管理 API。
 - OpenClient 后台管理页面。
 - Open API Submission 创建入口。
+- Open API Submission 分页查询入口。
+- Open API Submission 状态调整入口。
 - Open API Submission 图片上传入口。
 - Open API 与 Audit 操作者上下文衔接。
 
@@ -127,9 +129,11 @@ Open API 写入业务对象时，业务对象不保存 OpenClient 来源字段�
 - `clientId + permission` 必须唯一。
 - 权限码使用业务模块权限码，不使用 `open:` 前缀。
 
-Submission 最小开放权限：
+Submission 首批开放权限：
 
 - `submission:submission:create`
+- `submission:submission:page`
+- `submission:submission:change-status`
 - `submission:submission:image:upload`
 
 ### 5.3 API KEY
@@ -288,7 +292,7 @@ SandwishSubjectType.OPEN_CLIENT -> AuditOperatorType.OPEN_CLIENT
 
 ### 6.6 Submission Boundary
 
-Open API 当前只开放 Submission 最小写入能力。
+Open API 当前开放 Submission 创建、分页查询、状态调整和图片上传能力。
 
 Open API Submission 入口固定调用 `SubmissionService`，不得直接访问 DAO、Mapper、Storage store 或底层对象存储。
 

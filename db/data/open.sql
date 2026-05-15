@@ -48,6 +48,16 @@ VALUES
         'submission:submission:image:upload'
     ),
     (
+        930000000000001004,
+        930000000000000001,
+        'submission:submission:page'
+    ),
+    (
+        930000000000001005,
+        930000000000000001,
+        'submission:submission:change-status'
+    ),
+    (
         930000000000001003,
         930000000000000002,
         'submission:submission:create'

@@ -1,18 +1,42 @@
 package com.github.thundax.modules.submission.assembler;
 
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
+import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionSaveRequest;
+import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
 import com.github.thundax.modules.submission.controller.response.SubmissionResponse;
 import com.github.thundax.modules.submission.entity.Submission;
+import com.github.thundax.modules.submission.entity.enums.SubmissionStatus;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionIdCodec;
+import com.github.thundax.modules.submission.service.command.ChangeSubmissionStatusCommand;
 import com.github.thundax.modules.submission.service.command.CreateSubmissionCommand;
+import com.github.thundax.modules.submission.service.query.SubmissionQuery;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 
 public final class SubmissionInterfaceAssembler {
 
     private SubmissionInterfaceAssembler() {}
+
+    @NonNull
+    public static SubmissionQuery toQuery(@NonNull SubmissionPageRequest request) {
+        SubmissionQuery query = new SubmissionQuery();
+        query.setStatus(StringUtils.isBlank(request.getStatus()) ? null : SubmissionStatus.from(request.getStatus()));
+        query.setSubmittedAtBegin(request.getSubmittedAtBegin());
+        query.setSubmittedAtEnd(request.getSubmittedAtEnd());
+        query.setSortDirection(request.getSortDirection());
+        return query;
+    }
+
+    @NonNull
+    public static ChangeSubmissionStatusCommand toChangeStatusCommand(@NonNull SubmissionStatusRequest request) {
+        ChangeSubmissionStatusCommand command = new ChangeSubmissionStatusCommand();
+        command.setId(SubmissionIdCodec.toDomain(request.getId()));
+        command.setStatus(SubmissionStatus.from(request.getStatus()));
+        return command;
+    }
 
     @NonNull
     public static CreateSubmissionCommand toCreateCommand(@NonNull SubmissionSaveRequest request) {

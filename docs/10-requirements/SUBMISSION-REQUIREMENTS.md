@@ -45,7 +45,7 @@
 - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission`
   - 提供后台创建、查询、详情、状态调整、排序、删除和提交图片上传入口适配。
 - `sandwish-open-api/src/main/java/com/github/thundax/modules/submission`
-  - 提供第三方提交入口适配。
+  - 提供第三方提交、分页查询、状态调整和图片上传入口适配。
 - `sandwish-front-api`
   - 当前不提供 `Submission` 入口。
 
@@ -134,7 +134,7 @@ Command 固定不包含：
 
 ### 6.2 Image Boundary
 
-`Submission` 提供业务专用图片上传入口，权限固定使用 `submission:submission:edit`。
+`Submission` 提供业务专用图片上传入口。后台权限固定使用 `submission:submission:edit`，开放接口权限固定使用 `submission:submission:image:upload`。
 
 上传实现固定复用 `StorageUploadRequestHelper` 和 Storage Service，上传后的存储对象 `ownerType` 固定为 `SUBMISSION`。Submission Controller 不直接访问 `StoredObjectStore`、DAO 或底层对象存储实现。
 
@@ -179,6 +179,21 @@ Command 固定不包含：
 | `POST` | `/api/submission/submission/sort` | `submission:submission:edit` | 重排提交内容 |
 | `POST` | `/api/submission/submission/image/upload` | `submission:submission:edit` | 上传提交内容图片 |
 
+### 6.6 Open API Boundary
+
+开放接口提交内容入口固定使用 `SubmissionController`，类级路径固定为 `/api/submission/submission`。
+
+固定 URL 和权限矩阵：
+
+| Method | URL | Permission | Description |
+| --- | --- | --- | --- |
+| `POST` | `/api/submission/submission/create` | `submission:submission:create` | 创建提交内容 |
+| `POST` | `/api/submission/submission/page` | `submission:submission:page` | 分页查询提交内容 |
+| `POST` | `/api/submission/submission/change-status` | `submission:submission:change-status` | 调整提交内容状态 |
+| `POST` | `/api/submission/submission/image/upload` | `submission:submission:image:upload` | 上传提交内容图片 |
+
+开放接口使用 OpenClient 直接权限，不使用后台菜单、角色或登录态权限。
+
 后台菜单和权限资源固定写入 `sys_menu`，初始化脚本归属 [`../../db/data/system.sql`](../../db/data/system.sql)：
 
 - 可见菜单：`/submission`、`/submission/submissions`。
@@ -203,7 +218,7 @@ Command 固定不包含：
 
 ### 7.2 Query Submission
 
-后台必须支持按提交内容状态、提交时间范围分页查询提交内容。
+后台和开放接口必须支持按提交内容状态、提交时间范围分页查询提交内容。
 
 提交内容分页默认按 `priority` 升序查询。
 
@@ -213,7 +228,7 @@ Command 固定不包含：
 
 ### 7.4 Change Submission Status
 
-后台必须支持调整提交内容状态。
+后台和开放接口必须支持调整提交内容状态。
 
 状态调整成功后：
 
@@ -232,7 +247,7 @@ Command 固定不包含：
 
 ### 7.6 Upload Submission Image
 
-后台必须支持在提交内容模块上传图片。
+后台和开放接口必须支持在提交内容模块上传图片。
 
 上传成功后：
 

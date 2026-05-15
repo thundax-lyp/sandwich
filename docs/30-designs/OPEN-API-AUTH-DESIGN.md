@@ -261,16 +261,20 @@ permission
 - Open API 不使用 `open:` 前缀表达入口类型。
 - 入口类型由认证主体类型 `OPEN_CLIENT` 表达。
 
-Submission 最小开放权限：
+Submission 首批开放权限：
 
 ```text
 submission:submission:create
+submission:submission:page
+submission:submission:change-status
 submission:submission:image:upload
 ```
 
 含义：
 
 - `submission:submission:create`：允许创建 Submission。
+- `submission:submission:page`：允许分页查询 Submission。
+- `submission:submission:change-status`：允许调整 Submission 状态。
 - `submission:submission:image:upload`：允许上传 Submission 图片。
 
 ## 12. Context And Audit

@@ -9,6 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.common.page.PageQuery;
+import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.modules.auth.security.OpenApiHeaders;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
@@ -17,7 +19,9 @@ import com.github.thundax.modules.storage.entity.enums.StorageOwnerType;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectId;
 import com.github.thundax.modules.storage.helper.StorageUploadResult;
 import com.github.thundax.modules.storage.helper.StorageUploadStreamHelper;
+import com.github.thundax.modules.submission.controller.request.SubmissionPageRequest;
 import com.github.thundax.modules.submission.controller.request.SubmissionSaveRequest;
+import com.github.thundax.modules.submission.controller.request.SubmissionStatusRequest;
 import com.github.thundax.modules.submission.controller.response.SubmissionResponse;
 import com.github.thundax.modules.submission.entity.Submission;
 import com.github.thundax.modules.submission.entity.SubmissionImage;
@@ -25,7 +29,9 @@ import com.github.thundax.modules.submission.entity.enums.SubmissionStatus;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionId;
 import com.github.thundax.modules.submission.entity.valueobject.SubmissionImageId;
 import com.github.thundax.modules.submission.service.SubmissionService;
+import com.github.thundax.modules.submission.service.command.ChangeSubmissionStatusCommand;
 import com.github.thundax.modules.submission.service.command.CreateSubmissionCommand;
+import com.github.thundax.modules.submission.service.query.SubmissionQuery;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import java.io.InputStream;
@@ -98,10 +104,49 @@ public class SubmissionControllerContractTest {
     }
 
     @Test
+    public void shouldConvertPageRequestToQuery() {
+        SubmissionService submissionService = mock(SubmissionService.class);
+        StorageUploadStreamHelper uploadStreamHelper = mock(StorageUploadStreamHelper.class);
+        SubmissionController controller = new SubmissionController(submissionService, uploadStreamHelper, properties());
+        when(submissionService.page(any(SubmissionQuery.class), any(PageQuery.class)))
+                .thenReturn(PageResult.of(1, 10, 1L, Collections.singletonList(submission())));
+
+        controller.page(pageRequest());
+
+        ArgumentCaptor<SubmissionQuery> queryCaptor = ArgumentCaptor.forClass(SubmissionQuery.class);
+        ArgumentCaptor<PageQuery> pageCaptor = ArgumentCaptor.forClass(PageQuery.class);
+        verify(submissionService).page(queryCaptor.capture(), pageCaptor.capture());
+        assertEquals("SUBMITTED", queryCaptor.getValue().getStatus().value());
+        assertEquals(1, pageCaptor.getValue().getPageNo());
+        assertEquals(10, pageCaptor.getValue().getPageSize());
+    }
+
+    @Test
+    public void shouldConvertStatusRequestToCommand() {
+        SubmissionService submissionService = mock(SubmissionService.class);
+        StorageUploadStreamHelper uploadStreamHelper = mock(StorageUploadStreamHelper.class);
+        SubmissionController controller = new SubmissionController(submissionService, uploadStreamHelper, properties());
+
+        controller.changeStatus(statusRequest());
+
+        ArgumentCaptor<ChangeSubmissionStatusCommand> captor =
+                ArgumentCaptor.forClass(ChangeSubmissionStatusCommand.class);
+        verify(submissionService).changeStatus(captor.capture());
+        assertEquals(Long.valueOf(9001L), Long.valueOf(captor.getValue().getId().value()));
+        assertEquals("APPROVED", captor.getValue().getStatus().value());
+    }
+
+    @Test
     public void shouldDeclareSubmissionPermissions() throws Exception {
         assertEquals(
                 "submission:submission:create",
                 permission(SubmissionController.class.getMethod("create", SubmissionSaveRequest.class)));
+        assertEquals(
+                "submission:submission:page",
+                permission(SubmissionController.class.getMethod("page", SubmissionPageRequest.class)));
+        assertEquals(
+                "submission:submission:change-status",
+                permission(SubmissionController.class.getMethod("changeStatus", SubmissionStatusRequest.class)));
         assertEquals(
                 "submission:submission:image:upload",
                 permission(SubmissionController.class.getMethod("uploadImage", MultipartFile.class)));
@@ -110,6 +155,8 @@ public class SubmissionControllerContractTest {
     @Test
     public void shouldDeclareOpenApiSwaggerHeaders() throws Exception {
         assertOpenApiHeaders(SubmissionController.class.getMethod("create", SubmissionSaveRequest.class));
+        assertOpenApiHeaders(SubmissionController.class.getMethod("page", SubmissionPageRequest.class));
+        assertOpenApiHeaders(SubmissionController.class.getMethod("changeStatus", SubmissionStatusRequest.class));
         assertOpenApiHeaders(SubmissionController.class.getMethod("uploadImage", MultipartFile.class));
     }
 
@@ -136,6 +183,21 @@ public class SubmissionControllerContractTest {
         request.setTitle("Partner form");
         request.setContent("Hello");
         request.setImageObjectIds(Collections.singletonList("7001"));
+        return request;
+    }
+
+    private SubmissionPageRequest pageRequest() {
+        SubmissionPageRequest request = new SubmissionPageRequest();
+        request.setPageNo(1);
+        request.setPageSize(10);
+        request.setStatus("SUBMITTED");
+        return request;
+    }
+
+    private SubmissionStatusRequest statusRequest() {
+        SubmissionStatusRequest request = new SubmissionStatusRequest();
+        request.setId("9001");
+        request.setStatus("APPROVED");
         return request;
     }
 

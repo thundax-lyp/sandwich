@@ -118,8 +118,6 @@ mvn -pl sandwish-infra -am test
 - 重置 API SECRET 时返回新 API SECRET 明文一次。
 - 查询详情和分页不得返回 API SECRET 明文。
 - 后台权限使用 `open:client:view` 和 `open:client:edit`。
-- 在 `db/data/system.sql` 增加 OpenClient 后台菜单和权限。
-- 将 OpenClient 后台菜单和权限数据同步到当前开发数据库。
 - 增加后台 Controller contract test。
 
 验收：
@@ -128,7 +126,25 @@ mvn -pl sandwish-infra -am test
 mvn -pl sandwish-admin-api -am test
 ```
 
-### 4.5 Add Admin Web OpenClient Management
+### 4.5 Add OpenClient Admin Menu And Permission Data
+
+目标：后台菜单、权限种子数据和当前开发数据库具备 OpenClient 管理入口。
+
+动作：
+
+- 在 `db/data/system.sql` 增加 OpenClient 后台菜单和权限数据。
+- 菜单 URL 固定与 admin-web OpenClient 管理页面路由一致。
+- 权限固定包含 `open:client:view` 和 `open:client:edit`。
+- 将 OpenClient 后台菜单和权限数据同步到当前开发数据库。
+- 验证当前登录用户可获得 OpenClient 菜单和权限。
+
+验收：
+
+```text
+mysql "$SANDWISH_DB_URL" < db/data/system.sql
+```
+
+### 4.6 Add Admin Web OpenClient Management
 
 目标：管理台具备 OpenClient 配置管理能力。
 
@@ -141,7 +157,6 @@ mvn -pl sandwish-admin-api -am test
 - 查询详情和分页不得展示 API SECRET 明文。
 - 重置 secret 功能必须有二次确认。
 - 菜单路由和 `db/data/system.sql` 中的菜单 URL 必须一致。
-- 确认 OpenClient 菜单和权限数据已经同步到当前开发数据库。
 
 验收：
 
@@ -151,7 +166,7 @@ npm --prefix sandwish-admin-web run test
 npm --prefix sandwish-admin-web run build
 ```
 
-### 4.6 Add Open API Auth Foundation
+### 4.7 Add Open API Auth Foundation
 
 目标：完成 Open API 独立认证、授权、错误响应和上下文注入。
 
@@ -172,7 +187,7 @@ npm --prefix sandwish-admin-web run build
 mvn -pl sandwish-open-api -am test
 ```
 
-### 4.7 Add Open API Submission Endpoints
+### 4.8 Add Open API Submission Endpoints
 
 目标：开放第三方 Submission 创建和图片上传。
 
@@ -194,7 +209,7 @@ mvn -pl sandwish-open-api -am test
 mvn -pl sandwish-open-api -am test
 ```
 
-### 4.8 Add Architecture And Contract Tests
+### 4.9 Add Architecture And Contract Tests
 
 目标：让新入口模块被现有工程门禁覆盖。
 
@@ -212,7 +227,7 @@ mvn -pl sandwish-open-api -am test
 mvn test
 ```
 
-### 4.9 Final Cleanup
+### 4.10 Final Cleanup
 
 目标：完成执行现场收口。
 

@@ -295,7 +295,7 @@ export const AdminLayout = () => {
                     <SandwichLogo className="brand-logo" />
                     <div className="brand-copy">
                         <strong>Sandwich</strong>
-                        <span>管理台</span>
+                        <span>Console</span>
                     </div>
                 </div>
 
@@ -326,7 +326,7 @@ export const AdminLayout = () => {
                             onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
                         />
                         <div>
-                            <Text className="topbar-path">Sandwich / 管理台</Text>
+                            <Text className="topbar-path">Sandwich Console</Text>
                         </div>
                     </div>
                     <Space className="topbar-actions">

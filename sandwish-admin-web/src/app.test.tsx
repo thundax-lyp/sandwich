@@ -712,6 +712,7 @@ describe("App", () => {
         await userEvent.click(screen.getByRole("button", { name: "编辑 调试客户端" }));
 
         expect(await screen.findByText("swk_test")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "复制 API KEY" })).toBeEnabled();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/open/client/get",
             expect.objectContaining({

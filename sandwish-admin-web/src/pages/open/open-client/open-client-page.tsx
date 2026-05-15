@@ -373,6 +373,8 @@ export const OpenClientPage = () => {
                         className="open-client-secret-copy"
                         type="text"
                         icon={<CopyOutlined />}
+                        aria-label={`复制 ${label}`}
+                        disabled={!value}
                         onClick={() => copySecretValue(label, value)}
                     >
                         复制
@@ -578,7 +580,7 @@ export const OpenClientPage = () => {
                     <Form.Item name="id" hidden>
                         <Input />
                     </Form.Item>
-                    {editingClient?.apiKey ? (
+                    {editingClient ? (
                         <div className="open-client-editor-api-key">
                             {renderSecretField("API KEY", editingClient.apiKey)}
                         </div>

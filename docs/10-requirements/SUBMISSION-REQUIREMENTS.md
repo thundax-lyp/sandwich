@@ -14,6 +14,7 @@
 - 提交内容图片 `SubmissionImage`
 - 标题、正文、图片列表和来源 client
 - 提交内容生命周期状态
+- 提交内容平铺排序
 - 提交内容创建和查询
 - 提交内容状态调整
 
@@ -60,6 +61,7 @@
 - `content`：正文。
 - `sourceClientId`：来源第三方 client ID。
 - `status`：提交内容状态。
+- `priority`：排序值。
 - `submittedAt`：提交发生时间。
 - `lastStatusChangedAt`：最近状态变化时间。
 - `images`：提交内容图片列表。
@@ -76,6 +78,7 @@
 - `title` 必填。
 - `content` 必填。
 - `sourceClientId` 必填，后台手工创建时固定使用入口定义的系统 client 标识。
+- `priority` 只用于后台列表平铺排序，不承载提交时间、状态或来源语义。
 - `submittedAt` 表达业务提交时间，不作为通用审计字段。
 - `lastStatusChangedAt` 只表达提交状态变化时间，不替代 Audit 变更记录。
 - `Submission` 不保存图片 URL、文件名、大小和 MIME 类型。
@@ -117,6 +120,11 @@
 - `id`
 - `status`
 
+排序 Command 固定包含：
+
+- `orderedIds`
+- `sortDirection`
+
 Command 固定不包含：
 
 - 当前用户 ID。
@@ -124,6 +132,7 @@ Command 固定不包含：
 - 请求 IP。
 - 审计快照。
 - 存储对象元数据。
+- `priority` 数值。
 
 ### 6.2 Image Boundary
 
@@ -142,6 +151,18 @@ Command 固定不包含：
 
 创建提交内容使用 `AuditAction.CREATE`。状态调整使用 `AuditAction.UPDATE` 或后续更具体状态动作。
 
+### 6.4 Sort Boundary
+
+`Submission` 固定作为 `FlatSort` 可排序实体，使用 `priority` 控制后台列表展示顺序。
+
+固定约束：
+
+- 外部入口和后台入口不得提交 `priority` 数值。
+- 后台重排只接收 `orderedIds` 和 `sortDirection`。
+- `Submission` 排序域固定为全局平铺排序集合。
+- 创建提交内容时，Service 负责生成新的 `priority`。
+- 提交内容列表默认按 `priority` 升序查询。
+
 ## 7. Functional Requirements
 
 ### 7.1 Create Submission
@@ -153,12 +174,15 @@ Command 固定不包含：
 - 写入 `Submission`。
 - 写入 `SubmissionImage` 列表。
 - `status` 固定为 `SUBMITTED`。
+- `priority` 固定由 Service 生成。
 - `submittedAt` 固定为提交发生时间。
 - 记录 `CREATE` 审计日志。
 
 ### 7.2 Query Submission
 
 后台必须支持按提交内容状态、来源 client、提交时间范围分页查询提交内容。
+
+提交内容分页默认按 `priority` 升序查询。
 
 ### 7.3 Get Submission Detail
 
@@ -173,6 +197,16 @@ Command 固定不包含：
 - 更新 `status`。
 - 更新 `lastStatusChangedAt`。
 - 记录数据审计。
+
+### 7.5 Sort Submission
+
+后台必须支持提交内容平铺重排。
+
+排序成功后：
+
+- 只更新 `priority`。
+- 刷新查询后顺序与 `orderedIds` 一致。
+- 不修改提交内容状态、标题、正文、图片引用和提交时间。
 
 ## 8. Key Flows
 
@@ -197,12 +231,23 @@ Command 固定不包含：
 3. `SubmissionService` 查询提交内容分页。
 4. 入口 assembler 组装后台响应。
 
+### 8.3 Admin Sort Flow
+
+固定流程：
+
+1. 后台用户提交 `orderedIds` 和 `sortDirection`。
+2. `sandwish-admin-api` 组装排序 Command。
+3. `SubmissionService` 校验排序域完整性。
+4. `SubmissionService` 在事务内交换写回 `priority`。
+5. 接口返回排序成功。
+
 ## 9. Non-Functional Requirements
 
 - 标题、正文和图片列表必须进行长度和数量校验。
 - 图片对象 ID 列表必须保持顺序。
 - 创建提交内容和创建图片引用必须在同一事务内完成。
 - 提交内容查询必须支持分页。
+- 提交内容排序必须符合 `FlatSort` 规则。
 - 提交内容写操作必须可审计。
 
 ## 10. Open Items

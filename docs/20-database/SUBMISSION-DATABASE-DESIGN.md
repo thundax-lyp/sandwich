@@ -39,6 +39,7 @@
 - 独立数据库表主键数据库类型固定为 `bigint`，Java 类型固定为 `Long`。
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - 枚举字段使用 `varchar` 存储。
+- `priority` 是 `FlatSort` 排序字段，固定由 Service 管理。
 - `submitted_at` 是业务提交时间字段。
 - `last_status_changed_at` 是业务状态变化时间字段。
 - 业务对象变更审计固定归属 Audit 模块，不在 `submission_` 表中保存通用审计字段。
@@ -74,6 +75,7 @@
 | `content` | `content` | `content` | 是 | 正文 |
 | `source_client_id` | `sourceClientId` | `sourceClientId` | 是 | 来源第三方 client ID |
 | `status` | `status` | `status` | 是 | 提交内容状态 |
+| `priority` | `priority` | `priority` | 是 | 排序值 |
 | `submitted_at` | `submittedAt` | `submittedAt` | 是 | 提交发生时间 |
 | `last_status_changed_at` | `lastStatusChangedAt` | `lastStatusChangedAt` | 否 | 最近状态变化时间 |
 
@@ -85,14 +87,16 @@
 - `source_client_id` 固定保存来源 client ID。
 - `status` 通过 `SubmissionStatus.value()` 写入。
 - `status` 固定使用状态值：`SUBMITTED`、`APPROVED`、`REJECTED`、`CLOSED`。
+- `priority` 默认值固定为 `0`，由 Service 维护。
 - `submitted_at` 固定写入提交发生时间。
 - `last_status_changed_at` 仅在状态调整时写入。
 
 索引：
 
 - 主键：`pk_submission_submission(id)`
-- 普通索引：`idx_submission_submission_status(status, submitted_at)`
-- 普通索引：`idx_submission_submission_client(source_client_id, submitted_at)`
+- 唯一索引：`uk_submission_submission_priority(priority)`
+- 普通索引：`idx_submission_submission_status(status, priority)`
+- 普通索引：`idx_submission_submission_client(source_client_id, priority)`
 - 普通索引：`idx_submission_submission_submitted(submitted_at, id)`
 
 ### 6.2 submission_image
@@ -145,8 +149,9 @@
 ## 9. Query Model Rules
 
 - 提交内容列表固定支持按 `status`、`sourceClientId`、`submittedAt` 时间范围过滤。
-- 提交内容分页排序固定使用 `submitted_at desc, id desc`。
+- 提交内容列表和分页默认按 `priority asc, id asc` 排序。
 - 提交内容详情固定按 `submission_id, sort_order` 升序装载图片列表。
+- 提交内容重排固定只更新 `priority`。
 - `pageNo` / `pageSize` 由 Service 校验，DAO implementation 只按已校验参数执行分页。
 
 ## 10. Open Items

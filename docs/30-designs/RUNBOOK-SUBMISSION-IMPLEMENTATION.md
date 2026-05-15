@@ -4,7 +4,7 @@
 
 本文档定义 `Submission` 占位业务域从文档设计落到代码实现的一次性执行顺序。
 
-目标是在不引入额外业务复杂度的前提下，按 `biz -> infra -> admin-api` 顺序实现提交内容主体、图片引用、后台查询和状态调整能力，为后续 `sandwish-open-api` 接入第三方提交入口保留稳定业务基础。
+目标是在不引入额外业务复杂度的前提下，按 `biz -> infra -> admin-api` 顺序实现提交内容主体、图片引用、后台查询、状态调整和后台平铺排序能力，为后续 `sandwish-open-api` 接入第三方提交入口保留稳定业务基础。
 
 ## 2. Scope
 
@@ -12,7 +12,7 @@
 
 - `sandwish-biz` 中 `Submission` 领域对象、值对象、枚举、DAO 契约、Service 契约和 Service implementation。
 - `sandwish-infra` 中 `SubmissionDO`、`SubmissionImageDO`、Mapper、DAO implementation 和持久化装配器。
-- `sandwish-admin-api` 中后台查询、详情、状态调整 Controller、request、response、assembler 和错误转换。
+- `sandwish-admin-api` 中后台查询、详情、状态调整、排序 Controller、request、response、assembler 和错误转换。
 - `Submission` 审计快照、审计对象加载和 `@AuditLog` 写操作接入。
 - 对应单元测试、契约测试和架构测试补充。
 
@@ -35,6 +35,7 @@
 4. [`docs/00-governance/DATABASE-RULES.md`](../00-governance/DATABASE-RULES.md)
 5. [`docs/10-requirements/SUBMISSION-REQUIREMENTS.md`](../10-requirements/SUBMISSION-REQUIREMENTS.md)
 6. [`docs/20-database/SUBMISSION-DATABASE-DESIGN.md`](../20-database/SUBMISSION-DATABASE-DESIGN.md)
+7. [`docs/30-designs/SORT-ORDERING-SPECIAL-DESIGN.md`](./SORT-ORDERING-SPECIAL-DESIGN.md)
 
 涉及审计接入时固定再读取：
 
@@ -64,21 +65,26 @@
 2. 新增 `SubmissionStatus` 枚举，固定状态为 `SUBMITTED`、`APPROVED`、`REJECTED`、`CLOSED`。
 3. 新增 `SubmissionId`、`SubmissionImageId` 和对应 codec。
 4. 新增 `SubmissionDao`、`SubmissionImageDao` 契约。
-5. 新增创建、状态调整、详情、分页查询所需 Command / Query / Result 模型。
+5. 新增创建、状态调整、排序、详情、分页查询所需 Command / Query / Result 模型。
 6. 新增 `SubmissionService` 和 `SubmissionServiceImpl`。
 7. 创建提交内容时校验 `title`、`content`、`sourceClientId` 和 `imageObjectIds`。
-8. 创建提交内容时生成 `SUBMITTED` 状态、`submittedAt` 和顺序图片引用。
+8. 创建提交内容时生成 `SUBMITTED` 状态、`priority`、`submittedAt` 和顺序图片引用。
 9. 状态调整时更新 `status` 和 `lastStatusChangedAt`。
-10. 在写操作上声明 `@AuditLog(type = "Submission", ...)`。
-11. 新增 `Submission` 审计 object loader 和 snapshot assembler。
-12. 补充 Service 单元测试和审计快照测试。
+10. 排序时按 `FlatSort` 规则校验 `orderedIds` 和排序域完整性。
+11. 排序时只交换写回 `priority`。
+12. 在写操作上声明 `@AuditLog(type = "Submission", ...)`。
+13. 新增 `Submission` 审计 object loader 和 snapshot assembler。
+14. 补充 Service 单元测试、排序测试和审计快照测试。
 
 验收点：
 
 - Service 不依赖 `DO/DataObject`、Mapper 或 Controller request / response。
 - Command 不包含当前用户、请求 IP、审计快照或存储对象元数据。
+- Command 不接收外部传入的 `priority` 数值。
 - 图片列表顺序从 `0` 开始。
 - 创建提交内容和图片引用由 Service 事务统一编排。
+- `Submission` 实体实现 `Sortable`。
+- `Submission` 排序符合 `FlatSort` 规则。
 - `Submission` 写操作具备审计注解和快照装配能力。
 
 ### 4.2 Infra Persistence
@@ -98,12 +104,13 @@
 3. 新增 `SubmissionMapper extends BaseMapper<SubmissionDO>`。
 4. 新增 `SubmissionImageMapper extends BaseMapper<SubmissionImageDO>`。
 5. 新增 `SubmissionPersistenceAssembler` 和 `SubmissionImagePersistenceAssembler`。
-6. 新增 `SubmissionDaoImpl`，负责插入、更新状态、详情、分页查询。
+6. 新增 `SubmissionDaoImpl`，负责插入、更新状态、更新排序值、详情、分页查询。
 7. 新增 `SubmissionImageDaoImpl`，负责批量插入、按提交内容 ID 查询图片列表。
 8. DAO implementation 使用 `SnowflakeIdGenerator` 生成独立表主键。
-9. 分页查询固定按 `submitted_at desc, id desc` 排序。
+9. 分页查询固定按 `priority asc, id asc` 排序。
 10. 详情装载图片固定按 `submission_id, sort_order` 升序。
-11. 补充 DAO / persistence assembler 测试。
+11. 重排持久化固定只更新 `priority`。
+12. 补充 DAO / persistence assembler 测试。
 
 验收点：
 
@@ -111,6 +118,7 @@
 - `DO/DataObject` 不使用 `@TableField` 做普通列名映射。
 - DAO implementation 不暴露 `DO/DataObject`。
 - 查询、排序、分页逻辑在 infra DAO implementation 中完成。
+- `submission_submission.priority` 存在唯一约束。
 - SQL 字段、文档字段和 DO 字段一致。
 
 ### 4.3 Admin API
@@ -129,11 +137,13 @@
 1. 新增后台提交内容分页查询 request / response。
 2. 新增后台提交内容详情 request / response。
 3. 新增后台提交内容状态调整 request / response。
-4. 新增 `SubmissionInterfaceAssembler` 完成 API 模型与 biz 模型转换。
-5. 新增 `SubmissionController`，入口路径固定在后台 API submission 模块下。
-6. 按后台 API 既有方式补充参数校验、Swagger 注解和统一响应。
-7. 若新增后台错误码，更新 `ADMIN-API-ERROR-CODE-DESIGN.md` 和入口异常转换。
-8. 补充 Controller contract test。
+4. 新增后台提交内容排序 request / response。
+5. 新增 `SubmissionInterfaceAssembler` 完成 API 模型与 biz 模型转换。
+6. 新增 `SubmissionController`，入口路径固定在后台 API submission 模块下。
+7. 排序入口只接收 `orderedIds` 和 `sortDirection`。
+8. 按后台 API 既有方式补充参数校验、Swagger 注解和统一响应。
+9. 若新增后台错误码，更新 `ADMIN-API-ERROR-CODE-DESIGN.md` 和入口异常转换。
+10. 补充 Controller contract test。
 
 验收点：
 
@@ -142,17 +152,18 @@
 - ID 字段按入口既有 ID codec 规则转换。
 - 后台查询接口只提供后台治理视图，不暴露 open-api 专用契约。
 - 状态调整接口调用 `SubmissionService` 写入口并触发审计链路。
+- 排序接口不接收 `priority` 数值。
 
 ## 5. Commit Plan
 
 固定拆分为以下提交：
 
 1. `Feat(submission): 增加提交内容业务服务`
-   - 收敛 `sandwish-biz` 领域、Service、审计运行时和测试。
+   - 收敛 `sandwish-biz` 领域、Service、排序、审计运行时和测试。
 2. `Feat(submission): 增加提交内容持久化实现`
-   - 收敛 `sandwish-infra` DO、Mapper、DAO implementation、assembler 和测试。
+   - 收敛 `sandwish-infra` DO、Mapper、DAO implementation、排序持久化、assembler 和测试。
 3. `Feat(admin): 增加提交内容后台接口`
-   - 收敛 `sandwish-admin-api` Controller、API 模型、assembler、错误码和契约测试。
+   - 收敛 `sandwish-admin-api` Controller、API 模型、排序入口、assembler、错误码和契约测试。
 4. `Docs(submission): 清理提交内容实现手册`
    - 完成后删除本 RUNBOOK，或在存在剩余执行范围时收窄本 RUNBOOK。
 
@@ -196,11 +207,12 @@ mvn -q verify
 2. `SUBMISSION-DATABASE-DESIGN.md` 与 DO、Mapper、DAO implementation 一致。
 3. `db/schema/submission.sql` 与 DO 字段一致。
 4. Audit object type 固定为 `Submission`。
-5. 后台接口错误码文档与代码一致。
-6. `TODO.md` 不保留已完成任务。
-7. 本 RUNBOOK 已删除、或收窄为仍未完成范围。
-8. 工作区不存在无关修改。
-9. 每个提交都符合 `Type(domain): 中文说明`。
+5. `Submission` 已纳入 `SORT-ORDERING-SPECIAL-DESIGN.md` 可排序实体清单。
+6. 后台接口错误码文档与代码一致。
+7. `TODO.md` 不保留已完成任务。
+8. 本 RUNBOOK 已删除、或收窄为仍未完成范围。
+9. 工作区不存在无关修改。
+10. 每个提交都符合 `Type(domain): 中文说明`。
 
 ## 8. Open Items
 

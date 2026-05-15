@@ -6,11 +6,13 @@ CREATE TABLE IF NOT EXISTS `submission_submission` (
     `content` text NOT NULL,
     `source_client_id` varchar(128) NOT NULL,
     `status` varchar(32) NOT NULL DEFAULT 'SUBMITTED',
+    `priority` int NOT NULL DEFAULT 0,
     `submitted_at` datetime(3) NOT NULL,
     `last_status_changed_at` datetime(3) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_submission_submission_status` (`status`, `submitted_at`),
-    KEY `idx_submission_submission_client` (`source_client_id`, `submitted_at`),
+    UNIQUE KEY `uk_submission_submission_priority` (`priority`),
+    KEY `idx_submission_submission_status` (`status`, `priority`),
+    KEY `idx_submission_submission_client` (`source_client_id`, `priority`),
     KEY `idx_submission_submission_submitted` (`submitted_at`, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提交内容主表';
 

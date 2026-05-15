@@ -35,6 +35,7 @@
 | `com.github.thundax.modules.sys.entity.Menu` | `TreeSort` | `lft` | `parentId` 与树边界（`lft/rgt`），`visibility/maxRank` 仅作过滤 |
 | `com.github.thundax.modules.storage.entity.StoredObject` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 | `com.github.thundax.modules.member.entity.Member` | `FlatSort` | `priority, name` | 无固定 scope（全局平铺排序集合） |
+| `com.github.thundax.modules.submission.entity.Submission` | `FlatSort` | `priority, id` | 无固定 scope（全局平铺排序集合） |
 
 ### 4.1 模块边界
 - `sandwish-admin-api` / `sandwish-front-api`：

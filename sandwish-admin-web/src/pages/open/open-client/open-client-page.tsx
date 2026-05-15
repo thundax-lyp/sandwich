@@ -1,4 +1,5 @@
 import {
+    CopyOutlined,
     EditOutlined,
     KeyOutlined,
     MoreOutlined,
@@ -7,7 +8,7 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Form, Input, Modal, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Dropdown, Form, Input, Modal, Select, Space, Tag, Tooltip, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
@@ -30,7 +31,7 @@ import type {
 } from "./open-client-service";
 import "./open-client-page.css";
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 const DEFAULT_PAGE_NO = 1;
@@ -320,6 +321,41 @@ export const OpenClientPage = () => {
         resetSecretMutation.mutate({ id: resettingClient.id });
     };
 
+    const copySecretValue = async (label: string, value?: string | null) => {
+        if (!value) {
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(value);
+            messageApi.success(`${label} 已复制`);
+        } catch {
+            messageApi.error("复制失败");
+        }
+    };
+
+    const renderSecretField = (label: string, value?: string | null) => (
+        <div className="open-client-secret-field">
+            <div className="open-client-secret-field-header">
+                <Text strong>{label}</Text>
+            </div>
+            <div className="open-client-secret-control">
+                <div className="open-client-secret-value" title={value || undefined}>
+                    {value || "-"}
+                </div>
+                <Tooltip title={`复制 ${label}`}>
+                    <Button
+                        className="open-client-secret-copy"
+                        type="text"
+                        icon={<CopyOutlined />}
+                        onClick={() => copySecretValue(label, value)}
+                    >
+                        复制
+                    </Button>
+                </Tooltip>
+            </div>
+        </div>
+    );
+
     const columns: SandwishTableProps<OpenClientResponse>["columns"] = [
         {
             key: "name",
@@ -391,6 +427,15 @@ export const OpenClientPage = () => {
                             disabled={!canEditOpenClient}
                             onClick={() => openUpdateEditor(client)}
                         />
+                        <Tooltip title="复制 API KEY">
+                            <Button
+                                aria-label={`复制 ${client.name} API KEY`}
+                                icon={<CopyOutlined />}
+                                size="small"
+                                disabled={!client.apiKey}
+                                onClick={() => copySecretValue("API KEY", client.apiKey)}
+                            />
+                        </Tooltip>
                         <Dropdown
                             trigger={["click"]}
                             menu={{
@@ -526,6 +571,11 @@ export const OpenClientPage = () => {
                     <Form.Item name="id" hidden>
                         <Input />
                     </Form.Item>
+                    {editingClient?.apiKey ? (
+                        <div className="open-client-editor-api-key">
+                            {renderSecretField("API KEY", editingClient.apiKey)}
+                        </div>
+                    ) : null}
                     <Form.Item
                         name="name"
                         label="第三方主体名称"
@@ -562,25 +612,19 @@ export const OpenClientPage = () => {
             <Modal
                 className="open-client-secret-modal"
                 open={Boolean(secretResponse)}
-                title="API SECRET"
+                width={680}
+                title="API SECRET 已重置"
                 okText="我已保存"
                 cancelButtonProps={{ style: { display: "none" } }}
                 onOk={() => setSecretResponse(null)}
                 onCancel={() => setSecretResponse(null)}
             >
+                <Text className="open-client-secret-note" type="secondary">
+                    API KEY 保持不变，新的 API SECRET 只在本次结果中显示。
+                </Text>
                 <div className="open-client-secret-panel">
-                    <div className="open-client-secret-row">
-                        <Text type="secondary">API KEY</Text>
-                        <Paragraph copyable code>
-                            {secretResponse?.apiKey || "-"}
-                        </Paragraph>
-                    </div>
-                    <div className="open-client-secret-row">
-                        <Text type="secondary">API SECRET</Text>
-                        <Paragraph copyable code>
-                            {secretResponse?.apiSecret || "-"}
-                        </Paragraph>
-                    </div>
+                    {renderSecretField("API KEY", secretResponse?.apiKey)}
+                    {renderSecretField("API SECRET", secretResponse?.apiSecret)}
                 </div>
             </Modal>
         </>

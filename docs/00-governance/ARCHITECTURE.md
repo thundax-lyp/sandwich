@@ -35,6 +35,7 @@
   - `sandwish-infra`: jar
   - `sandwish-admin-api`: jar
   - `sandwish-front-api`: jar
+  - `sandwish-open-api`: jar
 - base package: `com.github.thundax`
 - persistence: MyBatis-Plus
 - api docs: Swagger / Springfox
@@ -45,7 +46,7 @@
 
 - 项目对外展示名固定为 `Sandwich`。
 - Maven artifact、模块名、目录名和包内项目名前缀继续沿用现有 `sandwish`，不得为了拼写统一做无业务收益的大规模重命名。
-- 运行 jar 的 `finalName` 固定使用入口模块名：`sandwish-admin-api`、`sandwish-front-api`。
+- 运行 jar 的 `finalName` 固定使用入口模块名：`sandwish-admin-api`、`sandwish-front-api`、`sandwish-open-api`。
 - 部署样例、README、数据库脚本和治理文档使用 `Sandwich` 表达项目展示名，引用真实模块、路径或 artifact 时使用对应 `sandwish-*` 名称。
 
 ## Quality Tools
@@ -349,6 +350,23 @@ Sandwich 固定采用三层 API 架构。
 - 前台登录态、权限和会话适配固定在前台入口模块处理。
 - 复用业务能力必须通过 `sandwish-biz`，不得复制后台业务实现。
 
+### `sandwish-open-api`
+
+职责：
+
+- 开放 API 应用入口
+- 第三方开放接口 Controller
+- 开放接口配置
+- 开放接口认证、签名校验、防重放、权限校验和上下文注入
+- 开放接口专用工具、Request 和 Response
+
+边界：
+
+- 可以依赖 `sandwish-biz`。
+- 面向第三方系统调用能力，不承载后台管理或前台会员访问语义。
+- 入口认证、签名校验、防重放、权限校验和上下文注入固定在开放接口入口模块处理。
+- 复用业务能力必须通过 `sandwish-biz`，不得复制后台或前台业务实现。
+
 ## Dependency Direction
 
 固定依赖方向为：
@@ -356,6 +374,8 @@ Sandwich 固定采用三层 API 架构。
 `sandwish-admin-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
 `sandwish-front-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
+
+`sandwish-open-api -> sandwish-infra -> sandwish-biz -> sandwish-common-mybatis -> sandwish-common-core`
 
 通用 Web 支撑链路允许入口模块依赖：
 
@@ -367,17 +387,25 @@ Sandwich 固定采用三层 API 架构。
 
 `sandwish-front-api -> sandwish-common-web -> sandwish-common-security`
 
+`sandwish-open-api -> sandwish-common-web -> sandwish-common-core`
+
+`sandwish-open-api -> sandwish-common-web -> sandwish-common-security`
+
 Spring Security 接入链路允许入口模块依赖：
 
 `sandwish-admin-api -> sandwish-common-security -> sandwish-common-core`
 
 `sandwish-front-api -> sandwish-common-security -> sandwish-common-core`
 
+`sandwish-open-api -> sandwish-common-security -> sandwish-common-core`
+
 Swagger 文档链路允许入口模块依赖：
 
 `sandwish-admin-api -> sandwish-common-swagger`
 
 `sandwish-front-api -> sandwish-common-swagger`
+
+`sandwish-open-api -> sandwish-common-swagger`
 
 OSS 存储链路允许 infra 和入口装配依赖：
 
@@ -394,9 +422,9 @@ OSS 存储链路允许 infra 和入口装配依赖：
 禁止依赖方向：
 
 - `sandwish-common` 及其子模块不得依赖任何业务或入口模块。
-- `sandwish-biz` 不得依赖 `sandwish-infra`、`sandwish-admin-api` 或 `sandwish-front-api`。
-- `sandwish-infra` 不得依赖 `sandwish-admin-api` 或 `sandwish-front-api`。
-- `sandwish-admin-api` 与 `sandwish-front-api` 不得互相依赖。
+- `sandwish-biz` 不得依赖 `sandwish-infra`、`sandwish-admin-api`、`sandwish-front-api` 或 `sandwish-open-api`。
+- `sandwish-infra` 不得依赖 `sandwish-admin-api`、`sandwish-front-api` 或 `sandwish-open-api`。
+- `sandwish-admin-api`、`sandwish-front-api` 与 `sandwish-open-api` 不得互相依赖。
 - 后台与前台不得通过复制 Service 实现来共享业务能力。
 
 ## Layer Rules

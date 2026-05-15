@@ -24,6 +24,7 @@
         <module>sandwish-infra</module>
         <module>sandwish-admin-api</module>
         <module>sandwish-front-api</module>
+        <module>sandwish-open-api</module>
     </modules>
 
 

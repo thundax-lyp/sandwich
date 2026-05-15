@@ -12,23 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-api-module-bootstrap`：创建 sandwish-open-api 入口模块空工程
-  - 范围文件：
-    - `pom.xml`
-    - `sandwish-open-api/pom.xml`
-    - `sandwish-open-api/src/main/java/com/github/thundax/OpenApiApplication.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/autoconfigure/SandwishConfiguration.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/autoconfigure/SandwishProperties.java`
-    - `sandwish-open-api/src/main/java/com/github/thundax/autoconfigure/WebMvcConfiguration.java`
-    - `sandwish-open-api/src/main/resources/config/application.yml`
-    - `sandwish-open-api/src/main/resources/config/logback-spring.xml`
-    - `sandwish-open-api/src/main/resources/i18n/messages.properties`
-    - `sandwish-open-api/src/main/resources/i18n/messages_zh_CN.properties`
-    - `sandwish-open-api/src/test/java/com/github/thundax/OpenApiApplicationTest.java`
-  - 处理动作：新增可编译、可测试、context path 为 `/open-api` 的 Open API 入口模块。
-  - 验收点：`mvn -pl sandwish-open-api -am test` 能执行到新模块测试。
-  - 重要度：10/10
-
 - [ ] `open-client-biz-model`：增加 OpenClient 业务模型和主体枚举
   - 范围文件：
     - `sandwish-biz/src/main/java/com/github/thundax/modules/open/entity/OpenClient.java`

@@ -132,6 +132,8 @@
   后台 API 应用，包含后台 Controller、配置、过滤器、拦截器、Swagger 和静态 API 支撑资源。
 - `sandwish-front-api`:
   前台 API 应用，包含前台 Controller、配置、过滤器、拦截器和访问适配。
+- `sandwish-open-api`:
+  开放 API 应用，包含第三方开放接口 Controller、配置、过滤器、拦截器和访问适配。
 
 ## Layer Router
 

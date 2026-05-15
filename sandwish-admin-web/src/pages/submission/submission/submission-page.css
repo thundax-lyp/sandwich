@@ -1,0 +1,102 @@
+.submission-page .sandwish-page-description {
+    max-width: 680px;
+}
+
+.submission-filter-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(160px, 1fr)) auto auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.submission-filter-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--sandwish-color-text-secondary);
+    font-size: 12px;
+}
+
+.submission-filter-search {
+    min-width: 96px;
+}
+
+.submission-title-cell,
+.submission-time-cell,
+.submission-image-list,
+.submission-upload-list,
+.submission-detail-content {
+    display: grid;
+    gap: 4px;
+}
+
+.submission-content-preview {
+    color: var(--sandwish-color-text-secondary);
+}
+
+.submission-status {
+    border: 0;
+    font-weight: 600;
+}
+
+.submission-status-submitted {
+    background: #eaf2ff;
+    color: #1f5fbf;
+}
+
+.submission-status-approved {
+    background: #eaf8ef;
+    color: #147a3a;
+}
+
+.submission-status-rejected {
+    background: #fff1f0;
+    color: #c02d2d;
+}
+
+.submission-status-closed {
+    background: #f2f3f5;
+    color: #5a6472;
+}
+
+.submission-image-id {
+    max-width: 132px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.submission-editor-form {
+    display: grid;
+    gap: 4px;
+}
+
+.submission-upload-field {
+    display: grid;
+    gap: 10px;
+}
+
+.submission-upload-list {
+    padding: 10px;
+    border: 1px solid var(--sandwish-color-border);
+    border-radius: 8px;
+    background: var(--sandwish-color-fill-tertiary);
+}
+
+.submission-upload-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.submission-upload-item-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .submission-filter-form {
+        grid-template-columns: 1fr;
+    }
+}

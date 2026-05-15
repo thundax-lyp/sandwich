@@ -38,15 +38,14 @@ public class SubmissionDaoImplTest {
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
 
-        dao.list("SUBMITTED", "client-1", begin, end, SortDirection.ASC);
+        dao.list("SUBMITTED", begin, end, SortDirection.ASC);
 
         Wrapper<SubmissionDO> wrapper = captureListWrapper(mapper);
         assertSqlContains(wrapper, "status");
-        assertSqlContains(wrapper, "source_client_id");
         assertSqlContains(wrapper, "submitted_at");
         assertSqlContains(wrapper, "priority asc");
         assertSqlContains(wrapper, "id asc");
-        assertParamsContain(wrapper, "SUBMITTED", "client-1", begin, end);
+        assertParamsContain(wrapper, "SUBMITTED", begin, end);
     }
 
     @Test
@@ -57,7 +56,7 @@ public class SubmissionDaoImplTest {
         dataObjectPage.setTotal(0);
         when(mapper.selectPage(any(), any())).thenReturn(dataObjectPage);
 
-        Page<?> page = dao.page("APPROVED", "client-1", null, null, SortDirection.DESC, 3, 25);
+        Page<?> page = dao.page("APPROVED", null, null, SortDirection.DESC, 3, 25);
 
         ArgumentCaptor<Page> pageCaptor = ArgumentCaptor.forClass(Page.class);
         ArgumentCaptor<Wrapper> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);
@@ -67,7 +66,7 @@ public class SubmissionDaoImplTest {
         assertEquals(3L, page.getCurrent());
         assertEquals(25L, page.getSize());
         assertSqlContains(wrapperCaptor.getValue(), "priority desc");
-        assertParamsContain(wrapperCaptor.getValue(), "APPROVED", "client-1");
+        assertParamsContain(wrapperCaptor.getValue(), "APPROVED");
     }
 
     @Test

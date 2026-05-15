@@ -28,7 +28,6 @@ public class SubmissionAuditSnapshotAssembler implements AuditSnapshotAssembler 
                 submission.getTitle(),
                 AuditSnapshots.field("title", "标题", submission.getTitle()),
                 AuditSnapshots.field("content", "正文", submission.getContent()),
-                AuditSnapshots.field("status", "状态", submission.getStatus()),
-                AuditSnapshots.field("sourceClientId", "来源 client", submission.getSourceClientId()));
+                AuditSnapshots.field("status", "状态", submission.getStatus()));
     }
 }

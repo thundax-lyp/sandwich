@@ -75,7 +75,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         }
         return submissionDao.list(
                 statusValue(query),
-                query == null ? null : query.getSourceClientId(),
                 query == null ? null : query.getSubmittedAtBegin(),
                 query == null ? null : query.getSubmittedAtEnd(),
                 query == null ? null : query.getSortDirection());
@@ -85,7 +84,6 @@ public class SubmissionServiceImpl implements SubmissionService {
     public PageResult<Submission> page(SubmissionQuery query, PageQuery page) {
         IPage<Submission> dataPage = submissionDao.page(
                 statusValue(query),
-                query == null ? null : query.getSourceClientId(),
                 query == null ? null : query.getSubmittedAtBegin(),
                 query == null ? null : query.getSubmittedAtEnd(),
                 query == null ? null : query.getSortDirection(),
@@ -103,7 +101,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         Submission submission = new Submission();
         submission.setTitle(command.getTitle());
         submission.setContent(command.getContent());
-        submission.setSourceClientId(command.getSourceClientId());
         submission.setStatus(SubmissionStatus.SUBMITTED);
         submission.setPriority(submissionDao.maxPriority() + PRIORITY_STEP);
         submission.setSubmittedAt(new Date());
@@ -146,7 +143,6 @@ public class SubmissionServiceImpl implements SubmissionService {
         Submission submission = new Submission();
         submission.setId(command.getId());
         submission.setStatus(command.getStatus());
-        submission.setLastStatusChangedAt(new Date());
         return submissionDao.updateStatus(submission);
     }
 
@@ -164,7 +160,7 @@ public class SubmissionServiceImpl implements SubmissionService {
                     ErrorCode.SORT_EMPTY_INPUT.getMessage());
         }
 
-        List<Submission> currentSubmissions = submissionDao.list(null, null, null, null, effectiveDirection);
+        List<Submission> currentSubmissions = submissionDao.list(null, null, null, effectiveDirection);
         if (currentSubmissions == null || currentSubmissions.isEmpty()) {
             throw new BizException(
                     ErrorCode.SORT_MISSING_ID.getCode(),
@@ -302,10 +298,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     private static void validateCreate(CreateSubmissionCommand command) {
-        if (command == null
-                || StringUtils.isBlank(command.getTitle())
-                || StringUtils.isBlank(command.getContent())
-                || StringUtils.isBlank(command.getSourceClientId())) {
+        if (command == null || StringUtils.isBlank(command.getTitle()) || StringUtils.isBlank(command.getContent())) {
             throw invalidParameter("提交内容参数无效");
         }
         if (command.getImageObjectIds() == null) {

@@ -1,0 +1,725 @@
+import {
+    DeleteOutlined,
+    EyeOutlined,
+    FileImageOutlined,
+    HolderOutlined,
+    MoreOutlined,
+    ReloadOutlined,
+    SearchOutlined,
+    UploadOutlined
+} from "@ant-design/icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+    App,
+    Button,
+    Dropdown,
+    Form,
+    Input,
+    Modal,
+    Select,
+    Space,
+    Tag,
+    Typography,
+    Upload
+} from "antd";
+import { useMemo, useState } from "react";
+import type { Key } from "react";
+import { hasPermission } from "@/auth/permission-storage";
+import { ListPage } from "@/components/list-page";
+import { SandwishDrawer } from "@/components/sandwish-drawer";
+import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import {
+    changeSubmissionStatus,
+    createSubmission,
+    deleteSubmissions,
+    pageSubmissions,
+    sortSubmissions,
+    uploadSubmissionImage
+} from "./submission-service";
+import type {
+    StorageUploadResponse,
+    SubmissionPageRequest,
+    SubmissionResponse,
+    SubmissionSaveRequest,
+    SubmissionStatus
+} from "./submission-service";
+import "./submission-page.css";
+
+const { Text, Paragraph } = Typography;
+const { TextArea } = Input;
+
+const DEFAULT_PAGE_NO = 1;
+const DEFAULT_PAGE_SIZE = 10;
+
+const DEFAULT_COLUMN_WIDTHS = {
+    title: 300,
+    status: 120,
+    submittedAt: 180,
+    images: 180,
+    actions: 116
+};
+
+interface SubmissionFilters {
+    status: SubmissionStatus | "ALL";
+}
+
+interface SubmissionFormValues {
+    title: string;
+    content: string;
+    imageObjectIds?: string[];
+}
+
+interface UploadedSubmissionImage {
+    id: string;
+    name: string;
+}
+
+const DEFAULT_SUBMISSION_FILTERS: SubmissionFilters = {
+    status: "ALL"
+};
+
+const submissionStatusLabels: Record<SubmissionStatus, string> = {
+    SUBMITTED: "已提交",
+    APPROVED: "已通过",
+    REJECTED: "已驳回",
+    CLOSED: "已关闭"
+};
+
+const submissionStatusOptions: Array<{ label: string; value: SubmissionStatus }> = [
+    { value: "SUBMITTED", label: submissionStatusLabels.SUBMITTED },
+    { value: "APPROVED", label: submissionStatusLabels.APPROVED },
+    { value: "REJECTED", label: submissionStatusLabels.REJECTED },
+    { value: "CLOSED", label: submissionStatusLabels.CLOSED }
+];
+
+const readStatusFilterValue = (value: SubmissionStatus | "ALL") => {
+    return value === "ALL" ? undefined : value;
+};
+
+const readStatusLabel = (status?: string | null) => {
+    return status && status in submissionStatusLabels
+        ? submissionStatusLabels[status as SubmissionStatus]
+        : status || "未知";
+};
+
+const statusClassName = (status?: string | null) => {
+    return status ? `submission-status submission-status-${status.toLowerCase()}` : "";
+};
+
+const formatDateTime = (value?: string | null) => {
+    if (!value) {
+        return "-";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+};
+
+const readFormRequest = (values: SubmissionFormValues): SubmissionSaveRequest => {
+    return {
+        title: values.title.trim(),
+        content: values.content.trim(),
+        imageObjectIds: values.imageObjectIds?.filter(Boolean) || []
+    };
+};
+
+const sortByMove = (
+    submissions: SubmissionResponse[],
+    sourceSubmission: SubmissionResponse,
+    targetSubmission: SubmissionResponse,
+    position: SandwishTableSortPosition
+) => {
+    const sourceIndex = submissions.findIndex(
+        (submission) => submission.id === sourceSubmission.id
+    );
+    const targetIndex = submissions.findIndex(
+        (submission) => submission.id === targetSubmission.id
+    );
+    if (sourceIndex < 0 || targetIndex < 0) {
+        return submissions;
+    }
+
+    const nextSubmissions = [...submissions];
+    const [movedSubmission] = nextSubmissions.splice(sourceIndex, 1);
+    const nextTargetIndex = nextSubmissions.findIndex(
+        (submission) => submission.id === targetSubmission.id
+    );
+    nextSubmissions.splice(
+        position === "before" ? nextTargetIndex : nextTargetIndex + 1,
+        0,
+        movedSubmission
+    );
+    return nextSubmissions;
+};
+
+const readUploadedImageName = (response: StorageUploadResponse, fallbackName: string) => {
+    return response.originalFilename || fallbackName || response.id || "图片";
+};
+
+export const SubmissionPage = () => {
+    const { message: messageApi } = App.useApp();
+    const [editForm] = Form.useForm<SubmissionFormValues>();
+    const queryClient = useQueryClient();
+    const canEditSubmission = hasPermission("submission:submission:edit");
+    const [query, setQuery] = useState<SubmissionPageRequest>({
+        pageNo: DEFAULT_PAGE_NO,
+        pageSize: DEFAULT_PAGE_SIZE,
+        sortDirection: "ASC"
+    });
+    const [filters, setFilters] = useState<SubmissionFilters>(DEFAULT_SUBMISSION_FILTERS);
+    const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+    const [editorOpen, setEditorOpen] = useState(false);
+    const [detailSubmission, setDetailSubmission] = useState<SubmissionResponse | null>(null);
+    const [uploadedImages, setUploadedImages] = useState<UploadedSubmissionImage[]>([]);
+    const hasSelectedSubmissions = selectedRowKeys.length > 0;
+    const hasActiveFilters = Boolean(filters.status !== "ALL");
+
+    const submissionQuery = useQuery({
+        queryKey: ["submission", "page", query],
+        queryFn: () => pageSubmissions(query),
+        retry: false
+    });
+    const submissionPage = submissionQuery.data;
+    const submissions = useMemo(() => submissionPage?.records || [], [submissionPage?.records]);
+    const totalCount = submissionPage?.count ?? submissionPage?.totalCount ?? 0;
+    const currentPageNo = submissionPage?.pageNo || query.pageNo || DEFAULT_PAGE_NO;
+    const currentPageSize = submissionPage?.pageSize || query.pageSize || DEFAULT_PAGE_SIZE;
+
+    const invalidateSubmissionPage = async () => {
+        await queryClient.invalidateQueries({ queryKey: ["submission", "page"] });
+    };
+
+    const createMutation = useMutation({
+        mutationFn: createSubmission,
+        onSuccess: async () => {
+            setEditorOpen(false);
+            setUploadedImages([]);
+            editForm.resetFields();
+            await invalidateSubmissionPage();
+            messageApi.success("提交内容已创建");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "创建失败");
+        }
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteSubmissions,
+        onSuccess: async () => {
+            setSelectedRowKeys([]);
+            await invalidateSubmissionPage();
+            messageApi.success("提交内容已删除");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "删除失败");
+        }
+    });
+
+    const statusMutation = useMutation({
+        mutationFn: changeSubmissionStatus,
+        onSuccess: async () => {
+            await invalidateSubmissionPage();
+            messageApi.success("提交状态已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "状态更新失败");
+        }
+    });
+
+    const sortMutation = useMutation({
+        mutationFn: sortSubmissions,
+        onSuccess: async () => {
+            await invalidateSubmissionPage();
+            messageApi.success("提交顺序已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "排序失败");
+        }
+    });
+
+    const uploadMutation = useMutation({
+        mutationFn: uploadSubmissionImage,
+        onSuccess: (response, file) => {
+            if (response.error) {
+                messageApi.error(response.error);
+                return;
+            }
+            if (!response.id) {
+                messageApi.error("上传失败");
+                return;
+            }
+
+            const currentIds = editForm.getFieldValue("imageObjectIds") || [];
+            editForm.setFieldValue("imageObjectIds", [...currentIds, response.id]);
+            setUploadedImages((currentImages) => [
+                ...currentImages,
+                {
+                    id: response.id as string,
+                    name: readUploadedImageName(response, file.name)
+                }
+            ]);
+            messageApi.success("图片已上传");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "上传失败");
+        }
+    });
+
+    const updateQuery = (values: Partial<SubmissionPageRequest>) => {
+        setSelectedRowKeys([]);
+        setQuery((currentQuery) => {
+            const nextQuery = { ...currentQuery, ...values };
+            return {
+                status: nextQuery.status,
+                submittedAtBegin: nextQuery.submittedAtBegin,
+                submittedAtEnd: nextQuery.submittedAtEnd,
+                sortDirection: nextQuery.sortDirection || "ASC",
+                pageNo: values.pageNo || DEFAULT_PAGE_NO,
+                pageSize: values.pageSize || currentQuery.pageSize || DEFAULT_PAGE_SIZE
+            };
+        });
+    };
+
+    const applyFilters = (closeFilter: () => void) => {
+        updateQuery({
+            status: readStatusFilterValue(filters.status)
+        });
+        closeFilter();
+    };
+
+    const resetFilters = () => {
+        setFilters(DEFAULT_SUBMISSION_FILTERS);
+        updateQuery({
+            status: undefined
+        });
+    };
+
+    const openCreateEditor = () => {
+        editForm.resetFields();
+        setUploadedImages([]);
+        setEditorOpen(true);
+    };
+
+    const closeEditor = () => {
+        if (createMutation.isPending || uploadMutation.isPending) {
+            return;
+        }
+        setEditorOpen(false);
+        setUploadedImages([]);
+        editForm.resetFields();
+    };
+
+    const saveSubmission = async () => {
+        const values = await editForm.validateFields();
+        createMutation.mutate(
+            readFormRequest({
+                ...values,
+                imageObjectIds: editForm.getFieldValue("imageObjectIds")
+            })
+        );
+    };
+
+    const removeUploadedImage = (id: string) => {
+        setUploadedImages((currentImages) => currentImages.filter((image) => image.id !== id));
+        const currentIds = editForm.getFieldValue("imageObjectIds") || [];
+        editForm.setFieldValue(
+            "imageObjectIds",
+            currentIds.filter((currentId: string) => currentId !== id)
+        );
+    };
+
+    const confirmDelete = (ids: string[]) => {
+        Modal.confirm({
+            title: "删除提交内容",
+            content: `确认删除 ${ids.length} 条提交内容？图片会解除业务绑定，存储对象由存储模块清理。`,
+            okText: "删除",
+            okButtonProps: {
+                danger: true,
+                loading: deleteMutation.isPending
+            },
+            cancelText: "取消",
+            onOk: () => deleteMutation.mutateAsync(ids)
+        });
+    };
+
+    const moveSubmission = (
+        sourceSubmission: SubmissionResponse,
+        targetSubmission: SubmissionResponse,
+        position: SandwishTableSortPosition
+    ) => {
+        if (!canEditSubmission || sourceSubmission.id === targetSubmission.id) {
+            return;
+        }
+        const nextSubmissions = sortByMove(
+            submissions,
+            sourceSubmission,
+            targetSubmission,
+            position
+        );
+        sortMutation.mutate({
+            orderedIds: nextSubmissions.map((submission) => submission.id),
+            sortDirection: query.sortDirection || "ASC"
+        });
+    };
+
+    const changeStatus = (submission: SubmissionResponse, status: SubmissionStatus) => {
+        if (!canEditSubmission || submission.status === status) {
+            return;
+        }
+        statusMutation.mutate({
+            id: submission.id,
+            status
+        });
+    };
+
+    const columns: SandwishTableProps<SubmissionResponse>["columns"] = [
+        {
+            title: "内容",
+            dataIndex: "title",
+            key: "title",
+            width: DEFAULT_COLUMN_WIDTHS.title,
+            ellipsis: true,
+            render: (_, submission) => (
+                <div className="submission-title-cell">
+                    <Text strong>{submission.title}</Text>
+                    <Text className="submission-content-preview" ellipsis>
+                        {submission.content}
+                    </Text>
+                </div>
+            )
+        },
+        {
+            title: "状态",
+            dataIndex: "status",
+            key: "status",
+            width: DEFAULT_COLUMN_WIDTHS.status,
+            render: (status?: string | null) => (
+                <Tag className={statusClassName(status)}>{readStatusLabel(status)}</Tag>
+            )
+        },
+        {
+            title: "时间",
+            dataIndex: "submittedAt",
+            key: "submittedAt",
+            width: DEFAULT_COLUMN_WIDTHS.submittedAt,
+            render: (submittedAt?: string | null) => <Text>{formatDateTime(submittedAt)}</Text>
+        },
+        {
+            title: "图片",
+            dataIndex: "imageObjectIds",
+            key: "images",
+            width: DEFAULT_COLUMN_WIDTHS.images,
+            render: (imageObjectIds?: string[] | null) => {
+                if (!imageObjectIds?.length) {
+                    return <Text type="secondary">未上传</Text>;
+                }
+                return (
+                    <Space wrap size={4}>
+                        {imageObjectIds.slice(0, 3).map((id) => (
+                            <Tag key={id} className="submission-image-id">
+                                {id}
+                            </Tag>
+                        ))}
+                        {imageObjectIds.length > 3 ? <Tag>+{imageObjectIds.length - 3}</Tag> : null}
+                    </Space>
+                );
+            }
+        },
+        {
+            title: "操作",
+            key: "actions",
+            width: DEFAULT_COLUMN_WIDTHS.actions,
+            render: (_, submission) => (
+                <div className="sandwish-table-row-actions">
+                    <Space.Compact className="sandwish-table-row-actions-inline">
+                        <Button
+                            aria-label={`查看 ${submission.title}`}
+                            className="sandwish-table-row-action"
+                            icon={<EyeOutlined />}
+                            type="text"
+                            onClick={() => setDetailSubmission(submission)}
+                        />
+                        <Button
+                            aria-label={`删除 ${submission.title}`}
+                            className="sandwish-table-row-action"
+                            disabled={!canEditSubmission}
+                            icon={<DeleteOutlined />}
+                            type="text"
+                            danger
+                            onClick={() => confirmDelete([submission.id])}
+                        />
+                    </Space.Compact>
+                    <button
+                        aria-label={`拖动排序 ${submission.title}`}
+                        className="sandwish-table-row-action sandwish-table-row-drag-handle"
+                        disabled={!canEditSubmission}
+                        type="button"
+                    >
+                        <HolderOutlined />
+                    </button>
+                    <Dropdown
+                        menu={{
+                            items: [
+                                {
+                                    key: "view",
+                                    icon: <EyeOutlined />,
+                                    label: "查看"
+                                },
+                                ...submissionStatusOptions.map((statusOption) => ({
+                                    key: `status:${statusOption.value}`,
+                                    disabled:
+                                        !canEditSubmission ||
+                                        submission.status === statusOption.value,
+                                    label: statusOption.label
+                                })),
+                                {
+                                    key: "delete",
+                                    danger: true,
+                                    disabled: !canEditSubmission,
+                                    icon: <DeleteOutlined />,
+                                    label: "删除"
+                                }
+                            ],
+                            onClick: ({ key }) => {
+                                if (key === "view") {
+                                    setDetailSubmission(submission);
+                                }
+                                if (key === "delete") {
+                                    confirmDelete([submission.id]);
+                                }
+                                if (String(key).startsWith("status:")) {
+                                    changeStatus(
+                                        submission,
+                                        String(key).replace("status:", "") as SubmissionStatus
+                                    );
+                                }
+                            }
+                        }}
+                        trigger={["click"]}
+                    >
+                        <Button
+                            aria-label={`展开 ${submission.title} 操作`}
+                            className="sandwish-table-row-action sandwish-table-row-action-more"
+                            icon={<MoreOutlined />}
+                            type="text"
+                        />
+                    </Dropdown>
+                </div>
+            )
+        }
+    ];
+
+    return (
+        <>
+            <ListPage<SubmissionResponse>
+                pageClassName="submission-page"
+                title="提交内容"
+                description="管理第三方通过开放接口提交的标题、正文和图片资料。"
+                subjectName="提交内容"
+                enableAdd={canEditSubmission}
+                addText="新增提交"
+                enableFilter
+                onAdd={openCreateEditor}
+                filterActive={hasActiveFilters}
+                filterClassName="submission-filter-panel"
+                filter={({ closeFilter }) => (
+                    <div className="submission-filter-form">
+                        <label>
+                            <span>状态</span>
+                            <Select<SubmissionStatus | "ALL">
+                                value={filters.status}
+                                options={[
+                                    { value: "ALL", label: "全部" },
+                                    ...submissionStatusOptions
+                                ]}
+                                onChange={(status) =>
+                                    setFilters((currentFilters) => ({
+                                        ...currentFilters,
+                                        status
+                                    }))
+                                }
+                            />
+                        </label>
+                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
+                            重置
+                        </Button>
+                        <Button
+                            className="submission-filter-search"
+                            icon={<SearchOutlined />}
+                            onClick={() => applyFilters(closeFilter)}
+                        >
+                            查询
+                        </Button>
+                    </div>
+                )}
+                pageActions={
+                    <Button
+                        icon={<ReloadOutlined />}
+                        loading={submissionQuery.isFetching}
+                        onClick={() => submissionQuery.refetch()}
+                    >
+                        刷新
+                    </Button>
+                }
+                selectedCount={selectedRowKeys.length}
+                batchActions={
+                    <Space wrap>
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            disabled={!hasSelectedSubmissions || !canEditSubmission}
+                            loading={deleteMutation.isPending}
+                            onClick={() => confirmDelete(selectedRowKeys.map(String))}
+                        >
+                            批量删除
+                        </Button>
+                    </Space>
+                }
+                rowKey="id"
+                className="submission-table"
+                columns={columns}
+                dataSource={submissions}
+                loading={
+                    submissionQuery.isFetching || sortMutation.isPending || statusMutation.isPending
+                }
+                onSort={moveSubmission}
+                pagination={{
+                    current: currentPageNo,
+                    pageSize: currentPageSize,
+                    total: totalCount,
+                    showSizeChanger: true,
+                    showTotal: (total) => `${total} 条提交内容`,
+                    onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
+                }}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: setSelectedRowKeys
+                }}
+                sortable={canEditSubmission}
+            />
+
+            <SandwishDrawer
+                title="新增提交"
+                open={editorOpen}
+                size="middle"
+                onClose={closeEditor}
+                extra={
+                    <Space>
+                        <Button onClick={closeEditor}>取消</Button>
+                        <Button
+                            type="primary"
+                            loading={createMutation.isPending}
+                            onClick={saveSubmission}
+                        >
+                            保存
+                        </Button>
+                    </Space>
+                }
+            >
+                <Form<SubmissionFormValues>
+                    form={editForm}
+                    layout="vertical"
+                    className="submission-editor-form"
+                >
+                    <Form.Item
+                        name="title"
+                        label="标题"
+                        rules={[
+                            { required: true, message: "请输入标题" },
+                            { max: 200, message: "标题不能超过 200 个字符" }
+                        ]}
+                    >
+                        <Input placeholder="请输入标题" maxLength={200} showCount />
+                    </Form.Item>
+                    <Form.Item
+                        name="content"
+                        label="正文"
+                        rules={[{ required: true, message: "请输入正文" }]}
+                    >
+                        <TextArea placeholder="请输入正文" rows={8} />
+                    </Form.Item>
+                    <Form.Item label="图片">
+                        <div className="submission-upload-field">
+                            <Upload
+                                accept="image/*"
+                                beforeUpload={(file) => {
+                                    uploadMutation.mutate(file);
+                                    return false;
+                                }}
+                                disabled={uploadMutation.isPending}
+                                showUploadList={false}
+                            >
+                                <Button
+                                    icon={<UploadOutlined />}
+                                    loading={uploadMutation.isPending}
+                                >
+                                    上传图片
+                                </Button>
+                            </Upload>
+                            {uploadedImages.length ? (
+                                <div className="submission-upload-list">
+                                    {uploadedImages.map((image) => (
+                                        <div key={image.id} className="submission-upload-item">
+                                            <Space size={8} className="submission-upload-item-name">
+                                                <FileImageOutlined />
+                                                <Text ellipsis>{image.name}</Text>
+                                            </Space>
+                                            <Button
+                                                type="text"
+                                                danger
+                                                size="small"
+                                                onClick={() => removeUploadedImage(image.id)}
+                                            >
+                                                移除
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <Text type="secondary">可上传多张图片，保存后绑定到提交内容。</Text>
+                            )}
+                        </div>
+                    </Form.Item>
+                </Form>
+            </SandwishDrawer>
+
+            <SandwishDrawer
+                title="提交详情"
+                open={Boolean(detailSubmission)}
+                size="middle"
+                onClose={() => setDetailSubmission(null)}
+            >
+                {detailSubmission ? (
+                    <div className="submission-detail-content">
+                        <Text type="secondary">标题</Text>
+                        <Paragraph strong>{detailSubmission.title}</Paragraph>
+                        <Text type="secondary">正文</Text>
+                        <Paragraph>{detailSubmission.content}</Paragraph>
+                        <Text type="secondary">状态</Text>
+                        <Paragraph>{readStatusLabel(detailSubmission.status)}</Paragraph>
+                        <Text type="secondary">图片对象</Text>
+                        {detailSubmission.imageObjectIds?.length ? (
+                            <Space wrap>
+                                {detailSubmission.imageObjectIds.map((id) => (
+                                    <Tag key={id}>{id}</Tag>
+                                ))}
+                            </Space>
+                        ) : (
+                            <Paragraph type="secondary">未上传</Paragraph>
+                        )}
+                    </div>
+                ) : null}
+            </SandwishDrawer>
+        </>
+    );
+};

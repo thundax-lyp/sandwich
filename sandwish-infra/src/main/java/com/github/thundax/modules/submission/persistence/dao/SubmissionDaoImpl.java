@@ -15,7 +15,6 @@ import com.github.thundax.modules.submission.persistence.dataobject.SubmissionDO
 import com.github.thundax.modules.submission.persistence.mapper.SubmissionMapper;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,19 +39,14 @@ public class SubmissionDaoImpl implements SubmissionDao {
 
     @Override
     public List<Submission> list(
-            String status,
-            String sourceClientId,
-            Date submittedAtBegin,
-            Date submittedAtEnd,
-            SortDirection sortDirection) {
-        return SubmissionPersistenceAssembler.toEntityList(mapper.selectList(
-                buildListWrapper(status, sourceClientId, submittedAtBegin, submittedAtEnd, sortDirection)));
+            String status, Date submittedAtBegin, Date submittedAtEnd, SortDirection sortDirection) {
+        return SubmissionPersistenceAssembler.toEntityList(
+                mapper.selectList(buildListWrapper(status, submittedAtBegin, submittedAtEnd, sortDirection)));
     }
 
     @Override
     public Page<Submission> page(
             String status,
-            String sourceClientId,
             Date submittedAtBegin,
             Date submittedAtEnd,
             SortDirection sortDirection,
@@ -60,7 +54,7 @@ public class SubmissionDaoImpl implements SubmissionDao {
             int pageSize) {
         Page<SubmissionDO> dataObjectPage = mapper.selectPage(
                 new Page<>(pageNo, pageSize),
-                buildListWrapper(status, sourceClientId, submittedAtBegin, submittedAtEnd, sortDirection));
+                buildListWrapper(status, submittedAtBegin, submittedAtEnd, sortDirection));
         Page<Submission> entityPage = new Page<>(dataObjectPage.getCurrent(), dataObjectPage.getSize());
         entityPage.setTotal(dataObjectPage.getTotal());
         entityPage.setRecords(SubmissionPersistenceAssembler.toEntityList(dataObjectPage.getRecords()));
@@ -102,10 +96,7 @@ public class SubmissionDaoImpl implements SubmissionDao {
     public int updateStatus(Submission entity) {
         SubmissionDO dataObject = SubmissionPersistenceAssembler.toDataObject(entity);
         return mapper.update(
-                null,
-                buildIdUpdateWrapper(dataObject)
-                        .set(SubmissionDO::getStatus, dataObject.getStatus())
-                        .set(SubmissionDO::getLastStatusChangedAt, dataObject.getLastStatusChangedAt()));
+                null, buildIdUpdateWrapper(dataObject).set(SubmissionDO::getStatus, dataObject.getStatus()));
     }
 
     @Override
@@ -131,17 +122,10 @@ public class SubmissionDaoImpl implements SubmissionDao {
     }
 
     private LambdaQueryWrapper<SubmissionDO> buildListWrapper(
-            String status,
-            String sourceClientId,
-            Date submittedAtBegin,
-            Date submittedAtEnd,
-            SortDirection sortDirection) {
+            String status, Date submittedAtBegin, Date submittedAtEnd, SortDirection sortDirection) {
         LambdaQueryWrapper<SubmissionDO> wrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotBlank(status)) {
+        if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(SubmissionDO::getStatus, status);
-        }
-        if (StringUtils.isNotBlank(sourceClientId)) {
-            wrapper.eq(SubmissionDO::getSourceClientId, sourceClientId);
         }
         if (submittedAtBegin != null) {
             wrapper.ge(SubmissionDO::getSubmittedAt, submittedAtBegin);

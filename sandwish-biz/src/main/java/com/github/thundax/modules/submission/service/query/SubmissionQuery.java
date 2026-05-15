@@ -17,7 +17,6 @@ import lombok.Setter;
 public class SubmissionQuery {
     private List<SubmissionId> ids;
     private SubmissionStatus status;
-    private String sourceClientId;
     private Date submittedAtBegin;
     private Date submittedAtEnd;
     private SortDirection sortDirection = SortDirection.ASC;

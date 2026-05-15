@@ -16,7 +16,6 @@ public class SubmissionAuditSnapshotAssemblerTest {
         submission.setId(SubmissionId.of(9001L));
         submission.setTitle("title");
         submission.setContent("content");
-        submission.setSourceClientId("client-1");
         submission.setStatus(SubmissionStatus.SUBMITTED);
 
         AuditSnapshot snapshot = new SubmissionAuditSnapshotAssembler().assemble(submission);
@@ -24,6 +23,6 @@ public class SubmissionAuditSnapshotAssemblerTest {
         assertEquals("Submission", snapshot.getObjectType());
         assertEquals("9001", snapshot.getObjectId());
         assertEquals("title", snapshot.getDisplayName());
-        assertEquals(4, snapshot.getFields().size());
+        assertEquals(3, snapshot.getFields().size());
     }
 }

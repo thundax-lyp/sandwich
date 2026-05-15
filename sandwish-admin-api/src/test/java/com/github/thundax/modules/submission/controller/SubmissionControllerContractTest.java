@@ -63,7 +63,6 @@ public class SubmissionControllerContractTest {
         request.setPageNo(0);
         request.setPageSize(0);
         request.setStatus("SUBMITTED");
-        request.setSourceClientId("client-a");
         request.setSortDirection(SortDirection.DESC);
 
         PageResponse<SubmissionResponse> response = controller.page(request);
@@ -76,7 +75,6 @@ public class SubmissionControllerContractTest {
         assertEquals(PageRules.firstPageIndex(), response.getPageNo());
         assertEquals(PageRules.defaultPageSize(), response.getPageSize());
         assertEquals(SubmissionStatus.SUBMITTED, queryCaptor.getValue().getStatus());
-        assertEquals("client-a", queryCaptor.getValue().getSourceClientId());
         assertEquals(SortDirection.DESC, queryCaptor.getValue().getSortDirection());
     }
 
@@ -139,7 +137,6 @@ public class SubmissionControllerContractTest {
         verify(submissionService).create(captor.capture());
         assertEquals("Title", captor.getValue().getTitle());
         assertEquals("Content", captor.getValue().getContent());
-        assertEquals("ADMIN", captor.getValue().getSourceClientId());
         assertEquals(
                 StoredObjectIdCodec.toDomain(2001L),
                 captor.getValue().getImageObjectIds().get(0));

@@ -60,11 +60,9 @@
 - `id`：提交内容 ID。
 - `title`：标题。
 - `content`：正文。
-- `sourceClientId`：来源第三方 client ID。
 - `status`：提交内容状态。
 - `priority`：排序值。
 - `submittedAt`：提交发生时间。
-- `lastStatusChangedAt`：最近状态变化时间。
 - `images`：提交内容图片列表。
 
 固定状态：
@@ -78,10 +76,10 @@
 
 - `title` 必填。
 - `content` 必填。
-- `sourceClientId` 必填，后台手工创建时固定使用入口定义的系统 client 标识。
 - `priority` 只用于后台列表平铺排序，不承载提交时间、状态或来源语义。
 - `submittedAt` 表达业务提交时间，不作为通用审计字段。
-- `lastStatusChangedAt` 只表达提交状态变化时间，不替代 Audit 变更记录。
+- 状态变化时间由 Audit 记录，不在 `Submission` 主对象重复保存。
+- 第三方 client 来源归属开放接口认证、调用日志或 Audit operator 维度，不进入 `Submission` 主对象。
 - `Submission` 不保存图片 URL、文件名、大小和 MIME 类型。
 
 ### 5.2 SubmissionImage
@@ -114,7 +112,6 @@
 - `title`
 - `content`
 - `imageObjectIds`
-- `sourceClientId`
 
 状态调整 Command 固定包含：
 
@@ -206,7 +203,7 @@ Command 固定不包含：
 
 ### 7.2 Query Submission
 
-后台必须支持按提交内容状态、来源 client、提交时间范围分页查询提交内容。
+后台必须支持按提交内容状态、提交时间范围分页查询提交内容。
 
 提交内容分页默认按 `priority` 升序查询。
 
@@ -221,7 +218,6 @@ Command 固定不包含：
 状态调整成功后：
 
 - 更新 `status`。
-- 更新 `lastStatusChangedAt`。
 - 记录数据审计。
 
 ### 7.5 Sort Submission

@@ -43,8 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @WrappedApiController
 public class SubmissionController {
 
-    private static final String ADMIN_SOURCE_CLIENT_ID = "ADMIN";
-
     private final SubmissionService submissionService;
     private final StorageUploadRequestHelper storageUploadRequestHelper;
 
@@ -65,8 +63,7 @@ public class SubmissionController {
     })
     @PostMapping(value = "create")
     public SubmissionResponse create(@Valid @RequestBody SubmissionSaveRequest request) {
-        SubmissionId id =
-                submissionService.create(SubmissionInterfaceAssembler.toCreateCommand(request, ADMIN_SOURCE_CLIENT_ID));
+        SubmissionId id = submissionService.create(SubmissionInterfaceAssembler.toCreateCommand(request));
         return SubmissionInterfaceAssembler.toResponse(submissionService.get(id));
     }
 

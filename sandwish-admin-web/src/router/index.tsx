@@ -3,6 +3,7 @@ import { AdminLayout } from "../layouts/admin-layout";
 import { LoginPage } from "../pages/auth/login/login-page";
 import { DashboardPage } from "../pages/dashboard/dashboard/dashboard-page";
 import { StorageObjectPage } from "../pages/storage/storage-object/storage-object-page";
+import { SubmissionPage } from "../pages/submission/submission/submission-page";
 import { DepartmentPage } from "../pages/system/department/department-page";
 import { DictionaryPage } from "../pages/system/dictionary/dictionary-page";
 import { MenuPage } from "../pages/system/menu/menu-page";
@@ -64,6 +65,10 @@ const router = createBrowserRouter(
                         {
                             path: "storage/objects",
                             element: <StorageObjectPage />
+                        },
+                        {
+                            path: "submission/submissions",
+                            element: <SubmissionPage />
                         }
                     ]
                 }

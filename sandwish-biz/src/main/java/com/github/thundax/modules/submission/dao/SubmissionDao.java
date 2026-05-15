@@ -13,16 +13,10 @@ public interface SubmissionDao {
 
     List<Submission> listByIds(List<Long> idList);
 
-    List<Submission> list(
-            String status,
-            String sourceClientId,
-            Date submittedAtBegin,
-            Date submittedAtEnd,
-            SortDirection sortDirection);
+    List<Submission> list(String status, Date submittedAtBegin, Date submittedAtEnd, SortDirection sortDirection);
 
     Page<Submission> page(
             String status,
-            String sourceClientId,
             Date submittedAtBegin,
             Date submittedAtEnd,
             SortDirection sortDirection,

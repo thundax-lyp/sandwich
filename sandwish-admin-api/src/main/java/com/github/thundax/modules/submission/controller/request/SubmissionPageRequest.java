@@ -8,7 +8,6 @@ import com.github.thundax.common.web.request.PageRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
-import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,13 +20,7 @@ public class SubmissionPageRequest extends PageRequest {
 
     @ApiModelProperty(name = "status", value = "提交状态")
     @JsonProperty("status")
-    @Size(max = 32, message = "提交状态长度不能超过32")
     private String status;
-
-    @ApiModelProperty(name = "sourceClientId", value = "来源client ID")
-    @JsonProperty("sourceClientId")
-    @Size(max = 128, message = "来源client ID长度不能超过128")
-    private String sourceClientId;
 
     @ApiModelProperty(name = "submittedAtBegin", value = "提交开始时间")
     @JsonProperty("submittedAtBegin")

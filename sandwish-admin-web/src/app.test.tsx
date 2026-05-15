@@ -5,6 +5,7 @@ import App from "./app";
 import { postJson } from "./api/http";
 import { clearPermissions, hasPermission, replacePermissions } from "./auth/permission-storage";
 import { SandwishTable } from "./components/sandwish-table";
+import { SubmissionPage } from "./pages/submission/submission/submission-page";
 import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
 import { UserPage } from "./pages/system/user/user-page";
@@ -533,6 +534,81 @@ describe("App", () => {
                     method: "POST"
                 })
             )
+        );
+    });
+
+    it("renders the submission page", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["submission:submission:view", "submission:submission:edit"])
+        );
+        replacePermissions(["submission:submission:view", "submission:submission:edit"]);
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/submission/submission/page")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalPage: 1,
+                                totalCount: 1,
+                                records: [
+                                    {
+                                        id: "1",
+                                        title: "产品反馈",
+                                        content: "希望支持图片列表",
+                                        status: "SUBMITTED",
+                                        submittedAt: "2026-05-15T10:00:00.000+08:00",
+                                        imageObjectIds: ["101", "102"]
+                                    }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <SubmissionPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByRole("heading", { name: "提交内容" })).toBeInTheDocument();
+        expect(await screen.findByText("产品反馈")).toBeInTheDocument();
+        expect(screen.getByText("希望支持图片列表")).toBeInTheDocument();
+        expect(screen.getByText("已提交")).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /新增提交/ })).toBeInTheDocument();
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/submission/submission/page",
+            expect.objectContaining({
+                body: JSON.stringify({
+                    pageNo: 1,
+                    pageSize: 10,
+                    sortDirection: "ASC"
+                }),
+                headers: expect.objectContaining({
+                    "Access-Token": "test-token"
+                }),
+                method: "POST"
+            })
         );
     });
 

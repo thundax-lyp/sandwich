@@ -15,5 +15,4 @@ public class CreateSubmissionCommand {
     private String title;
     private String content;
     private List<StoredObjectId> imageObjectIds;
-    private String sourceClientId;
 }

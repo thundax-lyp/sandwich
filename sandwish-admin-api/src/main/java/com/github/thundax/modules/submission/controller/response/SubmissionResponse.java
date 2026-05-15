@@ -30,10 +30,6 @@ public class SubmissionResponse implements Serializable {
     @JsonProperty("content")
     private String content;
 
-    @ApiModelProperty(name = "sourceClientId", value = "来源client ID")
-    @JsonProperty("sourceClientId")
-    private String sourceClientId;
-
     @ApiModelProperty(name = "status", value = "提交状态")
     @JsonProperty("status")
     private String status;
@@ -41,10 +37,6 @@ public class SubmissionResponse implements Serializable {
     @ApiModelProperty(name = "submittedAt", value = "提交时间")
     @JsonProperty("submittedAt")
     private Date submittedAt;
-
-    @ApiModelProperty(name = "lastStatusChangedAt", value = "最近状态变化时间")
-    @JsonProperty("lastStatusChangedAt")
-    private Date lastStatusChangedAt;
 
     @ApiModelProperty(name = "imageObjectIds", value = "图片对象ID列表")
     @JsonProperty("imageObjectIds")

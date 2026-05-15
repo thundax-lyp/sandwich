@@ -39,7 +39,7 @@ public class SubmissionServiceImplTest {
         SubmissionServiceImpl service = new SubmissionServiceImpl(dao, imageDao, storageService);
 
         SubmissionId id = service.create(new CreateSubmissionCommand(
-                "title", "content", Arrays.asList(StoredObjectId.of(11L), StoredObjectId.of(12L)), "client-1"));
+                "title", "content", Arrays.asList(StoredObjectId.of(11L), StoredObjectId.of(12L))));
 
         assertEquals(SubmissionId.of(9001L), id);
         assertEquals(SubmissionStatus.SUBMITTED, dao.inserted.getStatus());
@@ -66,14 +66,12 @@ public class SubmissionServiceImplTest {
         Date begin = new Date(1000L);
         Date end = new Date(2000L);
         query.setStatus(SubmissionStatus.APPROVED);
-        query.setSourceClientId("client-1");
         query.setSubmittedAtBegin(begin);
         query.setSubmittedAtEnd(end);
 
         service.page(query, new com.github.thundax.common.page.PageQuery(2, 20));
 
         assertEquals("APPROVED", dao.status);
-        assertEquals("client-1", dao.sourceClientId);
         assertSame(begin, dao.submittedAtBegin);
         assertSame(end, dao.submittedAtEnd);
         assertEquals(2, dao.pageNo);
@@ -91,7 +89,6 @@ public class SubmissionServiceImplTest {
 
         assertEquals(1, count);
         assertEquals(SubmissionStatus.REJECTED, dao.statusEntity.getStatus());
-        assertNotNull(dao.statusEntity.getLastStatusChangedAt());
     }
 
     @Test
@@ -151,7 +148,6 @@ public class SubmissionServiceImplTest {
         private Submission inserted;
         private Submission statusEntity;
         private String status;
-        private String sourceClientId;
         private Date submittedAtBegin;
         private Date submittedAtEnd;
         private int pageNo;
@@ -172,25 +168,19 @@ public class SubmissionServiceImplTest {
 
         @Override
         public List<Submission> list(
-                String status,
-                String sourceClientId,
-                Date submittedAtBegin,
-                Date submittedAtEnd,
-                SortDirection sortDirection) {
+                String status, Date submittedAtBegin, Date submittedAtEnd, SortDirection sortDirection) {
             return currentList;
         }
 
         @Override
         public com.baomidou.mybatisplus.extension.plugins.pagination.Page<Submission> page(
                 String status,
-                String sourceClientId,
                 Date submittedAtBegin,
                 Date submittedAtEnd,
                 SortDirection sortDirection,
                 int pageNo,
                 int pageSize) {
             this.status = status;
-            this.sourceClientId = sourceClientId;
             this.submittedAtBegin = submittedAtBegin;
             this.submittedAtEnd = submittedAtEnd;
             this.pageNo = pageNo;

@@ -30,7 +30,6 @@ public final class SubmissionInterfaceAssembler {
     public static SubmissionQuery toQuery(@NonNull SubmissionPageRequest request) {
         SubmissionQuery query = new SubmissionQuery();
         query.setStatus(StringUtils.isBlank(request.getStatus()) ? null : SubmissionStatus.from(request.getStatus()));
-        query.setSourceClientId(request.getSourceClientId());
         query.setSubmittedAtBegin(request.getSubmittedAtBegin());
         query.setSubmittedAtEnd(request.getSubmittedAtEnd());
         query.setSortDirection(request.getSortDirection());
@@ -46,12 +45,10 @@ public final class SubmissionInterfaceAssembler {
     }
 
     @NonNull
-    public static CreateSubmissionCommand toCreateCommand(
-            @NonNull SubmissionSaveRequest request, String sourceClientId) {
+    public static CreateSubmissionCommand toCreateCommand(@NonNull SubmissionSaveRequest request) {
         CreateSubmissionCommand command = new CreateSubmissionCommand();
         command.setTitle(request.getTitle());
         command.setContent(request.getContent());
-        command.setSourceClientId(sourceClientId);
         command.setImageObjectIds(
                 request.getImageObjectIds() == null
                         ? Collections.emptyList()
@@ -72,10 +69,8 @@ public final class SubmissionInterfaceAssembler {
                 .id(SubmissionIdCodec.toStringValue(entity.getId()))
                 .title(entity.getTitle())
                 .content(entity.getContent())
-                .sourceClientId(entity.getSourceClientId())
                 .status(entity.getStatus() == null ? null : entity.getStatus().value())
                 .submittedAt(entity.getSubmittedAt())
-                .lastStatusChangedAt(entity.getLastStatusChangedAt())
                 .imageObjectIds(
                         entity.getImages() == null
                                 ? Collections.emptyList()

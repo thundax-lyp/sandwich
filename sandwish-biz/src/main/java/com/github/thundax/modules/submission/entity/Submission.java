@@ -20,12 +20,10 @@ public class Submission implements Sortable {
 
     private String title;
     private String content;
-    private String sourceClientId;
 
     private SubmissionStatus status = SubmissionStatus.SUBMITTED;
 
     private int priority;
     private Date submittedAt;
-    private Date lastStatusChangedAt;
     private List<SubmissionImage> images = new ArrayList<>();
 }

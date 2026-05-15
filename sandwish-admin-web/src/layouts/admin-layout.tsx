@@ -4,6 +4,7 @@ import {
     BookOutlined,
     CloudServerOutlined,
     DownOutlined,
+    FileTextOutlined,
     IdcardOutlined,
     LogoutOutlined,
     MenuFoldOutlined,
@@ -50,6 +51,8 @@ const menuIconMap: Record<string, ReactNode> = {
     logs: <AuditOutlined />,
     storage: <CloudServerOutlined />,
     "storage-objects": <CloudServerOutlined />,
+    submission: <FileTextOutlined />,
+    submissions: <FileTextOutlined />,
     permission: <SafetyCertificateOutlined />
 };
 
@@ -62,6 +65,10 @@ const getOpenKeys = (pathname: string) => {
 
     if (pathname.startsWith("/storage/")) {
         openKeys.push("/storage");
+    }
+
+    if (pathname.startsWith("/submission/")) {
+        openKeys.push("/submission");
     }
 
     return openKeys;

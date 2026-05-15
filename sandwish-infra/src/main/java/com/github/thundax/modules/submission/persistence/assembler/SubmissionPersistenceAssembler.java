@@ -19,11 +19,9 @@ public final class SubmissionPersistenceAssembler {
         dataObject.setId(SubmissionIdCodec.toValue(entity.getId()));
         dataObject.setTitle(entity.getTitle());
         dataObject.setContent(entity.getContent());
-        dataObject.setSourceClientId(entity.getSourceClientId());
         dataObject.setStatus(statusValue(entity.getStatus()));
         dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setSubmittedAt(entity.getSubmittedAt());
-        dataObject.setLastStatusChangedAt(entity.getLastStatusChangedAt());
         return dataObject;
     }
 
@@ -35,11 +33,9 @@ public final class SubmissionPersistenceAssembler {
         entity.setId(SubmissionIdCodec.toDomain(dataObject.getId()));
         entity.setTitle(dataObject.getTitle());
         entity.setContent(dataObject.getContent());
-        entity.setSourceClientId(dataObject.getSourceClientId());
         entity.setStatus(statusFrom(dataObject.getStatus()));
         entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setSubmittedAt(dataObject.getSubmittedAt());
-        entity.setLastStatusChangedAt(dataObject.getLastStatusChangedAt());
         return entity;
     }
 

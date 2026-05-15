@@ -41,8 +41,8 @@
 - 枚举字段使用 `varchar` 存储。
 - `priority` 是 `FlatSort` 排序字段，固定由 Service 管理。
 - `submitted_at` 是业务提交时间字段。
-- `last_status_changed_at` 是业务状态变化时间字段。
 - 业务对象变更审计固定归属 Audit 模块，不在 `submission_` 表中保存通用审计字段。
+- 第三方 client 来源归属开放接口认证、调用日志或 Audit operator 维度，不进入 `submission_submission`。
 - `DO/DataObject` 不暴露给 Controller 或 Service。
 
 ## 4. Naming Rules
@@ -53,7 +53,6 @@
 - 提交内容外键字段固定为 `submission_id`。
 - 存储对象引用字段固定为 `storage_object_id`。
 - 图片排序字段固定为 `sort_order`。
-- 来源 client 字段固定为 `source_client_id`。
 
 ## 5. Table Mapping
 
@@ -73,30 +72,25 @@
 | `id` | `id` | `id` | 是 | 提交内容主键 |
 | `title` | `title` | `title` | 是 | 标题 |
 | `content` | `content` | `content` | 是 | 正文 |
-| `source_client_id` | `sourceClientId` | `sourceClientId` | 是 | 来源第三方 client ID |
 | `status` | `status` | `status` | 是 | 提交内容状态 |
 | `priority` | `priority` | `priority` | 是 | 排序值 |
 | `submitted_at` | `submittedAt` | `submittedAt` | 是 | 提交发生时间 |
-| `last_status_changed_at` | `lastStatusChangedAt` | `lastStatusChangedAt` | 否 | 最近状态变化时间 |
 
 字段规则：
 
 - `id` 由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `title` 固定使用 `varchar(200)`。
 - `content` 固定使用 `text`。
-- `source_client_id` 固定保存来源 client ID。
 - `status` 通过 `SubmissionStatus.value()` 写入。
 - `status` 固定使用状态值：`SUBMITTED`、`APPROVED`、`REJECTED`、`CLOSED`。
 - `priority` 默认值固定为 `0`，由 Service 维护。
 - `submitted_at` 固定写入提交发生时间。
-- `last_status_changed_at` 仅在状态调整时写入。
 
 索引：
 
 - 主键：`pk_submission_submission(id)`
 - 唯一索引：`uk_submission_submission_priority(priority)`
 - 普通索引：`idx_submission_submission_status(status, priority)`
-- 普通索引：`idx_submission_submission_client(source_client_id, priority)`
 - 普通索引：`idx_submission_submission_submitted(submitted_at, id)`
 
 ### 6.2 submission_image
@@ -149,7 +143,7 @@
 
 ## 9. Query Model Rules
 
-- 提交内容列表固定支持按 `status`、`sourceClientId`、`submittedAt` 时间范围过滤。
+- 提交内容列表固定支持按 `status`、`submittedAt` 时间范围过滤。
 - 提交内容列表和分页默认按 `priority asc, id asc` 排序。
 - 提交内容详情固定按 `submission_id, sort_order` 升序装载图片列表。
 - 提交内容重排固定只更新 `priority`。

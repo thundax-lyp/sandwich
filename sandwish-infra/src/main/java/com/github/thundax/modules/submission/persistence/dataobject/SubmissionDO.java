@@ -21,11 +21,9 @@ public class SubmissionDO {
 
     private String title;
     private String content;
-    private String sourceClientId;
 
     private String status;
 
     private Integer priority;
     private Date submittedAt;
-    private Date lastStatusChangedAt;
 }

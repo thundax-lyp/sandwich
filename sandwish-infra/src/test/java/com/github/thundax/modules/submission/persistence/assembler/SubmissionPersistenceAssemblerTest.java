@@ -31,7 +31,6 @@ public class SubmissionPersistenceAssemblerTest {
         entity.setId(SubmissionId.of(9001L));
         entity.setTitle("title");
         entity.setContent("content");
-        entity.setSourceClientId("client-1");
         entity.setStatus(SubmissionStatus.REJECTED);
         entity.setPriority(20);
         entity.setSubmittedAt(submittedAt);
@@ -41,7 +40,6 @@ public class SubmissionPersistenceAssemblerTest {
         assertEquals(Long.valueOf(9001L), dataObject.getId());
         assertEquals("title", dataObject.getTitle());
         assertEquals("content", dataObject.getContent());
-        assertEquals("client-1", dataObject.getSourceClientId());
         assertEquals("REJECTED", dataObject.getStatus());
         assertEquals(Integer.valueOf(20), dataObject.getPriority());
         assertSame(submittedAt, dataObject.getSubmittedAt());

@@ -7,13 +7,13 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Form, Input, Modal, Space, Tag, Typography } from "antd";
+import { App, Button, Dropdown, Input, Modal, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import { DictionaryEdit } from "./components/dictionary-edit";
 import {
     addDictionary,
     deleteDictionaries,
@@ -24,7 +24,6 @@ import type { DictPageRequest, DictResponse, DictSaveRequest } from "./dictionar
 import "./dictionary-page.css";
 
 const { Text } = Typography;
-const { TextArea } = Input;
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
@@ -36,14 +35,6 @@ const DEFAULT_COLUMN_WIDTHS = {
     remarks: 320,
     actions: 116
 };
-
-interface DictFormValues {
-    id?: string | null;
-    type: string;
-    label: string;
-    value: string;
-    remarks?: string | null;
-}
 
 interface DictionaryFilters {
     remarks: string;
@@ -60,19 +51,8 @@ const normalizeSearch = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFormRequest = (values: DictFormValues): DictSaveRequest => {
-    return {
-        id: values.id,
-        type: values.type.trim(),
-        label: values.label.trim(),
-        value: values.value.trim(),
-        remarks: normalizeSearch(values.remarks)
-    };
-};
-
 export const DictionaryPage = () => {
     const { message: messageApi } = App.useApp();
-    const [editForm] = Form.useForm<DictFormValues>();
     const queryClient = useQueryClient();
     const canEditDictionary = hasPermission("sys:dict:edit");
     const [query, setQuery] = useState<DictPageRequest>({
@@ -104,7 +84,6 @@ export const DictionaryPage = () => {
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingDictionary(null);
-            editForm.resetFields();
             await queryClient.invalidateQueries({ queryKey: ["dictionary", "page"] });
             messageApi.success("字典项已保存");
         },
@@ -161,19 +140,11 @@ export const DictionaryPage = () => {
 
     const openCreateEditor = () => {
         setEditingDictionary(null);
-        editForm.resetFields();
         setEditorOpen(true);
     };
 
     const openEditEditor = (dictionary: DictResponse) => {
         setEditingDictionary(dictionary);
-        editForm.setFieldsValue({
-            id: dictionary.id,
-            type: dictionary.type,
-            label: dictionary.label,
-            value: dictionary.value,
-            remarks: dictionary.remarks
-        });
         setEditorOpen(true);
     };
 
@@ -183,12 +154,10 @@ export const DictionaryPage = () => {
         }
         setEditorOpen(false);
         setEditingDictionary(null);
-        editForm.resetFields();
     };
 
-    const saveDictionary = async () => {
-        const values = await editForm.validateFields();
-        saveMutation.mutate(readFormRequest(values));
+    const saveDictionary = (request: DictSaveRequest) => {
+        saveMutation.mutate(request);
     };
 
     const confirmDelete = (ids: string[]) => {
@@ -414,59 +383,13 @@ export const DictionaryPage = () => {
                 }}
             />
 
-            <SandwishDrawer
-                className="dictionary-edit-drawer"
-                title={editingDictionary ? "编辑字典项" : "新增字典项"}
+            <DictionaryEdit
                 open={editorOpen}
-                size="small"
+                dictionary={editingDictionary}
+                saving={saveMutation.isPending}
                 onClose={closeEditor}
-                footer={
-                    <div className="dictionary-edit-footer">
-                        <Button onClick={closeEditor}>取消</Button>
-                        <Button
-                            type="primary"
-                            loading={saveMutation.isPending}
-                            onClick={saveDictionary}
-                        >
-                            保存字典项
-                        </Button>
-                    </div>
-                }
-            >
-                <Form<DictFormValues>
-                    form={editForm}
-                    layout="vertical"
-                    className="dictionary-editor-form"
-                >
-                    <Form.Item name="id" hidden>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="type"
-                        label="字典类型"
-                        rules={[{ required: true, message: "请输入字典类型" }]}
-                    >
-                        <Input placeholder="例如：user_status" />
-                    </Form.Item>
-                    <Form.Item
-                        name="label"
-                        label="标签"
-                        rules={[{ required: true, message: "请输入标签" }]}
-                    >
-                        <Input placeholder="例如：启用" />
-                    </Form.Item>
-                    <Form.Item
-                        name="value"
-                        label="值"
-                        rules={[{ required: true, message: "请输入值" }]}
-                    >
-                        <Input placeholder="例如：ENABLED" />
-                    </Form.Item>
-                    <Form.Item name="remarks" label="备注">
-                        <TextArea rows={3} maxLength={200} showCount placeholder="补充使用说明" />
-                    </Form.Item>
-                </Form>
-            </SandwishDrawer>
+                onSave={saveDictionary}
+            />
         </>
     );
 };

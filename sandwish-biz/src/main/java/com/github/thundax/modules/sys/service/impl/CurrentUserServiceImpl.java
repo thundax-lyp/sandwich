@@ -233,9 +233,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
     }
 
     private List<Menu> sortedMenus(List<Menu> menus) {
-        List<Menu> menuList = menus == null ? new ArrayList<>() : new ArrayList<>(menus);
-        menuList.sort(Menu::compareTo);
-        return menuList;
+        return menus == null ? new ArrayList<>() : new ArrayList<>(menus);
     }
 
     private UserQuery userQuery(UserId userId) {

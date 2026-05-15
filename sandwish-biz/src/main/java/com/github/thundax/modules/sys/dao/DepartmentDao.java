@@ -20,8 +20,6 @@ public interface DepartmentDao {
 
     int update(Department department);
 
-    int updatePriority(Department department);
-
     int deleteById(DepartmentId id);
 
     void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType);

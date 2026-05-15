@@ -19,7 +19,6 @@ public final class DepartmentPersistenceAssembler {
         dataObject.setParentId(DepartmentIdCodec.toValue(entity.getParentId()));
         dataObject.setName(entity.getName());
         dataObject.setShortName(entity.getShortName());
-        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         return dataObject;
     }
@@ -33,7 +32,6 @@ public final class DepartmentPersistenceAssembler {
         entity.setParentId(DepartmentIdCodec.toDomain(dataObject.getParentId()));
         entity.setName(dataObject.getName());
         entity.setShortName(dataObject.getShortName());
-        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         return entity;
     }
@@ -54,9 +52,5 @@ public final class DepartmentPersistenceAssembler {
         dataObject.setId(id);
         dataObject.setParentId(parentId);
         return dataObject;
-    }
-
-    private static int priorityOrDefault(Integer priority) {
-        return priority == null || priority < 0 ? 0 : priority;
     }
 }

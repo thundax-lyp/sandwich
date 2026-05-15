@@ -153,7 +153,6 @@
 | `display_params` | `displayParams` | `displayParams` | 否 | 显示参数，JSON 格式，菜单图标使用 `icon` 字段 |
 | `url` | `url` | `url` | 否 | 访问路径 |
 | `target` | `target` | `target` | 否 | 打开目标 |
-| `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 
 字段规则：
@@ -165,7 +164,7 @@
 索引：
 
 - 主键：`pk_sys_menu(id)`
-- 普通索引：`idx_sys_menu_parent(parent_id, priority)`
+- 普通索引：`idx_sys_menu_parent(parent_id)`
 - 普通索引：`idx_sys_menu_nested(lft, rgt)`
 - 普通索引：`idx_sys_menu_visibility(visibility, ranks)`
 
@@ -181,7 +180,6 @@
 | `rgt` | `rgt` | - | 是 | nested-set 右索引 |
 | `name` | `name` | `name` | 是 | 部门名称 |
 | `short_name` | `shortName` | `shortName` | 否 | 部门简称 |
-| `priority` | `priority` | `priority` | 是 | 排序值 |
 | `remarks` | `remarks` | `remarks` | 否 | 备注 |
 
 字段规则：
@@ -192,7 +190,7 @@
 索引：
 
 - 主键：`pk_sys_department(id)`
-- 普通索引：`idx_sys_department_parent(parent_id, priority)`
+- 普通索引：`idx_sys_department_parent(parent_id)`
 - 普通索引：`idx_sys_department_nested(lft, rgt)`
 
 ### 6.5 sys_dict

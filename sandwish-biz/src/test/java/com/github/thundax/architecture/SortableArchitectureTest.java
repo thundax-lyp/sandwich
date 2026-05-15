@@ -12,7 +12,6 @@ public class SortableArchitectureTest {
     public void shouldKeepSortableDomainsWithinContract() throws Exception {
         Path sourceRoot = mainSourceRoot();
 
-        SortableArchitectureRuleSupport.assertSortableEntitiesDeclarePriority(sourceRoot);
         SortableArchitectureRuleSupport.assertSortCommandsUseOrderedIdsOnly(sourceRoot);
         SortableArchitectureRuleSupport.assertSortMethodsAreTransactional(sourceRoot);
     }

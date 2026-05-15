@@ -95,7 +95,6 @@ public class MenuCacheSupport {
         menu.setDisplayParams(cacheDTO.displayParams);
         menu.setUrl(cacheDTO.url);
         menu.setTarget(cacheDTO.target);
-        menu.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         menu.setRemarks(cacheDTO.remarks);
         return menu;
     }
@@ -112,7 +111,6 @@ public class MenuCacheSupport {
         cacheDTO.displayParams = menu.getDisplayParams();
         cacheDTO.url = menu.getUrl();
         cacheDTO.target = menu.getTarget();
-        cacheDTO.priority = menu.getPriority();
         cacheDTO.remarks = menu.getRemarks();
         return cacheDTO;
     }
@@ -127,7 +125,6 @@ public class MenuCacheSupport {
         private String displayParams;
         private String url;
         private String target;
-        private Integer priority;
         private String remarks;
     }
 }

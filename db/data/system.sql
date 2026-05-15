@@ -6,87 +6,87 @@ SET NAMES utf8mb4;
 
 INSERT INTO `sys_department` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `short_name`,
-    `priority`, `remarks`
+    `remarks`
 ) VALUES
     (
         1000000000000000001, NULL, 1, 40, 'GitHub', 'GitHub',
-        0, '系统初始化根部门'
+        '系统初始化根部门'
     ),
     (
         1000000000000000002, 1000000000000000001, 2, 7, '总裁办', 'CEO Office',
-        1, '公司治理、战略决策和综合协调'
+        '公司治理、战略决策和综合协调'
     ),
     (
         1000000000000000003, 1000000000000000002, 3, 4, '战略发展部', 'Strategy',
-        1, '战略规划、行业研究和重点项目跟进'
+        '战略规划、行业研究和重点项目跟进'
     ),
     (
         1000000000000000004, 1000000000000000002, 5, 6, '法务合规部', 'Legal',
-        2, '合同、合规、风险控制和制度审查'
+        '合同、合规、风险控制和制度审查'
     ),
     (
         1000000000000000005, 1000000000000000001, 8, 21, '研发中心', 'R&D',
-        2, '产品研发、工程交付和技术平台建设'
+        '产品研发、工程交付和技术平台建设'
     ),
     (
         1000000000000000006, 1000000000000000005, 9, 10, '平台架构部', 'Platform',
-        1, '基础架构、公共组件和技术规范'
+        '基础架构、公共组件和技术规范'
     ),
     (
         1000000000000000007, 1000000000000000005, 11, 12, '后端研发部', 'Backend',
-        2, '后端服务、业务接口和系统集成'
+        '后端服务、业务接口和系统集成'
     ),
     (
         1000000000000000008, 1000000000000000005, 13, 14, '前端体验部', 'Frontend',
-        3, '管理台、前台应用和用户体验实现'
+        '管理台、前台应用和用户体验实现'
     ),
     (
         1000000000000000009, 1000000000000000005, 15, 16, '测试质量部', 'QA',
-        4, '测试体系、质量保障和发布验收'
+        '测试体系、质量保障和发布验收'
     ),
     (
         1000000000000000010, 1000000000000000005, 17, 18, '运维效能部', 'DevOps',
-        5, '环境、部署、监控和研发效能'
+        '环境、部署、监控和研发效能'
     ),
     (
         1000000000000000011, 1000000000000000005, 19, 20, '数据智能部', 'Data',
-        6, '数据分析、报表建设和智能能力探索'
+        '数据分析、报表建设和智能能力探索'
     ),
     (
         1000000000000000012, 1000000000000000001, 22, 29, '产品中心', 'Product',
-        3, '产品规划、体验设计和需求管理'
+        '产品规划、体验设计和需求管理'
     ),
     (
         1000000000000000013, 1000000000000000012, 23, 24, '产品规划部', 'PM',
-        1, '产品路线图、需求评审和版本规划'
+        '产品路线图、需求评审和版本规划'
     ),
     (
         1000000000000000014, 1000000000000000012, 25, 26, '交互设计部', 'Design',
-        2, '交互设计、视觉规范和体验走查'
+        '交互设计、视觉规范和体验走查'
     ),
     (
         1000000000000000015, 1000000000000000012, 27, 28, '用户研究部', 'UXR',
-        3, '用户研究、反馈分析和可用性验证'
+        '用户研究、反馈分析和可用性验证'
     ),
     (
         1000000000000000016, 1000000000000000001, 30, 35, '商业化中心', 'Business',
-        4, '市场增长、客户成功和商业化运营'
+        '市场增长、客户成功和商业化运营'
     ),
     (
         1000000000000000017, 1000000000000000016, 31, 32, '市场运营部', 'Marketing',
-        1, '市场活动、内容运营和品牌传播'
+        '市场活动、内容运营和品牌传播'
     ),
     (
         1000000000000000018, 1000000000000000016, 33, 34, '客户成功部', 'CS',
-        2, '客户交付、续约支持和服务质量'
+        '客户交付、续约支持和服务质量'
     ),
     (
         1000000000000000019, 1000000000000000001, 36, 39, '财务人事中心', 'FAHR',
-        5, '财务核算、人事行政和组织支持'
+        '财务核算、人事行政和组织支持'
     ),
     (
         1000000000000000020, 1000000000000000019, 37, 38, '财务管理部', 'Finance',
-        1, '预算、核算、报销和经营分析'
+        '预算、核算、报销和经营分析'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -94,7 +94,6 @@ ON DUPLICATE KEY UPDATE
     `rgt` = VALUES(`rgt`),
     `name` = VALUES(`name`),
     `short_name` = VALUES(`short_name`),
-    `priority` = VALUES(`priority`),
     `remarks` = VALUES(`remarks`);
 
 INSERT INTO `sys_user` (
@@ -288,87 +287,87 @@ ON DUPLICATE KEY UPDATE
 -- display_params keeps frontend presentation metadata as JSON.
 INSERT INTO `sys_menu` (
     `id`, `parent_id`, `lft`, `rgt`, `name`, `perms`, `ranks`,
-    `visibility`, `display_params`, `url`, `target`, `priority`, `remarks`
+    `visibility`, `display_params`, `url`, `target`, `remarks`
 ) VALUES
     (
         1000000000000001020, NULL, 1, 2, '仪表盘', NULL, 0,
-        'VISIBLE', '{"icon":"dashboard"}', '/dashboard', NULL, 0, '后台仪表盘'
+        'VISIBLE', '{"icon":"dashboard"}', '/dashboard', NULL, '后台仪表盘'
     ),
     (
         1000000000000001001, NULL, 3, 32, '系统管理', NULL, 0,
-        'VISIBLE', '{"icon":"system"}', '/system', NULL, 1, '系统管理根菜单'
+        'VISIBLE', '{"icon":"system"}', '/system', NULL, '系统管理根菜单'
     ),
     (
         1000000000000001002, 1000000000000001001, 4, 9, '用户管理', NULL, 0,
-        'VISIBLE', '{"icon":"users"}', '/system/users', NULL, 1, '用户管理'
+        'VISIBLE', '{"icon":"users"}', '/system/users', NULL, '用户管理'
     ),
     (
         1000000000000001003, 1000000000000001002, 5, 6, '用户查看', 'sys:user:view', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '用户查看权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '用户查看权限'
     ),
     (
         1000000000000001004, 1000000000000001002, 7, 8, '用户编辑', 'sys:user:edit', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '用户编辑权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '用户编辑权限'
     ),
     (
         1000000000000001005, 1000000000000001001, 10, 15, '角色管理', NULL, 0,
-        'VISIBLE', '{"icon":"roles"}', '/system/roles', NULL, 2, '角色管理'
+        'VISIBLE', '{"icon":"roles"}', '/system/roles', NULL, '角色管理'
     ),
     (
         1000000000000001006, 1000000000000001005, 11, 12, '角色查看', 'sys:role:view', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '角色查看权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '角色查看权限'
     ),
     (
         1000000000000001007, 1000000000000001005, 13, 14, '角色编辑', 'sys:role:edit', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '角色编辑权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '角色编辑权限'
     ),
     (
         1000000000000001008, 1000000000000001001, 16, 17, '菜单管理', 'super', 0,
-        'VISIBLE', '{"icon":"menus"}', '/system/menus', NULL, 3, '菜单管理'
+        'VISIBLE', '{"icon":"menus"}', '/system/menus', NULL, '菜单管理'
     ),
     (
         1000000000000001009, 1000000000000001001, 18, 23, '部门管理', NULL, 0,
-        'VISIBLE', '{"icon":"departments"}', '/system/departments', NULL, 4, '部门管理'
+        'VISIBLE', '{"icon":"departments"}', '/system/departments', NULL, '部门管理'
     ),
     (
         1000000000000001010, 1000000000000001009, 19, 20, '部门查看', 'sys:department:view', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '部门查看权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '部门查看权限'
     ),
     (
         1000000000000001011, 1000000000000001009, 21, 22, '部门编辑', 'sys:department:edit', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '部门编辑权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '部门编辑权限'
     ),
     (
         1000000000000001012, 1000000000000001001, 24, 29, '字典管理', NULL, 0,
-        'VISIBLE', '{"icon":"dictionaries"}', '/system/dictionaries', NULL, 5, '字典管理'
+        'VISIBLE', '{"icon":"dictionaries"}', '/system/dictionaries', NULL, '字典管理'
     ),
     (
         1000000000000001013, 1000000000000001012, 25, 26, '字典查看', 'sys:dict:view', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '字典查看权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '字典查看权限'
     ),
     (
         1000000000000001014, 1000000000000001012, 27, 28, '字典编辑', 'sys:dict:edit', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '字典编辑权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '字典编辑权限'
     ),
     (
         1000000000000001015, 1000000000000001001, 30, 31, '系统日志', 'super', 0,
-        'VISIBLE', '{"icon":"logs"}', '/system/logs', NULL, 6, '系统日志'
+        'VISIBLE', '{"icon":"logs"}', '/system/logs', NULL, '系统日志'
     ),
     (
         1000000000000001016, NULL, 33, 40, '存储管理', NULL, 0,
-        'VISIBLE', '{"icon":"storage"}', '/storage', NULL, 2, '存储管理根菜单'
+        'VISIBLE', '{"icon":"storage"}', '/storage', NULL, '存储管理根菜单'
     ),
     (
         1000000000000001017, 1000000000000001016, 34, 39, '存储对象', NULL, 0,
-        'VISIBLE', '{"icon":"storage-objects"}', '/storage/objects', NULL, 1, '存储对象'
+        'VISIBLE', '{"icon":"storage-objects"}', '/storage/objects', NULL, '存储对象'
     ),
     (
         1000000000000001018, 1000000000000001017, 35, 36, '存储对象查看', 'storage:storage:view', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 1, '存储对象查看权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '存储对象查看权限'
     ),
     (
         1000000000000001019, 1000000000000001017, 37, 38, '存储对象编辑', 'storage:storage:edit', 0,
-        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 2, '存储对象编辑权限'
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, '存储对象编辑权限'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -381,7 +380,6 @@ ON DUPLICATE KEY UPDATE
     `display_params` = VALUES(`display_params`),
     `url` = VALUES(`url`),
     `target` = VALUES(`target`),
-    `priority` = VALUES(`priority`),
     `remarks` = VALUES(`remarks`);
 
 INSERT INTO `sys_user_role` (`user_id`, `role_id`) VALUES

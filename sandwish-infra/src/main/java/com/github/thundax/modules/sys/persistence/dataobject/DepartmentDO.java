@@ -28,7 +28,5 @@ public class DepartmentDO {
 
     private String shortName;
 
-    private Integer priority;
-
     private String remarks;
 }

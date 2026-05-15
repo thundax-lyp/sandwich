@@ -44,16 +44,20 @@ public class MenuPersistenceAssemblerTest {
     }
 
     @Test
-    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+    public void shouldMapDisplayFieldsAtPersistenceBoundary() {
         Menu entity = new Menu();
-        entity.setPriority(-1);
+        entity.setName("用户管理");
+        entity.setPerms("sys:user:view");
         MenuDO dataObject = new MenuDO();
-        dataObject.setPriority(-1);
+        dataObject.setName("角色管理");
+        dataObject.setPerms("sys:role:view");
 
+        assertEquals("用户管理", MenuPersistenceAssembler.toDataObject(entity).getName());
         assertEquals(
-                Integer.valueOf(0),
-                MenuPersistenceAssembler.toDataObject(entity).getPriority());
-        assertEquals(0, MenuPersistenceAssembler.toEntity(dataObject).getPriority());
+                "sys:user:view", MenuPersistenceAssembler.toDataObject(entity).getPerms());
+        assertEquals("角色管理", MenuPersistenceAssembler.toEntity(dataObject).getName());
+        assertEquals(
+                "sys:role:view", MenuPersistenceAssembler.toEntity(dataObject).getPerms());
     }
 
     @Test

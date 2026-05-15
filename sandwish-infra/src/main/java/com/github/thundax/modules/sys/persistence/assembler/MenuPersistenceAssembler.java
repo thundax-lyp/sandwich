@@ -26,7 +26,6 @@ public final class MenuPersistenceAssembler {
         dataObject.setDisplayParams(entity.getDisplayParams());
         dataObject.setUrl(entity.getUrl());
         dataObject.setTarget(entity.getTarget());
-        dataObject.setPriority(priorityOrDefault(entity.getPriority()));
         dataObject.setRemarks(entity.getRemarks());
         return dataObject;
     }
@@ -45,7 +44,6 @@ public final class MenuPersistenceAssembler {
         entity.setDisplayParams(dataObject.getDisplayParams());
         entity.setUrl(dataObject.getUrl());
         entity.setTarget(dataObject.getTarget());
-        entity.setPriority(priorityOrDefault(dataObject.getPriority()));
         entity.setRemarks(dataObject.getRemarks());
         return entity;
     }
@@ -66,10 +64,6 @@ public final class MenuPersistenceAssembler {
         dataObject.setId(id);
         dataObject.setParentId(parentId);
         return dataObject;
-    }
-
-    private static int priorityOrDefault(Integer priority) {
-        return priority == null || priority < 0 ? 0 : priority;
     }
 
     private static String visibilityValue(MenuVisibility visibility) {

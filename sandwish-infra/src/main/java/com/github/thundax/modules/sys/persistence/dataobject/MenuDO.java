@@ -38,8 +38,6 @@ public class MenuDO {
 
     private String target;
 
-    private Integer priority;
-
     private String remarks;
 
     public Integer treeSpan() {

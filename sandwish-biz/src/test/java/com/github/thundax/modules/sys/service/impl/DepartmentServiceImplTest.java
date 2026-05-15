@@ -129,7 +129,6 @@ public class DepartmentServiceImplTest {
         private Department inserted;
         private Department updated;
         private Long deletedId;
-        private int priorityCalls;
 
         @Override
         public Department getById(DepartmentId id) {
@@ -173,12 +172,6 @@ public class DepartmentServiceImplTest {
         @Override
         public int update(Department department) {
             this.updated = department;
-            return 1;
-        }
-
-        @Override
-        public int updatePriority(Department department) {
-            this.priorityCalls++;
             return 1;
         }
 

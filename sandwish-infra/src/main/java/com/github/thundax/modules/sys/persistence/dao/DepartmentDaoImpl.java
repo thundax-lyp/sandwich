@@ -49,26 +49,16 @@ public class DepartmentDaoImpl implements DepartmentDao {
 
     @Override
     public List<Department> listByIds(List<Long> idList) {
-        List<Department> departmentList = new ArrayList<>();
-        List<Long> uncachedIdList = new ArrayList<>();
-        for (Long id : idList) {
-            Department department = cacheSupport.getById(id);
-            if (department == null) {
-                uncachedIdList.add(id);
-            } else {
-                departmentList.add(department);
-            }
+        if (idList == null || idList.isEmpty()) {
+            return new ArrayList<>();
         }
-
-        if (!uncachedIdList.isEmpty()) {
-            List<Department> uncachedDepartmentList =
-                    DepartmentPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
-            for (Department department : uncachedDepartmentList) {
-                cacheSupport.putById(department);
-                departmentList.add(department);
-            }
+        LambdaQueryWrapper<DepartmentDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(DepartmentDO::getId, idList).orderByAsc(DepartmentDO::getLft);
+        List<Department> departments = DepartmentPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
+        for (Department department : departments) {
+            cacheSupport.putById(department);
         }
-        return departmentList;
+        return departments;
     }
 
     @Override
@@ -117,18 +107,8 @@ public class DepartmentDaoImpl implements DepartmentDao {
                         .set(DepartmentDO::getParentId, dataObject.getParentId())
                         .set(DepartmentDO::getName, dataObject.getName())
                         .set(DepartmentDO::getShortName, dataObject.getShortName())
-                        .set(DepartmentDO::getPriority, dataObject.getPriority())
                         .set(DepartmentDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
-        return count;
-    }
-
-    @Override
-    public int updatePriority(Department entity) {
-        DepartmentDO dataObject = DepartmentPersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(DepartmentDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(DepartmentIdCodec.toValue(entity.getId()));
         return count;
     }
 

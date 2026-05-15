@@ -218,11 +218,6 @@ public class MenuServiceImplTest {
         }
 
         @Override
-        public int updatePriority(Menu menu) {
-            return 1;
-        }
-
-        @Override
         public int deleteById(MenuId id) {
             this.deletedId = id.value();
             return 1;

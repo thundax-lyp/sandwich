@@ -7,10 +7,9 @@ CREATE TABLE IF NOT EXISTS `sys_department` (
     `rgt` int NOT NULL,
     `name` varchar(128) NOT NULL,
     `short_name` varchar(128) DEFAULT NULL,
-    `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_department_parent` (`parent_id`, `priority`),
+    KEY `idx_sys_department_parent` (`parent_id`),
     KEY `idx_sys_department_nested` (`lft`, `rgt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台部门表';
 
@@ -54,10 +53,9 @@ CREATE TABLE IF NOT EXISTS `sys_menu` (
     `display_params` text DEFAULT NULL,
     `url` varchar(512) DEFAULT NULL,
     `target` varchar(64) DEFAULT NULL,
-    `priority` int NOT NULL DEFAULT 0,
     `remarks` varchar(512) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    KEY `idx_sys_menu_parent` (`parent_id`, `priority`),
+    KEY `idx_sys_menu_parent` (`parent_id`),
     KEY `idx_sys_menu_nested` (`lft`, `rgt`),
     KEY `idx_sys_menu_visibility` (`visibility`, `ranks`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台菜单表';

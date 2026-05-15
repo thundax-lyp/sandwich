@@ -20,8 +20,6 @@ public interface MenuDao {
 
     int update(Menu menu);
 
-    int updatePriority(Menu menu);
-
     int deleteById(MenuId id);
 
     void moveTreeNode(Long fromId, Long toId, TreeNodeMoveType moveType);

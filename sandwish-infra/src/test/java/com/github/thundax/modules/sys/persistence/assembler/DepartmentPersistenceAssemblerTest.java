@@ -9,15 +9,18 @@ import org.junit.Test;
 public class DepartmentPersistenceAssemblerTest {
 
     @Test
-    public void shouldNormalizeNegativePriorityAtPersistenceBoundary() {
+    public void shouldMapNameFieldsAtPersistenceBoundary() {
         Department entity = new Department();
-        entity.setPriority(-1);
+        entity.setName("研发中心");
+        entity.setShortName("R&D");
         DepartmentDO dataObject = new DepartmentDO();
-        dataObject.setPriority(-1);
+        dataObject.setName("产品中心");
+        dataObject.setShortName("Product");
 
+        assertEquals("研发中心", DepartmentPersistenceAssembler.toDataObject(entity).getName());
+        assertEquals("R&D", DepartmentPersistenceAssembler.toDataObject(entity).getShortName());
+        assertEquals("产品中心", DepartmentPersistenceAssembler.toEntity(dataObject).getName());
         assertEquals(
-                Integer.valueOf(0),
-                DepartmentPersistenceAssembler.toDataObject(entity).getPriority());
-        assertEquals(0, DepartmentPersistenceAssembler.toEntity(dataObject).getPriority());
+                "Product", DepartmentPersistenceAssembler.toEntity(dataObject).getShortName());
     }
 }

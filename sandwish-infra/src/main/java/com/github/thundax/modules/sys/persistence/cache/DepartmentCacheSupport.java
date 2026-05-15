@@ -88,7 +88,6 @@ public class DepartmentCacheSupport {
         department.setParentId(DepartmentIdCodec.toDomain(cacheDTO.parentId));
         department.setName(cacheDTO.name);
         department.setShortName(cacheDTO.shortName);
-        department.setPriority(cacheDTO.priority == null ? 0 : cacheDTO.priority);
         department.setRemarks(cacheDTO.remarks);
         return department;
     }
@@ -99,7 +98,6 @@ public class DepartmentCacheSupport {
         cacheDTO.parentId = DepartmentIdCodec.toValue(department.getParentId());
         cacheDTO.name = department.getName();
         cacheDTO.shortName = department.getShortName();
-        cacheDTO.priority = department.getPriority();
         cacheDTO.remarks = department.getRemarks();
         return cacheDTO;
     }
@@ -109,7 +107,6 @@ public class DepartmentCacheSupport {
         private Long parentId;
         private String name;
         private String shortName;
-        private Integer priority;
         private String remarks;
     }
 }

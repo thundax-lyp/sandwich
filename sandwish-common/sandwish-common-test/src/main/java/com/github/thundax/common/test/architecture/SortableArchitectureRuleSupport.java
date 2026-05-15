@@ -13,8 +13,6 @@ import java.util.stream.Stream;
 
 public final class SortableArchitectureRuleSupport {
 
-    private static final Pattern SORTABLE_CLASS_PATTERN =
-            Pattern.compile("\\bpublic\\s+class\\s+([A-Za-z0-9_]+)\\s+implements\\s+([^\\{]+)");
     private static final Pattern FIELD_PATTERN = Pattern.compile(
             "\\bprivate\\s+(?:static\\s+final\\s+)?[A-Za-z0-9_<>, ?\\.\\[\\]]+\\s+([A-Za-z][A-Za-z0-9_]*)\\s*(?:=[^;]*)?;");
     private static final Pattern SORT_METHOD_PATTERN = Pattern.compile(
@@ -24,19 +22,6 @@ public final class SortableArchitectureRuleSupport {
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     private SortableArchitectureRuleSupport() {}
-
-    public static void assertSortableEntitiesDeclarePriority(Path sourceRoot) throws IOException {
-        Path root = ArchitectureSourceSupport.repositoryRoot();
-        List<String> violations = new ArrayList<String>();
-
-        try (Stream<Path> paths = Files.walk(sourceRoot)) {
-            paths.filter(path -> path.getFileName().toString().endsWith(".java"))
-                    .filter(SortableArchitectureRuleSupport::isEntitySource)
-                    .forEach(path -> collectSortablePriorityViolations(root, path, violations));
-        }
-
-        assertTrue("Sortable entity classes must declare priority field: " + violations, violations.isEmpty());
-    }
 
     public static void assertSortCommandsUseOrderedIdsOnly(Path sourceRoot) throws IOException {
         Path root = ArchitectureSourceSupport.repositoryRoot();
@@ -70,24 +55,12 @@ public final class SortableArchitectureRuleSupport {
         while (matcher.find()) {
             String tableName = matcher.group(1);
             String tableBody = matcher.group(2);
-            if (tableBody.contains("`priority`") && !isTreeSortTable(tableBody) && !tableBody.contains("UNIQUE KEY")) {
+            if (tableBody.contains("`priority`") && !tableBody.contains("UNIQUE KEY")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, schemaRoot) + " table=" + tableName);
             }
         }
 
         assertTrue("FlatSort tables must declare unique priority keys: " + violations, violations.isEmpty());
-    }
-
-    private static void collectSortablePriorityViolations(Path root, Path path, List<String> violations) {
-        String content = ArchitectureSourceSupport.readSourceWithoutComments(path);
-        Matcher matcher = SORTABLE_CLASS_PATTERN.matcher(content);
-        while (matcher.find()) {
-            String className = matcher.group(1);
-            String interfaces = matcher.group(2);
-            if (interfaces.contains("Sortable") && !content.contains(" priority")) {
-                violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " class=" + className);
-            }
-        }
     }
 
     private static void collectSortCommandFieldViolations(Path root, Path path, List<String> violations) {
@@ -124,14 +97,5 @@ public final class SortableArchitectureRuleSupport {
                             .append('\n'));
         }
         return builder.toString();
-    }
-
-    private static boolean isEntitySource(Path path) {
-        return path.getParent() != null
-                && "entity".equals(path.getParent().getFileName().toString());
-    }
-
-    private static boolean isTreeSortTable(String tableBody) {
-        return tableBody.contains("`lft`") && tableBody.contains("`rgt`") && tableBody.contains("`parent_id`");
     }
 }

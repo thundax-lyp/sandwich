@@ -53,23 +53,14 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public List<Menu> listByIds(List<Long> idList) {
-        List<Menu> menuList = new ArrayList<>();
-        List<Long> uncachedIdList = new ArrayList<>();
-        for (Long id : idList) {
-            Menu menu = cacheSupport.getById(id);
-            if (menu == null) {
-                uncachedIdList.add(id);
-            } else {
-                menuList.add(menu);
-            }
+        if (idList == null || idList.isEmpty()) {
+            return new ArrayList<>();
         }
-
-        if (!uncachedIdList.isEmpty()) {
-            List<Menu> uncachedMenuList = MenuPersistenceAssembler.toEntityList(mapper.selectBatchIds(uncachedIdList));
-            for (Menu menu : uncachedMenuList) {
-                cacheSupport.putById(menu);
-                menuList.add(menu);
-            }
+        LambdaQueryWrapper<MenuDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(MenuDO::getId, idList).orderByAsc(MenuDO::getLft);
+        List<Menu> menuList = MenuPersistenceAssembler.toEntityList(mapper.selectList(wrapper));
+        for (Menu menu : menuList) {
+            cacheSupport.putById(menu);
         }
         return menuList;
     }
@@ -127,15 +118,6 @@ public class MenuDaoImpl implements MenuDao {
                         .set(MenuDO::getDisplayParams, dataObject.getDisplayParams())
                         .set(MenuDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeAll();
-        return count;
-    }
-
-    @Override
-    public int updatePriority(Menu entity) {
-        MenuDO dataObject = MenuPersistenceAssembler.toDataObject(entity);
-        int count = mapper.update(
-                null, buildIdUpdateWrapper(dataObject).set(MenuDO::getPriority, dataObject.getPriority()));
-        cacheSupport.removeById(MenuIdCodec.toValue(entity.getId()));
         return count;
     }
 

@@ -1,6 +1,5 @@
 package com.github.thundax.modules.sys.entity;
 
-import com.github.thundax.common.domain.Sortable;
 import com.github.thundax.modules.sys.entity.enums.MenuVisibility;
 import com.github.thundax.modules.sys.entity.valueobject.AccessRank;
 import com.github.thundax.modules.sys.entity.valueobject.MenuId;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu implements Sortable, Comparable<Menu> {
+public class Menu {
     private MenuId id;
 
     private MenuId parentId;
@@ -25,29 +24,10 @@ public class Menu implements Sortable, Comparable<Menu> {
     private String displayParams;
     private String url;
     private String target;
-    private int priority;
     private String remarks;
 
     public boolean isDisplay() {
         return MenuVisibility.VISIBLE == getVisibility();
-    }
-
-    @Override
-    public int compareTo(Menu that) {
-        return compareInteger(this.getPriority(), that.getPriority());
-    }
-
-    private static int compareInteger(Integer left, Integer right) {
-        if (left == null && right == null) {
-            return 0;
-        }
-        if (left == null) {
-            return -1;
-        }
-        if (right == null) {
-            return 1;
-        }
-        return left.compareTo(right);
     }
 
     public AccessRank getRank() {

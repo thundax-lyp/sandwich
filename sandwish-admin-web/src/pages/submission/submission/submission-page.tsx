@@ -1,43 +1,28 @@
 import {
     DeleteOutlined,
     EyeOutlined,
-    FileImageOutlined,
     HolderOutlined,
     MoreOutlined,
     ReloadOutlined,
-    SearchOutlined,
-    UploadOutlined
+    SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-    App,
-    Button,
-    Dropdown,
-    Form,
-    Input,
-    Modal,
-    Select,
-    Space,
-    Tag,
-    Typography,
-    Upload
-} from "antd";
+import { App, Button, Dropdown, Modal, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { SubmissionDetail } from "./components/submission-detail";
+import { SubmissionEdit } from "./components/submission-edit";
 import {
     changeSubmissionStatus,
     createSubmission,
     deleteSubmissions,
     pageSubmissions,
-    sortSubmissions,
-    uploadSubmissionImage
+    sortSubmissions
 } from "./submission-service";
 import type {
-    StorageUploadResponse,
     SubmissionPageRequest,
     SubmissionResponse,
     SubmissionSaveRequest,
@@ -45,8 +30,7 @@ import type {
 } from "./submission-service";
 import "./submission-page.css";
 
-const { Text, Paragraph } = Typography;
-const { TextArea } = Input;
+const { Text } = Typography;
 
 const DEFAULT_PAGE_NO = 1;
 const DEFAULT_PAGE_SIZE = 10;
@@ -61,17 +45,6 @@ const DEFAULT_COLUMN_WIDTHS = {
 
 interface SubmissionFilters {
     status: SubmissionStatus | "ALL";
-}
-
-interface SubmissionFormValues {
-    title: string;
-    content: string;
-    imageObjectIds?: string[];
-}
-
-interface UploadedSubmissionImage {
-    id: string;
-    name: string;
 }
 
 const DEFAULT_SUBMISSION_FILTERS: SubmissionFilters = {
@@ -125,14 +98,6 @@ const formatDateTime = (value?: string | null) => {
     });
 };
 
-const readFormRequest = (values: SubmissionFormValues): SubmissionSaveRequest => {
-    return {
-        title: values.title.trim(),
-        content: values.content.trim(),
-        imageObjectIds: values.imageObjectIds?.filter(Boolean) || []
-    };
-};
-
 const sortByMove = (
     submissions: SubmissionResponse[],
     sourceSubmission: SubmissionResponse,
@@ -162,13 +127,8 @@ const sortByMove = (
     return nextSubmissions;
 };
 
-const readUploadedImageName = (response: StorageUploadResponse, fallbackName: string) => {
-    return response.originalFilename || fallbackName || response.id || "图片";
-};
-
 export const SubmissionPage = () => {
     const { message: messageApi } = App.useApp();
-    const [editForm] = Form.useForm<SubmissionFormValues>();
     const queryClient = useQueryClient();
     const canEditSubmission = hasPermission("submission:submission:edit");
     const [query, setQuery] = useState<SubmissionPageRequest>({
@@ -180,7 +140,6 @@ export const SubmissionPage = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [editorOpen, setEditorOpen] = useState(false);
     const [detailSubmission, setDetailSubmission] = useState<SubmissionResponse | null>(null);
-    const [uploadedImages, setUploadedImages] = useState<UploadedSubmissionImage[]>([]);
     const hasSelectedSubmissions = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.status !== "ALL");
 
@@ -203,8 +162,6 @@ export const SubmissionPage = () => {
         mutationFn: createSubmission,
         onSuccess: async () => {
             setEditorOpen(false);
-            setUploadedImages([]);
-            editForm.resetFields();
             await invalidateSubmissionPage();
             messageApi.success("提交内容已创建");
         },
@@ -247,34 +204,6 @@ export const SubmissionPage = () => {
         }
     });
 
-    const uploadMutation = useMutation({
-        mutationFn: uploadSubmissionImage,
-        onSuccess: (response, file) => {
-            if (response.error) {
-                messageApi.error(response.error);
-                return;
-            }
-            if (!response.id) {
-                messageApi.error("上传失败");
-                return;
-            }
-
-            const currentIds = editForm.getFieldValue("imageObjectIds") || [];
-            editForm.setFieldValue("imageObjectIds", [...currentIds, response.id]);
-            setUploadedImages((currentImages) => [
-                ...currentImages,
-                {
-                    id: response.id as string,
-                    name: readUploadedImageName(response, file.name)
-                }
-            ]);
-            messageApi.success("图片已上传");
-        },
-        onError: (error) => {
-            messageApi.error(error instanceof Error ? error.message : "上传失败");
-        }
-    });
-
     const updateQuery = (values: Partial<SubmissionPageRequest>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => {
@@ -305,37 +234,18 @@ export const SubmissionPage = () => {
     };
 
     const openCreateEditor = () => {
-        editForm.resetFields();
-        setUploadedImages([]);
         setEditorOpen(true);
     };
 
     const closeEditor = () => {
-        if (createMutation.isPending || uploadMutation.isPending) {
+        if (createMutation.isPending) {
             return;
         }
         setEditorOpen(false);
-        setUploadedImages([]);
-        editForm.resetFields();
     };
 
-    const saveSubmission = async () => {
-        const values = await editForm.validateFields();
-        createMutation.mutate(
-            readFormRequest({
-                ...values,
-                imageObjectIds: editForm.getFieldValue("imageObjectIds")
-            })
-        );
-    };
-
-    const removeUploadedImage = (id: string) => {
-        setUploadedImages((currentImages) => currentImages.filter((image) => image.id !== id));
-        const currentIds = editForm.getFieldValue("imageObjectIds") || [];
-        editForm.setFieldValue(
-            "imageObjectIds",
-            currentIds.filter((currentId: string) => currentId !== id)
-        );
+    const saveSubmission = (request: SubmissionSaveRequest) => {
+        createMutation.mutate(request);
     };
 
     const confirmDelete = (ids: string[]) => {
@@ -608,118 +518,19 @@ export const SubmissionPage = () => {
                 sortable={canEditSubmission}
             />
 
-            <SandwishDrawer
-                title="新增提交"
+            <SubmissionEdit
+                key={editorOpen ? "create" : "closed"}
                 open={editorOpen}
-                size="middle"
+                saving={createMutation.isPending}
                 onClose={closeEditor}
-                extra={
-                    <Space>
-                        <Button onClick={closeEditor}>取消</Button>
-                        <Button
-                            type="primary"
-                            loading={createMutation.isPending}
-                            onClick={saveSubmission}
-                        >
-                            保存
-                        </Button>
-                    </Space>
-                }
-            >
-                <Form<SubmissionFormValues>
-                    form={editForm}
-                    layout="vertical"
-                    className="submission-editor-form"
-                >
-                    <Form.Item
-                        name="title"
-                        label="标题"
-                        rules={[
-                            { required: true, message: "请输入标题" },
-                            { max: 200, message: "标题不能超过 200 个字符" }
-                        ]}
-                    >
-                        <Input placeholder="请输入标题" maxLength={200} showCount />
-                    </Form.Item>
-                    <Form.Item
-                        name="content"
-                        label="正文"
-                        rules={[{ required: true, message: "请输入正文" }]}
-                    >
-                        <TextArea placeholder="请输入正文" rows={8} />
-                    </Form.Item>
-                    <Form.Item label="图片">
-                        <div className="submission-upload-field">
-                            <Upload
-                                accept="image/*"
-                                beforeUpload={(file) => {
-                                    uploadMutation.mutate(file);
-                                    return false;
-                                }}
-                                disabled={uploadMutation.isPending}
-                                showUploadList={false}
-                            >
-                                <Button
-                                    icon={<UploadOutlined />}
-                                    loading={uploadMutation.isPending}
-                                >
-                                    上传图片
-                                </Button>
-                            </Upload>
-                            {uploadedImages.length ? (
-                                <div className="submission-upload-list">
-                                    {uploadedImages.map((image) => (
-                                        <div key={image.id} className="submission-upload-item">
-                                            <Space size={8} className="submission-upload-item-name">
-                                                <FileImageOutlined />
-                                                <Text ellipsis>{image.name}</Text>
-                                            </Space>
-                                            <Button
-                                                type="text"
-                                                danger
-                                                size="small"
-                                                onClick={() => removeUploadedImage(image.id)}
-                                            >
-                                                移除
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <Text type="secondary">可上传多张图片，保存后绑定到提交内容。</Text>
-                            )}
-                        </div>
-                    </Form.Item>
-                </Form>
-            </SandwishDrawer>
+                onSave={saveSubmission}
+            />
 
-            <SandwishDrawer
-                title="提交详情"
-                open={Boolean(detailSubmission)}
-                size="middle"
+            <SubmissionDetail
+                submission={detailSubmission}
+                statusLabels={submissionStatusLabels}
                 onClose={() => setDetailSubmission(null)}
-            >
-                {detailSubmission ? (
-                    <div className="submission-detail-content">
-                        <Text type="secondary">标题</Text>
-                        <Paragraph strong>{detailSubmission.title}</Paragraph>
-                        <Text type="secondary">正文</Text>
-                        <Paragraph>{detailSubmission.content}</Paragraph>
-                        <Text type="secondary">状态</Text>
-                        <Paragraph>{readStatusLabel(detailSubmission.status)}</Paragraph>
-                        <Text type="secondary">图片对象</Text>
-                        {detailSubmission.imageObjectIds?.length ? (
-                            <Space wrap>
-                                {detailSubmission.imageObjectIds.map((id) => (
-                                    <Tag key={id}>{id}</Tag>
-                                ))}
-                            </Space>
-                        ) : (
-                            <Paragraph type="secondary">未上传</Paragraph>
-                        )}
-                    </div>
-                ) : null}
-            </SandwishDrawer>
+            />
         </>
     );
 };

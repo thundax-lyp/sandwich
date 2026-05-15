@@ -277,6 +277,11 @@ export const OpenClientPage = () => {
         onSuccess: async (response) => {
             setResettingClient(null);
             await invalidateOpenClientPage();
+            setEditingClient((current) =>
+                current && current.id === response.id
+                    ? { ...current, apiKey: response.apiKey }
+                    : current
+            );
             setSecretResponse(response);
             messageApi.success("API SECRET 已重置");
         },
@@ -383,6 +388,35 @@ export const OpenClientPage = () => {
             </div>
         </div>
     );
+
+    const renderEditorApiKey = () => {
+        if (!editingClient) {
+            return null;
+        }
+
+        if (editingClient.apiKey) {
+            return (
+                <div className="open-client-editor-api-key">
+                    {renderSecretField("API KEY", editingClient.apiKey)}
+                </div>
+            );
+        }
+
+        return (
+            <div className="open-client-editor-api-key open-client-editor-api-key-empty">
+                <Text type="secondary">API KEY 未生成</Text>
+                {canEditOpenClient ? (
+                    <Button
+                        icon={<KeyOutlined />}
+                        loading={resetSecretMutation.isPending}
+                        onClick={() => setResettingClient(editingClient)}
+                    >
+                        生成凭据
+                    </Button>
+                ) : null}
+            </div>
+        );
+    };
 
     const columns: SandwishTableProps<OpenClientResponse>["columns"] = [
         {
@@ -580,11 +614,7 @@ export const OpenClientPage = () => {
                     <Form.Item name="id" hidden>
                         <Input />
                     </Form.Item>
-                    {editingClient ? (
-                        <div className="open-client-editor-api-key">
-                            {renderSecretField("API KEY", editingClient.apiKey)}
-                        </div>
-                    ) : null}
+                    {renderEditorApiKey()}
                     <Form.Item
                         name="name"
                         label="第三方主体名称"

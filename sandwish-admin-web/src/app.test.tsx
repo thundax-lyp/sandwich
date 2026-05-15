@@ -727,6 +727,90 @@ describe("App", () => {
         );
     });
 
+    it("hides new open client api key and shows generation entry when detail has no key", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem(
+            "sandwish.admin.permissions",
+            JSON.stringify(["open:client:view", "open:client:edit"])
+        );
+        replacePermissions(["open:client:view", "open:client:edit"]);
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/open/client/page")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalPage: 1,
+                                totalCount: 1,
+                                records: [
+                                    {
+                                        id: "1",
+                                        name: "未生成凭据客户端",
+                                        status: "ENABLED",
+                                        permissions: ["submission:submission:create"]
+                                    }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+            if (url.endsWith("/open/client/get")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                id: "1",
+                                name: "未生成凭据客户端",
+                                status: "ENABLED",
+                                permissions: ["submission:submission:create"]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <OpenClientPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByText("未生成凭据客户端")).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole("button", { name: /新增客户端/ }));
+        expect(screen.queryByText("API KEY 未生成")).not.toBeInTheDocument();
+        fireEvent.click(screen.getByRole("button", { name: /取\s*消/ }));
+
+        fireEvent.click(screen.getByRole("button", { name: "编辑 未生成凭据客户端" }));
+        expect(await screen.findByText("API KEY 未生成")).toBeInTheDocument();
+
+        const generateButtons = screen.getAllByRole("button", { name: /生成凭据/ });
+        expect(generateButtons[generateButtons.length - 1]).toBeEnabled();
+    });
+
     it("renders the silver user management layout interactions", async () => {
         localStorage.setItem("sandwish.admin.accessToken", "test-token");
         localStorage.setItem(

@@ -46,6 +46,7 @@ This file extends the repository root `AGENTS.md` for work under `sandwish-admin
 
 ## Testing And Verification
 
+- Admin web tests are Vitest tests. Do not use Jest-only CLI flags or APIs such as `--runInBand`; use `npm test` or Vitest-supported arguments only.
 - For auth, permission, routing, request hook, or layout behavior changes, update `src/app.test.tsx` or add a focused test.
 - Before committing frontend changes, run the smallest relevant checks:
     - `npm run format:check`

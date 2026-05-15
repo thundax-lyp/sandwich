@@ -19,12 +19,4 @@ public class StoredObjectReference {
     private StorageOwnerType ownerType;
     private String ownerParams;
     private StoredObjectReferenceStatus referenceStatus;
-
-    public StoredObjectId getId() {
-        return objectId;
-    }
-
-    public void setId(StoredObjectId id) {
-        this.objectId = id;
-    }
 }

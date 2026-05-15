@@ -151,7 +151,7 @@ public class StorageServiceImplTest {
 
     private static StoredObjectReference storageBusiness(Long id) {
         StoredObjectReference storageBusiness = new StoredObjectReference();
-        storageBusiness.setId(StoredObjectIdCodec.toDomain(id));
+        storageBusiness.setObjectId(StoredObjectIdCodec.toDomain(id));
         return storageBusiness;
     }
 

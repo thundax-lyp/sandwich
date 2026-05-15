@@ -103,7 +103,7 @@ public class StoragePersistenceAssemblerTest {
 
         StoredObjectReference entity = StoragePersistenceAssembler.toBusinessEntity(dataObject);
 
-        assertEquals(Long.valueOf(5001L), entity.getId().value());
+        assertEquals(Long.valueOf(5001L), entity.getObjectId().value());
         assertEquals("owner-1", entity.getOwnerId());
         assertEquals("USER", entity.getOwnerType().value());
         assertEquals(

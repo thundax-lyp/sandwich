@@ -12,13 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `open-client-admin-data`：增加并同步 OpenClient 后台菜单权限数据
-  - 范围文件：
-    - `db/data/system.sql`
-  - 处理动作：增加 OpenClient 后台菜单和 `open:client:view`、`open:client:edit` 权限数据，并同步到当前开发数据库。
-  - 验收点：当前数据库存在 OpenClient 菜单和权限，当前登录用户可获得 OpenClient 菜单入口和权限。
-  - 重要度：10/10
-
 - [ ] `open-client-admin-web`：增加 OpenClient 管理台配置页面
   - 范围文件：
     - `sandwish-admin-web/src/router/index.tsx`

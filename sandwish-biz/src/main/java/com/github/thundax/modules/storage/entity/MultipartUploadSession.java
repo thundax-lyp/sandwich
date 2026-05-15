@@ -27,12 +27,4 @@ public class MultipartUploadSession {
     private MultipartUploadStatus uploadStatus = MultipartUploadStatus.INITIATED;
     private Date completedDate;
     private Date abortedDate;
-
-    public void setOwnerType(StorageOwnerType ownerType) {
-        this.ownerType = ownerType;
-    }
-
-    public void setUploadStatus(MultipartUploadStatus uploadStatus) {
-        this.uploadStatus = uploadStatus;
-    }
 }

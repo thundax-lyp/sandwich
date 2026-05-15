@@ -212,7 +212,7 @@ Open API 请求认证流程固定如下：
 
 nonce 固定按 API KEY 维度防重放。
 
-固定运行态存储：
+固定 key：
 
 ```text
 open-api:nonce:{apiKey}:{nonce}
@@ -227,6 +227,8 @@ TTL 固定等于或略大于 timestamp 允许时间窗。
 ```
 
 nonce 写入必须是原子“仅当不存在才写入”。如果 nonce 已存在，请求固定判定为重放请求。
+
+首批实现使用 `sandwish-open-api` 进程内内存 TTL store，不做磁盘落盘。多节点部署前必须替换为 Redis、JetCache 或等价集中式原子存储，并保持 key 格式、TTL 和原子写入语义。
 
 ## 11. Permission Model
 

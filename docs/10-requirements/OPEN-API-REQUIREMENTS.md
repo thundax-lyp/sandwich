@@ -21,6 +21,8 @@
 - OpenClient 权限。
 - API KEY / API SECRET 认证边界。
 - HMAC 签名认证。
+- OpenClient 后台管理 API。
+- OpenClient 后台管理页面。
 - Open API Submission 创建入口。
 - Open API Submission 图片上传入口。
 - Open API 与 Audit 操作者上下文衔接。
@@ -31,8 +33,6 @@
 - SDK、示例工程或 Postman 集合。
 - OAuth2 client credentials。
 - 非对称签名。
-- OpenClient 后台管理页面。
-- OpenClient 管理 API 完整 request / response。
 - Open API 独立调用日志表。
 - 除 Submission 以外的业务模块开放。
 
@@ -476,6 +476,8 @@ open-api:nonce:{apiKey}:{nonce}
 nonce TTL 必须等于或略大于 timestamp 时间窗。
 
 nonce 写入必须满足“仅当不存在才写入”的原子语义。
+
+首批实现使用 `sandwish-open-api` 进程内内存 TTL store，不依赖磁盘落盘。多节点部署前必须替换为 Redis、JetCache 或等价集中式原子存储，并保持上述 key、TTL 和原子写入语义。
 
 ### 9.3 Logging
 

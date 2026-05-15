@@ -1,5 +1,6 @@
 import {
     AppstoreOutlined,
+    ApiOutlined,
     AuditOutlined,
     BookOutlined,
     CloudServerOutlined,
@@ -53,6 +54,8 @@ const menuIconMap: Record<string, ReactNode> = {
     "storage-objects": <CloudServerOutlined />,
     submission: <FileTextOutlined />,
     submissions: <FileTextOutlined />,
+    "open-api": <ApiOutlined />,
+    "open-clients": <IdcardOutlined />,
     permission: <SafetyCertificateOutlined />
 };
 
@@ -69,6 +72,10 @@ const getOpenKeys = (pathname: string) => {
 
     if (pathname.startsWith("/submission/")) {
         openKeys.push("/submission");
+    }
+
+    if (pathname.startsWith("/open/")) {
+        openKeys.push("/open");
     }
 
     return openKeys;

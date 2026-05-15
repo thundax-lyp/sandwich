@@ -71,6 +71,7 @@
 | STORAGE-00003 | 400 | storage.exception.invalid-part-number | 分片序号无效 | 分片上传 partNumber 不合法 | admin |
 | STORAGE-00004 | 400 | storage.exception.multipart-upload-invalid | 分片上传无效 | 分片上传会话或分片状态不合法 | admin |
 | AUDIT-00001 | 400 | audit.exception.invalid-query | 审计查询参数无效 | 后台审计查询参数不合法 | admin |
+| SUBMISSION-00001 | 400 | submission.exception.invalid-parameter | 提交内容参数无效 | 后台提交内容请求参数不合法 | admin |
 
 ## 5. Maintenance Rules
 

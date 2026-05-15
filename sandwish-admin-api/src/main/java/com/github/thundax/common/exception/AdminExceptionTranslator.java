@@ -56,6 +56,7 @@ public class AdminExceptionTranslator implements ExceptionTranslator, Ordered {
         register(WebErrorCode.BAD_REQUEST, "SYS-00007", "sys.exception.sort-duplicate-id", "排序实体存在重复 ID");
         register(WebErrorCode.CONFLICT, "SYS-00008", "sys.exception.sort-concurrent-modification", "排序存在并发修改，请重试");
         register(WebErrorCode.SYSTEM_ERROR, "SYS-00009", "sys.exception.sort-db-failure", "排序数据库异常");
+        register(WebErrorCode.BAD_REQUEST, "SUBMISSION-00001", "submission.exception.invalid-parameter", "提交内容参数无效");
     }
 
     @Override

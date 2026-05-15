@@ -12,18 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `submission-admin-api`：实现提交内容后台接口
-  - 范围文件：
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission/controller/**`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission/assembler/**`
-    - `sandwish-admin-api/src/main/java/com/github/thundax/modules/submission/service/**`
-    - `sandwish-admin-api/src/main/resources/**`
-    - `sandwish-admin-api/src/test/java/com/github/thundax/modules/submission/**`
-    - `docs/30-designs/ADMIN-API-ERROR-CODE-DESIGN.md`
-  - 处理动作：按 RUNBOOK 新增后台分页、详情、状态调整、排序接口和契约测试，并同步必要后台错误码
-  - 验收点：Controller 不暴露持久化对象，排序入口只接收 `orderedIds` 和 `sortDirection`，且 `mvn -pl sandwish-admin-api -am -Dtest='*Submission*Test' test` 通过
-  - 重要度：8/10
-
 - [ ] `submission-closeout`：收口提交内容实现任务
   - 范围文件：
     - `docs/10-requirements/SUBMISSION-REQUIREMENTS.md`

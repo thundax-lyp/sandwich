@@ -90,6 +90,9 @@
 - 上线准备、运维、发布、jar 打包：
   先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
   再读 `40-readiness/`
+- API 压测、Docker 部署后压力测试、k6、压测报告：
+  先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
+  再读 `00-governance/how-to/HOW-TO-API-LOAD-TEST.md`
 - TODO 协作、任务拆解、人机审阅、任务列表重写：
   读 `00-governance/TODO-RULES.md`
   再读 `00-governance/how-to/HOW-TO-RUN-TODO-COLLABORATION.md`

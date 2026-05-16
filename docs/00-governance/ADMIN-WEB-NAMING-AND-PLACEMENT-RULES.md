@@ -22,6 +22,7 @@
 当前范围：
 
 - `sandwish-admin-web/src`
+- `sandwish-admin-web/e2e`
 - React 页面、布局、组件和路由
 - 页面专属 service、共享 service 和通用 API helper
 - TypeScript request / response / view model 类型
@@ -100,6 +101,8 @@
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。
+- E2E 测试目录跟随目标页面目录到页面域层级，固定使用 `sandwish-admin-web/e2e/<module>/<domain>/<domain>.spec.ts`，对应 `src/pages/<module>/<domain>/<domain>-page.tsx`。
+- 不归属单个页面的后台壳层、布局和跨页面导航 E2E 测试放在 `sandwish-admin-web/e2e/layout/`。
 
 ### Layer
 

@@ -180,6 +180,21 @@ smoke_expect_status() {
     smoke_fail "${name} returned HTTP ${SMOKE_HTTP_STATUS}, expected ${expected}"
 }
 
+smoke_expect_status_in() {
+    local name="$1"
+    shift
+    local expected
+    for expected in "$@"; do
+        if [ "${SMOKE_HTTP_STATUS}" = "${expected}" ]; then
+            smoke_log "OK ${name} (${SMOKE_HTTP_STATUS})"
+            return 0
+        fi
+    done
+
+    echo "${SMOKE_HTTP_BODY}" >&2
+    smoke_fail "${name} returned HTTP ${SMOKE_HTTP_STATUS}, expected one of: $*"
+}
+
 smoke_expect_body() {
     local name="$1"
     if [ -z "${SMOKE_HTTP_BODY}" ]; then

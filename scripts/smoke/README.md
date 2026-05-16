@@ -22,6 +22,7 @@ scripts/smoke/smoke-all.sh
 scripts/smoke/smoke-admin-api.sh
 scripts/smoke/smoke-front-api.sh
 scripts/smoke/smoke-open-api.sh
+scripts/smoke/smoke-api-surface.sh
 ```
 
 ## Environment
@@ -45,5 +46,6 @@ scripts/smoke/smoke-open-api.sh
 - `smoke-admin-api.sh`: 调用 `/admin-api/api/auth/session/pre-auth-session` 验证后台挂载；有 token 时继续验证当前用户、菜单、权限、字典分页和存储对象树接口。上传冒烟必须显式开启。
 - `smoke-front-api.sh`: 调用 `/front-api/api/auth/session/pre-auth-session` 验证前台挂载，并验证登录状态接口。
 - `smoke-open-api.sh`: 调用 `/open-api/api/submission/submission/page` 验证开放接口挂载；默认未签名请求应返回 401，有 Open API key/secret 时继续验证签名请求。
+- `smoke-api-surface.sh`: 点火所有 Controller URL，验证 Docker / nginx context-path、security filter 和 request mapping 可达；使用空请求或无效参数避免真实 create / update / delete 写入数据。
 
 脚本不提交真实 token、密码、生产连接串或环境专用配置。

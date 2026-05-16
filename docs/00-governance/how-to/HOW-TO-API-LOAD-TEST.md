@@ -95,6 +95,8 @@ cp .env.test.example .env.load
 - `SANDWICH_SMOKE_OPEN_API_KEY`
 - `SANDWICH_SMOKE_OPEN_API_SECRET`
 - `SANDWICH_LOAD_STAGES`
+- `SANDWICH_LOAD_K6_IMAGE`
+- `SANDWICH_LOAD_DOCKER_NETWORK`
 
 `.env.test.example` 同时覆盖 smoke 和 load 变量。`scripts/smoke/.env.example` 与 `scripts/load/.env.example` 只作为专项变量参考。
 
@@ -121,6 +123,26 @@ scripts/smoke/smoke-api-surface.sh
 ```bash
 scripts/load/run-k6-api-read.sh
 ```
+
+压测固定默认使用 `SANDWICH_LOAD_K6_IMAGE` 指定的 Docker 镜像。项目自有镜像固定为：
+
+```text
+sandwish/k6:dev
+```
+
+压测镜像固定通过以下命令生成：
+
+```bash
+SANDWISH_IMAGE_TAG=dev deploy/build-k6-image.sh
+```
+
+输出文件固定为：
+
+```text
+deploy/image-files/sandwish-k6-dev.tar
+```
+
+只有明确设置 `SANDWICH_LOAD_USE_LOCAL_K6=true` 时，才使用本机 `k6` 命令。
 
 默认压测范围：
 
@@ -178,6 +200,8 @@ SANDWICH_LOAD_STAGES=2m:50,30m:50,2m:0 scripts/load/run-k6-api-read.sh
 
 固定文件：
 
+- `deploy/images/k6.Dockerfile`
+- `deploy/build-k6-image.sh`
 - `scripts/load/k6-api-read.js`
 - `scripts/load/run-k6-api-read.sh`
 - `scripts/load/.env.example`

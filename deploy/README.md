@@ -43,11 +43,18 @@ cd sandwish-admin-web && npm ci && npm run build
 - `sandwish-front-api/target/sandwish-front-api.jar`
 - `sandwish-open-api/target/sandwish-open-api.jar`
 - `sandwish-admin-web/dist`
+- `sandwish/k6:dev` 压测运行镜像
 
 一键构建 API jar、admin-web dist、本地 Docker 镜像，并导出镜像文件：
 
 ```bash
 SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
+```
+
+只构建并导出 k6 压测镜像：
+
+```bash
+SANDWISH_IMAGE_TAG=dev deploy/build-k6-image.sh
 ```
 
 默认镜像名：
@@ -56,6 +63,11 @@ SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
 - `sandwish/front-api:dev`
 - `sandwish/open-api:dev`
 - `sandwish/nginx:dev`
+- `sandwish/k6:dev`
+
+k6 镜像文件固定导出为：
+
+- `sandwish-k6-dev.tar`
 
 脚本还会把基础设施镜像打成 `sandwish/*` 名称并导出：
 

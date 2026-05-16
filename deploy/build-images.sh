@@ -15,6 +15,7 @@ REDIS_SOURCE_IMAGE="${SANDWISH_REDIS_SOURCE_IMAGE:-redis:7.4-alpine}"
 ROCKETMQ_SOURCE_IMAGE="${SANDWISH_ROCKETMQ_SOURCE_IMAGE:-apache/rocketmq:5.4.0}"
 MINIO_SOURCE_IMAGE="${SANDWISH_MINIO_SOURCE_IMAGE:-minio/minio:RELEASE.2025-02-28T09-55-16Z}"
 MINIO_MC_SOURCE_IMAGE="${SANDWISH_MINIO_MC_SOURCE_IMAGE:-minio/mc:RELEASE.2025-02-21T16-00-46Z}"
+K6_SOURCE_IMAGE="${SANDWISH_K6_SOURCE_IMAGE:-grafana/k6:1.3.0}"
 
 ADMIN_API_IMAGE="$REGISTRY/admin-api:$TAG"
 FRONT_API_IMAGE="$REGISTRY/front-api:$TAG"
@@ -25,6 +26,7 @@ REDIS_IMAGE="$REGISTRY/redis:7.4-alpine"
 ROCKETMQ_IMAGE="$REGISTRY/rocketmq:5.4.0"
 MINIO_IMAGE="$REGISTRY/minio:RELEASE.2025-02-28T09-55-16Z"
 MINIO_MC_IMAGE="$REGISTRY/minio-mc:RELEASE.2025-02-21T16-00-46Z"
+K6_IMAGE="$REGISTRY/k6:$TAG"
 
 cd "$ROOT_DIR"
 
@@ -69,6 +71,13 @@ docker build \
     -t "$NGINX_RUNTIME_IMAGE" \
     "$ROOT_DIR"
 
+echo "==> Building Docker image: $REGISTRY/k6:$TAG"
+docker build \
+    -f "$ROOT_DIR/deploy/images/k6.Dockerfile" \
+    --build-arg "SANDWISH_K6_IMAGE=$K6_SOURCE_IMAGE" \
+    -t "$K6_IMAGE" \
+    "$ROOT_DIR"
+
 if [ "$PULL_INFRA_IMAGES" = "true" ]; then
     echo "==> Pulling infrastructure images"
     docker pull "$MYSQL_SOURCE_IMAGE"
@@ -93,6 +102,7 @@ docker save -o "$OUTPUT_DIR/sandwish-admin-api-$TAG.tar" "$ADMIN_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-front-api-$TAG.tar" "$FRONT_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-open-api-$TAG.tar" "$OPEN_API_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-nginx-$TAG.tar" "$NGINX_RUNTIME_IMAGE"
+docker save -o "$OUTPUT_DIR/sandwish-k6-$TAG.tar" "$K6_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-mysql.tar" "$MYSQL_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-redis.tar" "$REDIS_IMAGE"
 docker save -o "$OUTPUT_DIR/sandwish-rocketmq.tar" "$ROCKETMQ_IMAGE"
@@ -104,6 +114,7 @@ $ADMIN_API_IMAGE -> sandwish-admin-api-$TAG.tar
 $FRONT_API_IMAGE -> sandwish-front-api-$TAG.tar
 $OPEN_API_IMAGE -> sandwish-open-api-$TAG.tar
 $NGINX_RUNTIME_IMAGE -> sandwish-nginx-$TAG.tar
+$K6_IMAGE -> sandwish-k6-$TAG.tar
 $MYSQL_IMAGE -> sandwish-mysql.tar
 $REDIS_IMAGE -> sandwish-redis.tar
 $ROCKETMQ_IMAGE -> sandwish-rocketmq.tar

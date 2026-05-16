@@ -34,14 +34,23 @@ mkdir -p "${SANDWICH_LOAD_REPORT_DIR}"
 export SANDWICH_LOAD_SUMMARY_JSON
 export SANDWICH_LOAD_REPORT_MD
 
-if command -v k6 >/dev/null 2>&1; then
+SANDWICH_LOAD_K6_IMAGE="${SANDWICH_LOAD_K6_IMAGE:-sandwish/k6:dev}"
+SANDWICH_LOAD_USE_LOCAL_K6="${SANDWICH_LOAD_USE_LOCAL_K6:-false}"
+SANDWICH_LOAD_DOCKER_NETWORK="${SANDWICH_LOAD_DOCKER_NETWORK:-host}"
+
+if [ "${SANDWICH_LOAD_USE_LOCAL_K6}" = "true" ] && command -v k6 >/dev/null 2>&1; then
     k6 run "${SCRIPT_DIR}/k6-api-read.js"
     exit 0
 fi
 
 if command -v docker >/dev/null 2>&1; then
+    docker_network_args=()
+    if [ -n "${SANDWICH_LOAD_DOCKER_NETWORK}" ]; then
+        docker_network_args=(--network "${SANDWICH_LOAD_DOCKER_NETWORK}")
+    fi
+
     docker run --rm \
-        --network host \
+        "${docker_network_args[@]}" \
         -e SANDWICH_PUBLIC_BASE_URL \
         -e SANDWICH_ADMIN_BASE_URL \
         -e SANDWICH_FRONT_BASE_URL \
@@ -61,9 +70,9 @@ if command -v docker >/dev/null 2>&1; then
         -e SANDWICH_LOAD_REPORT_MD=/reports/k6-report.md \
         -v "${SCRIPT_DIR}:/scripts:ro" \
         -v "${SANDWICH_LOAD_REPORT_DIR}:/reports" \
-        grafana/k6:latest run /scripts/k6-api-read.js
+        "${SANDWICH_LOAD_K6_IMAGE}" run /scripts/k6-api-read.js
     exit 0
 fi
 
-echo "[load] missing k6 or docker" >&2
+echo "[load] missing docker; set SANDWICH_LOAD_USE_LOCAL_K6=true to use a local k6 binary" >&2
 exit 1

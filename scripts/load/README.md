@@ -5,7 +5,7 @@
 ## Files
 
 - `k6-api-read.js`: admin/front/open 读链路 k6 压测脚本。
-- `run-k6-api-read.sh`: k6 执行入口，优先使用本机 `k6`，没有本机 k6 时使用 `grafana/k6` Docker 镜像。
+- `run-k6-api-read.sh`: k6 执行入口，默认使用 `sandwish/k6` Docker 镜像。
 - `.env.example`: 压测环境变量样例。
 - `REPORT-TEMPLATE.md`: 人工测试报告模板。
 
@@ -24,3 +24,5 @@ scripts/load/run-k6-api-read.sh
 默认脚本只压读链路和认证边界，不执行 create / update / delete / upload 写入压测。
 
 `scripts/load/.env.example` 只保留 load 专项变量样例。部署后联动冒烟和压测时，固定优先使用根目录 `.env.test.example`。
+
+默认运行镜像为 `SANDWICH_LOAD_K6_IMAGE=sandwish/k6:dev`。只有明确设置 `SANDWICH_LOAD_USE_LOCAL_K6=true` 时，脚本才使用本机 `k6` 命令。

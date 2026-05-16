@@ -33,8 +33,10 @@ smoke_load_env() {
 }
 
 smoke_defaults() {
-    SANDWICH_ADMIN_BASE_URL="${SANDWICH_ADMIN_BASE_URL:-http://127.0.0.1:18080/admin-api}"
-    SANDWICH_FRONT_BASE_URL="${SANDWICH_FRONT_BASE_URL:-http://127.0.0.1:18080/front-api}"
+    SANDWICH_PUBLIC_BASE_URL="${SANDWICH_PUBLIC_BASE_URL:-http://127.0.0.1:18080}"
+    SANDWICH_ADMIN_BASE_URL="${SANDWICH_ADMIN_BASE_URL:-${SANDWICH_PUBLIC_BASE_URL%/}/admin-api}"
+    SANDWICH_FRONT_BASE_URL="${SANDWICH_FRONT_BASE_URL:-${SANDWICH_PUBLIC_BASE_URL%/}/front-api}"
+    SANDWICH_OPEN_BASE_URL="${SANDWICH_OPEN_BASE_URL:-${SANDWICH_PUBLIC_BASE_URL%/}/open-api}"
     SANDWICH_SMOKE_TIMEOUT="${SANDWICH_SMOKE_TIMEOUT:-10}"
     SANDWICH_SMOKE_TOKEN_HEADER="${SANDWICH_SMOKE_TOKEN_HEADER:-Access-Token}"
     SANDWICH_SMOKE_ACCESS_TOKEN="${SANDWICH_SMOKE_ACCESS_TOKEN:-}"
@@ -42,6 +44,9 @@ smoke_defaults() {
     SANDWICH_SMOKE_REQUIRE_AUTH="${SANDWICH_SMOKE_REQUIRE_AUTH:-false}"
     SANDWICH_SMOKE_STORAGE_UPLOAD="${SANDWICH_SMOKE_STORAGE_UPLOAD:-false}"
     SANDWICH_SMOKE_STORAGE_FILE="${SANDWICH_SMOKE_STORAGE_FILE:-}"
+    SANDWICH_SMOKE_OPEN_API_KEY="${SANDWICH_SMOKE_OPEN_API_KEY:-}"
+    SANDWICH_SMOKE_OPEN_API_SECRET="${SANDWICH_SMOKE_OPEN_API_SECRET:-}"
+    SANDWICH_SMOKE_REQUIRE_OPEN_API="${SANDWICH_SMOKE_REQUIRE_OPEN_API:-false}"
 }
 
 smoke_bootstrap() {
@@ -110,6 +115,38 @@ smoke_http() {
     SMOKE_HTTP_BODY="$(cat "${body_file}")"
 }
 
+smoke_http_with_headers() {
+    local method="$1"
+    local url="$2"
+    local body="${3:-}"
+    shift 3
+    local body_file
+    local status
+    local -a curl_args
+
+    body_file="$(mktemp "${TMPDIR:-/tmp}/sandwich-smoke.XXXXXX")"
+    SMOKE_TMP_FILES+=("${body_file}")
+
+    curl_args=(-sS -m "${SANDWICH_SMOKE_TIMEOUT}" -o "${body_file}" -w "%{http_code}" -X "${method}")
+    curl_args+=(-H "Accept: application/json")
+    while [ "$#" -gt 0 ]; do
+        curl_args+=(-H "$1")
+        shift
+    done
+    if [ -n "${body}" ]; then
+        curl_args+=(-H "Content-Type: application/json" --data "${body}")
+    fi
+
+    smoke_log "${method} ${url}"
+    if ! status="$(curl "${curl_args[@]}" "${url}")"; then
+        cat "${body_file}" >&2 || true
+        smoke_fail "request failed: ${method} ${url}"
+    fi
+
+    SMOKE_HTTP_STATUS="${status}"
+    SMOKE_HTTP_BODY="$(cat "${body_file}")"
+}
+
 smoke_get() {
     smoke_http "GET" "$1" "" "${2:-}"
 }
@@ -131,6 +168,18 @@ smoke_expect_2xx() {
     esac
 }
 
+smoke_expect_status() {
+    local name="$1"
+    local expected="$2"
+    if [ "${SMOKE_HTTP_STATUS}" = "${expected}" ]; then
+        smoke_log "OK ${name} (${SMOKE_HTTP_STATUS})"
+        return 0
+    fi
+
+    echo "${SMOKE_HTTP_BODY}" >&2
+    smoke_fail "${name} returned HTTP ${SMOKE_HTTP_STATUS}, expected ${expected}"
+}
+
 smoke_expect_body() {
     local name="$1"
     if [ -z "${SMOKE_HTTP_BODY}" ]; then
@@ -149,6 +198,29 @@ smoke_require_admin_token() {
 
     smoke_log "SKIP authenticated smoke: token is not set"
     return 1
+}
+
+smoke_require_open_api_credentials() {
+    if [ -n "${SANDWICH_SMOKE_OPEN_API_KEY}" ] && [ -n "${SANDWICH_SMOKE_OPEN_API_SECRET}" ]; then
+        return 0
+    fi
+
+    if smoke_bool "${SANDWICH_SMOKE_REQUIRE_OPEN_API}"; then
+        smoke_fail "SANDWICH_SMOKE_OPEN_API_KEY and SANDWICH_SMOKE_OPEN_API_SECRET are required"
+    fi
+
+    smoke_log "SKIP signed open api smoke: api key or secret is not set"
+    return 1
+}
+
+smoke_sha256_hex() {
+    printf "%s" "$1" | openssl dgst -sha256 -hex | awk '{print $NF}'
+}
+
+smoke_hmac_sha256_hex() {
+    local secret="$1"
+    local value="$2"
+    printf "%s" "${value}" | openssl dgst -sha256 -hmac "${secret}" -hex | awk '{print $NF}'
 }
 
 smoke_bootstrap

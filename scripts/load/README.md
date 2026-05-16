@@ -12,7 +12,7 @@
 ## Usage
 
 ```bash
-cp scripts/load/.env.example .env.load
+cp .env.test.example .env.load
 scripts/load/run-k6-api-read.sh
 ```
 
@@ -22,3 +22,5 @@ scripts/load/run-k6-api-read.sh
 - `reports/load/k6-report.md`
 
 默认脚本只压读链路和认证边界，不执行 create / update / delete / upload 写入压测。
+
+`scripts/load/.env.example` 只保留 load 专项变量样例。部署后联动冒烟和压测时，固定优先使用根目录 `.env.test.example`。

@@ -82,7 +82,7 @@ Sandwich Docker 部署固定通过 nginx 暴露三个 API context-path：
 复制压测环境变量样例：
 
 ```bash
-cp scripts/load/.env.example .env.load
+cp .env.test.example .env.load
 ```
 
 固定按实际环境填写：
@@ -95,6 +95,8 @@ cp scripts/load/.env.example .env.load
 - `SANDWICH_SMOKE_OPEN_API_KEY`
 - `SANDWICH_SMOKE_OPEN_API_SECRET`
 - `SANDWICH_LOAD_STAGES`
+
+`.env.test.example` 同时覆盖 smoke 和 load 变量。`scripts/smoke/.env.example` 与 `scripts/load/.env.example` 只作为专项变量参考。
 
 ### 7.2 部署正确性检查
 

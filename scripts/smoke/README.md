@@ -7,7 +7,7 @@
 复制环境变量样例：
 
 ```bash
-cp scripts/smoke/.env.example .env.smoke
+cp .env.test.example .env.smoke
 ```
 
 按目标环境修改 `.env.smoke` 后执行：
@@ -49,3 +49,5 @@ scripts/smoke/smoke-api-surface.sh
 - `smoke-api-surface.sh`: 点火所有 Controller URL，验证 Docker / nginx context-path、security filter 和 request mapping 可达；使用空请求或无效参数避免真实 create / update / delete 写入数据。
 
 脚本不提交真实 token、密码、生产连接串或环境专用配置。
+
+`scripts/smoke/.env.example` 只保留 smoke 专项变量样例。部署后联动冒烟和压测时，固定优先使用根目录 `.env.test.example`。

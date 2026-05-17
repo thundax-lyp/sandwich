@@ -202,6 +202,39 @@ smoke_expect_body() {
     fi
 }
 
+smoke_json_value() {
+    local path="$1"
+    SMOKE_JSON_INPUT="${SMOKE_HTTP_BODY}" python3 - "${path}" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1].split(".")
+data = json.loads(os.environ.get("SMOKE_JSON_INPUT", ""))
+for part in path:
+    if not isinstance(data, dict) or part not in data:
+        sys.exit(1)
+    data = data[part]
+if data is None:
+    sys.exit(1)
+print(data)
+PY
+}
+
+smoke_require_three_instance_urls() {
+    local name="$1"
+    local base_a="$2"
+    local base_b="$3"
+    local base_c="$4"
+
+    if [ -z "${base_a}" ] || [ -z "${base_b}" ] || [ -z "${base_c}" ]; then
+        smoke_fail "${name} requires A/B/C base urls"
+    fi
+    if [ "${base_a%/}" = "${base_b%/}" ] || [ "${base_a%/}" = "${base_c%/}" ] || [ "${base_b%/}" = "${base_c%/}" ]; then
+        smoke_fail "${name} requires three distinct instance base urls"
+    fi
+}
+
 smoke_require_admin_token() {
     if [ -n "${SANDWICH_SMOKE_ADMIN_TOKEN}" ]; then
         return 0

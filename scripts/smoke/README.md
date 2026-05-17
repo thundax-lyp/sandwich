@@ -25,6 +25,15 @@ scripts/smoke/smoke-open-api.sh
 scripts/smoke/smoke-api-surface.sh
 ```
 
+多实例缓存同步验证固定使用 A/B/C 三个实例地址：
+
+```bash
+scripts/smoke/smoke-admin-api-cache-sync.sh
+scripts/smoke/smoke-front-api-cache-sync.sh
+scripts/smoke/smoke-open-api-cache-sync.sh
+scripts/smoke/smoke-cache-sync-all.sh
+```
+
 ## Environment
 
 - `SANDWICH_PUBLIC_BASE_URL`: nginx 对外基础地址，默认 `http://127.0.0.1:18080`
@@ -40,6 +49,9 @@ scripts/smoke/smoke-api-surface.sh
 - `SANDWICH_SMOKE_OPEN_API_KEY`: Open API 签名冒烟使用的 API key
 - `SANDWICH_SMOKE_OPEN_API_SECRET`: Open API 签名冒烟使用的 API secret 明文
 - `SANDWICH_SMOKE_REQUIRE_OPEN_API`: `true` 时，缺少 Open API key/secret 直接失败；默认缺少时只验证未签名请求边界
+- `SANDWICH_ADMIN_API_A_BASE_URL` / `SANDWICH_ADMIN_API_B_BASE_URL` / `SANDWICH_ADMIN_API_C_BASE_URL`: 后台 API 三实例缓存同步验证地址
+- `SANDWICH_FRONT_API_A_BASE_URL` / `SANDWICH_FRONT_API_B_BASE_URL` / `SANDWICH_FRONT_API_C_BASE_URL`: 前台 API 三实例缓存同步验证地址
+- `SANDWICH_OPEN_API_A_BASE_URL` / `SANDWICH_OPEN_API_B_BASE_URL` / `SANDWICH_OPEN_API_C_BASE_URL`: 开放 API 三实例缓存同步验证地址
 
 ## Boundaries
 
@@ -47,6 +59,10 @@ scripts/smoke/smoke-api-surface.sh
 - `smoke-front-api.sh`: 调用 `/front-api/api/auth/session/pre-auth-session` 验证前台挂载，并验证登录状态接口。
 - `smoke-open-api.sh`: 调用 `/open-api/api/submission/submission/page` 验证开放接口挂载；默认未签名请求应返回 401，有 Open API key/secret 时继续验证签名请求。
 - `smoke-api-surface.sh`: 点火所有 Controller URL，验证 Docker / nginx context-path、security filter 和 request mapping 可达；使用空请求或无效参数避免真实 create / update / delete 写入数据。
+- `smoke-admin-api-cache-sync.sh`: 使用 A/B/C 三个后台实例验证预认证会话运行态跨实例可刷新。
+- `smoke-front-api-cache-sync.sh`: 使用 A/B/C 三个前台实例验证预认证会话运行态跨实例可刷新。
+- `smoke-open-api-cache-sync.sh`: 使用 A/B/C 三个开放接口实例验证 nonce 防重放跨实例生效。
+- `smoke-cache-sync-all.sh`: 串行执行三类入口缓存同步验证。
 
 脚本不提交真实 token、密码、生产连接串或环境专用配置。
 

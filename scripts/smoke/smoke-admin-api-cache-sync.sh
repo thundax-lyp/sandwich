@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/smoke-common.sh
+. "${SCRIPT_DIR}/lib/smoke-common.sh"
+
+smoke_require curl
+smoke_require python3
+
+admin_base_a="${SANDWICH_ADMIN_API_A_BASE_URL:-}"
+admin_base_b="${SANDWICH_ADMIN_API_B_BASE_URL:-}"
+admin_base_c="${SANDWICH_ADMIN_API_C_BASE_URL:-}"
+
+smoke_require_three_instance_urls "admin api cache sync" "${admin_base_a}" "${admin_base_b}" "${admin_base_c}"
+
+admin_create_pre_auth_session() {
+    local base_url="$1"
+    local name="$2"
+
+    smoke_post "$(smoke_url "${base_url}" "/api/auth/session/pre-auth-session")"
+    smoke_expect_2xx "${name} create pre-auth session"
+    smoke_expect_body "${name} create pre-auth session"
+    CACHE_SYNC_REFRESH_TOKEN="$(smoke_json_value "data.refreshToken")"
+}
+
+admin_refresh_pre_auth_session() {
+    local base_url="$1"
+    local refresh_token="$2"
+    local name="$3"
+
+    smoke_post "$(smoke_url "${base_url}" "/api/auth/session/pre-auth-session/refresh")" \
+        "{\"refreshToken\":\"${refresh_token}\"}"
+    smoke_expect_2xx "${name} refresh pre-auth session"
+    smoke_expect_body "${name} refresh pre-auth session"
+    CACHE_SYNC_REFRESH_TOKEN="$(smoke_json_value "data.refreshToken")"
+}
+
+admin_verify_cycle() {
+    local write_base="$1"
+    local read_base_first="$2"
+    local read_base_second="$3"
+    local name="$4"
+    local refresh_token
+
+    admin_create_pre_auth_session "${write_base}" "${name} writer"
+    refresh_token="${CACHE_SYNC_REFRESH_TOKEN}"
+    admin_refresh_pre_auth_session "${read_base_first}" "${refresh_token}" "${name} first reader"
+    refresh_token="${CACHE_SYNC_REFRESH_TOKEN}"
+    admin_refresh_pre_auth_session "${read_base_second}" "${refresh_token}" "${name} second reader"
+}
+
+admin_verify_cycle "${admin_base_a}" "${admin_base_b}" "${admin_base_c}" "A-to-B-C"
+admin_verify_cycle "${admin_base_b}" "${admin_base_c}" "${admin_base_a}" "B-to-C-A"
+admin_verify_cycle "${admin_base_c}" "${admin_base_a}" "${admin_base_b}" "C-to-A-B"
+
+smoke_log "admin api cache sync smoke completed"

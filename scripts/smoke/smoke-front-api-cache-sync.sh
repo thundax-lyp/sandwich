@@ -15,6 +15,10 @@ front_base_c="${SANDWICH_FRONT_API_C_BASE_URL:-}"
 
 smoke_require_three_instance_urls "front api cache sync" "${front_base_a}" "${front_base_b}" "${front_base_c}"
 
+front_refresh_token() {
+    smoke_json_value "data.refreshToken" 2>/dev/null || smoke_json_value "refreshToken"
+}
+
 front_create_pre_auth_session() {
     local base_url="$1"
     local name="$2"
@@ -22,7 +26,7 @@ front_create_pre_auth_session() {
     smoke_post "$(smoke_url "${base_url}" "/api/auth/session/pre-auth-session")"
     smoke_expect_2xx "${name} create pre-auth session"
     smoke_expect_body "${name} create pre-auth session"
-    CACHE_SYNC_REFRESH_TOKEN="$(smoke_json_value "data.refreshToken")"
+    CACHE_SYNC_REFRESH_TOKEN="$(front_refresh_token)"
 }
 
 front_refresh_pre_auth_session() {
@@ -34,7 +38,7 @@ front_refresh_pre_auth_session() {
         "{\"refreshToken\":\"${refresh_token}\"}"
     smoke_expect_2xx "${name} refresh pre-auth session"
     smoke_expect_body "${name} refresh pre-auth session"
-    CACHE_SYNC_REFRESH_TOKEN="$(smoke_json_value "data.refreshToken")"
+    CACHE_SYNC_REFRESH_TOKEN="$(front_refresh_token)"
 }
 
 front_verify_cycle() {

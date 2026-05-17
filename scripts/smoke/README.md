@@ -44,6 +44,8 @@ scripts/smoke/smoke-cache-sync-all.sh
 - `SANDWICH_SMOKE_ACCESS_TOKEN`: 通用访问 token
 - `SANDWICH_SMOKE_ADMIN_TOKEN`: 后台访问 token，优先级高于通用 token
 - `SANDWICH_SMOKE_REQUIRE_AUTH`: `true` 时，缺少 token 直接失败；默认缺少 token 时跳过认证态检查
+- `SANDWICH_SMOKE_FRONT_ACCESS_TOKEN`: 前台访问 token，供前台认证态缓存同步夹具使用
+- `SANDWICH_SMOKE_FRONT_REFRESH_TOKEN`: 前台 refresh token，供前台 refresh 缓存同步夹具使用
 - `SANDWICH_SMOKE_STORAGE_UPLOAD`: `true` 时执行上传冒烟；默认关闭，因为上传会写入对象和数据库记录
 - `SANDWICH_SMOKE_STORAGE_FILE`: 上传冒烟使用的本地文件路径
 - `SANDWICH_SMOKE_OPEN_API_KEY`: Open API 签名冒烟使用的 API key
@@ -52,6 +54,12 @@ scripts/smoke/smoke-cache-sync-all.sh
 - `SANDWICH_ADMIN_API_A_BASE_URL` / `SANDWICH_ADMIN_API_B_BASE_URL` / `SANDWICH_ADMIN_API_C_BASE_URL`: 后台 API 三实例缓存同步验证地址
 - `SANDWICH_FRONT_API_A_BASE_URL` / `SANDWICH_FRONT_API_B_BASE_URL` / `SANDWICH_FRONT_API_C_BASE_URL`: 前台 API 三实例缓存同步验证地址
 - `SANDWICH_OPEN_API_A_BASE_URL` / `SANDWICH_OPEN_API_B_BASE_URL` / `SANDWICH_OPEN_API_C_BASE_URL`: 开放 API 三实例缓存同步验证地址
+- `SANDWICH_CACHE_SYNC_USER_ID`: 后台用户 by-id 缓存同步夹具
+- `SANDWICH_CACHE_SYNC_ROLE_ID`: 后台角色 by-id 缓存同步夹具
+- `SANDWICH_CACHE_SYNC_MENU_ID`: 后台菜单 by-id 缓存同步夹具
+- `SANDWICH_CACHE_SYNC_DEPARTMENT_ID`: 后台部门 by-id 缓存同步夹具
+- `SANDWICH_CACHE_SYNC_DICT_ID`: 后台字典 by-id 缓存同步夹具
+- `SANDWICH_CACHE_SYNC_STORAGE_OBJECT_ID`: 后台存储对象 by-id 缓存同步夹具
 
 ## Boundaries
 
@@ -59,9 +67,9 @@ scripts/smoke/smoke-cache-sync-all.sh
 - `smoke-front-api.sh`: 调用 `/front-api/api/auth/session/pre-auth-session` 验证前台挂载，并验证登录状态接口。
 - `smoke-open-api.sh`: 调用 `/open-api/api/submission/submission/page` 验证开放接口挂载；默认未签名请求应返回 401，有 Open API key/secret 时继续验证签名请求。
 - `smoke-api-surface.sh`: 点火所有 Controller URL，验证 Docker / nginx context-path、security filter 和 request mapping 可达；使用空请求或无效参数避免真实 create / update / delete 写入数据。
-- `smoke-admin-api-cache-sync.sh`: 使用 A/B/C 三个后台实例验证预认证会话运行态跨实例可刷新。
-- `smoke-front-api-cache-sync.sh`: 使用 A/B/C 三个前台实例验证预认证会话运行态跨实例可刷新。
-- `smoke-open-api-cache-sync.sh`: 使用 A/B/C 三个开放接口实例验证 nonce 防重放跨实例生效。
+- `smoke-admin-api-cache-sync.sh`: 使用 A/B/C 三个后台实例验证预认证会话运行态跨实例可刷新，并按 Cache 矩阵输出 `COVER` / `SKIP`。
+- `smoke-front-api-cache-sync.sh`: 使用 A/B/C 三个前台实例验证预认证会话运行态跨实例可刷新，并按 Cache 矩阵输出 `COVER` / `SKIP`。
+- `smoke-open-api-cache-sync.sh`: 使用 A/B/C 三个开放接口实例验证 nonce 防重放跨实例生效，并按 Cache 矩阵输出 `COVER` / `SKIP`。
 - `smoke-cache-sync-all.sh`: 串行执行三类入口缓存同步验证。
 
 脚本不提交真实 token、密码、生产连接串或环境专用配置。

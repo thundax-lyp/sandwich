@@ -17,7 +17,10 @@ open_base_c="${SANDWICH_OPEN_API_C_BASE_URL:-}"
 smoke_require_three_instance_urls "open api cache sync" "${open_base_a}" "${open_base_b}" "${open_base_c}"
 
 if ! smoke_require_open_api_credentials; then
-    smoke_fail "open api cache sync requires signed credentials"
+    smoke_matrix_skip "OpenApiNonceStore" "SANDWICH_SMOKE_OPEN_API_KEY or SANDWICH_SMOKE_OPEN_API_SECRET is not set"
+    smoke_matrix_summary
+    smoke_log "open api cache sync smoke completed"
+    exit 0
 fi
 
 open_api_page_path="/api/submission/submission/page"
@@ -72,5 +75,7 @@ open_verify_cycle() {
 open_verify_cycle "${open_base_a}" "${open_base_b}" "${open_base_c}" "A-to-B-C"
 open_verify_cycle "${open_base_b}" "${open_base_c}" "${open_base_a}" "B-to-C-A"
 open_verify_cycle "${open_base_c}" "${open_base_a}" "${open_base_b}" "C-to-A-B"
+smoke_matrix_cover "OpenApiNonceStore" "signed nonce accepted once and rejected as replay on peer instances"
+smoke_matrix_summary
 
 smoke_log "open api cache sync smoke completed"

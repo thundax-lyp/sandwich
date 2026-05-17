@@ -73,6 +73,7 @@
 4. A/B/C 三个实例可以被脚本直接访问，不经过随机负载均衡入口。
 5. Open API 脚本已经准备可用的 API key 和 API secret。
 6. 测试环境允许创建预认证会话和 Open API 签名读请求。
+7. 需要覆盖 by-id 业务缓存时，提前准备对应的用户、角色、菜单、部门、字典或存储对象 ID。
 
 ## 7. Steps
 
@@ -119,6 +120,27 @@ export SANDWICH_SMOKE_OPEN_API_KEY=实际 API key
 export SANDWICH_SMOKE_OPEN_API_SECRET=实际 API secret
 ```
 
+按需配置后台 by-id 缓存夹具：
+
+```bash
+export SANDWICH_SMOKE_ADMIN_TOKEN=实际后台 access token
+export SANDWICH_CACHE_SYNC_USER_ID=实际用户 ID
+export SANDWICH_CACHE_SYNC_ROLE_ID=实际角色 ID
+export SANDWICH_CACHE_SYNC_MENU_ID=实际菜单 ID
+export SANDWICH_CACHE_SYNC_DEPARTMENT_ID=实际部门 ID
+export SANDWICH_CACHE_SYNC_DICT_ID=实际字典 ID
+export SANDWICH_CACHE_SYNC_STORAGE_OBJECT_ID=实际存储对象 ID
+```
+
+未配置夹具的 Cache 不会让脚本失败，脚本会输出 `SKIP cache=... reason=...`。
+
+按需配置前台认证缓存夹具：
+
+```bash
+export SANDWICH_SMOKE_FRONT_ACCESS_TOKEN=实际前台 access token
+export SANDWICH_SMOKE_FRONT_REFRESH_TOKEN=实际前台 refresh token
+```
+
 ### 7.3 执行单入口验证
 
 后台 API：
@@ -146,6 +168,31 @@ scripts/smoke/smoke-open-api-cache-sync.sh
 ```bash
 scripts/smoke/smoke-cache-sync-all.sh
 ```
+
+### 7.5 查看 Cache 矩阵
+
+缓存同步脚本固定输出 Cache 覆盖矩阵：
+
+- `COVER cache=...`：本次脚本对该 Cache 至少保留并读取了一个样本。
+- `SKIP cache=... reason=...`：本次脚本没有该 Cache 的安全夹具，或者该 Cache 暂无稳定公开 smoke 路径。
+- `cache matrix summary: covered=N skipped=M`：本次矩阵汇总。
+
+验收时不能只看脚本是否 completed，还要看目标 Cache 是否为 `COVER`。
+
+当前矩阵口径：
+
+- `PreAuthSessionDaoImpl`：admin/front 预认证 refresh token 在 A/B/C 间创建和刷新。
+- `PrincipalAuthSessionDaoImpl`：admin 当前用户或 front check-login access token 解析链路。
+- `PrincipalAccessTokenDaoImpl`：admin 当前用户或 front check-login access token 解析链路。
+- `PrincipalRefreshTokenDaoImpl`：front refresh token 刷新链路，或后续补充 admin login/refresh 夹具。
+- `OpenApiNonceStore`：open-api 签名 nonce 首次接受，跨实例重放拒绝。
+- `UserCacheSupport`：后台当前用户或 `SANDWICH_CACHE_SYNC_USER_ID`。
+- `RoleCacheSupport`：后台 `SANDWICH_CACHE_SYNC_ROLE_ID`。
+- `MenuCacheSupport`：后台 `SANDWICH_CACHE_SYNC_MENU_ID`。
+- `DepartmentCacheSupport`：后台 `SANDWICH_CACHE_SYNC_DEPARTMENT_ID`。
+- `DictCacheSupport`：后台 `SANDWICH_CACHE_SYNC_DICT_ID`。
+- `StorageCacheSupport`：后台 `SANDWICH_CACHE_SYNC_STORAGE_OBJECT_ID`，内容接口需要返回 200。
+- `SmsValidateCodeDaoImpl`：默认跳过，除非后续补充安全短信验证码夹具。
 
 ## 8. Files To Touch
 
@@ -196,6 +243,8 @@ bash -n scripts/smoke/smoke-cache-sync-all.sh
 - 后台 A/B/C 预认证会话 create / refresh 链路全部返回 2xx。
 - 前台 A/B/C 预认证会话 create / refresh 链路全部返回 2xx。
 - 开放接口同一个 nonce 首个实例返回 200，另外两个实例返回 401。
+- 目标 Cache 输出 `COVER cache=...`。
+- 无夹具 Cache 输出 `SKIP cache=... reason=...`，并由执行人确认是否接受该缺口。
 - 任一方向失败时，不进入容量压测。
 
 ## 11. Commit Guidance

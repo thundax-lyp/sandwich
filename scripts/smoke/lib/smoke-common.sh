@@ -47,6 +47,16 @@ smoke_defaults() {
     SANDWICH_SMOKE_OPEN_API_KEY="${SANDWICH_SMOKE_OPEN_API_KEY:-}"
     SANDWICH_SMOKE_OPEN_API_SECRET="${SANDWICH_SMOKE_OPEN_API_SECRET:-}"
     SANDWICH_SMOKE_REQUIRE_OPEN_API="${SANDWICH_SMOKE_REQUIRE_OPEN_API:-false}"
+    SANDWICH_SMOKE_FRONT_ACCESS_TOKEN="${SANDWICH_SMOKE_FRONT_ACCESS_TOKEN:-}"
+    SANDWICH_SMOKE_FRONT_REFRESH_TOKEN="${SANDWICH_SMOKE_FRONT_REFRESH_TOKEN:-}"
+    SANDWICH_CACHE_SYNC_USER_ID="${SANDWICH_CACHE_SYNC_USER_ID:-}"
+    SANDWICH_CACHE_SYNC_ROLE_ID="${SANDWICH_CACHE_SYNC_ROLE_ID:-}"
+    SANDWICH_CACHE_SYNC_MENU_ID="${SANDWICH_CACHE_SYNC_MENU_ID:-}"
+    SANDWICH_CACHE_SYNC_DEPARTMENT_ID="${SANDWICH_CACHE_SYNC_DEPARTMENT_ID:-}"
+    SANDWICH_CACHE_SYNC_DICT_ID="${SANDWICH_CACHE_SYNC_DICT_ID:-}"
+    SANDWICH_CACHE_SYNC_STORAGE_OBJECT_ID="${SANDWICH_CACHE_SYNC_STORAGE_OBJECT_ID:-}"
+    SMOKE_MATRIX_COVERED=0
+    SMOKE_MATRIX_SKIPPED=0
 }
 
 smoke_bootstrap() {
@@ -200,6 +210,24 @@ smoke_expect_body() {
     if [ -z "${SMOKE_HTTP_BODY}" ]; then
         smoke_fail "${name} returned empty body"
     fi
+}
+
+smoke_matrix_cover() {
+    local cache_name="$1"
+    local detail="$2"
+    SMOKE_MATRIX_COVERED=$((SMOKE_MATRIX_COVERED + 1))
+    smoke_log "COVER cache=${cache_name} ${detail}"
+}
+
+smoke_matrix_skip() {
+    local cache_name="$1"
+    local reason="$2"
+    SMOKE_MATRIX_SKIPPED=$((SMOKE_MATRIX_SKIPPED + 1))
+    smoke_log "SKIP cache=${cache_name} reason=${reason}"
+}
+
+smoke_matrix_summary() {
+    smoke_log "cache matrix summary: covered=${SMOKE_MATRIX_COVERED} skipped=${SMOKE_MATRIX_SKIPPED}"
 }
 
 smoke_json_value() {

@@ -19,7 +19,7 @@ public class DictCacheSupport {
 
     @CreateCache(
             name = CACHE_SECTION,
-            cacheType = CacheType.REMOTE,
+            cacheType = CacheType.BOTH,
             expire = OBJECT_EXPIRE_SECONDS,
             timeUnit = TimeUnit.SECONDS)
     private Cache<Long, DictCacheDTO> cache;

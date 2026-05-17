@@ -45,7 +45,7 @@ public class PrincipalRefreshTokenDaoImpl implements PrincipalRefreshTokenDao {
     private final RedisClient redisClient;
     private StatefulRedisConnection<String, String> redisConnection;
 
-    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
+    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.BOTH)
     private Cache<String, Object> cache;
 
     public PrincipalRefreshTokenDaoImpl(@Value("${spring.redis.url:redis://127.0.0.1:6379/0}") String redisUrl) {

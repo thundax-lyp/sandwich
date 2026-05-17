@@ -13,7 +13,7 @@ public class SmsValidateCodeDaoImpl implements SmsValidateCodeDao {
 
     private static final String CACHE_MOBILE = SandwishCacheNames.PREFIX + "smsValidateMobile.";
 
-    @CreateCache(name = CACHE_MOBILE, cacheType = CacheType.REMOTE)
+    @CreateCache(name = CACHE_MOBILE, cacheType = CacheType.BOTH)
     private Cache<String, String> cache;
 
     @Override

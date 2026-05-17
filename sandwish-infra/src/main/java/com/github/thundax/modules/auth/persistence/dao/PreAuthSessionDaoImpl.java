@@ -36,7 +36,7 @@ public class PreAuthSessionDaoImpl implements PreAuthSessionDao {
     private static final String ACTIVE_SESSION_KEY = CACHE_SECTION + "ACTIVE";
     private static final int SAFETY_SECONDS = 5;
 
-    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
+    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.BOTH)
     private Cache<String, Object> cache;
 
     private final RedisClient redisClient;

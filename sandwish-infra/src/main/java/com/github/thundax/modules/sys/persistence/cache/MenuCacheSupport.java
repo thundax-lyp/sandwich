@@ -23,14 +23,14 @@ public class MenuCacheSupport {
 
     @CreateCache(
             name = CACHE_SECTION,
-            cacheType = CacheType.REMOTE,
+            cacheType = CacheType.BOTH,
             expire = OBJECT_EXPIRE_SECONDS,
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Object> cache;
 
     @CreateCache(
             name = CACHE_SECTION + "keys.",
-            cacheType = CacheType.REMOTE,
+            cacheType = CacheType.BOTH,
             expire = OBJECT_EXPIRE_SECONDS,
             timeUnit = TimeUnit.SECONDS)
     private Cache<String, Set<String>> keyIndexCache;

@@ -31,7 +31,7 @@ public class PrincipalAuthSessionDaoImpl implements PrincipalAuthSessionDao {
     private static final String CACHE_SECTION = SandwishCacheNames.PREFIX + "PRINCIPAL_AUTH_SESSION_";
     private static final String SESSION_PREFIX = CACHE_SECTION + "SESSION_";
 
-    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.REMOTE)
+    @CreateCache(name = CACHE_SECTION, cacheType = CacheType.BOTH)
     private Cache<String, PrincipalAuthSessionCacheDTO> cache;
 
     @Override

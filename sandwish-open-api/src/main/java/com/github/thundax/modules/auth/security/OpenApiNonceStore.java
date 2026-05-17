@@ -6,6 +6,7 @@ import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import javax.annotation.PreDestroy;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class OpenApiNonceStore {
     private final NonceWriter nonceWriter;
     private StatefulRedisConnection<String, String> redisConnection;
 
+    @Autowired
     public OpenApiNonceStore(@Value("${spring.redis.url:redis://127.0.0.1:6379/0}") String redisUrl) {
         this(DEFAULT_TTL_MILLIS, RedisClient.create(redisUrl), null);
     }

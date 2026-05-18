@@ -4,10 +4,11 @@
 
 ## 1. Purpose
 
-Sandwich 当前以两个 jar API 应用作为主要运行入口：
+Sandwich 当前以三个 jar API 应用作为主要运行入口：
 
 - `sandwish-admin-api`
 - `sandwish-front-api`
+- `sandwish-open-api`
 
 本文档用于避免后台、前台、共享业务和部署配置之间的边界混乱。
 
@@ -19,6 +20,7 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 - 配置文件
 - 前后台入口边界
 - API 流量归属
+- 对外 / 对内 Nginx 流量边界
 - 静态 API 支撑资源运行边界
 - vendor JAR 路径
 - 上线准备文档路由
@@ -42,13 +44,18 @@ Sandwich 当前以两个 jar API 应用作为主要运行入口：
 
 - 后台管理流量进入 `sandwish-admin-api`
 - 前台用户流量进入 `sandwish-front-api`
+- 开放接口流量进入 `sandwish-open-api`
+- 对外 `nginx` 只承载页面资源和业务 API，不暴露 Swagger、Actuator health 或其他运维面资源
+- 对内 `nginx-internal` 只承载 Swagger、Actuator health 和内部运维面资源，默认只绑定内网或本机管理端口
 - 后台专用 Controller、Filter、Interceptor、Swagger 配置和静态 API 支撑资源归属 `sandwish-admin-api`
 - 前台专用 Controller、Filter、Interceptor 和访问适配归属 `sandwish-front-api`
+- 开放接口专用 Controller、Filter、Interceptor、签名认证和访问适配归属 `sandwish-open-api`
 - 前后台共享业务能力进入 `sandwish-biz`
 - 前后台共享持久化实现进入 `sandwish-infra`
 - 通用技术能力进入 `sandwish-common`
 - `sandwish-admin-api` 与 `sandwish-front-api` 不互相依赖
 - 外部流量不得绕过 API 入口模块直接访问 `sandwish-biz` 或 `sandwish-infra`
+- API 入口模块仍负责业务认证、权限和签名校验；Nginx 只负责公网业务面和内部运维面的流量隔离，不替代业务安全判断
 
 ## 5. Configuration Rules
 

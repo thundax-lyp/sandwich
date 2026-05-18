@@ -65,6 +65,12 @@ Sandwich 固定采用三层 API 架构。
 
 `HTTP/API -> Controller -> Service -> DAO/Mapper -> Database`
 
+固定入口边界为：
+
+- 对外入口：`client -> nginx -> sandwish-*-api`，只承载页面和业务 API 流量。
+- 对内入口：`operator/internal network -> nginx-internal -> sandwish-*-api`，只承载健康检查、Swagger 和其他运维面流量。
+- API 应用仍负责业务认证、权限和签名校验；Nginx 负责把运维面和公网业务面隔离，避免每个 API 入口重复维护 Swagger / health 暴露规则。
+
 三层职责固定为：
 
 - Web 层：请求入口、登录态、权限、参数接收、API 响应组装。

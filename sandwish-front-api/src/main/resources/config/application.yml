@@ -90,6 +90,15 @@ logging:
   level:
     com.github.thundax: INFO
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
 swagger:
   base-package: com.github.thundax.modules
   title: Sandwich Front API

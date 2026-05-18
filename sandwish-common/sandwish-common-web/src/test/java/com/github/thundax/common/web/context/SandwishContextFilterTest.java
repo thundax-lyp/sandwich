@@ -7,6 +7,7 @@ import com.github.thundax.common.security.context.SandwishContextHolder;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -44,5 +45,20 @@ public class SandwishContextFilterTest {
                 (servletRequest, servletResponse) -> assertNull(SandwishContextHolder.requestId()));
 
         assertNull(SandwishContextHolder.requestId());
+    }
+
+    @Test
+    public void shouldLogAndKeepResponseStatus() throws ServletException, IOException {
+        SandwishContextFilter filter = new SandwishContextFilter(new DefaultSandwishContextResolver(), 1L);
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/test");
+        request.addHeader(DefaultSandwishContextResolver.HEADER_REQUEST_ID, "request-2");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        filter.doFilter(request, response, (servletRequest, servletResponse) -> {
+            ((MockHttpServletResponse) servletResponse).setStatus(202);
+            Assert.assertEquals("request-2", SandwishContextHolder.requestId());
+        });
+
+        assertEquals(202, response.getStatus());
     }
 }

@@ -12,6 +12,7 @@
 包含服务：
 
 - `nginx`
+- `nginx-internal`
 - `sandwish-admin-api`
 - `sandwish-front-api`
 - `sandwish-open-api`
@@ -117,7 +118,7 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d
 docker compose --env-file deploy/.env.dev -f deploy/docker-compose.yml up -d
 ```
 
-Compose 会等待 MySQL、Redis、MinIO 和 RocketMQ healthcheck 通过后再启动 `sandwish-admin-api`，等待 MySQL、Redis、MinIO healthcheck 通过后再启动 `sandwish-front-api` 和 `sandwish-open-api`，避免 API 容器早于基础设施可用状态启动。
+Compose 会按 healthcheck 等待基础设施、API 和入口服务就绪。入口边界以 `docs/00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md` 为准。
 
 MySQL 数据通过 `SANDWISH_MYSQL_DATA_PATH` 挂载到部署机器本地目录，默认路径为 `deploy/data/mysql`，便于人工备份和排查。
 
@@ -134,6 +135,10 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml down
 - 前台 API：`http://127.0.0.1:18080/front-api`
 - 开放 API：`http://127.0.0.1:18080/open-api`
 - 前台页面：`http://127.0.0.1:18080/`
+- 内部后台健康检查：`http://127.0.0.1:18081/admin-api/actuator/health`
+- 内部前台健康检查：`http://127.0.0.1:18081/front-api/actuator/health`
+- 内部开放 API 健康检查：`http://127.0.0.1:18081/open-api/actuator/health`
+- 内部 Swagger：`http://127.0.0.1:18081/{admin-api|front-api|open-api}/swagger-ui.html`
 - MinIO API：`http://127.0.0.1:19000`
 - MinIO Console：`http://127.0.0.1:19001`
 - RocketMQ NameServer：`127.0.0.1:19876`

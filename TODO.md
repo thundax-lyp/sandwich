@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-runbook`：补充集成测试环境操作说明
-  - 范围文件：deploy/integration/README.md
-  - 处理动作：新增集成测试环境启动、初始化、运行、清理和排错说明
-  - 验收点：README 能独立说明 `deploy/integration` 的目录职责和最小运行命令
-  - 重要度：9/10
-
 - [ ] `integration-env`：补充集成测试环境变量样例
   - 范围文件：deploy/integration/.env.example
   - 处理动作：新增 MySQL、Redis、RocketMQ、OSS 和测试前缀的环境变量样例

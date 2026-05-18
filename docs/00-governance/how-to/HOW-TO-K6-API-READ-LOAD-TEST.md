@@ -1,10 +1,12 @@
-# HOW-TO API Load Test
+# HOW-TO k6 API Read Load Test
 
 ## 1. Purpose
 
-本文档定义 Sandwich `*-api` Docker 部署后的压测操作流程、脚本入口和报告规范。
+本文档定义 Sandwich `*-api` Docker 部署后的 k6 API 读链路压测操作流程、脚本入口和报告规范。
 
-目标是让后台 API、前台 API 和开放 API 的压测固定按同一套最小闭环执行，避免把部署错误、接口挂载错误、认证配置错误和真实容量问题混在一起判断。
+目标是让后台 API、前台 API 和开放 API 的读链路压测固定按同一套最小闭环执行，避免把部署错误、接口挂载错误、认证配置错误和真实容量问题混在一起判断。
+
+本文档不是全量 API 冒烟手册。`scripts/smoke/smoke-api-surface.sh` 是全量 Controller URL 点火脚本，只用于压测前确认接口面可达，不能作为压力测试结果。
 
 ## 2. Scope
 
@@ -25,6 +27,7 @@
 - 不替代数据库专项压测
 - 不替代 JVM、MySQL、Redis、MinIO 或 RocketMQ 调优手册
 - 不把写入接口压测作为默认动作
+- 不把全量 API URL 点火当作压力测试
 
 ## 3. Bounded Context
 
@@ -36,11 +39,11 @@ Sandwich Docker 部署固定通过 nginx 暴露三个 API context-path：
 
 压测必须先确认 Docker / nginx / context-path / Controller mapping 可用，再进入吞吐和延迟测试。
 
-压测分三层：
+验证和压测分三步：
 
 1. `smoke-all.sh`：核心入口冒烟，验证主要运行链路。
-2. `smoke-api-surface.sh`：全部 Controller URL 点火，验证接口面可达。
-3. `run-k6-api-read.sh`：读链路压力测试，输出 JSON 和 Markdown 报告。
+2. `smoke-api-surface.sh`：全部 Controller URL 点火，验证接口面可达；这是冒烟测试，不是压力测试。
+3. `run-k6-api-read.sh`：k6 读链路压力测试，输出 JSON 和 Markdown 报告。
 
 ## 4. When To Use
 
@@ -49,7 +52,7 @@ Sandwich Docker 部署固定通过 nginx 暴露三个 API context-path：
 - Docker Compose 部署到服务器后做上线前验证
 - 调整 nginx、context-path、容器环境变量或镜像版本后做回归
 - 评估 `*-api` 在当前服务器规格下的读链路容量
-- 生成可保存的 API 压测报告
+- 生成可保存的 k6 API 读链路压测报告
 
 ## 5. Do Not Use For
 
@@ -59,6 +62,7 @@ Sandwich Docker 部署固定通过 nginx 暴露三个 API context-path：
 - 大规模写入、删除、上传或数据污染型压测
 - 数据库索引、慢 SQL、连接池的专项压测
 - 前端页面渲染性能测试
+- 全量 API 冒烟测试结果归档
 
 生产环境只允许低强度只读压测。极限压测固定使用独立压测环境。
 
@@ -74,6 +78,8 @@ Sandwich Docker 部署固定通过 nginx 暴露三个 API context-path：
 6. 后台认证态压测已经准备 `SANDWICH_SMOKE_ADMIN_TOKEN`。
 7. 开放 API 签名压测已经准备 `SANDWICH_SMOKE_OPEN_API_KEY` 和 `SANDWICH_SMOKE_OPEN_API_SECRET`。
 8. 已确认本次是否允许写入测试数据。默认不允许写入。
+9. 本地非必要 Docker 容器已经停止，避免 k6 与其他本地容器争用 CPU、内存和网络。
+10. 已采集被测服务器环境快照，用于报告说明和后续复测对比。
 
 ## 7. Steps
 
@@ -100,7 +106,25 @@ cp .env.test.example .env.load
 
 `.env.test.example` 同时覆盖 smoke 和 load 变量。`scripts/smoke/.env.example` 与 `scripts/load/.env.example` 只作为专项变量参考。
 
-### 7.2 部署正确性检查
+### 7.2 准备后台 token
+
+后台认证态压测需要 `SANDWICH_SMOKE_ADMIN_TOKEN`。固定使用浏览器完成一次真实登录，再从前端存储中读取 token。
+
+自动化执行时使用 Playwright 辅助访问后台登录页：
+
+```text
+{SANDWICH_PUBLIC_BASE_URL}/admin/login
+```
+
+获取 token 后只写入本机临时环境变量或本机 `.env.load`，不要写入仓库、报告正文或提交记录。
+
+登录、验证码和预认证接口默认不作为持续压测目标。它们通常带有防刷和限流策略，持续压测会把登录保护能力与业务读接口容量混在一起。只有明确要评估认证限流时，才设置：
+
+```bash
+SANDWICH_LOAD_INCLUDE_PRE_AUTH=true
+```
+
+### 7.3 部署正确性检查
 
 执行核心冒烟：
 
@@ -114,9 +138,9 @@ scripts/smoke/smoke-all.sh
 scripts/smoke/smoke-api-surface.sh
 ```
 
-`smoke-api-surface.sh` 使用空请求、无效参数或未签名请求验证 Controller URL 可达。该脚本不作为业务成功率指标。
+`smoke-api-surface.sh` 使用空请求、无效参数或未签名请求验证 Controller URL 可达。该脚本只证明 API surface 已挂载，不作为业务成功率、吞吐或延迟指标。
 
-### 7.3 执行读链路压测
+### 7.4 执行读链路压测
 
 执行 k6 读链路压测：
 
@@ -146,8 +170,6 @@ deploy/image-files/sandwish-k6-dev.tar
 
 默认压测范围：
 
-- `/admin-api/api/auth/session/pre-auth-session`
-- `/front-api/api/auth/session/pre-auth-session`
 - `/front-api/api/auth/session/check-login`
 - `/open-api/api/submission/submission/page` 未签名认证边界
 - 有后台 token 时压后台当前用户、菜单、权限、字典分页和存储树
@@ -162,7 +184,7 @@ deploy/image-files/sandwish-k6-dev.tar
 - sort
 - move
 
-### 7.4 分阶段加压
+### 7.5 分阶段加压
 
 `SANDWICH_LOAD_STAGES` 固定使用 `duration:target,duration:target` 格式。
 
@@ -178,13 +200,44 @@ SANDWICH_LOAD_STAGES=30s:5,2m:20,30s:0 scripts/load/run-k6-api-read.sh
 SANDWICH_LOAD_STAGES=1m:20,3m:50,3m:100,1m:0 scripts/load/run-k6-api-read.sh
 ```
 
+高阶梯示例：
+
+```bash
+SANDWICH_LOAD_STAGES=1m:50,3m:100,3m:200,1m:0 scripts/load/run-k6-api-read.sh
+```
+
 稳定性示例：
 
 ```bash
 SANDWICH_LOAD_STAGES=2m:50,30m:50,2m:0 scripts/load/run-k6-api-read.sh
 ```
 
-### 7.5 收集资源指标
+### 7.6 收集服务器环境说明
+
+每次形成正式报告前，固定拉取被测服务器环境说明。报告中只保留脱敏后的信息。
+
+固定采集：
+
+- `hostnamectl`
+- `uname -a`
+- `lscpu`
+- `free -h`
+- `df -h`
+- `docker version`
+- `docker compose version`
+- `docker images`
+- `docker compose ps`
+- `docker compose config` 脱敏结果
+
+敏感值必须脱敏：
+
+- password
+- secret
+- token
+- access key
+- private key
+
+### 7.7 收集资源指标
 
 压测期间固定收集：
 
@@ -195,6 +248,22 @@ SANDWICH_LOAD_STAGES=2m:50,30m:50,2m:0 scripts/load/run-k6-api-read.sh
 - Redis 连接数、延迟和内存
 - MinIO 请求错误
 - RocketMQ broker 日志和堆积
+
+### 7.8 形成本次完成报告
+
+正式报告固定落在 `reports/load/{target}-{scenario}-{timestamp}/`，目录中至少包含：
+
+- `k6-summary.json`
+- `k6-report.md`
+- `docker-stats.txt`
+- `server-environment.txt`
+
+报告结论必须区分两类问题：
+
+- 容量问题：P95、P99、CPU、内存、连接数、慢 SQL 或 upstream error 显示资源瓶颈。
+- 功能问题：某个接口稳定返回非预期状态或业务异常，例如 schema 缺字段、认证配置错误、接口实现异常。
+
+若响应分位数满足阈值但错误率不满足，报告结论不能写成容量不足，应定位失败接口和错误原因。
 
 ## 8. Files To Touch
 
@@ -224,11 +293,14 @@ SANDWICH_LOAD_STAGES=2m:50,30m:50,2m:0 scripts/load/run-k6-api-read.sh
 
 - 未跑 `smoke-api-surface.sh` 就开始压测，导致把 404、405 或 502 误判为容量问题。
 - 在 API 服务器本机运行大压力，导致压测进程和服务端争用资源。
+- 本地同时运行其他 Docker 容器，导致本地 k6 压测端资源不稳定。
 - 用生产环境做极限压测。
 - 默认压 create / update / delete / upload，污染测试数据。
+- 把登录、验证码或预认证接口混入业务读接口压测，导致登录限流被误判为业务接口失败。
 - 只看平均响应时间，不看 P95、P99 和错误率。
 - 只看 k6 结果，不看 MySQL、Redis、nginx 和 API 容器资源。
 - Open API 签名压测时忘记 `SANDWICH_OPEN_CONTEXT_PATH`，导致 canonical path 不一致。
+- 只看 k6 阈值红灯，不检查失败接口；功能性 500 可能会掩盖真实性能表现。
 
 ## 10. Verification
 
@@ -250,6 +322,8 @@ scripts/smoke/smoke-api-surface.sh
 - API 容器无持续 5xx
 - nginx 无持续 upstream error
 - MySQL 无持续慢 SQL 或连接耗尽
+- 失败接口已经按 endpoint、状态码和服务端日志定位
+- `server-environment.txt` 已脱敏
 
 ## 11. Report Specification
 

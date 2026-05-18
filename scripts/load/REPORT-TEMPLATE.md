@@ -1,4 +1,4 @@
-# Sandwich API Load Test Report
+# Sandwich k6 API Read Load Test Report
 
 ## Test Metadata
 
@@ -29,7 +29,7 @@
 | Phase | Command | Stages | Duration | Write Data |
 | --- | --- | --- | --- | --- |
 | smoke | `scripts/smoke/smoke-all.sh` | - | - | no |
-| surface | `scripts/smoke/smoke-api-surface.sh` | - | - | no |
+| API surface smoke | `scripts/smoke/smoke-api-surface.sh` | - | - | no |
 | baseline | `scripts/load/run-k6-api-read.sh` |  |  | no |
 | stress |  |  |  | no |
 | soak |  |  |  | no |

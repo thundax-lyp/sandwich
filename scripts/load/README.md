@@ -1,6 +1,6 @@
 # Sandwich Load Scripts
 
-本目录保存 API 压测脚本和报告模板。长期操作手册见 `docs/00-governance/how-to/HOW-TO-API-LOAD-TEST.md`。
+本目录保存 k6 API 读链路压测脚本和报告模板。长期操作手册见 `docs/00-governance/how-to/HOW-TO-K6-API-READ-LOAD-TEST.md`。
 
 ## Files
 

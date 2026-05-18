@@ -92,7 +92,7 @@
   再读 `40-readiness/`
 - API 压测、Docker 部署后压力测试、k6、压测报告：
   先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
-  再读 `00-governance/how-to/HOW-TO-API-LOAD-TEST.md`
+  再读 `00-governance/how-to/HOW-TO-K6-API-READ-LOAD-TEST.md`
 - API 多实例缓存同步、A/B/C 三实例验证、负载均衡前缓存一致性测试：
   先读 `00-governance/DEPLOYMENT-AND-TRAFFIC-BOUNDARY-RULES.md`
   再读 `00-governance/how-to/HOW-TO-API-CACHE-SYNC-TEST.md`

@@ -168,7 +168,7 @@ const metricValue = (data, metric, field) => {
 };
 
 const renderMarkdownSummary = (data) => {
-    return `# Sandwich API Load Test Report
+    return `# Sandwich k6 API Read Load Test Report
 
 ## Test Metadata
 

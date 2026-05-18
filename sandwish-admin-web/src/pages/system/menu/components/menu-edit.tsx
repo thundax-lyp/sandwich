@@ -59,14 +59,7 @@ const toFormValues = (menu: MenuResponse): MenuFormValues => {
     };
 };
 
-export const MenuEdit = ({
-    open,
-    menu,
-    parentOptions,
-    saving,
-    onClose,
-    onSave
-}: MenuEditProps) => {
+export const MenuEdit = ({ open, menu, parentOptions, saving, onClose, onSave }: MenuEditProps) => {
     const [form] = Form.useForm<MenuFormValues>();
 
     useEffect(() => {

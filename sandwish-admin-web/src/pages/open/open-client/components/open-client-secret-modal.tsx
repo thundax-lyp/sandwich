@@ -29,11 +29,7 @@ export const OpenClientSecretModal = ({
             API KEY 保持不变，新的 API SECRET 只在本次结果中显示。
         </Text>
         <div className="open-client-secret-panel">
-            <OpenClientSecretField
-                label="API KEY"
-                value={secret?.apiKey}
-                onCopy={onCopySecret}
-            />
+            <OpenClientSecretField label="API KEY" value={secret?.apiKey} onCopy={onCopySecret} />
             <OpenClientSecretField
                 label="API SECRET"
                 value={secret?.apiSecret}

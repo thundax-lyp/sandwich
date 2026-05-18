@@ -40,6 +40,9 @@ jobs:
       - name: Run prettier check
         run: npm run format:check
 
+      - name: Run unit tests
+        run: npm test
+
       - name: Run build
         run: npm run build
 

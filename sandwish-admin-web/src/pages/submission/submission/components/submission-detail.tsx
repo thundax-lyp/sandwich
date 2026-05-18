@@ -20,12 +20,7 @@ const readStatusLabel = (
 };
 
 export const SubmissionDetail = ({ submission, statusLabels, onClose }: SubmissionDetailProps) => (
-    <SandwishDrawer
-        title="提交详情"
-        open={Boolean(submission)}
-        size="middle"
-        onClose={onClose}
-    >
+    <SandwishDrawer title="提交详情" open={Boolean(submission)} size="middle" onClose={onClose}>
         {submission ? (
             <div className="submission-detail-content">
                 <Text type="secondary">标题</Text>

@@ -133,11 +133,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     color: var(--text-primary);
-    font-family:
-        "SFMono-Regular",
-        Consolas,
-        "Liberation Mono",
-        monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
     font-size: 12px;
     line-height: 18px;
     white-space: nowrap;

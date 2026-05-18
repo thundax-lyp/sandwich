@@ -138,7 +138,11 @@ export const SubmissionEdit = ({ open, saving, onClose, onSave }: SubmissionEdit
                 >
                     <Input placeholder="请输入标题" maxLength={200} showCount />
                 </Form.Item>
-                <Form.Item name="content" label="正文" rules={[{ required: true, message: "请输入正文" }]}>
+                <Form.Item
+                    name="content"
+                    label="正文"
+                    rules={[{ required: true, message: "请输入正文" }]}
+                >
                     <TextArea placeholder="请输入正文" rows={8} />
                 </Form.Item>
                 <Form.Item label="图片">

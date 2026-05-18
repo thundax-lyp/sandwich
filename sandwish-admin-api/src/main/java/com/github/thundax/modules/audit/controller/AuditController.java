@@ -13,7 +13,6 @@ import com.github.thundax.modules.audit.controller.request.AuditLogDetailRequest
 import com.github.thundax.modules.audit.controller.request.AuditLogPageRequest;
 import com.github.thundax.modules.audit.controller.request.AuditMetaRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectFieldRequest;
-import com.github.thundax.modules.audit.controller.request.AuditObjectHistoryRequest;
 import com.github.thundax.modules.audit.controller.request.AuditObjectPageRequest;
 import com.github.thundax.modules.audit.controller.response.AuditLogDetailResponse;
 import com.github.thundax.modules.audit.controller.response.AuditLogResponse;
@@ -27,7 +26,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,10 +67,11 @@ public class AuditController {
                 dataTypeClass = String.class),
     })
     @PostMapping(value = "history")
-    public List<AuditLogResponse> history(@Valid @RequestBody AuditObjectHistoryRequest request) {
-        return auditService.list(AuditInterfaceAssembler.toMetaQuery(request)).stream()
-                .map(AuditInterfaceAssembler::toLogResponse)
-                .collect(Collectors.toList());
+    public PageResponse<AuditLogResponse> history(@Valid @RequestBody AuditObjectPageRequest request) {
+        return PageResponseHelper.fromPageResult(
+                auditService.page(
+                        AuditInterfaceAssembler.toLogQuery(request), PageInterfaceAssembler.toPageQuery(request)),
+                AuditInterfaceAssembler::toLogResponse);
     }
 
     @ApiOperation(value = "获取审计日志详情", notes = "audit:view")

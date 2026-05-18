@@ -34,8 +34,10 @@ public class AdminAuditLogIT extends AbstractAdminApiIT {
         assertEquals(2, ((Number) meta.get("version")).intValue());
         assertEquals("UPDATE", meta.get("lastAction"));
 
-        List<Map<String, Object>> history = (List<Map<String, Object>>) data(httpClient.postJson(
-                "/api/audit/log/history", objectRequest(), authHeaders(token.getToken()), Map.class));
+        Map<String, Object> historyPage = dataMap(httpClient.postJson(
+                "/api/audit/log/history", objectPageRequest(), authHeaders(token.getToken()), Map.class));
+        assertEquals(2, ((Number) historyPage.get("count")).intValue());
+        List<Map<String, Object>> history = (List<Map<String, Object>>) historyPage.get("records");
         assertEquals(2, history.size());
         assertContainsAction(history, "CREATE");
         assertContainsAction(history, "UPDATE");
@@ -54,11 +56,8 @@ public class AdminAuditLogIT extends AbstractAdminApiIT {
         assertEquals(2, ((Number) ((Map<String, Object>) overview.get("meta")).get("version")).intValue());
         assertTrue(((List<Map<String, Object>>) overview.get("latestLogs")).size() >= 1);
 
-        Map<String, Object> objectPageRequest = objectRequest();
-        objectPageRequest.put("pageNo", 1);
-        objectPageRequest.put("pageSize", 5);
         Map<String, Object> objectPage = dataMap(httpClient.postJson(
-                "/api/audit/log/object/page", objectPageRequest, authHeaders(token.getToken()), Map.class));
+                "/api/audit/log/object/page", objectPageRequest(), authHeaders(token.getToken()), Map.class));
         assertEquals(2, ((Number) objectPage.get("count")).intValue());
 
         Map<String, Object> page = dataMap(
@@ -98,6 +97,13 @@ public class AdminAuditLogIT extends AbstractAdminApiIT {
     private Map<String, Object> objectRequest() {
         Map<String, Object> request = request("objectType", "Department");
         request.put("objectId", DEPARTMENT_ID);
+        return request;
+    }
+
+    private Map<String, Object> objectPageRequest() {
+        Map<String, Object> request = objectRequest();
+        request.put("pageNo", 1);
+        request.put("pageSize", 5);
         return request;
     }
 

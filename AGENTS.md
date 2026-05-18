@@ -21,6 +21,7 @@
 - Business code: `sandwish-biz/`
 - Admin API application: `sandwish-admin-api/`
 - Front API application: `sandwish-front-api/`
+- Open API application: `sandwish-open-api/`
 - AI routing docs: `docs/`
 
 Main dependency direction:
@@ -31,6 +32,14 @@ Main dependency direction:
 Main runtime chain:
 
 - `HTTP/API -> Controller -> Service -> DAO/Mapper -> Database`
+
+## Debugging
+
+- When debugging a `sandwish-*-api` application, do not look for the startup class in the root `pom.xml`.
+- Use the matching API module `pom.xml`; each API module declares its own `<start-class>`.
+- Admin API startup class: `com.github.thundax.AdminApiApplication`
+- Front API startup class: `com.github.thundax.FrontApiApplication`
+- Open API startup class: `com.github.thundax.OpenApiApplication`
 
 ## Code Rules
 

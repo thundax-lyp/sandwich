@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-data`：补齐集成测试 cleanup 脚本
-  - 范围文件：deploy/integration/db/90-cleanup/001-clean-business-data.sql
-  - 范围文件：deploy/integration/db/90-cleanup/002-clean-auth-data.sql
-  - 处理动作：新增 sys、open、storage、submission、audit、member、token、会话、验证码、nonce 和登录事件清理脚本
-  - 验收点：脚本可重复执行且只清理集成测试业务数据和认证运行态数据
-  - 重要度：10/10
-
 - [ ] `admin-it`：补齐后台认证与当前用户集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/auth/AdminAuthSessionIT.java
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminCurrentUserIT.java

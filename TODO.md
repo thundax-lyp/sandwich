@@ -9,16 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-submission-audit-it`：补齐提交内容与审计集成测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/submission/AdminSubmissionQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/submission/AdminSubmissionMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/audit/AdminAuditLogIT.java
-  - 处理动作：覆盖 submission 查询、创建、状态变更、删除、排序、图片上传，以及 audit meta、history、detail、object overview、object page、page、options 和 fields 接口
-  - 验收点：SubmissionController 和 AuditController 全部业务接口通过真实 HTTP 入口完成成功和失败断言
-  - 重要度：10/10
-
-## 待审阅任务项
-
 - [ ] `front-it`：补齐前台认证与注册集成测试
   - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontAuthSessionIT.java
   - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontRegisterAccountIT.java
@@ -27,6 +17,8 @@
   - 处理动作：覆盖预认证会话、账号登录、短信登录替身链路、token refresh、login status、check-login、logout、账号/手机号/邮箱注册接口
   - 验收点：LoginController 和会员注册链路具备成功链路；验证码、凭据、token、重复账号/手机号/邮箱失败链路具备断言
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `open-api-it`：补齐开放接口签名与提交集成测试
   - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/auth/OpenApiSignatureIT.java

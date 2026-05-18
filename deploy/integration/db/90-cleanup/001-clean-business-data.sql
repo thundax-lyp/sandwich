@@ -7,12 +7,22 @@ SET NAMES utf8mb4;
 DELETE FROM `submission_image`
 WHERE `id` BETWEEN 9100000000000080100 AND 9100000000000080999
    OR `submission_id` BETWEEN 9100000000000080000 AND 9100000000000080999
+   OR `submission_id` IN (
+       SELECT `id`
+       FROM `submission_submission`
+       WHERE `title` LIKE 'Integration%'
+   )
    OR `storage_object_id` BETWEEN 9100000000000070000 AND 9100000000000070999;
 
 DELETE FROM `assist_storage_business`
 WHERE `file_id` BETWEEN 9100000000000070000 AND 9100000000000070999
    OR (`reference_owner_type` = 'SUBMISSION'
-       AND `reference_owner_id` BETWEEN '9100000000000080000' AND '9100000000000080999');
+       AND (`reference_owner_id` BETWEEN '9100000000000080000' AND '9100000000000080999'
+           OR `reference_owner_id` IN (
+               SELECT CAST(`id` AS CHAR)
+               FROM `submission_submission`
+               WHERE `title` LIKE 'Integration%'
+           )));
 
 DELETE FROM `assist_storage_multipart_upload_part`
 WHERE `id` BETWEEN 9100000000000070200 AND 9100000000000070999
@@ -56,12 +66,24 @@ WHERE `id` BETWEEN 9100000000000090100 AND 9100000000000090999
    OR `meta_id` BETWEEN 9100000000000090000 AND 9100000000000090999
    OR `idempotency_key` LIKE 'it-%'
    OR `request_id` LIKE 'it-%'
-   OR `trace_id` LIKE 'it-%';
+   OR `trace_id` LIKE 'it-%'
+   OR (`object_type` = 'Submission'
+       AND `object_id` IN (
+           SELECT CAST(`id` AS CHAR)
+           FROM `submission_submission`
+           WHERE `title` LIKE 'Integration%'
+       ));
 
 DELETE FROM `audit_meta`
 WHERE `id` BETWEEN 9100000000000090000 AND 9100000000000090999
    OR (`object_type` = 'Department'
-       AND `object_id` BETWEEN '9100000000000000000' AND '9100000000000000999');
+       AND `object_id` BETWEEN '9100000000000000000' AND '9100000000000000999')
+   OR (`object_type` = 'Submission'
+       AND `object_id` IN (
+           SELECT CAST(`id` AS CHAR)
+           FROM `submission_submission`
+           WHERE `title` LIKE 'Integration%'
+       ));
 
 DELETE FROM `sys_log`
 WHERE `id` BETWEEN 9100000000000090200 AND 9100000000000090999

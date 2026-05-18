@@ -79,6 +79,14 @@ public class MybatisPlusConfigurationTest {
     }
 
     @Test
+    public void shouldRejectMissingDatasourceConfiguration() {
+        ApplicationContextRunner runner =
+                new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(MybatisPlusConfiguration.class));
+
+        runner.run(context -> assertTrue(hasCause(context.getStartupFailure(), IllegalStateException.class)));
+    }
+
+    @Test
     public void shouldRegisterDefaultTypeHandlers() {
         contextRunner.run(context -> {
             MybatisConfiguration configuration = new MybatisConfiguration();

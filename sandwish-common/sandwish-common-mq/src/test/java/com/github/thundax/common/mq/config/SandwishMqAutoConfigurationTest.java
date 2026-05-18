@@ -27,10 +27,15 @@ public class SandwishMqAutoConfigurationTest {
             new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(SandwishMqAutoConfiguration.class));
 
     @Test
-    public void shouldCreatePropertiesWithoutSenderWhenNoBrokerClientConfigured() {
-        contextRunner.run(context -> {
+    public void shouldRejectEnabledMqWhenNoBrokerClientConfigured() {
+        contextRunner.run(context -> assertTrue(hasCause(context.getStartupFailure(), IllegalStateException.class)));
+    }
+
+    @Test
+    public void shouldCreatePropertiesWithoutSenderWhenDisabledAndNoBrokerClientConfigured() {
+        contextRunner.withPropertyValues("sandwish.mq.enabled=false").run(context -> {
             assertNotNull(context.getBean(SandwishMqProperties.class));
-            assertTrue(context.getBeansOfType(SandwishMqSender.class).isEmpty());
+            assertTrue(context.getBean(SandwishMqSender.class) instanceof NoOpSandwishMqSender);
         });
     }
 
@@ -68,11 +73,19 @@ public class SandwishMqAutoConfigurationTest {
     public void shouldCreateRocketSenderWhenRocketTypeConfigured() {
         contextRunner
                 .withUserConfiguration(RocketMqTemplateConfiguration.class)
-                .withPropertyValues("sandwish.mq.type=ROCKETMQ")
+                .withPropertyValues("sandwish.mq.type=ROCKETMQ", "rocketmq.name-server=127.0.0.1:9876")
                 .run(context -> {
                     SandwishMqSender sender = context.getBean(SandwishMqSender.class);
                     assertTrue(sender instanceof RocketMqSandwishMqSender);
                 });
+    }
+
+    @Test
+    public void shouldRejectRocketMqWhenNameServerMissing() {
+        contextRunner
+                .withUserConfiguration(RocketMqTemplateConfiguration.class)
+                .withPropertyValues("sandwish.mq.type=ROCKETMQ")
+                .run(context -> assertTrue(hasCause(context.getStartupFailure(), IllegalStateException.class)));
     }
 
     @Test
@@ -110,5 +123,16 @@ public class SandwishMqAutoConfigurationTest {
         public RocketMQTemplate rocketMQTemplate() {
             return mock(RocketMQTemplate.class);
         }
+    }
+
+    private boolean hasCause(Throwable throwable, Class<? extends Throwable> causeType) {
+        Throwable cause = throwable;
+        while (cause != null) {
+            if (causeType.isInstance(cause)) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 }

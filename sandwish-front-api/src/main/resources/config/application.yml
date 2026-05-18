@@ -100,6 +100,7 @@ management:
       show-details: never
 
 swagger:
+  enabled: ${SANDWISH_SWAGGER_ENABLED:true}
   base-package: com.github.thundax.modules
   title: Sandwich Front API
   description: Sandwich 前台服务接口

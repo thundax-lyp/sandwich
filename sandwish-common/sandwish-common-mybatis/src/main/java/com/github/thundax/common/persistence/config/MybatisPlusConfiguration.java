@@ -56,6 +56,10 @@ public class MybatisPlusConfiguration {
     }
 
     private DbType resolveDbType(DataSourceProperties properties) {
+        if (properties.getUrl() == null && properties.getDriverClassName() == null) {
+            throw new IllegalStateException(
+                    "Missing datasource configuration. Configure spring.datasource.url or spring.datasource.driver-class-name.");
+        }
         DbType dbType = resolveDbType(properties.getUrl());
         if (dbType != DbType.OTHER) {
             return dbType;

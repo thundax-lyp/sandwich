@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.mock.env.MockEnvironment;
 
 public class JetCacheAutoConfigurationTest {
 
@@ -35,5 +36,22 @@ public class JetCacheAutoConfigurationTest {
         beanPostProcessor.postProcessAfterInitialization(globalCacheConfig, "globalCacheConfig");
 
         assertEquals(5, globalCacheConfig.getStatIntervalMinutes());
+    }
+
+    @Test
+    public void shouldAcceptRedisUriConfiguration() throws Exception {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("jetcache.remote.default.type", "redis.lettuce")
+                .withProperty("jetcache.remote.default.uri", "redis://127.0.0.1:6379/0");
+
+        new JetCacheAutoConfiguration.RedisConfigurationValidator(environment).afterPropertiesSet();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldRejectMissingRedisUriConfiguration() throws Exception {
+        MockEnvironment environment =
+                new MockEnvironment().withProperty("jetcache.remote.default.type", "redis.lettuce");
+
+        new JetCacheAutoConfiguration.RedisConfigurationValidator(environment).afterPropertiesSet();
     }
 }

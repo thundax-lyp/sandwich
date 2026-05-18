@@ -22,6 +22,7 @@ scripts/smoke/smoke-all.sh
 scripts/smoke/smoke-admin-api.sh
 scripts/smoke/smoke-front-api.sh
 scripts/smoke/smoke-open-api.sh
+scripts/smoke/smoke-observability.sh
 scripts/smoke/smoke-api-surface.sh
 ```
 
@@ -37,6 +38,7 @@ scripts/smoke/smoke-cache-sync-all.sh
 ## Environment
 
 - `SANDWICH_PUBLIC_BASE_URL`: nginx 对外基础地址，默认 `http://127.0.0.1:18080`
+- `SANDWICH_INTERNAL_BASE_URL`: nginx 对内基础地址，默认 `http://127.0.0.1:18081`
 - `SANDWICH_ADMIN_BASE_URL`: 后台 API 基础地址，默认 `http://127.0.0.1:18080/admin-api`
 - `SANDWICH_FRONT_BASE_URL`: 前台 API 基础地址，默认 `http://127.0.0.1:18080/front-api`
 - `SANDWICH_OPEN_BASE_URL`: 开放 API 基础地址，默认 `http://127.0.0.1:18080/open-api`
@@ -51,6 +53,7 @@ scripts/smoke/smoke-cache-sync-all.sh
 - `SANDWICH_SMOKE_OPEN_API_KEY`: Open API 签名冒烟使用的 API key
 - `SANDWICH_SMOKE_OPEN_API_SECRET`: Open API 签名冒烟使用的 API secret 明文
 - `SANDWICH_SMOKE_REQUIRE_OPEN_API`: `true` 时，缺少 Open API key/secret 直接失败；默认缺少时只验证未签名请求边界
+- `SANDWICH_SMOKE_SWAGGER_ENABLED`: `true` 时验证对内 Swagger 可达；默认 `true`
 - `SANDWICH_ADMIN_API_A_BASE_URL` / `SANDWICH_ADMIN_API_B_BASE_URL` / `SANDWICH_ADMIN_API_C_BASE_URL`: 后台 API 三实例缓存同步验证地址
 - `SANDWICH_FRONT_API_A_BASE_URL` / `SANDWICH_FRONT_API_B_BASE_URL` / `SANDWICH_FRONT_API_C_BASE_URL`: 前台 API 三实例缓存同步验证地址
 - `SANDWICH_OPEN_API_A_BASE_URL` / `SANDWICH_OPEN_API_B_BASE_URL` / `SANDWICH_OPEN_API_C_BASE_URL`: 开放 API 三实例缓存同步验证地址
@@ -66,6 +69,7 @@ scripts/smoke/smoke-cache-sync-all.sh
 - `smoke-admin-api.sh`: 调用 `/admin-api/api/auth/session/pre-auth-session` 验证后台挂载；有 token 时继续验证当前用户、菜单、权限、字典分页和存储对象树接口。上传冒烟必须显式开启。
 - `smoke-front-api.sh`: 调用 `/front-api/api/auth/session/pre-auth-session` 验证前台挂载，并验证登录状态接口。
 - `smoke-open-api.sh`: 调用 `/open-api/api/submission/submission/page` 验证开放接口挂载；默认未签名请求应返回 401，有 Open API key/secret 时继续验证签名请求。
+- `smoke-observability.sh`: 验证对外 health / Swagger 阻断，对内 health / Swagger 可达。
 - `smoke-api-surface.sh`: 点火所有 Controller URL，验证 Docker / nginx context-path、security filter 和 request mapping 可达；使用空请求或无效参数避免真实 create / update / delete 写入数据。
 - `smoke-admin-api-cache-sync.sh`: 使用 A/B/C 三个后台实例验证预认证会话运行态跨实例可刷新，并按 Cache 矩阵输出 `COVER` / `SKIP`。
 - `smoke-front-api-cache-sync.sh`: 使用 A/B/C 三个前台实例验证预认证会话运行态跨实例可刷新，并按 Cache 矩阵输出 `COVER` / `SKIP`。

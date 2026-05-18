@@ -341,6 +341,14 @@ scripts/smoke/smoke-api-surface.sh
 - 当前容量边界
 - 进入生产前必须完成事项
 
+压测报告固定遵守项目文档语言规则：
+
+- 报告标题、章节标题、结论、分析、说明性文字使用中文。
+- 模块名、服务名、接口路径、命令、环境变量、文件名、字段名和 k6 指标名保留英文原文。
+- `Docker`、`Docker Compose`、`k6`、`Playwright`、`nginx`、`MySQL`、`Redis`、`MinIO`、`RocketMQ` 等工具和组件名保留英文原文。
+- 错误日志、SQL 错误、HTTP 状态码和原始 metric key 保持原文，后面用中文解释含义和影响。
+- 报告不得用整段英文描述测试结论、瓶颈分析或处理建议。
+
 报告模板固定使用：
 
 ```bash

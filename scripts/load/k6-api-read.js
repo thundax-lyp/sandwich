@@ -168,9 +168,9 @@ const metricValue = (data, metric, field) => {
 };
 
 const renderMarkdownSummary = (data) => {
-    return `# Sandwich k6 API Read Load Test Report
+    return `# Sandwich k6 API 读链路压测报告
 
-## Test Metadata
+## 测试元信息
 
 - target: ${publicBaseUrl}
 - adminBaseUrl: ${adminBaseUrl}
@@ -180,9 +180,9 @@ const renderMarkdownSummary = (data) => {
 - includePreAuth: ${includePreAuth}
 - generatedAt: ${new Date().toISOString()}
 
-## Result Summary
+## 结果摘要
 
-| Metric | Value |
+| 指标 | 值 |
 | --- | --- |
 | http_reqs.count | ${metricValue(data, "http_reqs", "count")} |
 | http_req_failed.rate | ${metricValue(data, "http_req_failed", "rate")} |
@@ -191,7 +191,7 @@ const renderMarkdownSummary = (data) => {
 | http_req_duration.p99 | ${metricValue(data, "http_req_duration", "p(99)")} |
 | iterations.count | ${metricValue(data, "iterations", "count")} |
 
-## Required Analysis
+## 必填分析
 
 - 说明测试环境规格、Docker Compose 配置、API 镜像版本和数据库数据量。
 - 记录测试期间 API、MySQL、Redis、MinIO、RocketMQ、nginx 的 CPU、内存、连接数和错误日志。

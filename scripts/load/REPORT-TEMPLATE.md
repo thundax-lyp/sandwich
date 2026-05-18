@@ -1,6 +1,6 @@
-# Sandwich k6 API Read Load Test Report
+# Sandwich k6 API 读链路压测报告
 
-## Test Metadata
+## 测试元信息
 
 - 测试日期：
 - 执行人：
@@ -11,9 +11,9 @@
 - 被测环境：
 - 数据规模：
 
-## Environment
+## 环境说明
 
-| Component | Deployment | CPU | Memory | Notes |
+| 组件 | 部署方式 | CPU | 内存 | 备注 |
 | --- | --- | --- | --- | --- |
 | nginx |  |  |  |  |
 | sandwish-admin-api |  |  |  |  |
@@ -24,27 +24,27 @@
 | MinIO |  |  |  |  |
 | RocketMQ |  |  |  |  |
 
-## Test Plan
+## 测试计划
 
-| Phase | Command | Stages | Duration | Write Data |
+| 阶段 | 命令 | 阶梯 | 持续时间 | 是否写入数据 |
 | --- | --- | --- | --- | --- |
-| smoke | `scripts/smoke/smoke-all.sh` | - | - | no |
-| API surface smoke | `scripts/smoke/smoke-api-surface.sh` | - | - | no |
-| baseline | `scripts/load/run-k6-api-read.sh` |  |  | no |
-| stress |  |  |  | no |
-| soak |  |  |  | no |
+| smoke | `scripts/smoke/smoke-all.sh` | - | - | 否 |
+| API surface 冒烟 | `scripts/smoke/smoke-api-surface.sh` | - | - | 否 |
+| baseline | `scripts/load/run-k6-api-read.sh` |  |  | 否 |
+| stress |  |  |  | 否 |
+| soak |  |  |  | 否 |
 
-## Results
+## 测试结果
 
-| Phase | QPS | Error Rate | Avg | P95 | P99 | Max | Result |
+| 阶段 | QPS | 错误率 | Avg | P95 | P99 | Max | 结果 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | baseline |  |  |  |  |  |  |  |
 | stress |  |  |  |  |  |  |  |
 | soak |  |  |  |  |  |  |  |
 
-## Resource Metrics
+## 资源指标
 
-| Component | CPU Peak | Memory Peak | Error Log | Notes |
+| 组件 | CPU 峰值 | 内存峰值 | 错误日志 | 备注 |
 | --- | --- | --- | --- | --- |
 | nginx |  |  |  |  |
 | admin-api |  |  |  |  |
@@ -55,7 +55,7 @@
 | MinIO |  |  |  |  |
 | RocketMQ |  |  |  |  |
 
-## Bottleneck Analysis
+## 瓶颈分析
 
 - 现象：
 - 证据：
@@ -63,7 +63,7 @@
 - 根因判断：
 - 处理建议：
 
-## Conclusion
+## 结论
 
 - 是否通过：
 - 当前容量边界：

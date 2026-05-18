@@ -85,6 +85,15 @@ public class AuthControllerContractTest {
                 .andExpect(jsonPath("$.data.expireAt").value(1778513052155L));
     }
 
+    @Test
+    public void shouldRejectSmsLoginWhenRequiredFieldsAreMissing() throws Exception {
+        mockMvc(mock(AdminAuthService.class), mock(PreAuthSessionService.class))
+                .perform(post("/api/auth/session/login/sms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+    }
+
     private MockMvc mockMvc(AdminAuthService authService, PreAuthSessionService preAuthSessionService) {
         return MockMvcBuilders.standaloneSetup(new AuthController(
                         authService,

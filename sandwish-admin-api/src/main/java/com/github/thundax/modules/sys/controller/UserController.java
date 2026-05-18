@@ -13,6 +13,7 @@ import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialType;
+import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityStatus;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
@@ -24,6 +25,7 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.PrincipalCredentialService;
 import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.command.PrincipalCredentialCommand;
+import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
@@ -62,6 +64,7 @@ import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCom
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
+import com.github.thundax.modules.sys.utils.SysApiUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -217,6 +220,7 @@ public class UserController {
         if (StringUtils.isBlank(request.getLoginPass())) {
             throw AdminResponseExceptions.invalidParameter("password");
         }
+        validatePassword(request.getLoginPass());
 
         User entity = UserInterfaceAssembler.toEntity(new User(), request);
         String encryptedPassword = PasswordHelper.encrypt(request.getLoginPass());
@@ -229,6 +233,8 @@ public class UserController {
         }
 
         entity.setId(userService.create(UserInterfaceAssembler.toCreateCommand(request, encryptedPassword)));
+        PrincipalIdentity accountIdentity = upsertAccountIdentity(entity, request.getLoginName());
+        upsertPassword(entity, encryptedPassword, accountIdentity);
 
         return toResponse(entity);
     }
@@ -251,6 +257,7 @@ public class UserController {
             String password = Sm2Crypto.decrypt(request.getLoginPass(), getPrivateKey(request.getToken()));
             // 先解密，否则密码规则无法校验
             request.setLoginPass(password);
+            validatePassword(request.getLoginPass());
         }
         validateDepartment(request.getDepartment());
         validateRoles(request.getRoleList());
@@ -274,8 +281,9 @@ public class UserController {
 
         userService.changeInfo(UserInterfaceAssembler.toChangeInfoCommand(request));
 
+        PrincipalIdentity accountIdentity = upsertAccountIdentity(entity, request.getLoginName());
         if (StringUtils.isNotBlank(request.getLoginPass())) {
-            upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()));
+            upsertPassword(entity, PasswordHelper.encrypt(request.getLoginPass()), accountIdentity);
         }
 
         return toResponse(entity);
@@ -628,8 +636,7 @@ public class UserController {
                 PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(userId)), PrincipalIdentityType.USER_ACCOUNT));
     }
 
-    private void upsertPassword(User user, String encryptedPassword) {
-        PrincipalIdentity accountIdentity = getAccountIdentity(user.getId());
+    private void upsertPassword(User user, String encryptedPassword, PrincipalIdentity accountIdentity) {
         if (accountIdentity == null || StringUtils.isBlank(encryptedPassword)) {
             return;
         }
@@ -655,6 +662,36 @@ public class UserController {
         credential.setLockedUntil(null);
         credential.setLastVerifiedAt(null);
         principalCredentialService.change(new PrincipalCredentialCommand(credential));
+    }
+
+    private PrincipalIdentity upsertAccountIdentity(User user, String loginName) {
+        if (user == null || user.getId() == null || StringUtils.isBlank(loginName)) {
+            return null;
+        }
+        PrincipalKey principalKey = PrincipalKey.of(PrincipalType.USER, UserIdCodec.toValue(user.getId()));
+        PrincipalIdentity accountIdentity = getAccountIdentity(user.getId());
+        if (accountIdentity == null) {
+            accountIdentity = new PrincipalIdentity();
+            accountIdentity.setPrincipalKey(principalKey);
+            accountIdentity.setType(PrincipalIdentityType.USER_ACCOUNT);
+            accountIdentity.setIdentityValue(loginName);
+            accountIdentity.setStatus(PrincipalIdentityStatus.ENABLED);
+            accountIdentity.setId(principalIdentityService.create(new PrincipalIdentityCommand(accountIdentity)));
+            return accountIdentity;
+        }
+
+        accountIdentity.setPrincipalKey(principalKey);
+        accountIdentity.setType(PrincipalIdentityType.USER_ACCOUNT);
+        accountIdentity.setIdentityValue(loginName);
+        accountIdentity.setStatus(PrincipalIdentityStatus.ENABLED);
+        principalIdentityService.change(new PrincipalIdentityCommand(accountIdentity));
+        return accountIdentity;
+    }
+
+    private void validatePassword(String password) {
+        if (!password.matches(SysApiUtils.PASSWORD_VALIDATE_PATTERN)) {
+            throw AdminResponseExceptions.invalidParameter("password");
+        }
     }
 
     private PrincipalIdentityQuery identityQuery(PrincipalIdentityType identityType, String identityValue) {

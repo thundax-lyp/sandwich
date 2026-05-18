@@ -90,15 +90,6 @@ public class AdminCurrentUserIT extends AbstractAdminApiIT {
         assertEquals(null, deleted.get("avatar"));
     }
 
-    private AuthToken loginAdmin() {
-        PreAuthSession preAuthSession = authClient.createAdminPreAuthSession();
-        return authClient.loginAdmin(
-                preAuthSession.getLoginToken(),
-                "it-admin",
-                Sm2Crypto.encrypt("Q1w2e3r$", preAuthSession.getPublicKey()),
-                "6666");
-    }
-
     private byte[] jpegBytes() throws Exception {
         BufferedImage image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
         image.setRGB(0, 0, Color.RED.getRGB());

@@ -6,6 +6,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -29,6 +30,14 @@ public class IntegrationHttpClient {
 
     public <T> T get(String path, Class<T> responseType) {
         ResponseEntity<T> response = restOperations.getForEntity(url(path), responseType);
+        return response.getBody();
+    }
+
+    public <T> T get(String path, Map<String, String> headerValues, Class<T> responseType) {
+        HttpHeaders headers = new HttpHeaders();
+        addHeaders(headers, headerValues);
+        ResponseEntity<T> response =
+                restOperations.exchange(url(path), HttpMethod.GET, new HttpEntity<>(headers), responseType);
         return response.getBody();
     }
 

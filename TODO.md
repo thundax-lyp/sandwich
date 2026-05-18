@@ -7,16 +7,7 @@
 - 已完成任务必须删除，不在 `TODO.md` 中打勾长期保留。
 - 完成记录保留在 commit 或 PR 中。
 
-## 待审阅任务项
-
-- [ ] `admin-sys-it`：补齐用户与角色集成测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminUserQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminUserMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminRoleQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminRoleMutationIT.java
-  - 处理动作：覆盖 UserController 和 RoleController 的查询、写入、状态、排序、头像、角色分配和失败链路
-  - 验收点：用户与角色全部业务接口通过真实 HTTP 入口完成成功和失败断言
-  - 重要度：10/10
+## 当前任务项
 
 - [ ] `admin-sys-it`：补齐菜单、部门、字典和日志集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminMenuQueryIT.java
@@ -29,6 +20,8 @@
   - 处理动作：覆盖菜单、部门、字典、日志的查询、写入、移动、排序、删除和失败链路
   - 验收点：MenuController、DepartmentController、DictController、LogController 全部业务接口通过真实 HTTP 入口完成断言
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `admin-open-storage-it`：补齐 OpenClient 与存储集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/open/AdminOpenClientQueryIT.java

@@ -1,7 +1,10 @@
 package com.github.thundax.integration;
 
 import com.github.thundax.AdminApiApplication;
+import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.test.integration.IntegrationAuthClient;
+import com.github.thundax.common.test.integration.IntegrationAuthClient.AuthToken;
+import com.github.thundax.common.test.integration.IntegrationAuthClient.PreAuthSession;
 import com.github.thundax.common.test.integration.IntegrationDatabaseScriptRunner;
 import com.github.thundax.common.test.integration.IntegrationHttpClient;
 import com.github.thundax.common.test.integration.IntegrationOssCleaner;
@@ -102,5 +105,24 @@ public abstract class AbstractAdminApiIT {
         Map<String, Object> request = new LinkedHashMap<String, Object>();
         request.put(name, value);
         return request;
+    }
+
+    protected AuthToken loginAdmin() {
+        return loginAdmin("it-admin", "Q1w2e3r$", "6666");
+    }
+
+    protected AuthToken loginAdmin(String userName, String password, String captcha) {
+        PreAuthSession preAuthSession = authClient.createAdminPreAuthSession();
+        return authClient.loginAdmin(
+                preAuthSession.getLoginToken(),
+                userName,
+                Sm2Crypto.encrypt(password, preAuthSession.getPublicKey()),
+                captcha);
+    }
+
+    protected String encryptedWithNewPreAuthSession(Map<String, Object> request, String password) {
+        PreAuthSession preAuthSession = authClient.createAdminPreAuthSession();
+        request.put("token", preAuthSession.getLoginToken());
+        return Sm2Crypto.encrypt(password, preAuthSession.getPublicKey());
     }
 }

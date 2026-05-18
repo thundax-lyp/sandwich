@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-support`：补齐集成测试 HTTP 与认证客户端
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationHttpClient.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationAuthClient.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationHttpClientTest.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationAuthClientTest.java
-  - 处理动作：封装 JSON POST、GET、multipart、admin/front 登录、token refresh 和 logout 测试调用
-  - 验收点：admin、front、open 集成测试能复用同一 HTTP 客户端；入口集成测试能通过认证客户端获取测试 token
-  - 重要度：9/10
-
 - [ ] `integration-support`：补齐集成测试数据与资源清理支撑
   - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationDatabaseScriptRunner.java
   - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationRedisCleaner.java

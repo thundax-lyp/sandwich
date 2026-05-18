@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-env`：补充集成测试环境变量样例
-  - 范围文件：deploy/integration/.env.example
-  - 处理动作：新增 MySQL、Redis、RocketMQ、OSS 和测试前缀的环境变量样例
-  - 验收点：`docker-compose.yml` 和 `application-it.yml` 所需变量均有样例值
-  - 重要度：8/10
-
 - [ ] `integration-env`：补充集成测试 Docker Compose
   - 范围文件：deploy/integration/docker-compose.yml
   - 处理动作：新增 MySQL、Redis、RocketMQ 集成测试基础服务

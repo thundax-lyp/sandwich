@@ -9,9 +9,16 @@
     --sandwish-table-muted: var(--text-muted);
     --sandwish-table-panel-bg: color-mix(in srgb, var(--surface-panel) 62%, transparent);
     --sandwish-table-primary: var(--accent-blue);
+    --sandwish-table-resize-line: color-mix(in srgb, var(--text-muted) 38%, transparent);
+    --sandwish-table-resize-line-active: color-mix(in srgb, var(--accent-blue) 88%, #0f172a);
     position: relative;
     z-index: 1;
     min-width: 0;
+}
+
+html[data-theme="dark"] .sandwish-table {
+    --sandwish-table-resize-line: color-mix(in srgb, var(--text-muted) 24%, transparent);
+    --sandwish-table-resize-line-active: var(--sandwish-table-primary);
 }
 
 .sandwish-table .ant-table {
@@ -77,13 +84,18 @@
     -webkit-font-smoothing: antialiased;
 }
 
+.sandwish-table .ant-table-thead > tr > th.sandwish-table-action-column {
+    text-align: center;
+}
+
 .sandwish-table-column-title {
     display: inline-flex;
     min-width: 0;
     width: 100%;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
+    text-align: left;
 }
 
 .sandwish-table-column-resize-handle {
@@ -101,13 +113,21 @@
     top: 0;
     bottom: 0;
     left: 3px;
-    width: 1px;
+    width: 2px;
     content: "";
-    background: transparent;
+    background: var(--sandwish-table-resize-line);
+    border-radius: 999px;
+    transition:
+        background 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.16s ease;
 }
 
-.sandwish-table-column-resize-handle:hover::after {
-    background: var(--sandwish-table-primary);
+.sandwish-table-column-resize-handle:hover::after,
+.sandwish-table-column-resize-handle:active::after {
+    background: var(--sandwish-table-resize-line-active);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--sandwish-table-primary) 12%, transparent);
+    transform: scaleX(1.4);
 }
 
 .sandwish-table .ant-table-tbody > tr > td {
@@ -124,7 +144,6 @@
 }
 
 .sandwish-table .ant-table-thead > tr > th.ant-table-cell-fix-right {
-    text-align: center;
     background: var(--sandwish-table-fixed-head-bg);
 }
 

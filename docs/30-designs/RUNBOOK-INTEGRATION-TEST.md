@@ -152,6 +152,7 @@ open API 覆盖域：
 2. 新增 `deploy/integration/docker-compose.yml` 和 `.env.example`。
 3. 新增 `deploy/integration/db/` 目录结构。
 4. 固定 MySQL、Redis、RocketMQ 的端口、账号、database、topic 和 group 前缀。
+5. 固定集成测试执行前的 Docker 环境启动和健康检查命令。
 
 ### Phase 3: Test Profile
 
@@ -189,9 +190,12 @@ open API 覆盖域：
 2. 跑完整集成测试命令。
 3. 更新 `deploy/integration/README.md` 中的命令、数据和排错说明。
 4. 删除或收窄已完成 `TODO.md` 项。
-5. 清理本 RUNBOOK 和残留引用。
+5. 同步 Docker 运行配置并重建 `deploy/image-files/*.tar`。
+6. 清理本 RUNBOOK 和残留引用。
 
 ## Verification
+
+执行集成测试前必须先启动测试 Docker 环境，并确认 MySQL、Redis、RocketMQ 服务健康。
 
 基础环境验收：
 
@@ -208,6 +212,7 @@ mvn test
 集成测试验收：
 
 ```bash
+docker compose -f deploy/integration/docker-compose.yml ps
 mvn verify -Pit
 ```
 

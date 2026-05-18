@@ -9,23 +9,14 @@
 
 ## 当前任务项
 
-- [ ] `open-api-it`：补齐开放接口签名与提交集成测试
-  - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/auth/OpenApiSignatureIT.java
-  - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/submission/OpenSubmissionQueryIT.java
-  - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/submission/OpenSubmissionMutationIT.java
-  - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/submission/OpenSubmissionUploadIT.java
-  - 处理动作：覆盖签名成功、签名失败、nonce 重放、IP 白名单失败、开放 submission 查询/创建/状态变更/图片上传接口
-  - 验收点：OpenAPI 认证过滤链路和开放提交业务接口通过真实 HTTP 入口完成成功和失败断言
-  - 重要度：10/10
-
-## 待审阅任务项
-
 - [ ] `integration-docs`：补齐接口覆盖清单和最终运行说明
   - 范围文件：deploy/integration/API-COVERAGE.md
   - 范围文件：deploy/integration/README.md
   - 处理动作：新增 Controller 接口到 `*IT.java` 的覆盖映射清单，并同步最终命令、数据装载、覆盖清单和排错说明
   - 验收点：admin、front、open 全部业务接口均能在清单中定位到集成测试文件；README 与实际 compose、SQL、profile 和 Maven 命令一致
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `integration-docker`：同步 Docker 运行配置
   - 范围文件：deploy/docker-compose.yml

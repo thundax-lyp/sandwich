@@ -2,7 +2,7 @@
 
 本文档用途：说明集成测试 Docker 环境、数据初始化、测试运行、清理和排错入口。
 
-设计和阶段拆解以 `docs/30-designs/RUNBOOK-INTEGRATION-TEST.md` 为准。正式部署样例仍以 `deploy/README.md` 和 `deploy/docker-compose.yml` 为准。
+阶段拆解以 `TODO.md` 为准。正式部署样例仍以 `deploy/README.md` 和 `deploy/docker-compose.yml` 为准。
 
 ## Purpose
 
@@ -148,6 +148,16 @@ mvn -pl sandwish-front-api -am verify -Pit
 mvn -pl sandwish-open-api -am verify -Pit
 ```
 
+调试单组 IT 时可用 Surefire 指定类名：
+
+```bash
+mvn -pl sandwish-admin-api -am -Dtest=AdminAuthSessionIT test
+mvn -pl sandwish-front-api -am -Dtest=FrontAuthSessionIT test
+mvn -pl sandwish-open-api -am -Dtest=OpenApiSignatureIT,OpenSubmissionQueryIT,OpenSubmissionMutationIT,OpenSubmissionUploadIT test
+```
+
+接口覆盖清单见 `deploy/integration/API-COVERAGE.md`。新增或修改 Controller 时，必须同步该清单和对应 `*IT.java`。
+
 ## Cleanup
 
 停止集成测试环境：
@@ -170,5 +180,7 @@ docker compose --env-file deploy/integration/.env -f deploy/integration/docker-c
 - MySQL 初始化失败：先执行 `docker compose ... down -v`，再重新启动环境。
 - Redis 数据污染：确认 key prefix 使用 integration 专用前缀。
 - RocketMQ 启动慢：先确认 NameServer 健康，再检查 Broker 日志。
+- RocketMQ 同步发送超时：先确认本地测试进程可访问 `127.0.0.1:${SANDWISH_IT_ROCKETMQ_NAMESRV_PORT}` 和 Broker `127.0.0.1:${SANDWISH_IT_ROCKETMQ_BROKER_PORT}`。
+- RocketMQ 多 IP 环境异常：确认 `deploy/integration/rocketmq/broker.conf` 中 `brokerIP1` 与宿主机访问地址一致。
 - 集成测试拒绝启动：确认 `application-it.yml` 中 `sandwish.integration-test.enabled=true`。
 - 验证码失败：确认测试请求提交的 `captcha` 命中验证码值白名单。

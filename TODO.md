@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-maven`：补充 common-test 集成测试支撑依赖
-  - 范围文件：sandwish-common/sandwish-common-test/pom.xml
-  - 处理动作：增加集成测试支撑所需的测试依赖声明
-  - 验收点：common-test 能编译 HTTP、数据库、Redis 和 Spring 测试支撑类
-  - 重要度：8/10
-
 - [ ] `integration-profile`：补充 admin API 集成测试配置
   - 范围文件：sandwish-admin-api/src/test/resources/application-it.yml
   - 处理动作：新增 admin 入口集成测试 profile 配置

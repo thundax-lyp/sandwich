@@ -83,10 +83,12 @@ deploy/integration/
 - 集成测试专用 Redis key prefix。
 - 集成测试专用 RocketMQ topic、group 和 tag 前缀。
 - 本地 OSS 临时目录。
-- 验证码白名单固定值。
+- 验证码值白名单，例如 `6666`、`8888`。
 - OpenAPI 固定 `clientId`、`clientSecret`、nonce 和 IP 白名单数据口径。
 
 测试启动时必须校验 `sandwish.integration-test.enabled=true`，未开启时集成测试直接失败。
+
+验证码白名单固定按提交的 `captcha` 值判断。请求中的 `captcha` 命中白名单值时，验证码校验放行；白名单不得绑定手机号、邮箱、登录名或用户 ID。该规则用于充分覆盖注册、登录和验证码失败链路。
 
 ## Data Plan
 

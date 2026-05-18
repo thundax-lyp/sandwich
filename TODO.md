@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-support`：补齐三类 API 集成测试基类
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/AbstractAdminApiIT.java
-  - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/AbstractFrontApiIT.java
-  - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/AbstractOpenApiIT.java
-  - 处理动作：新增 admin、front、open 入口 HTTP 端口、token/签名、数据重置和 profile guard 基类
-  - 验收点：三类入口 `*IT.java` 能继承基类完成身份准备、签名请求和数据准备
-  - 重要度：9/10
-
 - [ ] `integration-data`：补齐后台账号与权限 baseline 数据
   - 范围文件：deploy/integration/db/10-baseline/001-admin-user.sql
   - 范围文件：deploy/integration/db/10-baseline/002-admin-role-menu-permission.sql

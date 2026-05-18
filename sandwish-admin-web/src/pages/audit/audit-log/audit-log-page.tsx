@@ -7,8 +7,12 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Descriptions, Empty, Input, Select, Space, Tag, Typography } from "antd";
+import { Avatar, Button, Descriptions, Empty, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import { useCurrentAccessToken } from "@/auth/hooks";
+import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
+import { ADMIN_API_BASE_URL } from "@/api/http";
 import { ListPage } from "@/components/list-page";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
@@ -35,6 +39,8 @@ const DEFAULT_COLUMN_WIDTHS = {
     summary: 260,
     actions: 84
 };
+
+const ADMIN_OPERATOR_TYPE = "USER";
 
 interface AuditLogFilters {
     objectType: string;
@@ -96,6 +102,24 @@ const readObjectTypeLabel = (log: AuditLogResponse) => {
     return log.objectTypeLabel || log.objectType || "未知对象";
 };
 
+const getInitials = (value?: string | null) => {
+    const normalizedValue = value?.trim() || "U";
+    return Array.from(normalizedValue.replace(/\s+/g, "")).slice(0, 2).join("");
+};
+
+const readOperatorName = (log: AuditLogResponse) => {
+    return log.operatorName || log.operatorId || "-";
+};
+
+const readOperatorUser = (log: AuditLogResponse) => {
+    const name = readOperatorName(log);
+    const avatarUrl =
+        log.operatorType === ADMIN_OPERATOR_TYPE && log.operatorId
+            ? `${ADMIN_API_BASE_URL}/sys/user/avatar?id=${encodeURIComponent(log.operatorId)}`
+            : undefined;
+    return { avatarUrl, name };
+};
+
 const optionItems = (options?: Array<{ value: string; label: string }>) => [
     { value: "ALL", label: "全部" },
     ...(options || []).map((option) => ({
@@ -142,7 +166,25 @@ const renderSnapshot = (snapshot?: AuditSnapshotResponse | null) => {
     );
 };
 
+const renderOperator = (
+    log: AuditLogResponse,
+    accessToken: string | null,
+    nameNode?: ReactNode
+) => {
+    const user = readOperatorUser(log);
+    const avatarUrl = toAuthenticatedResourceUrl(user.avatarUrl, accessToken);
+    return (
+        <Space size={8} className="audit-log-operator-cell">
+            <Avatar size={28} src={avatarUrl}>
+                {getInitials(user.name)}
+            </Avatar>
+            {nameNode || <Text ellipsis>{user.name}</Text>}
+        </Space>
+    );
+};
+
 export const AuditLogPage = () => {
+    const accessToken = useCurrentAccessToken();
     const [query, setQuery] = useState<AuditLogPageRequest>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
@@ -283,7 +325,7 @@ export const AuditLogPage = () => {
             key: "operator",
             width: DEFAULT_COLUMN_WIDTHS.operator,
             ellipsis: true,
-            render: (_, log) => log.operatorName || log.operatorId || "-"
+            render: (_, log) => renderOperator(log, accessToken)
         },
         {
             title: "来源",
@@ -524,7 +566,11 @@ export const AuditLogPage = () => {
                                 {detailLog.version ?? "-"}
                             </Descriptions.Item>
                             <Descriptions.Item label="操作者">
-                                {detailLog.operatorName || detailLog.operatorId || "-"}
+                                {renderOperator(
+                                    detailLog,
+                                    accessToken,
+                                    <span>{readOperatorName(detailLog)}</span>
+                                )}
                             </Descriptions.Item>
                             <Descriptions.Item label="操作者类型">
                                 {detailLog.operatorTypeLabel || detailLog.operatorType || "-"}

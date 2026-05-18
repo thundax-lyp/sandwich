@@ -53,6 +53,14 @@
     color: var(--accent-blue);
 }
 
+.audit-log-operator-cell {
+    max-width: 100%;
+}
+
+.audit-log-operator-cell .ant-typography {
+    min-width: 0;
+}
+
 .audit-log-detail {
     display: grid;
     gap: 18px;

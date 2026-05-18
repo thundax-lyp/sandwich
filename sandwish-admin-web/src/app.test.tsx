@@ -743,7 +743,7 @@ describe("App", () => {
                             data: {
                                 objectTypes: [{ value: "SUBMISSION", label: "提交内容" }],
                                 actions: [{ value: "UPDATE", label: "更新" }],
-                                operatorTypes: [{ value: "ADMIN", label: "后台用户" }]
+                                operatorTypes: [{ value: "USER", label: "后台用户" }]
                             }
                         }),
                         {
@@ -775,7 +775,8 @@ describe("App", () => {
                                         version: 2,
                                         action: "UPDATE",
                                         actionLabel: "更新",
-                                        operatorType: "ADMIN",
+                                        operatorType: "USER",
+                                        operatorId: "1000000000000000101",
                                         operatorTypeLabel: "后台用户",
                                         operatorName: "Developer",
                                         source: "ADMIN_WEB",
@@ -813,6 +814,15 @@ describe("App", () => {
         expect(screen.getByText("更新")).toBeInTheDocument();
         expect(screen.getByText("Developer")).toBeInTheDocument();
         expect(screen.queryByRole("columnheader", { name: "字段" })).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(
+                Array.from(document.querySelectorAll("img")).some((image) =>
+                    image.src.endsWith(
+                        "/admin-api/api/sys/user/avatar?id=1000000000000000101&token=test-token"
+                    )
+                )
+            ).toBe(true);
+        });
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/audit/log/page",
             expect.objectContaining({

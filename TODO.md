@@ -11,12 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-profile`：补充 open API 集成测试配置
-  - 范围文件：sandwish-open-api/src/test/resources/application-it.yml
-  - 处理动作：新增 open 入口集成测试 profile 配置
-  - 验收点：open 集成测试能读取 MySQL、Redis、RocketMQ、OpenAPI 签名和防误连配置
-  - 重要度：9/10
-
 - [ ] `integration-guard`：增加集成测试 profile 防误连保护
   - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationTestProfileGuard.java
   - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationTestProfileGuardTest.java

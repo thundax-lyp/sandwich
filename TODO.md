@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-env`：补充集成测试 Docker Compose
-  - 范围文件：deploy/integration/docker-compose.yml
-  - 处理动作：新增 MySQL、Redis、RocketMQ 集成测试基础服务
-  - 验收点：`docker compose -f deploy/integration/docker-compose.yml up -d` 能启动基础环境
-  - 重要度：9/10
-
 - [ ] `integration-env`：补充集成测试 Docker 环境自检
   - 范围文件：deploy/integration/README.md
   - 范围文件：deploy/integration/docker-compose.yml

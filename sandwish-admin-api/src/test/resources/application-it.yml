@@ -41,6 +41,25 @@ sandwish:
             topic: ${SANDWISH_IT_ROCKETMQ_TOPIC_PREFIX:sandwish-it-}sys-log
             tag: "*"
             consumer-group: ${SANDWISH_IT_ROCKETMQ_GROUP_PREFIX:sandwish-it-}admin-sys-log-consumer
+    upload:
+        content-path: /api/storage/object/
+        storage-path: ${SANDWISH_IT_OSS_LOCAL_ROOT:target/integration-test/oss}/admin-api
+        allow-image-suffix:
+            - jpg
+            - jpeg
+            - png
+            - gif
+            - webp
+        allow-suffix:
+            - jpg
+            - jpeg
+            - png
+            - gif
+            - webp
+            - txt
+        max-file-count: 10
+        max-file-size: 20971520
+        image-quality: 0.8
     oss:
         type: ${SANDWISH_IT_OSS_TYPE:local}
         local:

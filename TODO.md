@@ -9,18 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-open-storage-it`：补齐 OpenClient 与存储集成测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/open/AdminOpenClientQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/open/AdminOpenClientMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/storage/AdminStorageObjectQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/storage/AdminStorageObjectMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/storage/AdminMultipartUploadIT.java
-  - 处理动作：覆盖 OpenClient 查询/写入/密钥重置、存储对象查询/上传/删除/排序、分片上传完整链路
-  - 验收点：OpenClientController、StorageController、MultipartUploadController 全部业务接口通过真实 HTTP 入口完成成功和失败断言
-  - 重要度：10/10
-
-## 待审阅任务项
-
 - [ ] `admin-submission-audit-it`：补齐提交内容与审计集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/submission/AdminSubmissionQueryIT.java
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/submission/AdminSubmissionMutationIT.java
@@ -28,6 +16,8 @@
   - 处理动作：覆盖 submission 查询、创建、状态变更、删除、排序、图片上传，以及 audit meta、history、detail、object overview、object page、page、options 和 fields 接口
   - 验收点：SubmissionController 和 AuditController 全部业务接口通过真实 HTTP 入口完成成功和失败断言
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `front-it`：补齐前台认证与注册集成测试
   - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontAuthSessionIT.java

@@ -38,6 +38,9 @@ public class MultipartUploadServiceImplTest {
 
         assertNotNull(saved.getId());
         assertNotNull(saved.getUploadId());
+        assertNotNull(saved.getObjectKey());
+        assertTrue(saved.getObjectKey().startsWith("multipart/upload-1/"));
+        assertEquals("upload-1", saved.getProviderUploadId());
         assertEquals(Integer.valueOf(0), saved.getUploadedPartCount());
         assertSame(MultipartUploadStatus.INITIATED, saved.getUploadStatus());
         assertSame(saved, dao.insertedMultipartSession);

@@ -49,6 +49,12 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         if (StringUtils.isBlank(session.getUploadId())) {
             session.setUploadId(UuidHelper.compact());
         }
+        if (StringUtils.isBlank(session.getObjectKey())) {
+            session.setObjectKey(defaultObjectKey(session));
+        }
+        if (StringUtils.isBlank(session.getProviderUploadId())) {
+            session.setProviderUploadId(session.getUploadId());
+        }
         session.setUploadStatus(MultipartUploadStatus.INITIATED);
         session.setUploadedPartCount(0);
         session.setId(multipartUploadDao.insertMultipartSession(session));
@@ -233,5 +239,14 @@ public class MultipartUploadServiceImpl implements MultipartUploadService {
         }
         int index = originalFilename.lastIndexOf(EXTENSION_SEPARATOR);
         return index < 0 ? null : StringUtils.lowerCase(originalFilename.substring(index + 1));
+    }
+
+    private String defaultObjectKey(MultipartUploadSession session) {
+        String extension = extension(session.getOriginalFilename());
+        return "multipart/"
+                + session.getUploadId()
+                + "/"
+                + UuidHelper.compact()
+                + (StringUtils.isBlank(extension) ? "" : EXTENSION_SEPARATOR + extension);
     }
 }

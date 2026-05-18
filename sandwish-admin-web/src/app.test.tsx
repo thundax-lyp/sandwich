@@ -5,6 +5,7 @@ import App from "./app";
 import { postJson } from "./api/http";
 import { clearPermissions, hasPermission, replacePermissions } from "./auth/permission-storage";
 import { SandwishTable } from "./components/sandwish-table";
+import { AuditLogPage } from "./pages/audit/audit-log/audit-log-page";
 import { OpenClientPage } from "./pages/open/open-client/open-client-page";
 import { SubmissionPage } from "./pages/submission/submission/submission-page";
 import { DepartmentPage } from "./pages/system/department/department-page";
@@ -718,6 +719,106 @@ describe("App", () => {
             expect.objectContaining({
                 body: JSON.stringify({
                     id: "1"
+                }),
+                headers: expect.objectContaining({
+                    "Access-Token": "test-token"
+                }),
+                method: "POST"
+            })
+        );
+    });
+
+    it("renders the audit log page", async () => {
+        localStorage.setItem("sandwish.admin.accessToken", "test-token");
+        localStorage.setItem("sandwish.admin.permissions", JSON.stringify(["audit:view"]));
+        replacePermissions(["audit:view"]);
+        vi.spyOn(globalThis, "fetch").mockImplementation((input) => {
+            const url = String(input);
+            if (url.endsWith("/audit/log/options")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                objectTypes: [{ value: "SUBMISSION", label: "提交内容" }],
+                                actions: [{ value: "UPDATE", label: "更新" }],
+                                operatorTypes: [{ value: "ADMIN", label: "后台用户" }]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            if (url.endsWith("/audit/log/page")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                pageNo: 1,
+                                pageSize: 10,
+                                totalPage: 1,
+                                totalCount: 1,
+                                records: [
+                                    {
+                                        id: "9001",
+                                        objectType: "SUBMISSION",
+                                        objectTypeLabel: "提交内容",
+                                        objectId: "1001",
+                                        objectDisplayName: "产品反馈",
+                                        version: 2,
+                                        action: "UPDATE",
+                                        actionLabel: "更新",
+                                        operatorType: "ADMIN",
+                                        operatorTypeLabel: "后台用户",
+                                        operatorName: "Developer",
+                                        source: "ADMIN_WEB",
+                                        summary: "更新提交内容",
+                                        occurredAt: "2026-05-19T10:00:00.000+08:00",
+                                        changedFieldCount: 1
+                                    }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
+            return Promise.resolve(
+                new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
+                    headers: { "Content-Type": "application/json" },
+                    status: 404
+                })
+            );
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <AuditLogPage />
+            </QueryClientProvider>
+        );
+
+        expect(await screen.findByRole("heading", { name: "审计日志" })).toBeInTheDocument();
+        expect(await screen.findByText("产品反馈")).toBeInTheDocument();
+        expect(screen.getByText("提交内容")).toBeInTheDocument();
+        expect(screen.getByText("更新")).toBeInTheDocument();
+        expect(screen.getByText("Developer")).toBeInTheDocument();
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/audit/log/page",
+            expect.objectContaining({
+                body: JSON.stringify({
+                    pageNo: 1,
+                    pageSize: 10
                 }),
                 headers: expect.objectContaining({
                     "Access-Token": "test-token"

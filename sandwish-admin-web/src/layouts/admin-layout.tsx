@@ -50,6 +50,8 @@ const menuIconMap: Record<string, ReactNode> = {
     departments: <AppstoreOutlined />,
     dictionaries: <BookOutlined />,
     logs: <AuditOutlined />,
+    audit: <AuditOutlined />,
+    "audit-logs": <AuditOutlined />,
     storage: <CloudServerOutlined />,
     "storage-objects": <CloudServerOutlined />,
     submission: <FileTextOutlined />,
@@ -76,6 +78,10 @@ const getOpenKeys = (pathname: string) => {
 
     if (pathname.startsWith("/open/")) {
         openKeys.push("/open");
+    }
+
+    if (pathname.startsWith("/audit/")) {
+        openKeys.push("/audit");
     }
 
     return openKeys;

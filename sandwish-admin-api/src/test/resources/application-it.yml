@@ -1,0 +1,54 @@
+server:
+    port: ${SANDWISH_IT_ADMIN_API_PORT:12009}
+    servlet:
+        context-path: /admin-api
+
+spring:
+    application:
+        name: sandwish-admin-api-it
+    datasource:
+        driver-class-name: ${SANDWISH_IT_DB_DRIVER:com.mysql.jdbc.Driver}
+        url: "jdbc:mysql://127.0.0.1:${SANDWISH_IT_MYSQL_PORT:13306}/${SANDWISH_IT_MYSQL_DATABASE:sandwish_integration}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+        username: ${SANDWISH_IT_MYSQL_USER:sandwish_it}
+        password: ${SANDWISH_IT_MYSQL_PASSWORD:sandwish_it_password}
+    redis:
+        url: "redis://:${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}@127.0.0.1:${SANDWISH_IT_REDIS_PORT:16379}/0"
+        password: ${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}
+        timeout: ${SANDWISH_IT_REDIS_TIMEOUT:5s}
+
+jetcache:
+    remote:
+        default:
+            uri: "redis://:${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}@127.0.0.1:${SANDWISH_IT_REDIS_PORT:16379}/0"
+
+rocketmq:
+    name-server: "127.0.0.1:${SANDWISH_IT_ROCKETMQ_NAMESRV_PORT:19876}"
+    producer:
+        group: ${SANDWISH_IT_ROCKETMQ_GROUP_PREFIX:sandwish-it-}admin-api-producer
+
+sandwish:
+    integration-test:
+        enabled: ${SANDWISH_INTEGRATION_TEST_ENABLED:true}
+        captcha:
+            whitelist-values: ${SANDWISH_IT_CAPTCHA_WHITELIST:6666,8888}
+    mq:
+        enabled: true
+        type: ROCKETMQ
+    log:
+        storage-path: ${SANDWISH_IT_LOG_STORAGE_PATH:target/integration-test/sys-log}
+        sys:
+            topic: ${SANDWISH_IT_ROCKETMQ_TOPIC_PREFIX:sandwish-it-}sys-log
+            tag: "*"
+            consumer-group: ${SANDWISH_IT_ROCKETMQ_GROUP_PREFIX:sandwish-it-}admin-sys-log-consumer
+    oss:
+        type: ${SANDWISH_IT_OSS_TYPE:local}
+        local:
+            root-path: ${SANDWISH_IT_OSS_LOCAL_ROOT:target/integration-test/oss}
+            location-prefix: ${SANDWISH_IT_OSS_LOCAL_LOCATION_PREFIX:file:}
+
+swagger:
+    enabled: false
+
+logging:
+    level:
+        root: INFO

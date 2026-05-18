@@ -9,14 +9,7 @@
 
 ## 当前任务项
 
-
 ## 待审阅任务项
-
-- [ ] `integration-profile`：补充 admin API 集成测试配置
-  - 范围文件：sandwish-admin-api/src/test/resources/application-it.yml
-  - 处理动作：新增 admin 入口集成测试 profile 配置
-  - 验收点：admin 集成测试能读取 MySQL、Redis、RocketMQ、本地 OSS、验证码白名单和防误连配置
-  - 重要度：9/10
 
 - [ ] `integration-profile`：补充 front API 集成测试配置
   - 范围文件：sandwish-front-api/src/test/resources/application-it.yml

@@ -11,17 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-support`：补齐集成测试数据与资源清理支撑
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationDatabaseScriptRunner.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationRedisCleaner.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationOssCleaner.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationDatabaseScriptRunnerTest.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationRedisCleanerTest.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationOssCleanerTest.java
-  - 处理动作：封装 cleanup、baseline、scenario SQL 执行入口，以及 Redis key 和本地 OSS 临时目录清理能力
-  - 验收点：测试类能按固定顺序重置并装载集成测试数据；清理动作只影响 integration 前缀和测试临时目录
-  - 重要度：10/10
-
 - [ ] `integration-support`：补齐三类 API 集成测试基类
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/AbstractAdminApiIT.java
   - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/AbstractFrontApiIT.java

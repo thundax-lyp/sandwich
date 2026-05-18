@@ -12,15 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-db`：建立集成测试 SQL 目录骨架
-  - 范围文件：deploy/integration/db/00-schema/.gitkeep
-  - 范围文件：deploy/integration/db/10-baseline/.gitkeep
-  - 范围文件：deploy/integration/db/20-scenarios/.gitkeep
-  - 范围文件：deploy/integration/db/90-cleanup/.gitkeep
-  - 处理动作：新增集成测试 SQL 分层目录占位
-  - 验收点：四个 SQL 分层目录被 Git 跟踪
-  - 重要度：7/10
-
 - [ ] `integration-maven`：增加根 Maven 集成测试 profile
   - 范围文件：pom.xml
   - 处理动作：新增 `it` profile 和 Failsafe 配置执行 `*IT.java`

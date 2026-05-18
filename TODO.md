@@ -11,15 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-data`：补齐开放接口、会员、存储和提交 baseline 数据
-  - 范围文件：deploy/integration/db/10-baseline/005-open-client.sql
-  - 范围文件：deploy/integration/db/10-baseline/006-member.sql
-  - 范围文件：deploy/integration/db/10-baseline/007-storage.sql
-  - 范围文件：deploy/integration/db/10-baseline/008-submission.sql
-  - 处理动作：新增 OpenClient、前台会员、存储对象、分片上传、submission 和 submission image 测试数据
-  - 验收点：admin open client、open-api 签名、front 登录注册、storage 和 submission 链路具备稳定数据
-  - 重要度：10/10
-
 - [ ] `integration-data`：补齐集成测试 cleanup 脚本
   - 范围文件：deploy/integration/db/90-cleanup/001-clean-business-data.sql
   - 范围文件：deploy/integration/db/90-cleanup/002-clean-auth-data.sql

@@ -26,7 +26,7 @@ INSERT INTO `sys_menu` (
     `visibility`, `display_params`, `url`, `target`, `remarks`
 ) VALUES
     (
-        9100000000000001001, NULL, 1, 28, 'Integration System', NULL, 0,
+        9100000000000001001, NULL, 1, 46, 'Integration System', NULL, 0,
         'VISIBLE', '{"icon":"system"}', '/integration/system', NULL, 'Integration system root menu'
     ),
     (
@@ -80,6 +80,42 @@ INSERT INTO `sys_menu` (
     (
         9100000000000001014, 9100000000000001001, 26, 27, 'Integration Audit View', 'audit:view', 0,
         'HIDDEN', '{"icon":"audit"}', NULL, NULL, 'Integration audit view permission'
+    ),
+    (
+        9100000000000001015, 9100000000000001001, 28, 33, 'Integration Open Clients', NULL, 0,
+        'VISIBLE', '{"icon":"open-clients"}', '/integration/open/clients', NULL, 'Integration open client menu'
+    ),
+    (
+        9100000000000001016, 9100000000000001015, 29, 30, 'Integration Open Client View', 'open:client:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration open client view permission'
+    ),
+    (
+        9100000000000001017, 9100000000000001015, 31, 32, 'Integration Open Client Edit', 'open:client:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration open client edit permission'
+    ),
+    (
+        9100000000000001018, 9100000000000001001, 34, 39, 'Integration Storage', NULL, 0,
+        'VISIBLE', '{"icon":"storage"}', '/integration/storage/objects', NULL, 'Integration storage menu'
+    ),
+    (
+        9100000000000001019, 9100000000000001018, 35, 36, 'Integration Storage View', 'storage:storage:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration storage view permission'
+    ),
+    (
+        9100000000000001020, 9100000000000001018, 37, 38, 'Integration Storage Edit', 'storage:storage:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration storage edit permission'
+    ),
+    (
+        9100000000000001021, 9100000000000001001, 40, 45, 'Integration Submissions', NULL, 0,
+        'VISIBLE', '{"icon":"submission"}', '/integration/submission/submissions', NULL, 'Integration submission menu'
+    ),
+    (
+        9100000000000001022, 9100000000000001021, 41, 42, 'Integration Submission View', 'submission:submission:view', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration submission view permission'
+    ),
+    (
+        9100000000000001023, 9100000000000001021, 43, 44, 'Integration Submission Edit', 'submission:submission:edit', 0,
+        'HIDDEN', '{"icon":"permission"}', NULL, NULL, 'Integration submission edit permission'
     )
 ON DUPLICATE KEY UPDATE
     `parent_id` = VALUES(`parent_id`),
@@ -115,6 +151,15 @@ INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
     (9100000000000000401, 9100000000000001012),
     (9100000000000000401, 9100000000000001013),
     (9100000000000000401, 9100000000000001014),
+    (9100000000000000401, 9100000000000001015),
+    (9100000000000000401, 9100000000000001016),
+    (9100000000000000401, 9100000000000001017),
+    (9100000000000000401, 9100000000000001018),
+    (9100000000000000401, 9100000000000001019),
+    (9100000000000000401, 9100000000000001020),
+    (9100000000000000401, 9100000000000001021),
+    (9100000000000000401, 9100000000000001022),
+    (9100000000000000401, 9100000000000001023),
     (9100000000000000402, 9100000000000001001),
     (9100000000000000402, 9100000000000001002),
     (9100000000000000402, 9100000000000001003),
@@ -124,6 +169,12 @@ INSERT INTO `sys_role_menu` (`role_id`, `menu_id`) VALUES
     (9100000000000000402, 9100000000000001009),
     (9100000000000000402, 9100000000000001011),
     (9100000000000000402, 9100000000000001012),
-    (9100000000000000402, 9100000000000001014)
+    (9100000000000000402, 9100000000000001014),
+    (9100000000000000402, 9100000000000001015),
+    (9100000000000000402, 9100000000000001016),
+    (9100000000000000402, 9100000000000001018),
+    (9100000000000000402, 9100000000000001019),
+    (9100000000000000402, 9100000000000001021),
+    (9100000000000000402, 9100000000000001022)
 ON DUPLICATE KEY UPDATE
     `menu_id` = VALUES(`menu_id`);

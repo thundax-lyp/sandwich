@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-data`：补齐后台系统参照 baseline 数据
-  - 范围文件：deploy/integration/db/10-baseline/003-department.sql
-  - 范围文件：deploy/integration/db/10-baseline/004-dict.sql
-  - 范围文件：deploy/integration/db/10-baseline/009-audit.sql
-  - 处理动作：新增部门树、字典类型和值、审计元数据和审计对象测试数据
-  - 验收点：部门、字典和审计查询/写入链路具备稳定参照数据
-  - 重要度：9/10
-
 - [ ] `integration-data`：补齐开放接口、会员、存储和提交 baseline 数据
   - 范围文件：deploy/integration/db/10-baseline/005-open-client.sql
   - 范围文件：deploy/integration/db/10-baseline/006-member.sql

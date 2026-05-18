@@ -11,7 +11,7 @@ INSERT INTO `sys_user` (
 ) VALUES
     (
         9100000000000000101, NULL, 'it-admin@sandwish.local', NULL, 'IT-1001',
-        'Integration Admin', 100, 'ADMIN', 'ENABLED', 'Integration test administrator'
+        'Integration Admin', 100, 'SUPER', 'ENABLED', 'Integration test administrator'
     ),
     (
         9100000000000000102, NULL, 'it-user@sandwish.local', NULL, 'IT-1002',

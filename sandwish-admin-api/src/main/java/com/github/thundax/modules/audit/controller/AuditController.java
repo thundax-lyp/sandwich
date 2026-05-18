@@ -20,6 +20,7 @@ import com.github.thundax.modules.audit.controller.response.AuditMetaResponse;
 import com.github.thundax.modules.audit.controller.response.AuditObjectFieldResponse;
 import com.github.thundax.modules.audit.controller.response.AuditObjectOverviewResponse;
 import com.github.thundax.modules.audit.controller.response.AuditOptionsResponse;
+import com.github.thundax.modules.audit.runtime.AuditSnapshotAssemblerRegistry;
 import com.github.thundax.modules.audit.service.AuditService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,9 +38,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuditController {
 
     private final AuditService auditService;
+    private final AuditSnapshotAssemblerRegistry auditSnapshotAssemblerRegistry;
 
-    public AuditController(AuditService auditService) {
+    public AuditController(AuditService auditService, AuditSnapshotAssemblerRegistry auditSnapshotAssemblerRegistry) {
         this.auditService = auditService;
+        this.auditSnapshotAssemblerRegistry = auditSnapshotAssemblerRegistry;
     }
 
     @ApiOperation(value = "获取审计元数据", notes = "audit:view")
@@ -71,7 +74,7 @@ public class AuditController {
         return PageResponseHelper.fromPageResult(
                 auditService.page(
                         AuditInterfaceAssembler.toLogQuery(request), PageInterfaceAssembler.toPageQuery(request)),
-                AuditInterfaceAssembler::toLogResponse);
+                log -> AuditInterfaceAssembler.toLogResponse(log, auditSnapshotAssemblerRegistry));
     }
 
     @ApiOperation(value = "获取审计日志详情", notes = "audit:view")
@@ -86,7 +89,7 @@ public class AuditController {
     @PostMapping(value = "detail")
     public AuditLogDetailResponse detail(@Valid @RequestBody AuditLogDetailRequest request) {
         return AuditInterfaceAssembler.toLogDetailResponse(
-                auditService.getLog(AuditInterfaceAssembler.toLogId(request)));
+                auditService.getLog(AuditInterfaceAssembler.toLogId(request)), auditSnapshotAssemblerRegistry);
     }
 
     @ApiOperation(value = "获取对象审计概览", notes = "audit:view")
@@ -104,7 +107,8 @@ public class AuditController {
                 auditService.getMeta(AuditInterfaceAssembler.toMetaQuery(request)),
                 auditService.page(
                         AuditInterfaceAssembler.toObjectLogQuery(request),
-                        new PageQuery(PageRules.firstPageIndex(), 5)));
+                        new PageQuery(PageRules.firstPageIndex(), 5)),
+                auditSnapshotAssemblerRegistry);
     }
 
     @ApiOperation(value = "获取对象审计分页", notes = "audit:view")
@@ -121,7 +125,7 @@ public class AuditController {
         return PageResponseHelper.fromPageResult(
                 auditService.page(
                         AuditInterfaceAssembler.toLogQuery(request), PageInterfaceAssembler.toPageQuery(request)),
-                AuditInterfaceAssembler::toLogResponse);
+                log -> AuditInterfaceAssembler.toLogResponse(log, auditSnapshotAssemblerRegistry));
     }
 
     @ApiOperation(value = "审计日志分页", notes = "audit:view")
@@ -138,7 +142,7 @@ public class AuditController {
         PageQuery pageQuery = PageInterfaceAssembler.toPageQuery(request);
         return PageResponseHelper.fromPageResult(
                 auditService.page(AuditInterfaceAssembler.toLogQuery(request), pageQuery),
-                AuditInterfaceAssembler::toLogResponse);
+                log -> AuditInterfaceAssembler.toLogResponse(log, auditSnapshotAssemblerRegistry));
     }
 
     @ApiOperation(value = "获取审计选项", notes = "audit:view")
@@ -152,7 +156,7 @@ public class AuditController {
     })
     @PostMapping(value = "options")
     public AuditOptionsResponse options() {
-        return AuditInterfaceAssembler.toOptionsResponse();
+        return AuditInterfaceAssembler.toOptionsResponse(auditSnapshotAssemblerRegistry);
     }
 
     @ApiOperation(value = "获取审计对象字段", notes = "audit:view")
@@ -166,6 +170,6 @@ public class AuditController {
     })
     @PostMapping(value = "fields")
     public List<AuditObjectFieldResponse> fields(@Valid @RequestBody AuditObjectFieldRequest request) {
-        return AuditInterfaceAssembler.toFieldResponses(request.getObjectType());
+        return AuditInterfaceAssembler.toFieldResponses(auditSnapshotAssemblerRegistry, request.getObjectType());
     }
 }

@@ -10,14 +10,19 @@ import com.github.thundax.modules.audit.controller.request.AuditLogDetailRequest
 import com.github.thundax.modules.audit.controller.request.AuditObjectFieldRequest;
 import com.github.thundax.modules.audit.controller.response.AuditLogDetailResponse;
 import com.github.thundax.modules.audit.controller.response.AuditObjectFieldResponse;
+import com.github.thundax.modules.audit.controller.response.AuditOptionResponse;
 import com.github.thundax.modules.audit.controller.response.AuditOptionsResponse;
 import com.github.thundax.modules.audit.entity.AuditLog;
 import com.github.thundax.modules.audit.entity.enums.AuditAction;
 import com.github.thundax.modules.audit.entity.enums.AuditOperatorType;
 import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
+import com.github.thundax.modules.audit.runtime.AuditSnapshotAssemblerRegistry;
 import com.github.thundax.modules.audit.runtime.AuditSnapshots;
+import com.github.thundax.modules.audit.runtime.submission.SubmissionAuditSnapshotAssembler;
+import com.github.thundax.modules.audit.runtime.sys.UserAuditSnapshotAssembler;
 import com.github.thundax.modules.audit.service.AuditService;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
@@ -26,7 +31,7 @@ public class AuditControllerContractTest {
     @Test
     public void shouldReturnAuditDetailForUi() {
         AuditService auditService = mock(AuditService.class);
-        AuditController controller = new AuditController(auditService);
+        AuditController controller = new AuditController(auditService, auditRegistry());
         AuditLog log = auditLog();
         when(auditService.getLog(org.mockito.ArgumentMatchers.argThat(queryWithId(1001L))))
                 .thenReturn(log);
@@ -47,7 +52,7 @@ public class AuditControllerContractTest {
 
     @Test
     public void shouldReturnAuditOptionsAndObjectFieldsForUi() {
-        AuditController controller = new AuditController(mock(AuditService.class));
+        AuditController controller = new AuditController(mock(AuditService.class), auditRegistry());
 
         AuditOptionsResponse options = controller.options();
         List<AuditObjectFieldResponse> fields = controller.fields(fieldRequest("User"));
@@ -55,7 +60,7 @@ public class AuditControllerContractTest {
         assertFalse(options.getObjectTypes().isEmpty());
         assertFalse(options.getActions().isEmpty());
         assertFalse(options.getOperatorTypes().isEmpty());
-        assertEquals("User", options.getObjectTypes().get(0).getValue());
+        assertContainsOption(options.getObjectTypes(), "User");
         assertEquals("CREATE", options.getActions().get(0).getValue());
         assertEquals("name", fields.get(0).getFieldName());
         assertEquals("名称", fields.get(0).getFieldLabel());
@@ -91,5 +96,19 @@ public class AuditControllerContractTest {
 
     private org.mockito.ArgumentMatcher<AuditLogId> queryWithId(Long id) {
         return query -> query != null && AuditLogIdCodec.toDomain(id).equals(query);
+    }
+
+    private AuditSnapshotAssemblerRegistry auditRegistry() {
+        return new AuditSnapshotAssemblerRegistry(
+                Arrays.asList(new UserAuditSnapshotAssembler(), new SubmissionAuditSnapshotAssembler()));
+    }
+
+    private void assertContainsOption(List<AuditOptionResponse> options, String value) {
+        for (AuditOptionResponse option : options) {
+            if (value.equals(option.getValue())) {
+                return;
+            }
+        }
+        throw new AssertionError("missing option " + value);
     }
 }

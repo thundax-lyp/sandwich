@@ -24,5 +24,9 @@ public class SubmissionAuditSnapshotAssemblerTest {
         assertEquals("9001", snapshot.getObjectId());
         assertEquals("title", snapshot.getDisplayName());
         assertEquals(3, snapshot.getFields().size());
+
+        SubmissionAuditSnapshotAssembler assembler = new SubmissionAuditSnapshotAssembler();
+        assertEquals("提交内容", assembler.objectTypeLabel());
+        assertEquals("title", assembler.fields().get(0).getFieldName());
     }
 }

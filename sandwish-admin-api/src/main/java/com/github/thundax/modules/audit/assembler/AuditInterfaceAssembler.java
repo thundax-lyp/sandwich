@@ -25,37 +25,16 @@ import com.github.thundax.modules.audit.entity.valueobject.AuditLogId;
 import com.github.thundax.modules.audit.entity.valueobject.AuditLogIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditMetaIdCodec;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
+import com.github.thundax.modules.audit.runtime.AuditSnapshotAssembler;
+import com.github.thundax.modules.audit.runtime.AuditSnapshotAssemblerRegistry;
 import com.github.thundax.modules.audit.service.query.AuditLogQuery;
 import com.github.thundax.modules.audit.service.query.AuditMetaQuery;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class AuditInterfaceAssembler {
-
-    private static final Map<String, String> OBJECT_TYPE_LABELS = new LinkedHashMap<>();
-    private static final Map<String, List<AuditObjectFieldResponse>> OBJECT_FIELDS = new LinkedHashMap<>();
-
-    static {
-        OBJECT_TYPE_LABELS.put("User", "后台用户");
-        OBJECT_TYPE_LABELS.put("Role", "角色");
-        OBJECT_TYPE_LABELS.put("Menu", "菜单");
-        OBJECT_TYPE_LABELS.put("Department", "部门");
-        OBJECT_TYPE_LABELS.put("Dict", "字典");
-        OBJECT_TYPE_LABELS.put("Member", "会员");
-        OBJECT_TYPE_LABELS.put("Submission", "提交内容");
-
-        OBJECT_FIELDS.put("User", fields(field("name", "名称"), field("status", "状态"), field("privilege", "权限")));
-        OBJECT_FIELDS.put("Role", fields(field("name", "名称"), field("status", "状态"), field("privilege", "权限")));
-        OBJECT_FIELDS.put("Menu", fields(field("name", "名称"), field("perms", "权限"), field("visibility", "可见性")));
-        OBJECT_FIELDS.put("Department", fields(field("name", "名称"), field("shortName", "简称"), field("parentId", "父级")));
-        OBJECT_FIELDS.put("Dict", fields(field("type", "类型"), field("label", "标签"), field("value", "值")));
-        OBJECT_FIELDS.put("Member", fields(field("name", "名称"), field("status", "状态"), field("gender", "性别")));
-        OBJECT_FIELDS.put("Submission", fields(field("title", "标题"), field("content", "正文"), field("status", "状态")));
-    }
 
     private AuditInterfaceAssembler() {}
 
@@ -119,13 +98,21 @@ public final class AuditInterfaceAssembler {
     }
 
     public static AuditLogResponse toLogResponse(AuditLog entity) {
+        return toLogResponse(entity, null);
+    }
+
+    public static AuditLogResponse toLogResponse(AuditLog entity, AuditSnapshotAssemblerRegistry registry) {
         if (entity == null) {
             return AuditLogResponse.builder().changedFields(new ArrayList<>()).build();
         }
-        return logResponseBuilder(entity).build();
+        return logResponseBuilder(entity, registry).build();
     }
 
     public static AuditLogDetailResponse toLogDetailResponse(AuditLog entity) {
+        return toLogDetailResponse(entity, null);
+    }
+
+    public static AuditLogDetailResponse toLogDetailResponse(AuditLog entity, AuditSnapshotAssemblerRegistry registry) {
         if (entity == null) {
             return AuditLogDetailResponse.builder()
                     .changedFields(new ArrayList<>())
@@ -134,7 +121,7 @@ public final class AuditInterfaceAssembler {
         return AuditLogDetailResponse.builder()
                 .id(AuditLogIdCodec.toStringValue(entity.getId()))
                 .objectType(entity.getObjectType())
-                .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
+                .objectTypeLabel(objectTypeLabel(entity.getObjectType(), registry))
                 .objectId(entity.getObjectId())
                 .objectDisplayName(displayName(entity))
                 .version(entity.getVersion())
@@ -166,22 +153,25 @@ public final class AuditInterfaceAssembler {
     }
 
     public static AuditObjectOverviewResponse toOverviewResponse(AuditMeta meta, PageResult<AuditLog> latestLogs) {
+        return toOverviewResponse(meta, latestLogs, null);
+    }
+
+    public static AuditObjectOverviewResponse toOverviewResponse(
+            AuditMeta meta, PageResult<AuditLog> latestLogs, AuditSnapshotAssemblerRegistry registry) {
         return AuditObjectOverviewResponse.builder()
                 .meta(toMetaResponse(meta))
                 .latestLogs(
                         latestLogs == null || latestLogs.getRecords() == null
                                 ? null
                                 : latestLogs.getRecords().stream()
-                                        .map(AuditInterfaceAssembler::toLogResponse)
+                                        .map(log -> AuditInterfaceAssembler.toLogResponse(log, registry))
                                         .collect(Collectors.toList()))
                 .build();
     }
 
-    public static AuditOptionsResponse toOptionsResponse() {
+    public static AuditOptionsResponse toOptionsResponse(AuditSnapshotAssemblerRegistry registry) {
         return AuditOptionsResponse.builder()
-                .objectTypes(OBJECT_TYPE_LABELS.entrySet().stream()
-                        .map(entry -> option(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList()))
+                .objectTypes(objectTypeOptions(registry))
                 .actions(Arrays.stream(AuditAction.values())
                         .map(action -> option(action.value(), actionLabel(action)))
                         .collect(Collectors.toList()))
@@ -191,21 +181,32 @@ public final class AuditInterfaceAssembler {
                 .build();
     }
 
-    public static List<AuditObjectFieldResponse> toFieldResponses(String objectType) {
-        List<AuditObjectFieldResponse> fields = OBJECT_FIELDS.get(objectType);
-        if (fields == null) {
+    private static List<AuditOptionResponse> objectTypeOptions(AuditSnapshotAssemblerRegistry registry) {
+        if (registry == null) {
             return new ArrayList<>();
         }
-        return fields.stream()
-                .map(field -> field(field.getFieldName(), field.getFieldLabel()))
+        return registry.list().stream()
+                .map(assembler -> option(assembler.objectType(), assembler.objectTypeLabel()))
                 .collect(Collectors.toList());
     }
 
-    private static AuditLogResponse.AuditLogResponseBuilder logResponseBuilder(AuditLog entity) {
+    public static List<AuditObjectFieldResponse> toFieldResponses(
+            AuditSnapshotAssemblerRegistry registry, String objectType) {
+        AuditSnapshotAssembler assembler = registry == null ? null : registry.get(objectType);
+        if (assembler == null || assembler.fields() == null) {
+            return new ArrayList<>();
+        }
+        return assembler.fields().stream()
+                .map(field -> objectField(field.getFieldName(), field.getFieldLabel()))
+                .collect(Collectors.toList());
+    }
+
+    private static AuditLogResponse.AuditLogResponseBuilder logResponseBuilder(
+            AuditLog entity, AuditSnapshotAssemblerRegistry registry) {
         return AuditLogResponse.builder()
                 .id(AuditLogIdCodec.toStringValue(entity.getId()))
                 .objectType(entity.getObjectType())
-                .objectTypeLabel(objectTypeLabel(entity.getObjectType()))
+                .objectTypeLabel(objectTypeLabel(entity.getObjectType(), registry))
                 .objectId(entity.getObjectId())
                 .objectDisplayName(displayName(entity))
                 .version(entity.getVersion())
@@ -287,8 +288,9 @@ public final class AuditInterfaceAssembler {
         return null;
     }
 
-    private static String objectTypeLabel(String objectType) {
-        return OBJECT_TYPE_LABELS.get(objectType);
+    private static String objectTypeLabel(String objectType, AuditSnapshotAssemblerRegistry registry) {
+        AuditSnapshotAssembler assembler = registry == null ? null : registry.get(objectType);
+        return assembler == null ? null : assembler.objectTypeLabel();
     }
 
     private static String actionLabel(AuditAction action) {
@@ -345,14 +347,10 @@ public final class AuditInterfaceAssembler {
         return AuditOptionResponse.builder().value(value).label(label).build();
     }
 
-    private static AuditObjectFieldResponse field(String fieldName, String fieldLabel) {
+    private static AuditObjectFieldResponse objectField(String fieldName, String fieldLabel) {
         return AuditObjectFieldResponse.builder()
                 .fieldName(fieldName)
                 .fieldLabel(fieldLabel)
                 .build();
-    }
-
-    private static List<AuditObjectFieldResponse> fields(AuditObjectFieldResponse... fields) {
-        return Arrays.asList(fields);
     }
 }

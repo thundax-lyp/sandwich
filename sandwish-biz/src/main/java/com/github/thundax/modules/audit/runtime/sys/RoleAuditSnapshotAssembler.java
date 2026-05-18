@@ -1,9 +1,12 @@
 package com.github.thundax.modules.audit.runtime.sys;
 
+import com.github.thundax.modules.audit.entity.valueobject.AuditField;
 import com.github.thundax.modules.audit.entity.valueobject.AuditSnapshot;
 import com.github.thundax.modules.audit.runtime.AuditSnapshotAssembler;
 import com.github.thundax.modules.audit.runtime.AuditSnapshots;
 import com.github.thundax.modules.sys.entity.Role;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +17,19 @@ public class RoleAuditSnapshotAssembler implements AuditSnapshotAssembler {
     @Override
     public String objectType() {
         return OBJECT_TYPE;
+    }
+
+    @Override
+    public String objectTypeLabel() {
+        return "角色";
+    }
+
+    @Override
+    public List<AuditField> fields() {
+        return Arrays.asList(
+                AuditSnapshots.field("name", "名称", null),
+                AuditSnapshots.field("status", "状态", null),
+                AuditSnapshots.field("privilege", "权限", null));
     }
 
     @Override

@@ -42,6 +42,20 @@
 - formatter: Spotless
 - rule gate: Checkstyle
 
+版本边界固定为：
+
+- Java 固定使用 `8` / `1.8`。
+- Spring Boot 固定使用 `2.0.5.RELEASE`。
+- 不得为了跟随新版本、统一外部样例或引入新依赖而升级 Java 或 Spring Boot。
+- 新增 Maven 插件、依赖或工具版本时，必须先确认兼容 Java 8 和 Spring Boot `2.0.5.RELEASE`。
+
+JSON 边界固定为：
+
+- HTTP API、接口模型、配置对象和项目内通用 JSON 读写固定使用 Spring Boot 默认 Jackson。
+- 对外 Request / Response 模型使用 Jackson 注解表达 JSON 字段名、空值和反序列化兼容规则。
+- 业务代码、基础设施代码和 API 入口不得新增或使用其他 JSON 包作为项目 JSON 处理能力。
+- JetCache 等第三方组件自身配置中的内部 key convertor 名称不改变项目 JSON 边界；不得据此在业务代码中引入其他 JSON 包。
+
 ## Project Identity
 
 - 项目对外展示名固定为 `Sandwich`。

@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-data`：补齐后台账号与权限 baseline 数据
-  - 范围文件：deploy/integration/db/10-baseline/001-admin-user.sql
-  - 范围文件：deploy/integration/db/10-baseline/002-admin-role-menu-permission.sql
-  - 处理动作：新增后台集成测试管理员、普通用户、角色、菜单、权限、用户角色和角色菜单关系数据
-  - 验收点：admin 登录、当前用户、用户查询、权限成功和权限失败链路具备稳定数据
-  - 重要度：10/10
-
 - [ ] `integration-data`：补齐后台系统参照 baseline 数据
   - 范围文件：deploy/integration/db/10-baseline/003-department.sql
   - 范围文件：deploy/integration/db/10-baseline/004-dict.sql

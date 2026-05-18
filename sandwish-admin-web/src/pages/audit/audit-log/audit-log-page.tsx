@@ -33,7 +33,6 @@ const DEFAULT_COLUMN_WIDTHS = {
     operator: 180,
     source: 140,
     summary: 260,
-    changedFields: 112,
     actions: 84
 };
 
@@ -300,13 +299,6 @@ export const AuditLogPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.summary,
             ellipsis: true,
             render: (summary?: string | null) => summary || "-"
-        },
-        {
-            title: "字段",
-            dataIndex: "changedFieldCount",
-            key: "changedFieldCount",
-            width: DEFAULT_COLUMN_WIDTHS.changedFields,
-            render: (changedFieldCount?: number | null) => <Tag>{changedFieldCount ?? 0} 项</Tag>
         },
         {
             title: "操作",

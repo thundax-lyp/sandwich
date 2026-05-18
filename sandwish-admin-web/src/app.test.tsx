@@ -780,8 +780,7 @@ describe("App", () => {
                                         operatorName: "Developer",
                                         source: "ADMIN_WEB",
                                         summary: "更新提交内容",
-                                        occurredAt: "2026-05-19T10:00:00.000+08:00",
-                                        changedFieldCount: 1
+                                        occurredAt: "2026-05-19T10:00:00.000+08:00"
                                     }
                                 ]
                             }
@@ -813,6 +812,7 @@ describe("App", () => {
         expect(screen.getByText("提交内容")).toBeInTheDocument();
         expect(screen.getByText("更新")).toBeInTheDocument();
         expect(screen.getByText("Developer")).toBeInTheDocument();
+        expect(screen.queryByRole("columnheader", { name: "字段" })).not.toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/audit/log/page",
             expect.objectContaining({

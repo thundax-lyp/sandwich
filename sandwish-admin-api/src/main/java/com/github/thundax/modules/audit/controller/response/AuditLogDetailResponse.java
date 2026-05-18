@@ -74,9 +74,6 @@ public class AuditLogDetailResponse implements Serializable {
     @ApiModelProperty(name = "changedFields", value = "变更字段")
     private List<AuditFieldResponse> changedFields;
 
-    @ApiModelProperty(name = "changedFieldCount", value = "变更字段数")
-    private Integer changedFieldCount;
-
     @ApiModelProperty(name = "idempotencyKey", value = "幂等键")
     private String idempotencyKey;
 

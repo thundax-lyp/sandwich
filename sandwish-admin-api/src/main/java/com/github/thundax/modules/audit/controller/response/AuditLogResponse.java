@@ -74,7 +74,4 @@ public class AuditLogResponse implements Serializable {
 
     @ApiModelProperty(name = "changedFields", value = "变更字段")
     private List<AuditFieldResponse> changedFields = new ArrayList<>();
-
-    @ApiModelProperty(name = "changedFieldCount", value = "变更字段数")
-    private Integer changedFieldCount;
 }

@@ -68,7 +68,6 @@ export interface AuditLogResponse {
     summary?: string | null;
     occurredAt?: string | null;
     changedFields?: AuditFieldResponse[] | null;
-    changedFieldCount?: number | null;
 }
 
 export interface AuditLogDetailResponse extends AuditLogResponse {

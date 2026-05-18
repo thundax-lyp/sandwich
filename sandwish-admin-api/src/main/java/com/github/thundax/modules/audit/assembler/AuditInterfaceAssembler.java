@@ -141,10 +141,6 @@ public final class AuditInterfaceAssembler {
                 .summary(entity.getSummary())
                 .occurredAt(entity.getOccurredAt())
                 .changedFields(toChangedFieldResponses(entity.getChangedFields()))
-                .changedFieldCount(
-                        entity.getChangedFields() == null
-                                ? 0
-                                : entity.getChangedFields().size())
                 .idempotencyKey(entity.getIdempotencyKey())
                 .previousVersion(entity.getPreviousVersion())
                 .beforeSnapshot(toSnapshotResponse(entity.getBeforeSnapshot()))
@@ -225,11 +221,7 @@ public final class AuditInterfaceAssembler {
                 .remoteAddr(entity.getRemoteAddr())
                 .summary(entity.getSummary())
                 .occurredAt(entity.getOccurredAt())
-                .changedFields(toChangedFieldResponses(entity.getChangedFields()))
-                .changedFieldCount(
-                        entity.getChangedFields() == null
-                                ? 0
-                                : entity.getChangedFields().size());
+                .changedFields(toChangedFieldResponses(entity.getChangedFields()));
     }
 
     private static AuditSnapshotResponse toSnapshotResponse(AuditSnapshot snapshot) {

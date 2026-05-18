@@ -42,6 +42,7 @@
 - 独立数据库表主键由 DAO implementation 通过 `SnowflakeIdGenerator` 生成。
 - `StoredObjectReferenceDO.fileId` 映射数据库列 `file_id`，由装配器转换为 `StoredObjectReference.objectId`。
 - `StoredObjectReferenceDO.fileId` 复用 `assist_storage.id`，引用关系表不单独生成关系 ID。
+- `StoredObjectReferenceDO.fileId` 在 MyBatis-Plus 映射中声明 `@TableId(type = IdType.INPUT)`，只用于消除关系表无单列主键的框架识别噪声，不改变数据库唯一性规则。
 - 对象生命周期固定由 `object_status` 表达。
 - DAO `deleteById` 将 `object_status` 更新为 `DELETED`。
 - DAO get/list/page 默认排除 `object_status = DELETED`；显式按 `DELETED` 查询时返回已删除对象。
@@ -137,6 +138,7 @@
 字段规则：
 
 - `file_id` 来源是 `assist_storage.id`，不生成新主键。
+- `fileId` 在 DO 中作为 MyBatis-Plus 虚拟主键声明，不表示 `file_id` 在数据库中单列唯一。
 - 同一个对象允许被多个业务资源引用。
 - 引用关系唯一性固定由 `file_id + reference_owner_type + reference_owner_id` 表达。
 - `StoredObjectReferenceDO` 固定不包含创建时间和更新时间。

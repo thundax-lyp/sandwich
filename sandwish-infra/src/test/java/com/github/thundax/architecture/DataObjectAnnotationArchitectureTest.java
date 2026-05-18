@@ -87,9 +87,7 @@ public class DataObjectAnnotationArchitectureTest extends AbstractArchitectureTe
                 storageBusinessDO.getFullName() + ".fileId must be Long",
                 Long.class.getName(),
                 fileIdField.getRawType().getFullName());
-        assertFalse(
-                storageBusinessDO.getFullName() + ".fileId must not be single-column TableId",
-                fileIdField.isAnnotatedWith(TableId.class));
+        assertTableId(storageBusinessDO, "fileId", "", IdType.INPUT, Long.class);
     }
 
     @Test

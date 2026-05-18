@@ -49,6 +49,7 @@
         <jetcache.version>2.5.16</jetcache.version>
         <rocketmq-spring-boot.version>2.0.3</rocketmq-spring-boot.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
+        <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
         <checkstyle.version>8.33</checkstyle.version>
         <spotless-maven-plugin.version>2.22.8</spotless-maven-plugin.version>
         <palantir-java-format.version>1.1.0</palantir-java-format.version>
@@ -452,5 +453,34 @@
 
     </build>
 
+    <profiles>
+        <profile>
+            <id>it</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven-failsafe-plugin.version}</version>
+                        <configuration>
+                            <includes>
+                                <include>**/*IT.java</include>
+                            </includes>
+                            <failIfNoTests>false</failIfNoTests>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

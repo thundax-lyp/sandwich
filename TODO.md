@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-maven`：增加根 Maven 集成测试 profile
-  - 范围文件：pom.xml
-  - 处理动作：新增 `it` profile 和 Failsafe 配置执行 `*IT.java`
-  - 验收点：`mvn test` 不执行 `*IT.java`，`mvn verify -Pit` 执行 `*IT.java`
-  - 重要度：10/10
-
 - [ ] `integration-maven`：补充 common-test 集成测试支撑依赖
   - 范围文件：sandwish-common/sandwish-common-test/pom.xml
   - 处理动作：增加集成测试支撑所需的测试依赖声明

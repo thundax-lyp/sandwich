@@ -11,13 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-guard`：增加集成测试 profile 防误连保护
-  - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationTestProfileGuard.java
-  - 范围文件：sandwish-common/sandwish-common-test/src/test/java/com/github/thundax/common/test/integration/IntegrationTestProfileGuardTest.java
-  - 处理动作：新增 `sandwish.integration-test.enabled=true` 启动校验支撑
-  - 验收点：未启用 integration-test 开关时集成测试启动校验失败
-  - 重要度：10/10
-
 - [ ] `captcha`：增加验证码值白名单配置模型
   - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/model/CaptchaWhitelistProperties.java
   - 处理动作：新增按验证码值配置白名单的模型

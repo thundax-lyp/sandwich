@@ -25,6 +25,7 @@ rocketmq:
     name-server: "127.0.0.1:${SANDWISH_IT_ROCKETMQ_NAMESRV_PORT:19876}"
     producer:
         group: ${SANDWISH_IT_ROCKETMQ_GROUP_PREFIX:sandwish-it-}admin-api-producer
+        send-message-timeout: ${SANDWISH_IT_ROCKETMQ_SEND_TIMEOUT_MS:15000}
 
 sandwish:
     integration-test:

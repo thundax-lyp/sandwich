@@ -9,20 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `admin-sys-it`：补齐菜单、部门、字典和日志集成测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminMenuQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminMenuMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminDepartmentQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminDepartmentMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminDictQueryIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminDictMutationIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminLogIT.java
-  - 处理动作：覆盖菜单、部门、字典、日志的查询、写入、移动、排序、删除和失败链路
-  - 验收点：MenuController、DepartmentController、DictController、LogController 全部业务接口通过真实 HTTP 入口完成断言
-  - 重要度：10/10
-
-## 待审阅任务项
-
 - [ ] `admin-open-storage-it`：补齐 OpenClient 与存储集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/open/AdminOpenClientQueryIT.java
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/open/AdminOpenClientMutationIT.java
@@ -32,6 +18,8 @@
   - 处理动作：覆盖 OpenClient 查询/写入/密钥重置、存储对象查询/上传/删除/排序、分片上传完整链路
   - 验收点：OpenClientController、StorageController、MultipartUploadController 全部业务接口通过真实 HTTP 入口完成成功和失败断言
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `admin-submission-audit-it`：补齐提交内容与审计集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/submission/AdminSubmissionQueryIT.java

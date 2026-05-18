@@ -68,15 +68,18 @@ services:
     depends_on:
       rocketmq-namesrv:
         condition: service_healthy
-    command: ["broker", "-n", "rocketmq-namesrv:9876"]
+    command: ["broker", "-n", "rocketmq-namesrv:9876", "-c", "/home/rocketmq/conf/broker.conf"]
     environment:
       HEAP_OPTS: "${SANDWISH_IT_ROCKETMQ_BROKER_HEAP_OPTS:--Xms256m -Xmx256m -Xmn128m -XX:MaxDirectMemorySize=128m}"
       NAMESRV_ADDR: "rocketmq-namesrv:9876"
     ports:
-      - "${SANDWISH_IT_ROCKETMQ_BROKER_PORT:-20911}:10911"
-      - "${SANDWISH_IT_ROCKETMQ_BROKER_HA_PORT:-20912}:10909"
+      - "${SANDWISH_IT_ROCKETMQ_BROKER_FAST_PORT:-20909}:20909"
+      - "${SANDWISH_IT_ROCKETMQ_BROKER_PORT:-20911}:20911"
+      - "${SANDWISH_IT_ROCKETMQ_BROKER_HA_PORT:-20912}:20912"
+    volumes:
+      - ./rocketmq/broker.conf:/home/rocketmq/conf/broker.conf:ro
     healthcheck:
-      test: ["CMD-SHELL", "bash -ec '</dev/tcp/127.0.0.1/10911'"]
+      test: ["CMD-SHELL", "bash -ec '</dev/tcp/127.0.0.1/20911'"]
       interval: 5s
       timeout: 5s
       retries: 30

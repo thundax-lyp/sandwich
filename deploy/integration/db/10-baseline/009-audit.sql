@@ -76,12 +76,12 @@ INSERT INTO `sys_log` (
     `method`, `request_uri`, `request_params`
 ) VALUES
     (
-        9100000000000090201, 9100000000000000101, 'INFO', '2026-01-01 10:02:00.000',
+        9100000000000090201, 9100000000000000101, 'ACCESS', '2026-01-01 10:02:00.000',
         'Integration admin system log', '127.0.0.1', 'integration-test',
         'POST', '/api/sys/log/page', '{}'
     ),
     (
-        9100000000000090202, 9100000000000000102, 'INFO', '2026-01-01 10:03:00.000',
+        9100000000000090202, 9100000000000000102, 'ACCESS', '2026-01-01 10:03:00.000',
         'Integration user system log', '127.0.0.1', 'integration-test',
         'POST', '/api/sys/user/page', '{}'
     )

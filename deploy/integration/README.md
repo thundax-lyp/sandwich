@@ -59,6 +59,8 @@ cp deploy/integration/.env.example deploy/integration/.env
 docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml up -d
 ```
 
+RocketMQ 发送超时可通过 `SANDWISH_IT_ROCKETMQ_SEND_TIMEOUT_MS` 调整，默认 `15000` 毫秒。该值只作用于 `application-it.yml`，用于覆盖集成测试冷启动时的首次路由发现耗时。
+
 查看服务状态：
 
 ```bash
@@ -91,6 +93,23 @@ docker compose --env-file deploy/integration/.env -f deploy/integration/docker-c
 docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs redis
 docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs rocketmq-namesrv
 docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs rocketmq-broker
+```
+
+RocketMQ 还需要确认 Broker 注册地址是宿主机可访问地址：
+
+```bash
+docker exec integration-rocketmq-broker-1 \
+  /home/rocketmq/rocketmq-5.4.0/bin/mqadmin clusterList -n rocketmq-namesrv:9876
+```
+
+期望 `#Addr` 为 `127.0.0.1:20911`。如果看到 `172.*:10911`，宿主机上的集成测试会连接容器内网地址并导致同步发送超时。
+
+如怀疑 Docker 内 RocketMQ 权限异常，检查 Broker 日志和存储目录：
+
+```bash
+docker logs integration-rocketmq-broker-1
+docker exec integration-rocketmq-broker-1 \
+  sh -lc 'grep -R "Permission denied\\|permission denied" -n /home/rocketmq/logs /home/rocketmq/store 2>/dev/null || true'
 ```
 
 ## Data Initialization

@@ -54,6 +54,7 @@ JSON 边界固定为：
 - HTTP API、接口模型、配置对象和项目内通用 JSON 读写固定使用 Spring Boot 默认 Jackson。
 - 对外 Request / Response 模型使用 Jackson 注解表达 JSON 字段名、空值和反序列化兼容规则。
 - 业务代码、基础设施代码和 API 入口不得新增或使用其他 JSON 包作为项目 JSON 处理能力。
+- Maven POM 不得直接声明非 Jackson JSON 包；生产源码不得 import 或直接调用非 Jackson JSON 包，固定通过架构测试门禁检查。
 - JetCache 等第三方组件自身配置中的内部 key convertor 名称不改变项目 JSON 边界；不得据此在业务代码中引入其他 JSON 包。
 
 ## Project Identity

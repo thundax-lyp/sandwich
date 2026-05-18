@@ -65,6 +65,34 @@ docker compose --env-file deploy/integration/.env -f deploy/integration/docker-c
 docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml ps
 ```
 
+## Health Check
+
+执行集成测试前，`mysql`、`redis`、`rocketmq-namesrv` 和 `rocketmq-broker` 必须全部处于 `healthy` 状态。
+
+检查命令：
+
+```bash
+docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml ps
+```
+
+期望状态：
+
+```text
+mysql                 Up ... (healthy)
+redis                 Up ... (healthy)
+rocketmq-namesrv      Up ... (healthy)
+rocketmq-broker       Up ... (healthy)
+```
+
+服务未健康时查看日志：
+
+```bash
+docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs mysql
+docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs redis
+docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs rocketmq-namesrv
+docker compose --env-file deploy/integration/.env -f deploy/integration/docker-compose.yml logs rocketmq-broker
+```
+
 ## Data Initialization
 
 集成测试数据固定由 `deploy/integration/db/` 提供。

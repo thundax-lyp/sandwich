@@ -12,13 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-env`：补充集成测试 Docker 环境自检
-  - 范围文件：deploy/integration/README.md
-  - 范围文件：deploy/integration/docker-compose.yml
-  - 处理动作：明确执行集成测试前必须启动并检查测试 Docker 环境
-  - 验收点：README 包含测试前启动命令和服务健康检查方式
-  - 重要度：9/10
-
 - [ ] `integration-db`：补充集成测试数据库目录说明
   - 范围文件：deploy/integration/db/README.md
   - 处理动作：新增 schema、baseline、scenario、cleanup SQL 的职责和执行顺序说明

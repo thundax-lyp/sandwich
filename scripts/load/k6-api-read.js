@@ -12,6 +12,7 @@ const tokenHeader = __ENV.SANDWICH_SMOKE_TOKEN_HEADER || "Access-Token";
 const openApiKey = __ENV.SANDWICH_SMOKE_OPEN_API_KEY || "";
 const openApiSecret = __ENV.SANDWICH_SMOKE_OPEN_API_SECRET || "";
 const thinkTimeSeconds = Number(__ENV.SANDWICH_LOAD_THINK_TIME_SECONDS || "1");
+const includePreAuth = (__ENV.SANDWICH_LOAD_INCLUDE_PRE_AUTH || "true") !== "false";
 
 const parseStages = (value) => {
     const raw = value || "30s:5,2m:20,30s:0";
@@ -24,11 +25,15 @@ const parseStages = (value) => {
     });
 };
 
+const loadStages = parseStages(__ENV.SANDWICH_LOAD_STAGES);
+
+http.setResponseCallback(http.expectedStatuses({ min: 200, max: 399 }, 401));
+
 export const options = {
     scenarios: {
         api_read: {
             executor: "ramping-vus",
-            stages: parseStages(__ENV.SANDWICH_LOAD_STAGES),
+            stages: loadStages,
             gracefulRampDown: "30s"
         }
     },
@@ -80,17 +85,19 @@ const openApiHeaders = (method, path, body) => {
 };
 
 export default function () {
-    expectStatus(
-        "admin auth pre-auth-session",
-        postJson("admin_auth_pre_auth_session", adminBaseUrl, "/api/auth/session/pre-auth-session"),
-        [200]
-    );
+    if (includePreAuth) {
+        expectStatus(
+            "admin auth pre-auth-session",
+            postJson("admin_auth_pre_auth_session", adminBaseUrl, "/api/auth/session/pre-auth-session"),
+            [200]
+        );
 
-    expectStatus(
-        "front auth pre-auth-session",
-        postJson("front_auth_pre_auth_session", frontBaseUrl, "/api/auth/session/pre-auth-session"),
-        [200]
-    );
+        expectStatus(
+            "front auth pre-auth-session",
+            postJson("front_auth_pre_auth_session", frontBaseUrl, "/api/auth/session/pre-auth-session"),
+            [200]
+        );
+    }
 
     expectStatus(
         "front auth check-login",
@@ -169,7 +176,8 @@ const renderMarkdownSummary = (data) => {
 - adminBaseUrl: ${adminBaseUrl}
 - frontBaseUrl: ${frontBaseUrl}
 - openBaseUrl: ${openBaseUrl}
-- stages: ${JSON.stringify(options.scenarios.api_read.stages)}
+- stages: ${JSON.stringify(loadStages)}
+- includePreAuth: ${includePreAuth}
 - generatedAt: ${new Date().toISOString()}
 
 ## Result Summary

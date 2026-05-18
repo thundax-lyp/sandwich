@@ -85,10 +85,10 @@ k6 镜像文件固定导出为：
 for image in deploy/image-files/*.tar; do docker load -i "$image"; done
 ```
 
-如果当前机器已经有基础设施镜像，或外网 registry 不稳定，可以跳过拉取：
+构建脚本默认跳过基础设施镜像拉取，并优先复用本机已有的 `sandwish/*` 基础镜像。若需要强制从外网 registry 更新基础设施镜像，可以开启拉取：
 
 ```bash
-SANDWISH_PULL_INFRA_IMAGES=false deploy/build-images.sh
+SANDWISH_PULL_INFRA_IMAGES=true deploy/build-images.sh
 ```
 
 ## Start

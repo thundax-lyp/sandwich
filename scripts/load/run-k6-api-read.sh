@@ -62,6 +62,7 @@ if command -v docker >/dev/null 2>&1; then
         -e SANDWICH_SMOKE_OPEN_API_KEY \
         -e SANDWICH_SMOKE_OPEN_API_SECRET \
         -e SANDWICH_LOAD_STAGES \
+        -e SANDWICH_LOAD_INCLUDE_PRE_AUTH \
         -e SANDWICH_LOAD_THINK_TIME_SECONDS \
         -e SANDWICH_LOAD_FAILED_THRESHOLD \
         -e SANDWICH_LOAD_P95_THRESHOLD \

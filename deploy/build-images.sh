@@ -6,7 +6,7 @@ TAG="${SANDWISH_IMAGE_TAG:-dev}"
 REGISTRY="${SANDWISH_IMAGE_REGISTRY:-sandwish}"
 NPM_INSTALL_MODE="${SANDWISH_NPM_INSTALL_MODE:-ci}"
 OUTPUT_DIR="${SANDWISH_IMAGE_OUTPUT_DIR:-$ROOT_DIR/deploy/image-files}"
-PULL_INFRA_IMAGES="${SANDWISH_PULL_INFRA_IMAGES:-true}"
+PULL_INFRA_IMAGES="${SANDWISH_PULL_INFRA_IMAGES:-false}"
 
 JRE_IMAGE="${SANDWISH_JRE_IMAGE:-eclipse-temurin:8-jre}"
 NGINX_IMAGE="${SANDWISH_NGINX_IMAGE:-nginx:1.27-alpine}"
@@ -78,23 +78,41 @@ docker build \
     -t "$K6_IMAGE" \
     "$ROOT_DIR"
 
+ensure_infra_image() {
+    source_image="$1"
+    target_image="$2"
+
+    if [ "$PULL_INFRA_IMAGES" = "true" ]; then
+        docker pull "$source_image"
+    fi
+
+    if docker image inspect "$source_image" >/dev/null 2>&1; then
+        docker tag "$source_image" "$target_image"
+        return
+    fi
+
+    if docker image inspect "$target_image" >/dev/null 2>&1; then
+        echo "==> Reusing existing Docker image: $target_image"
+        return
+    fi
+
+    echo "Missing Docker image: $source_image or $target_image" >&2
+    echo "Set SANDWISH_PULL_INFRA_IMAGES=true when the network can pull images." >&2
+    exit 1
+}
+
 if [ "$PULL_INFRA_IMAGES" = "true" ]; then
     echo "==> Pulling infrastructure images"
-    docker pull "$MYSQL_SOURCE_IMAGE"
-    docker pull "$REDIS_SOURCE_IMAGE"
-    docker pull "$ROCKETMQ_SOURCE_IMAGE"
-    docker pull "$MINIO_SOURCE_IMAGE"
-    docker pull "$MINIO_MC_SOURCE_IMAGE"
 else
     echo "==> Skipping infrastructure image pull"
 fi
 
-echo "==> Tagging infrastructure images into $REGISTRY/*"
-docker tag "$MYSQL_SOURCE_IMAGE" "$MYSQL_IMAGE"
-docker tag "$REDIS_SOURCE_IMAGE" "$REDIS_IMAGE"
-docker tag "$ROCKETMQ_SOURCE_IMAGE" "$ROCKETMQ_IMAGE"
-docker tag "$MINIO_SOURCE_IMAGE" "$MINIO_IMAGE"
-docker tag "$MINIO_MC_SOURCE_IMAGE" "$MINIO_MC_IMAGE"
+echo "==> Preparing infrastructure images in $REGISTRY/*"
+ensure_infra_image "$MYSQL_SOURCE_IMAGE" "$MYSQL_IMAGE"
+ensure_infra_image "$REDIS_SOURCE_IMAGE" "$REDIS_IMAGE"
+ensure_infra_image "$ROCKETMQ_SOURCE_IMAGE" "$ROCKETMQ_IMAGE"
+ensure_infra_image "$MINIO_SOURCE_IMAGE" "$MINIO_IMAGE"
+ensure_infra_image "$MINIO_MC_SOURCE_IMAGE" "$MINIO_MC_IMAGE"
 
 echo "==> Exporting Docker image files"
 mkdir -p "$OUTPUT_DIR"

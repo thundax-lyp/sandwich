@@ -9,11 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `integration-cleanup`：清理集成测试 RUNBOOK
-  - 范围文件：docs/30-designs/RUNBOOK-INTEGRATION-TEST.md
-  - 范围文件：TODO.md
-  - 处理动作：集成测试体系完成后删除 RUNBOOK 并删除或收窄对应 TODO
-  - 验收点：无残留 RUNBOOK 引用，`TODO.md` 不保留已完成任务
-  - 重要度：7/10
+暂无。
 
 ## 待讨论项

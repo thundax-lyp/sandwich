@@ -1,0 +1,10 @@
+sandwish/admin-api:dev -> sandwish-admin-api-dev.tar
+sandwish/front-api:dev -> sandwish-front-api-dev.tar
+sandwish/open-api:dev -> sandwish-open-api-dev.tar
+sandwish/nginx:dev -> sandwish-nginx-dev.tar
+sandwish/k6:dev -> sandwish-k6-dev.tar
+sandwish/mysql:8.4 -> sandwish-mysql.tar
+sandwish/redis:7.4-alpine -> sandwish-redis.tar
+sandwish/rocketmq:5.4.0 -> sandwish-rocketmq.tar
+sandwish/minio:RELEASE.2025-02-28T09-55-16Z -> sandwish-minio.tar
+sandwish/minio-mc:RELEASE.2025-02-21T16-00-46Z -> sandwish-minio-mc.tar

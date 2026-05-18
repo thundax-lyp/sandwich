@@ -33,21 +33,37 @@ public class IntegrationHttpClient {
     }
 
     public <T> T postJson(String path, Object body, Class<T> responseType) {
+        return postJson(path, body, null, responseType);
+    }
+
+    public <T> T postJson(String path, Object body, Map<String, String> headerValues, Class<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        addHeaders(headers, headerValues);
         return restOperations.postForObject(url(path), new HttpEntity<Object>(body, headers), responseType);
     }
 
     public <T> T postMultipart(String path, MultiValueMap<String, Object> parts, Class<T> responseType) {
+        return postMultipart(path, parts, null, responseType);
+    }
+
+    public <T> T postMultipart(
+            String path, MultiValueMap<String, Object> parts, Map<String, String> headerValues, Class<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        addHeaders(headers, headerValues);
         return restOperations.postForObject(
                 url(path), new HttpEntity<MultiValueMap<String, Object>>(parts, headers), responseType);
     }
 
     public MultiValueMap<String, Object> multipartBody(
             Map<String, ?> fields, String fileName, byte[] content, MediaType contentType) {
+        return multipartBody(fields, "file", fileName, content, contentType);
+    }
+
+    public MultiValueMap<String, Object> multipartBody(
+            Map<String, ?> fields, String fileField, String fileName, byte[] content, MediaType contentType) {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
         if (fields != null) {
             for (Map.Entry<String, ?> entry : fields.entrySet()) {
@@ -57,7 +73,9 @@ public class IntegrationHttpClient {
         if (fileName != null && content != null) {
             HttpHeaders fileHeaders = new HttpHeaders();
             fileHeaders.setContentType(contentType == null ? MediaType.APPLICATION_OCTET_STREAM : contentType);
-            body.add("file", new HttpEntity<Resource>(namedResource(fileName, content), fileHeaders));
+            body.add(
+                    fileField == null ? "file" : fileField,
+                    new HttpEntity<Resource>(namedResource(fileName, content), fileHeaders));
         }
         return body;
     }
@@ -83,5 +101,14 @@ public class IntegrationHttpClient {
             return value;
         }
         return value.substring(0, value.length() - 1);
+    }
+
+    private static void addHeaders(HttpHeaders headers, Map<String, String> headerValues) {
+        if (headerValues == null || headerValues.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, String> entry : headerValues.entrySet()) {
+            headers.set(entry.getKey(), entry.getValue());
+        }
     }
 }

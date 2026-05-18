@@ -9,6 +9,9 @@ import com.github.thundax.common.test.integration.IntegrationRedisCleaner;
 import com.github.thundax.common.test.integration.IntegrationTestProfileGuard;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -70,5 +73,34 @@ public abstract class AbstractAdminApiIT {
 
     protected void cleanOss() {
         new IntegrationOssCleaner(Paths.get(ossRootPath)).clean();
+    }
+
+    protected void prepareIntegrationData() {
+        cleanRedis();
+        cleanOss();
+        runSql(
+                Paths.get("db/schema"),
+                Paths.get("deploy/integration/db/90-cleanup"),
+                Paths.get("deploy/integration/db/10-baseline"));
+    }
+
+    protected Map<String, String> authHeaders(String token) {
+        return Collections.singletonMap("Access-Token", token);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> dataMap(Map<?, ?> response) {
+        Object data = response == null ? null : response.get("data");
+        return data == null ? new LinkedHashMap<String, Object>() : (Map<String, Object>) data;
+    }
+
+    protected Object data(Map<?, ?> response) {
+        return response == null ? null : response.get("data");
+    }
+
+    protected Map<String, Object> request(String name, Object value) {
+        Map<String, Object> request = new LinkedHashMap<String, Object>();
+        request.put(name, value);
+        return request;
     }
 }

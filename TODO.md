@@ -7,16 +7,7 @@
 - 已完成任务必须删除，不在 `TODO.md` 中打勾长期保留。
 - 完成记录保留在 commit 或 PR 中。
 
-## 当前任务项
-
 ## 待审阅任务项
-
-- [ ] `admin-it`：补齐后台认证与当前用户集成测试
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/auth/AdminAuthSessionIT.java
-  - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminCurrentUserIT.java
-  - 处理动作：覆盖后台登录、验证码白名单、token refresh、logout、权限失败、会话失效、当前用户信息、更新、密码、头像、菜单和权限接口
-  - 验收点：auth 和 CurrentUserController 关键链路通过真实 HTTP 入口完成成功和失败断言
-  - 重要度：10/10
 
 - [ ] `admin-sys-it`：补齐用户与角色集成测试
   - 范围文件：sandwish-admin-api/src/test/java/com/github/thundax/integration/sys/AdminUserQueryIT.java

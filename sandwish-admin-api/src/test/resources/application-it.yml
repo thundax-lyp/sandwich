@@ -10,7 +10,7 @@ spring:
         driver-class-name: ${SANDWISH_IT_DB_DRIVER:com.mysql.jdbc.Driver}
         url: "jdbc:mysql://127.0.0.1:${SANDWISH_IT_MYSQL_PORT:13306}/${SANDWISH_IT_MYSQL_DATABASE:sandwish_integration}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
         username: ${SANDWISH_IT_MYSQL_USER:sandwish_it}
-        password: ${SANDWISH_IT_MYSQL_PASSWORD:sandwish_it_password}
+        password: ${SANDWISH_IT_MYSQL_PASSWORD:sandwish_it}
     redis:
         url: "redis://:${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}@127.0.0.1:${SANDWISH_IT_REDIS_PORT:16379}/0"
         password: ${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}

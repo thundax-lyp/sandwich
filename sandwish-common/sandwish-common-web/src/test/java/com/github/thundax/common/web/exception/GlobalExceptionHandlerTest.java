@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.springframework.context.support.StaticMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 
@@ -43,6 +44,17 @@ public class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(WebErrorCode.BAD_REQUEST.getCode(), response.getBody().getCode());
         assertEquals("名称不能为空", response.getBody().getMessage());
+        assertNull(response.getBody().getData());
+    }
+
+    @Test
+    public void shouldConvertAccessDeniedExceptionToForbiddenResponse() {
+        ResponseEntity<ApiResponse<Object>> response =
+                handler.handleException(new AccessDeniedException("denied"), null);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(WebErrorCode.FORBIDDEN.getCode(), response.getBody().getCode());
+        assertEquals(WebErrorCode.FORBIDDEN.getMessage(), response.getBody().getMessage());
         assertNull(response.getBody().getData());
     }
 

@@ -3,12 +3,10 @@ package com.github.thundax.modules.sys.controller.request;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.thundax.modules.sys.utils.SysApiUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +25,6 @@ public class PersonalPasswordUpdateRequest implements Serializable {
     @ApiModelProperty(name = "password", value = "新密码")
     @JsonProperty("password")
     @NotEmpty(message = "\"新密码\"不能为空")
-    @Pattern(regexp = SysApiUtils.PASSWORD_VALIDATE_PATTERN, message = SysApiUtils.PASSWORD_VALIDATE_MESSAGE)
     private String password;
 
     @ApiModelProperty(name = "token", value = "令牌")

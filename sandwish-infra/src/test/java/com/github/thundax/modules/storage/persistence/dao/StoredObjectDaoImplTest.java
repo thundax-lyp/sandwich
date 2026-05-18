@@ -1,6 +1,7 @@
 package com.github.thundax.modules.storage.persistence.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -129,6 +130,20 @@ public class StoredObjectDaoImplTest {
         when(mapper.selectObjs(any())).thenReturn(Collections.singletonList(null));
 
         assertEquals(0, dao.maxPriority());
+    }
+
+    @Test
+    public void shouldIncludeDeletedRowsWhenReadingMaxPriority() {
+        StoredObjectMapper mapper = mock(StoredObjectMapper.class);
+        StoredObjectReferenceMapper referenceMapper = mock(StoredObjectReferenceMapper.class);
+        StoredObjectDaoImpl dao = dao(mapper, referenceMapper);
+        when(mapper.selectObjs(any())).thenReturn(Collections.<Object>singletonList(20));
+
+        assertEquals(20, dao.maxPriority());
+
+        ArgumentCaptor<Wrapper> wrapperCaptor = ArgumentCaptor.forClass(Wrapper.class);
+        verify(mapper).selectObjs(wrapperCaptor.capture());
+        assertFalse(normalizedSql(wrapperCaptor.getValue()).contains("object_status"));
     }
 
     private StoredObjectDaoImpl dao(StoredObjectMapper mapper, StoredObjectReferenceMapper referenceMapper) {

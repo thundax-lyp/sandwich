@@ -1,6 +1,7 @@
 package com.github.thundax.common.web.exception;
 
 import org.springframework.core.Ordered;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,6 +10,9 @@ public class DefaultExceptionTranslator implements ExceptionTranslator, Ordered 
 
     @Override
     public SandwishException translate(Exception exception) {
+        if (exception instanceof AccessDeniedException) {
+            return new SandwishException(WebErrorCode.FORBIDDEN);
+        }
         if (exception instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException validException = (MethodArgumentNotValidException) exception;
             return new BadRequestException(
